@@ -1,0 +1,62 @@
+//-----------------------------------------------------------------------------
+/*!
+   \file
+   \brief       Application list display delegate (header)
+
+   See cpp file for detailed description
+
+   \implementation
+   project     openSYDE
+   copyright   STW (c) 1999-20xx
+   license     use only under terms of contract / confidential
+
+   created     31.01.2017  STW/B.Bayer
+   \endimplementation
+*/
+//-----------------------------------------------------------------------------
+#ifndef C_SDNDEDBLISTDELEGATE_H
+#define C_SDNDEDBLISTDELEGATE_H
+
+/* -- Includes ------------------------------------------------------------- */
+#include <QStyledItemDelegate>
+
+#include "stwtypes.h"
+#include "C_SdNdeDbWidget.h"
+
+/* -- Namespace ------------------------------------------------------------ */
+namespace stw_opensyde_gui_logic
+{
+/* -- Global Constants ----------------------------------------------------- */
+
+/* -- Types ---------------------------------------------------------------- */
+
+class C_SdNdeDbListDelegate :
+   public QStyledItemDelegate
+{
+   Q_OBJECT
+
+public:
+   C_SdNdeDbListDelegate(QObject * const opc_Parent = NULL);
+
+   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
+   //lint -save -e1960
+   virtual void paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
+                      const QModelIndex & orc_Index) const override;
+   //lint -restore
+
+   void StartPaint(const stw_types::sint32 s32_Index, stw_opensyde_gui::C_SdNdeDbWidget * const opc_MovingWidget);
+   void StopPaint(void);
+
+private:
+   //Avoid call
+   C_SdNdeDbListDelegate(const C_SdNdeDbListDelegate &);
+   C_SdNdeDbListDelegate & operator =(const C_SdNdeDbListDelegate &);
+
+   stw_opensyde_gui::C_SdNdeDbWidget * mpc_ApplicationWidget;
+   stw_types::sint32 ms32_IndexPaint;
+};
+
+/* -- Extern Global Variables ---------------------------------------------- */
+} //end of namespace
+
+#endif

@@ -1,0 +1,76 @@
+//-----------------------------------------------------------------------------
+/*!
+   \file
+   \brief       Data class for communication interface settings (header)
+
+   See cpp file for detailed description
+
+   \implementation
+   project     openSYDE
+   copyright   STW (c) 1999-20xx
+   license     use only under terms of contract / confidential
+
+   created     22.12.2016  STW/M.Echtler
+   \endimplementation
+*/
+//-----------------------------------------------------------------------------
+#ifndef C_OSCNODECOMINTERFACESETTINGS_H
+#define C_OSCNODECOMINTERFACESETTINGS_H
+
+/* -- Includes ------------------------------------------------------------- */
+
+#include "stwtypes.h"
+#include "CSCLString.h"
+#include "C_OSCSystemBus.h"
+
+/* -- Namespace ------------------------------------------------------------ */
+namespace stw_opensyde_core
+{
+/* -- Global Constants ----------------------------------------------------- */
+
+/* -- Types ---------------------------------------------------------------- */
+
+class C_OSCNodeComInterfaceSettings
+{
+public:
+   class C_IpAddress
+   {
+   public:
+      C_IpAddress(void);
+
+      stw_types::uint8 au8_IpAddress[4];      //IP V4 address
+      stw_types::uint8 au8_NetMask[4];        //IP V4 net mask
+      stw_types::uint8 au8_DefaultGateway[4]; //IP V4 default gateway
+   };
+
+   C_OSCNodeComInterfaceSettings(void);
+   ~C_OSCNodeComInterfaceSettings(void);
+
+   void CalcHash(stw_types::uint32 & oru32_HashValue) const;
+
+   C_OSCSystemBus::E_Type e_InterfaceType; ///< e.g. CAN, ethernet
+   stw_types::uint8 u8_InterfaceNumber;    ///< 0 = first bus
+   stw_types::uint8 u8_NodeID;             ///< Node ID on bus
+
+   C_IpAddress c_Ip; ///< only used with interface type ethernet
+
+   bool q_IsUpdateEnabled;                   ///< Flag for update enabled using this bus
+   bool q_IsRoutingEnabled;                  ///< Flag for routing enabled using this bus
+   bool q_IsDiagnosisEnabled;                ///< Flag for diagnosis enabled using this bus
+   bool q_IsComProtocolL2Enabled;            ///< Flag for communication protocol L2 enabled using this bus
+   bool q_IsComProtocolCANOpenSafetyEnabled; ///< Flag for communication protocol CANOpenSafety enabled
+   ///< using this bus
+   bool q_IsComProtocolECeSEnabled; ///< Flag for communication protocol ECeS enabled using this bus
+   bool q_IsBusConnected;           ///< Flag if there is a valid bus connected to this interface
+   stw_types::uint32 u32_BusIndex;  ///< Target bus index this interface connects to
+   ///< (index in system definition)
+   ///< Only valid if bus flag q_IsBusConnected is true
+
+   void AddConnection(const stw_types::uint32 & oru32_BusIndex);
+   void RemoveConnection(void);
+};
+
+/* -- Extern Global Variables ---------------------------------------------- */
+} //end of namespace
+
+#endif

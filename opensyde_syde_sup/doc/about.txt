@@ -1,0 +1,26 @@
+---------------------------------------------------------------------
+File:      about.txt
+Content:   Information about this project
+Author:    GS / gesa.landsgesell@sensor-technik.de
+---------------------------------------------------------------------
+
+Description:
+============
+SYDEsup is a console application for updating your system with a service
+update package created with openSYDE.
+
+Features:
+* Unpack Service Update Package and update system with resulting information
+* Communication via CAN or Ethernet
+* Configuration through command line parameters (call .exe without parameters to get a list of options)
+
+Non-Features:
+* Update system without previous use of openSYDE to create Service Update Package
+
+Platform:
+=========
+MS Windows (Win10 verified)
+
+Requires:
+=========
+- STW "CANDLL" to access CAN bus

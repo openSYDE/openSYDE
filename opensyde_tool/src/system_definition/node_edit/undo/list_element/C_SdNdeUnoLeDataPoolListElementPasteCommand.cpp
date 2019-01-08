@@ -1,0 +1,181 @@
+//-----------------------------------------------------------------------------
+/*!
+   \internal
+   \file
+   \brief       Data pool list element paste undo command (implementation)
+
+   Data pool list element paste undo command
+
+   \implementation
+   project     openSYDE
+   copyright   STW (c) 1999-20xx
+   license     use only under terms of contract / confidential
+
+   created     25.01.2017  STW/M.Echtler
+   \endimplementation
+*/
+//-----------------------------------------------------------------------------
+
+/* -- Includes ------------------------------------------------------------- */
+#include "precomp_headers.h"
+
+#include "stwtypes.h"
+#include "stwerrors.h"
+#include "C_SdNdeUnoLeDataPoolListElementPasteCommand.h"
+#include "C_SdClipBoardHelper.h"
+#include "C_PuiSdHandler.h"
+#include "constants.h"
+#include "C_GtGetText.h"
+#include "C_OgeWiCustomMessage.h"
+#include "C_SdNdeDataPoolListTableView.h"
+
+/* -- Used Namespaces ------------------------------------------------------ */
+using namespace stw_types;
+using namespace stw_opensyde_gui_logic;
+using namespace stw_opensyde_gui;
+using namespace stw_opensyde_core;
+using namespace stw_errors;
+using namespace stw_opensyde_gui_elements;
+
+/* -- Module Global Constants ---------------------------------------------- */
+
+/* -- Types ---------------------------------------------------------------- */
+
+/* -- Global Variables ----------------------------------------------------- */
+
+/* -- Module Global Variables ---------------------------------------------- */
+
+/* -- Module Global Function Prototypes ------------------------------------ */
+
+/* -- Implementation ------------------------------------------------------- */
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Default constructor
+
+   \param[in]     oru32_NodeIndex                  Node index
+   \param[in]     oru32_DataPoolIndex              Node data pool index
+   \param[in]     oru32_DataPoolListIndex          Node data pool list index
+   \param[in,out] opc_DataPoolListModelViewManager Data pool lists model view manager to get objects to perform actions on
+   \param[in,out] opc_Parent                       Optional pointer to parent
+
+   \created     25.01.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+C_SdNdeUnoLeDataPoolListElementPasteCommand::C_SdNdeUnoLeDataPoolListElementPasteCommand(const uint32 & oru32_NodeIndex,
+                                                                                         const uint32 & oru32_DataPoolIndex, const uint32 & oru32_DataPoolListIndex, C_SdNdeDataPoolListModelViewManager * const opc_DataPoolListModelViewManager,
+                                                                                         QUndoCommand * const opc_Parent)
+   :
+   C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex,
+                                                       opc_DataPoolListModelViewManager,
+                                                       std::vector<stw_types::uint32>(),
+                                                       "Paste List element", opc_Parent)
+{
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Initial setup of paste command (Check clipboard for valid data)
+
+   \param[in] oru32_FirstIndex First new index
+
+   \return
+   true:  Worked
+   false: Discarded
+
+   \created     27.01.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+bool C_SdNdeUnoLeDataPoolListElementPasteCommand::InitialSetup(const stw_types::uint32 & oru32_FirstIndex)
+{
+   std::vector<C_OSCNodeDataPoolListElement> c_OSCContent;
+   std::vector<C_PuiSdNodeDataPoolListElement> c_UIContent;
+   bool q_Retval =
+      (C_SdClipBoardHelper::h_LoadToDataPoolListElementsFromClipBoard(c_OSCContent, c_UIContent) == C_NO_ERR);
+
+   if (q_Retval == true)
+   {
+      q_Retval = (c_OSCContent.size() == c_UIContent.size());
+      if (q_Retval == true)
+      {
+         const C_OSCNodeDataPoolList * pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+            this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
+         if (pc_List != NULL)
+         {
+            q_Retval =
+               (static_cast<uint32>(pc_List->c_Elements.size() + c_OSCContent.size()) <=
+                mu32_NODE_DATA_POOL_LIST_ELEMENT_MAX);
+            if (q_Retval == true)
+            {
+               std::vector<stw_types::uint32> c_Indices;
+
+               c_Indices.reserve(c_OSCContent.size());
+               q_Retval = (c_OSCContent.size() == c_UIContent.size());
+               for (uint32 u32_NewIndices = 0; u32_NewIndices < c_OSCContent.size(); ++u32_NewIndices)
+               {
+                  c_Indices.push_back(oru32_FirstIndex + u32_NewIndices);
+               }
+               this->SetIndices(c_Indices);
+               this->SetInitialData(c_OSCContent, c_UIContent);
+            }
+            else
+            {
+               QString c_Text;
+               C_OgeWiCustomMessage c_MessageBox(this->mpc_DataPoolListModelViewManager->GetElementView(
+                                                    this->mu32_NodeIndex, this->mu32_DataPoolIndex,
+                                                    this->mu32_DataPoolListIndex));
+               c_MessageBox.SetType(C_OgeWiCustomMessage::E_Type::eERROR);
+               const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+                  this->mu32_NodeIndex,
+                  this->mu32_DataPoolIndex);
+               if (pc_DataPool != NULL)
+               {
+                  if (pc_DataPool->e_Type == C_OSCNodeDataPool::eDIAG)
+                  {
+                     c_Text = C_GtGetText::h_GetText("Variables");
+                  }
+                  else
+                  {
+                     c_Text = C_GtGetText::h_GetText("Parameters");
+                  }
+               }
+               else
+               {
+                  c_Text = C_GtGetText::h_GetText("Data elements");
+               }
+               c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText("Only %1 %2 allowed per List.")).arg(
+                                              mu32_NODE_DATA_POOL_LIST_ELEMENT_MAX).arg(c_Text));
+               c_MessageBox.Execute();
+            }
+         }
+      }
+   }
+
+   return q_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Redo add
+
+   \created     27.01.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_SdNdeUnoLeDataPoolListElementPasteCommand::redo(void)
+{
+   this->Add();
+   C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::redo();
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Undo add
+
+   \created     27.01.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_SdNdeUnoLeDataPoolListElementPasteCommand::undo(void)
+{
+   C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::undo();
+   this->Delete();
+}

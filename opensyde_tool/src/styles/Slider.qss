@@ -1,0 +1,73 @@
+/* --------------------------------------------------------------------- */
+stw_opensyde_gui_elements--C_OgeSliDefault::groove:horizontal {
+   height: 3px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
+}
+
+stw_opensyde_gui_elements--C_OgeSliDefault::handle:horizontal {
+    border-style:solid;
+    border-radius: 0px;
+    border-width: 1px;
+
+    width: 15px;
+
+    margin: -7px 0; /*  handle is placed by default on the contents rect of the groove. Expand outside the groove */
+    
+}
+
+/*BORDER*/
+stw_opensyde_gui_elements--C_OgeSliDashboard[Style="OPENSYDE_BRIGHT"]::groove,
+stw_opensyde_gui_elements--C_OgeSliDashboard[Style="OPENSYDE_DARK"]::groove,
+stw_opensyde_gui_elements--C_OgeSliDashboard[Style="OPENSYDE_BRIGHT"]::handle,
+stw_opensyde_gui_elements--C_OgeSliDashboard[Style="OPENSYDE_DARK"]::handle {
+border-style:none;
+}
+
+
+stw_opensyde_gui_elements--C_OgeSliDashboard[Style="OPENSYDE_2_BRIGHT"]::groove:horizontal,
+stw_opensyde_gui_elements--C_OgeSliDashboard[Style="OPENSYDE_2_DARK"]::groove:horizontal {
+height: 3px; 
+border-width: 1px;
+border-style: solid; 
+}
+
+stw_opensyde_gui_elements--C_OgeSliDashboard[Style="FLAT_BRIGHT"][Type="1"]::groove:horizontal,
+stw_opensyde_gui_elements--C_OgeSliDashboard[Style="FLAT_DARK"][Type="1"]::groove:horizontal {
+height: 1px;
+}
+stw_opensyde_gui_elements--C_OgeSliDashboard[Style="FLAT_BRIGHT"][Type="2"]::groove:horizontal,
+stw_opensyde_gui_elements--C_OgeSliDashboard[Style="FLAT_DARK"][Type="2"]::groove:horizontal {
+height: 3px;
+}
+
+stw_opensyde_gui_elements--C_OgeSliDashboard[Style="SKEUOMORPH_BRIGHT"][Type="1"]::groove:horizontal,
+stw_opensyde_gui_elements--C_OgeSliDashboard[Style="SKEUOMORPH_DARK"][Type="1"]::groove:horizontal,
+stw_opensyde_gui_elements--C_OgeSliDashboard[Style="SKEUOMORPH_BRIGHT"][Type="2"]::groove:horizontal,
+stw_opensyde_gui_elements--C_OgeSliDashboard[Style="SKEUOMORPH_DARK"][Type="2"]::groove:horizontal {
+height: 5px; 
+border-top-width: 1px;
+border-top-style: solid; 
+border-left-width: 1px;
+border-left-style: solid; 
+border-right-width: 1px;
+border-right-style: solid; 
+border-bottom-width: 1px;
+border-bottom-style: solid;
+}
+stw_opensyde_gui_elements--C_OgeSliDashboard[Style="SKEUOMORPH_BRIGHT"][Type="1"]::groove:horizontal,
+stw_opensyde_gui_elements--C_OgeSliDashboard[Style="SKEUOMORPH_DARK"][Type="1"]::groove:horizontal {
+border-radius: 1px;
+}
+stw_opensyde_gui_elements--C_OgeSliDashboard[Style="SKEUOMORPH_BRIGHT"][Type="2"]::groove:horizontal,
+stw_opensyde_gui_elements--C_OgeSliDashboard[Style="SKEUOMORPH_DARK"][Type="2"]::groove:horizontal {
+border-radius: 2px;
+}
+
+/*IMAGES*/
+/*OPENSYDE images*/
+
+stw_opensyde_gui_elements--C_OgeSliDashboard::handle {
+image: none;
+}
+
+
+/* --------------------------------------------------------------------- */

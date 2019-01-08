@@ -1,0 +1,27 @@
+---------------------------------------------------------------------
+File:      build.txt
+Content:   How to build project
+Author:    BAY / bernd.bayer@sensor-technik.de
+---------------------------------------------------------------------
+Used Compiler:
+==============
+MinGW: 5.3.0
+
+Editor:
+=======
+Qt Creator 4.0.2
+
+Special Libraries:
+==================
+Qt SDK 5.7.0
+
+How to build:
+=============
+1. Open Qt Creator
+2. Open project
+ -> should be located at .../pjt/*.pro
+3. Select the Qt kit
+4. Go to the Projects view
+5. Select the Build button below your kit
+6. Configure the result folder for each build configuration
+7. Build the project

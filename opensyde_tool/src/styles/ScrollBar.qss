@@ -1,0 +1,316 @@
+/* --------------------------------------------------------------------- */
+/*Scrollbar generic customization*/
+QScrollBar:horizontal,
+QScrollBar:vertical {
+margin-top:0px;
+margin-bottom:0px;
+margin-right:0px;
+margin-left:0px;
+}
+
+QScrollBar::sub-line,
+QScrollBar::add-line {
+width:0px;
+height:0px;
+}
+
+QScrollBar::add-page,
+QScrollBar::sub-page,
+QScrollBar::handle {
+border-width:1px;
+border-style:solid;
+border-radius:2px;
+}
+
+QScrollBar::sub-page {
+border-bottom-width:0px;
+border-bottom-left-radius: 0px;
+border-bottom-right-radius: 0px;
+}
+
+QScrollBar::add-page {
+border-top-width:0px;
+border-top-left-radius: 0px;
+border-top-right-radius: 0px;
+}
+
+QScrollBar::handle {
+min-height: 15px;
+}
+
+stw_opensyde_gui_elements--C_OgeTedTable QScrollBar::handle {
+min-height: 0px;
+}
+
+stw_opensyde_gui_elements--C_OgeScMain,
+stw_opensyde_gui_elements--C_OgeDarkScrollArea,
+stw_opensyde_gui_elements--C_OgeTransparentScrollArea {
+border-style:none;
+}
+
+/*Scrollbar customization start (only: width and padding. Other items are generic */
+/*toolbox scrollbar*/
+/*topology scrollbar*/
+stw_opensyde_gui_elements--C_OgeSmoothScrollArea QScrollBar:vertical,
+stw_opensyde_gui--C_SebGraphicsView QScrollBar:vertical,
+stw_opensyde_gui_elements--C_OgeFrame QScrollBar:vertical {
+width:11px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
+padding-right:6px;
+padding-top:15px;
+padding-bottom:15px;
+}
+
+stw_opensyde_gui_elements--C_OgeDarkScrollArea QScrollBar:horizontal,
+stw_opensyde_gui_elements--C_OgeSmoothScrollArea QScrollBar:horizontal,
+stw_opensyde_gui--C_SebGraphicsView QScrollBar:horizontal,
+stw_opensyde_gui_elements--C_OgeFrame QScrollBar:horizontal {
+height:11px; /*real width of scroll bar is 5px; Real width = width - padding-bottom/top */
+padding-bottom:6px;
+padding-left:15px;
+padding-right:15px;
+}
+
+/*List/table scrollbar*/
+stw_opensyde_gui--C_SyvUpProgressLog QScrollBar:vertical,
+stw_opensyde_gui_elements--C_OgeTedSdListHeader QScrollBar:vertical,
+stw_opensyde_gui_elements--C_OgeTedSyListHeader QScrollBar:vertical,
+stw_opensyde_gui_logic--C_PopFileTableView QScrollBar:vertical,
+stw_opensyde_gui--C_SdBueMessageTableView QScrollBar:vertical,
+stw_opensyde_gui--C_SdBueSignalTableView QScrollBar:vertical,
+stw_opensyde_gui--C_SdNdeDataPoolComListWidget QScrollBar:vertical {
+width:8px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
+padding-left:3px;
+padding-right:0px;
+padding-top:0px;
+padding-bottom:0px;
+}
+
+stw_opensyde_gui--C_SyvUpProgressLog QScrollBar:horizontal,
+stw_opensyde_gui_logic--C_PopFileTableView QScrollBar:horizontal,
+stw_opensyde_gui--C_SdBueMessageTableView QScrollBar:horizontal,
+stw_opensyde_gui--C_SdBueSignalTableView QScrollBar:horizontal,
+stw_opensyde_gui--C_SdNdeDataPoolComListWidget QScrollBar:horizontal {
+height:8px; /*real width of scroll bar is 5px; Real height = height - padding-bottom/top */
+padding-top:3px;
+padding-bottom:0px;
+padding-left:0px;
+padding-right:0px;
+}
+
+/* message tables scroll bar */
+stw_opensyde_gui--C_SdBueMessageTableView QScrollBar:vertical,
+stw_opensyde_gui--C_SdBueSignalTableView QScrollBar:vertical {
+width:8px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
+padding-left:3px;
+padding-right:0px;
+padding-top:34px;
+padding-bottom:0px;
+}
+
+/* node data pool table scroll bar */
+stw_opensyde_gui--C_SdBueMessageRxList QScrollBar:vertical,
+stw_opensyde_gui--C_SdNdeDbListWidget QScrollBar[C_SdNdeDbWidget="true"]:vertical,
+stw_opensyde_gui--C_SyvDcConnectedNodeList QScrollBar:vertical,
+stw_opensyde_gui--C_SyvDcExistingNodeList QScrollBar:vertical,
+stw_opensyde_gui--C_SyvDaItPaArView QScrollBar:vertical,
+stw_opensyde_gui_elements--C_OgeTableWidgetComIF QScrollBar:vertical,
+stw_opensyde_gui--C_SdNdeDataPoolListArrayEditView QScrollBar:vertical,
+stw_opensyde_gui--C_SdNdeDataPoolListDataSetView QScrollBar:vertical,
+stw_opensyde_gui--C_SyvDaPeUpdateModeTableView QScrollBar:vertical,
+stw_opensyde_gui--C_SdNdeDataPoolListTableView QScrollBar:vertical,
+stw_opensyde_gui--C_SyvDaItPaTableView QScrollBar:vertical,
+stw_opensyde_gui--C_SyvDaItPaTreeView QScrollBar:vertical,
+stw_opensyde_gui--C_SyvDaItTaView QScrollBar:vertical,
+stw_opensyde_gui--C_SyvDaItPaListTreeWidget QScrollBar[C_SyvDaItPaListTreeWidget="true"]:vertical,
+stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget QScrollBar[C_SyvDaPeUpdateModeTreeWidget="true"]:vertical,
+stw_opensyde_gui--C_SdNdeDataPoolListsTreeWidget QScrollBar[C_SdNdeDataPoolListsTreeWidget="true"]:vertical {
+width:10px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
+padding-left:5px;
+padding-right:0px;
+padding-bottom:0px;
+}
+
+stw_opensyde_gui_elements--C_OgeScNaviBar QScrollBar:vertical {
+width:10px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
+padding-left:0px;
+padding-right:5px;
+padding-bottom:4px;
+padding-top:3px;
+}
+
+stw_opensyde_gui_elements--C_OgeTableWidgetComIF QScrollBar:vertical {
+padding-top:28px; /* Header size */
+}
+
+stw_opensyde_gui--C_SyvDaItPaTreeView QScrollBar:vertical,
+stw_opensyde_gui--C_SyvDaItTaView QScrollBar:vertical {
+padding-top:30px; /* Header size */
+}
+
+stw_opensyde_gui--C_SyvDaItPaTableView QScrollBar[C_SyvDaItPaTableView="true"]:vertical {
+padding-top:30px; /* Header size */
+}
+stw_opensyde_gui--C_SdNdeDataPoolListTableView QScrollBar[C_SdNdeDataPoolListTableView="true"]:vertical {
+padding-top:47px; /* Header size should be 50... */
+}
+stw_opensyde_gui--C_SyvDaPeUpdateModeTableView QScrollBar[C_SyvDaPeUpdateModeTableView="true"]:vertical {
+padding-top:50px; /* Header size */
+}
+
+stw_opensyde_gui--C_SdNdeDataPoolListDataSetView QScrollBar[C_SdNdeDataPoolListDataSetView="true"]:vertical {
+padding-top:34px; /* Header size */
+}
+
+stw_opensyde_gui--C_SyvDaItPaListTreeWidget QScrollBar[C_SyvDaItPaListTreeWidget="true"]:vertical,
+stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget QScrollBar[C_SyvDaPeUpdateModeTreeWidget="true"]:vertical,
+stw_opensyde_gui--C_SdNdeDataPoolListsTreeWidget QScrollBar[C_SdNdeDataPoolListsTreeWidget="true"]:vertical {
+padding-top:0px;
+}
+
+stw_opensyde_gui--C_SyvDaItPaTreeView QScrollBar:horizontal,
+stw_opensyde_gui--C_SyvDaItTaView QScrollBar:horizontal,
+stw_opensyde_gui--C_SyvDaItPaTableView QScrollBar:horizontal,
+stw_opensyde_gui--C_SyvDaPeUpdateModeTableView QScrollBar:horizontal,
+stw_opensyde_gui--C_SdNdeDataPoolListTableView QScrollBar:horizontal,
+stw_opensyde_gui--C_SyvDaItPaListTreeWidget QScrollBar[C_SyvDaItPaListTreeWidget="true"]:horizontal,
+stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget QScrollBar[C_SyvDaPeUpdateModeTreeWidget="true"]:horizontal,
+stw_opensyde_gui--C_SdNdeDataPoolListsTreeWidget QScrollBar[C_SdNdeDataPoolListsTreeWidget="true"]:horizontal {
+height:10px; /*real width of scroll bar is 5px; Real height = height - padding-bottom/top */
+padding-top:5px;
+padding-bottom:0px;
+padding-left:0px;
+padding-right:0px;
+}
+
+stw_opensyde_gui_elements--C_OgeScNaviBar QScrollBar:horizontal {
+height:5px; /*real width of scroll bar is 5px; Real height = height - padding-bottom/top */
+padding-top:0px;
+padding-bottom:0px;
+padding-left:3px;
+padding-right:4px;
+}
+
+stw_opensyde_gui--C_SyvDaItPaArView QScrollBar:horizontal,
+stw_opensyde_gui--C_SdNdeDataPoolListArrayEditView QScrollBar:horizontal
+{
+height:10px; /*real width of scroll bar is 5px; Real height = height - padding-bottom/top */
+padding-top:5px;
+padding-bottom:0px;
+padding-left:68px; /* Header size */
+padding-right:0px;
+}
+
+stw_opensyde_gui--C_SdNdeDataPoolListDataSetView QScrollBar:horizontal
+{
+height:10px; /*real width of scroll bar is 5px; Real height = height - padding-bottom/top */
+padding-top:5px;
+padding-bottom:0px;
+padding-left:95px;
+padding-right:0px;
+}
+
+/*Textedit/combo box scrollbar */
+stw_opensyde_gui_elements--C_OgeTedPropertiesComment QScrollBar:vertical,
+stw_opensyde_gui_elements--C_OgeTebReport QScrollBar:vertical
+{
+width:5px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
+padding-right:0px;
+padding-top:3px;
+padding-bottom:3px;
+}
+/*--------- horizontal not tested/used yet*/
+stw_opensyde_gui_elements--C_OgeTedPropertiesComment QScrollBar:horizontal,
+stw_opensyde_gui_elements--C_OgeTebReport QScrollBar:horizontal
+{
+height:5px; /*real width of scroll bar is 5px; Real height = height - padding-bottom/top */
+padding-bottom:0px;
+padding-left:3px;
+padding-right:3px;
+}
+
+/* Message box details scrollbar */
+stw_opensyde_gui_elements--C_OgeTebMessageDetails QScrollBar:vertical {
+width:10px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
+padding-right:5px;
+padding-top:6px;
+padding-bottom:6px;
+}
+/*--------- horizontal not tested/used yet*/
+stw_opensyde_gui_elements--C_OgeTebMessageDetails QScrollBar:horizontal {
+height:5px; /*real height of scroll bar is 5px; Real height = height - padding-bottom/top */
+padding-bottom:0px;
+padding-left:3px;
+padding-right:3px;
+}
+
+/*Combo box scrollbar */
+stw_opensyde_gui_elements--C_OgeCbxListHeader QAbstractItemView QScrollBar:vertical,
+stw_opensyde_gui_elements--C_OgeCbxFontProperties QAbstractItemView QScrollBar:vertical,
+stw_opensyde_gui_elements--C_OgeCbxText QAbstractItemView QScrollBar:vertical {
+width:7px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
+padding-right:2px;
+padding-top:1px;
+padding-bottom:1px;
+}
+/*--------- horizontal not tested/used yet*/
+stw_opensyde_gui_elements--C_OgeCbxListHeader QAbstractItemView QScrollBar:horizontal,
+stw_opensyde_gui_elements--C_OgeCbxFontProperties QAbstractItemView QScrollBar:horizontal,
+stw_opensyde_gui_elements--C_OgeCbxText QAbstractItemView QScrollBar:horizontal {
+height:7px; /*real width of scroll bar is 5px; Real height = height - padding-bottom/top */
+padding-bottom:2px;
+padding-left:1px;
+padding-right:1px;
+}
+
+/*Tree scrollbar */
+stw_opensyde_gui--C_SdSearchTreeWidget QScrollBar:vertical {
+width:8px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
+padding-right:3px;
+padding-top:3px;
+padding-bottom:3px;
+}
+
+stw_opensyde_gui--C_SdBueNodeSelectorCheckBoxListWidget QScrollBar:vertical,
+stw_opensyde_gui--C_SyvDaItChartDataSelectorWidget QScrollBar:vertical {
+width:7px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
+padding-right:2px;
+padding-top:3px;
+padding-bottom:3px;
+}
+
+stw_opensyde_gui--C_SyvUpUpdatePackageListNodeWidget QScrollBar:vertical {
+width:9px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
+padding-right:2px;
+padding-top:3px;
+padding-bottom:3px;
+padding-left:2px;
+}
+
+stw_opensyde_gui_elements--C_OgeDarkScrollArea QScrollBar:vertical,
+stw_opensyde_gui--C_TblTreDataElementView QScrollBar:vertical,
+stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget QScrollBar:vertical {
+width:20px; /*real width of scroll bar is 5px; Real width = width - padding-right/left */
+padding-right:3px;
+padding-top:3px;
+padding-bottom:3px;
+padding-left:12px;
+}
+
+/*--------- horizontal not tested/used yet*/
+stw_opensyde_gui--C_SdSearchTreeWidget QScrollBar:horizontal,
+stw_opensyde_gui--C_TblTreDataElementView QScrollBar:horizontal,
+stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget QScrollBar:horizontal,
+stw_opensyde_gui--C_SdBueNodeSelectorCheckBoxListWidget QScrollBar:horizontal,
+stw_opensyde_gui--C_SyvUpUpdatePackageListNodeWidget QScrollBar:horizontal,
+stw_opensyde_gui--C_SyvDaItChartDataSelectorWidget QScrollBar:horizontal {
+height:5px; /*real width of scroll bar is 5px; Real width = width - padding-bottom/top */
+padding-bottom:0px;
+padding-left:3px;
+padding-right:3px;
+}
+
+stw_opensyde_gui_elements--C_OgeTransparentScrollArea QScrollBar:horizontal {
+height:5px; /*real width of scroll bar is 5px; Real width = width - padding-bottom/top */
+}
+
+/* --------------------------------------------------------------------- */

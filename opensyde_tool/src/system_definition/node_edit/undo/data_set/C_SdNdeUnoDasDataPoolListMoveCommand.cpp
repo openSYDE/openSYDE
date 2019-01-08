@@ -1,0 +1,116 @@
+//-----------------------------------------------------------------------------
+/*!
+   \internal
+   \file
+   \brief       Data pool list data set move undo command (implementation)
+
+   Data pool list data set move undo command
+
+   \implementation
+   project     openSYDE
+   copyright   STW (c) 1999-20xx
+   license     use only under terms of contract / confidential
+
+   created     25.01.2017  STW/M.Echtler
+   \endimplementation
+*/
+//-----------------------------------------------------------------------------
+
+/* -- Includes ------------------------------------------------------------- */
+#include "precomp_headers.h"
+
+#include "stwtypes.h"
+#include "C_SdNdeUnoDasDataPoolListMoveCommand.h"
+#include "C_PuiSdHandler.h"
+#include "C_SdNdeUnoUtil.h"
+#include "C_SdUtil.h"
+
+/* -- Used Namespaces ------------------------------------------------------ */
+using namespace stw_types;
+using namespace stw_opensyde_gui_logic;
+
+/* -- Module Global Constants ---------------------------------------------- */
+
+/* -- Types ---------------------------------------------------------------- */
+
+/* -- Global Variables ----------------------------------------------------- */
+
+/* -- Module Global Variables ---------------------------------------------- */
+
+/* -- Module Global Function Prototypes ------------------------------------ */
+
+/* -- Implementation ------------------------------------------------------- */
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Default constructor
+
+   \param[in]     oru32_NodeIndex            Node index
+   \param[in]     oru32_DataPoolIndex        Node data pool index
+   \param[in]     oru32_DataPoolListIndex    Node data pool list index
+   \param[in,out] opc_DataPoolListTableModel Data pool lists table model to perform actions on
+   \param[in,out] opc_DataPoolListTableView  Data pool lists table widget to perform actions on
+   \param[in]     orc_SourceCol              Source columns
+   \param[in]     orc_TargetCol              Target columns
+   \param[in]     orq_AdaptIndices           Flag, if target columns should be adapted to source column deletion
+   \param[in,out] opc_Parent                 Optional pointer to parent
+
+   \created     25.01.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+C_SdNdeUnoDasDataPoolListMoveCommand::C_SdNdeUnoDasDataPoolListMoveCommand(const uint32 & oru32_NodeIndex,
+                                                                           const uint32 & oru32_DataPoolIndex,
+                                                                           const uint32 & oru32_DataPoolListIndex,
+                                                                           C_SdNdeDataPoolListModelViewManager * const opc_DataPoolListModelViewManager,
+                                                                           const std::vector<uint32> & orc_SourceCol,
+                                                                           const std::vector<uint32> & orc_TargetCol, const bool & orq_AdaptIndices,
+                                                                           QUndoCommand * const opc_Parent) :
+   C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex,
+                                                 opc_DataPoolListModelViewManager, orc_SourceCol,
+                                                 "Move List Dataset", opc_Parent),
+   mc_SourceCol(orc_SourceCol),
+   mc_TargetCol(orc_TargetCol)
+{
+   C_SdUtil::h_SortSourceDescending(this->mc_SourceCol, this->mc_TargetCol);
+   if (orq_AdaptIndices == true)
+   {
+      C_SdNdeUnoUtil::h_AdaptTargetToDeletedSource(this->mc_SourceCol, this->mc_TargetCol);
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Redo
+
+   \created     26.01.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_SdNdeUnoDasDataPoolListMoveCommand::redo(void)
+{
+   //DELETE
+   this->SetIndices(mc_SourceCol);
+   this->Delete();
+   //ADD
+   this->SetIndices(mc_TargetCol);
+   this->Add();
+   C_SdNdeUnoDasDataPoolListBaseCommand::redo();
+   this->mq_Initial = false;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Undo
+
+   \created     26.01.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_SdNdeUnoDasDataPoolListMoveCommand::undo(void)
+{
+   C_SdNdeUnoDasDataPoolListBaseCommand::undo();
+   //DELETE
+   this->SetIndices(mc_TargetCol);
+   this->Delete();
+   //ADD
+   this->SetIndices(mc_SourceCol);
+   this->Add();
+}

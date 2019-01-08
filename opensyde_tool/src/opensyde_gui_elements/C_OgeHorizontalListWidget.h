@@ -1,0 +1,99 @@
+//-----------------------------------------------------------------------------
+/*!
+   \file
+   \brief       Base class for horizontal orientated list widgets (header)
+
+   See cpp file for detailed description
+
+   \implementation
+   project     openSYDE
+   copyright   STW (c) 1999-20xx
+   license     use only under terms of contract / confidential
+
+   created     12.02.2018  STW/B.Bayer
+   \endimplementation
+*/
+//-----------------------------------------------------------------------------
+#ifndef C_OGEHORIZONTALLISTWIDGET_H
+#define C_OGEHORIZONTALLISTWIDGET_H
+
+/* -- Includes ------------------------------------------------------------- */
+#include <QTimer>
+#include <QListWidget>
+
+#include "stwtypes.h"
+
+/* -- Namespace ------------------------------------------------------------ */
+namespace stw_opensyde_gui_elements
+{
+/* -- Global Constants ----------------------------------------------------- */
+
+/* -- Types ---------------------------------------------------------------- */
+
+class C_OgeHorizontalListWidget :
+   public QListWidget
+{
+   Q_OBJECT
+
+public:
+   C_OgeHorizontalListWidget(QWidget * const opc_Parent = NULL);
+   virtual ~C_OgeHorizontalListWidget();
+
+   stw_types::sintn GetCountLines(void) const;
+   stw_types::sintn GetActualLine(void) const;
+   void SetActualLine(const stw_types::sintn osn_Line, const bool oq_SetActive = false);
+   void ScrollToItem(const stw_types::sintn osn_Index);
+
+   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
+   //lint -save -e1960
+   virtual void dropEvent(QDropEvent * const opc_Event) override;
+   //lint -restore
+
+   //The signals keyword is necessary for Qt signal slot functionality
+   //lint -save -e1736
+
+Q_SIGNALS:
+   //lint -restore
+   void SigListChanged(void);
+
+protected:
+   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
+   //lint -save -e1960
+   virtual void startDrag(const Qt::DropActions oc_SupportedActions) override;
+   virtual void dragMoveEvent(QDragMoveEvent * const opc_Event) override;
+   virtual void dragLeaveEvent(QDragLeaveEvent * const opc_Event) override;
+   virtual void wheelEvent(QWheelEvent * const opc_Event) override;
+   //lint -restore
+
+   virtual void m_MoveItem(const stw_types::sintn osn_SourceIndex, const stw_types::sintn osn_TargetIndex) = 0;
+   virtual void m_UpdateNumbers(void) const = 0;
+   virtual void m_DelegateStartPaint(void) = 0;
+   virtual void m_DelegateStopPaint(void) = 0;
+
+   stw_types::sintn msn_DragItemIndex;
+   stw_types::sintn msn_ItemsPerLine;
+   stw_types::sintn msn_CountLines;
+   stw_types::sintn msn_ActualLine;
+
+private:
+   //Avoid call
+   C_OgeHorizontalListWidget(const C_OgeHorizontalListWidget &);
+   C_OgeHorizontalListWidget & operator =(const C_OgeHorizontalListWidget &);
+
+   void m_DragTimeout(void);
+   void m_StopDragTimer(void);
+
+   QTimer mc_TimerDragMove;
+
+   bool mq_DragTimeoutActiveLeft;
+   bool mq_DragTimeoutActiveRight;
+
+   static const stw_types::sintn mhsn_ScrollArea;
+   static const stw_types::sintn mhsn_DragScrollTimerIntervalStart;
+   static const stw_types::sintn mhsn_DragScrollTimerInterval;
+};
+
+/* -- Extern Global Variables ---------------------------------------------- */
+} //end of namespace
+
+#endif

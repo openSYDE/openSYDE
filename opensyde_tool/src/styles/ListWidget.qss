@@ -1,0 +1,47 @@
+/* --------------------------------------------------------------------- */
+stw_opensyde_gui_elements--C_OgeListWidget {
+border-style:solid;
+border-width:1px;
+border-radius:0px;
+}
+
+stw_opensyde_gui--C_NagTopList,
+stw_opensyde_gui--C_NagViewList,
+stw_opensyde_gui--C_SyvDcConnectedNodeList,
+stw_opensyde_gui--C_SyvDcExistingNodeList,
+stw_opensyde_gui--C_SdNdeDataPoolSelectorListWidget,
+stw_opensyde_gui--C_SyvUpUpdatePackageListWidget {
+outline:none;
+}
+
+stw_opensyde_gui--C_NagTopList,
+stw_opensyde_gui--C_NagViewList,
+stw_opensyde_gui--C_SyvDcConnectedNodeList,
+stw_opensyde_gui--C_SyvDcExistingNodeList,
+stw_opensyde_gui--C_SdTopologyListWidget,
+stw_opensyde_gui--C_SdTopologyListWidget::item:selected,
+stw_opensyde_gui--C_SdTopologyListWidget::item:hover,
+stw_opensyde_gui--C_SdNdeDbListWidget,
+stw_opensyde_gui--C_SdNdeDbListWidget::item:selected,
+stw_opensyde_gui--C_SdNdeDbListWidget::item:hover,
+stw_opensyde_gui--C_SdNdeDataPoolSelectorListWidget,
+stw_opensyde_gui--C_SdNdeDataPoolSelectorListWidget::item:selected,
+stw_opensyde_gui--C_SdNdeDataPoolSelectorListWidget::item:hover,
+stw_opensyde_gui--C_SyvUpUpdatePackageListWidget,
+stw_opensyde_gui--C_SyvUpUpdatePackageListWidget::item:selected,
+stw_opensyde_gui--C_SyvUpUpdatePackageListWidget::item:hover{
+border-style: none;
+}
+
+stw_opensyde_gui--C_NagTopList::item {
+padding-left:16px;
+}
+
+stw_opensyde_gui--C_SyvDcConnectedNodeList::item,
+stw_opensyde_gui--C_SyvDcExistingNodeList::item {
+border-style:none;
+border-width:0px;
+border-radius:0px;
+}
+
+/* --------------------------------------------------------------------- */

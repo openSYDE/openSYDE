@@ -1,0 +1,574 @@
+//-----------------------------------------------------------------------------
+/*!
+   \internal
+   \file
+   \brief       Custom text element graphics item (implementation)
+
+   X
+
+   \implementation
+   project     openSYDE
+   copyright   STW (c) 1999-20xx
+   license     use only under terms of contract / confidential
+
+   created     11.08.2016  STW/B.Bayer
+   \endimplementation
+*/
+//-----------------------------------------------------------------------------
+
+/* -- Includes ------------------------------------------------------------- */
+#include "precomp_headers.h"
+
+#include <QKeyEvent>
+#include <QTextCursor>
+#include <QGraphicsView>
+
+#include "C_GiBiTextElement.h"
+#include "C_GiCustomFunctions.h"
+#include "C_OgePopUpDialog.h"
+#include "C_GiSyBaseWidget.h"
+#include "C_GiSyTextElementWidget.h"
+#include "C_PuiSdDataElement.h"
+#include "gitypes.h"
+#include "constants.h"
+
+/* -- Used Namespaces ------------------------------------------------------ */
+using namespace stw_opensyde_gui;
+using namespace stw_opensyde_gui_logic;
+using namespace stw_types;
+using namespace stw_opensyde_gui_elements;
+
+/* -- Module Global Constants ---------------------------------------------- */
+const float64 mf64_ActionPointOffsetBoundary = 10.0;
+
+const float64 C_GiBiTextElement::mhf64_MinWidthTextElement = 70.0;
+const float64 C_GiBiTextElement::mhf64_MinHeightTextElement = 20.0;
+
+const QString mc_NAME_TEXT_ELEMENT = "TEXT ELEMENT";
+
+/* -- Types ---------------------------------------------------------------- */
+
+/* -- Global Variables ----------------------------------------------------- */
+
+/* -- Module Global Variables ---------------------------------------------- */
+
+/* -- Module Global Function Prototypes ------------------------------------ */
+
+/* -- Implementation ------------------------------------------------------- */
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Default constructor
+
+   Set up GUI with all elements.
+
+   \param[in]     oru64_ID    Unique ID
+   \param[in]     oq_Editable Flag for editing the content of the text element
+   \param[in,out] opc_Parent  Optional pointer to parent
+
+   \created     11.08.2016  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+C_GiBiTextElement::C_GiBiTextElement(const stw_types::uint64 & oru64_ID, const bool oq_Editable,
+                                     QGraphicsItem * const opc_Parent) :
+   //lint -e{1938}  static const is guaranteed preinitialized before main
+   C_GiBiRectBaseGroup(oru64_ID, mhf64_MinWidthTextElement, mhf64_MinHeightTextElement, mf64_ActionPointOffsetBoundary,
+                       false, opc_Parent),
+   mq_Editable(oq_Editable)
+{
+   this->m_Init();
+   //lint -e{1566}  no memory leak because of the parent of mpc_TextItem and the Qt memory management
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Default constructor
+
+   Set up GUI with all elements.
+
+   \param[in]     oru64_ID   Unique ID
+   \param[in,out] opc_Parent Optional pointer to parent
+
+   \created     11.08.2016  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+C_GiBiTextElement::C_GiBiTextElement(const uint64 & oru64_ID, QGraphicsItem * const opc_Parent) :
+   //lint -e{1938}  static const is guaranteed preinitialized before main
+   C_GiBiRectBaseGroup(oru64_ID, mhf64_MinWidthTextElement, mhf64_MinHeightTextElement, mf64_ActionPointOffsetBoundary,
+                       false, opc_Parent),
+   mq_Editable(true)
+{
+   this->m_Init();
+   //lint -e{1566}  no memory leak because of the parent of mpc_TextItem and the Qt memory management
+}
+
+//-----------------------------------------------------------------------------
+void C_GiBiTextElement::m_Init()
+{
+   QFont c_Font;
+   //lint -e{1938}  static const is guaranteed preinitialized before main
+   QRectF c_Rect = QRectF(0.0, 0.0,
+                          std::max(mhf64_MinWidthTextElement, 1.0),
+                          std::max(mhf64_MinHeightTextElement, 1.0));
+
+   this->mpc_TextItem = new C_GiText(c_Rect, this->mq_Editable);
+
+   // Notify the base class about the boundary as biggest item as orientation. Very important!
+   this->m_SetBiggestItem(*this->mpc_TextItem);
+
+   connect(this->mpc_TextItem, &C_GiText::SigChangedSize, this,
+           &C_GiBiTextElement::m_BiggestItemChanged);
+
+   this->addToGroup(this->mpc_TextItem);
+
+   // Init z order
+   this->setZValue(mf64_ZORDER_INIT_TEXT_ELEMENT);
+
+   this->setHandlesChildEvents(false);
+
+   // Set default font
+   c_Font = mc_STYLE_GUIDE_FONT_REGULAR_16_ITALIC;
+   //Convert point to pixel
+   c_Font.setPixelSize(c_Font.pointSize());
+   this->mpc_TextItem->setFont(c_Font);
+
+   //Mouse cursor
+   connect(this->mpc_TextItem, &C_GiText::SigTextInteractionModeStateChanged, this,
+           &C_GiBiTextElement::m_HandleTextInteractionMode);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   default destructor
+
+   Clean up.
+
+   \created     11.08.2016  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+C_GiBiTextElement::~C_GiBiTextElement()
+{
+   //lint -e{1540}  no memory leak because of the parent of mpc_TextItem and the Qt memory management
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Returns the type of this itme
+
+   \return  ID
+
+   \created     01.09.2016  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+sintn C_GiBiTextElement::type() const
+{
+   return msn_GRAPHICS_ITEM_TEXTELEMENT;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Open style dialog
+
+   \param[in] oq_DarkMode Optional dark mode flag
+
+   \return
+   true     Ok was clicked
+   false    Cancel was clicked
+
+   \created     02.11.2016  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+bool C_GiBiTextElement::OpenStyleDialog(const bool oq_DarkMode)
+{
+   bool q_Retval;
+
+   QGraphicsView * const pc_View = this->scene()->views().at(0);
+
+   QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View, pc_View);
+   C_GiSyBaseWidget * pc_Dialog = new C_GiSyBaseWidget(*c_New, mc_NAME_TEXT_ELEMENT, oq_DarkMode);
+   C_GiSyTextElementWidget * pc_SettingsWidget = new C_GiSyTextElementWidget(*pc_Dialog);
+
+   pc_SettingsWidget->SetFontColor(this->GetFontColor());
+   pc_SettingsWidget->SetFontStyle(this->GetFontStyle());
+
+   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   {
+      ApplyStyle(pc_SettingsWidget->GetFontStyle(), pc_SettingsWidget->GetFontColor());
+      q_Retval = true;
+   }
+   else
+   {
+      q_Retval = false;
+   }
+   if (c_New != NULL)
+   {
+      c_New->HideOverlay();
+   }
+
+   this->mpc_TextItem->AutoAdaptSize();
+   //lint -e{429}  no memory leak because of the parent of pc_Dialog and pc_SettingsWidget and the Qt memory management
+   return q_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Restore default mouse cursor
+
+   \created     10.11.2016  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_GiBiTextElement::RestoreDefaultCursor(void)
+{
+   C_GiBiRectBaseGroup::RestoreDefaultCursor();
+   this->mpc_TextItem->setCursor(this->mc_DefaultCursor);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief  Change mouse cursor temporarily
+
+   \param[in] orc_TemporaryCursor New mouse cursor
+
+   \created     10.11.2016  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_GiBiTextElement::SetTemporaryCursor(const QCursor & orc_TemporaryCursor)
+{
+   C_GiBiRectBaseGroup::SetTemporaryCursor(orc_TemporaryCursor);
+   this->mpc_TextItem->setCursor(QCursor(Qt::IBeamCursor));
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set shown text
+
+   \param[in] orc_Text   New text
+
+   \created     02.11.2016  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_GiBiTextElement::SetText(const QString & orc_Text)
+{
+   this->mpc_TextItem->SetText(orc_Text);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set font style
+
+   \param[in] orc_Font   New font style configuration
+
+   \created     02.11.2016  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_GiBiTextElement::SetFontStyle(const QFont & orc_Font)
+{
+   this->mpc_TextItem->setFont(orc_Font);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set font color
+
+   \param[in] orc_Color New color
+
+   \created     02.11.2016  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_GiBiTextElement::SetFontColor(const QColor & orc_Color)
+{
+   this->mpc_TextItem->setDefaultTextColor(orc_Color);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set shown text
+
+   \param[in] orc_Color New text
+
+   \created     02.11.2016  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+QString C_GiBiTextElement::GetText() const
+{
+   return this->mpc_TextItem->toPlainText();
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get font style
+
+   \created     02.11.2016  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+QFont C_GiBiTextElement::GetFontStyle() const
+{
+   return this->mpc_TextItem->font();
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get font color
+
+   \created     02.11.2016  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+QColor C_GiBiTextElement::GetFontColor() const
+{
+   return this->mpc_TextItem->defaultTextColor();
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Helper function to apply style and trigger updates
+
+   \param[in] orc_Font  New font
+   \param[in] orc_Color New color
+
+   \created     06.12.2016  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_GiBiTextElement::ApplyStyle(const QFont & orc_Font, const QColor & orc_Color)
+{
+   this->SetFontColor(orc_Color);
+   this->SetFontStyle(orc_Font);
+   this->mpc_TextItem->AutoAdaptSize();
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Setting the flag if the text element is editable
+
+   \param[in]     oq_Editable    Flag for editing the content of the text element
+
+   \created     10.01.2018  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_GiBiTextElement::SetEditable(const bool oq_Editable)
+{
+   this->mq_Editable = oq_Editable;
+   this->mpc_TextItem->SetEditable(oq_Editable);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Function for initially loading internal data
+
+   \param[in,out] opc_Data    Text element data
+   \param[in]     oq_DarkMode Optional flag if dark mode is active
+
+   \created     15.05.2017  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_GiBiTextElement::m_LoadTextElementData(const C_PuiBsTextElement * const opc_Data, const bool oq_DarkMode)
+{
+   this->LoadBasicData(*opc_Data);
+
+   if (oq_DarkMode == true)
+   {
+      this->SetFontColor(opc_Data->c_UIFontColorDark);
+   }
+   else
+   {
+      this->SetFontColor(opc_Data->c_UIFontColorBright);
+   }
+   this->SetFontStyle(opc_Data->c_UIFontStyle);
+   this->SetText(opc_Data->c_UIText);
+   this->ApplySizeChange(opc_Data->c_UIPosition, QSizeF(opc_Data->f64_Width, opc_Data->f64_Height));
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Slot function for updating internal data
+
+   \param[in,out] opc_Data    Text element data
+   \param[in]     oq_DarkMode Optional flag if dark mode is active
+
+   \created     15.05.2017  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_GiBiTextElement::m_UpdateTextElementData(C_PuiBsTextElement * const opc_Data, const bool oq_DarkMode) const
+{
+   this->UpdateBasicData(*opc_Data);
+
+   if (oq_DarkMode == true)
+   {
+      opc_Data->c_UIFontColorDark = this->GetFontColor();
+   }
+   else
+   {
+      opc_Data->c_UIFontColorBright = this->GetFontColor();
+   }
+   opc_Data->c_UIFontStyle = this->GetFontStyle();
+   opc_Data->c_UIText = this->GetText();
+}
+
+//-----------------------------------------------------------------------------
+void C_GiBiTextElement::m_ResizeUpdateItems(const float64 of64_DiffWidth, const float64 of64_DiffHeight)
+{
+   Q_UNUSED(of64_DiffWidth)
+   Q_UNUSED(of64_DiffHeight)
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Overrided key press event
+
+   \param[in,out] opc_event  Pointer to key event
+
+   \created     04.11.2016  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_GiBiTextElement::keyPressEvent(QKeyEvent * const opc_Event)
+{
+   if ((opc_Event->key() == static_cast<sintn>(Qt::Key_F2)) &&
+       (this->mq_Editable == true))
+   {
+      QTextCursor c_Cursor = this->mpc_TextItem->textCursor();
+
+      this->mpc_TextItem->SetTextInteraction(true);
+
+      // Select the entire text
+      c_Cursor.select(QTextCursor::Document);
+      this->mpc_TextItem->setTextCursor(c_Cursor);
+   }
+   else
+   {
+      C_GiBiRectBaseGroup::keyPressEvent(opc_Event);
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Overwritten mouse move event slot
+
+   Here: do not allow mouse move when editor mode active
+
+   \param[in,out] opc_Event Event identification and information
+
+   \created     13.12.2016  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_GiBiTextElement::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Event)
+{
+   if (this->mpc_TextItem->IsEditModeActive() == false)
+   {
+      C_GiBiRectBaseGroup::mouseMoveEvent(opc_Event);
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Overwritten itemChange event slot
+
+   \param[in,out] opc_Change Indicator what changed
+   \param[in]     orc_Value  Value corresponding to change
+
+   \created     25.10.2016  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+QVariant C_GiBiTextElement::itemChange(const GraphicsItemChange oe_Change, const QVariant & orc_Value)
+{
+   QVariant c_Return = C_GiBiRectBaseGroup::itemChange(oe_Change, orc_Value);
+
+   switch (oe_Change)
+   {
+   case ItemSceneHasChanged:
+      if (this->scene() != NULL)
+      {
+         // item was added to scene
+         this->mpc_TextItem->installSceneEventFilter(this);
+      }
+      break;
+   case ItemSceneChange:
+      if (orc_Value.isNull() == true)
+      {
+         // item was removed from scene
+         this->mpc_TextItem->removeSceneEventFilter(this);
+      }
+      break;
+   default:
+      break;
+   } //lint !e788 //All other cases handled by call of parent
+
+   return c_Return;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Overwritten scene event filter event slot
+
+   Prevent single click the text item to select it with one click.
+
+   \param[in]     opc_Watched Actual event receiver
+   \param[in,out] opc_Event   Event identification and information
+
+   \return
+   true     Event will be ignored
+   false    Event will be forwarded normally
+
+   \created     04.11.2016  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+bool C_GiBiTextElement::sceneEventFilter(QGraphicsItem * const opc_Watched, QEvent * const opc_Event)
+{
+   bool q_Return = false;
+
+   if ((opc_Watched == this->mpc_TextItem) &&
+       (this->mpc_TextItem->IsEditModeActive() == false))
+   {
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      QGraphicsSceneMouseEvent * pc_MouseEvent = dynamic_cast<QGraphicsSceneMouseEvent *>(opc_Event);
+
+      switch (opc_Event->type())
+      {
+      case QEvent::GraphicsSceneMousePress:
+         C_GiBiRectBaseGroup::mousePressEvent(pc_MouseEvent);
+         q_Return = true;
+         break;
+
+      case QEvent::GraphicsSceneMouseRelease:
+         C_GiBiRectBaseGroup::mouseReleaseEvent(pc_MouseEvent);
+         q_Return = true;
+         break;
+
+      case QEvent::GraphicsSceneMouseMove:
+         C_GiBiRectBaseGroup::mouseMoveEvent(pc_MouseEvent);
+         q_Return = true;
+         break;
+
+      default:
+         break;
+         //lint -e{788}  not all enum constants are necessary here
+      }
+   }
+   else
+   {
+      C_GiBiRectBaseGroup::sceneEventFilter(opc_Watched, opc_Event);
+   }
+
+   return q_Return;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   React to text interaction mode change
+
+   \param[in] orq_On Flag if text interaction mode is currently active
+
+   \created     10.11.2016  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_GiBiTextElement::m_HandleTextInteractionMode(const bool & orq_On)
+{
+   Q_EMIT this->SigTextInteractionModeStateChanged(orq_On);
+
+   if (orq_On == true)
+   {
+      this->SetTemporaryCursor(QCursor(Qt::ArrowCursor));
+   }
+   else
+   {
+      this->RestoreDefaultCursor();
+   }
+}

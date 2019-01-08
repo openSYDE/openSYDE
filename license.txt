@@ -1,0 +1,50 @@
+openSYDE
+========
+openSYDE is provided under the "GPL V3" license.
+Please see the "gpl-3.0.txt" license file in this folder for the full license text.
+
+The "openSYDE GUI" is based on the openSYDE Core library.
+This library can be alternatively licensed under a proprietary license.
+The "SYDE Coder C" and "SYDEsup" tools can also be licensed under that proprietary license.
+Please contact STW for details.
+
+The sources are provided at https://github.com/openSYDE.
+
+In addition to the components developed by STW the GitHub repository contains a number of
+open source components used in the development of openSYDE.
+
+The following components were used.
+
+Component           License                   Folder                                             Details
+========================================================================================================================================
+openSYDE GUI        GPL V3                    opensyde_tool\src                                  
+openSYDE Core       GPL V3 or proprietary     opensyde_tool\libs\opensyde_core                   
+SYDE Coder C        GPL V3 or proprietary     opensyde_syde_coder_c                              
+SYDEsup             GPL V3 or proprietary     opensyde_syde_sup                                  
+Qt 5.7.0            LGPL 3; some parts GPL 3  <no sources provided> (*)                          http://doc.qt.io/qt-5/licensing.html
+gettext             LPGL 2.1                  libraries\gettext-0.19.7                           https://www.gnu.org/software/gettext/
+Vector::DBC Module  GPL 3                     libraries\vector_dbc-1.0.4_with_stw_modifications  http://www.tomilo.org/vector_dbc.html
+TinyXML-2           zlib license              <no sources provided>                              http://leethomason.github.io/tinyxml2/
+MinGW Runtime       MIT Style                 <no sources provided>                              http://www.mingw.org/license
+Miniz               MIT                       <no sources provided>                              https://github.com/richgel999/miniz
+
+(*) Copies of the (unmodified) Qt library sources have not been placed in the openSYDE GitHub repository.
+These can be 
+- found e.g. under http://download.qt.io/archive/qt/5.7/5.7.0/single/
+- obtained by contacting STW
+
+The Qt libraries drag in a few other libraries with different licensing terms.
+For details see https://doc.qt.io/qt-5/licenses-used-in-qt.html and the license files distributed with the Qt sources.
+
+Note:
+"openSYDE GUI", "SYDE Coder C", "SYDEsup" all are based on the "openSYDE Core".
+A copy of the Core is provided with each of those tools.
+The version of the Core"s" may slightly differ.
+
+openSYDE Docu Creator
+=====================
+The openSYDE Docu Creator is not provided under an open source license.
+See "STW_Software_Agreement_openSYDE_DocuCreator.pdf" for license details of that tool.
+
+The ImageMagick library by ImageMagick Studio LLC was used in the creation of the openSYDE Docu Creator.
+See "ImageMagick_license.txt" for license details of that library.

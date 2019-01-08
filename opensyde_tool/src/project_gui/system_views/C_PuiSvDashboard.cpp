@@ -1,0 +1,3185 @@
+//-----------------------------------------------------------------------------
+/*!
+   \internal
+   \file
+   \brief       System view dashboard (implementation)
+
+   System view dashboard
+
+   \implementation
+   project     openSYDE
+   copyright   STW (c) 1999-20xx
+   license     use only under terms of contract / confidential
+
+   created     21.06.2017  STW/M.Echtler
+   \endimplementation
+*/
+//-----------------------------------------------------------------------------
+
+/* -- Includes ------------------------------------------------------------- */
+#include "precomp_headers.h"
+
+#include "stwtypes.h"
+#include "stwerrors.h"
+#include "TGLUtils.h"
+#include "C_CieUtil.h"
+#include "CSCLChecksums.h"
+#include "C_PuiSdHandler.h"
+#include "C_PuiSvDashboard.h"
+#include "C_SdNdeDataPoolContentUtil.h"
+
+/* -- Used Namespaces ------------------------------------------------------ */
+using namespace stw_tgl;
+using namespace stw_types;
+using namespace stw_errors;
+using namespace stw_opensyde_core;
+using namespace stw_opensyde_gui_logic;
+
+/* -- Module Global Constants ---------------------------------------------- */
+
+/* -- Types ---------------------------------------------------------------- */
+
+/* -- Global Variables ----------------------------------------------------- */
+
+/* -- Module Global Variables ---------------------------------------------- */
+
+/* -- Module Global Function Prototypes ------------------------------------ */
+
+/* -- Implementation ------------------------------------------------------- */
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Default constructor
+
+   \created     21.06.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+C_PuiSvDashboard::C_PuiSvDashboard(void) :
+   C_PuiBsElements(),
+   mc_Name("Dashboard"),
+   mc_Comment(""),
+   mq_Active(true)
+{
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Calculates the hash value over all data
+
+   The hash value is a 32 bit CRC value.
+
+   \param[in,out] oru32_HashValue Hash value with init [in] value and result [out] value
+
+   \created     21.06.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::CalcHash(uint32 & oru32_HashValue) const
+{
+   stw_scl::C_SCLChecksums::CalcCRC32(this->mc_Name.toStdString().c_str(),
+                                      this->mc_Name.length(), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(this->mc_Comment.toStdString().c_str(),
+                                      this->mc_Comment.length(), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->mq_Active, sizeof(this->mq_Active), oru32_HashValue);
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < this->mc_Charts.size(); ++u32_ItWidget)
+   {
+      const C_PuiSvDbChart & rc_Widget = this->mc_Charts[u32_ItWidget];
+      rc_Widget.CalcHash(oru32_HashValue);
+   }
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < this->mc_Labels.size(); ++u32_ItWidget)
+   {
+      const C_PuiSvDbLabel & rc_Label = this->mc_Labels[u32_ItWidget];
+      rc_Label.CalcHash(oru32_HashValue);
+   }
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < this->mc_PieCharts.size(); ++u32_ItWidget)
+   {
+      const C_PuiSvDbPieChart & rc_Widget = this->mc_PieCharts[u32_ItWidget];
+      rc_Widget.CalcHash(oru32_HashValue);
+   }
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < this->mc_ProgressBars.size(); ++u32_ItWidget)
+   {
+      const C_PuiSvDbProgressBar & rc_Widget = this->mc_ProgressBars[u32_ItWidget];
+      rc_Widget.CalcHash(oru32_HashValue);
+   }
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < this->mc_SpinBoxes.size(); ++u32_ItWidget)
+   {
+      const C_PuiSvDbSpinBox & rc_Widget = this->mc_SpinBoxes[u32_ItWidget];
+      rc_Widget.CalcHash(oru32_HashValue);
+   }
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < this->mc_Sliders.size(); ++u32_ItWidget)
+   {
+      const C_PuiSvDbSlider & rc_Widget = this->mc_Sliders[u32_ItWidget];
+      rc_Widget.CalcHash(oru32_HashValue);
+   }
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < this->mc_Tables.size(); ++u32_ItWidget)
+   {
+      const C_PuiSvDbTable & rc_Widget = this->mc_Tables[u32_ItWidget];
+      rc_Widget.CalcHash(oru32_HashValue);
+   }
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < this->mc_Toggles.size(); ++u32_ItWidget)
+   {
+      const C_PuiSvDbToggle & rc_Widget = this->mc_Toggles[u32_ItWidget];
+      rc_Widget.CalcHash(oru32_HashValue);
+   }
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < this->mc_ParamWidgets.size(); ++u32_ItWidget)
+   {
+      const C_PuiSvDbParam & rc_Widget = this->mc_ParamWidgets[u32_ItWidget];
+      rc_Widget.CalcHash(oru32_HashValue);
+   }
+   C_PuiBsElements::CalcHash(oru32_HashValue);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get name
+
+   \return
+   Current name
+
+   \created     06.07.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+const QString & C_PuiSvDashboard::GetName(void) const
+{
+   return this->mc_Name;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set name
+
+   \param[in] orc_Value New name
+
+   \created     06.07.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::SetName(const QString & orc_Value)
+{
+   this->mc_Name = orc_Value;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get comment
+
+   \return
+   Current comment
+
+   \created     24.07.2018  STW/G.Scupin
+*/
+//-----------------------------------------------------------------------------
+const QString & C_PuiSvDashboard::GetComment(void) const
+{
+   return this->mc_Comment;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set comment
+
+   \param[in] orc_Value New comment
+
+   \created     24.07.2018  STW/G.Scupin
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::SetComment(const QString & orc_Value)
+{
+   this->mc_Comment = orc_Value;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get active flag
+
+   \return
+   Current active flag
+
+   \created     06.07.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+bool C_PuiSvDashboard::GetActive(void) const
+{
+   return this->mq_Active;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set active flag
+
+   \param[in] oq_Value New active flag
+
+   \created     06.07.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::SetActive(const bool oq_Value)
+{
+   this->mq_Active = oq_Value;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get widgets
+
+   \return
+   Current widgets
+
+   \created     19.07.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+const std::vector<C_PuiSvDbChart> & C_PuiSvDashboard::GetCharts(void) const
+{
+   return this->mc_Charts;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set widgets
+
+   \param[in] orc_Value New widgets
+
+   \created     19.07.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::SetCharts(const std::vector<C_PuiSvDbChart> & orc_Value)
+{
+   this->mc_Charts = orc_Value;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get widget
+
+   \param[in] ou32_Index Widget index
+
+   \return
+   NULL Widget not found
+   Else Valid widget
+
+   \created     19.07.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+const C_PuiSvDbChart * C_PuiSvDashboard::GetChart(const uint32 ou32_Index) const
+{
+   const C_PuiSvDbChart * pc_Retval = NULL;
+
+   if (ou32_Index < this->mc_Charts.size())
+   {
+      pc_Retval = &this->mc_Charts[ou32_Index];
+   }
+   return pc_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get widgets
+
+   \return
+   Current widgets
+
+   \created     19.07.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+const std::vector<C_PuiSvDbLabel> & C_PuiSvDashboard::GetLabels(void) const
+{
+   return this->mc_Labels;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set widgets
+
+   \param[in] orc_Value New widgets
+
+   \created     19.07.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::SetLabels(const std::vector<C_PuiSvDbLabel> & orc_Value)
+{
+   this->mc_Labels = orc_Value;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get widget
+
+   \param[in] ou32_Index Widget index
+
+   \return
+   NULL Widget not found
+   Else Valid widget
+
+   \created     19.07.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+const C_PuiSvDbLabel * C_PuiSvDashboard::GetLabel(const uint32 ou32_Index) const
+{
+   const C_PuiSvDbLabel * pc_Retval = NULL;
+
+   if (ou32_Index < this->mc_Labels.size())
+   {
+      pc_Retval = &this->mc_Labels[ou32_Index];
+   }
+   return pc_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get widgets
+
+   \return
+   Current widgets
+
+   \created     25.10.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+const std::vector<C_PuiSvDbParam> & C_PuiSvDashboard::GetParams(void) const
+{
+   return this->mc_ParamWidgets;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set widgets
+
+   \param[in] orc_Value New widgets
+
+   \created     25.10.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::SetParams(const std::vector<C_PuiSvDbParam> & orc_Value)
+{
+   this->mc_ParamWidgets = orc_Value;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get widget
+
+   \param[in] ou32_Index Widget index
+
+   \return
+   NULL Widget not found
+   Else Valid widget
+
+   \created     25.10.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+const C_PuiSvDbParam * C_PuiSvDashboard::GetParam(const uint32 ou32_Index) const
+{
+   const C_PuiSvDbParam * pc_Retval = NULL;
+
+   if (ou32_Index < this->mc_ParamWidgets.size())
+   {
+      pc_Retval = &this->mc_ParamWidgets[ou32_Index];
+   }
+   return pc_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get widgets
+
+   \return
+   Current widgets
+
+   \created     28.08.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+const std::vector<C_PuiSvDbPieChart> & C_PuiSvDashboard::GetPieCharts(void) const
+{
+   return this->mc_PieCharts;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set widgets
+
+   \param[in] orc_Value New widgets
+
+   \created     28.08.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::SetPieCharts(const std::vector<C_PuiSvDbPieChart> & orc_Value)
+{
+   this->mc_PieCharts = orc_Value;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get widget
+
+   \param[in] ou32_Index Widget index
+
+   \return
+   NULL Widget not found
+   Else Valid widget
+
+   \created     28.08.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+const C_PuiSvDbPieChart * C_PuiSvDashboard::GetPieChart(const uint32 ou32_Index) const
+{
+   const C_PuiSvDbPieChart * pc_Retval = NULL;
+
+   if (ou32_Index < this->mc_PieCharts.size())
+   {
+      pc_Retval = &this->mc_PieCharts[ou32_Index];
+   }
+   return pc_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get widgets
+
+   \return
+   Current widgets
+
+   \created     11.08.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+const std::vector<C_PuiSvDbSpinBox> & C_PuiSvDashboard::GetSpinBoxes(void) const
+{
+   return this->mc_SpinBoxes;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set widgets
+
+   \param[in] orc_Value New widgets
+
+   \created     11.08.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::SetSpinBoxes(const std::vector<C_PuiSvDbSpinBox> & orc_Value)
+{
+   this->mc_SpinBoxes = orc_Value;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get widget
+
+   \param[in] ou32_Index Widget index
+
+   \return
+   NULL Widget not found
+   Else Valid widget
+
+   \created     11.08.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+const C_PuiSvDbSpinBox * C_PuiSvDashboard::GetSpinBox(const uint32 ou32_Index) const
+{
+   const C_PuiSvDbSpinBox * pc_Retval = NULL;
+
+   if (ou32_Index < this->mc_SpinBoxes.size())
+   {
+      pc_Retval = &this->mc_SpinBoxes[ou32_Index];
+   }
+   return pc_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get widgets
+
+   \return
+   Current widgets
+
+   \created     17.08.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+const std::vector<C_PuiSvDbSlider> & C_PuiSvDashboard::GetSliders(void) const
+{
+   return this->mc_Sliders;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set widgets
+
+   \param[in] orc_Value New widgets
+
+   \created     17.08.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::SetSliders(const std::vector<C_PuiSvDbSlider> & orc_Value)
+{
+   this->mc_Sliders = orc_Value;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get widget
+
+   \param[in] ou32_Index Widget index
+
+   \return
+   NULL Widget not found
+   Else Valid widget
+
+   \created     17.08.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+const C_PuiSvDbSlider * C_PuiSvDashboard::GetSlider(const uint32 ou32_Index) const
+{
+   const C_PuiSvDbSlider * pc_Retval = NULL;
+
+   if (ou32_Index < this->mc_Sliders.size())
+   {
+      pc_Retval = &this->mc_Sliders[ou32_Index];
+   }
+   return pc_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get widgets
+
+   \return
+   Current widgets
+
+   \created     21.08.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+const std::vector<C_PuiSvDbProgressBar> & C_PuiSvDashboard::GetProgressBars(void) const
+{
+   return this->mc_ProgressBars;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set widgets
+
+   \param[in] orc_Value New widgets
+
+   \created     21.08.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::SetProgressBars(const std::vector<C_PuiSvDbProgressBar> & orc_Value)
+{
+   this->mc_ProgressBars = orc_Value;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get widget
+
+   \param[in] ou32_Index Widget index
+
+   \return
+   NULL Widget not found
+   Else Valid widget
+
+   \created     21.08.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+const C_PuiSvDbProgressBar * C_PuiSvDashboard::GetProgressBar(const uint32 ou32_Index) const
+{
+   const C_PuiSvDbProgressBar * pc_Retval = NULL;
+
+   if (ou32_Index < this->mc_ProgressBars.size())
+   {
+      pc_Retval = &this->mc_ProgressBars[ou32_Index];
+   }
+   return pc_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get widgets
+
+   \return
+   Current widgets
+
+   \created     29.08.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+const std::vector<C_PuiSvDbTable> & C_PuiSvDashboard::GetTables(void) const
+{
+   return this->mc_Tables;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set widgets
+
+   \param[in] orc_Value New widgets
+
+   \created     29.08.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::SetTables(const std::vector<C_PuiSvDbTable> & orc_Value)
+{
+   this->mc_Tables = orc_Value;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get widget
+
+   \param[in] ou32_Index Widget index
+
+   \return
+   NULL Widget not found
+   Else Valid widget
+
+   \created     29.08.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+const C_PuiSvDbTable * C_PuiSvDashboard::GetTable(const uint32 ou32_Index) const
+{
+   const C_PuiSvDbTable * pc_Retval = NULL;
+
+   if (ou32_Index < this->mc_Tables.size())
+   {
+      pc_Retval = &this->mc_Tables[ou32_Index];
+   }
+   return pc_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get widgets
+
+   \return
+   Current widgets
+
+   \created     21.08.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+const std::vector<C_PuiSvDbToggle> & C_PuiSvDashboard::GetToggles(void) const
+{
+   return this->mc_Toggles;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set widgets
+
+   \param[in] orc_Value New widgets
+
+   \created     21.08.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::SetToggles(const std::vector<C_PuiSvDbToggle> & orc_Value)
+{
+   this->mc_Toggles = orc_Value;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get widget
+
+   \param[in] ou32_Index Widget index
+
+   \return
+   NULL Widget not found
+   Else Valid widget
+
+   \created     21.08.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+const C_PuiSvDbToggle * C_PuiSvDashboard::GetToggle(const uint32 ou32_Index) const
+{
+   const C_PuiSvDbToggle * pc_Retval = NULL;
+
+   if (ou32_Index < this->mc_Toggles.size())
+   {
+      pc_Retval = &this->mc_Toggles[ou32_Index];
+   }
+   return pc_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get widget base item
+
+   \param[in] oe_Type    Widget type
+   \param[in] ou32_Index Widget index
+
+   \return
+   NULL Widget base item not found
+   Else Valid widget base item
+
+   \created     05.12.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+const C_PuiSvDbWidgetBase * C_PuiSvDashboard::GetWidgetBase(const C_PuiSvDbDataElement::E_Type oe_Type,
+                                                            const uint32 ou32_Index) const
+{
+   const C_PuiSvDbWidgetBase * pc_Retval = NULL;
+
+   switch (oe_Type)
+   {
+   case C_PuiSvDbDataElement::eCHART:
+      if (ou32_Index < this->mc_Charts.size())
+      {
+         pc_Retval = &this->mc_Charts[ou32_Index];
+      }
+      break;
+   case C_PuiSvDbDataElement::eLABEL:
+      if (ou32_Index < this->mc_Labels.size())
+      {
+         pc_Retval = &this->mc_Labels[ou32_Index];
+      }
+      break;
+   case C_PuiSvDbDataElement::ePIE_CHART:
+      if (ou32_Index < this->mc_PieCharts.size())
+      {
+         pc_Retval = &this->mc_PieCharts[ou32_Index];
+      }
+      break;
+   case C_PuiSvDbDataElement::eSPIN_BOX:
+      if (ou32_Index < this->mc_SpinBoxes.size())
+      {
+         pc_Retval = &this->mc_SpinBoxes[ou32_Index];
+      }
+      break;
+   case C_PuiSvDbDataElement::eSLIDER:
+      if (ou32_Index < this->mc_Sliders.size())
+      {
+         pc_Retval = &this->mc_Sliders[ou32_Index];
+      }
+      break;
+   case C_PuiSvDbDataElement::eTABLE:
+      if (ou32_Index < this->mc_Tables.size())
+      {
+         pc_Retval = &this->mc_Tables[ou32_Index];
+      }
+      break;
+   case C_PuiSvDbDataElement::eTOGGLE:
+      if (ou32_Index < this->mc_Toggles.size())
+      {
+         pc_Retval = &this->mc_Toggles[ou32_Index];
+      }
+      break;
+   case C_PuiSvDbDataElement::ePROGRESS_BAR:
+      if (ou32_Index < this->mc_ProgressBars.size())
+      {
+         pc_Retval = &this->mc_ProgressBars[ou32_Index];
+      }
+      break;
+   case C_PuiSvDbDataElement::ePARAM:
+      if (ou32_Index < this->mc_ParamWidgets.size())
+      {
+         pc_Retval = &this->mc_ParamWidgets[ou32_Index];
+      }
+      break;
+   default:
+      //No handling possible
+      break;
+   }
+   return pc_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get all widget items in one single vector
+
+   Warning: output not cleared
+
+   \param[in,out] orc_Output Output
+
+   \created     11.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::GetAllWidgetItems(std::vector<const C_PuiSvDbWidgetBase *> & orc_Output) const
+{
+   const uintn un_Size = this->mc_Charts.size() + this->mc_Labels.size() + this->mc_PieCharts.size() +
+                         this->mc_ProgressBars.size() + this->mc_SpinBoxes.size() + this->mc_Sliders.size() +
+                         this->mc_Tables.size() + this->mc_Toggles.size() + this->mc_ParamWidgets.size();
+
+   //Improve performance
+   orc_Output.reserve(un_Size);
+   for (uint32 u32_ItItem = 0; u32_ItItem < this->mc_Charts.size(); ++u32_ItItem)
+   {
+      orc_Output.push_back(&this->mc_Charts[u32_ItItem]);
+   }
+   for (uint32 u32_ItItem = 0; u32_ItItem < this->mc_Labels.size(); ++u32_ItItem)
+   {
+      orc_Output.push_back(&this->mc_Labels[u32_ItItem]);
+   }
+   for (uint32 u32_ItItem = 0; u32_ItItem < this->mc_ParamWidgets.size(); ++u32_ItItem)
+   {
+      orc_Output.push_back(&this->mc_ParamWidgets[u32_ItItem]);
+   }
+   for (uint32 u32_ItItem = 0; u32_ItItem < this->mc_PieCharts.size(); ++u32_ItItem)
+   {
+      orc_Output.push_back(&this->mc_PieCharts[u32_ItItem]);
+   }
+   for (uint32 u32_ItItem = 0; u32_ItItem < this->mc_ProgressBars.size(); ++u32_ItItem)
+   {
+      orc_Output.push_back(&this->mc_ProgressBars[u32_ItItem]);
+   }
+   for (uint32 u32_ItItem = 0; u32_ItItem < this->mc_SpinBoxes.size(); ++u32_ItItem)
+   {
+      orc_Output.push_back(&this->mc_SpinBoxes[u32_ItItem]);
+   }
+   for (uint32 u32_ItItem = 0; u32_ItItem < this->mc_Sliders.size(); ++u32_ItItem)
+   {
+      orc_Output.push_back(&this->mc_Sliders[u32_ItItem]);
+   }
+   for (uint32 u32_ItItem = 0; u32_ItItem < this->mc_Tables.size(); ++u32_ItItem)
+   {
+      orc_Output.push_back(&this->mc_Tables[u32_ItItem]);
+   }
+   for (uint32 u32_ItItem = 0; u32_ItItem < this->mc_Toggles.size(); ++u32_ItItem)
+   {
+      orc_Output.push_back(&this->mc_Toggles[u32_ItItem]);
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set widget
+
+   \param[in] ou32_Index Widget index
+   \param[in] opc_Value  New widget value
+   \param[in] oe_Type    New widget type
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+
+   \created     19.07.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+sint32 C_PuiSvDashboard::SetWidget(const uint32 ou32_Index, const C_PuiSvDbWidgetBase * const opc_Value,
+                                   const C_PuiSvDbDataElement::E_Type oe_Type)
+{
+   sint32 s32_Retval = C_NO_ERR;
+   const C_PuiSvDbChart * opc_Chart;
+   const C_PuiSvDbLabel * opc_Label;
+   const C_PuiSvDbParam * opc_ParamWidget;
+   const C_PuiSvDbPieChart * opc_PieChart;
+   const C_PuiSvDbProgressBar * opc_ProgressBar;
+   const C_PuiSvDbSlider * opc_Slider;
+   const C_PuiSvDbSpinBox * opc_SpinBox;
+   const C_PuiSvDbTable * opc_Table;
+   const C_PuiSvDbToggle * opc_Toggle;
+
+   switch (oe_Type)
+   {
+   case C_PuiSvDbDataElement::eCHART:
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      opc_Chart = dynamic_cast<const C_PuiSvDbChart *>(opc_Value);
+      if (opc_Chart != NULL)
+      {
+         if (ou32_Index < this->mc_Charts.size())
+         {
+            this->mc_Charts[ou32_Index] = *opc_Chart;
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::eLABEL:
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      opc_Label = dynamic_cast<const C_PuiSvDbLabel *>(opc_Value);
+      if (opc_Label != NULL)
+      {
+         if (ou32_Index < this->mc_Labels.size())
+         {
+            this->mc_Labels[ou32_Index] = *opc_Label;
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::ePARAM:
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      opc_ParamWidget = dynamic_cast<const C_PuiSvDbParam *>(opc_Value);
+      if (opc_ParamWidget != NULL)
+      {
+         if (ou32_Index < this->mc_ParamWidgets.size())
+         {
+            this->mc_ParamWidgets[ou32_Index] = *opc_ParamWidget;
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::ePIE_CHART:
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      opc_PieChart = dynamic_cast<const C_PuiSvDbPieChart *>(opc_Value);
+      if (opc_PieChart != NULL)
+      {
+         if (ou32_Index < this->mc_PieCharts.size())
+         {
+            this->mc_PieCharts[ou32_Index] = *opc_PieChart;
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::ePROGRESS_BAR:
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      opc_ProgressBar = dynamic_cast<const C_PuiSvDbProgressBar *>(opc_Value);
+      if (opc_ProgressBar != NULL)
+      {
+         if (ou32_Index < this->mc_ProgressBars.size())
+         {
+            this->mc_ProgressBars[ou32_Index] = *opc_ProgressBar;
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::eSLIDER:
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      opc_Slider = dynamic_cast<const C_PuiSvDbSlider *>(opc_Value);
+      if (opc_Slider != NULL)
+      {
+         if (ou32_Index < this->mc_Sliders.size())
+         {
+            this->mc_Sliders[ou32_Index] = *opc_Slider;
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::eSPIN_BOX:
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      opc_SpinBox = dynamic_cast<const C_PuiSvDbSpinBox *>(opc_Value);
+      if (opc_SpinBox != NULL)
+      {
+         if (ou32_Index < this->mc_SpinBoxes.size())
+         {
+            this->mc_SpinBoxes[ou32_Index] = *opc_SpinBox;
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::eTABLE:
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      opc_Table = dynamic_cast<const C_PuiSvDbTable *>(opc_Value);
+      if (opc_Table != NULL)
+      {
+         if (ou32_Index < this->mc_Tables.size())
+         {
+            this->mc_Tables[ou32_Index] = *opc_Table;
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::eTOGGLE:
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      opc_Toggle = dynamic_cast<const C_PuiSvDbToggle *>(opc_Value);
+      if (opc_Toggle != NULL)
+      {
+         if (ou32_Index < this->mc_Toggles.size())
+         {
+            this->mc_Toggles[ou32_Index] = *opc_Toggle;
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   default:
+      s32_Retval = C_RANGE;
+      break;
+   }
+
+   return s32_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in] ou32_Index Node index
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::OnSyncNodeAdded(const uint32 ou32_Index)
+{
+   std::vector<C_PuiSvDbWidgetBase *> c_Widgets;
+   m_GetAllWidgetItems(c_Widgets);
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
+   {
+      C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
+      if (pc_Widget != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Widget->c_DataPoolElementsConfig.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig = pc_Widget->c_DataPoolElementsConfig[u32_ItElement];
+            C_PuiSvDbNodeDataPoolListElementId & rc_DataElementId = rc_DataElementConfig.c_ElementId;
+            h_OnSyncNodeAdded(rc_DataElementId, ou32_Index);
+         }
+      }
+      if (pc_Param != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Param->c_ExpandedItems.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbExpandedTreeIndex & rc_DataElementConfig = pc_Param->c_ExpandedItems[u32_ItElement];
+            h_OnSyncNodeAdded(rc_DataElementConfig.c_ExpandedId, ou32_Index);
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in] ou32_Index Node index
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::OnSyncNodeAboutToBeDeleted(const uint32 ou32_Index)
+{
+   std::vector<C_PuiSvDbWidgetBase *> c_Widgets;
+   m_GetAllWidgetItems(c_Widgets);
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
+   {
+      C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
+      if (pc_Widget != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Widget->c_DataPoolElementsConfig.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig = pc_Widget->c_DataPoolElementsConfig[u32_ItElement];
+            C_PuiSvDbNodeDataPoolListElementId & rc_DataElementId = rc_DataElementConfig.c_ElementId;
+            h_OnSyncNodeAboutToBeDeleted(rc_DataElementId, ou32_Index);
+         }
+      }
+      if (pc_Param != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Param->c_ExpandedItems.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbExpandedTreeIndex & rc_DataElementConfig = pc_Param->c_ExpandedItems[u32_ItElement];
+            h_OnSyncNodeAboutToBeDeleted(rc_DataElementConfig.c_ExpandedId, ou32_Index);
+         }
+      }
+   }
+   m_SyncCleanUpParams();
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in] ou32_NodeIndex     Node index
+   \param[in] ou32_DataPoolIndex Data pool index
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::OnSyncNodeDataPoolAdded(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex)
+{
+   std::vector<C_PuiSvDbWidgetBase *> c_Widgets;
+   m_GetAllWidgetItems(c_Widgets);
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
+   {
+      C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
+      if (pc_Widget != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Widget->c_DataPoolElementsConfig.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig = pc_Widget->c_DataPoolElementsConfig[u32_ItElement];
+            C_PuiSvDbNodeDataPoolListElementId & rc_DataElementId = rc_DataElementConfig.c_ElementId;
+            h_OnSyncNodeDataPoolAdded(rc_DataElementId, ou32_NodeIndex, ou32_DataPoolIndex);
+         }
+      }
+      if (pc_Param != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Param->c_ExpandedItems.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbExpandedTreeIndex & rc_DataElementConfig = pc_Param->c_ExpandedItems[u32_ItElement];
+            h_OnSyncNodeDataPoolAdded(rc_DataElementConfig.c_ExpandedId, ou32_NodeIndex, ou32_DataPoolIndex);
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in] ou32_NodeIndex           Node index
+   \param[in] ou32_DataPoolSourceIndex Source data pool index
+   \param[in] ou32_DataPoolTargetIndex Target data pool index
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::OnSyncNodeDataPoolMoved(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolSourceIndex,
+                                               const uint32 ou32_DataPoolTargetIndex)
+{
+   std::vector<C_PuiSvDbWidgetBase *> c_Widgets;
+   m_GetAllWidgetItems(c_Widgets);
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
+   {
+      C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
+      if (pc_Widget != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Widget->c_DataPoolElementsConfig.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig = pc_Widget->c_DataPoolElementsConfig[u32_ItElement];
+            C_PuiSvDbNodeDataPoolListElementId & rc_DataElementId = rc_DataElementConfig.c_ElementId;
+            h_OnSyncNodeDataPoolMoved(rc_DataElementId, ou32_NodeIndex, ou32_DataPoolSourceIndex,
+                                      ou32_DataPoolTargetIndex);
+         }
+      }
+      if (pc_Param != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Param->c_ExpandedItems.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbExpandedTreeIndex & rc_DataElementConfig = pc_Param->c_ExpandedItems[u32_ItElement];
+            h_OnSyncNodeDataPoolMoved(rc_DataElementConfig.c_ExpandedId, ou32_NodeIndex, ou32_DataPoolSourceIndex,
+                                      ou32_DataPoolTargetIndex);
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in] ou32_NodeIndex     Node index
+   \param[in] ou32_DataPoolIndex Data pool index
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::OnSyncNodeDataPoolAboutToBeDeleted(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex)
+{
+   std::vector<C_PuiSvDbWidgetBase *> c_Widgets;
+   m_GetAllWidgetItems(c_Widgets);
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
+   {
+      C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
+      if (pc_Widget != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Widget->c_DataPoolElementsConfig.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig = pc_Widget->c_DataPoolElementsConfig[u32_ItElement];
+            C_PuiSvDbNodeDataPoolListElementId & rc_DataElementId = rc_DataElementConfig.c_ElementId;
+            h_OnSyncNodeDataPoolAboutToBeDeleted(rc_DataElementId, ou32_NodeIndex, ou32_DataPoolIndex);
+         }
+      }
+      if (pc_Param != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Param->c_ExpandedItems.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbExpandedTreeIndex & rc_DataElementConfig = pc_Param->c_ExpandedItems[u32_ItElement];
+            h_OnSyncNodeDataPoolAboutToBeDeleted(rc_DataElementConfig.c_ExpandedId, ou32_NodeIndex, ou32_DataPoolIndex);
+         }
+      }
+   }
+   m_SyncCleanUpParams();
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in] ou32_NodeIndex     Node index
+   \param[in] ou32_DataPoolIndex Data pool index
+   \param[in] ou32_ListIndex     List index
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::OnSyncNodeDataPoolListAdded(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
+                                                   const uint32 ou32_ListIndex)
+{
+   std::vector<C_PuiSvDbWidgetBase *> c_Widgets;
+   m_GetAllWidgetItems(c_Widgets);
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
+   {
+      C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
+      if (pc_Widget != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Widget->c_DataPoolElementsConfig.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig = pc_Widget->c_DataPoolElementsConfig[u32_ItElement];
+            C_PuiSvDbNodeDataPoolListElementId & rc_DataElementId = rc_DataElementConfig.c_ElementId;
+            h_OnSyncNodeDataPoolListAdded(rc_DataElementId, ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex);
+         }
+      }
+      if (pc_Param != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Param->c_ExpandedItems.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbExpandedTreeIndex & rc_DataElementConfig = pc_Param->c_ExpandedItems[u32_ItElement];
+            h_OnSyncNodeDataPoolListAdded(rc_DataElementConfig.c_ExpandedId, ou32_NodeIndex, ou32_DataPoolIndex,
+                                          ou32_ListIndex);
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in] ou32_NodeIndex       Node index
+   \param[in] ou32_DataPoolIndex   Data pool index
+   \param[in] ou32_ListSourceIndex Source list index
+   \param[in] ou32_ListTargetIndex Target list index
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::OnSyncNodeDataPoolListMoved(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
+                                                   const uint32 ou32_ListSourceIndex, const uint32 ou32_ListTargetIndex)
+{
+   std::vector<C_PuiSvDbWidgetBase *> c_Widgets;
+   m_GetAllWidgetItems(c_Widgets);
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
+   {
+      C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
+      if (pc_Widget != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Widget->c_DataPoolElementsConfig.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig = pc_Widget->c_DataPoolElementsConfig[u32_ItElement];
+            C_PuiSvDbNodeDataPoolListElementId & rc_DataElementId = rc_DataElementConfig.c_ElementId;
+            h_OnSyncNodeDataPoolListMoved(rc_DataElementId, ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListSourceIndex,
+                                          ou32_ListTargetIndex);
+         }
+      }
+      if (pc_Param != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Param->c_ExpandedItems.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbExpandedTreeIndex & rc_DataElementConfig = pc_Param->c_ExpandedItems[u32_ItElement];
+            h_OnSyncNodeDataPoolListMoved(rc_DataElementConfig.c_ExpandedId, ou32_NodeIndex, ou32_DataPoolIndex,
+                                          ou32_ListSourceIndex, ou32_ListTargetIndex);
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in] ou32_NodeIndex     Node index
+   \param[in] ou32_DataPoolIndex Data pool index
+   \param[in] ou32_ListIndex     List index
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::OnSyncNodeDataPoolListAboutToBeDeleted(const uint32 ou32_NodeIndex,
+                                                              const uint32 ou32_DataPoolIndex,
+                                                              const uint32 ou32_ListIndex)
+{
+   std::vector<C_PuiSvDbWidgetBase *> c_Widgets;
+   m_GetAllWidgetItems(c_Widgets);
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
+   {
+      C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
+      if (pc_Widget != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Widget->c_DataPoolElementsConfig.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig = pc_Widget->c_DataPoolElementsConfig[u32_ItElement];
+            C_PuiSvDbNodeDataPoolListElementId & rc_DataElementId = rc_DataElementConfig.c_ElementId;
+            h_OnSyncNodeDataPoolListAboutToBeDeleted(rc_DataElementId, ou32_NodeIndex, ou32_DataPoolIndex,
+                                                     ou32_ListIndex);
+         }
+      }
+      if (pc_Param != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Param->c_ExpandedItems.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbExpandedTreeIndex & rc_DataElementConfig = pc_Param->c_ExpandedItems[u32_ItElement];
+            h_OnSyncNodeDataPoolListAboutToBeDeleted(rc_DataElementConfig.c_ExpandedId, ou32_NodeIndex,
+                                                     ou32_DataPoolIndex, ou32_ListIndex);
+         }
+      }
+   }
+   m_SyncCleanUpParams();
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in] ou32_NodeIndex     Node index
+   \param[in] ou32_DataPoolIndex Data pool index
+   \param[in] ou32_ListIndex     List index
+   \param[in] ou32_DataSetIndex  Data set index
+
+   \created     10.11.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::OnSyncNodeDataPoolListDataSetAdded(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
+                                                          const uint32 ou32_ListIndex, const uint32 ou32_DataSetIndex)
+{
+   for (uint32 u32_ItParam = 0; u32_ItParam < this->mc_ParamWidgets.size(); ++u32_ItParam)
+   {
+      C_PuiSvDbParam & rc_ParamWidget = this->mc_ParamWidgets[u32_ItParam];
+      for (uint32 u32_ItElement = 0; u32_ItElement < rc_ParamWidget.c_DataPoolElementsConfig.size();
+           ++u32_ItElement)
+      {
+         const C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig =
+            rc_ParamWidget.c_DataPoolElementsConfig[u32_ItElement];
+         if (((rc_DataElementConfig.c_ElementId.u32_NodeIndex == ou32_NodeIndex) &&
+              (rc_DataElementConfig.c_ElementId.u32_DataPoolIndex == ou32_DataPoolIndex)) &&
+             (rc_DataElementConfig.c_ElementId.u32_ListIndex == ou32_ListIndex))
+         {
+            //Should be synchronised
+            tgl_assert(u32_ItElement < rc_ParamWidget.c_DataSetSelectionIndices.size());
+            if (u32_ItElement < rc_ParamWidget.c_DataSetSelectionIndices.size())
+            {
+               sint32 & rs32_DataSetIndex = rc_ParamWidget.c_DataSetSelectionIndices[u32_ItElement];
+               if (rs32_DataSetIndex >= 0)
+               {
+                  const uint32 u32_DataSetIndex = static_cast<uint32>(rs32_DataSetIndex);
+                  if (u32_DataSetIndex >= ou32_DataSetIndex)
+                  {
+                     ++rs32_DataSetIndex;
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in] ou32_NodeIndex          Node index
+   \param[in] ou32_DataPoolIndex      Data pool index
+   \param[in] ou32_ListIndex          List index
+   \param[in] ou32_DataSetSourceIndex Source data set index
+   \param[in] ou32_DataSetTargetIndex Target data set index
+
+   \created     10.11.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::OnSyncNodeDataPoolListDataSetMoved(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
+                                                          const uint32 ou32_ListIndex,
+                                                          const uint32 ou32_DataSetSourceIndex,
+                                                          const uint32 ou32_DataSetTargetIndex)
+{
+   for (uint32 u32_ItParam = 0; u32_ItParam < this->mc_ParamWidgets.size(); ++u32_ItParam)
+   {
+      C_PuiSvDbParam & rc_ParamWidget = this->mc_ParamWidgets[u32_ItParam];
+      for (uint32 u32_ItElement = 0; u32_ItElement < rc_ParamWidget.c_DataPoolElementsConfig.size();
+           ++u32_ItElement)
+      {
+         const C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig =
+            rc_ParamWidget.c_DataPoolElementsConfig[u32_ItElement];
+         if (((rc_DataElementConfig.c_ElementId.u32_NodeIndex == ou32_NodeIndex) &&
+              (rc_DataElementConfig.c_ElementId.u32_DataPoolIndex == ou32_DataPoolIndex)) &&
+             (rc_DataElementConfig.c_ElementId.u32_ListIndex == ou32_ListIndex))
+         {
+            //Should be synchronised
+            tgl_assert(u32_ItElement < rc_ParamWidget.c_DataSetSelectionIndices.size());
+            if (u32_ItElement < rc_ParamWidget.c_DataSetSelectionIndices.size())
+            {
+               sint32 & rs32_DataSetIndex = rc_ParamWidget.c_DataSetSelectionIndices[u32_ItElement];
+               if (rs32_DataSetIndex >= 0)
+               {
+                  const uint32 u32_DataSetIndex = static_cast<uint32>(rs32_DataSetIndex);
+                  if (u32_DataSetIndex > ou32_DataSetSourceIndex)
+                  {
+                     --rs32_DataSetIndex;
+                     if ((u32_DataSetIndex - 1) >= ou32_DataSetTargetIndex)
+                     {
+                        ++rs32_DataSetIndex;
+                     }
+                     else
+                     {
+                        //No adaptation necessary
+                     }
+                  }
+                  else if (u32_DataSetIndex == ou32_DataSetSourceIndex)
+                  {
+                     rs32_DataSetIndex = ou32_DataSetTargetIndex;
+                  }
+                  else
+                  {
+                     if (u32_DataSetIndex >= ou32_DataSetTargetIndex)
+                     {
+                        ++rs32_DataSetIndex;
+                     }
+                     else
+                     {
+                        //No adaptation necessary
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in] ou32_NodeIndex     Node index
+   \param[in] ou32_DataPoolIndex Data pool index
+   \param[in] ou32_ListIndex     List index
+   \param[in] ou32_DataSetIndex  Data set index
+
+   \created     10.11.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::OnSyncNodeDataPoolListDataSetAboutToBeDeleted(const uint32 ou32_NodeIndex,
+                                                                     const uint32 ou32_DataPoolIndex,
+                                                                     const uint32 ou32_ListIndex,
+                                                                     const uint32 ou32_DataSetIndex)
+{
+   for (uint32 u32_ItParam = 0; u32_ItParam < this->mc_ParamWidgets.size(); ++u32_ItParam)
+   {
+      C_PuiSvDbParam & rc_ParamWidget = this->mc_ParamWidgets[u32_ItParam];
+      for (uint32 u32_ItElement = 0; u32_ItElement < rc_ParamWidget.c_DataPoolElementsConfig.size();
+           ++u32_ItElement)
+      {
+         const C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig =
+            rc_ParamWidget.c_DataPoolElementsConfig[u32_ItElement];
+         if (((rc_DataElementConfig.c_ElementId.u32_NodeIndex == ou32_NodeIndex) &&
+              (rc_DataElementConfig.c_ElementId.u32_DataPoolIndex == ou32_DataPoolIndex)) &&
+             (rc_DataElementConfig.c_ElementId.u32_ListIndex == ou32_ListIndex))
+         {
+            //Should be synchronised
+            tgl_assert(u32_ItElement < rc_ParamWidget.c_DataSetSelectionIndices.size());
+            if (u32_ItElement < rc_ParamWidget.c_DataSetSelectionIndices.size())
+            {
+               sint32 & rs32_DataSetIndex = rc_ParamWidget.c_DataSetSelectionIndices[u32_ItElement];
+               if (rs32_DataSetIndex >= 0)
+               {
+                  const uint32 u32_DataSetIndex = static_cast<uint32>(rs32_DataSetIndex);
+                  if (u32_DataSetIndex == ou32_DataSetIndex)
+                  {
+                     //Reset to no selection
+                     rs32_DataSetIndex = -1;
+                  }
+                  else if (u32_DataSetIndex > ou32_DataSetIndex)
+                  {
+                     --rs32_DataSetIndex;
+                  }
+                  else
+                  {
+                     //All fine
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in] ou32_NodeIndex     Node index
+   \param[in] ou32_DataPoolIndex Data pool index
+   \param[in] ou32_ListIndex     List index
+   \param[in] ou32_ElementIndex  Element index
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::OnSyncNodeDataPoolListElementAdded(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
+                                                          const uint32 ou32_ListIndex, const uint32 ou32_ElementIndex)
+{
+   std::vector<C_PuiSvDbWidgetBase *> c_Widgets;
+   m_GetAllWidgetItems(c_Widgets);
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
+   {
+      C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
+      if (pc_Widget != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Widget->c_DataPoolElementsConfig.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig = pc_Widget->c_DataPoolElementsConfig[u32_ItElement];
+            C_PuiSvDbNodeDataPoolListElementId & rc_DataElementId = rc_DataElementConfig.c_ElementId;
+            h_OnSyncNodeDataPoolListElementAdded(rc_DataElementId, ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                                                 ou32_ElementIndex);
+         }
+      }
+      if (pc_Param != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Param->c_ExpandedItems.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbExpandedTreeIndex & rc_DataElementConfig = pc_Param->c_ExpandedItems[u32_ItElement];
+            h_OnSyncNodeDataPoolListElementAdded(rc_DataElementConfig.c_ExpandedId, ou32_NodeIndex, ou32_DataPoolIndex,
+                                                 ou32_ListIndex, ou32_ElementIndex);
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in] ou32_NodeIndex          Node index
+   \param[in] ou32_DataPoolIndex      Data pool index
+   \param[in] ou32_ListIndex          List index
+   \param[in] ou32_ElementSourceIndex Source element index
+   \param[in] ou32_ElementTargetIndex Target element index
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::OnSyncNodeDataPoolListElementMoved(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
+                                                          const uint32 ou32_ListIndex,
+                                                          const uint32 ou32_ElementSourceIndex,
+                                                          const uint32 ou32_ElementTargetIndex)
+{
+   std::vector<C_PuiSvDbWidgetBase *> c_Widgets;
+   m_GetAllWidgetItems(c_Widgets);
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
+   {
+      C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
+      if (pc_Widget != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Widget->c_DataPoolElementsConfig.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig = pc_Widget->c_DataPoolElementsConfig[u32_ItElement];
+            C_PuiSvDbNodeDataPoolListElementId & rc_DataElementId = rc_DataElementConfig.c_ElementId;
+            h_OnSyncNodeDataPoolListElementMoved(rc_DataElementId, ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                                                 ou32_ElementSourceIndex, ou32_ElementTargetIndex);
+         }
+      }
+      if (pc_Param != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Param->c_ExpandedItems.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbExpandedTreeIndex & rc_DataElementConfig = pc_Param->c_ExpandedItems[u32_ItElement];
+            h_OnSyncNodeDataPoolListElementMoved(rc_DataElementConfig.c_ExpandedId, ou32_NodeIndex, ou32_DataPoolIndex,
+                                                 ou32_ListIndex, ou32_ElementSourceIndex, ou32_ElementTargetIndex);
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in] ou32_NodeIndex     Node index
+   \param[in] ou32_DataPoolIndex Data pool index
+   \param[in] ou32_ListIndex     List index
+   \param[in] ou32_ElementIndex  Element index
+   \param[in] oe_Type            New element type
+   \param[in] oq_IsArray         New array type
+   \param[in] ou32_ArraySize     New array size
+
+   \return
+   True  Some elements invalidated
+   False No elements were invalidated
+
+   \created     28.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+bool C_PuiSvDashboard::OnSyncNodeDataPoolListElementArrayChanged(const uint32 ou32_NodeIndex,
+                                                                 const uint32 ou32_DataPoolIndex,
+                                                                 const uint32 ou32_ListIndex,
+                                                                 const uint32 ou32_ElementIndex,
+                                                                 const C_OSCNodeDataPoolContent::E_Type oe_Type,
+                                                                 const bool oq_IsArray, const uint32 ou32_ArraySize)
+{
+   bool q_Retval = false;
+
+   std::vector<C_PuiSvDbWidgetBase *> c_Widgets;
+   m_GetAllWidgetItems(c_Widgets);
+
+   //Only critical if element was turned into an array
+   if (oq_IsArray == true)
+   {
+      for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
+      {
+         C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
+         if (pc_Widget != NULL)
+         {
+            //Skip widgets which support array type
+            if ((C_PuiSvDashboard::h_GetWidgetType(pc_Widget) != C_PuiSvDbDataElement::eTABLE) &&
+                (C_PuiSvDashboard::h_GetWidgetType(pc_Widget) != C_PuiSvDbDataElement::ePARAM))
+            {
+               for (uint32 u32_ItElement = 0; u32_ItElement < pc_Widget->c_DataPoolElementsConfig.size();
+                    ++u32_ItElement)
+               {
+                  C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig =
+                     pc_Widget->c_DataPoolElementsConfig[u32_ItElement];
+                  C_PuiSvDbNodeDataPoolListElementId & rc_DataElementId = rc_DataElementConfig.c_ElementId;
+                  if ((rc_DataElementId ==
+                       C_PuiSvDbNodeDataPoolListElementId(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                                                          ou32_ElementIndex,
+                                                          C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)) ||
+                      (rc_DataElementId ==
+                       C_PuiSvDbNodeDataPoolListElementId(
+                          ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                          ou32_ElementIndex, C_PuiSvDbNodeDataPoolListElementId::eBUS_SIGNAL)))
+                  {
+                     mh_MarkInvalid(rc_DataElementId);
+                     q_Retval = true;
+                  }
+               }
+            }
+         }
+      }
+      //Probably not necessary
+      m_SyncCleanUpParams();
+   }
+   //For param widgets we need to sync the array size
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
+   {
+      C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
+      if (pc_Widget != NULL)
+      {
+         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         C_PuiSvDbParam * const pc_ParamWidgets = dynamic_cast<C_PuiSvDbParam * const>(pc_Widget);
+         if (pc_ParamWidgets != NULL)
+         {
+            for (uint32 u32_ItElement = 0; u32_ItElement < pc_ParamWidgets->c_DataPoolElementsConfig.size();
+                 ++u32_ItElement)
+            {
+               const C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig =
+                  pc_ParamWidgets->c_DataPoolElementsConfig[u32_ItElement];
+               const C_PuiSvDbNodeDataPoolListElementId & rc_DataElementId = rc_DataElementConfig.c_ElementId;
+               if (rc_DataElementId ==
+                   C_PuiSvDbNodeDataPoolListElementId(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                                                      ou32_ElementIndex,
+                                                      C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT))
+               {
+                  C_OSCNodeDataPoolContent & rc_CurElement = pc_ParamWidgets->c_ListValues[u32_ItElement];
+
+                  rc_CurElement.SetType(oe_Type);
+                  rc_CurElement.SetArray(oq_IsArray);
+                  if (oq_IsArray == true)
+                  {
+                     rc_CurElement.SetArraySize(ou32_ArraySize);
+                  }
+               }
+            }
+         }
+      }
+   }
+   return q_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in] ou32_NodeIndex     Node index
+   \param[in] ou32_DataPoolIndex Data pool index
+   \param[in] ou32_ListIndex     List index
+   \param[in] ou32_ElementIndex  Element index
+   \param[in] oe_Access          New access type
+
+   \created     12.06.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::OnSyncNodeDataPoolListElementAccessChanged(const uint32 ou32_NodeIndex,
+                                                                  const uint32 ou32_DataPoolIndex,
+                                                                  const uint32 ou32_ListIndex,
+                                                                  const uint32 ou32_ElementIndex,
+                                                                  const C_OSCNodeDataPoolListElement::E_Access oe_Access)
+{
+   std::vector<C_PuiSvDbWidgetBase *> c_Widgets;
+   m_GetAllWidgetItems(c_Widgets);
+
+   //Only critical if RO
+   if (oe_Access == C_OSCNodeDataPoolListElement::eACCESS_RO)
+   {
+      for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
+      {
+         C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
+         if (pc_Widget != NULL)
+         {
+            if (pc_Widget->IsReadElement() == false)
+            {
+               for (uint32 u32_ItElement = 0; u32_ItElement < pc_Widget->c_DataPoolElementsConfig.size();
+                    ++u32_ItElement)
+               {
+                  C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig =
+                     pc_Widget->c_DataPoolElementsConfig[u32_ItElement];
+                  C_PuiSvDbNodeDataPoolListElementId & rc_DataElementId = rc_DataElementConfig.c_ElementId;
+                  if ((rc_DataElementId ==
+                       C_PuiSvDbNodeDataPoolListElementId(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                                                          ou32_ElementIndex,
+                                                          C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)) ||
+                      (rc_DataElementId ==
+                       C_PuiSvDbNodeDataPoolListElementId(
+                          ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+                          ou32_ElementIndex, C_PuiSvDbNodeDataPoolListElementId::eBUS_SIGNAL)))
+                  {
+                     mh_MarkInvalid(rc_DataElementId);
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in] ou32_NodeIndex     Node index
+   \param[in] ou32_DataPoolIndex Data pool index
+   \param[in] ou32_ListIndex     List index
+   \param[in] ou32_ElementIndex  Element index
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::OnSyncNodeDataPoolListElementAboutToBeDeleted(const uint32 ou32_NodeIndex,
+                                                                     const uint32 ou32_DataPoolIndex,
+                                                                     const uint32 ou32_ListIndex,
+                                                                     const uint32 ou32_ElementIndex)
+{
+   std::vector<C_PuiSvDbWidgetBase *> c_Widgets;
+   m_GetAllWidgetItems(c_Widgets);
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
+   {
+      C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      C_PuiSvDbParam * const pc_Param = dynamic_cast<C_PuiSvDbParam * const>(c_Widgets[u32_ItWidget]);
+      if (pc_Widget != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Widget->c_DataPoolElementsConfig.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbNodeDataElementConfig & rc_DataElementConfig = pc_Widget->c_DataPoolElementsConfig[u32_ItElement];
+            C_PuiSvDbNodeDataPoolListElementId & rc_DataElementId = rc_DataElementConfig.c_ElementId;
+            h_OnSyncNodeDataPoolListElementAboutToBeDeleted(rc_DataElementId, ou32_NodeIndex, ou32_DataPoolIndex,
+                                                            ou32_ListIndex, ou32_ElementIndex);
+         }
+      }
+      if (pc_Param != NULL)
+      {
+         for (uint32 u32_ItElement = 0; u32_ItElement < pc_Param->c_ExpandedItems.size(); ++u32_ItElement)
+         {
+            C_PuiSvDbExpandedTreeIndex & rc_DataElementConfig = pc_Param->c_ExpandedItems[u32_ItElement];
+            h_OnSyncNodeDataPoolListElementAboutToBeDeleted(rc_DataElementConfig.c_ExpandedId, ou32_NodeIndex,
+                                                            ou32_DataPoolIndex, ou32_ListIndex, ou32_ElementIndex);
+         }
+      }
+   }
+   m_SyncCleanUpParams();
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in,out] orc_DataElementId Data element ID
+   \param[in]     ou32_Index        Node index
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::h_OnSyncNodeAdded(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
+                                         const uint32 ou32_Index)
+{
+   if (orc_DataElementId.GetIsValid() == true)
+   {
+      if (orc_DataElementId.u32_NodeIndex >= ou32_Index)
+      {
+         ++orc_DataElementId.u32_NodeIndex;
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in,out] orc_DataElementId Data element ID
+   \param[in]     ou32_Index        Node index
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::h_OnSyncNodeAboutToBeDeleted(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
+                                                    const uint32 ou32_Index)
+{
+   if (orc_DataElementId.GetIsValid() == true)
+   {
+      if (orc_DataElementId.u32_NodeIndex > ou32_Index)
+      {
+         --orc_DataElementId.u32_NodeIndex;
+      }
+      else if (orc_DataElementId.u32_NodeIndex == ou32_Index)
+      {
+         mh_MarkInvalid(orc_DataElementId);
+      }
+      else
+      {
+         //No adaptation necessary
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in,out] orc_DataElementId  Data element ID
+   \param[in]     ou32_NodeIndex     Node index
+   \param[in]     ou32_DataPoolIndex Data pool index
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::h_OnSyncNodeDataPoolAdded(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
+                                                 const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex)
+{
+   if (orc_DataElementId.GetIsValid() == true)
+   {
+      if (orc_DataElementId.u32_NodeIndex == ou32_NodeIndex)
+      {
+         if (orc_DataElementId.u32_DataPoolIndex >= ou32_DataPoolIndex)
+         {
+            ++orc_DataElementId.u32_DataPoolIndex;
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in,out] orc_DataElementId        Data element ID
+   \param[in]     ou32_NodeIndex           Node index
+   \param[in]     ou32_DataPoolSourceIndex Source data pool index
+   \param[in]     ou32_DataPoolTargetIndex Target data pool index
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::h_OnSyncNodeDataPoolMoved(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
+                                                 const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolSourceIndex,
+                                                 const uint32 ou32_DataPoolTargetIndex)
+{
+   if (orc_DataElementId.GetIsValid() == true)
+   {
+      if (orc_DataElementId.u32_NodeIndex == ou32_NodeIndex)
+      {
+         if (orc_DataElementId.u32_DataPoolIndex > ou32_DataPoolSourceIndex)
+         {
+            --orc_DataElementId.u32_DataPoolIndex;
+            if (orc_DataElementId.u32_DataPoolIndex >= ou32_DataPoolTargetIndex)
+            {
+               ++orc_DataElementId.u32_DataPoolIndex;
+            }
+            else
+            {
+               //No adaptation necessary
+            }
+         }
+         else if (orc_DataElementId.u32_DataPoolIndex == ou32_DataPoolSourceIndex)
+         {
+            orc_DataElementId.u32_DataPoolIndex = ou32_DataPoolTargetIndex;
+         }
+         else
+         {
+            if (orc_DataElementId.u32_DataPoolIndex >= ou32_DataPoolTargetIndex)
+            {
+               ++orc_DataElementId.u32_DataPoolIndex;
+            }
+            else
+            {
+               //No adaptation necessary
+            }
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in,out] orc_DataElementId  Data element ID
+   \param[in]     ou32_NodeIndex     Node index
+   \param[in]     ou32_DataPoolIndex Data pool index
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::h_OnSyncNodeDataPoolAboutToBeDeleted(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
+                                                            const uint32 ou32_NodeIndex,
+                                                            const uint32 ou32_DataPoolIndex)
+{
+   if (orc_DataElementId.GetIsValid() == true)
+   {
+      if (orc_DataElementId.u32_NodeIndex == ou32_NodeIndex)
+      {
+         if (orc_DataElementId.u32_DataPoolIndex > ou32_DataPoolIndex)
+         {
+            --orc_DataElementId.u32_DataPoolIndex;
+         }
+         else if (orc_DataElementId.u32_DataPoolIndex == ou32_DataPoolIndex)
+         {
+            mh_MarkInvalid(orc_DataElementId);
+         }
+         else
+         {
+            //No adaptation necessary
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in,out] orc_DataElementId  Data element ID
+   \param[in]     ou32_NodeIndex     Node index
+   \param[in]     ou32_DataPoolIndex Data pool index
+   \param[in]     ou32_ListIndex     List index
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::h_OnSyncNodeDataPoolListAdded(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
+                                                     const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
+                                                     const uint32 ou32_ListIndex)
+{
+   if (orc_DataElementId.GetIsValid() == true)
+   {
+      if ((orc_DataElementId.u32_NodeIndex == ou32_NodeIndex) &&
+          (orc_DataElementId.u32_DataPoolIndex == ou32_DataPoolIndex))
+      {
+         if (orc_DataElementId.u32_ListIndex >= ou32_ListIndex)
+         {
+            ++orc_DataElementId.u32_ListIndex;
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in,out] orc_DataElementId    Data element ID
+   \param[in]     ou32_NodeIndex       Node index
+   \param[in]     ou32_DataPoolIndex   Data pool index
+   \param[in]     ou32_ListSourceIndex Source list index
+   \param[in]     ou32_ListTargetIndex Target list index
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::h_OnSyncNodeDataPoolListMoved(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
+                                                     const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
+                                                     const uint32 ou32_ListSourceIndex,
+                                                     const uint32 ou32_ListTargetIndex)
+{
+   if (orc_DataElementId.GetIsValid() == true)
+   {
+      if ((orc_DataElementId.u32_NodeIndex == ou32_NodeIndex) &&
+          (orc_DataElementId.u32_DataPoolIndex == ou32_DataPoolIndex))
+      {
+         if (orc_DataElementId.u32_ListIndex > ou32_ListSourceIndex)
+         {
+            --orc_DataElementId.u32_ListIndex;
+            if (orc_DataElementId.u32_ListIndex >= ou32_ListTargetIndex)
+            {
+               ++orc_DataElementId.u32_ListIndex;
+            }
+            else
+            {
+               //No adaptation necessary
+            }
+         }
+         else if (orc_DataElementId.u32_ListIndex == ou32_ListSourceIndex)
+         {
+            orc_DataElementId.u32_ListIndex = ou32_ListTargetIndex;
+         }
+         else
+         {
+            if (orc_DataElementId.u32_ListIndex >= ou32_ListTargetIndex)
+            {
+               ++orc_DataElementId.u32_ListIndex;
+            }
+            else
+            {
+               //No adaptation necessary
+            }
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in,out] orc_DataElementId  Data element ID
+   \param[in]     ou32_NodeIndex     Node index
+   \param[in]     ou32_DataPoolIndex Data pool index
+   \param[in]     ou32_ListIndex     List index
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::h_OnSyncNodeDataPoolListAboutToBeDeleted(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
+                                                                const uint32 ou32_NodeIndex,
+                                                                const uint32 ou32_DataPoolIndex,
+                                                                const uint32 ou32_ListIndex)
+{
+   if (orc_DataElementId.GetIsValid() == true)
+   {
+      if ((orc_DataElementId.u32_NodeIndex == ou32_NodeIndex) &&
+          (orc_DataElementId.u32_DataPoolIndex == ou32_DataPoolIndex))
+      {
+         if (orc_DataElementId.u32_ListIndex > ou32_ListIndex)
+         {
+            --orc_DataElementId.u32_ListIndex;
+         }
+         else if (orc_DataElementId.u32_ListIndex == ou32_ListIndex)
+         {
+            mh_MarkInvalid(orc_DataElementId);
+         }
+         else
+         {
+            //No adaptation necessary
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in,out] orc_DataElementId  Data element ID
+   \param[in]     ou32_NodeIndex     Node index
+   \param[in]     ou32_DataPoolIndex Data pool index
+   \param[in]     ou32_ListIndex     List index
+   \param[in]     ou32_ElementIndex  Element index
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::h_OnSyncNodeDataPoolListElementAdded(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
+                                                            const uint32 ou32_NodeIndex,
+                                                            const uint32 ou32_DataPoolIndex,
+                                                            const uint32 ou32_ListIndex, const uint32 ou32_ElementIndex)
+{
+   if (orc_DataElementId.GetIsValid() == true)
+   {
+      if (((orc_DataElementId.u32_NodeIndex == ou32_NodeIndex) &&
+           (orc_DataElementId.u32_DataPoolIndex == ou32_DataPoolIndex)) &&
+          (orc_DataElementId.u32_ListIndex == ou32_ListIndex))
+      {
+         if (orc_DataElementId.u32_ElementIndex >= ou32_ElementIndex)
+         {
+            ++orc_DataElementId.u32_ElementIndex;
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in,out] orc_DataElementId       Data element ID
+   \param[in]     ou32_NodeIndex          Node index
+   \param[in]     ou32_DataPoolIndex      Data pool index
+   \param[in]     ou32_ListIndex          List index
+   \param[in]     ou32_ElementSourceIndex Source element index
+   \param[in]     ou32_ElementTargetIndex Target element index
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::h_OnSyncNodeDataPoolListElementMoved(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId,
+                                                            const uint32 ou32_NodeIndex,
+                                                            const uint32 ou32_DataPoolIndex,
+                                                            const uint32 ou32_ListIndex,
+                                                            const uint32 ou32_ElementSourceIndex,
+                                                            const uint32 ou32_ElementTargetIndex)
+{
+   if (orc_DataElementId.GetIsValid() == true)
+   {
+      if (((orc_DataElementId.u32_NodeIndex == ou32_NodeIndex) &&
+           (orc_DataElementId.u32_DataPoolIndex == ou32_DataPoolIndex)) &&
+          (orc_DataElementId.u32_ListIndex == ou32_ListIndex))
+      {
+         if (orc_DataElementId.u32_ElementIndex > ou32_ElementSourceIndex)
+         {
+            --orc_DataElementId.u32_ElementIndex;
+            if (orc_DataElementId.u32_ElementIndex >= ou32_ElementTargetIndex)
+            {
+               ++orc_DataElementId.u32_ElementIndex;
+            }
+            else
+            {
+               //No adaptation necessary
+            }
+         }
+         else if (orc_DataElementId.u32_ElementIndex == ou32_ElementSourceIndex)
+         {
+            orc_DataElementId.u32_ElementIndex = ou32_ElementTargetIndex;
+         }
+         else
+         {
+            if (orc_DataElementId.u32_ElementIndex >= ou32_ElementTargetIndex)
+            {
+               ++orc_DataElementId.u32_ElementIndex;
+            }
+            else
+            {
+               //No adaptation necessary
+            }
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapt to system definition change
+
+   \param[in,out] orc_DataElementId  Data element ID
+   \param[in]     ou32_NodeIndex     Node index
+   \param[in]     ou32_DataPoolIndex Data pool index
+   \param[in]     ou32_ListIndex     List index
+   \param[in]     ou32_ElementIndex  Element index
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::h_OnSyncNodeDataPoolListElementAboutToBeDeleted(
+   C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId, const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
+   const uint32 ou32_ListIndex, const uint32 ou32_ElementIndex)
+{
+   if (orc_DataElementId.GetIsValid() == true)
+   {
+      if (((orc_DataElementId.u32_NodeIndex == ou32_NodeIndex) &&
+           (orc_DataElementId.u32_DataPoolIndex == ou32_DataPoolIndex)) &&
+          (orc_DataElementId.u32_ListIndex == ou32_ListIndex))
+      {
+         if (orc_DataElementId.u32_ElementIndex > ou32_ElementIndex)
+         {
+            --orc_DataElementId.u32_ElementIndex;
+         }
+         else if (orc_DataElementId.u32_ElementIndex == ou32_ElementIndex)
+         {
+            mh_MarkInvalid(orc_DataElementId);
+         }
+         else
+         {
+            //No adaptation necessary
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Synchronise internally stored scaling information with current system definition
+
+   \created     06.10.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::SyncScalingInformation(void)
+{
+   std::vector<C_PuiSvDbWidgetBase *> c_Widgets;
+   this->m_GetAllWidgetItems(c_Widgets);
+   for (uint32 u32_ItWidget = 0; u32_ItWidget < c_Widgets.size(); ++u32_ItWidget)
+   {
+      C_PuiSvDbWidgetBase * const pc_Widget = c_Widgets[u32_ItWidget];
+      if (pc_Widget != NULL)
+      {
+         for (uint32 u32_ItData = 0; u32_ItData < pc_Widget->c_DataPoolElementsConfig.size(); ++u32_ItData)
+         {
+            C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Widget->c_DataPoolElementsConfig[u32_ItData];
+            if ((rc_Config.c_ElementId.GetIsValid() == true) && (rc_Config.c_ElementScaling.q_UseDefault == true))
+            {
+               const C_OSCNodeDataPoolListElement * const pc_Element =
+                  C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(rc_Config.c_ElementId.u32_NodeIndex,
+                                                                             rc_Config.c_ElementId.u32_DataPoolIndex,
+                                                                             rc_Config.c_ElementId.u32_ListIndex,
+                                                                             rc_Config.c_ElementId.u32_ElementIndex);
+               //Check with system definition
+               if (pc_Element != NULL)
+               {
+                  rc_Config.c_ElementScaling.c_Unit = pc_Element->c_Unit.c_str();
+                  rc_Config.c_ElementScaling.f64_Factor = pc_Element->f64_Factor;
+                  rc_Config.c_ElementScaling.f64_Offset = pc_Element->f64_Offset;
+               }
+            }
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Add widget to view dashboard
+
+   \param[in] opc_Box New widget value
+   \param[in] oe_Type New widget type
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+
+   \created     19.07.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+sint32 C_PuiSvDashboard::AddWidget(const C_PuiSvDbWidgetBase * const opc_Box,
+                                   const C_PuiSvDbDataElement::E_Type oe_Type)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   switch (oe_Type)
+   {
+   case C_PuiSvDbDataElement::eCHART:
+      s32_Retval = this->InsertWidget(this->mc_Charts.size(), opc_Box, oe_Type);
+      break;
+   case C_PuiSvDbDataElement::eLABEL:
+      s32_Retval = this->InsertWidget(this->mc_Labels.size(), opc_Box, oe_Type);
+      break;
+   case C_PuiSvDbDataElement::ePARAM:
+      s32_Retval = this->InsertWidget(this->mc_ParamWidgets.size(), opc_Box, oe_Type);
+      break;
+   case C_PuiSvDbDataElement::ePIE_CHART:
+      s32_Retval = this->InsertWidget(this->mc_PieCharts.size(), opc_Box, oe_Type);
+      break;
+   case C_PuiSvDbDataElement::ePROGRESS_BAR:
+      s32_Retval = this->InsertWidget(this->mc_ProgressBars.size(), opc_Box, oe_Type);
+      break;
+   case C_PuiSvDbDataElement::eSLIDER:
+      s32_Retval = this->InsertWidget(this->mc_Sliders.size(), opc_Box, oe_Type);
+      break;
+   case C_PuiSvDbDataElement::eSPIN_BOX:
+      s32_Retval = this->InsertWidget(this->mc_SpinBoxes.size(), opc_Box, oe_Type);
+      break;
+   case C_PuiSvDbDataElement::eTABLE:
+      s32_Retval = this->InsertWidget(this->mc_Tables.size(), opc_Box, oe_Type);
+      break;
+   case C_PuiSvDbDataElement::eTOGGLE:
+      s32_Retval = this->InsertWidget(this->mc_Toggles.size(), opc_Box, oe_Type);
+      break;
+   default:
+      s32_Retval = C_RANGE;
+      break;
+   }
+   return s32_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Insert widget to view dashboard
+
+   \param[in] ou32_WidgetIndex Widget index
+   \param[in] opc_Box          New widget value
+   \param[in] oe_Type          New widget type
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+
+   \created     19.07.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+sint32 C_PuiSvDashboard::InsertWidget(const uint32 ou32_WidgetIndex, const C_PuiSvDbWidgetBase * const opc_Box,
+                                      const C_PuiSvDbDataElement::E_Type oe_Type)
+{
+   sint32 s32_Retval = C_NO_ERR;
+   const C_PuiSvDbChart * opc_Chart;
+   const C_PuiSvDbLabel * opc_Label;
+   const C_PuiSvDbParam * opc_ParamWidget;
+   const C_PuiSvDbPieChart * opc_PieChart;
+   const C_PuiSvDbProgressBar * opc_ProgressBar;
+   const C_PuiSvDbSlider * opc_Slider;
+   const C_PuiSvDbSpinBox * opc_SpinBox;
+   const C_PuiSvDbTable * opc_Table;
+   const C_PuiSvDbToggle * opc_Toggle;
+
+   switch (oe_Type)
+   {
+   case C_PuiSvDbDataElement::eCHART:
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      opc_Chart = dynamic_cast<const C_PuiSvDbChart *>(opc_Box);
+      if (opc_Chart != NULL)
+      {
+         if (ou32_WidgetIndex <= this->mc_Charts.size())
+         {
+            this->mc_Charts.insert(this->mc_Charts.begin() + ou32_WidgetIndex, *opc_Chart);
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::eLABEL:
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      opc_Label = dynamic_cast<const C_PuiSvDbLabel *>(opc_Box);
+      if (opc_Label != NULL)
+      {
+         if (ou32_WidgetIndex <= this->mc_Labels.size())
+         {
+            this->mc_Labels.insert(this->mc_Labels.begin() + ou32_WidgetIndex, *opc_Label);
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::ePARAM:
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      opc_ParamWidget = dynamic_cast<const C_PuiSvDbParam *>(opc_Box);
+      if (opc_ParamWidget != NULL)
+      {
+         if (ou32_WidgetIndex <= this->mc_ParamWidgets.size())
+         {
+            this->mc_ParamWidgets.insert(this->mc_ParamWidgets.begin() + ou32_WidgetIndex, *opc_ParamWidget);
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::ePIE_CHART:
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      opc_PieChart = dynamic_cast<const C_PuiSvDbPieChart *>(opc_Box);
+      if (opc_PieChart != NULL)
+      {
+         if (ou32_WidgetIndex <= this->mc_PieCharts.size())
+         {
+            this->mc_PieCharts.insert(this->mc_PieCharts.begin() + ou32_WidgetIndex, *opc_PieChart);
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::ePROGRESS_BAR:
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      opc_ProgressBar = dynamic_cast<const C_PuiSvDbProgressBar *>(opc_Box);
+      if (opc_ProgressBar != NULL)
+      {
+         if (ou32_WidgetIndex <= this->mc_ProgressBars.size())
+         {
+            this->mc_ProgressBars.insert(this->mc_ProgressBars.begin() + ou32_WidgetIndex, *opc_ProgressBar);
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::eSLIDER:
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      opc_Slider = dynamic_cast<const C_PuiSvDbSlider *>(opc_Box);
+      if (opc_Slider != NULL)
+      {
+         if (ou32_WidgetIndex <= this->mc_Sliders.size())
+         {
+            this->mc_Sliders.insert(this->mc_Sliders.begin() + ou32_WidgetIndex, *opc_Slider);
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::eSPIN_BOX:
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      opc_SpinBox = dynamic_cast<const C_PuiSvDbSpinBox *>(opc_Box);
+      if (opc_SpinBox != NULL)
+      {
+         if (ou32_WidgetIndex <= this->mc_SpinBoxes.size())
+         {
+            this->mc_SpinBoxes.insert(this->mc_SpinBoxes.begin() + ou32_WidgetIndex, *opc_SpinBox);
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::eTABLE:
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      opc_Table = dynamic_cast<const C_PuiSvDbTable *>(opc_Box);
+      if (opc_Table != NULL)
+      {
+         if (ou32_WidgetIndex <= this->mc_Tables.size())
+         {
+            this->mc_Tables.insert(this->mc_Tables.begin() + ou32_WidgetIndex, *opc_Table);
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::eTOGGLE:
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      opc_Toggle = dynamic_cast<const C_PuiSvDbToggle *>(opc_Box);
+      if (opc_Toggle != NULL)
+      {
+         if (ou32_WidgetIndex <= this->mc_Toggles.size())
+         {
+            this->mc_Toggles.insert(this->mc_Toggles.begin() + ou32_WidgetIndex, *opc_Toggle);
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   default:
+      s32_Retval = C_RANGE;
+      break;
+   }
+   return s32_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Param widget clear all data pool elements
+
+   \param[in] ou32_ParamWidgetIndex Param index
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+
+   \created     05.12.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+sint32 C_PuiSvDashboard::ClearParamDataPoolElements(const uint32 ou32_ParamWidgetIndex)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (ou32_ParamWidgetIndex < this->mc_ParamWidgets.size())
+   {
+      C_PuiSvDbParam & rc_ParamWidget = this->mc_ParamWidgets[ou32_ParamWidgetIndex];
+      rc_ParamWidget.c_DataPoolElementsConfig.clear();
+      rc_ParamWidget.c_DataSetSelectionIndices.clear();
+      rc_ParamWidget.c_ListValues.clear();
+      rc_ParamWidget.c_ColWidth.clear();
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Param widget add new data pool element
+
+   \param[in] ou32_ParamWidgetIndex Param index
+   \param[in] orc_NewId             New ID
+   \param[in] opc_Content           Optional init value
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//-----------------------------------------------------------------------------
+sint32 C_PuiSvDashboard::AddParamNewDataPoolElement(const uint32 ou32_ParamWidgetIndex,
+                                                    const C_OSCNodeDataPoolListElementId & orc_NewId,
+                                                    const C_OSCNodeDataPoolContent * const opc_Content)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (ou32_ParamWidgetIndex < this->mc_ParamWidgets.size())
+   {
+      const C_OSCNodeDataPoolListElement * const pc_Element =
+         C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(orc_NewId.u32_NodeIndex,
+                                                                    orc_NewId.u32_DataPoolIndex,
+                                                                    orc_NewId.u32_ListIndex,
+                                                                    orc_NewId.u32_ElementIndex);
+
+      if (pc_Element != NULL)
+      {
+         C_PuiSvDbParam & rc_ParamWidget = this->mc_ParamWidgets[ou32_ParamWidgetIndex];
+         C_PuiSvDbNodeDataElementConfig c_NewConfig;
+         std::vector<sint32> c_InitalColWidth;
+         c_NewConfig.c_ElementId = C_PuiSvDbNodeDataPoolListElementId(orc_NewId,
+                                                                      C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT);
+         //Add all necessary elements
+         rc_ParamWidget.c_DataPoolElementsConfig.push_back(c_NewConfig);
+         rc_ParamWidget.c_DataSetSelectionIndices.push_back(-1);
+         if ((((opc_Content != NULL) && (opc_Content->GetType() == pc_Element->GetType())) &&
+              (opc_Content->GetArray() == pc_Element->GetArray())) &&
+             (opc_Content->GetArraySize() == pc_Element->GetArraySize()))
+         {
+            rc_ParamWidget.c_ListValues.push_back(*opc_Content);
+         }
+         else
+         {
+            C_SdNdeDataPoolContentUtil::E_ValueChangedTo e_Tmp;
+            C_OSCNodeDataPoolContent c_Content;
+            //Init content
+            c_Content = pc_Element->c_MinValue;
+            tgl_assert(C_SdNdeDataPoolContentUtil::h_SetValueInMinMaxRange(
+                          pc_Element->c_MinValue, pc_Element->c_MaxValue, c_Content, e_Tmp,
+                          C_SdNdeDataPoolContentUtil::eTO_ZERO) == C_NO_ERR);
+            rc_ParamWidget.c_ListValues.push_back(c_Content);
+         }
+         rc_ParamWidget.c_ColWidth.push_back(c_InitalColWidth);
+         //Expand up to new item
+         for (uint32 u32_ItRelevantLayer = 0UL; u32_ItRelevantLayer < 3UL; ++u32_ItRelevantLayer)
+         {
+            bool q_Found = false;
+            for (std::vector<C_PuiSvDbExpandedTreeIndex>::const_iterator c_ExistingItems =
+                    rc_ParamWidget.c_ExpandedItems.begin();
+                 (c_ExistingItems != rc_ParamWidget.c_ExpandedItems.end()) && (q_Found == false); ++c_ExistingItems)
+            {
+               const C_PuiSvDbExpandedTreeIndex & rc_CurItem = *c_ExistingItems;
+               if (rc_CurItem.u32_Layer == u32_ItRelevantLayer)
+               {
+                  switch (u32_ItRelevantLayer)
+                  {
+                  case 0UL:
+                     q_Found = true;
+                     break;
+                  case 1UL:
+                     if (rc_CurItem.c_ExpandedId.u32_NodeIndex == orc_NewId.u32_NodeIndex)
+                     {
+                        q_Found = true;
+                     }
+                     break;
+                  case 2UL:
+                     if ((rc_CurItem.c_ExpandedId.u32_NodeIndex == orc_NewId.u32_NodeIndex) &&
+                         (rc_CurItem.c_ExpandedId.u32_DataPoolIndex == orc_NewId.u32_DataPoolIndex))
+                     {
+                        q_Found = true;
+                     }
+                     break;
+                  default:
+                     //Unexpected
+                     break;
+                  }
+               }
+            }
+            if (q_Found == false)
+            {
+               //Append new item if not already existing
+               C_PuiSvDbExpandedTreeIndex c_NewItem;
+               c_NewItem.c_ExpandedId = C_PuiSvDbNodeDataPoolListElementId(orc_NewId,
+                                                                           C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT);
+               c_NewItem.u32_Layer = u32_ItRelevantLayer;
+               rc_ParamWidget.c_ExpandedItems.push_back(c_NewItem);
+            }
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Delete widget from view dashboard
+
+   \param[in] ou32_WidgetIndex Widget index
+   \param[in] oe_Type          New widget type
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+
+   \created     19.07.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+sint32 C_PuiSvDashboard::DeleteWidget(const uint32 ou32_WidgetIndex, const C_PuiSvDbDataElement::E_Type oe_Type)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   switch (oe_Type)
+   {
+   case C_PuiSvDbDataElement::eCHART:
+      if (ou32_WidgetIndex < this->mc_Charts.size())
+      {
+         this->mc_Charts.erase(this->mc_Charts.begin() + ou32_WidgetIndex);
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::eLABEL:
+      if (ou32_WidgetIndex < this->mc_Labels.size())
+      {
+         this->mc_Labels.erase(this->mc_Labels.begin() + ou32_WidgetIndex);
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::ePARAM:
+      if (ou32_WidgetIndex < this->mc_ParamWidgets.size())
+      {
+         this->mc_ParamWidgets.erase(this->mc_ParamWidgets.begin() + ou32_WidgetIndex);
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::ePIE_CHART:
+      if (ou32_WidgetIndex < this->mc_PieCharts.size())
+      {
+         this->mc_PieCharts.erase(this->mc_PieCharts.begin() + ou32_WidgetIndex);
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::ePROGRESS_BAR:
+      if (ou32_WidgetIndex < this->mc_ProgressBars.size())
+      {
+         this->mc_ProgressBars.erase(this->mc_ProgressBars.begin() + ou32_WidgetIndex);
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::eSLIDER:
+      if (ou32_WidgetIndex < this->mc_Sliders.size())
+      {
+         this->mc_Sliders.erase(this->mc_Sliders.begin() + ou32_WidgetIndex);
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::eSPIN_BOX:
+      if (ou32_WidgetIndex < this->mc_SpinBoxes.size())
+      {
+         this->mc_SpinBoxes.erase(this->mc_SpinBoxes.begin() + ou32_WidgetIndex);
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::eTABLE:
+      if (ou32_WidgetIndex < this->mc_Tables.size())
+      {
+         this->mc_Tables.erase(this->mc_Tables.begin() + ou32_WidgetIndex);
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   case C_PuiSvDbDataElement::eTOGGLE:
+      if (ou32_WidgetIndex < this->mc_Toggles.size())
+      {
+         this->mc_Toggles.erase(this->mc_Toggles.begin() + ou32_WidgetIndex);
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+      break;
+   default:
+      s32_Retval = C_RANGE;
+      break;
+   }
+   return s32_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Check error for dashboard
+
+   \param[in,out] opq_InvalidDataElements Error result for check of invalid data elements
+   \param[in,out] opq_MissingDataElements Error result for check of missing data elements
+
+   \created     27.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::CheckError(bool * const opq_InvalidDataElements, bool * const opq_MissingDataElements) const
+{
+   if ((opq_InvalidDataElements != NULL) || (opq_MissingDataElements != NULL))
+   {
+      std::vector<const C_PuiSvDbWidgetBase *> c_Widgets;
+      if (opq_MissingDataElements != NULL)
+      {
+         *opq_MissingDataElements = false;
+      }
+      if (opq_InvalidDataElements != NULL)
+      {
+         *opq_InvalidDataElements = false;
+      }
+      this->GetAllWidgetItems(c_Widgets);
+      //For all widgets
+      for (std::vector<const C_PuiSvDbWidgetBase *>::const_iterator c_ItWidget = c_Widgets.begin();
+           c_ItWidget != c_Widgets.end(); ++c_ItWidget)
+      {
+         const C_PuiSvDbWidgetBase * const pc_Widget = *c_ItWidget;
+         if (pc_Widget != NULL)
+         {
+            //For all data elements
+            for (std::vector<C_PuiSvDbNodeDataElementConfig>::const_iterator c_ItConfig =
+                    pc_Widget->c_DataPoolElementsConfig.begin();
+                 c_ItConfig != pc_Widget->c_DataPoolElementsConfig.end(); ++c_ItConfig)
+            {
+               const C_PuiSvDbNodeDataPoolListElementId & rc_ElementId = c_ItConfig->c_ElementId;
+               //Check ID valid
+               if (rc_ElementId.GetIsValid() == false)
+               {
+                  if (opq_InvalidDataElements != NULL)
+                  {
+                     *opq_InvalidDataElements = true;
+                  }
+               }
+            }
+            if ((pc_Widget->c_DataPoolElementsConfig.size() == 0) && (opq_MissingDataElements != NULL))
+            {
+               *opq_MissingDataElements = true;
+            }
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Check if list already in use by param widget
+
+   \param[in] orc_Id Node data pool list ID
+   \return
+   True  Used
+   False False unused
+
+   \created     20.11.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+bool C_PuiSvDashboard::CheckNvmParamListUsage(const C_OSCNodeDataPoolListId & orc_Id) const
+{
+   bool q_Retval = false;
+
+   //For all param widgets
+   for (uint32 u32_ItParam = 0; (u32_ItParam < this->mc_ParamWidgets.size()) && (q_Retval == false); ++u32_ItParam)
+   {
+      const C_PuiSvDbParam & rc_Param = this->mc_ParamWidgets[u32_ItParam];
+      //For each list and value item
+      for (uint32 u32_ItElement = 0; (u32_ItElement < rc_Param.c_DataPoolElementsConfig.size()) && (q_Retval == false);
+           ++u32_ItElement)
+      {
+         const C_PuiSvDbNodeDataElementConfig & rc_Config = rc_Param.c_DataPoolElementsConfig[u32_ItElement];
+         if (rc_Config.c_ElementId.GetIsValid() == true)
+         {
+            if (((rc_Config.c_ElementId.u32_NodeIndex == orc_Id.u32_NodeIndex) &&
+                 (rc_Config.c_ElementId.u32_DataPoolIndex == orc_Id.u32_DataPoolIndex)) &&
+                (rc_Config.c_ElementId.u32_ListIndex == orc_Id.u32_ListIndex))
+            {
+               q_Retval = true;
+            }
+         }
+      }
+   }
+
+   return q_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get widget type
+
+   \param[in] opc_Box Basic widget item
+
+   \return
+   Widget type, else widget type unknown
+
+   \created     28.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+C_PuiSvDbDataElement::E_Type C_PuiSvDashboard::h_GetWidgetType(const C_PuiSvDbWidgetBase * const opc_Box)
+{
+   C_PuiSvDbDataElement::E_Type e_Retval = C_PuiSvDbDataElement::eUNKNOWN;
+   if (opc_Box != NULL)
+   {
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      const C_PuiSvDbChart * const pc_Charts = dynamic_cast<const C_PuiSvDbChart * const>(opc_Box);
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      const C_PuiSvDbLabel * const pc_Labels = dynamic_cast<const C_PuiSvDbLabel * const>(opc_Box);
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      const C_PuiSvDbParam * const pc_ParamWidgets = dynamic_cast<const C_PuiSvDbParam * const>(opc_Box);
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      const C_PuiSvDbPieChart * const pc_PieCharts = dynamic_cast<const C_PuiSvDbPieChart * const>(opc_Box);
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      const C_PuiSvDbProgressBar * const pc_ProgressBars = dynamic_cast<const C_PuiSvDbProgressBar * const>(opc_Box);
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      const C_PuiSvDbSpinBox * const pc_SpinBoxes = dynamic_cast<const C_PuiSvDbSpinBox * const>(opc_Box);
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      const C_PuiSvDbSlider * const pc_Sliders = dynamic_cast<const C_PuiSvDbSlider * const>(opc_Box);
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      const C_PuiSvDbTable * const pc_Tables = dynamic_cast<const C_PuiSvDbTable * const>(opc_Box);
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      const C_PuiSvDbToggle * const pc_Toggles = dynamic_cast<const C_PuiSvDbToggle * const>(opc_Box);
+
+      if (pc_Charts != NULL)
+      {
+         e_Retval = C_PuiSvDbDataElement::eCHART;
+      }
+      if (pc_Labels != NULL)
+      {
+         e_Retval = C_PuiSvDbDataElement::eLABEL;
+      }
+      if (pc_ParamWidgets != NULL)
+      {
+         e_Retval = C_PuiSvDbDataElement::ePARAM;
+      }
+      if (pc_PieCharts != NULL)
+      {
+         e_Retval = C_PuiSvDbDataElement::ePIE_CHART;
+      }
+      if (pc_ProgressBars != NULL)
+      {
+         e_Retval = C_PuiSvDbDataElement::ePROGRESS_BAR;
+      }
+      if (pc_SpinBoxes != NULL)
+      {
+         e_Retval = C_PuiSvDbDataElement::eSPIN_BOX;
+      }
+      if (pc_Sliders != NULL)
+      {
+         e_Retval = C_PuiSvDbDataElement::eSLIDER;
+      }
+      if (pc_Tables != NULL)
+      {
+         e_Retval = C_PuiSvDbDataElement::eTABLE;
+      }
+      if (pc_Toggles != NULL)
+      {
+         e_Retval = C_PuiSvDbDataElement::eTOGGLE;
+      }
+      tgl_assert(e_Retval != C_PuiSvDbDataElement::eUNKNOWN);
+   }
+   return e_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Clear stored content
+
+   \created     24.07.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::Clear(void)
+{
+   this->mc_Charts.clear();
+   this->mc_Labels.clear();
+   this->mc_ParamWidgets.clear();
+   this->mc_PieCharts.clear();
+   this->mc_ProgressBars.clear();
+   this->mc_SpinBoxes.clear();
+   this->mc_Sliders.clear();
+   this->mc_Tables.clear();
+   this->mc_Toggles.clear();
+   C_PuiBsElements::Clear();
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Count sum of all items
+
+   \created     24.07.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+uint32 C_PuiSvDashboard::Count(void) const
+{
+   uint32 u32_Retval = C_PuiBsElements::Count();
+
+   u32_Retval += this->mc_Charts.size();
+   u32_Retval += this->mc_Labels.size();
+   u32_Retval += this->mc_ParamWidgets.size();
+   u32_Retval += this->mc_PieCharts.size();
+   u32_Retval += this->mc_ProgressBars.size();
+   u32_Retval += this->mc_SpinBoxes.size();
+   u32_Retval += this->mc_Sliders.size();
+   u32_Retval += this->mc_Tables.size();
+   u32_Retval += this->mc_Toggles.size();
+   return u32_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get all widget items in one single vector
+
+   Warning: output not cleared
+
+   \param[in,out] orc_Output Output
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::m_GetAllWidgetItems(std::vector<C_PuiSvDbWidgetBase *> & orc_Output)
+{
+   const uintn un_Size = this->mc_Charts.size() + this->mc_Labels.size() + this->mc_PieCharts.size() +
+                         this->mc_ProgressBars.size() + this->mc_SpinBoxes.size() + this->mc_Sliders.size() +
+                         this->mc_Tables.size() + this->mc_Toggles.size() + this->mc_ParamWidgets.size();
+
+   //Improve performance
+   orc_Output.reserve(un_Size);
+   for (uint32 u32_ItItem = 0; u32_ItItem < this->mc_Charts.size(); ++u32_ItItem)
+   {
+      orc_Output.push_back(&this->mc_Charts[u32_ItItem]);
+   }
+   for (uint32 u32_ItItem = 0; u32_ItItem < this->mc_Labels.size(); ++u32_ItItem)
+   {
+      orc_Output.push_back(&this->mc_Labels[u32_ItItem]);
+   }
+   for (uint32 u32_ItItem = 0; u32_ItItem < this->mc_ParamWidgets.size(); ++u32_ItItem)
+   {
+      orc_Output.push_back(&this->mc_ParamWidgets[u32_ItItem]);
+   }
+   for (uint32 u32_ItItem = 0; u32_ItItem < this->mc_PieCharts.size(); ++u32_ItItem)
+   {
+      orc_Output.push_back(&this->mc_PieCharts[u32_ItItem]);
+   }
+   for (uint32 u32_ItItem = 0; u32_ItItem < this->mc_ProgressBars.size(); ++u32_ItItem)
+   {
+      orc_Output.push_back(&this->mc_ProgressBars[u32_ItItem]);
+   }
+   for (uint32 u32_ItItem = 0; u32_ItItem < this->mc_SpinBoxes.size(); ++u32_ItItem)
+   {
+      orc_Output.push_back(&this->mc_SpinBoxes[u32_ItItem]);
+   }
+   for (uint32 u32_ItItem = 0; u32_ItItem < this->mc_Sliders.size(); ++u32_ItItem)
+   {
+      orc_Output.push_back(&this->mc_Sliders[u32_ItItem]);
+   }
+   for (uint32 u32_ItItem = 0; u32_ItItem < this->mc_Tables.size(); ++u32_ItItem)
+   {
+      orc_Output.push_back(&this->mc_Tables[u32_ItItem]);
+   }
+   for (uint32 u32_ItItem = 0; u32_ItItem < this->mc_Toggles.size(); ++u32_ItItem)
+   {
+      orc_Output.push_back(&this->mc_Toggles[u32_ItItem]);
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Mark data element id invalid
+
+   Warning: expected to be called before data element deletion
+
+   \param[in,out] orc_DataElementId Data element id
+
+   \created     20.09.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::mh_MarkInvalid(C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId)
+{
+   const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+      orc_DataElementId.u32_NodeIndex, orc_DataElementId.u32_DataPoolIndex);
+
+   if (pc_DataPool != NULL)
+   {
+      QString c_Namespace;
+      if (orc_DataElementId.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)
+      {
+         c_Namespace = C_PuiSdHandler::h_GetInstance()->GetNamespace(orc_DataElementId);
+      }
+      else
+      {
+         c_Namespace = C_PuiSdHandler::h_GetInstance()->GetSignalNamespace(orc_DataElementId);
+      }
+      orc_DataElementId.MarkInvalid(pc_DataPool->e_Type, c_Namespace);
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Clean up parameters after synchronisation step
+
+   \created     26.10.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvDashboard::m_SyncCleanUpParams(void)
+{
+   //For all param widgets
+   for (uint32 u32_ItParam = 0; u32_ItParam < this->mc_ParamWidgets.size(); ++u32_ItParam)
+   {
+      uint32 u32_ItElement = 0;
+      C_PuiSvDbParam & rc_Param = this->mc_ParamWidgets[u32_ItParam];
+      //For each list and value item
+      tgl_assert(rc_Param.c_ListValues.size() == rc_Param.c_DataPoolElementsConfig.size());
+      tgl_assert(rc_Param.c_DataSetSelectionIndices.size() == rc_Param.c_DataPoolElementsConfig.size());
+      for (std::vector<C_PuiSvDbNodeDataElementConfig>::iterator c_ItDataPoolElements =
+              rc_Param.c_DataPoolElementsConfig.begin();
+           c_ItDataPoolElements != rc_Param.c_DataPoolElementsConfig.end();)
+      {
+         const C_PuiSvDbNodeDataElementConfig & rc_Config = rc_Param.c_DataPoolElementsConfig[u32_ItElement];
+         //Check if the item was invalidated
+         if (rc_Config.c_ElementId.GetIsValid() == false)
+         {
+            //Erase current element
+            c_ItDataPoolElements = rc_Param.c_DataPoolElementsConfig.erase(c_ItDataPoolElements);
+            rc_Param.c_ListValues.erase(rc_Param.c_ListValues.begin() + u32_ItElement);
+            rc_Param.c_DataSetSelectionIndices.erase(rc_Param.c_DataSetSelectionIndices.begin() + u32_ItElement);
+         }
+         else
+         {
+            //Iterate to next item
+            ++c_ItDataPoolElements;
+            ++u32_ItElement;
+         }
+      }
+      for (std::vector<C_PuiSvDbExpandedTreeIndex>::iterator c_ItDataPoolElements = rc_Param.c_ExpandedItems.begin();
+           c_ItDataPoolElements != rc_Param.c_ExpandedItems.end();)
+      {
+         const C_PuiSvDbExpandedTreeIndex & rc_Config = *c_ItDataPoolElements;
+         //Check if the item was invalidated
+         if (rc_Config.c_ExpandedId.GetIsValid() == false)
+         {
+            //Erase current element
+            c_ItDataPoolElements = rc_Param.c_ExpandedItems.erase(c_ItDataPoolElements);
+         }
+         else
+         {
+            //Iterate to next item
+            ++c_ItDataPoolElements;
+         }
+      }
+   }
+}

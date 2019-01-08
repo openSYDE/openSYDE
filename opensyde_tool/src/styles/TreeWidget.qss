@@ -1,0 +1,120 @@
+/* --------------------------------------------------------------------- */
+stw_opensyde_gui--C_NagViewItemTree,
+stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget,
+stw_opensyde_gui--C_SdNdeDataPoolListsTreeWidget,
+stw_opensyde_gui--C_SyvDaItPaListTreeWidget,
+stw_opensyde_gui_elements--C_OgeTreeViewNaviBar,
+stw_opensyde_gui_elements--C_OgeTreeWidgetToolBarSearch,
+stw_opensyde_gui--C_TblTreDataElementView,
+stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget {
+border-style: none;
+outline:none;
+}
+
+stw_opensyde_gui_elements--C_OgeTreeWidgetToolBarSearch::item {
+margin-right: 10px;
+}
+
+stw_opensyde_gui--C_SyvDaItPaListTreeWidget::item:!has-children,
+stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget::item:!has-children,
+stw_opensyde_gui--C_SdNdeDataPoolListsTreeWidget::item:!has-children,
+stw_opensyde_gui_elements--C_OgeTreeViewNaviBar::item,
+stw_opensyde_gui--C_TblTreDataElementView::item,
+stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::item {
+border-style: none;
+}
+
+stw_opensyde_gui--C_TblTreDataElementView::item,
+stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::item {
+margin-top: 3px;
+margin-bottom: 3px;
+}
+
+stw_opensyde_gui--C_SyvDaItPaListTreeWidget::item:has-children,
+stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget::item:has-children,
+stw_opensyde_gui--C_SdNdeDataPoolListsTreeWidget::item:has-children {
+margin-bottom: 1px;
+}
+
+stw_opensyde_gui--C_SyvDaItPaListTreeWidget::item:has-children,
+stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget::item:has-children,
+stw_opensyde_gui--C_SdNdeDataPoolListsTreeWidget::item:has-children {
+border-style: solid;
+border-width: 1px;
+}
+
+/* closed and not selected */
+stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:has-children:!has-siblings:closed,
+stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:closed:has-children:has-siblings {
+border-image: none;
+image:url(:/images/IconArrowSmallOpen.png);
+}
+
+/* closed and selected */
+stw_opensyde_gui--C_SyvDaItPaTreeView::branch:has-children:!has-siblings:closed,
+stw_opensyde_gui--C_SyvDaItPaTreeView::branch:closed:has-children:has-siblings,
+stw_opensyde_gui--C_TblTreDataElementView::branch:has-children:!has-siblings:closed,
+stw_opensyde_gui--C_TblTreDataElementView::branch:closed:has-children:has-siblings,
+stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:has-children:!has-siblings:closed:selected,
+stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:closed:has-children:has-siblings:selected {
+border-image: none;
+image:url(:/images/IconArrowSmallOpenBlue.png);
+}
+
+/* open and not selected */
+stw_opensyde_gui--C_SyvDaItPaTreeView::branch:open:has-children:!has-siblings,
+stw_opensyde_gui--C_SyvDaItPaTreeView::branch:open:has-children:has-siblings,
+stw_opensyde_gui--C_TblTreDataElementView::branch:open:has-children:!has-siblings,
+stw_opensyde_gui--C_TblTreDataElementView::branch:open:has-children:has-siblings,
+stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:has-children:!has-siblings:open:selected,
+stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:open:has-children:has-siblings:selected {
+border-image: none;
+image:url(:/images/IconArrowSmallClose.png);
+}
+
+/* open and selected */
+stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:has-children:!has-siblings:open,
+stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:open:has-children:has-siblings {
+border-image: none;
+image:url(:/images/IconArrowSmallCloseGray.png);
+}
+
+/*Style name edit field */
+stw_opensyde_gui--C_NagViewItemTree QLineEdit {
+margin-top: 10px;
+margin-bottom: 10px;
+}
+
+stw_opensyde_gui--C_NagViewItemTree::branch:open:has-children {
+border-image: none;
+/* Chaos theory proves this is the correct margin to get the desired icon size! */
+margin: 2px 2px 2px 2px;
+image:url(://images/main_page_and_navi_bar/Icon_close_list.svg);
+}
+
+stw_opensyde_gui--C_NagViewItemTree::branch:!has-children:adjoins-item {
+border-image: none;
+/* Chaos theory proves this is the correct margin to get the desired icon size! */
+margin: 3px 3px 3px 3px;
+image:url(://images/main_page_and_navi_bar/IconBulletList.svg);
+}
+
+stw_opensyde_gui--C_NagViewItemTree::branch:closed:has-children {
+border-image: none;
+/* Chaos theory proves this is the correct margin to get the desired icon size! */
+margin: 2px 2px 2px 2px;
+image:url(://images/main_page_and_navi_bar/Icon_open_list.svg);
+}
+
+stw_opensyde_gui--C_TblTreDataElementView::branch {
+margin-top:3px;
+margin-bottom:3px;
+}
+
+/* Indent 2*24px */
+stw_opensyde_gui--C_SyvDaItPaListTreeWidget {
+padding-left:48px;
+}
+
+
+/* --------------------------------------------------------------------- */

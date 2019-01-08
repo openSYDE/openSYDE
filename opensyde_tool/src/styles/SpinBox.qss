@@ -1,0 +1,346 @@
+/* --------------------------------------------------------------------- */
+QSpinBox,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox,
+stw_opensyde_gui_elements--C_OgeSpxDoubleProperties,
+stw_opensyde_gui_elements--C_OgeSpxInt64Properties,
+stw_opensyde_gui_elements--C_OgeSpxFactorProperties,
+stw_opensyde_gui_elements--C_OgeWiSpinBoxGroupProperties QAbstractSpinBox {
+border-width:1px;
+border-style:solid;
+padding-left:6px;
+padding-right:6px;
+}
+
+/* Somehow this one has some default margins... */
+stw_opensyde_gui_elements--C_OgeWiSpinBoxGroupProperties QAbstractSpinBox,
+stw_opensyde_gui_elements--C_OgeWiSpinBoxGroupProperties QDoubleSpinBox,
+stw_opensyde_gui_elements--C_OgeWiSpinBoxGroupProperties QDoubleSpinBox:up-button,
+stw_opensyde_gui_elements--C_OgeWiSpinBoxGroupProperties QDoubleSpinBox::down-button {
+margin: 0px;
+}
+
+
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_BRIGHT"],
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_BRIGHT"][Type="2"]:up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_BRIGHT"][Type="2"]::down-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_DARK"],
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_DARK"][Type="2"]:up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_DARK"][Type="2"]::down-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_BRIGHT"],
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_BRIGHT"][Type="2"]:up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_BRIGHT"][Type="2"]::down-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_DARK"],
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_DARK"][Type="2"]:up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_DARK"][Type="2"]::down-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_BRIGHT"],
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_BRIGHT"][Type="2"]:up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_BRIGHT"][Type="2"]::down-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_DARK"],
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_DARK"][Type="2"]:up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_DARK"][Type="2"]::down-button {
+border-style:none;
+}
+
+
+
+
+/* Button offset */
+
+stw_opensyde_gui_elements--C_OgeSpxInt64FactorTable::down-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_BRIGHT"]::down-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_DARK"]::down-button,
+stw_opensyde_gui_elements--C_OgeSpxDoubleProperties::down-button,
+stw_opensyde_gui_elements--C_OgeSpxInt64Properties::down-button,
+stw_opensyde_gui_elements--C_OgeSpxFactorProperties::down-button,
+stw_opensyde_gui_elements--C_OgeWiSpinBoxGroupProperties QAbstractSpinBox::down-button,
+stw_opensyde_gui_elements--C_OgeSpxInt64Table::down-button,
+stw_opensyde_gui_elements--C_OgeWiParamSpinBoxGroup QAbstractSpinBox::down-button,
+stw_opensyde_gui_elements--C_OgeWiTableSpinBoxGroup QAbstractSpinBox::down-button,
+stw_opensyde_gui_elements--C_OgeSpxTableDouble::down-button,
+stw_opensyde_gui_elements--C_OgeSpxFactorTable::down-button,
+QSpinBox::down-button {
+border-right-width:0px;
+border-top-width:1px;
+border-left-width:1px;
+border-bottom-width:0px;
+border-style:solid;
+}
+/* Custom param widget style */
+stw_opensyde_gui_elements--C_OgeWiParamSpinBoxGroup QAbstractSpinBox::down-button {
+border-right-width:0px;
+border-top-width:0px;
+border-left-width:1px;
+border-bottom-width:0px;
+border-style:solid;
+}
+
+stw_opensyde_gui_elements--C_OgeSpxInt64FactorTable::up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_BRIGHT"]::up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_DARK"]::up-button,
+stw_opensyde_gui_elements--C_OgeSpxDoubleProperties::up-button,
+stw_opensyde_gui_elements--C_OgeSpxInt64Properties::up-button,
+stw_opensyde_gui_elements--C_OgeSpxFactorProperties::up-button,
+stw_opensyde_gui_elements--C_OgeWiSpinBoxGroupProperties QAbstractSpinBox::up-button,
+stw_opensyde_gui_elements--C_OgeSpxInt64Table::up-button,
+stw_opensyde_gui_elements--C_OgeWiParamSpinBoxGroup QAbstractSpinBox::up-button,
+stw_opensyde_gui_elements--C_OgeWiTableSpinBoxGroup QAbstractSpinBox::up-button,
+stw_opensyde_gui_elements--C_OgeSpxTableDouble::up-button,
+stw_opensyde_gui_elements--C_OgeSpxFactorTable::up-button,
+QSpinBox::up-button {
+image: url(:/images/SpinBoxUpArrow.png) 0 0 0 0 stretch stretch;
+border-right-width:0px;
+border-top-width:0px;
+border-left-width:1px;
+border-bottom-width:1px;
+border-style:solid;
+}
+
+/* Custom param widget style */
+stw_opensyde_gui_elements--C_OgeWiParamSpinBoxGroup QAbstractSpinBox::up-button {
+image: url(:/images/SpinBoxUpArrow.png) 0 0 0 0 stretch stretch;
+border-right-width:0px;
+border-top-width:0px;
+border-left-width:1px;
+border-bottom-width:1px;
+border-style:solid;
+}
+
+
+
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_BRIGHT"][Type="1"]:up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_DARK"][Type="1"]::up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_BRIGHT"][Type="1"]::up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_DARK"][Type="1"]::up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_BRIGHT"][Type="1"]::up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_DARK"][Type="1"]::up-button{
+border-right-width:0px;
+border-top-width:0px;
+border-left-width:0px;
+border-bottom-width:1px;
+border-style:solid;
+}
+
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_BRIGHT"][Type="1"]::down-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_DARK"][Type="1"]::down-button ,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_BRIGHT"][Type="1"]::down-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_DARK"][Type="1"]::down-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_BRIGHT"][Type="1"]::down-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_DARK"][Type="1"]::down-button {
+border-right-width:0px;
+border-top-width:1px;
+border-left-width:0px;
+border-bottom-width:0px;
+border-style:solid;
+}
+
+
+
+
+
+/* Default spin box icons */
+
+stw_opensyde_gui_elements--C_OgeSpxInt64FactorTable::down-button,
+stw_opensyde_gui_elements--C_OgeSpxDoubleProperties::down-button,
+stw_opensyde_gui_elements--C_OgeSpxInt64Properties::down-button,
+stw_opensyde_gui_elements--C_OgeSpxFactorProperties::down-button,
+stw_opensyde_gui_elements--C_OgeWiSpinBoxGroupProperties QAbstractSpinBox::down-button,
+stw_opensyde_gui_elements--C_OgeSpxInt64Table::down-button,
+stw_opensyde_gui_elements--C_OgeWiParamSpinBoxGroup QAbstractSpinBox::down-button,
+stw_opensyde_gui_elements--C_OgeWiTableSpinBoxGroup QAbstractSpinBox::down-button,
+stw_opensyde_gui_elements--C_OgeSpxTableDouble::down-button,
+stw_opensyde_gui_elements--C_OgeSpxFactorTable::down-button,
+QSpinBox::down-button {
+image: url(:/images/GroupBoxDownArrow.png) 0 0 0 0 stretch stretch;
+}
+
+stw_opensyde_gui_elements--C_OgeSpxInt64FactorTable::down-button:!enabled,
+stw_opensyde_gui_elements--C_OgeSpxDoubleProperties::down-button:!enabled,
+stw_opensyde_gui_elements--C_OgeSpxInt64Properties::down-button:!enabled,
+stw_opensyde_gui_elements--C_OgeSpxFactorProperties::down-button:!enabled,
+stw_opensyde_gui_elements--C_OgeWiSpinBoxGroupProperties QAbstractSpinBox::down-button:!enabled,
+stw_opensyde_gui_elements--C_OgeSpxInt64Table::down-button:!enabled,
+stw_opensyde_gui_elements--C_OgeWiParamSpinBoxGroup QAbstractSpinBox::down-button:!enabled,
+stw_opensyde_gui_elements--C_OgeWiTableSpinBoxGroup QAbstractSpinBox::down-button:!enabled,
+stw_opensyde_gui_elements--C_OgeSpxTableDouble::down-button:!enabled,
+stw_opensyde_gui_elements--C_OgeSpxFactorTable::down-button:!enabled,
+QSpinBox::down-button:!enabled {
+image: url(:/images/GroupBoxDownArrowDisabled.png) 0 0 0 0 stretch stretch;
+}
+
+stw_opensyde_gui_elements--C_OgeSpxInt64FactorTable::up-button,
+stw_opensyde_gui_elements--C_OgeSpxDoubleProperties::up-button,
+stw_opensyde_gui_elements--C_OgeSpxInt64Properties::up-button,
+stw_opensyde_gui_elements--C_OgeSpxFactorProperties::up-button,
+stw_opensyde_gui_elements--C_OgeWiSpinBoxGroupProperties QAbstractSpinBox::up-button,
+stw_opensyde_gui_elements--C_OgeSpxInt64Table::up-button,
+stw_opensyde_gui_elements--C_OgeWiParamSpinBoxGroup QAbstractSpinBox::up-button,
+stw_opensyde_gui_elements--C_OgeWiTableSpinBoxGroup QAbstractSpinBox::up-button,
+stw_opensyde_gui_elements--C_OgeSpxTableDouble::up-button,
+stw_opensyde_gui_elements--C_OgeSpxFactorTable::up-button,
+QSpinBox::up-button {
+image: url(:/images/SpinBoxUpArrow.png) 0 0 0 0 stretch stretch;
+}
+
+stw_opensyde_gui_elements--C_OgeSpxInt64FactorTable::up-button:!enabled,
+stw_opensyde_gui_elements--C_OgeSpxDoubleProperties::up-button:!enabled,
+stw_opensyde_gui_elements--C_OgeSpxInt64Properties::up-button:!enabled,
+stw_opensyde_gui_elements--C_OgeSpxFactorProperties::up-button:!enabled,
+stw_opensyde_gui_elements--C_OgeWiSpinBoxGroupProperties QAbstractSpinBox::up-button:!enabled,
+stw_opensyde_gui_elements--C_OgeSpxInt64Table::up-button:!enabled,
+stw_opensyde_gui_elements--C_OgeWiParamSpinBoxGroup QAbstractSpinBox::up-button:!enabled,
+stw_opensyde_gui_elements--C_OgeWiTableSpinBoxGroup QAbstractSpinBox::up-button:!enabled,
+stw_opensyde_gui_elements--C_OgeSpxTableDouble::up-button:!enabled,
+stw_opensyde_gui_elements--C_OgeSpxFactorTable::up-button:!enabled,
+QSpinBox::up-button:!enabled {
+image: url(:/images/SpinBoxUpArrowDisabled.png) 0 0 0 0 stretch stretch;
+}
+
+
+
+/* Alternative spin box icons */
+
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_BRIGHT"]::down-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_BRIGHT"]::down-button:!enabled,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_BRIGHT"][Type="2"]::down-button
+{
+image: url(://images/system_views/dashboards/icons/SpinBoxDownBlue.png) 0 0 0 0 stretch stretch;
+}
+
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_BRIGHT"]::up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_BRIGHT"]::up-button:!enabled,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_BRIGHT"][Type="2"]:up-button
+{
+image: url(://images/system_views/dashboards/icons/SpinBoxUpBlue.png) 0 0 0 0 stretch stretch;
+}
+
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_DARK"][Type="1"]::down-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_DARK"][Type="1"]::down-button:!enabled,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_BRIGHT"][Type="1"]::down-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_DARK"][Type="1"]::down-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_BRIGHT"][Type="1"]::down-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_DARK"][Type="1"]::down-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_DARK"][Type="2"]::down-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_BRIGHT"][Type="1"]::down-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_DARK"][Type="1"]::down-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_DARK"][Type="2"]::down-button
+{
+image: url(://images/system_views/dashboards/icons/SpinBoxDownWhite.png) 0 0 0 0 stretch stretch;
+}
+
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_DARK"][Type="1"]::up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_DARK"][Type="1"]::up-button:!enabled,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_BRIGHT"][Type="1"]:up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_DARK"][Type="1"]::up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_BRIGHT"][Type="1"]::up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_DARK"][Type="1"]::up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_DARK"][Type="2"]:up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_BRIGHT"][Type="1"]::up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_DARK"][Type="1"]::up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_DARK"][Type="2"]:up-button
+{
+image: url(://images/system_views/dashboards/icons/SpinBoxUpWhite.png) 0 0 0 0 stretch stretch;
+}
+
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_DARK"][Type="2"]::down-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_DARK"][Type="2"]::down-button:!enabled {
+image: url(://images/system_views/dashboards/icons/SpinBoxDownDarkBlue.png) 0 0 0 0 stretch stretch;
+}
+
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_DARK"][Type="2"]::up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_DARK"][Type="2"]::up-button:!enabled {
+image: url(://images/system_views/dashboards/icons/SpinBoxUpDarkBlue.png) 0 0 0 0 stretch stretch;
+}
+
+
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_BRIGHT"][Type="2"]:up-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_DARK"][Type="2"]:up-button {
+image: url(://images/system_views/dashboards/icons/SpinBoxUpGreen.png) 0 0 0 0 stretch stretch;		/*Wurde hinzugefuegt*/
+}
+
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_BRIGHT"][Type="2"]::down-button,
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_DARK"][Type="2"]::down-button {
+image: url(://images/system_views/dashboards/icons/SpinBoxDownGreen.png) 0 0 0 0 stretch stretch;		/*Wurde hinzugefuegt*/
+}
+
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_BRIGHT"][Type="2"]:up-button{
+image: url(://images/system_views/dashboards/icons/SpinBoxUpGrey.png) 0 0 0 0 stretch stretch;		/*Wurde hinzugefuegt*/
+}
+
+stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_BRIGHT"][Type="2"]::down-button{
+image: url(://images/system_views/dashboards/icons/SpinBoxDownGrey.png) 0 0 0 0 stretch stretch;		/*Wurde hinzugefuegt*/
+}
+
+
+
+
+/* Else */
+
+stw_opensyde_gui_elements--C_OgeSpxEditProperties::down-button:!focus,
+stw_opensyde_gui_elements--C_OgeSpxEditProperties::up-button:!focus {
+image: none;
+border-style:none;
+}
+
+stw_opensyde_gui_elements--C_OgeSpxEditProperties {
+border-style:none;
+}
+
+stw_opensyde_gui_elements--C_OgeSpxEditProperties:hover {
+border-style:solid;
+}
+
+stw_opensyde_gui_elements--C_OgeSpxEditProperties:focus {
+border-style:solid;
+}
+
+stw_opensyde_gui_elements--C_OgeSpxInt64FactorTable,
+stw_opensyde_gui_elements--C_OgeSpxInt64Table,
+stw_opensyde_gui_elements--C_OgeSpxFactorTable,
+stw_opensyde_gui_elements--C_OgeSpxTable,
+stw_opensyde_gui_elements--C_OgeSpxTableComIf,
+stw_opensyde_gui_elements--C_OgeWiTableSpinBoxGroup QAbstractSpinBox,
+stw_opensyde_gui_elements--C_OgeSpxTableDouble {
+border-style: solid;
+border-width: 1px;
+padding: 0px;
+margin-top: 3px;
+margin-bottom: 3px;
+}
+
+/* Size necessary for table usage */
+stw_opensyde_gui_elements--C_OgeWiTableSpinBoxGroup QAbstractSpinBox {
+max-height:30px;
+}
+
+/* Custom param widget style */
+stw_opensyde_gui_elements--C_OgeWiParamSpinBoxGroup QAbstractSpinBox {
+border-style: solid;
+border-width: 1px;
+padding: 0px;
+margin-top: 0px;
+margin-bottom: 0px;
+max-height:20px;
+}
+
+stw_opensyde_gui_elements--C_OgeSpxInt64FactorTable::down-button,
+stw_opensyde_gui_elements--C_OgeSpxInt64Table::down-button,
+stw_opensyde_gui_elements--C_OgeSpxFactorTable::down-button,
+stw_opensyde_gui_elements--C_OgeSpxTable::down-button,
+stw_opensyde_gui_elements--C_OgeSpxTableComIf::down-button,
+stw_opensyde_gui_elements--C_OgeWiTableSpinBoxGroup QAbstractSpinBox::down-button,
+stw_opensyde_gui_elements--C_OgeSpxTableDouble::down-button {
+margin-bottom: 3px;
+}
+
+stw_opensyde_gui_elements--C_OgeSpxInt64FactorTable::up-button,
+stw_opensyde_gui_elements--C_OgeSpxInt64Table::up-button,
+stw_opensyde_gui_elements--C_OgeSpxFactorTable::up-button,
+stw_opensyde_gui_elements--C_OgeSpxTable::up-button,
+stw_opensyde_gui_elements--C_OgeSpxTableComIf::up-button,
+stw_opensyde_gui_elements--C_OgeWiTableSpinBoxGroup QAbstractSpinBox::up-button,
+stw_opensyde_gui_elements--C_OgeSpxTableDouble::up-button {
+margin-top: 3px;
+}
+
+
+/* --------------------------------------------------------------------- */

@@ -1,0 +1,111 @@
+//-----------------------------------------------------------------------------
+/*!
+   \internal
+   \file
+   \brief       Main button in material design of navigation bar for the main use cases
+
+   \implementation
+   project     opensyde
+   copyright   STW (c) 1999-20xx
+   license     use only under terms of contract / confidential
+
+   created     08.07.2016  STW/B.Bayer
+   \endimplementation
+*/
+//-----------------------------------------------------------------------------
+
+/* -- Includes ------------------------------------------------------------- */
+#include "precomp_headers.h"
+
+#include "C_OgePubUseCaseNav.h"
+
+#include <QPainter>
+
+/* -- Used Namespaces ------------------------------------------------------ */
+
+using namespace stw_opensyde_gui_elements;
+
+/* -- Module Global Constants ---------------------------------------------- */
+
+/* -- Types ---------------------------------------------------------------- */
+
+/* -- Global Variables ----------------------------------------------------- */
+
+/* -- Module Global Variables ---------------------------------------------- */
+
+/* -- Module Global Function Prototypes ------------------------------------ */
+
+/* -- Implementation ------------------------------------------------------- */
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Default constructor
+
+   Set up GUI with all elements.
+
+   \param[in,out] opc_Parent Optional pointer to parent
+
+   \created     08.07.2016  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+C_OgePubUseCaseNav::C_OgePubUseCaseNav(QWidget * const opc_Parent) :
+   C_OgePubStandard(opc_Parent),
+   q_LastButton(false)
+{
+   this->setCheckable(true);
+   this->setChecked(false);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Overrided paint event
+
+   Draws the element
+
+   \param[in,out] opc_event  Pointer to paint event
+
+   \created     06.07.2016  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_OgePubUseCaseNav::paintEvent(QPaintEvent * const opc_Event)
+{
+   QPainter c_Painter(this);
+   QBrush c_Brush;
+   QPixmap c_Pixmap = this->icon().pixmap(44, 45);
+
+   const QColor c_ColBackground(71, 71, 99, 255);
+   const QColor c_ColBackgroundDark(19, 19, 45, 255);
+
+   Q_UNUSED(opc_Event)
+
+   // paint the main rectangle
+   c_Brush.setColor(c_ColBackground);
+   c_Brush.setStyle(Qt::SolidPattern);
+   c_Painter.setPen(c_ColBackground);
+   c_Painter.setBrush(c_Brush);
+   c_Painter.drawRect(0, 0, this->width() - 1, this->height() - 1);
+
+   if (this->isChecked() == true)
+   {
+      c_Brush.setColor(QColor(94, 163, 67));
+      c_Painter.setPen(QColor(94, 163, 67));
+      c_Painter.setBrush(c_Brush);
+      c_Painter.drawRect(0, 0, 5, this->height() - 1);
+   }
+
+   //draw line
+   c_Painter.setPen(c_ColBackgroundDark);
+   c_Painter.drawLine(0, 0, this->width() - 1, 0);
+
+   //buttom line
+   if (q_LastButton == true)
+   {
+      c_Painter.drawLine(0, this->height() - 1, this->width() - 1, this->height() - 1);
+   }
+
+   c_Painter.setPen(QColor(255, 255, 255));
+   c_Painter.drawText(QPoint(80, 43), this->text());
+
+   // draw the icon
+   c_Painter.drawPixmap(25, 22, c_Pixmap);
+}

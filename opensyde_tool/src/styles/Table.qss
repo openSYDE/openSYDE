@@ -1,0 +1,207 @@
+/* --------------------------------------------------------------------- */
+stw_opensyde_gui_elements--C_OgeTableWidgetComIF QLineEdit{
+border-style:none;
+}
+
+stw_opensyde_gui_elements--C_OgeLabNodePropComIfTable{
+padding-left: 6px;
+padding-right: 6px;
+}
+
+stw_opensyde_gui--C_SyvDaItPaTreeView,
+stw_opensyde_gui--C_SyvDaItPaTreeView::item,
+stw_opensyde_gui--C_SyvDaItTaView,
+stw_opensyde_gui--C_SyvDaItTaView::item {
+border-style:none;
+border-width:0px;
+outline:none;
+}
+stw_opensyde_gui_logic--C_PopFileTableView,
+stw_opensyde_gui--C_SyvDaPeUpdateModeTableView,
+stw_opensyde_gui--C_SdNdeDataPoolListTableView,
+stw_opensyde_gui--C_SdBueMessageTableView,
+stw_opensyde_gui--C_SdBueSignalTableView,
+stw_opensyde_gui--C_SyvDaItPaArView,
+stw_opensyde_gui--C_SyvDaItPaTableView,
+stw_opensyde_gui--C_SyvDaItPaTableView::item,
+stw_opensyde_gui--C_SdNdeDataPoolListArrayEditView,
+stw_opensyde_gui--C_SdNdeDataPoolListDataSetView,
+stw_opensyde_gui--C_SdNdeSfoResetMessageTableView,
+stw_opensyde_gui--C_SdNdeSfoResetMessageTableView::item,
+stw_opensyde_gui_elements--C_OgeTableWidgetComIF,
+stw_opensyde_gui_elements--C_OgeTableWidgetComIF::item{
+border-style:none;
+outline:none;
+}
+
+/* Offset between scroll bars */
+stw_opensyde_gui--C_SyvDaPeUpdateModeTableView {
+margin-right:37px;
+}
+stw_opensyde_gui--C_SyvDaItPaTableView {
+margin-right:27px;
+}
+
+stw_opensyde_gui_logic--C_PopFileTableView::item,
+stw_opensyde_gui--C_SdBueMessageTableView::item,
+stw_opensyde_gui--C_SdBueSignalTableView::item,
+stw_opensyde_gui--C_SyvDaItPaArView::item,
+stw_opensyde_gui--C_SyvDaPeUpdateModeTableView::item,
+stw_opensyde_gui--C_SdNdeDataPoolListTableView::item,
+stw_opensyde_gui--C_SdNdeDataPoolListArrayEditView::item,
+stw_opensyde_gui--C_SdNdeDataPoolListDataSetView::item
+{
+border-style:solid;
+border-width: 1px;
+}
+
+/* Padding around items */
+stw_opensyde_gui_logic--C_PopFileTableView::item
+{
+padding:6px;
+}
+
+/* SSI: Deaktivated top border. Still no solution for top/bottom border*/
+stw_opensyde_gui--C_SdNdeSfoResetMessageTableView QHeaderView::section,
+stw_opensyde_gui_elements--C_OgeTableWidgetComIF QHeaderView::section
+ {
+border-style:solid;
+border-top-width:0px;
+border-bottom-width:0px;
+border-right-width:0px;
+border-left-width:0px;
+padding-top:1px;
+padding-bottom:10px;
+padding-right:1px;
+padding-left:1px;
+}
+
+stw_opensyde_gui--C_SyvDaPeUpdateModeTableHeaderView[IsHorizontal="false"]::section,
+stw_opensyde_gui--C_SdNdeSingleHeaderView[IsHorizontal="false"]::section,
+stw_opensyde_gui--C_SdNdeDataPoolListDataSetHeaderView[IsHorizontal="false"]::section
+{
+border-top-width:0px;
+border-bottom-width:1px;
+border-right-width:1px;
+border-left-width:0px;
+padding-top:1px;
+padding-bottom:1px;
+padding-right:30px;
+/* Align corner button */
+padding-left:3px;
+}
+stw_opensyde_gui--C_SdNdeDataPoolListDataSetHeaderView[IsHorizontal="false"]::section:first
+{
+border-top-width:1px;
+}
+
+stw_opensyde_gui--C_SyvDaPeUpdateModeTableHeaderView[IsHorizontal="true"]::section,
+stw_opensyde_gui--C_SdNdeSingleHeaderView[IsHorizontal="true"]::section,
+stw_opensyde_gui--C_SdNdeDataPoolListDataSetHeaderView[IsHorizontal="true"]::section
+ {
+border-top-width:0px;
+border-bottom-width:1px;
+border-left-width:0px;
+/* 50px */
+margin-top:7px;
+padding-top:1px;
+padding-bottom:1px;
+padding-right:0px;
+padding-left:3px;
+}
+
+stw_opensyde_gui--C_SyvDaPeUpdateModeTableHeaderView[IsHorizontal="true"]::section,
+stw_opensyde_gui--C_SdNdeSingleHeaderView[IsHorizontal="true"]::section,
+stw_opensyde_gui--C_SdNdeDataPoolListDataSetHeaderView[IsHorizontal="true"]::section
+{
+border-right-width:1px;
+}
+stw_opensyde_gui--C_SdNdeDataPoolListDataSetHeaderView[IsHorizontal="true"]::section:first
+{
+border-left-width:1px;
+}
+
+stw_opensyde_gui--C_SyvDaPeUpdateModeTableHeaderView::section,
+stw_opensyde_gui--C_SdNdeSingleHeaderView::section,
+stw_opensyde_gui--C_SdNdeDataPoolListDataSetHeaderView::section{
+border-left-style:solid;
+border-top-style:solid;
+}
+
+stw_opensyde_gui--C_SyvDaPeUpdateModeTableHeaderView[IsHorizontal="true"]::section,
+stw_opensyde_gui--C_SdNdeSingleHeaderView[IsHorizontal="true"]::section,
+stw_opensyde_gui--C_SdNdeDataPoolListDataSetHeaderView[IsHorizontal="true"]::section
+{
+border-bottom-style:solid;
+border-right-style:dashed;
+}
+stw_opensyde_gui--C_SdNdeDataPoolListDataSetHeaderView[IsHorizontal="true"]::section:first
+{
+border-top-style:solid;
+border-left-style:dashed;
+}
+
+stw_opensyde_gui--C_SyvDaPeUpdateModeTableHeaderView[IsHorizontal="false"]::section,
+stw_opensyde_gui--C_SdNdeSingleHeaderView[IsHorizontal="false"]::section,
+stw_opensyde_gui--C_SdNdeDataPoolListDataSetHeaderView[IsHorizontal="false"]::section
+{
+border-bottom-style:dashed;
+border-right-style:solid;
+}
+
+stw_opensyde_gui--C_SyvDaItPaTreeView QHeaderView::section,
+stw_opensyde_gui--C_SyvDaItTaView QHeaderView::section {
+border-left-width:0px;
+border-top-width:0px;
+border-bottom-width:0px;
+border-right-width:1px;
+border-right-style:dashed;
+border-left-style:none;
+border-top-style:none;
+border-bottom-style:none;
+padding-left:3px;
+}
+stw_opensyde_gui--C_SdNdeDataPoolListDataSetHeaderView[IsHorizontal="false"]::section:first
+{
+border-top-style:dashed;
+border-left-style:solid;
+}
+
+/* Sort indicator */
+stw_opensyde_gui--C_SdBueMessageTableView QHeaderView::down-arrow,
+stw_opensyde_gui--C_SdBueSignalTableView QHeaderView::down-arrow {
+width: 20px;
+height: 20px;
+image: url(://images/GroupBoxDownArrow.png) 0 0 0 0 stretch stretch;
+}
+
+stw_opensyde_gui--C_SdBueMessageTableView QHeaderView::up-arrow,
+stw_opensyde_gui--C_SdBueSignalTableView QHeaderView::up-arrow {
+width: 20px;
+height: 20px;
+image: url(://images/SpinBoxUpArrow.png) 0 0 0 0 stretch stretch;
+}
+
+/* Corner button */
+stw_opensyde_gui--C_SyvDaItPaArView QTableCornerButton::section,
+stw_opensyde_gui--C_SdNdeDataPoolListArrayEditView QTableCornerButton::section,
+stw_opensyde_gui--C_SdNdeDataPoolListDataSetView QTableCornerButton::section
+{
+border-style:none;
+}
+stw_opensyde_gui--C_SyvDaItPaArView QLabel,
+stw_opensyde_gui--C_SdNdeDataPoolListArrayEditView QLabel,
+stw_opensyde_gui--C_SdNdeDataPoolListDataSetView QLabel
+{
+padding-top: 5px;
+padding-left: 0px;
+qproperty-alignment: 'AlignVCenter | AlignLeft';
+}
+
+/* Indent */
+stw_opensyde_gui--C_SyvDaItPaTableView {
+padding-left:47px;
+padding-bottom:15px;
+}
+
+/* --------------------------------------------------------------------- */

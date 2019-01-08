@@ -1,0 +1,27 @@
+---------------------------------------------------------------------
+File:      build.txt
+Content:   How to build this project
+Author:    GS / gesa.landsgesell@sensor-technik.de
+---------------------------------------------------------------------
+
+Used Compiler:
+==============
+MinGW: 5.3.0
+
+Editor:
+=======
+Qt Creator 4.0.2
+
+build
+=====
+Open project file in Qt Creator and rebuild.
+
+Alternative build using CMake
+=============================
+PATH=C:\CMake\bin;C:\MinGW\bin   # adopt paths
+cd <project_root>/pjt
+mkdir build
+cd build
+cmake -G"MinGW Makefiles" ..
+mingw32-make all
+mingw32-make install

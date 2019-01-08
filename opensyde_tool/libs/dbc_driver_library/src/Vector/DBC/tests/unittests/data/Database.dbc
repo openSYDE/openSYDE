@@ -1,0 +1,240 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_: Node_1 Node_2
+VAL_TABLE_ Value_Table 0 "Description for the value '0x0'" 1 "Description for the value '0x1'" ;
+
+
+BO_ 0 Multiplexed_Message: 8 Vector__XXX
+ SG_ Multiplexor M : 0|8@1- (1,0) [0|0] "" Vector__XXX
+ SG_ Signal_8 m1 : 8|8@1- (1,0) [0|0] "" Vector__XXX
+
+BO_ 1 Standard_Message_1: 8 Node_1
+ SG_ Signal_8_VtSig : 0|8@1- (1,0) [0|0] ""  Node_1
+
+BO_ 2147483649 Extended_Message_1: 8 Node_1
+ SG_ Signal_8 : 0|8@1- (1,0) [0|0] ""  Node_1
+
+BO_ 3221225472 VECTOR__INDEPENDENT_SIG_MSG: 0 Vector__XXX
+ SG_ Signal_32_Intel_Float : 0|32@1- (0.1,0) [0|0] "" Vector__XXX
+ SG_ Signal_32_Motorola_Float : 0|32@0- (0.1,0) [0|0] "" Vector__XXX
+ SG_ Signal_64_Intel_Double : 0|64@1- (0.01,0) [0|0] "" Vector__XXX
+ SG_ Signal_64_Motorola_Double : 0|64@0- (0.01,0) [0|0] "" Vector__XXX
+ SG_ Signal_8_Intel_Signed : 0|8@1- (1,0) [0|0] "" Vector__XXX
+ SG_ Signal_8_Intel_Unsigned : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ Signal_8_Motorola_Signed : 0|8@0- (1,0) [0|0] "" Vector__XXX
+ SG_ Signal_8_Motorola_Unsigned : 0|8@0+ (1,0) [0|0] "" Vector__XXX
+
+BO_TX_BU_ 1 : Node_1 Node_2;
+BO_TX_BU_ 2147483649 : Node_1 Node_2;
+
+
+EV_ Variable_Data_Read: 0 [0|0] "" 0 2 DUMMY_NODE_VECTOR1 Vector__XXX;
+
+EV_ Variable_Data_ReadWrite: 0 [0|0] "" 0 1 DUMMY_NODE_VECTOR3 Vector__XXX;
+
+EV_ Variable_Data_Write: 0 [0|0] "" 0 3 DUMMY_NODE_VECTOR2 Vector__XXX;
+
+EV_ Variable_Data_unrestricted: 0 [0|0] "" 0 14 DUMMY_NODE_VECTOR0 Vector__XXX;
+
+EV_ Variable_Float_Read: 1 [0|1] "" 0 6 DUMMY_NODE_VECTOR1 Vector__XXX;
+
+EV_ Variable_Float_ReadWrite: 1 [0|1] "" 0 4 DUMMY_NODE_VECTOR3 Vector__XXX;
+
+EV_ Variable_Float_Write: 1 [0|1] "" 0 5 DUMMY_NODE_VECTOR2 Vector__XXX;
+
+EV_ Variable_Float_unrestricted: 1 [0|1] "" 0 17 DUMMY_NODE_VECTOR0  Node_1;
+
+EV_ Variable_Integer_Read: 0 [0|1] "" 0 12 DUMMY_NODE_VECTOR1 Vector__XXX;
+
+EV_ Variable_Integer_ReadWrite: 0 [0|1] "" 0 10 DUMMY_NODE_VECTOR3 Vector__XXX;
+
+EV_ Variable_Integer_Write: 0 [0|1] "" 0 11 DUMMY_NODE_VECTOR2 Vector__XXX;
+
+EV_ Variable_Integer_unrestricted: 0 [0|1] "" 0 13 DUMMY_NODE_VECTOR0 Vector__XXX;
+
+EV_ Variable_String_Read: 0 [0|0] "" 0 9 DUMMY_NODE_VECTOR8001 Vector__XXX;
+
+EV_ Variable_String_ReadWrite: 0 [0|0] "" 0 7 DUMMY_NODE_VECTOR8003 Vector__XXX;
+
+EV_ Variable_String_Write: 0 [0|0] "" 0 8 DUMMY_NODE_VECTOR8002 Vector__XXX;
+
+EV_ Variable_String_unrestricted: 0 [0|1] "" 0 15 DUMMY_NODE_VECTOR8000 Vector__XXX;
+
+EV_ Variable_VtEv: 0 [0|1] "" 0 16 DUMMY_NODE_VECTOR0 Vector__XXX;
+ENVVAR_DATA_ Variable_Data_Read: 0;
+ENVVAR_DATA_ Variable_Data_ReadWrite: 0;
+ENVVAR_DATA_ Variable_Data_Write: 0;
+ENVVAR_DATA_ Variable_Data_unrestricted: 0;
+
+CM_ "Comment Line 1
+Comment Line 2";
+CM_ BU_ Node_1 "Comment Line 1
+Comment Line 2";
+CM_ BO_ 0 "Comment Line 1
+Comment Line 2";
+CM_ BO_ 3221225472 "This is a message for not used signals, created by Vector CANdb++ DBC OLE DB Provider.";
+CM_ SG_ 1 Signal_8_VtSig "Comment Line 1
+Comment Line 2";
+CM_ EV_ Variable_VtEv "Comment Line 1
+Comment Line 2";
+BA_DEF_REL_ BU_EV_REL_  "AttrDef_ControlUnit_EnvVar_Enum" ENUM  "1 one","2 two","3 three";
+BA_DEF_REL_ BU_EV_REL_  "AttrDef_ControlUnit_EnvVar_Float" FLOAT 0 2;
+BA_DEF_REL_ BU_EV_REL_  "AttrDef_ControlUnit_EnvVar_Hex" HEX 0 2;
+BA_DEF_REL_ BU_EV_REL_  "AttrDef_ControlUnit_EnvVar_Int" INT 0 2;
+BA_DEF_REL_ BU_EV_REL_  "AttrDef_ControlUnit_EnvVar_Str" STRING ;
+BA_DEF_ EV_  "AttrDef_EnvVar_Enum" ENUM  "1 one","2 two","3 three";
+BA_DEF_ EV_  "AttrDef_EnvVar_Float" FLOAT 0 2;
+BA_DEF_ EV_  "AttrDef_EnvVar_Hex" HEX 0 2;
+BA_DEF_ EV_  "AttrDef_EnvVar_Int" INT 0 2;
+BA_DEF_ EV_  "AttrDef_EnvVar_String" STRING ;
+BA_DEF_ BO_  "AttrDef_Message_Enum" ENUM  "1 one","2 two","3 three";
+BA_DEF_ BO_  "AttrDef_Message_Float" FLOAT 0 2;
+BA_DEF_ BO_  "AttrDef_Message_Hex" HEX 0 2;
+BA_DEF_ BO_  "AttrDef_Message_Int" INT 0 2;
+BA_DEF_ BO_  "AttrDef_Message_Str" STRING ;
+BA_DEF_  "AttrDef_Network_Enum" ENUM  "1 one","2 two","3 three","vector_leerstring";
+BA_DEF_  "AttrDef_Network_Float" FLOAT 0 2;
+BA_DEF_  "AttrDef_Network_Hex" HEX 0 2;
+BA_DEF_  "AttrDef_Network_Int" INT 0 2;
+BA_DEF_  "AttrDef_Network_Str" STRING ;
+BA_DEF_ BU_  "AttrDef_Node_Enum" ENUM  "1 one","2 two","3 three";
+BA_DEF_ BU_  "AttrDef_Node_Float" FLOAT 0 2;
+BA_DEF_ BU_  "AttrDef_Node_Hex" HEX 0 2;
+BA_DEF_ BU_  "AttrDef_Node_Int" INT 0 2;
+BA_DEF_REL_ BU_SG_REL_  "AttrDef_Node_MappedRxSignal_Enum" ENUM  "1 one","2 two","3 three";
+BA_DEF_REL_ BU_SG_REL_  "AttrDef_Node_MappedRxSignal_Floa" FLOAT 0 2;
+BA_DEF_REL_ BU_SG_REL_  "AttrDef_Node_MappedRxSignal_Hex" HEX 0 2;
+BA_DEF_REL_ BU_SG_REL_  "AttrDef_Node_MappedRxSignal_Int" INT 0 2;
+BA_DEF_REL_ BU_SG_REL_  "AttrDef_Node_MappedRxSignal_Str" STRING ;
+BA_DEF_ BU_  "AttrDef_Node_String" STRING ;
+BA_DEF_REL_ BU_BO_REL_  "AttrDef_Node_TxMessage_Enum" ENUM  "1 one","2 two","3 three";
+BA_DEF_REL_ BU_BO_REL_  "AttrDef_Node_TxMessage_Float" FLOAT 0 2;
+BA_DEF_REL_ BU_BO_REL_  "AttrDef_Node_TxMessage_Hex" HEX 0 2;
+BA_DEF_REL_ BU_BO_REL_  "AttrDef_Node_TxMessage_Int" INT 0 2;
+BA_DEF_REL_ BU_BO_REL_  "AttrDef_Node_TxMessage_Str" STRING ;
+BA_DEF_ SG_  "AttrDef_Signal_Enum" ENUM  "1 one","2 two","3 three";
+BA_DEF_ SG_  "AttrDef_Signal_Float" FLOAT 0 2;
+BA_DEF_ SG_  "AttrDef_Signal_Hex" HEX 0 2;
+BA_DEF_ SG_  "AttrDef_Signal_Int" INT 0 2;
+BA_DEF_ SG_  "AttrDef_Signal_Str" STRING ;
+BA_DEF_DEF_REL_ "AttrDef_ControlUnit_EnvVar_Enum" "2 two";
+BA_DEF_DEF_REL_ "AttrDef_ControlUnit_EnvVar_Float" 1;
+BA_DEF_DEF_REL_ "AttrDef_ControlUnit_EnvVar_Hex" 1;
+BA_DEF_DEF_REL_ "AttrDef_ControlUnit_EnvVar_Int" 1;
+BA_DEF_DEF_REL_ "AttrDef_ControlUnit_EnvVar_Str" "Default";
+BA_DEF_DEF_  "AttrDef_EnvVar_Enum" "2 two";
+BA_DEF_DEF_  "AttrDef_EnvVar_Float" 1;
+BA_DEF_DEF_  "AttrDef_EnvVar_Hex" 1;
+BA_DEF_DEF_  "AttrDef_EnvVar_Int" 1;
+BA_DEF_DEF_  "AttrDef_EnvVar_String" "Default";
+BA_DEF_DEF_  "AttrDef_Message_Enum" "2 two";
+BA_DEF_DEF_  "AttrDef_Message_Float" 1;
+BA_DEF_DEF_  "AttrDef_Message_Hex" 1;
+BA_DEF_DEF_  "AttrDef_Message_Int" 1;
+BA_DEF_DEF_  "AttrDef_Message_Str" "Default";
+BA_DEF_DEF_  "AttrDef_Network_Enum" "2 two";
+BA_DEF_DEF_  "AttrDef_Network_Float" 1;
+BA_DEF_DEF_  "AttrDef_Network_Hex" 1;
+BA_DEF_DEF_  "AttrDef_Network_Int" 1;
+BA_DEF_DEF_  "AttrDef_Network_Str" "Default";
+BA_DEF_DEF_  "AttrDef_Node_Enum" "2 two";
+BA_DEF_DEF_  "AttrDef_Node_Float" 1;
+BA_DEF_DEF_  "AttrDef_Node_Hex" 1;
+BA_DEF_DEF_  "AttrDef_Node_Int" 1;
+BA_DEF_DEF_REL_ "AttrDef_Node_MappedRxSignal_Enum" "2 two";
+BA_DEF_DEF_REL_ "AttrDef_Node_MappedRxSignal_Floa" 1;
+BA_DEF_DEF_REL_ "AttrDef_Node_MappedRxSignal_Hex" 1;
+BA_DEF_DEF_REL_ "AttrDef_Node_MappedRxSignal_Int" 1;
+BA_DEF_DEF_REL_ "AttrDef_Node_MappedRxSignal_Str" "Default";
+BA_DEF_DEF_  "AttrDef_Node_String" "Default";
+BA_DEF_DEF_REL_ "AttrDef_Node_TxMessage_Enum" "2 two";
+BA_DEF_DEF_REL_ "AttrDef_Node_TxMessage_Float" 1;
+BA_DEF_DEF_REL_ "AttrDef_Node_TxMessage_Hex" 1;
+BA_DEF_DEF_REL_ "AttrDef_Node_TxMessage_Int" 1;
+BA_DEF_DEF_REL_ "AttrDef_Node_TxMessage_Str" "Default";
+BA_DEF_DEF_  "AttrDef_Signal_Enum" "2 two";
+BA_DEF_DEF_  "AttrDef_Signal_Float" 1;
+BA_DEF_DEF_  "AttrDef_Signal_Hex" 1;
+BA_DEF_DEF_  "AttrDef_Signal_Int" 1;
+BA_DEF_DEF_  "AttrDef_Signal_Str" "Default";
+BA_ "AttrDef_Network_Enum" 2;
+BA_ "AttrDef_Network_Float" 2;
+BA_ "AttrDef_Network_Hex" 2;
+BA_ "AttrDef_Network_Int" 1;
+BA_ "AttrDef_Network_Str" "Changed";
+BA_ "AttrDef_Node_Enum" BU_ Node_1 2;
+BA_ "AttrDef_Node_Float" BU_ Node_1 2;
+BA_ "AttrDef_Node_Hex" BU_ Node_1 2;
+BA_ "AttrDef_Node_Int" BU_ Node_1 2;
+BA_ "AttrDef_Node_String" BU_ Node_1 "Changed";
+BA_ "AttrDef_Message_Enum" BO_ 1 2;
+BA_ "AttrDef_Message_Float" BO_ 1 2;
+BA_ "AttrDef_Message_Hex" BO_ 1 2;
+BA_ "AttrDef_Message_Int" BO_ 1 2;
+BA_ "AttrDef_Message_Str" BO_ 1 "Changed";
+BA_ "AttrDef_Signal_Enum" SG_ 1 Signal_8_VtSig 2;
+BA_ "AttrDef_Signal_Float" SG_ 1 Signal_8_VtSig 2;
+BA_ "AttrDef_Signal_Hex" SG_ 1 Signal_8_VtSig 2;
+BA_ "AttrDef_Signal_Int" SG_ 1 Signal_8_VtSig 2;
+BA_ "AttrDef_Signal_Str" SG_ 1 Signal_8_VtSig "Changed";
+BA_ "AttrDef_EnvVar_Enum" EV_ Variable_VtEv 2;
+BA_ "AttrDef_EnvVar_Float" EV_ Variable_VtEv 2;
+BA_ "AttrDef_EnvVar_Hex" EV_ Variable_VtEv 2;
+BA_ "AttrDef_EnvVar_Int" EV_ Variable_VtEv 1;
+BA_ "AttrDef_EnvVar_String" EV_ Variable_VtEv "Changed";
+BA_REL_ "AttrDef_ControlUnit_EnvVar_Enum" BU_EV_REL_ Node_1 Variable_Float_unrestricted 2;
+BA_REL_ "AttrDef_ControlUnit_EnvVar_Float" BU_EV_REL_ Node_1 Variable_Float_unrestricted 2;
+BA_REL_ "AttrDef_ControlUnit_EnvVar_Hex" BU_EV_REL_ Node_1 Variable_Float_unrestricted 2;
+BA_REL_ "AttrDef_ControlUnit_EnvVar_Int" BU_EV_REL_ Node_1 Variable_Float_unrestricted 2;
+BA_REL_ "AttrDef_ControlUnit_EnvVar_Str" BU_EV_REL_ Node_1 Variable_Float_unrestricted "Changed";
+BA_REL_ "AttrDef_Node_MappedRxSignal_Enum" BU_SG_REL_ Node_1 SG_ 1 Signal_8_VtSig 2;
+BA_REL_ "AttrDef_Node_MappedRxSignal_Floa" BU_SG_REL_ Node_1 SG_ 1 Signal_8_VtSig 2;
+BA_REL_ "AttrDef_Node_MappedRxSignal_Hex" BU_SG_REL_ Node_1 SG_ 1 Signal_8_VtSig 2;
+BA_REL_ "AttrDef_Node_MappedRxSignal_Int" BU_SG_REL_ Node_1 SG_ 1 Signal_8_VtSig 1;
+BA_REL_ "AttrDef_Node_MappedRxSignal_Int" BU_SG_REL_ Node_1 SG_ 2147483649 Signal_8 1;
+BA_REL_ "AttrDef_Node_MappedRxSignal_Str" BU_SG_REL_ Node_1 SG_ 1 Signal_8_VtSig "Changed";
+BA_REL_ "AttrDef_Node_TxMessage_Enum" BU_BO_REL_ Node_1 1 2;
+BA_REL_ "AttrDef_Node_TxMessage_Float" BU_BO_REL_ Node_1 1 2;
+BA_REL_ "AttrDef_Node_TxMessage_Hex" BU_BO_REL_ Node_1 1 2;
+BA_REL_ "AttrDef_Node_TxMessage_Int" BU_BO_REL_ Node_1 1 1;
+BA_REL_ "AttrDef_Node_TxMessage_Str" BU_BO_REL_ Node_1 1 "Changed";
+VAL_ 1 Signal_8_VtSig 0 "Description for the value '0x0'" 1 "Description for the value '0x1'" ;
+VAL_ Variable_VtEv 0 "Description for the value '0x0'" 1 "Description for the value '0x1'" ;
+SIG_VALTYPE_ 3221225472 Signal_32_Intel_Float : 1;
+SIG_VALTYPE_ 3221225472 Signal_32_Motorola_Float : 1;
+SIG_VALTYPE_ 3221225472 Signal_64_Intel_Double : 2;
+SIG_VALTYPE_ 3221225472 Signal_64_Motorola_Double : 2;
+

@@ -1,0 +1,104 @@
+/* --------------------------------------------------------------------- */
+stw_opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled::indicator,
+stw_opensyde_gui_elements--C_OgeChxProperties::indicator {
+width: 30px;
+height: 30px;
+margin-right: 6px;
+}
+
+stw_opensyde_gui_elements--C_OgeChxDefaultSmall::indicator {
+width: 22px;
+height: 22px;
+}
+
+/*Table cell*/
+stw_opensyde_gui--C_SdBueSignalTableView::indicator,
+stw_opensyde_gui--C_SdBueMessageTableView::indicator,
+stw_opensyde_gui--C_SdNdeDataPoolListTableView::indicator {
+width: 40px;
+height: 40px;
+border-style:solid;
+border-right-width:0px;
+border-left-width:0px;
+border-bottom-width:0px;
+border-top-width:0px;
+}
+
+stw_opensyde_gui_elements--C_OgeChxDefaultSmall::indicator {
+margin-top: 3px;
+}
+
+stw_opensyde_gui_elements--C_OgeChxDefaultSmall {
+margin-bottom: 4px;
+}
+
+stw_opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled::indicator,
+stw_opensyde_gui_elements--C_OgeChxProperties::indicator,
+stw_opensyde_gui_elements--C_OgeChxDefaultSmall::indicator,
+stw_opensyde_gui_elements--C_OgeChxTristate::indicator,
+stw_opensyde_gui_elements--C_OgeChxTristateTransparentError::indicator,
+stw_opensyde_gui_elements--C_OgeChxTristateTransparentToggle::indicator {
+border: none;
+}
+
+stw_opensyde_gui_elements--C_OgeChxTristateTransparentError:!checked {
+padding-left: 22px;
+padding-right: 3px;
+}
+
+stw_opensyde_gui_elements--C_OgeChxTristateTransparentError::indicator:checked {
+padding-left: 8px;
+padding-right: 3px;
+}
+
+stw_opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled::indicator:enabled:checked,
+stw_opensyde_gui_elements--C_OgeChxProperties::indicator:enabled:checked,
+stw_opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled::indicator:disabled:checked,
+stw_opensyde_gui_elements--C_OgeChxDefaultSmall::indicator:checked,
+stw_opensyde_gui_elements--C_OgeChxTristate::indicator:enabled:checked,
+stw_opensyde_gui--C_SdBueSignalTableView::indicator:enabled:checked,
+stw_opensyde_gui--C_SdBueMessageTableView::indicator:enabled:checked,
+stw_opensyde_gui--C_SdNdeDataPoolListTableView::indicator:enabled:checked {
+image:url(:/images/CheckBoxActiveWithoutBackground.svg);
+}
+
+stw_opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled::indicator:disabled:!checked,
+stw_opensyde_gui_elements--C_OgeChxTristate::indicator:disabled:!checked,
+stw_opensyde_gui_elements--C_OgeChxProperties::indicator:disabled:!checked {
+image:url(:/images/CheckBoxDisabledNotChecked.svg);
+}
+
+stw_opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled::indicator:disabled:checked,
+stw_opensyde_gui_elements--C_OgeChxTristate::indicator:disabled:checked,
+stw_opensyde_gui_elements--C_OgeChxProperties::indicator:disabled:checked {
+image:url(:/images/CheckBoxActiveDisabledWithoutBackground.svg);
+}
+
+stw_opensyde_gui_elements--C_OgeChxTristateTransparentToggle::indicator:checked:enabled {
+image:url(:/images/system_views/dashboards/icons/ToggleStwOnT1Bright.svg);
+}
+stw_opensyde_gui_elements--C_OgeChxTristateTransparentToggle::indicator:checked:disabled {
+image:url(:/images/system_views/dashboards/icons/ToggleStwOnT1Bright_Disabled.svg);
+}
+
+stw_opensyde_gui_elements--C_OgeChxTristateTransparentToggle::indicator:!checked:enabled {
+image:url(:/images/system_views/dashboards/icons/ToggleStwOffT1Bright.svg);
+}
+stw_opensyde_gui_elements--C_OgeChxTristateTransparentToggle::indicator:!checked:disabled {
+image:url(:/images/system_views/dashboards/icons/ToggleStwOffT1Bright_Disabled.svg);
+}
+
+stw_opensyde_gui_elements--C_OgeChxTristateTransparentError::indicator:checked {
+image:url(://images/Error_iconV2.svg);
+width:24px;
+height:24px;
+}
+
+/*No image necessary*/
+stw_opensyde_gui--C_SdBueSignalTableView::indicator:enabled,
+stw_opensyde_gui--C_SdBueMessageTableView::indicator:enabled,
+stw_opensyde_gui--C_SdNdeDataPoolListTableView::indicator:enabled {
+image:none;
+image-position: center left;
+}
+/* --------------------------------------------------------------------- */

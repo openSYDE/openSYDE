@@ -1,0 +1,9 @@
+/* --------------------------------------------------------------------- */
+
+stw_opensyde_gui_elements--C_OgeScNaviBar[C_OgeScNaviBar="true"],
+stw_opensyde_gui_elements--C_OgeScNaviBar QWidget[C_OgeScNaviBar="true"] {
+border-style:none;
+border-width:0px;
+}
+
+/* --------------------------------------------------------------------- */

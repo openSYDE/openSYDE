@@ -1,0 +1,17 @@
+---------------------------------------------------------------------
+File:      build.txt
+Content:   How to build this project
+Author:    AST / andreas.stangl@sensor-technik.de
+---------------------------------------------------------------------
+
+Used Compiler:
+==============
+MinGW: 5.3.0
+
+Editor:
+=======
+Qt Creator 4.0.2
+
+build
+=====
+Open project file in Qt Creator and rebuild

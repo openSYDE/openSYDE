@@ -1,0 +1,77 @@
+/* --------------------------------------------------------------------- */
+stw_opensyde_gui_elements--C_OgeWiHover,
+stw_opensyde_gui--C_SyvDaItPaListHeaderWidget,
+stw_opensyde_gui--C_SyvDaPeUpdateModeNodeHeader,
+stw_opensyde_gui--C_SdNdeDataPoolListHeaderWidget {
+border-style:none;
+}
+
+stw_opensyde_gui--C_SyvDaItDashboardBaseWidget,
+stw_opensyde_gui--C_SdNdeDataPoolListTableWidget {
+border-style:none;
+}
+
+stw_opensyde_gui--C_SyvDaItDashboardLabelWidget[Style="OPENSYDE_DARK"],
+stw_opensyde_gui--C_SyvDaItDashboardLabelWidget[Style="OPENSYDE_BRIGHT"],
+stw_opensyde_gui--C_SyvDaItPaWidget,
+stw_opensyde_gui--C_SyvDaItChartWidget[Style="OPENSYDE_DARK"],
+stw_opensyde_gui--C_SyvDaItChartWidget[Style="OPENSYDE_BRIGHT"],
+stw_opensyde_gui--C_SdNdeDataPoolListComHeaderWidget,
+stw_opensyde_gui_elements--C_OgeWiBorder,
+stw_opensyde_gui--C_SdNdeDataPoolListPopUp {
+border-style:solid;
+border-width:1px;
+}
+
+stw_opensyde_gui_elements--C_OgeWiDashboardTab {
+border-style: solid;
+border-right-width: 0px;
+border-left-width: 0px;
+border-top-width: 0px;
+border-bottom-width: 4px;
+}
+
+stw_opensyde_gui--C_SyvDcConnectedNodeWidget[First="true"],
+stw_opensyde_gui--C_SyvDcExistingNodeWidget[First="true"] {
+border-style:solid;
+border-width:1px;
+border-radius:0px;
+}
+
+stw_opensyde_gui--C_SyvDcConnectedNodeWidget[First="false"],
+stw_opensyde_gui--C_SyvDcExistingNodeWidget[First="false"] {
+border-top-style:none;
+border-top-width:0px;
+border-bottom-style:solid;
+border-bottom-width:1px;
+border-right-style:solid;
+border-right-width:1px;
+border-left-style:solid;
+border-left-width:1px;
+border-radius:0px;
+}
+
+stw_opensyde_gui--C_NagViewItem,
+stw_opensyde_gui_elements--C_OgeWiNavigationTab {
+border-style:solid;
+border-radius:0px;
+border-right-width: 0px;
+border-top-width: 1px;
+border-bottom-width: 0px;
+}
+
+stw_opensyde_gui_elements--C_OgeWiNavigationTab[IncludeLeftBorder="true"] {
+border-left-width: 1px;
+}
+
+stw_opensyde_gui--C_NagViewItem,
+stw_opensyde_gui_elements--C_OgeWiNavigationTab[IncludeLeftBorder="false"] {
+border-left-width: 0px;
+}
+
+/* Add margin for border behind this widget */
+stw_opensyde_gui--C_SyvDaDashboardWidget {
+margin-left:25px;
+margin-bottom:25px;
+margin-right:25px;
+}

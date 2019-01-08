@@ -1,0 +1,17 @@
+---------------------------------------------------------------------
+File:      about.txt
+Content:   Information about this project
+Author:    AST / andreas.stangl@sensor-technik.de
+---------------------------------------------------------------------
+
+Description:
+============
+openSYDE connector console application for code generation in C.
+
+Platform:
+=========
+MS Windows 7 and 10
+
+Usage:
+======
+Call the binary without any parameters or with "-h" to print the available command line parameters to the console.
