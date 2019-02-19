@@ -18,7 +18,6 @@
 #define C_GIBILINEBOUNDING_H
 
 /* -- Includes ------------------------------------------------------------- */
-
 #include <QVector>
 #include <QPointF>
 #include <QLineF>

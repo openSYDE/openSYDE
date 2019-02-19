@@ -89,6 +89,8 @@ public:
    bool CheckIfAnyNodeConnected(void) const;
    void SelectMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                       const bool oq_BlockSignal = true);
+   void SelectMessages(const std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> & orc_MessageIds,
+                       const bool oq_BlockSignal = true);
    void SelectSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                      const stw_types::uint32 & oru32_SignalIndex, const bool oq_BlockSignal = true);
    stw_types::sint32 GetLevelOfPos(const QPoint & orc_Pos) const;
@@ -105,6 +107,7 @@ Q_SIGNALS:
    void SigMessageCountChanged(void);
    void SigSelectName(void);
    void SigZeroMessages(void);
+   void SigErrorChanged(void);
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions

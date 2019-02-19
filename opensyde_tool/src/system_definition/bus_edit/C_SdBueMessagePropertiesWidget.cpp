@@ -184,7 +184,7 @@ void C_SdBueMessagePropertiesWidget::InitStaticNames(void) const
 
    this->mpc_Ui->pc_TextEditComment->setPlaceholderText(C_GtGetText::h_GetText("Add your comment here ..."));
    pc_LineEdit = new C_OgeLeComboBox(this->mpc_Ui->pc_ComboBoxTransmitter);
-   pc_LineEdit->setPlaceholderText(C_GtGetText::h_GetText("Please choose a transmitter"));
+   pc_LineEdit->setPlaceholderText(C_GtGetText::h_GetText("Choose a transmitter"));
    pc_LineEdit->setReadOnly(true);
    // force line edit to be not selectable (QLineEdit has no text interaction flags like QTextEdit or QLabel)
    connect(pc_LineEdit, &QLineEdit::selectionChanged, pc_LineEdit, &QLineEdit::deselect);
@@ -241,13 +241,12 @@ void C_SdBueMessagePropertiesWidget::InitStaticNames(void) const
                                                                                 "handled by application (spontaneous)."));
    this->mpc_Ui->pc_LabelEarly->SetToolTipInformation(C_GtGetText::h_GetText("Not earlier than"),
                                                       C_GtGetText::h_GetText("On change method property. "
-                                                                             "\nIf a signal change occurs during this "
-                                                                             "time, the message will not be transmitted. "
+                                                                             "\nIf a signal changes during this time, the message will not be transmitted."
                                                                              "\nThis allows the bus load to be controlled."));
    this->mpc_Ui->pc_LabelLater->SetToolTipInformation(C_GtGetText::h_GetText("But no later than"),
                                                       C_GtGetText::h_GetText("On change method property. "
-                                                                             "\nIf no signal change occurs, the message"
-                                                                             " will still be sent after this time."));
+                                                                             "\nIf the signal does not change, the message "
+                                                                             "will still be sent after this time."));
 }
 
 //-----------------------------------------------------------------------------
@@ -416,13 +415,22 @@ void C_SdBueMessagePropertiesWidget::m_LoadFromData(void)
 //-----------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnExtendedChange(const bool & orq_Extended) const
 {
-   if (orq_Extended == true)
+   if (this->me_ComProtocol == C_OSCCanProtocol::eCAN_OPEN_SAFETY)
    {
-      this->mpc_Ui->pc_SpinBoxId->SetMaximumCustom(0x1FFFFFFF);
+      this->mpc_Ui->pc_SpinBoxId->SetMinimumCustom(mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN);
+      this->mpc_Ui->pc_SpinBoxId->SetMaximumCustom(mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX);
    }
    else
    {
-      this->mpc_Ui->pc_SpinBoxId->SetMaximumCustom(0x7FF);
+      this->mpc_Ui->pc_SpinBoxId->SetMinimumCustom(0);
+      if (orq_Extended == true)
+      {
+         this->mpc_Ui->pc_SpinBoxId->SetMaximumCustom(0x1FFFFFFF);
+      }
+      else
+      {
+         this->mpc_Ui->pc_SpinBoxId->SetMaximumCustom(0x7FF);
+      }
    }
 }
 
@@ -1603,9 +1611,6 @@ void C_SdBueMessagePropertiesWidget::SetComProtocol(const C_OSCCanProtocol::E_Ty
       //Can id
       this->mpc_Ui->pc_CheckBoxExtendedType->setEnabled(false);
       this->mpc_Ui->pc_CheckBoxExtendedType->setChecked(false);
-      //overwrite min/max set from m_OnExtendedChange()
-      this->mpc_Ui->pc_SpinBoxId->SetMinimumCustom(mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN);
-      this->mpc_Ui->pc_SpinBoxId->SetMaximumCustom(mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX);
 
       //Dlc
       this->mpc_Ui->pc_SpinBoxDlc->setEnabled(true);
@@ -1628,9 +1633,11 @@ void C_SdBueMessagePropertiesWidget::SetComProtocol(const C_OSCCanProtocol::E_Ty
       //Tx method
       this->mpc_Ui->pc_ComboBoxTxMethod->setEnabled(true);
    }
+   //Min max handling (initially extended type is always set to false)
+   m_OnExtendedChange(false);
    //Restrict delay time to 16 bit unsigned
    this->mpc_Ui->pc_SpinBoxEarly->SetMinimumCustom(0);
-   this->mpc_Ui->pc_SpinBoxEarly->SetMaximumCustom(std::numeric_limits<uint16>::max());
+   this->mpc_Ui->pc_SpinBoxEarly->SetMaximumCustom(50000);
    //Restrict cycle time to 50000 (CANdb++ limit)
    this->mpc_Ui->pc_SpinBoxCycleTime->SetMinimumCustom(1);
    this->mpc_Ui->pc_SpinBoxCycleTime->SetMaximumCustom(50000);
@@ -1803,8 +1810,8 @@ void C_SdBueMessagePropertiesWidget::m_CheckEarlyTime(void) const
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_SpinBoxLater, "Valid", q_Valid);
    if (q_Valid == true)
    {
-      this->mpc_Ui->pc_SpinBoxEarly->SetToolTipInformation("", "", C_NagToolTip::eDEFAULT);
-      this->mpc_Ui->pc_SpinBoxLater->SetToolTipInformation("", "", C_NagToolTip::eDEFAULT);
+      this->mpc_Ui->pc_SpinBoxEarly->SetToolTipAdditionalInfo("", C_NagToolTip::eDEFAULT);
+      this->mpc_Ui->pc_SpinBoxLater->SetToolTipAdditionalInfo("", C_NagToolTip::eDEFAULT);
    }
    else
    {

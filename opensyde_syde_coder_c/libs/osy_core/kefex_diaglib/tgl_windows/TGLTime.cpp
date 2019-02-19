@@ -89,39 +89,10 @@ void stw_tgl::TGL_GetDateTimeNow(C_TGLDateTime & orc_DateTime)
 //-----------------------------------------------------------------------------
 void stw_tgl::TGL_DelayUs(const uint32 ou32_NumberUs)
 {
-   static bool hq_FirstCall = true;
-   LARGE_INTEGER u_Counts;
-   static float64 hf64_CountsPer1US = 0.0;
-   float64 f64_EndTime;
+   const uint64 u64_StopTime = TGL_GetTickCountUS() + ou32_NumberUs;
 
-   if (ou32_NumberUs == 0U)
+   while (TGL_GetTickCountUS() < u64_StopTime)
    {
-      return;
-   }
-
-   if (hq_FirstCall == true)
-   {
-      bool q_Test;
-      hq_FirstCall = false;
-      q_Test = (QueryPerformanceFrequency(&u_Counts) == 0) ? false : true;
-      tgl_assert(q_Test == true);
-      hf64_CountsPer1US = static_cast<float64>(u_Counts.QuadPart) / 1000000.0;
-   }
-   //lint -e{1960}  //comparison against 0.0 is well-defined; no problems ...
-   if (hf64_CountsPer1US == 0.0)
-   {
-      return;
-   }
-
-   (void)QueryPerformanceCounter(&u_Counts);
-   f64_EndTime = static_cast<float64>(u_Counts.QuadPart) + (static_cast<float64>(ou32_NumberUs) * hf64_CountsPer1US);
-   for (;; )
-   {
-      (void)QueryPerformanceCounter(&u_Counts);
-      if (static_cast<float64>(u_Counts.QuadPart) >= f64_EndTime)
-      {
-         break;
-      }
    }
 }
 
@@ -172,21 +143,7 @@ uint64 stw_tgl::TGL_GetTickCountUS(void)
 //-----------------------------------------------------------------------------
 uint32 stw_tgl::TGL_GetTickCount(void)
 {
-   static sint64 hs64_Freq;
-   static bool hq_FirstCall = true;
-   LARGE_INTEGER u_Counts;
-
-   if (hq_FirstCall == true)
-   {
-      bool q_Test;
-      q_Test = (QueryPerformanceFrequency(&u_Counts) == 0) ? false : true;
-      tgl_assert(q_Test == true);
-      hs64_Freq = u_Counts.QuadPart / 1000U; //we want the result in ms not in seconds
-      hq_FirstCall = false;
-   }
-
-   (void)QueryPerformanceCounter(&u_Counts);
-   return static_cast<uint32>(u_Counts.QuadPart / hs64_Freq);
+   return static_cast<uint32>(TGL_GetTickCountUS() / 1000U);
 }
 
 //-----------------------------------------------------------------------------
@@ -194,7 +151,7 @@ uint32 stw_tgl::TGL_GetTickCount(void)
    \brief   Sleep for a number of milliseconds
 
    Delay for a number of milliseconds. Thread control shall meanwhile be passed on.
-   i.e.: no active, blocking watiting.
+   i.e.: no active, blocking waiting.
 
    \param[in]    ou32_NumberMs    number of milliseconds to delay
 

@@ -19,8 +19,14 @@
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
 
+#include <iostream>
+
+#include <QElapsedTimer>
+
+#include "constants.h"
 #include "stwtypes.h"
 #include "stwerrors.h"
+#include "TGLFile.h"
 #include "TGLUtils.h"
 #include "CSCLString.h"
 #include "C_OSCUtils.h"
@@ -36,6 +42,7 @@
 
 /* -- Used Namespaces ------------------------------------------------------ */
 
+using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 using namespace stw_types;
@@ -58,58 +65,59 @@ C_PuiSdHandler * C_PuiSdHandler::mhpc_Singleton = NULL;
 
 //-----------------------------------------------------------------------------
 /*!
-   \brief   Set UI node from array
+   \brief   Set node ethernet configuration
 
-   \param[in] oru32_Index Index
-   \param[in] orc_Item    New value
+   \param[in] ou32_NodeIndex      Node index
+   \param[in] ou32_InterfaceIndex Interface index
 
-   \created     12.09.2016  STW/M.Echtler
+   \created     10.12.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-void C_PuiSdHandler::SetUINode(const uint32 & oru32_Index, const C_PuiSdNode & orc_Item)
+void C_PuiSdHandler::SetOSCNodeEthernetConfiguration(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
+                                                     const std::vector<sint32> & orc_Ip,
+                                                     const std::vector<sint32> & orc_NetMask,
+                                                     const std::vector<sint32> & orc_DefaultGateway)
 {
-   if (oru32_Index < this->mc_UINodes.size())
+   if (((orc_Ip.size() == 4UL) && (orc_NetMask.size() == 4UL)) && (orc_DefaultGateway.size() == 4UL))
    {
-      this->mc_UINodes[oru32_Index] = orc_Item;
+      if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+      {
+         C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+         if (ou32_InterfaceIndex < rc_Node.c_Properties.c_ComInterfaces.size())
+         {
+            C_OSCNodeComInterfaceSettings & rc_CurInterface = rc_Node.c_Properties.c_ComInterfaces[ou32_InterfaceIndex];
+            rc_CurInterface.c_Ip.au8_IpAddress[0] = static_cast<uint8>(orc_Ip[0]);
+            rc_CurInterface.c_Ip.au8_IpAddress[1] = static_cast<uint8>(orc_Ip[1]);
+            rc_CurInterface.c_Ip.au8_IpAddress[2] = static_cast<uint8>(orc_Ip[2]);
+            rc_CurInterface.c_Ip.au8_IpAddress[3] = static_cast<uint8>(orc_Ip[3]);
+            rc_CurInterface.c_Ip.au8_NetMask[0] = static_cast<uint8>(orc_NetMask[0]);
+            rc_CurInterface.c_Ip.au8_NetMask[1] = static_cast<uint8>(orc_NetMask[1]);
+            rc_CurInterface.c_Ip.au8_NetMask[2] = static_cast<uint8>(orc_NetMask[2]);
+            rc_CurInterface.c_Ip.au8_NetMask[3] = static_cast<uint8>(orc_NetMask[3]);
+            rc_CurInterface.c_Ip.au8_DefaultGateway[0] = static_cast<uint8>(orc_DefaultGateway[0]);
+            rc_CurInterface.c_Ip.au8_DefaultGateway[1] = static_cast<uint8>(orc_DefaultGateway[1]);
+            rc_CurInterface.c_Ip.au8_DefaultGateway[2] = static_cast<uint8>(orc_DefaultGateway[2]);
+            rc_CurInterface.c_Ip.au8_DefaultGateway[3] = static_cast<uint8>(orc_DefaultGateway[3]);
+         }
+      }
    }
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set OSC node from array
-
-   \param[in] oru32_Index Index
-   \param[in] orc_Item    New value
-
-   \created     12.09.2016  STW/M.Echtler
-*/
-//-----------------------------------------------------------------------------
-void C_PuiSdHandler::SetOSCNode(const uint32 & oru32_Index, const C_OSCNode & orc_Item)
-{
-   if (oru32_Index < this->mc_CoreDefinition.c_Nodes.size())
-   {
-      this->mc_CoreDefinition.c_Nodes[oru32_Index] = orc_Item;
-   }
-
-   //signal "node change"
-   Q_EMIT this->SigNodesChanged();
 }
 
 //-----------------------------------------------------------------------------
 /*!
    \brief   Set UI bus from array
 
-   \param[in] oru32_Index Index
+   \param[in] ou32_Index Index
    \param[in] orc_Item    New value
 
    \created     12.09.2016  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-void C_PuiSdHandler::SetUIBus(const uint32 & oru32_Index, const C_PuiSdBus & orc_Item)
+void C_PuiSdHandler::SetUIBus(const uint32 ou32_Index, const C_PuiSdBus & orc_Item)
 {
-   if (oru32_Index < this->mc_UIBuses.size())
+   if (ou32_Index < this->mc_UIBuses.size())
    {
-      mc_UIBuses[oru32_Index] = orc_Item;
+      mc_UIBuses[ou32_Index] = orc_Item;
    }
 }
 
@@ -117,17 +125,17 @@ void C_PuiSdHandler::SetUIBus(const uint32 & oru32_Index, const C_PuiSdBus & orc
 /*!
    \brief   Set OSC bus from array
 
-   \param[in] oru32_Index Index
+   \param[in] ou32_Index Index
    \param[in] orc_Item    New value
 
    \created     12.09.2016  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-void C_PuiSdHandler::SetOSCBus(const uint32 & oru32_Index, const C_OSCSystemBus & orc_Item)
+void C_PuiSdHandler::SetOSCBus(const uint32 ou32_Index, const C_OSCSystemBus & orc_Item)
 {
-   if (oru32_Index < this->mc_CoreDefinition.c_Buses.size())
+   if (ou32_Index < this->mc_CoreDefinition.c_Buses.size())
    {
-      this->mc_CoreDefinition.c_Buses[oru32_Index] = orc_Item;
+      this->mc_CoreDefinition.c_Buses[ou32_Index] = orc_Item;
    }
 
    //signal "bus change"
@@ -756,20 +764,15 @@ void C_PuiSdHandler::AddConnection(const uint32 ou32_NodeIndex, const uint8 ou8_
 //-----------------------------------------------------------------------------
 void C_PuiSdHandler::RemoveConnection(const uint32 ou32_NodeIndex, const C_PuiSdNodeConnectionId & orc_ID)
 {
-   const C_OSCNode * const pc_OSCNode = this->GetOSCNodeConst(ou32_NodeIndex);
-   const C_PuiSdNode * const pc_UINode = this->GetUINode(ou32_NodeIndex);
+   //Check size & consistency
+   tgl_assert(this->mc_UINodes.size() == this->mc_CoreDefinition.c_Nodes.size());
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_PuiSdNode & rc_UINode = this->mc_UINodes[ou32_NodeIndex];
+      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
 
-   if (pc_OSCNode != NULL)
-   {
-      C_OSCNode c_OSCNode = *pc_OSCNode;
-      c_OSCNode.c_Properties.DisconnectComInterface(orc_ID.e_InterfaceType, orc_ID.u8_InterfaceNumber);
-      this->SetOSCNode(ou32_NodeIndex, c_OSCNode);
-   }
-   if (pc_UINode != NULL)
-   {
-      C_PuiSdNode c_UINode = *pc_UINode;
-      c_UINode.DeleteConnection(orc_ID);
-      this->SetUINode(ou32_NodeIndex, c_UINode);
+      rc_OSCNode.c_Properties.DisconnectComInterface(orc_ID.e_InterfaceType, orc_ID.u8_InterfaceNumber);
+      rc_UINode.DeleteConnection(orc_ID);
    }
 }
 
@@ -812,19 +815,18 @@ void C_PuiSdHandler::ChangeCompleteConnection(const uint32 ou32_NodeIndex, const
                                               const C_PuiSdNodeConnectionId & orc_NewID, const uint8 & oru8_NodeId,
                                               const uint32 & oru32_BusIndex)
 {
-   const C_OSCNode * const pc_OSCNode = this->GetOSCNodeConst(ou32_NodeIndex);
-   const C_PuiSdNode * const pc_UINode = this->GetUINode(ou32_NodeIndex);
-
-   //Core
-   if (pc_OSCNode != NULL)
+   //Check size & consistency
+   tgl_assert(this->mc_UINodes.size() == this->mc_CoreDefinition.c_Nodes.size());
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
-      C_OSCNode c_OSCNode = *pc_OSCNode;
+      C_PuiSdNode & rc_UINode = this->mc_UINodes[ou32_NodeIndex];
+      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
       uint32 u32_LastBus = 0;
       //Unregister
-      for (uint32 u32_ItComInterface = 0; u32_ItComInterface < c_OSCNode.c_Properties.c_ComInterfaces.size();
+      for (uint32 u32_ItComInterface = 0; u32_ItComInterface < rc_OSCNode.c_Properties.c_ComInterfaces.size();
            ++u32_ItComInterface)
       {
-         C_OSCNodeComInterfaceSettings & rc_ComInterface = c_OSCNode.c_Properties.c_ComInterfaces[u32_ItComInterface];
+         C_OSCNodeComInterfaceSettings & rc_ComInterface = rc_OSCNode.c_Properties.c_ComInterfaces[u32_ItComInterface];
          if ((rc_ComInterface.e_InterfaceType == orc_PrevID.e_InterfaceType) &&
              (rc_ComInterface.u8_InterfaceNumber == orc_PrevID.u8_InterfaceNumber))
          {
@@ -834,10 +836,10 @@ void C_PuiSdHandler::ChangeCompleteConnection(const uint32 ou32_NodeIndex, const
          }
       }
       //Register
-      for (uint32 u32_ItComInterface = 0; u32_ItComInterface < c_OSCNode.c_Properties.c_ComInterfaces.size();
+      for (uint32 u32_ItComInterface = 0; u32_ItComInterface < rc_OSCNode.c_Properties.c_ComInterfaces.size();
            ++u32_ItComInterface)
       {
-         C_OSCNodeComInterfaceSettings & rc_ComInterface = c_OSCNode.c_Properties.c_ComInterfaces[u32_ItComInterface];
+         C_OSCNodeComInterfaceSettings & rc_ComInterface = rc_OSCNode.c_Properties.c_ComInterfaces[u32_ItComInterface];
          if ((rc_ComInterface.e_InterfaceType == orc_NewID.e_InterfaceType) &&
              (rc_ComInterface.u8_InterfaceNumber == orc_NewID.u8_InterfaceNumber))
          {
@@ -853,21 +855,152 @@ void C_PuiSdHandler::ChangeCompleteConnection(const uint32 ou32_NodeIndex, const
             rc_ComInterface.u8_NodeID = oru8_NodeId;
          }
       }
-      this->SetOSCNode(ou32_NodeIndex, c_OSCNode);
-   }
-   //UI
-   if (pc_UINode != NULL)
-   {
-      C_PuiSdNode c_UINode = *pc_UINode;
-      for (uint32 u32_ItBusConn = 0; u32_ItBusConn < c_UINode.c_UIBusConnections.size(); ++u32_ItBusConn)
+
+      //UI
+      for (uint32 u32_ItBusConn = 0; u32_ItBusConn < rc_UINode.c_UIBusConnections.size(); ++u32_ItBusConn)
       {
-         C_PuiSdNodeConnection & rc_BusConn = c_UINode.c_UIBusConnections[u32_ItBusConn];
+         C_PuiSdNodeConnection & rc_BusConn = rc_UINode.c_UIBusConnections[u32_ItBusConn];
          if (rc_BusConn.c_ConnectionID == orc_PrevID)
          {
             rc_BusConn.c_ConnectionID = orc_NewID;
          }
       }
-      this->SetUINode(ou32_NodeIndex, c_UINode);
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Apply node properties
+
+   \param[in] ou32_NodeIndex Node index
+   \param[in] orc_Properties New properties
+
+   \created     10.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSdHandler::SetOSCNodeProperties(const uint32 ou32_NodeIndex, const C_OSCNodeProperties & orc_Properties)
+{
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      rc_OSCNode.c_Properties = orc_Properties;
+      //Signal new name!
+      Q_EMIT this->SigNodesChanged();
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Apply node properties
+
+   \param[in] ou32_NodeIndex      Node index
+   \param[in] orc_Name            New name
+   \param[in] orc_Comment         New comment
+   \param[in] oe_DiagnosticServer New diagnostic server
+   \param[in] oe_FlashLoader      New flash loader
+   \param[in] orc_NodeIds         New node IDs
+   \param[in] orc_UpdateFlags     New update active flags
+   \param[in] orc_RoutingFlags    New routing active flags
+   \param[in] orc_DiagnosisFlags  New diagnosis active flags
+
+   \created     10.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSdHandler::SetOSCNodePropertiesDetailed(const uint32 ou32_NodeIndex, const QString & orc_Name,
+                                                  const QString & orc_Comment,
+                                                  const C_OSCNodeProperties::E_DiagnosticServerProtocol oe_DiagnosticServer, const C_OSCNodeProperties::E_FlashLoaderProtocol oe_FlashLoader, const std::vector<uint8> & orc_NodeIds, const std::vector<bool> & orc_UpdateFlags, const std::vector<bool> & orc_RoutingFlags,
+                                                  const std::vector<bool> & orc_DiagnosisFlags)
+{
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      rc_OSCNode.c_Properties.c_Name = orc_Name.toStdString().c_str();
+      rc_OSCNode.c_Properties.c_Comment = orc_Comment.toStdString().c_str();
+      rc_OSCNode.c_Properties.e_DiagnosticServer = oe_DiagnosticServer;
+      rc_OSCNode.c_Properties.e_FlashLoader = oe_FlashLoader;
+      if (((orc_NodeIds.size() == orc_UpdateFlags.size()) && (orc_NodeIds.size() == orc_RoutingFlags.size())) &&
+          (orc_NodeIds.size() == orc_DiagnosisFlags.size()))
+      {
+         for (uint32 u32_ItInt = 0UL;
+              (u32_ItInt < rc_OSCNode.c_Properties.c_ComInterfaces.size()) && (u32_ItInt < orc_NodeIds.size());
+              ++u32_ItInt)
+         {
+            C_OSCNodeComInterfaceSettings & rc_Interface = rc_OSCNode.c_Properties.c_ComInterfaces[u32_ItInt];
+            rc_Interface.u8_NodeID = orc_NodeIds[u32_ItInt];
+            rc_Interface.q_IsUpdateEnabled = orc_UpdateFlags[u32_ItInt];
+            rc_Interface.q_IsRoutingEnabled = orc_RoutingFlags[u32_ItInt];
+            rc_Interface.q_IsDiagnosisEnabled = orc_DiagnosisFlags[u32_ItInt];
+         }
+      }
+      //Signal new name!
+      Q_EMIT this->SigNodesChanged();
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set UI node box
+
+   \param[in] ou32_NodeIndex Node index
+   \param[in] orc_Box        Box data
+
+   \created     10.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSdHandler::SetUINodeBox(const uint32 ou32_NodeIndex, const C_PuiBsBox & orc_Box)
+{
+   if (ou32_NodeIndex < this->mc_UINodes.size())
+   {
+      C_PuiSdNode & rc_UINode = this->mc_UINodes[ou32_NodeIndex];
+      //Copy box manually
+      rc_UINode.c_UIPosition = orc_Box.c_UIPosition;
+      rc_UINode.f64_Height = orc_Box.f64_Height;
+      rc_UINode.f64_Width = orc_Box.f64_Width;
+      rc_UINode.f64_ZOrder = orc_Box.f64_ZOrder;
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set UI node connections
+
+   \param[in] ou32_NodeIndex  Node index
+   \param[in] orc_Connections Connection information
+
+   \created     10.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSdHandler::SetUINodeConnections(const uint32 ou32_NodeIndex,
+                                          const std::vector<C_PuiSdNodeConnection> & orc_Connections)
+{
+   if (ou32_NodeIndex < this->mc_UINodes.size())
+   {
+      C_PuiSdNode & rc_UINode = this->mc_UINodes[ou32_NodeIndex];
+      rc_UINode.c_UIBusConnections = orc_Connections;
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set UI node connection ID
+
+   \param[in] ou32_NodeIndex       Node index
+   \param[in] ou32_ConnectionIndex Connection index
+   \param[in] orc_Id               New ID
+
+   \created     10.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSdHandler::SetUINodeConnectionId(const uint32 ou32_NodeIndex, const uint32 ou32_ConnectionIndex,
+                                           const C_PuiSdNodeConnectionId & orc_Id)
+{
+   if (ou32_NodeIndex < this->mc_UINodes.size())
+   {
+      C_PuiSdNode & rc_UINode = this->mc_UINodes[ou32_NodeIndex];
+      if (ou32_ConnectionIndex < rc_UINode.c_UIBusConnections.size())
+      {
+         rc_UINode.c_UIBusConnections[ou32_ConnectionIndex].c_ConnectionID = orc_Id;
+      }
    }
 }
 
@@ -888,7 +1021,7 @@ uint32 C_PuiSdHandler::AddNodeAndSort(C_OSCNode & orc_OSCNode, const C_PuiSdNode
 {
    uint32 u32_Index = mc_CoreDefinition.c_Nodes.size();
 
-   orc_OSCNode.c_Properties.c_Name = C_PuiSdUtil::h_GetUniqueName(
+   orc_OSCNode.c_Properties.c_Name = C_Uti::h_GetUniqueName(
       this->m_GetExistingNodeNames(), orc_OSCNode.c_Properties.c_Name);
 
    mc_CoreDefinition.AddNode(orc_OSCNode); //add node and set device definition pointer
@@ -949,7 +1082,7 @@ uint32 C_PuiSdHandler::AddBusAndSort(C_OSCSystemBus & orc_OSCBus, const C_PuiSdB
    }
    else
    {
-      orc_OSCBus.c_Name = C_PuiSdUtil::h_GetUniqueName(
+      orc_OSCBus.c_Name = C_Uti::h_GetUniqueName(
          this->GetExistingBusNames(), orc_OSCBus.c_Name);
    }
    if (oq_AllowBusIdAdaption == true)
@@ -979,13 +1112,12 @@ uint32 C_PuiSdHandler::AddBusAndSort(C_OSCSystemBus & orc_OSCBus, const C_PuiSdB
    \created     28.02.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-std::vector<const C_SCLString *> C_PuiSdHandler::GetExistingBusNames(void) const
+std::map<C_SCLString, bool> C_PuiSdHandler::GetExistingBusNames(void) const
 {
-   std::vector<const C_SCLString *> c_Retval;
-   c_Retval.reserve(this->mc_CoreDefinition.c_Buses.size());
+   std::map<C_SCLString, bool> c_Retval;
    for (uint32 u32_ItBus = 0; u32_ItBus < this->mc_CoreDefinition.c_Buses.size(); ++u32_ItBus)
    {
-      c_Retval.push_back(&this->mc_CoreDefinition.c_Buses[u32_ItBus].c_Name);
+      c_Retval[this->mc_CoreDefinition.c_Buses[u32_ItBus].c_Name] = true;
    }
    return c_Retval;
 }
@@ -1084,7 +1216,8 @@ void C_PuiSdHandler::RemoveBus(const uint32 ou32_BusIndex)
 /*!
    \brief   Check if there is a node conflict
 
-   \param[in] oru32_NodeIndex Node index
+   \param[in]     oru32_NodeIndex Node index
+   \param[in,out] opc_NameMap     Optional map to use for name conflict check
 
    \return
    true  Conflict
@@ -1095,31 +1228,83 @@ void C_PuiSdHandler::RemoveBus(const uint32 ou32_BusIndex)
 //-----------------------------------------------------------------------------
 bool C_PuiSdHandler::CheckNodeConflict(const uint32 & oru32_NodeIndex) const
 {
+   QElapsedTimer c_Timer;
    bool q_Retval;
-   bool q_NameConflict;
-   bool q_NameEmpty;
-   bool q_NodeIdInvalid;
-   bool q_DataPoolsInvalid;
-   bool q_ApplicationsInvalid;
+   static QMap<uint32, bool> hc_PreviousResult;
 
-   if (this->mc_CoreDefinition.CheckErrorNode(oru32_NodeIndex, &q_NameConflict, &q_NameEmpty, &q_NodeIdInvalid,
-                                              &q_DataPoolsInvalid, &q_ApplicationsInvalid, true, NULL, NULL,
-                                              NULL) == C_NO_ERR)
+   if (mq_TIMING_OUTPUT)
    {
-      if (((((q_NameConflict == true) || (q_NodeIdInvalid == true)) || (q_DataPoolsInvalid == true)) ||
-           (q_ApplicationsInvalid == true)) || (q_NameEmpty == true))
+      c_Timer.start();
+   }
+   //Get reference hash
+   const uint32 u32_Hash = this->m_GetHashNode(oru32_NodeIndex);
+   //Look up
+   const QMap<uint32, bool>::const_iterator c_It = hc_PreviousResult.find(u32_Hash);
+   if (c_It == hc_PreviousResult.end())
+   {
+      bool q_NameConflict;
+      bool q_NameEmpty;
+      bool q_NodeIdInvalid;
+      bool q_DataPoolsInvalid;
+      bool q_ApplicationsInvalid;
+
+      if (this->mc_CoreDefinition.CheckErrorNode(oru32_NodeIndex, &q_NameConflict, &q_NameEmpty, &q_NodeIdInvalid,
+                                                 &q_DataPoolsInvalid, &q_ApplicationsInvalid, true, NULL,
+                                                 NULL,
+                                                 NULL) == C_NO_ERR)
       {
-         q_Retval = true;
+         if (((((q_NameConflict == true) || (q_NodeIdInvalid == true)) || (q_DataPoolsInvalid == true)) ||
+              (q_ApplicationsInvalid == true)) || (q_NameEmpty == true))
+         {
+            q_Retval = true;
+         }
+         else
+         {
+            // one further check necessary
+            q_Retval = this->CheckNodeNvmDataPoolsSizeConflict(oru32_NodeIndex);
+         }
+         //Store for future reference
+         if (((((q_NodeIdInvalid == true) || (q_DataPoolsInvalid == true)) || (q_ApplicationsInvalid == true)) ||
+              (q_NameEmpty == true)) || (this->CheckNodeNvmDataPoolsSizeConflict(oru32_NodeIndex) == true))
+         {
+            hc_PreviousResult.insert(u32_Hash, true);
+         }
+         else
+         {
+            hc_PreviousResult.insert(u32_Hash, false);
+         }
       }
       else
       {
-         // one further check necessary
-         q_Retval = this->CheckNodeNvmDataPoolsSizeConflict(oru32_NodeIndex);
+         q_Retval = true;
       }
    }
    else
    {
-      q_Retval = true;
+      //Only do name conflict check, otherwise reuse stored value
+      bool q_NameConflict;
+
+      if (this->mc_CoreDefinition.CheckErrorNode(oru32_NodeIndex, &q_NameConflict, NULL, NULL, NULL, NULL, true, NULL,
+                                                 NULL, NULL) == C_NO_ERR)
+      {
+         if (q_NameConflict == true)
+         {
+            q_Retval = true;
+         }
+         else
+         {
+            // one further check necessary
+            q_Retval = c_It.value();
+         }
+      }
+      else
+      {
+         q_Retval = true;
+      }
+   }
+   if (mq_TIMING_OUTPUT)
+   {
+      std::cout << "Node " << oru32_NodeIndex << " check: " << c_Timer.elapsed() << " ms" << &std::endl;
    }
    return q_Retval;
 }
@@ -1168,12 +1353,125 @@ bool C_PuiSdHandler::CheckNodeNvmDataPoolsSizeConflict(const uint32 ou32_NodeInd
 /*!
    \brief   Check if there is a bus conflict
 
-   \param[in]  ou32_BusIndex              Bus index
-   \param[out] opq_NameConflict           Name conflict
-   \param[out] opq_NameEmpty              Name empty
-   \param[out] opq_IdInvalid              Id out of range
-   \param[out] opc_InvalidNodesForBitRate Additional info for bit rate error
-   \param[out] opc_InvalidProtocols       Additional info for protocol error
+   \param[in]     ou32_BusIndex              Bus index
+
+   \return
+   true  Conflict
+   false No conflict
+
+   \created     20.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+bool C_PuiSdHandler::CheckBusConflict(const uint32 ou32_BusIndex) const
+{
+   QElapsedTimer c_Timer;
+   bool q_NameConflict;
+   bool q_IdInvalid;
+   static QMap<std::vector<uint32>, bool> hc_PreviousResults;
+
+   QMap<std::vector<uint32>, bool>::const_iterator c_It;
+   std::vector<uint32> c_Hashes;
+   std::vector<uint32> c_NodeIndexes;
+   std::vector<uint32> c_InterfaceIndexes;
+   bool q_Retval;
+
+   if (mq_TIMING_OUTPUT)
+   {
+      c_Timer.start();
+   }
+
+   //get all required hashes
+   this->mc_CoreDefinition.GetNodeIndexesOfBus(ou32_BusIndex, c_NodeIndexes, c_InterfaceIndexes);
+   //Bus hash
+   c_Hashes.push_back(this->m_GetHashBus(ou32_BusIndex));
+   //Nodes hashes
+   for (uint32 u32_ItNode = 0UL; u32_ItNode < c_NodeIndexes.size(); ++u32_ItNode)
+   {
+      c_Hashes.push_back(this->m_GetHashNode(c_NodeIndexes[u32_ItNode]));
+   }
+
+   //Lookup if there is a result for this hash
+   c_It = hc_PreviousResults.find(c_Hashes);
+   if (c_It == hc_PreviousResults.end())
+   {
+      bool q_NameEmpty;
+
+      std::vector<QString> c_InvalidNodesForBitRate;
+      std::vector<C_OSCCanProtocol::E_Type> c_InvalidProtocols;
+      if (mq_TIMING_OUTPUT)
+      {
+         std::cout << "Bus " << ou32_BusIndex << " recheck" << &std::endl;
+      }
+      //Do all checks
+      if (this->CheckBusConflictDetailed(ou32_BusIndex, &q_NameConflict, &q_NameEmpty, &q_IdInvalid,
+                                         &c_InvalidNodesForBitRate, &c_InvalidProtocols) == C_NO_ERR)
+      {
+         if (((((q_NameConflict == true) || (q_NameEmpty == true)) || (q_IdInvalid == true)) ||
+              (c_InvalidNodesForBitRate.size() > 0UL)) || (c_InvalidProtocols.size() > 0UL))
+         {
+            q_Retval = true;
+         }
+         else
+         {
+            q_Retval = false;
+         }
+         //Store for future reference (without conflict checks)
+         if (((q_NameEmpty == true) || (c_InvalidNodesForBitRate.size() > 0UL)) ||
+             (c_InvalidProtocols.size() > 0UL))
+         {
+            hc_PreviousResults.insert(c_Hashes, true);
+         }
+         else
+         {
+            hc_PreviousResults.insert(c_Hashes, false);
+         }
+      }
+      else
+      {
+         q_Retval = true;
+      }
+   }
+   else
+   {
+      if (mq_TIMING_OUTPUT)
+      {
+         std::cout << "Bus " << ou32_BusIndex << " skip" << &std::endl;
+      }
+      //rely on hash and do name & id conflict check
+      if (this->CheckBusConflictDetailed(ou32_BusIndex, &q_NameConflict, NULL, &q_IdInvalid, NULL, NULL) == C_NO_ERR)
+      {
+         if ((q_NameConflict == true) || (q_IdInvalid == true))
+         {
+            q_Retval = true;
+         }
+         else
+         {
+            q_Retval = c_It.value();
+         }
+      }
+      else
+      {
+         q_Retval = true;
+      }
+   }
+   if (mq_TIMING_OUTPUT)
+   {
+      std::cout << "Bus " << ou32_BusIndex << " check: " << c_Timer.elapsed() << " ms" << &std::endl;
+   }
+   return q_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Check for bus conflict details
+
+   \param[in]     ou32_BusIndex              Bus index
+   \param[in,out] opc_NameMap                Optional map to use for name conflict check
+   \param[out]    opq_NameConflict           Name conflict
+   \param[out]    opq_NameEmpty              Name empty
+   \param[out]    opq_IdInvalid              Id out of range
+   \param[out]    opc_InvalidNodesForBitRate Additional info for bit rate error
+   \param[out]    opc_InvalidProtocols       Additional info for protocol error
 
    \return
    true  Conflict
@@ -1182,66 +1480,59 @@ bool C_PuiSdHandler::CheckNodeNvmDataPoolsSizeConflict(const uint32 ou32_NodeInd
    \created     18.05.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
-bool C_PuiSdHandler::CheckBusConflict(const uint32 ou32_BusIndex, bool * const opq_NameConflict,
-                                      bool * const opq_NameEmpty, bool * const opq_IdInvalid,
-                                      std::vector<QString> * const opc_InvalidNodesForBitRate,
-                                      std::vector<C_OSCCanProtocol::E_Type> * const opc_InvalidProtocols) const
+sint32 C_PuiSdHandler::CheckBusConflictDetailed(const uint32 ou32_BusIndex, bool * const opq_NameConflict,
+                                                bool * const opq_NameEmpty, bool * const opq_IdInvalid,
+                                                std::vector<QString> * const opc_InvalidNodesForBitRate,
+                                                std::vector<C_OSCCanProtocol::E_Type> * const opc_InvalidProtocols)
+const
 {
-   bool q_Retval = false;
-   bool q_NameConflict;
-   bool q_NameEmpty;
-   bool q_IdInvalid;
+   sint32 s32_Retval = C_NO_ERR;
 
    //Check bus errors
-   if (this->mc_CoreDefinition.CheckErrorBus(ou32_BusIndex, &q_NameConflict, &q_NameEmpty, &q_IdInvalid,
+   if (this->mc_CoreDefinition.CheckErrorBus(ou32_BusIndex, opq_NameConflict, opq_NameEmpty, opq_IdInvalid,
                                              NULL) == C_NO_ERR)
    {
       // Check current bitrate
-      const C_OSCSystemBus * const pc_CheckedBus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(ou32_BusIndex);
-      if (((q_NameConflict == true) || (q_IdInvalid == true)) || (q_NameEmpty == true))
+      if (opc_InvalidNodesForBitRate != NULL)
       {
-         q_Retval = true;
-      }
+         const C_OSCSystemBus * const pc_CheckedBus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(ou32_BusIndex);
 
-      if ((pc_CheckedBus != NULL) &&
-          (pc_CheckedBus->e_Type == C_OSCSystemBus::eCAN)) // Only relevant for CAN
-      {
-         const uint32 u32_CurrentBitrate = static_cast<uint32>(pc_CheckedBus->u64_BitRate / 1000ULL);
-         std::vector<uint32> c_ConnectedNodes;
-         std::vector<uint32> c_ConnectedInterfaces;
-         uint32 u32_NodeCounter;
-
-         this->mc_CoreDefinition.GetNodeIndexesOfBus(ou32_BusIndex, c_ConnectedNodes, c_ConnectedInterfaces);
-
-         // Every node must support the CAN bitrate
-         for (u32_NodeCounter = 0U; u32_NodeCounter < c_ConnectedNodes.size(); ++u32_NodeCounter)
+         if ((pc_CheckedBus != NULL) &&
+             (pc_CheckedBus->e_Type == C_OSCSystemBus::eCAN)) // Only relevant for CAN
          {
-            const C_OSCNode * const pc_Node =
-               C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_ConnectedNodes[u32_NodeCounter]);
+            const uint32 u32_CurrentBitrate = static_cast<uint32>(pc_CheckedBus->u64_BitRate / 1000ULL);
+            std::vector<uint32> c_ConnectedNodes;
+            std::vector<uint32> c_ConnectedInterfaces;
+            uint32 u32_NodeCounter;
 
-            if (pc_Node != NULL)
+            this->mc_CoreDefinition.GetNodeIndexesOfBus(ou32_BusIndex, c_ConnectedNodes, c_ConnectedInterfaces);
+
+            // Every node must support the CAN bitrate
+            for (u32_NodeCounter = 0U; u32_NodeCounter < c_ConnectedNodes.size(); ++u32_NodeCounter)
             {
-               uint32 u32_BitrateCounter;
-               bool q_BitrateFound = false;
-               tgl_assert(pc_Node->pc_DeviceDefinition != NULL);
+               const C_OSCNode * const pc_Node =
+                  C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_ConnectedNodes[u32_NodeCounter]);
 
-               for (u32_BitrateCounter = 0U;
-                    u32_BitrateCounter < pc_Node->pc_DeviceDefinition->c_SupportedBitrates.size();
-                    ++u32_BitrateCounter)
+               if (pc_Node != NULL)
                {
-                  if (u32_CurrentBitrate == pc_Node->pc_DeviceDefinition->c_SupportedBitrates[u32_BitrateCounter])
+                  uint32 u32_BitrateCounter;
+                  bool q_BitrateFound = false;
+                  tgl_assert(pc_Node->pc_DeviceDefinition != NULL);
+
+                  for (u32_BitrateCounter = 0U;
+                       u32_BitrateCounter < pc_Node->pc_DeviceDefinition->c_SupportedBitrates.size();
+                       ++u32_BitrateCounter)
                   {
-                     q_BitrateFound = true;
-                     break;
+                     if (u32_CurrentBitrate == pc_Node->pc_DeviceDefinition->c_SupportedBitrates[u32_BitrateCounter])
+                     {
+                        q_BitrateFound = true;
+                        break;
+                     }
                   }
-               }
 
-               if (q_BitrateFound == false)
-               {
-                  // Bitrate not supported
-                  q_Retval = true;
-                  if (opc_InvalidNodesForBitRate != NULL)
+                  if (q_BitrateFound == false)
                   {
+                     // Bitrate not supported
                      opc_InvalidNodesForBitRate->push_back(pc_Node->c_Properties.c_Name.c_str());
                   }
                }
@@ -1250,46 +1541,45 @@ bool C_PuiSdHandler::CheckBusConflict(const uint32 ou32_BusIndex, bool * const o
       }
 
       //Check message errors
-      for (uint8 u8_ItToggle = 0; u8_ItToggle < 3; ++u8_ItToggle)
+      if (opc_InvalidProtocols != NULL)
       {
-         bool q_MessageNameConflict;
-         bool q_MessageIdInvalid;
-         bool q_MessagesHaveNoTx;
-         bool q_DelayTimeInvalid;
-         bool q_MessageSignalInvalid;
-         C_OSCCanProtocol::E_Type e_Type;
-         uint32 u32_CANMessageValidSignalsDLCOffset = 0UL;
-         if (u8_ItToggle == 0)
+         for (uint8 u8_ItToggle = 0; u8_ItToggle < 3; ++u8_ItToggle)
          {
-            e_Type = C_OSCCanProtocol::eLAYER2;
-         }
-         else if (u8_ItToggle == 1)
-         {
-            e_Type = C_OSCCanProtocol::eECES;
-            u32_CANMessageValidSignalsDLCOffset = 2UL;
-         }
-         else
-         {
-            e_Type = C_OSCCanProtocol::eCAN_OPEN_SAFETY;
-         }
-         {
-            C_PuiSdNodeCanMessageSyncManager c_SyncMan;
-
-            c_SyncMan.Init(ou32_BusIndex, e_Type);
-
-            c_SyncMan.CheckErrorBus(&q_MessageNameConflict, &q_MessageIdInvalid, &q_MessagesHaveNoTx,
-                                    &q_DelayTimeInvalid,
-                                    &q_MessageSignalInvalid, u32_CANMessageValidSignalsDLCOffset);
-            if (((((q_MessageNameConflict == false) && (q_MessageIdInvalid == false)) &&
-                  (q_DelayTimeInvalid == false)) && (q_MessageSignalInvalid == false)) &&
-                (q_MessagesHaveNoTx == false))
+            bool q_MessageNameConflict;
+            bool q_MessageIdInvalid;
+            bool q_MessagesHaveNoTx;
+            bool q_DelayTimeInvalid;
+            bool q_MessageSignalInvalid;
+            C_OSCCanProtocol::E_Type e_Type;
+            uint32 u32_CANMessageValidSignalsDLCOffset = 0UL;
+            if (u8_ItToggle == 0)
             {
-               //No error
+               e_Type = C_OSCCanProtocol::eLAYER2;
+            }
+            else if (u8_ItToggle == 1)
+            {
+               e_Type = C_OSCCanProtocol::eECES;
+               u32_CANMessageValidSignalsDLCOffset = 2UL;
             }
             else
             {
-               q_Retval = true;
-               if (opc_InvalidProtocols != NULL)
+               e_Type = C_OSCCanProtocol::eCAN_OPEN_SAFETY;
+            }
+            {
+               C_PuiSdNodeCanMessageSyncManager c_SyncMan;
+
+               c_SyncMan.Init(ou32_BusIndex, e_Type);
+
+               c_SyncMan.CheckErrorBus(&q_MessageNameConflict, &q_MessageIdInvalid, &q_MessagesHaveNoTx,
+                                       &q_DelayTimeInvalid,
+                                       &q_MessageSignalInvalid, u32_CANMessageValidSignalsDLCOffset);
+               if (((((q_MessageNameConflict == false) && (q_MessageIdInvalid == false)) &&
+                     (q_DelayTimeInvalid == false)) && (q_MessageSignalInvalid == false)) &&
+                   (q_MessagesHaveNoTx == false))
+               {
+                  //No error
+               }
+               else
                {
                   opc_InvalidProtocols->push_back(e_Type);
                }
@@ -1299,22 +1589,10 @@ bool C_PuiSdHandler::CheckBusConflict(const uint32 ou32_BusIndex, bool * const o
    }
    else
    {
-      q_Retval = true;
-   }
-   if (opq_NameConflict != NULL)
-   {
-      *opq_NameConflict = q_NameConflict;
-   }
-   if (opq_NameEmpty != NULL)
-   {
-      *opq_NameEmpty = q_NameEmpty;
-   }
-   if (opq_IdInvalid != NULL)
-   {
-      *opq_IdInvalid = q_IdInvalid;
+      s32_Retval = C_CONFIG;
    }
 
-   return q_Retval;
+   return s32_Retval;
 }
 
 //-----------------------------------------------------------------------------
@@ -2022,7 +2300,7 @@ sint32 C_PuiSdHandler::MoveApplication(const uint32 ou32_NodeIndex, const uint32
 C_SCLString C_PuiSdHandler::GetUniqueApplicationName(const uint32 & oru32_NodeIndex,
                                                      const C_SCLString & orc_Proposal) const
 {
-   return C_PuiSdUtil::h_GetUniqueName(this->m_GetExistingNodeApplicationNames(oru32_NodeIndex), orc_Proposal);
+   return C_Uti::h_GetUniqueName(this->m_GetExistingNodeApplicationNames(oru32_NodeIndex), orc_Proposal);
 }
 
 //-----------------------------------------------------------------------------
@@ -2225,7 +2503,7 @@ sint32 C_PuiSdHandler::CheckApplicationName(const uint32 ou32_NodeIndex, const C
 C_SCLString C_PuiSdHandler::GetUniqueDataPoolName(const uint32 & oru32_NodeIndex,
                                                   const C_SCLString & orc_Proposal) const
 {
-   return C_PuiSdUtil::h_GetUniqueName(this->m_GetExistingNodeDataPoolNames(oru32_NodeIndex), orc_Proposal);
+   return C_Uti::h_GetUniqueName(this->m_GetExistingNodeDataPoolNames(oru32_NodeIndex), orc_Proposal);
 }
 
 //-----------------------------------------------------------------------------
@@ -2436,36 +2714,62 @@ sint32 C_PuiSdHandler::InsertDataPoolList(const uint32 & oru32_NodeIndex, const 
                                           const C_OSCNodeDataPoolList & orc_OSCContent,
                                           const C_PuiSdNodeDataPoolList & orc_UIContent)
 {
-   sint32 s32_Retval;
-   C_PuiSdNodeDataPool c_UIDataPool;
-   C_OSCNodeDataPool c_OSCDataPool;
+   sint32 s32_Retval = C_NO_ERR;
 
-   s32_Retval = this->GetDataPool(oru32_NodeIndex, oru32_DataPoolIndex, c_OSCDataPool, c_UIDataPool);
-   if (s32_Retval == C_NO_ERR)
+   //Check size & consistency
+   tgl_assert(this->mc_UINodes.size() == this->mc_CoreDefinition.c_Nodes.size());
+   if (oru32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
-      //Unique name
-      C_OSCNodeDataPoolList c_NodeDataPoolList = orc_OSCContent;
-      c_NodeDataPoolList.c_Name =
-         C_PuiSdUtil::h_GetUniqueName(this->m_GetExistingNodeDataPoolListNames(oru32_NodeIndex,
+      C_PuiSdNode & rc_UINode = this->mc_UINodes[oru32_NodeIndex];
+      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
+
+      //Check size & consistency
+      tgl_assert(rc_UINode.c_UIDataPools.size() == rc_OSCNode.c_DataPools.size());
+      if (oru32_DataPoolIndex < rc_OSCNode.c_DataPools.size())
+      {
+         C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[oru32_DataPoolIndex];
+         C_OSCNodeDataPool & rc_OSCDataPool = rc_OSCNode.c_DataPools[oru32_DataPoolIndex];
+
+         //Check size & consistency
+         tgl_assert(rc_UIDataPool.c_DataPoolLists.size() == rc_OSCDataPool.c_Lists.size());
+         if (oru32_DataPoolListIndex <= rc_OSCDataPool.c_Lists.size())
+         {
+            //Unique name
+            C_OSCNodeDataPoolList c_NodeDataPoolList = orc_OSCContent;
+            c_NodeDataPoolList.c_Name =
+               C_Uti::h_GetUniqueName(this->m_GetExistingNodeDataPoolListNames(oru32_NodeIndex,
                                                                                oru32_DataPoolIndex),
                                       c_NodeDataPoolList.c_Name);
-      //Adapt required fields
-      if (c_OSCDataPool.q_IsSafety == true)
-      {
-         c_NodeDataPoolList.q_NvMCRCActive = true;
-         for (uint32 u32_ItElement = 0; u32_ItElement < c_NodeDataPoolList.c_Elements.size(); ++u32_ItElement)
+            //Adapt required fields
+            if (rc_OSCDataPool.q_IsSafety == true)
+            {
+               c_NodeDataPoolList.q_NvMCRCActive = true;
+               for (uint32 u32_ItElement = 0; u32_ItElement < c_NodeDataPoolList.c_Elements.size(); ++u32_ItElement)
+               {
+                  C_OSCNodeDataPoolListElement & rc_CurElement = c_NodeDataPoolList.c_Elements[u32_ItElement];
+                  rc_CurElement.e_Access = C_OSCNodeDataPoolListElement::eACCESS_RO;
+               }
+            }
+            //Insert
+            rc_UIDataPool.c_DataPoolLists.insert(rc_UIDataPool.c_DataPoolLists.begin() + oru32_DataPoolListIndex,
+                                                 orc_UIContent);
+            rc_OSCDataPool.c_Lists.insert(rc_OSCDataPool.c_Lists.begin() + oru32_DataPoolListIndex, c_NodeDataPoolList);
+            //Synchronization engine
+            Q_EMIT this->SigSyncNodeDataPoolListAdded(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex);
+         }
+         else
          {
-            C_OSCNodeDataPoolListElement & rc_CurElement = c_NodeDataPoolList.c_Elements[u32_ItElement];
-            rc_CurElement.e_Access = C_OSCNodeDataPoolListElement::eACCESS_RO;
+            s32_Retval = C_RANGE;
          }
       }
-      //Insert
-      c_UIDataPool.c_DataPoolLists.insert(c_UIDataPool.c_DataPoolLists.begin() + oru32_DataPoolListIndex,
-                                          orc_UIContent);
-      c_OSCDataPool.c_Lists.insert(c_OSCDataPool.c_Lists.begin() + oru32_DataPoolListIndex, c_NodeDataPoolList);
-      this->SetDataPool(oru32_NodeIndex, oru32_DataPoolIndex, c_OSCDataPool, c_UIDataPool);
-      //Synchronization engine
-      Q_EMIT this->SigSyncNodeDataPoolListAdded(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex);
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
    }
 
    return s32_Retval;
@@ -2489,28 +2793,45 @@ sint32 C_PuiSdHandler::InsertDataPoolList(const uint32 & oru32_NodeIndex, const 
 sint32 C_PuiSdHandler::RemoveDataPoolList(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
                                           const uint32 & oru32_DataPoolListIndex)
 {
-   sint32 s32_Retval;
-   C_PuiSdNodeDataPool c_UIDataPool;
-   C_OSCNodeDataPool c_OSCDataPool;
+   sint32 s32_Retval = C_NO_ERR;
 
-   s32_Retval = this->GetDataPool(oru32_NodeIndex, oru32_DataPoolIndex, c_OSCDataPool, c_UIDataPool);
-   if (s32_Retval == C_NO_ERR)
+   //Check size & consistency
+   tgl_assert(this->mc_UINodes.size() == this->mc_CoreDefinition.c_Nodes.size());
+   if (oru32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
+      C_PuiSdNode & rc_UINode = this->mc_UINodes[oru32_NodeIndex];
+      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
+
       //Check size & consistency
-      tgl_assert(c_UIDataPool.c_DataPoolLists.size() == c_OSCDataPool.c_Lists.size());
-      if (oru32_DataPoolListIndex < c_UIDataPool.c_DataPoolLists.size())
+      tgl_assert(rc_UINode.c_UIDataPools.size() == rc_OSCNode.c_DataPools.size());
+      if (oru32_DataPoolIndex < rc_OSCNode.c_DataPools.size())
       {
-         //Synchronization engine (First!)
-         Q_EMIT this->SigSyncNodeDataPoolListAboutToBeDeleted(oru32_NodeIndex, oru32_DataPoolIndex,
-                                                              oru32_DataPoolListIndex);
-         c_UIDataPool.c_DataPoolLists.erase(c_UIDataPool.c_DataPoolLists.begin() + oru32_DataPoolListIndex);
-         c_OSCDataPool.c_Lists.erase(c_OSCDataPool.c_Lists.begin() + oru32_DataPoolListIndex);
-         this->SetDataPool(oru32_NodeIndex, oru32_DataPoolIndex, c_OSCDataPool, c_UIDataPool);
+         C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[oru32_DataPoolIndex];
+         C_OSCNodeDataPool & rc_OSCDataPool = rc_OSCNode.c_DataPools[oru32_DataPoolIndex];
+
+         //Check size & consistency
+         tgl_assert(rc_UIDataPool.c_DataPoolLists.size() == rc_OSCDataPool.c_Lists.size());
+         if (oru32_DataPoolListIndex < rc_OSCDataPool.c_Lists.size())
+         {
+            //Synchronization engine (First!)
+            Q_EMIT this->SigSyncNodeDataPoolListAboutToBeDeleted(oru32_NodeIndex, oru32_DataPoolIndex,
+                                                                 oru32_DataPoolListIndex);
+            rc_UIDataPool.c_DataPoolLists.erase(rc_UIDataPool.c_DataPoolLists.begin() + oru32_DataPoolListIndex);
+            rc_OSCDataPool.c_Lists.erase(rc_OSCDataPool.c_Lists.begin() + oru32_DataPoolListIndex);
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
       }
       else
       {
          s32_Retval = C_RANGE;
       }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
    }
 
    return s32_Retval;
@@ -2570,6 +2891,250 @@ sint32 C_PuiSdHandler::SetDataPoolList(const uint32 & oru32_NodeIndex, const uin
             {
                s32_Retval = C_NOACT;
             }
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set data pool list name
+
+   \param[in] oru32_NodeIndex         Node index
+   \param[in] oru32_DataPoolIndex     Data pool index
+   \param[in] oru32_DataPoolListIndex Data pool list index
+   \param[in] orc_Value               New value
+
+   \return
+   C_NO_ERR OK
+   C_RANGE  Something out of range
+
+   \created     07.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+sint32 C_PuiSdHandler::SetDataPoolListName(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
+                                           const uint32 & oru32_DataPoolListIndex, const QString & orc_Value)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   //Check size & consistency
+   tgl_assert(this->mc_UINodes.size() == this->mc_CoreDefinition.c_Nodes.size());
+   if (oru32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_PuiSdNode & rc_UINode = this->mc_UINodes[oru32_NodeIndex];
+      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
+
+      //Check size & consistency
+      tgl_assert(rc_UINode.c_UIDataPools.size() == rc_OSCNode.c_DataPools.size());
+      if (oru32_DataPoolIndex < rc_OSCNode.c_DataPools.size())
+      {
+         C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[oru32_DataPoolIndex];
+         C_OSCNodeDataPool & rc_OSCDataPool = rc_OSCNode.c_DataPools[oru32_DataPoolIndex];
+
+         //Check size & consistency
+         tgl_assert(rc_UIDataPool.c_DataPoolLists.size() == rc_OSCDataPool.c_Lists.size());
+         if (oru32_DataPoolListIndex < rc_OSCDataPool.c_Lists.size())
+         {
+            C_OSCNodeDataPoolList & rc_OSCList = rc_OSCDataPool.c_Lists[oru32_DataPoolListIndex];
+            rc_OSCList.c_Name = orc_Value.toStdString().c_str();
+            //Update addresses
+            rc_OSCDataPool.RecalculateAddress();
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set data pool list comment
+
+   \param[in] oru32_NodeIndex         Node index
+   \param[in] oru32_DataPoolIndex     Data pool index
+   \param[in] oru32_DataPoolListIndex Data pool list index
+   \param[in] orc_Value               New value
+
+   \return
+   C_NO_ERR OK
+   C_RANGE  Something out of range
+
+   \created     07.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+sint32 C_PuiSdHandler::SetDataPoolListComment(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
+                                              const uint32 & oru32_DataPoolListIndex, const QString & orc_Value)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   //Check size & consistency
+   tgl_assert(this->mc_UINodes.size() == this->mc_CoreDefinition.c_Nodes.size());
+   if (oru32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_PuiSdNode & rc_UINode = this->mc_UINodes[oru32_NodeIndex];
+      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
+
+      //Check size & consistency
+      tgl_assert(rc_UINode.c_UIDataPools.size() == rc_OSCNode.c_DataPools.size());
+      if (oru32_DataPoolIndex < rc_OSCNode.c_DataPools.size())
+      {
+         C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[oru32_DataPoolIndex];
+         C_OSCNodeDataPool & rc_OSCDataPool = rc_OSCNode.c_DataPools[oru32_DataPoolIndex];
+
+         //Check size & consistency
+         tgl_assert(rc_UIDataPool.c_DataPoolLists.size() == rc_OSCDataPool.c_Lists.size());
+         if (oru32_DataPoolListIndex < rc_OSCDataPool.c_Lists.size())
+         {
+            C_OSCNodeDataPoolList & rc_OSCList = rc_OSCDataPool.c_Lists[oru32_DataPoolListIndex];
+            rc_OSCList.c_Comment = orc_Value.toStdString().c_str();
+            //Update addresses
+            rc_OSCDataPool.RecalculateAddress();
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set data pool list nvm size
+
+   \param[in] oru32_NodeIndex         Node index
+   \param[in] oru32_DataPoolIndex     Data pool index
+   \param[in] oru32_DataPoolListIndex Data pool list index
+   \param[in] ou32_Value              New value
+
+   \return
+   C_NO_ERR OK
+   C_RANGE  Something out of range
+
+   \created     07.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+sint32 C_PuiSdHandler::SetDataPoolListNVMSize(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
+                                              const uint32 & oru32_DataPoolListIndex, const uint32 ou32_Value)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   //Check size & consistency
+   tgl_assert(this->mc_UINodes.size() == this->mc_CoreDefinition.c_Nodes.size());
+   if (oru32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_PuiSdNode & rc_UINode = this->mc_UINodes[oru32_NodeIndex];
+      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
+
+      //Check size & consistency
+      tgl_assert(rc_UINode.c_UIDataPools.size() == rc_OSCNode.c_DataPools.size());
+      if (oru32_DataPoolIndex < rc_OSCNode.c_DataPools.size())
+      {
+         C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[oru32_DataPoolIndex];
+         C_OSCNodeDataPool & rc_OSCDataPool = rc_OSCNode.c_DataPools[oru32_DataPoolIndex];
+
+         //Check size & consistency
+         tgl_assert(rc_UIDataPool.c_DataPoolLists.size() == rc_OSCDataPool.c_Lists.size());
+         if (oru32_DataPoolListIndex < rc_OSCDataPool.c_Lists.size())
+         {
+            C_OSCNodeDataPoolList & rc_OSCList = rc_OSCDataPool.c_Lists[oru32_DataPoolListIndex];
+            rc_OSCList.u32_NvMSize = ou32_Value;
+            //Update addresses
+            rc_OSCDataPool.RecalculateAddress();
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set data pool list nvm crc flag
+
+   \param[in] oru32_NodeIndex         Node index
+   \param[in] oru32_DataPoolIndex     Data pool index
+   \param[in] oru32_DataPoolListIndex Data pool list index
+   \param[in] oq_Value                New value
+
+   \created     07.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+sint32 C_PuiSdHandler::SetDataPoolListNVMCRC(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
+                                             const uint32 & oru32_DataPoolListIndex, const bool oq_Value)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   //Check size & consistency
+   tgl_assert(this->mc_UINodes.size() == this->mc_CoreDefinition.c_Nodes.size());
+   if (oru32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_PuiSdNode & rc_UINode = this->mc_UINodes[oru32_NodeIndex];
+      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
+
+      //Check size & consistency
+      tgl_assert(rc_UINode.c_UIDataPools.size() == rc_OSCNode.c_DataPools.size());
+      if (oru32_DataPoolIndex < rc_OSCNode.c_DataPools.size())
+      {
+         C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[oru32_DataPoolIndex];
+         C_OSCNodeDataPool & rc_OSCDataPool = rc_OSCNode.c_DataPools[oru32_DataPoolIndex];
+
+         //Check size & consistency
+         tgl_assert(rc_UIDataPool.c_DataPoolLists.size() == rc_OSCDataPool.c_Lists.size());
+         if (oru32_DataPoolListIndex < rc_OSCDataPool.c_Lists.size())
+         {
+            C_OSCNodeDataPoolList & rc_OSCList = rc_OSCDataPool.c_Lists[oru32_DataPoolListIndex];
+            rc_OSCList.q_NvMCRCActive = oq_Value;
+            //Update addresses
+            rc_OSCDataPool.RecalculateAddress();
          }
          else
          {
@@ -2844,10 +3409,10 @@ sint32 C_PuiSdHandler::InsertDataPoolListDataSet(const uint32 & oru32_NodeIndex,
                //Unique name
                C_OSCNodeDataPoolDataSet c_NodeDataPoolDataSet = orc_OSCName;
                c_NodeDataPoolDataSet.c_Name =
-                  C_PuiSdUtil::h_GetUniqueName(this->m_GetExistingNodeDataPoolListDataSetNames(oru32_NodeIndex,
-                                                                                               oru32_DataPoolIndex,
-                                                                                               oru32_DataPoolListIndex),
-                                               c_NodeDataPoolDataSet.c_Name);
+                  C_Uti::h_GetUniqueName(this->m_GetExistingNodeDataPoolListDataSetNames(oru32_NodeIndex,
+                                                                                         oru32_DataPoolIndex,
+                                                                                         oru32_DataPoolListIndex),
+                                         c_NodeDataPoolDataSet.c_Name);
                //Insert
                rc_OSCList.c_DataSets.insert(
                   rc_OSCList.c_DataSets.begin() + oru32_DataPoolListDataSetIndex, c_NodeDataPoolDataSet);
@@ -3163,35 +3728,123 @@ const C_PuiSdNodeDataPoolList * C_PuiSdHandler::GetUIDataPoolList(const uint32 &
 sint32 C_PuiSdHandler::MoveDataPoolList(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
                                         const uint32 & oru32_SourceIndex, const uint32 & oru32_TargetIndex)
 {
-   sint32 s32_Retval;
-   C_OSCNodeDataPool c_OSCDataPool;
-   C_PuiSdNodeDataPool c_UIDataPool;
+   sint32 s32_Retval = C_NO_ERR;
 
-   s32_Retval = this->GetDataPool(oru32_NodeIndex, oru32_DataPoolIndex, c_OSCDataPool, c_UIDataPool);
-   if (s32_Retval == C_NO_ERR)
+   //Check size & consistency
+   tgl_assert(this->mc_UINodes.size() == this->mc_CoreDefinition.c_Nodes.size());
+   if (oru32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
-      c_OSCDataPool.MoveList(oru32_SourceIndex, oru32_TargetIndex);
-      if ((oru32_SourceIndex < c_UIDataPool.c_DataPoolLists.size()) &&
-          (oru32_TargetIndex < c_UIDataPool.c_DataPoolLists.size()))
+      C_PuiSdNode & rc_UINode = this->mc_UINodes[oru32_NodeIndex];
+      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
+
+      //Check size & consistency
+      tgl_assert(rc_UINode.c_UIDataPools.size() == rc_OSCNode.c_DataPools.size());
+      if (oru32_DataPoolIndex < rc_OSCNode.c_DataPools.size())
       {
-         //Copy
-         C_PuiSdNodeDataPoolList c_Data = c_UIDataPool.c_DataPoolLists[oru32_SourceIndex];
-         //Erase
-         c_UIDataPool.c_DataPoolLists.erase(c_UIDataPool.c_DataPoolLists.begin() + oru32_SourceIndex);
-         //Insert
-         c_UIDataPool.c_DataPoolLists.insert(c_UIDataPool.c_DataPoolLists.begin() + oru32_TargetIndex, c_Data);
+         C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[oru32_DataPoolIndex];
+         C_OSCNodeDataPool & rc_OSCDataPool = rc_OSCNode.c_DataPools[oru32_DataPoolIndex];
+         rc_OSCDataPool.MoveList(oru32_SourceIndex, oru32_TargetIndex);
+         if ((oru32_SourceIndex < rc_UIDataPool.c_DataPoolLists.size()) &&
+             (oru32_TargetIndex < rc_UIDataPool.c_DataPoolLists.size()))
+         {
+            //Copy
+            C_PuiSdNodeDataPoolList c_Data = rc_UIDataPool.c_DataPoolLists[oru32_SourceIndex];
+            //Erase
+            rc_UIDataPool.c_DataPoolLists.erase(rc_UIDataPool.c_DataPoolLists.begin() + oru32_SourceIndex);
+            //Insert
+            rc_UIDataPool.c_DataPoolLists.insert(rc_UIDataPool.c_DataPoolLists.begin() + oru32_TargetIndex, c_Data);
+            //Synchronization engine
+            Q_EMIT this->SigSyncNodeDataPoolListMoved(oru32_NodeIndex, oru32_DataPoolIndex, oru32_SourceIndex,
+                                                      oru32_TargetIndex);
+         }
       }
-      this->SetDataPool(oru32_NodeIndex, oru32_DataPoolIndex, c_OSCDataPool, c_UIDataPool);
-      //Synchronization engine
-      Q_EMIT this->SigSyncNodeDataPoolListMoved(oru32_NodeIndex, oru32_DataPoolIndex, oru32_SourceIndex,
-                                                oru32_TargetIndex);
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
    }
    return s32_Retval;
 }
 
 //-----------------------------------------------------------------------------
 /*!
-   \brief   Insert data pool list element at specific position
+   \brief   Reserve data pool list elements section
+
+   \param[in] oru32_NodeIndex          Node index
+   \param[in] oru32_DataPoolIndex      Data pool index
+   \param[in] oru32_DataPoolListIndex  Data pool list index
+   \param[in] oru32_AdditionalElements Number of additional elements to reserve for
+
+   \return
+   C_NO_ERR OK
+   C_RANGE  Something out of range
+
+   \created     06.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+sint32 C_PuiSdHandler::ReserveDataPoolListElements(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
+                                                   const uint32 & oru32_DataPoolListIndex,
+                                                   const uint32 & oru32_AdditionalElements)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   //Check size & consistency
+   tgl_assert(this->mc_UINodes.size() == this->mc_CoreDefinition.c_Nodes.size());
+   if (oru32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_PuiSdNode & rc_UINode = this->mc_UINodes[oru32_NodeIndex];
+      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
+
+      //Check size & consistency
+      tgl_assert(rc_UINode.c_UIDataPools.size() == rc_OSCNode.c_DataPools.size());
+      if (oru32_DataPoolIndex < rc_OSCNode.c_DataPools.size())
+      {
+         C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[oru32_DataPoolIndex];
+         C_OSCNodeDataPool & rc_OSCDataPool = rc_OSCNode.c_DataPools[oru32_DataPoolIndex];
+
+         //Check size & consistency
+         tgl_assert(rc_UIDataPool.c_DataPoolLists.size() == rc_OSCDataPool.c_Lists.size());
+         if (oru32_DataPoolListIndex < rc_OSCDataPool.c_Lists.size())
+         {
+            C_PuiSdNodeDataPoolList & rc_UIList = rc_UIDataPool.c_DataPoolLists[oru32_DataPoolListIndex];
+            C_OSCNodeDataPoolList & rc_OSCList = rc_OSCDataPool.c_Lists[oru32_DataPoolListIndex];
+            //Reserve
+            rc_UIList.c_DataPoolListElements.reserve(
+               static_cast<std::vector<C_OSCNodeDataPoolListElement>::size_type>(
+                  rc_UIList.c_DataPoolListElements.size() +
+                  oru32_AdditionalElements));
+            rc_OSCList.c_Elements.reserve(
+               static_cast<std::vector<C_PuiSdNodeDataPoolListElement>::size_type>(rc_OSCList
+                                                                                   .
+                                                                                   c_Elements
+                                                                                   .size() +
+                                                                                   oru32_AdditionalElements));
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Insert data pool list elements at specific position
 
    \param[in] oru32_NodeIndex                Node index
    \param[in] oru32_DataPoolIndex            Data pool index
@@ -3215,38 +3868,68 @@ sint32 C_PuiSdHandler::InsertDataPoolListElement(const uint32 & oru32_NodeIndex,
                                                  const C_PuiSdNodeDataPoolListElement & orc_UIContent)
 {
    sint32 s32_Retval = C_NO_ERR;
-   const C_OSCNodeDataPool * const pc_OSCDataPool = this->GetOSCDataPool(oru32_NodeIndex, oru32_DataPoolIndex);
 
-   if (pc_OSCDataPool != NULL)
+   //Check size & consistency
+   tgl_assert(this->mc_UINodes.size() == this->mc_CoreDefinition.c_Nodes.size());
+   if (oru32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
-      C_PuiSdNodeDataPoolList c_UIList;
-      C_OSCNodeDataPoolList c_OSCList;
+      C_PuiSdNode & rc_UINode = this->mc_UINodes[oru32_NodeIndex];
+      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
 
-      s32_Retval =
-         this->GetDataPoolList(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex, c_OSCList, c_UIList);
-      if (s32_Retval == C_NO_ERR)
+      //Check size & consistency
+      tgl_assert(rc_UINode.c_UIDataPools.size() == rc_OSCNode.c_DataPools.size());
+      if (oru32_DataPoolIndex < rc_OSCNode.c_DataPools.size())
       {
-         //Unique name
-         C_OSCNodeDataPoolListElement c_NodeDataPoolListElement = orc_OSCContent;
-         c_NodeDataPoolListElement.c_Name =
-            C_PuiSdUtil::h_GetUniqueName(this->m_GetExistingNodeDataPoolListVariableNames(oru32_NodeIndex,
+         C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[oru32_DataPoolIndex];
+         C_OSCNodeDataPool & rc_OSCDataPool = rc_OSCNode.c_DataPools[oru32_DataPoolIndex];
+
+         //Check size & consistency
+         tgl_assert(rc_UIDataPool.c_DataPoolLists.size() == rc_OSCDataPool.c_Lists.size());
+         if (oru32_DataPoolListIndex < rc_OSCDataPool.c_Lists.size())
+         {
+            C_PuiSdNodeDataPoolList & rc_UIList = rc_UIDataPool.c_DataPoolLists[oru32_DataPoolListIndex];
+            C_OSCNodeDataPoolList & rc_OSCList = rc_OSCDataPool.c_Lists[oru32_DataPoolListIndex];
+
+            //Check size & consistency
+            tgl_assert(rc_UIList.c_DataPoolListElements.size() == rc_OSCList.c_Elements.size());
+            if (oru32_DataPoolListElementIndex <= rc_UIList.c_DataPoolListElements.size())
+            {
+               //Unique name
+               C_OSCNodeDataPoolListElement c_NodeDataPoolListElement = orc_OSCContent;
+               c_NodeDataPoolListElement.c_Name =
+                  C_Uti::h_GetUniqueName(this->m_GetExistingNodeDataPoolListVariableNames(oru32_NodeIndex,
                                                                                           oru32_DataPoolIndex,
                                                                                           oru32_DataPoolListIndex),
                                          c_NodeDataPoolListElement.c_Name);
-         //Adapt required fields
-         if (pc_OSCDataPool->q_IsSafety == true)
-         {
-            c_NodeDataPoolListElement.e_Access = C_OSCNodeDataPoolListElement::eACCESS_RO;
+               //Adapt required fields
+               if (rc_OSCDataPool.q_IsSafety == true)
+               {
+                  c_NodeDataPoolListElement.e_Access = C_OSCNodeDataPoolListElement::eACCESS_RO;
+               }
+               //Insert
+               rc_UIList.c_DataPoolListElements.insert(
+                  rc_UIList.c_DataPoolListElements.begin() + oru32_DataPoolListElementIndex,
+                  orc_UIContent);
+               rc_OSCList.c_Elements.insert(rc_OSCList.c_Elements.begin() + oru32_DataPoolListElementIndex,
+                                            c_NodeDataPoolListElement);
+               //Synchronization engine
+               Q_EMIT this->SigSyncNodeDataPoolListElementAdded(oru32_NodeIndex, oru32_DataPoolIndex,
+                                                                oru32_DataPoolListIndex,
+                                                                oru32_DataPoolListElementIndex);
+            }
+            else
+            {
+               s32_Retval = C_RANGE;
+            }
          }
-         //Insert
-         c_UIList.c_DataPoolListElements.insert(
-            c_UIList.c_DataPoolListElements.begin() + oru32_DataPoolListElementIndex, orc_UIContent);
-         c_OSCList.c_Elements.insert(c_OSCList.c_Elements.begin() + oru32_DataPoolListElementIndex,
-                                     c_NodeDataPoolListElement);
-         this->SetDataPoolList(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex, c_OSCList, c_UIList);
-         //Synchronization engine
-         Q_EMIT this->SigSyncNodeDataPoolListElementAdded(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex,
-                                                          oru32_DataPoolListElementIndex);
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
       }
    }
    else
@@ -3277,31 +3960,59 @@ sint32 C_PuiSdHandler::RemoveDataPoolListElement(const uint32 & oru32_NodeIndex,
                                                  const uint32 & oru32_DataPoolListIndex,
                                                  const uint32 & oru32_DataPoolListElementIndex)
 {
-   sint32 s32_Retval;
-   C_PuiSdNodeDataPoolList c_UIList;
-   C_OSCNodeDataPoolList c_OSCList;
+   sint32 s32_Retval = C_NO_ERR;
 
-   s32_Retval =
-      this->GetDataPoolList(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex, c_OSCList, c_UIList);
-   if (s32_Retval == C_NO_ERR)
+   //Check size & consistency
+   tgl_assert(this->mc_UINodes.size() == this->mc_CoreDefinition.c_Nodes.size());
+   if (oru32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
+      C_PuiSdNode & rc_UINode = this->mc_UINodes[oru32_NodeIndex];
+      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
+
       //Check size & consistency
-      tgl_assert(c_UIList.c_DataPoolListElements.size() == c_OSCList.c_Elements.size());
-      if (oru32_DataPoolListElementIndex < c_UIList.c_DataPoolListElements.size())
+      tgl_assert(rc_UINode.c_UIDataPools.size() == rc_OSCNode.c_DataPools.size());
+      if (oru32_DataPoolIndex < rc_OSCNode.c_DataPools.size())
       {
-         //Synchronization engine (First!)
-         Q_EMIT this->SigSyncNodeDataPoolListElementAboutToBeDeleted(oru32_NodeIndex, oru32_DataPoolIndex,
-                                                                     oru32_DataPoolListIndex,
-                                                                     oru32_DataPoolListElementIndex);
-         c_UIList.c_DataPoolListElements.erase(c_UIList.c_DataPoolListElements.begin() +
-                                               oru32_DataPoolListElementIndex);
-         c_OSCList.c_Elements.erase(c_OSCList.c_Elements.begin() + oru32_DataPoolListElementIndex);
-         this->SetDataPoolList(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex, c_OSCList, c_UIList);
+         C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[oru32_DataPoolIndex];
+         C_OSCNodeDataPool & rc_OSCDataPool = rc_OSCNode.c_DataPools[oru32_DataPoolIndex];
+
+         //Check size & consistency
+         tgl_assert(rc_UIDataPool.c_DataPoolLists.size() == rc_OSCDataPool.c_Lists.size());
+         if (oru32_DataPoolListIndex < rc_OSCDataPool.c_Lists.size())
+         {
+            C_PuiSdNodeDataPoolList & rc_UIList = rc_UIDataPool.c_DataPoolLists[oru32_DataPoolListIndex];
+            C_OSCNodeDataPoolList & rc_OSCList = rc_OSCDataPool.c_Lists[oru32_DataPoolListIndex];
+
+            //Check size & consistency
+            tgl_assert(rc_UIList.c_DataPoolListElements.size() == rc_OSCList.c_Elements.size());
+            if (oru32_DataPoolListElementIndex < rc_UIList.c_DataPoolListElements.size())
+            {
+               //Synchronization engine (First!)
+               Q_EMIT this->SigSyncNodeDataPoolListElementAboutToBeDeleted(oru32_NodeIndex, oru32_DataPoolIndex,
+                                                                           oru32_DataPoolListIndex,
+                                                                           oru32_DataPoolListElementIndex);
+               rc_UIList.c_DataPoolListElements.erase(rc_UIList.c_DataPoolListElements.begin() +
+                                                      oru32_DataPoolListElementIndex);
+               rc_OSCList.c_Elements.erase(rc_OSCList.c_Elements.begin() + oru32_DataPoolListElementIndex);
+            }
+            else
+            {
+               s32_Retval = C_RANGE;
+            }
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
       }
       else
       {
          s32_Retval = C_RANGE;
       }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
    }
 
    return s32_Retval;
@@ -3945,6 +4656,75 @@ sint32 C_PuiSdHandler::SetDataPoolListElementNVMValue(const uint32 & oru32_NodeI
 
 //-----------------------------------------------------------------------------
 /*!
+   \brief   Set data pool list element NVM value changed flag
+
+   \param[in] oru32_NodeIndex                Node index
+   \param[in] oru32_DataPoolIndex            Data pool index
+   \param[in] oru32_DataPoolListIndex        Data pool list index
+   \param[in] oru32_DataPoolListElementIndex Data pool list element index
+   \param[in] oq_NvmValueChanged             New flag
+
+   \return
+   C_NO_ERR OK
+   C_RANGE  Something out of range
+
+   \created     31.01.2019  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+sint32 C_PuiSdHandler::SetDataPoolListElementNVMValueChanged(const uint32 & oru32_NodeIndex,
+                                                             const uint32 & oru32_DataPoolIndex,
+                                                             const uint32 & oru32_DataPoolListIndex,
+                                                             const uint32 & oru32_DataPoolListElementIndex,
+                                                             const bool oq_NvmValueChanged)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   //Check size
+   if (oru32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
+
+      //Check size
+      if (oru32_DataPoolIndex < rc_OSCNode.c_DataPools.size())
+      {
+         C_OSCNodeDataPool & rc_OSCDataPool = rc_OSCNode.c_DataPools[oru32_DataPoolIndex];
+
+         //Check size
+         if (oru32_DataPoolListIndex < rc_OSCDataPool.c_Lists.size())
+         {
+            C_OSCNodeDataPoolList & rc_OSCList = rc_OSCDataPool.c_Lists[oru32_DataPoolListIndex];
+
+            //Check size
+            if (oru32_DataPoolListElementIndex < rc_OSCList.c_Elements.size())
+            {
+               C_OSCNodeDataPoolListElement & rc_Element = rc_OSCList.c_Elements[oru32_DataPoolListElementIndex];
+               rc_Element.q_NvMValueChanged = oq_NvmValueChanged;
+            }
+            else
+            {
+               s32_Retval = C_RANGE;
+            }
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
    \brief   Get OSC data pool list element
 
    \param[in] oru32_NodeIndex                Node index
@@ -4058,32 +4838,66 @@ sint32 C_PuiSdHandler::MoveDataPoolListElement(const uint32 & oru32_NodeIndex, c
                                                const uint32 & oru32_DataPoolListIndex, const uint32 & oru32_SourceIndex,
                                                const uint32 & oru32_TargetIndex)
 {
-   sint32 s32_Retval;
-   C_OSCNodeDataPoolList c_OSCDataPoolList;
-   C_PuiSdNodeDataPoolList c_UIDataPoolList;
+   sint32 s32_Retval = C_NO_ERR;
 
-   s32_Retval = this->GetDataPoolList(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex, c_OSCDataPoolList,
-                                      c_UIDataPoolList);
-   if (s32_Retval == C_NO_ERR)
+   //Check size & consistency
+   tgl_assert(this->mc_UINodes.size() == this->mc_CoreDefinition.c_Nodes.size());
+   if (oru32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
-      c_OSCDataPoolList.MoveElement(oru32_SourceIndex, oru32_TargetIndex);
-      if ((oru32_SourceIndex < c_UIDataPoolList.c_DataPoolListElements.size()) &&
-          (oru32_TargetIndex < c_UIDataPoolList.c_DataPoolListElements.size()))
+      C_PuiSdNode & rc_UINode = this->mc_UINodes[oru32_NodeIndex];
+      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
+
+      //Check size & consistency
+      tgl_assert(rc_UINode.c_UIDataPools.size() == rc_OSCNode.c_DataPools.size());
+      if (oru32_DataPoolIndex < rc_OSCNode.c_DataPools.size())
       {
-         //Copy
-         C_PuiSdNodeDataPoolListElement c_Data = c_UIDataPoolList.c_DataPoolListElements[oru32_SourceIndex];
-         //Erase
-         c_UIDataPoolList.c_DataPoolListElements.erase(
-            c_UIDataPoolList.c_DataPoolListElements.begin() + oru32_SourceIndex);
-         //Insert
-         c_UIDataPoolList.c_DataPoolListElements.insert(
-            c_UIDataPoolList.c_DataPoolListElements.begin() + oru32_TargetIndex, c_Data);
+         C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[oru32_DataPoolIndex];
+         C_OSCNodeDataPool & rc_OSCDataPool = rc_OSCNode.c_DataPools[oru32_DataPoolIndex];
+
+         //Check size & consistency
+         tgl_assert(rc_UIDataPool.c_DataPoolLists.size() == rc_OSCDataPool.c_Lists.size());
+         if (oru32_DataPoolListIndex < rc_OSCDataPool.c_Lists.size())
+         {
+            C_PuiSdNodeDataPoolList & rc_UIList = rc_UIDataPool.c_DataPoolLists[oru32_DataPoolListIndex];
+            C_OSCNodeDataPoolList & rc_OSCList = rc_OSCDataPool.c_Lists[oru32_DataPoolListIndex];
+
+            //Check size & consistency
+            tgl_assert(rc_UIList.c_DataPoolListElements.size() == rc_OSCList.c_Elements.size());
+            if ((oru32_SourceIndex < rc_UIList.c_DataPoolListElements.size()) &&
+                (oru32_TargetIndex < rc_UIList.c_DataPoolListElements.size()))
+            {
+               //Copy
+               C_PuiSdNodeDataPoolListElement c_Data = rc_UIList.c_DataPoolListElements[oru32_SourceIndex];
+               rc_OSCList.MoveElement(oru32_SourceIndex, oru32_TargetIndex);
+               //Erase
+               rc_UIList.c_DataPoolListElements.erase(
+                  rc_UIList.c_DataPoolListElements.begin() + oru32_SourceIndex);
+               //Insert
+               rc_UIList.c_DataPoolListElements.insert(
+                  rc_UIList.c_DataPoolListElements.begin() + oru32_TargetIndex, c_Data);
+               //Synchronization engine
+               Q_EMIT this->SigSyncNodeDataPoolListElementMoved(oru32_NodeIndex, oru32_DataPoolIndex,
+                                                                oru32_DataPoolListIndex,
+                                                                oru32_SourceIndex, oru32_TargetIndex);
+            }
+            else
+            {
+               s32_Retval = C_RANGE;
+            }
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
       }
-      this->SetDataPoolList(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex, c_OSCDataPoolList,
-                            c_UIDataPoolList);
-      //Synchronization engine
-      Q_EMIT this->SigSyncNodeDataPoolListElementMoved(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex,
-                                                       oru32_SourceIndex, oru32_TargetIndex);
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
    }
    return s32_Retval;
 }
@@ -4653,6 +5467,8 @@ sint32 C_PuiSdHandler::GetCanSignalComplete(const C_OSCCanMessageIdentificationI
    \param[in]  orc_MessageId2            Second message identification indices
    \param[out] orq_IsMatch               Flag if messages match
    \param[in]  oq_IgnoreMessageDirection Flag to compare messages without message direction check
+                                         True: compare the message content no matter what the message directions are
+                                         False: if both messages are TX this function will always say: no match
 
    \return
    C_NO_ERR Done
@@ -4759,6 +5575,39 @@ sint32 C_PuiSdHandler::CheckMessageMatch(const C_OSCCanMessageIdentificationIndi
       }
    }
    return s32_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set CAN protocol message container connected flag
+
+   \param[in] ou32_NodeIndex      Node index
+   \param[in] oe_ComType          Can protocol type
+   \param[in] ou32_InterfaceIndex Node interface index
+   \param[in] oq_Value             New value to apply
+
+   \created     10.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSdHandler::SetCanProtocolMessageContainerConnected(const uint32 ou32_NodeIndex,
+                                                             const C_OSCCanProtocol::E_Type oe_ComType,
+                                                             const uint32 ou32_InterfaceIndex, const bool oq_Value)
+{
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      // get necessary datapool
+      C_OSCCanProtocol * const pc_Protocol = rc_Node.GetCANProtocol(oe_ComType);
+
+      if (pc_Protocol != NULL)
+      {
+         if (ou32_InterfaceIndex < pc_Protocol->c_ComMessages.size())
+         {
+            // set the flag
+            pc_Protocol->c_ComMessages[ou32_InterfaceIndex].q_IsComProtocolUsedByInterface = oq_Value;
+         }
+      }
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -5329,7 +6178,7 @@ sint32 C_PuiSdHandler::InsertCanMessage(const C_OSCCanMessageIdentificationIndic
       if (orq_AutomatedPropertiesAdaption == true)
       {
          //Get unique name
-         c_AdaptedMessage.c_Name = C_PuiSdUtil::h_GetUniqueName(
+         c_AdaptedMessage.c_Name = C_Uti::h_GetUniqueName(
             this->m_GetExistingMessageNames(orc_MessageId.u32_NodeIndex, orc_MessageId.e_ComProtocol,
                                             orc_MessageId.u32_InterfaceIndex), orc_Message.c_Name);
       }
@@ -5478,7 +6327,7 @@ sint32 C_PuiSdHandler::InsertCanSignal(const C_OSCCanMessageIdentificationIndice
       C_OSCNodeDataPoolListElementId c_Id;
 
       //Get unique name
-      c_OSCAdaptedSignalCommon.c_Name = C_PuiSdUtil::h_GetUniqueName(
+      c_OSCAdaptedSignalCommon.c_Name = C_Uti::h_GetUniqueName(
          this->m_GetExistingSignalNames(orc_MessageId), orc_OSCSignalCommon.c_Name);
       rc_OSCNode.InsertSignal(orc_MessageId.e_ComProtocol, orc_MessageId.u32_InterfaceIndex,
                               orc_MessageId.q_MessageIsTx, orc_MessageId.u32_MessageIndex, oru32_SignalIndex,
@@ -5905,7 +6754,7 @@ void C_PuiSdHandler::Clear(void)
    this->c_BusTextElements.clear();
 
    //Reset hash
-   this->mu32_CalculatedHashSystemDefinition = this->m_CalcHashSystemDefinition();
+   this->mu32_CalculatedHashSystemDefinition = this->CalcHashSystemDefinition();
    //signal "node change"
    Q_EMIT this->SigNodesChanged();
    //signal "bus change"
@@ -5961,85 +6810,108 @@ C_SdTopologyDataSnapshot C_PuiSdHandler::GetSnapshot(void) const
 //-----------------------------------------------------------------------------
 sint32 C_PuiSdHandler::LoadFromFile(const C_SCLString & orc_Path)
 {
-   sint32 s32_Return;
+   QElapsedTimer c_Timer;
+   sint32 s32_Return = C_NO_ERR;
 
-   s32_Return =
-      C_OSCSystemDefinitionFiler::h_LoadSystemDefinitionFile(mc_CoreDefinition, orc_Path,
-                                                             (C_Uti::h_GetExePath() +
-                                                              "/../devices/devices.ini").toStdString().c_str());
-   if (s32_Return == C_NO_ERR)
+   if (mq_TIMING_OUTPUT)
    {
-      //Core data read successfully; now go for UI data.
-      //As reading the core data was OK we can assume the file exists and its structure is OK
+      c_Timer.start();
+   }
+
+   if (TGL_FileExists(orc_Path) == true)
+   {
       C_OSCXMLParser c_XMLParser;
-      (void)c_XMLParser.LoadFromFile(orc_Path);
-      tgl_assert(c_XMLParser.SelectRoot() == "opensyde-system-definition");
-      tgl_assert(c_XMLParser.SelectNodeChild("nodes") == "nodes");
-
-      s32_Return = C_PuiSdHandlerFiler::h_LoadNodes(this->mc_UINodes, c_XMLParser);
-
+      s32_Return = c_XMLParser.LoadFromFile(orc_Path);
       if (s32_Return == C_NO_ERR)
       {
-         //Return
-         tgl_assert(c_XMLParser.SelectNodeParent() == "opensyde-system-definition");
-         //Bus
-         tgl_assert(c_XMLParser.SelectNodeChild("buses") == "buses");
-         s32_Return = C_PuiSdHandlerFiler::h_LoadBuses(this->mc_UIBuses, c_XMLParser);
-      }
-      //GUI items
-      this->c_Elements.Clear();
-      this->c_BusTextElements.clear();
-      if (s32_Return == C_NO_ERR)
-      {
-         //Return
-         tgl_assert(c_XMLParser.SelectNodeParent() == "opensyde-system-definition");
-         if (c_XMLParser.SelectNodeChild("gui-only") == "gui-only")
+         s32_Return = C_OSCSystemDefinitionFiler::h_LoadSystemDefinition(mc_CoreDefinition, c_XMLParser,
+                                                                         (C_Uti::h_GetExePath() +
+                                                                          "/../devices/devices.ini").toStdString().c_str());
+         if (s32_Return == C_NO_ERR)
          {
-            //bus text elements
-            if (c_XMLParser.SelectNodeChild("bus-text-elements") == "bus-text-elements")
-            {
-               s32_Return = C_PuiSdHandlerFiler::h_LoadBusTextElements(this->c_BusTextElements, c_XMLParser);
-               tgl_assert(c_XMLParser.SelectNodeParent() == "gui-only");
-            }
-            else
-            {
-               s32_Return = C_CONFIG;
-            }
+            tgl_assert(c_XMLParser.SelectRoot() == "opensyde-system-definition");
+            tgl_assert(c_XMLParser.SelectNodeChild("nodes") == "nodes");
+
+            s32_Return = C_PuiSdHandlerFiler::h_LoadNodes(this->mc_UINodes, c_XMLParser);
+
             if (s32_Return == C_NO_ERR)
             {
-               //Base elements
-               s32_Return = C_PuiBsElementsFiler::h_LoadBaseElements(this->c_Elements, c_XMLParser);
+               //Return
+               tgl_assert(c_XMLParser.SelectNodeParent() == "opensyde-system-definition");
+               //Bus
+               tgl_assert(c_XMLParser.SelectNodeChild("buses") == "buses");
+               s32_Return = C_PuiSdHandlerFiler::h_LoadBuses(this->mc_UIBuses, c_XMLParser);
+            }
+            //GUI items
+            this->c_Elements.Clear();
+            this->c_BusTextElements.clear();
+            if (s32_Return == C_NO_ERR)
+            {
+               //Return
+               tgl_assert(c_XMLParser.SelectNodeParent() == "opensyde-system-definition");
+               if (c_XMLParser.SelectNodeChild("gui-only") == "gui-only")
+               {
+                  //bus text elements
+                  if (c_XMLParser.SelectNodeChild("bus-text-elements") == "bus-text-elements")
+                  {
+                     s32_Return = C_PuiSdHandlerFiler::h_LoadBusTextElements(this->c_BusTextElements, c_XMLParser);
+                     tgl_assert(c_XMLParser.SelectNodeParent() == "gui-only");
+                  }
+                  else
+                  {
+                     s32_Return = C_CONFIG;
+                  }
+                  if (s32_Return == C_NO_ERR)
+                  {
+                     //Base elements
+                     s32_Return = C_PuiBsElementsFiler::h_LoadBaseElements(this->c_Elements, c_XMLParser);
+                  }
+               }
+               else
+               {
+                  s32_Return = C_CONFIG;
+               }
             }
          }
          else
          {
-            s32_Return = C_CONFIG;
+            osc_write_log_error("Loading System Definition", "Could not load System Definition. Error code: " +
+                                C_SCLString::IntToStr(s32_Return));
          }
+
+         if (s32_Return == C_NO_ERR)
+         {
+            //calculate the hash value and save it for comparing
+            this->mu32_CalculatedHashSystemDefinition = this->CalcHashSystemDefinition();
+
+            //Fix inconsistency problems with existing projects (notify user about changes, so do this after CRC update)
+            m_FixCommInconsistencyErrors();
+            m_FixAddressIssues();
+            m_FixNameIssues();
+         }
+
+         //AFTER automated adaptions!
+         //signal "node change"
+         Q_EMIT this->SigNodesChanged();
+         //signal "bus change"
+         Q_EMIT this->SigBussesChanged();
+      }
+      else
+      {
+         osc_write_log_error("Loading System Definition",
+                             "File \"" + orc_Path + "\" could not be opened.");
+         s32_Return = C_NOACT;
       }
    }
    else
    {
-      osc_write_log_error("Loading System Definition", "Could not load System Definition. Error code: " +
-                          C_SCLString::IntToStr(s32_Return));
+      osc_write_log_error("Loading System Definition", "File \"" + orc_Path + "\" does not exist.");
+      s32_Return = C_RANGE;
    }
-
-   if (s32_Return == C_NO_ERR)
+   if (mq_TIMING_OUTPUT)
    {
-      //calculate the hash value and save it for comparing
-      this->mu32_CalculatedHashSystemDefinition = this->m_CalcHashSystemDefinition();
-
-      //Fix inconsistency problems with existing projects (notify user about changes, so do this after CRC update)
-      m_FixCommInconsistencyErrors();
-      m_FixAddressIssues();
-      m_FixNameIssues();
+      std::cout << "Load " << c_Timer.elapsed() << " ms" << &std::endl;
    }
-
-   //AFTER automated adaptions!
-   //signal "node change"
-   Q_EMIT this->SigNodesChanged();
-   //signal "bus change"
-   Q_EMIT this->SigBussesChanged();
-
    return s32_Return;
 }
 
@@ -6061,7 +6933,13 @@ sint32 C_PuiSdHandler::LoadFromFile(const C_SCLString & orc_Path)
 //-----------------------------------------------------------------------------
 sint32 C_PuiSdHandler::SaveToFile(const C_SCLString & orc_Path)
 {
+   QElapsedTimer c_Timer;
    sint32 s32_Return = C_NO_ERR;
+
+   if (mq_TIMING_OUTPUT)
+   {
+      c_Timer.start();
+   }
 
    //Sort first
    tgl_assert(this->mc_UINodes.size() == this->mc_CoreDefinition.c_Nodes.size());
@@ -6076,13 +6954,22 @@ sint32 C_PuiSdHandler::SaveToFile(const C_SCLString & orc_Path)
       //Save sorted structure
       if (s32_Return == C_NO_ERR)
       {
-         s32_Return = C_OSCSystemDefinitionFiler::h_SaveSystemDefinitionFile(c_SortedOSCDefinition, orc_Path);
+         if (TGL_FileExists(orc_Path) == true)
+         {
+            //erase it:
+            sintn sn_Return;
+            sn_Return = std::remove(orc_Path.c_str());
+            if (sn_Return != 0)
+            {
+               osc_write_log_error("Saving System Definition",
+                                   "Could not erase pre-existing file \"" + orc_Path + "\".");
+               s32_Return = C_RD_WR;
+            }
+         }
          if (s32_Return == C_NO_ERR)
          {
-            //Core data written successfully; now go for UI data.
-            //As writing the core data was OK we can assume the file exists and its structure is OK
             C_OSCXMLParser c_XMLParser;
-            (void)c_XMLParser.LoadFromFile(orc_Path);
+            C_OSCSystemDefinitionFiler::h_SaveSystemDefinition(c_SortedOSCDefinition, c_XMLParser);
             tgl_assert(c_XMLParser.SelectRoot() == "opensyde-system-definition");
             tgl_assert(c_XMLParser.SelectNodeChild("nodes") == "nodes");
 
@@ -6106,9 +6993,14 @@ sint32 C_PuiSdHandler::SaveToFile(const C_SCLString & orc_Path)
             C_PuiBsElementsFiler::h_SaveBaseElements(this->c_Elements, c_XMLParser);
 
             //calculate the hash value and save it for comparing
-            this->mu32_CalculatedHashSystemDefinition = this->m_CalcHashSystemDefinition();
+            this->mu32_CalculatedHashSystemDefinition = this->CalcHashSystemDefinition();
 
-            (void)c_XMLParser.SaveToFile(orc_Path);
+            s32_Return = c_XMLParser.SaveToFile(orc_Path);
+            if (s32_Return != C_NO_ERR)
+            {
+               osc_write_log_error("Saving System Definition", "Could not write to file \"" + orc_Path + "\".");
+               s32_Return = C_RD_WR;
+            }
          }
       }
       else
@@ -6119,6 +7011,10 @@ sint32 C_PuiSdHandler::SaveToFile(const C_SCLString & orc_Path)
    else
    {
       s32_Return = C_COM;
+   }
+   if (mq_TIMING_OUTPUT)
+   {
+      std::cout << "Save " << c_Timer.elapsed() << " ms" << &std::endl;
    }
 
    return s32_Return;
@@ -6137,7 +7033,7 @@ sint32 C_PuiSdHandler::SaveToFile(const C_SCLString & orc_Path)
 //-----------------------------------------------------------------------------
 bool C_PuiSdHandler::HasHashChanged(void) const
 {
-   const uint32 u32_NewHash = this->m_CalcHashSystemDefinition();
+   const uint32 u32_NewHash = this->CalcHashSystemDefinition();
    bool q_Changed = true;
 
    if (u32_NewHash == this->mu32_CalculatedHashSystemDefinition)
@@ -6146,6 +7042,48 @@ bool C_PuiSdHandler::HasHashChanged(void) const
    }
 
    return q_Changed;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Calculates the hash value of the system definition
+
+   Start value is 0xFFFFFFFF
+
+   \return
+   Calculated hash value
+
+   \created     21.03.2017  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+uint32 C_PuiSdHandler::CalcHashSystemDefinition(void) const
+{
+   // init value of CRC
+   uint32 u32_Hash = 0xFFFFFFFFU;
+   uint32 u32_Counter;
+
+   // calculate the hash for the core elements
+   this->mc_CoreDefinition.CalcHash(u32_Hash);
+
+   // calculate the hash for the ui elements
+   this->c_Elements.CalcHash(u32_Hash);
+
+   for (u32_Counter = 0U; u32_Counter < this->c_BusTextElements.size(); ++u32_Counter)
+   {
+      this->c_BusTextElements[u32_Counter].CalcHash(u32_Hash);
+   }
+
+   for (u32_Counter = 0U; u32_Counter < this->mc_UINodes.size(); ++u32_Counter)
+   {
+      this->mc_UINodes[u32_Counter].CalcHash(u32_Hash);
+   }
+
+   for (u32_Counter = 0U; u32_Counter < this->mc_UIBuses.size(); ++u32_Counter)
+   {
+      this->mc_UIBuses[u32_Counter].CalcHash(u32_Hash);
+   }
+
+   return u32_Hash;
 }
 
 //-----------------------------------------------------------------------------
@@ -6234,13 +7172,12 @@ C_PuiSdHandler::~C_PuiSdHandler(void)
    \created     28.02.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-std::vector<const C_SCLString *> C_PuiSdHandler::m_GetExistingNodeNames(void) const
+std::map<C_SCLString, bool> C_PuiSdHandler::m_GetExistingNodeNames(void) const
 {
-   std::vector<const C_SCLString *> c_Retval;
-   c_Retval.reserve(this->mc_CoreDefinition.c_Nodes.size());
+   std::map<C_SCLString, bool> c_Retval;
    for (uint32 u32_ItNode = 0; u32_ItNode < this->mc_CoreDefinition.c_Nodes.size(); ++u32_ItNode)
    {
-      c_Retval.push_back(&this->mc_CoreDefinition.c_Nodes[u32_ItNode].c_Properties.c_Name);
+      c_Retval[this->mc_CoreDefinition.c_Nodes[u32_ItNode].c_Properties.c_Name] = true;
    }
    return c_Retval;
 }
@@ -6255,16 +7192,15 @@ std::vector<const C_SCLString *> C_PuiSdHandler::m_GetExistingNodeNames(void) co
    \created     12.01.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-std::vector<const C_SCLString *> C_PuiSdHandler::m_GetExistingNodeApplicationNames(const uint32 & oru32_NodeIndex) const
+std::map<C_SCLString, bool> C_PuiSdHandler::m_GetExistingNodeApplicationNames(const uint32 & oru32_NodeIndex) const
 {
-   std::vector<const C_SCLString *> c_Retval;
+   std::map<C_SCLString, bool> c_Retval;
    const C_OSCNode * const pc_Node = this->GetOSCNodeConst(oru32_NodeIndex);
    if (pc_Node != NULL)
    {
-      c_Retval.reserve(pc_Node->c_Applications.size());
       for (uint32 u32_ItApplication = 0; u32_ItApplication < pc_Node->c_Applications.size(); ++u32_ItApplication)
       {
-         c_Retval.push_back(&pc_Node->c_Applications[u32_ItApplication].c_Name);
+         c_Retval[pc_Node->c_Applications[u32_ItApplication].c_Name] = true;
       }
    }
    return c_Retval;
@@ -6282,16 +7218,15 @@ std::vector<const C_SCLString *> C_PuiSdHandler::m_GetExistingNodeApplicationNam
    \created     28.02.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-std::vector<const C_SCLString *> C_PuiSdHandler::m_GetExistingNodeDataPoolNames(const uint32 & oru32_NodeIndex) const
+std::map<C_SCLString, bool> C_PuiSdHandler::m_GetExistingNodeDataPoolNames(const uint32 & oru32_NodeIndex) const
 {
-   std::vector<const C_SCLString *> c_Retval;
+   std::map<C_SCLString, bool> c_Retval;
    const C_OSCNode * const pc_Node = this->GetOSCNodeConst(oru32_NodeIndex);
    if (pc_Node != NULL)
    {
-      c_Retval.reserve(pc_Node->c_DataPools.size());
       for (uint32 u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
       {
-         c_Retval.push_back(&pc_Node->c_DataPools[u32_ItDataPool].c_Name);
+         c_Retval[pc_Node->c_DataPools[u32_ItDataPool].c_Name] = true;
       }
    }
    return c_Retval;
@@ -6310,18 +7245,17 @@ std::vector<const C_SCLString *> C_PuiSdHandler::m_GetExistingNodeDataPoolNames(
    \created     28.02.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-std::vector<const C_SCLString *> C_PuiSdHandler::m_GetExistingNodeDataPoolListNames(const uint32 & oru32_NodeIndex,
-                                                                                    const uint32 & oru32_DataPoolIndex)
+std::map<C_SCLString, bool> C_PuiSdHandler::m_GetExistingNodeDataPoolListNames(const uint32 & oru32_NodeIndex,
+                                                                               const uint32 & oru32_DataPoolIndex)
 const
 {
-   std::vector<const C_SCLString *> c_Retval;
+   std::map<C_SCLString, bool> c_Retval;
    const C_OSCNodeDataPool * const pc_NodeDataPool = this->GetOSCDataPool(oru32_NodeIndex, oru32_DataPoolIndex);
    if (pc_NodeDataPool != NULL)
    {
-      c_Retval.reserve(pc_NodeDataPool->c_Lists.size());
       for (uint32 u32_ItDataPoolList = 0; u32_ItDataPoolList < pc_NodeDataPool->c_Lists.size(); ++u32_ItDataPoolList)
       {
-         c_Retval.push_back(&pc_NodeDataPool->c_Lists[u32_ItDataPoolList].c_Name);
+         c_Retval[pc_NodeDataPool->c_Lists[u32_ItDataPoolList].c_Name] = true;
       }
    }
    return c_Retval;
@@ -6341,20 +7275,21 @@ const
    \created     16.03.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-std::vector<const C_SCLString *> C_PuiSdHandler::m_GetExistingNodeDataPoolListDataSetNames(
-   const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex, const uint32 & oru32_DataPoolListIndex) const
+std::map<C_SCLString, bool> C_PuiSdHandler::m_GetExistingNodeDataPoolListDataSetNames(const uint32 & oru32_NodeIndex,
+                                                                                      const uint32 & oru32_DataPoolIndex,
+                                                                                      const uint32 & oru32_DataPoolListIndex)
+const
 {
-   std::vector<const C_SCLString *> c_Retval;
+   std::map<C_SCLString, bool> c_Retval;
    const C_OSCNodeDataPoolList * const pc_NodeDataPoolList = this->GetOSCDataPoolList(oru32_NodeIndex,
                                                                                       oru32_DataPoolIndex,
                                                                                       oru32_DataPoolListIndex);
    if (pc_NodeDataPoolList != NULL)
    {
-      c_Retval.reserve(pc_NodeDataPoolList->c_DataSets.size());
       for (uint32 u32_ItDataPoolListElement = 0; u32_ItDataPoolListElement < pc_NodeDataPoolList->c_DataSets.size();
            ++u32_ItDataPoolListElement)
       {
-         c_Retval.push_back(&pc_NodeDataPoolList->c_DataSets[u32_ItDataPoolListElement].c_Name);
+         c_Retval[pc_NodeDataPoolList->c_DataSets[u32_ItDataPoolListElement].c_Name] = true;
       }
    }
    return c_Retval;
@@ -6374,20 +7309,21 @@ std::vector<const C_SCLString *> C_PuiSdHandler::m_GetExistingNodeDataPoolListDa
    \created     28.02.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-std::vector<const C_SCLString *> C_PuiSdHandler::m_GetExistingNodeDataPoolListVariableNames(
-   const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex, const uint32 & oru32_DataPoolListIndex) const
+std::map<C_SCLString, bool> C_PuiSdHandler::m_GetExistingNodeDataPoolListVariableNames(const uint32 & oru32_NodeIndex,
+                                                                                       const uint32 & oru32_DataPoolIndex,
+                                                                                       const uint32 & oru32_DataPoolListIndex)
+const
 {
-   std::vector<const C_SCLString *> c_Retval;
+   std::map<C_SCLString, bool> c_Retval;
    const C_OSCNodeDataPoolList * const pc_NodeDataPoolList = this->GetOSCDataPoolList(oru32_NodeIndex,
                                                                                       oru32_DataPoolIndex,
                                                                                       oru32_DataPoolListIndex);
    if (pc_NodeDataPoolList != NULL)
    {
-      c_Retval.reserve(pc_NodeDataPoolList->c_Elements.size());
       for (uint32 u32_ItDataPoolListElement = 0; u32_ItDataPoolListElement < pc_NodeDataPoolList->c_Elements.size();
            ++u32_ItDataPoolListElement)
       {
-         c_Retval.push_back(&pc_NodeDataPoolList->c_Elements[u32_ItDataPoolListElement].c_Name);
+         c_Retval[pc_NodeDataPoolList->c_Elements[u32_ItDataPoolListElement].c_Name] = true;
       }
    }
    return c_Retval;
@@ -6407,11 +7343,11 @@ std::vector<const C_SCLString *> C_PuiSdHandler::m_GetExistingNodeDataPoolListVa
    \created     28.02.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-std::vector<const C_SCLString *> C_PuiSdHandler::m_GetExistingMessageNames(const uint32 & oru32_NodeIndex,
-                                                                           const C_OSCCanProtocol::E_Type & ore_ComType,
-                                                                           const uint32 & oru32_InterfaceIndex) const
+std::map<C_SCLString, bool> C_PuiSdHandler::m_GetExistingMessageNames(const uint32 & oru32_NodeIndex,
+                                                                      const C_OSCCanProtocol::E_Type & ore_ComType,
+                                                                      const uint32 & oru32_InterfaceIndex) const
 {
-   std::vector<const C_SCLString *> c_Retval;
+   std::map<C_SCLString, bool> c_Retval;
    const C_OSCCanMessageContainer * const pc_Container = this->GetCanProtocolMessageContainer(oru32_NodeIndex,
                                                                                               ore_ComType,
                                                                                               oru32_InterfaceIndex);
@@ -6419,18 +7355,17 @@ std::vector<const C_SCLString *> C_PuiSdHandler::m_GetExistingMessageNames(const
    {
       const std::vector<C_OSCCanMessage> & rc_TxMessages = pc_Container->GetMessagesConst(true);
       const std::vector<C_OSCCanMessage> & rc_RxMessages = pc_Container->GetMessagesConst(false);
-      c_Retval.reserve(rc_TxMessages.size() + rc_RxMessages.size());
       //Tx
       for (uint32 u32_ItMessage = 0; u32_ItMessage < rc_TxMessages.size(); ++u32_ItMessage)
       {
          const C_OSCCanMessage & rc_Message = rc_TxMessages[u32_ItMessage];
-         c_Retval.push_back(&rc_Message.c_Name);
+         c_Retval[rc_Message.c_Name] = true;
       }
       //Rx
       for (uint32 u32_ItMessage = 0; u32_ItMessage < rc_RxMessages.size(); ++u32_ItMessage)
       {
          const C_OSCCanMessage & rc_Message = rc_RxMessages[u32_ItMessage];
-         c_Retval.push_back(&rc_Message.c_Name);
+         c_Retval[rc_Message.c_Name] = true;
       }
    }
    return c_Retval;
@@ -6450,10 +7385,10 @@ std::vector<const C_SCLString *> C_PuiSdHandler::m_GetExistingMessageNames(const
    \created     28.02.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-std::vector<const C_SCLString *> C_PuiSdHandler::m_GetExistingSignalNames(
+std::map<C_SCLString, bool> C_PuiSdHandler::m_GetExistingSignalNames(
    const C_OSCCanMessageIdentificationIndices & orc_MessageId) const
 {
-   std::vector<const C_SCLString *> c_Retval;
+   std::map<C_SCLString, bool> c_Retval;
    const C_OSCNode * const pc_Node = this->GetOSCNodeConst(orc_MessageId.u32_NodeIndex);
    if (pc_Node != NULL)
    {
@@ -6466,7 +7401,6 @@ std::vector<const C_SCLString *> C_PuiSdHandler::m_GetExistingSignalNames(
          const C_OSCCanMessage * const pc_Message = this->GetCanMessage(orc_MessageId);
          if ((pc_Message != NULL) && (pc_List != NULL))
          {
-            c_Retval.reserve(pc_Message->c_Signals.size());
             for (uint32 u32_ItSignal = 0; u32_ItSignal < pc_Message->c_Signals.size(); ++u32_ItSignal)
             {
                const C_OSCCanSignal & rc_Signal = pc_Message->c_Signals[u32_ItSignal];
@@ -6474,55 +7408,13 @@ std::vector<const C_SCLString *> C_PuiSdHandler::m_GetExistingSignalNames(
                {
                   const C_OSCNodeDataPoolListElement & rc_DataElement =
                      pc_List->c_Elements[rc_Signal.u32_ComDataElementIndex];
-                  c_Retval.push_back(&rc_DataElement.c_Name);
+                  c_Retval[rc_DataElement.c_Name] = true;
                }
             }
          }
       }
    }
    return c_Retval;
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value of the system definition
-
-   Start value is 0xFFFFFFFF
-
-   \return
-   Calculated hash value
-
-   \created     21.03.2017  STW/B.Bayer
-*/
-//-----------------------------------------------------------------------------
-uint32 C_PuiSdHandler::m_CalcHashSystemDefinition(void) const
-{
-   // init value of CRC
-   uint32 u32_Hash = 0xFFFFFFFFU;
-   uint32 u32_Counter;
-
-   // calculate the hash for the core elements
-   this->mc_CoreDefinition.CalcHash(u32_Hash);
-
-   // calculate the hash for the ui elements
-   this->c_Elements.CalcHash(u32_Hash);
-
-   for (u32_Counter = 0U; u32_Counter < this->c_BusTextElements.size(); ++u32_Counter)
-   {
-      this->c_BusTextElements[u32_Counter].CalcHash(u32_Hash);
-   }
-
-   for (u32_Counter = 0U; u32_Counter < this->mc_UINodes.size(); ++u32_Counter)
-   {
-      this->mc_UINodes[u32_Counter].CalcHash(u32_Hash);
-   }
-
-   for (u32_Counter = 0U; u32_Counter < this->mc_UIBuses.size(); ++u32_Counter)
-   {
-      this->mc_UIBuses[u32_Counter].CalcHash(u32_Hash);
-   }
-
-   return u32_Hash;
 }
 
 //-----------------------------------------------------------------------------
@@ -7535,4 +8427,52 @@ sint32 C_PuiSdHandler::mh_SortMessagesByName(C_OSCNode & orc_OSCNode, C_PuiSdNod
       s32_Retval = C_CONFIG;
    }
    return s32_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get hash for node
+
+   \param[in] ou32_NodeIndex Index
+
+   \return
+   Hash for bus
+
+   \created     19.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+uint32 C_PuiSdHandler::m_GetHashNode(const uint32 ou32_NodeIndex) const
+{
+   uint32 u32_Retval = 0xFFFFFFFFU;
+
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      const C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      rc_Node.CalcHash(u32_Retval);
+   }
+   return u32_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get hash for bus
+
+   \param[in] ou32_BusIndex Index
+
+   \return
+   Hash for bus
+
+   \created     19.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+uint32 C_PuiSdHandler::m_GetHashBus(const uint32 ou32_BusIndex) const
+{
+   uint32 u32_Retval = 0xFFFFFFFFU;
+
+   if (ou32_BusIndex < this->mc_CoreDefinition.c_Buses.size())
+   {
+      const C_OSCSystemBus & rc_Bus = this->mc_CoreDefinition.c_Buses[ou32_BusIndex];
+      rc_Bus.CalcHash(u32_Retval);
+   }
+   return u32_Retval;
 }

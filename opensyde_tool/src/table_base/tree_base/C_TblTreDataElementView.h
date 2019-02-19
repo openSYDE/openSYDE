@@ -45,7 +45,8 @@ public:
    void InitSV(const stw_types::uint32 ou32_ViewIndex, const bool oq_ShowOnlyWriteElements,
                const bool oq_ShowArrayElements, const bool oq_Show64BitValues, const bool oq_ShowNVMLists);
    void Search(const QString & orc_Text);
-   void SwitchMode(const stw_opensyde_gui_logic::C_TblTreDataElementModel::E_Mode & ore_Mode);
+   void SwitchMode(const stw_opensyde_gui_logic::C_TblTreDataElementModel::E_Mode & ore_Mode,
+                   const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements, const bool oq_Show64BitValues);
 
    std::vector<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId> GetSelectedDataElements(void) const;
    bool IsEmpty(void) const;

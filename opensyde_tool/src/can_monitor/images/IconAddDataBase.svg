@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 22.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 16 16" style="enable-background:new 0 0 16 16;" xml:space="preserve">
+<style type="text/css">
+	.st0{opacity:0.2;fill:#FF0000;}
+	.st1{fill:#CECED9;}
+	.st2{fill:#5757AA;}
+	.st3{fill:#9B9BAA;}
+	.st4{fill:#5EA343;}
+	.st5{fill:#7F7FBB;}
+	.st6{opacity:0.2;fill:none;}
+	.st7{fill:#E63A3F;}
+	.st8{fill:#FFFFFF;}
+	.st9{fill:#FAFAFA;}
+	.st10{fill:none;stroke:#5757AA;stroke-width:2;stroke-linecap:round;stroke-miterlimit:10;}
+	.st11{fill:#CBEBC1;}
+	.st12{fill:#82828F;}
+	.st13{fill:#EDEDF2;}
+	.st14{fill:#38396D;}
+	.st15{fill:url(#SVGID_1_);}
+	.st16{fill:url(#SVGID_2_);}
+	.st17{fill:url(#SVGID_3_);}
+	.st18{fill:url(#SVGID_4_);}
+	.st19{fill:none;stroke:#5757AA;stroke-width:1.8947;stroke-miterlimit:10;}
+	.st20{fill:#CCCCCC;stroke:#CECED9;stroke-miterlimit:10;}
+	.st21{fill:none;stroke:#CECED9;stroke-width:1.6733;stroke-linecap:round;stroke-miterlimit:10;}
+	.st22{fill:#E1E1E5;}
+	.st23{fill:#FF00FF;}
+	.st24{fill:#FFFF00;}
+	.st25{fill:#39396D;}
+	.st26{fill:url(#SVGID_5_);}
+	.st27{fill:url(#SVGID_6_);}
+	.st28{fill:#2B2B5B;}
+	.st29{fill:none;stroke:#5757AA;stroke-width:1;stroke-miterlimit:10;}
+</style>
+<g id="background">
+</g>
+<g id="Ebene_1">
+	<g>
+		<ellipse class="st8" cx="10" cy="2" rx="6" ry="2"/>
+		<path class="st8" d="M4,6.3C4,7.2,6.7,8,10,8s6-0.8,6-1.7V4c0,1-2.7,1.7-6,1.7S4,5,4,4V6.3z"/>
+	</g>
+	<path class="st8" d="M10,9.7c-0.7,0-1.4,0-2-0.1v2.3C8.6,12,9.3,12,10,12c3.3,0,6-0.8,6-1.7V8C16,9,13.3,9.7,10,9.7z"/>
+	<g>
+		<rect y="12" class="st8" width="7" height="1"/>
+	</g>
+	<g>
+		<rect x="3" y="9" class="st8" width="1" height="7"/>
+	</g>
+	<path class="st8" d="M10,13.7c-0.7,0-1.4,0-2-0.1v2.3C8.6,16,9.3,16,10,16c3.3,0,6-0.8,6-1.7V12C16,13,13.3,13.7,10,13.7z"/>
+	<g>
+		<path class="st24" d="M279-100V18H-3v-118H279 M280-101H-4V19h284V-101L280-101z"/>
+	</g>
+</g>
+</svg>

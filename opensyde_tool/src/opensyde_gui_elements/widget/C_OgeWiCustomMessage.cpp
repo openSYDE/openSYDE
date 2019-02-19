@@ -267,11 +267,6 @@ void C_OgeWiCustomMessage::m_InitButtons(void)
    this->mpc_Ui->pc_ButtonOk->setText(C_GtGetText::h_GetText("OK"));
    this->mpc_Ui->pc_LabelDetails->setText(C_GtGetText::h_GetText("DETAILS"));
 
-   // Initialize the arrow icon paths
-   mc_PathExpandIcon = ":/images/BtnWidgetMax.png";
-   mc_PathMinimizeIcon = ":/images/BtnWidgetMin.png";
-   QIcon c_ExpandIcon = QIcon(mc_PathExpandIcon);
-
    // hide the cancel and no button (only needed for question)
    this->mpc_Ui->pc_ButtonNo->hide();
    this->mpc_Ui->pc_ButtonCancel->hide();
@@ -279,12 +274,18 @@ void C_OgeWiCustomMessage::m_InitButtons(void)
 
    // make details read only
    this->mpc_Ui->pc_TebDetails->setReadOnly(true);
-   // hide the details at start
-   this->mpc_Ui->pc_TebDetails->hide();
-   this->mpc_Ui->pc_ButtonDetails->setIcon(c_ExpandIcon);
+
+   // Initialize the arrow icon paths
+   // expanded = checked = arrow up (arrow implies future state); collapsed = unchecked = arrow down
+   this->mpc_Ui->pc_ButtonDetails->SetSvg("://images/IconArrowBottomMessageBox.svg", "", "",
+                                          "://images/IconArrowUpMessageBox.svg");
 
    // Show and hide the Details
-   connect(this->mpc_Ui->pc_ButtonDetails, &QPushButton::clicked, this, &C_OgeWiCustomMessage::m_ExpandCollapseDetails);
+   this->mpc_Ui->pc_ButtonDetails->setCheckable(true);
+   this->m_ExpandCollapseDetails(false); // hide at start
+
+   connect(this->mpc_Ui->pc_ButtonDetails, &C_OgePubSvgIconOnly::toggled, this,
+           &C_OgeWiCustomMessage::m_ExpandCollapseDetails);
 
    // Make the buttons behave similar to QToolButtonBox or QMessageBox
    me_Output = E_Outputs::eINVALID; // gets overwritten by a valid value like eOK or eNO when box is closed (by
@@ -425,21 +426,11 @@ void C_OgeWiCustomMessage::m_SetText(const QString & orc_Heading, const QString 
    \created     17.04.2018  STW/G.Scupin
 */
 //-----------------------------------------------------------------------------
-void C_OgeWiCustomMessage::m_ExpandCollapseDetails(void) const
+void C_OgeWiCustomMessage::m_ExpandCollapseDetails(const bool & orq_Expand) const
 {
    // show or hide the details according to previous state
-   if (this->mpc_Ui->pc_TebDetails->isHidden() == true)
-   {
-      const QIcon c_MinimizeIcon = QIcon(mc_PathMinimizeIcon);
-      this->mpc_Ui->pc_TebDetails->show();
-      this->mpc_Ui->pc_ButtonDetails->setIcon(c_MinimizeIcon);
-   }
-   else
-   {
-      const QIcon c_ExpandIcon = QIcon(mc_PathExpandIcon);
-      this->mpc_Ui->pc_TebDetails->hide();
-      this->mpc_Ui->pc_ButtonDetails->setIcon(c_ExpandIcon);
-   }
+   this->mpc_Ui->pc_TebDetails->setVisible(orq_Expand);
+   this->mpc_Ui->pc_ButtonDetails->setChecked(orq_Expand);
 }
 
 //-----------------------------------------------------------------------------

@@ -1,0 +1,47 @@
+/* --------------------------------------------------------------------- */
+stw_opensyde_gui_elements--C_CamOgeWiSpinBoxGroupTable QAbstractSpinBox,
+stw_opensyde_gui_elements--C_CamOgeSpxProperties
+{
+border-style:solid;
+border-width:1px;
+padding-left:6px;
+padding-right:6px;
+}
+
+/* Button offset */
+stw_opensyde_gui_elements--C_CamOgeSpxProperties::down-button {
+border-right-width:0px;
+border-top-width:1px;
+border-left-width:1px;
+border-bottom-width:0px;
+border-style:solid;
+}
+
+stw_opensyde_gui_elements--C_CamOgeSpxProperties::up-button {
+border-right-width:0px;
+border-top-width:0px;
+border-left-width:1px;
+border-bottom-width:1px;
+border-style:solid;
+}
+
+/* Default spin box icons */
+stw_opensyde_gui_elements--C_CamOgeWiSpinBoxGroupTable QAbstractSpinBox::down-button,
+stw_opensyde_gui_elements--C_CamOgeSpxProperties::down-button {
+image: url(://images/IconSpinBoxDown.svg) 0 0 0 0 stretch stretch;
+}
+
+stw_opensyde_gui_elements--C_CamOgeWiSpinBoxGroupTable QAbstractSpinBox::down-button:!enabled,
+stw_opensyde_gui_elements--C_CamOgeSpxProperties::down-button:!enabled {
+image: url(://images/IconSpinBoxDownDisabled.svg) 0 0 0 0 stretch stretch;
+}
+
+stw_opensyde_gui_elements--C_CamOgeWiSpinBoxGroupTable QAbstractSpinBox::up-button,
+stw_opensyde_gui_elements--C_CamOgeSpxProperties::up-button {
+image: url(://images/IconSpinBoxUp.svg) 0 0 0 0 stretch stretch;
+}
+
+stw_opensyde_gui_elements--C_CamOgeWiSpinBoxGroupTable QAbstractSpinBox::up-button:!enabled,
+stw_opensyde_gui_elements--C_CamOgeSpxProperties::up-button:!enabled {
+image: url(://images/IconSpinBoxUpDisabled.svg) 0 0 0 0 stretch stretch;
+}

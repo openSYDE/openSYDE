@@ -1,29 +1,29 @@
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeFrame {
-border-left-width:2px;
-border-top-width:2px;
-border-bottom-width:2px;
-border-right-width:2px;
-border-style:solid;
+stw_opensyde_gui_elements--C_OgeFrame
+{
+border-width: 2px;
+border-style: solid;
 }
 
-QFrame#pc_FrameApplicationWidget {
-border-width:1px;
-border-style:solid;
+QFrame#pc_FrameApplicationWidget
+{
+border-width: 1px;
+border-style: solid;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeFrame[OpenRight="true"] {
-border-right-width:0px;
-}
-stw_opensyde_gui_elements--C_OgeFrame[NoBorder="true"] {
-border-left-width:0px;
-border-top-width:0px;
-border-bottom-width:0px;
-border-right-width:0px;
+stw_opensyde_gui_elements--C_OgeFrame[OpenRight="true"]
+{
+border-right-width: 0px;
 }
 
-QFrame#pc_FrameSdNdeDpSelectorItem {
+stw_opensyde_gui_elements--C_OgeFrame[NoBorder="true"]
+{
+border-width: 0px;
+}
+
+QFrame#pc_FrameSdNdeDpSelectorItem
+{
 border-style: solid;
 border-width: 1px;
 }

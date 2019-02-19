@@ -63,7 +63,7 @@ C_OSCNodeOpenSYDEServerSettings::C_OSCNodeOpenSYDEServerSettings(void)
 void C_OSCNodeOpenSYDEServerSettings::Initialize(void)
 {
    u8_MaxClients = 1U;
-   u8_MaxParallelTransmissions = 16U;
+   u8_MaxParallelTransmissions = 64U;
    s16_DPDDataBlockIndex = -1;
    u16_MaxMessageBufferTx = 585U;
    u16_MaxRoutingMessageBufferRx = 585U;

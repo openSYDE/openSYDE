@@ -284,9 +284,14 @@ sint32 C_SyvComDriverDiag::SetDiagnosticMode(QString & orc_ErrorDetails)
 
    The function will abort on the first communication problem.
 
-   \param[in,out] orc_ErrorDetails         Error details (if any)
-   \param[in,out] orc_FailedIdRegisters    Element IDs which failed registration (if any)
-   \param[in,out] orc_FailedIdErrorDetails Error details for element IDs which failed registration (if any)
+   \param[in,out] orc_ErrorDetails              Error details (if any)
+   \param[in,out] orc_FailedIdRegisters         Element IDs which failed registration (if any)
+   \param[in,out] orc_FailedIdErrorDetails      Error details for element IDs which failed registration (if any)
+   \param[out]    orc_FailedNodesElementNumber  Map with all nodes as key with the number (not the index) of the
+                                                element which caused the error OSY_UDS_NRC_UPLOAD_DOWNLOAD_NOT_ACCEPTED
+                                                (0x70: To many transmissions already registered)
+   \param[out]    orc_NodesElementNumber        Map with all nodes as key with the number (not the index) of the
+                                                element which should be registered (With and without error)
 
    \return
    C_CONFIG   configured view does not exist
@@ -299,11 +304,16 @@ sint32 C_SyvComDriverDiag::SetDiagnosticMode(QString & orc_ErrorDetails)
 //-----------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
                                                     std::vector<C_OSCNodeDataPoolListElementId> & orc_FailedIdRegisters,
-                                                    std::vector<QString> & orc_FailedIdErrorDetails)
+                                                    std::vector<QString> & orc_FailedIdErrorDetails, std::map<uint32,
+                                                                                                              uint32> & orc_FailedNodesElementNumber, std::map<uint32,
+                                                                                                                                                               uint32> & orc_NodesElementNumber)
 {
    uint16 u16_Node;
    sint32 s32_Return = C_NO_ERR;
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+
+   orc_FailedNodesElementNumber.clear();
+   orc_NodesElementNumber.clear();
 
    if ((pc_View == NULL) || (this->mq_Initialized == false))
    {
@@ -370,6 +380,21 @@ sint32 C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
             tgl_assert(c_It.key().u32_ListIndex <= 0xFFFFU);
             tgl_assert(c_It.key().u32_ElementIndex <= 0xFFFFU);
 
+            if ((c_It.value().e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_CYCLIC) ||
+                (c_It.value().e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_ON_CHANGE))
+            {
+               const std::map<uint32, uint32>::iterator c_ItNodesElementNumber = orc_NodesElementNumber.find(
+                  c_It.key().u32_NodeIndex);
+               if (c_ItNodesElementNumber == orc_NodesElementNumber.end())
+               {
+                  orc_NodesElementNumber[c_It.key().u32_NodeIndex] = 1U;
+               }
+               else
+               {
+                  ++c_ItNodesElementNumber->second;
+               }
+            }
+
             if (c_It.value().e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_CYCLIC)
             {
                s32_Return = this->mc_DiagProtocols[u32_ActiveNodeIndex]->DataPoolReadCyclic(
@@ -382,7 +407,8 @@ sint32 C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
                std::vector<uint8> c_Threshold;
                uint32 u32_Threshold;
                c_It.value().c_ChangeThreshold.GetValueAsLittleEndianBlob(c_Threshold);
-               tgl_assert(c_Threshold.size() < 4);
+               //defensive measure: as element may only be up to 32bit the threshold may also not be > 32bit
+               tgl_assert(c_Threshold.size() <= 4);
                //fill up to 4 bytes with zeroes
                c_Threshold.resize(4, 0U);
                //finally compose the uint32:
@@ -407,6 +433,8 @@ sint32 C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
             {
                QString c_AdditionalInfo;
                QString c_Details;
+               std::map<uint32, uint32>::iterator c_ItFailedNodesElementNumber;
+
                switch (s32_Return)
                {
                case C_RANGE:
@@ -425,15 +453,23 @@ sint32 C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
                      c_AdditionalInfo = C_GtGetText::h_GetText("Incorrect length of request");
                      break;
                   case 0x22:
-                     c_AdditionalInfo = C_GtGetText::h_GetText("When initiating transmission:\n"
-                                                               "- Datapool element specified by data identifier cannot be transferred event driven (invalid data type)");
+                     c_AdditionalInfo = C_GtGetText::h_GetText(
+                        "Datapool element specified by data identifier cannot be transferred event driven (invalid data type)");
                      break;
                   case 0x70:
-                     c_AdditionalInfo = C_GtGetText::h_GetText("When initiating transmission:\n"
-                                                               "- too many transmissions already registered");
+                     c_AdditionalInfo = C_GtGetText::h_GetText("Too many transmissions already registered");
+
+                     c_ItFailedNodesElementNumber = orc_FailedNodesElementNumber.find(c_It.key().u32_NodeIndex);
+
+                     if (c_ItFailedNodesElementNumber == orc_FailedNodesElementNumber.end())
+                     {
+                        // Save the information about the number of the first element which failed
+                        orc_FailedNodesElementNumber[c_It.key().u32_NodeIndex] =
+                           orc_NodesElementNumber[c_It.key().u32_NodeIndex];
+                     }
                      break;
                   case 0x31:
-                     c_AdditionalInfo = C_GtGetText::h_GetText("Invalid transmissionMode.\n"
+                     c_AdditionalInfo = C_GtGetText::h_GetText("Invalid transmission mode.\n"
                                                                "\n"
                                                                "When initiating transmission:\n"
                                                                "- Datapool element specified by data identifier is not available\n"
@@ -1574,7 +1610,7 @@ bool C_SyvComDriverDiag::C_SyvComDriverDiagWidgetRegistration::operator ==(
 
 //-----------------------------------------------------------------------------
 /*!
-   \brief   Detects all nodes which are used in currernt dashboard
+   \brief   Detects all nodes which are used in current dashboard
 
    The nodes which which has used datapool elements will be saved in an addition vector
 

@@ -19,6 +19,8 @@
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
 
+#include <map>
+
 #include "stwerrors.h"
 
 #include "C_OSCNode.h"
@@ -1355,6 +1357,7 @@ void C_OSCNode::CheckErrorDataPool(const uint32 & oru32_DataPoolIndex, bool * co
             const C_OSCCanProtocol * const pc_Protocol = this->GetRelatedCANProtocolConst(oru32_DataPoolIndex);
             if (pc_Protocol != NULL)
             {
+               static std::map<std::vector<uint32>, bool> hc_PreviousResults;
                for (uint32 u32_ItContainer = 0; u32_ItContainer < pc_Protocol->c_ComMessages.size(); ++u32_ItContainer)
                {
                   uint32 u32_TxListIndex;
@@ -1364,26 +1367,63 @@ void C_OSCNode::CheckErrorDataPool(const uint32 & oru32_DataPoolIndex, bool * co
                       (C_OSCCanProtocol::h_GetComListIndex(rc_CheckedDataPool, u32_ItContainer, false,
                                                            u32_RxListIndex) == C_NO_ERR))
                   {
-                     if ((u32_TxListIndex < rc_CheckedDataPool.c_Lists.size()) &&
-                         (u32_RxListIndex < rc_CheckedDataPool.c_Lists.size()))
+                     //Get Hash for all relevant data
+                     const uint32 u32_HashCon = this->m_GetContainerHash(oru32_DataPoolIndex, u32_ItContainer);
+                     const uint32 u32_HashTx = this->m_GetListHash(oru32_DataPoolIndex, u32_TxListIndex);
+                     const uint32 u32_HashRx = this->m_GetListHash(oru32_DataPoolIndex, u32_RxListIndex);
+                     std::vector<uint32> c_Hashes;
+                     std::map<std::vector<uint32>, bool>::const_iterator c_It;
+                     c_Hashes.push_back(u32_HashCon);
+                     c_Hashes.push_back(u32_HashTx);
+                     c_Hashes.push_back(u32_HashRx);
+                     //Check if check was already performed in the past
+                     c_It = hc_PreviousResults.find(c_Hashes);
+                     if (c_It == hc_PreviousResults.end())
                      {
-                        const C_OSCCanMessageContainer & rc_Container = pc_Protocol->c_ComMessages[u32_ItContainer];
-                        const bool q_Error = rc_Container.CheckLocalError(rc_CheckedDataPool.c_Lists[u32_TxListIndex],
-                                                                          rc_CheckedDataPool.c_Lists[u32_RxListIndex],
-                                                                          C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
-                                                                             pc_Protocol->e_Type));
-                        if (q_Error == true)
+                        if ((u32_TxListIndex < rc_CheckedDataPool.c_Lists.size()) &&
+                            (u32_RxListIndex < rc_CheckedDataPool.c_Lists.size()))
+                        {
+                           const C_OSCCanMessageContainer & rc_Container = pc_Protocol->c_ComMessages[u32_ItContainer];
+                           const bool q_Error = rc_Container.CheckLocalError(
+                              rc_CheckedDataPool.c_Lists[u32_TxListIndex],
+                              rc_CheckedDataPool.c_Lists[u32_RxListIndex],
+                              C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                                 pc_Protocol->e_Type));
+                           if (q_Error == true)
+                           {
+                              *opq_IsErrorInListOrMessage = true;
+                              if (opc_InvalidListIndices != NULL)
+                              {
+                                 opc_InvalidListIndices->push_back(u32_ItContainer);
+                              }
+                              //Append for possible reusing this result
+                              hc_PreviousResults[c_Hashes] = true;
+                           }
+                           else
+                           {
+                              //Append for possible reusing this result
+                              hc_PreviousResults[c_Hashes] = false;
+                           }
+                        }
+                        else
                         {
                            *opq_IsErrorInListOrMessage = true;
                            if (opc_InvalidListIndices != NULL)
                            {
                               opc_InvalidListIndices->push_back(u32_ItContainer);
                            }
+                           //Append for possible reusing this result
+                           hc_PreviousResults[c_Hashes] = true;
                         }
                      }
                      else
                      {
-                        *opq_IsErrorInListOrMessage = true;
+                        //Do not reset error
+                        *opq_IsErrorInListOrMessage = (*opq_IsErrorInListOrMessage) || (c_It->second);
+                        if ((opc_InvalidListIndices != NULL) && (c_It->second))
+                        {
+                           opc_InvalidListIndices->push_back(u32_ItContainer);
+                        }
                      }
                   }
                   else
@@ -1395,8 +1435,9 @@ void C_OSCNode::CheckErrorDataPool(const uint32 & oru32_DataPoolIndex, bool * co
          }
          else
          {
+            std::map<stw_scl::C_SCLString, uint32> c_PreviousNames;
+            static std::map<uint32, bool> hc_PreviousResults;
             bool q_CheckSize;
-            bool q_NameConflict;
             bool q_NameInvalid;
             bool q_UsageInvalid;
             bool q_OutOfDataPool;
@@ -1417,26 +1458,83 @@ void C_OSCNode::CheckErrorDataPool(const uint32 & oru32_DataPoolIndex, bool * co
                  ((*opq_IsErrorInListOrMessage == false) || (opc_InvalidListIndices != NULL));
                  ++u32_ItList)
             {
-               q_NameConflict = false;
-               q_NameInvalid = false;
-               q_UsageInvalid = false;
-               q_OutOfDataPool = false;
-               q_DataSetsInvalid = false;
-               q_ElementsInvalid = false;
-               rc_CheckedDataPool.CheckErrorList(u32_ItList, &q_NameConflict, &q_NameInvalid, &q_UsageInvalid,
-                                                 &q_OutOfDataPool, &q_DataSetsInvalid, &q_ElementsInvalid, NULL, NULL);
-               if (q_CheckSize == false)
-               {
-                  q_UsageInvalid = false;
-                  q_OutOfDataPool = false;
-               }
-               if ((((((q_NameConflict == true) || (q_NameInvalid == true)) || (q_UsageInvalid == true)) ||
-                     (q_ElementsInvalid == true)) || (q_OutOfDataPool == true)) || (q_DataSetsInvalid == true))
+               //Overarching checks
+               const C_OSCNodeDataPoolList & rc_List = rc_CheckedDataPool.c_Lists[u32_ItList];
+               const std::map<stw_scl::C_SCLString,
+                              uint32>::const_iterator c_ItList = c_PreviousNames.find(rc_List.c_Name.LowerCase());
+               if (c_ItList != c_PreviousNames.end())
                {
                   *opq_IsErrorInListOrMessage = true;
                   if (opc_InvalidListIndices != NULL)
                   {
+                     bool q_Added = false;
+                     //Only add element once!
+                     for (uint32 u32_It = 0UL; u32_It < opc_InvalidListIndices->size(); ++u32_It)
+                     {
+                        if ((*opc_InvalidListIndices)[u32_It] == c_ItList->second)
+                        {
+                           q_Added = true;
+                           break;
+                        }
+                     }
+                     //Add conflicting other item
+                     if (q_Added == false)
+                     {
+                        opc_InvalidListIndices->push_back(c_ItList->second);
+                     }
+                     //Add itself
                      opc_InvalidListIndices->push_back(u32_ItList);
+                  }
+               }
+               else
+               {
+                  //Get Hash for all relevant data
+                  const uint32 u32_Hash = this->m_GetListHash(oru32_DataPoolIndex, u32_ItList);
+                  //Check if check was already performed in the past
+                  const std::map<uint32, bool>::const_iterator c_ItErr = hc_PreviousResults.find(u32_Hash);
+                  //Append new name
+                  c_PreviousNames[rc_List.c_Name.LowerCase()] = u32_ItList;
+                  //Element specific checks
+                  if (c_ItErr == hc_PreviousResults.end())
+                  {
+                     q_NameInvalid = false;
+                     q_UsageInvalid = false;
+                     q_OutOfDataPool = false;
+                     q_DataSetsInvalid = false;
+                     q_ElementsInvalid = false;
+                     rc_CheckedDataPool.CheckErrorList(u32_ItList, NULL, &q_NameInvalid, &q_UsageInvalid,
+                                                       &q_OutOfDataPool, &q_DataSetsInvalid, &q_ElementsInvalid, NULL,
+                                                       NULL);
+                     if (q_CheckSize == false)
+                     {
+                        q_UsageInvalid = false;
+                        q_OutOfDataPool = false;
+                     }
+                     if (((((q_NameInvalid == true) || (q_UsageInvalid == true)) ||
+                           (q_ElementsInvalid == true)) || (q_OutOfDataPool == true)) || (q_DataSetsInvalid == true))
+                     {
+                        *opq_IsErrorInListOrMessage = true;
+                        if (opc_InvalidListIndices != NULL)
+                        {
+                           opc_InvalidListIndices->push_back(u32_ItList);
+                        }
+                        //Append for possible reusing this result
+                        hc_PreviousResults[u32_Hash] = true;
+                     }
+                     else
+                     {
+                        //Append for possible reusing this result
+                        hc_PreviousResults[u32_Hash] = false;
+                     }
+                  }
+                  else
+                  {
+                     //Do not reset error
+                     *opq_IsErrorInListOrMessage = (*opq_IsErrorInListOrMessage) || (c_ItErr->second);
+                     if ((opc_InvalidListIndices != NULL) && (c_ItErr->second))
+                     {
+                        opc_InvalidListIndices->push_back(u32_ItList);
+                     }
                   }
                }
             }
@@ -1661,6 +1759,35 @@ bool C_OSCNode::IsAnyUpdateAvailable(void) const
 
 //-----------------------------------------------------------------------------
 /*!
+   \brief   Checks if the node supports routing
+
+   Special case: Hybrid nodes can be used with openSYDE or KEFEX server,
+   but routing is available with the openSYDE server only.
+
+   \param[in]     oe_Type       Interface type
+
+   \return
+   true  Routing is available
+   false Routing is not available
+
+   \created     10.01.2019  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+bool C_OSCNode::IsRoutingAvailable(const C_OSCSystemBus::E_Type oe_Type) const
+{
+   bool q_Return = false;
+
+   if ((this->pc_DeviceDefinition != NULL) &&
+       (this->c_Properties.e_DiagnosticServer == C_OSCNodeProperties::eDS_OPEN_SYDE))
+   {
+      q_Return = this->pc_DeviceDefinition->IsRoutingAvailable(oe_Type);
+   }
+
+   return q_Return;
+}
+
+//-----------------------------------------------------------------------------
+/*!
    \brief   Recalculate data pool addresses
 
    \created     26.01.2017  STW/M.Echtler
@@ -1834,4 +1961,62 @@ void C_OSCNode::m_AppendAllProtocolMessages(const uint32 & oru32_InterfaceIndex,
          }
       }
    }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get hash for list
+
+   \param[in] ou32_DataPoolIndex Data pool index
+   \param[in] ou32_ListIndex     List index
+
+   \return
+   Hash for list
+
+   \created     20.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+uint32 C_OSCNode::m_GetListHash(const uint32 ou32_DataPoolIndex, const uint32 ou32_ListIndex) const
+{
+   uint32 u32_Retval = 0xFFFFFFFFUL;
+
+   if (ou32_DataPoolIndex < this->c_DataPools.size())
+   {
+      const C_OSCNodeDataPool & rc_Dp = this->c_DataPools[ou32_DataPoolIndex];
+      if (ou32_ListIndex < rc_Dp.c_Lists.size())
+      {
+         const C_OSCNodeDataPoolList & rc_List = rc_Dp.c_Lists[ou32_ListIndex];
+         rc_List.CalcHash(u32_Retval);
+      }
+   }
+   return u32_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get hash for container
+
+   \param[in] ou32_DataPoolIndex  Data pool index
+   \param[in] ou32_ContainerIndex Container index
+
+   \return
+   Hash for container
+
+   \created     20.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+uint32 C_OSCNode::m_GetContainerHash(const uint32 ou32_DataPoolIndex, const uint32 ou32_ContainerIndex) const
+{
+   uint32 u32_Retval = 0xFFFFFFFFUL;
+   const C_OSCCanProtocol * const pc_Protocol = this->GetRelatedCANProtocolConst(ou32_DataPoolIndex);
+
+   if (pc_Protocol != NULL)
+   {
+      if (ou32_ContainerIndex < pc_Protocol->c_ComMessages.size())
+      {
+         const C_OSCCanMessageContainer & rc_Container = pc_Protocol->c_ComMessages[ou32_ContainerIndex];
+         rc_Container.CalcHash(u32_Retval);
+      }
+   }
+   return u32_Retval;
 }

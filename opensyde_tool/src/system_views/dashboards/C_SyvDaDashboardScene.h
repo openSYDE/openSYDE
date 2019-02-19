@@ -114,7 +114,7 @@ protected:
    // copy past functions
    virtual void m_Copy(void);
    virtual void m_Cut(void);
-   virtual bool m_IsPastePossible(void) const;
+   virtual bool m_IsPastePossible(void);
    virtual bool m_IsUndoAvailable(void) const;
 
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions

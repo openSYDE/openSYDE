@@ -285,7 +285,7 @@ void C_SdBueNodeSelectorWidget::m_NodeToggled(const uint32 ou32_NodeIndex, const
 void C_SdBueNodeSelectorWidget::m_NodeComImport(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex)
 {
    sint32 s32_Return = C_NO_ERR;
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(ou32_NodeIndex);
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
    uint32 u32_ProtocolCounter;
    uint32 u32_DataPoolIndex = 0U;
 
@@ -316,6 +316,7 @@ void C_SdBueNodeSelectorWidget::m_NodeComImport(const uint32 ou32_NodeIndex, con
       {
          // Refresh update
          Q_EMIT this->SigReload();
+         Q_EMIT this->SigErrorChange();
       }
    }
 }

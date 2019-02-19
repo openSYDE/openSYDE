@@ -19,16 +19,27 @@
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
 
-#include <QApplication>
-#include <QDesktopWidget>
+#include <limits>
+
 #include <QPainter>
+#include <QFileInfo>
+#include <QApplication>
 #include <QStyleOption>
+#include <QDesktopWidget>
+
+#include "C_OSCUtils.h"
+#include "TGLUtils.h"
+#include "C_GtGetText.h"
 #include "C_OgeWiUtil.h"
 #include "C_OgePopUpDialog.h"
+#include "C_OgeWiCustomMessage.h"
 
 /* -- Used Namespaces ------------------------------------------------------ */
+using namespace stw_tgl;
 using namespace stw_types;
+using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
+using namespace stw_opensyde_gui_elements;
 
 /* -- Module Global Constants ---------------------------------------------- */
 
@@ -252,47 +263,65 @@ sintn C_OgeWiUtil::h_UpdateFontSize(QWidget * const opc_Widget, const QString & 
 sintn C_OgeWiUtil::h_GetNextOptimalPointSize(const QFont & orc_Font, const QSize & orc_Size, const QString & orc_Text,
                                              const float32 of32_HeightScaling)
 {
-   const float32 f32_WidgetHeight = static_cast<float32>(orc_Size.height()) * of32_HeightScaling;
-   const sintn sn_WidgetHeight = static_cast<sintn>(f32_WidgetHeight);
-   const sintn sn_Init = std::max(std::max(orc_Font.pointSize(), orc_Font.pixelSize()), 1);
-   sintn sn_Retval = sn_Init;
-   QFont c_Font(orc_Font.family(), sn_Retval, orc_Font.weight(), orc_Font.italic());
+   sintn sn_Retval;
+   static QMap<QString, sintn> hc_PreviousResults;
+   //Find some way to uniquely identify the input parameter constellation
+   const QString c_CompleteInput = QString("%1,%2,%3,%4,%5").arg(orc_Font.toString()).arg(orc_Size.width()).arg(
+      orc_Size.height()).arg(orc_Text).arg(static_cast<float64>(of32_HeightScaling));
+   //Look up
+   const QMap<QString, sintn>::const_iterator c_It = hc_PreviousResults.find(c_CompleteInput);
 
-   for (sintn sn_StepWidth = 2; sn_StepWidth > 0; --sn_StepWidth)
+   //Check if anything found
+   if (c_It == hc_PreviousResults.end())
    {
-      //Check size increase (iterative)
-      for (; sn_Retval < 2000; sn_Retval += sn_StepWidth)
+      const float32 f32_WidgetHeight = static_cast<float32>(orc_Size.height()) * of32_HeightScaling;
+      const sintn sn_WidgetHeight = static_cast<sintn>(f32_WidgetHeight);
+      const sintn sn_Init = std::max(std::max(orc_Font.pointSize(), orc_Font.pixelSize()), 1);
+      QFont c_Font(orc_Font.family(), sn_Init, orc_Font.weight(), orc_Font.italic());
+
+      sn_Retval = sn_Init;
+      for (sintn sn_StepWidth = 2; sn_StepWidth > 0; --sn_StepWidth)
       {
-         c_Font.setPointSize(sn_Retval);
-         {
-            const QFontMetrics c_Metric(c_Font);
-            if ((c_Metric.width(orc_Text) > orc_Size.width()) || (c_Metric.height() > sn_WidgetHeight))
-            {
-               //Assuming previous one was ok
-               sn_Retval -= sn_StepWidth;
-               break;
-            }
-         }
-      }
-      //Check if size increase did at least one iteration
-      //(We don't need to iterate in the other direction if increase already worked)
-      if (sn_Retval < sn_Init)
-      {
-         //Undo last step
-         sn_Retval += sn_StepWidth;
-         //Check size decrease (iterative)
-         for (; sn_Retval > sn_StepWidth; sn_Retval -= sn_StepWidth)
+         //Check size increase (iterative)
+         for (; sn_Retval < 2000; sn_Retval += sn_StepWidth)
          {
             c_Font.setPointSize(sn_Retval);
             {
                const QFontMetrics c_Metric(c_Font);
-               if ((c_Metric.width(orc_Text) <= orc_Size.width()) && (c_Metric.height() <= sn_WidgetHeight))
+               if ((c_Metric.width(orc_Text) > orc_Size.width()) || (c_Metric.height() > sn_WidgetHeight))
                {
+                  //Assuming previous one was ok
+                  sn_Retval -= sn_StepWidth;
                   break;
                }
             }
          }
+         //Check if size increase did at least one iteration
+         //(We don't need to iterate in the other direction if increase already worked)
+         if (sn_Retval < sn_Init)
+         {
+            //Undo last step
+            sn_Retval += sn_StepWidth;
+            //Check size decrease (iterative)
+            for (; sn_Retval > sn_StepWidth; sn_Retval -= sn_StepWidth)
+            {
+               c_Font.setPointSize(sn_Retval);
+               {
+                  const QFontMetrics c_Metric(c_Font);
+                  if ((c_Metric.width(orc_Text) <= orc_Size.width()) && (c_Metric.height() <= sn_WidgetHeight))
+                  {
+                     break;
+                  }
+               }
+            }
+         }
       }
+      //Store new value for further calls
+      hc_PreviousResults.insert(c_CompleteInput, sn_Retval);
+   }
+   else
+   {
+      sn_Retval = c_It.value();
    }
 
    return std::max(sn_Retval, 1);
@@ -386,6 +415,76 @@ bool C_OgeWiUtil::h_CheckGlobalKey(const QKeyEvent * const opc_Event)
       q_Retval = false;
    }
    return q_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get save file name via QFileDialog
+
+   \param[in,out] opc_Parent          Parent widget
+   \param[in]     orc_Heading         QFileDialog heading
+   \param[in]     orc_StartingFolder  QFileDialog starting folder
+   \param[in]     orc_Filter          QFileDialog filter
+   \param[in]     orc_DefaultFileName QFileDialog default file name
+   \param[in]     oc_Option           QFileDialog option
+
+   \return
+   Get save file name (empty if aborted)
+
+   \created     05.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+QString C_OgeWiUtil::h_GetSaveFileName(QWidget * const opc_Parent, const QString & orc_Heading,
+                                       const QString & orc_StartingFolder, const QString & orc_Filter,
+                                       const QString & orc_DefaultFileName, const QFileDialog::Options oc_Option)
+{
+   QString c_Retval;
+   bool q_Stop = false;
+   QFileDialog c_FileDialog(opc_Parent, orc_Heading, orc_StartingFolder, orc_Filter);
+
+   c_FileDialog.setFileMode(QFileDialog::AnyFile);
+   c_FileDialog.setAcceptMode(QFileDialog::AcceptSave);
+   c_FileDialog.setOptions(oc_Option);
+   c_FileDialog.selectFile(orc_DefaultFileName);
+   while (q_Stop == false)
+   {
+      const sintn sn_UserChoice = c_FileDialog.exec();
+      if (sn_UserChoice == static_cast<sintn>(QDialog::Accepted))
+      {
+         // take file name (we save only one file therefore take first entry)
+         const QString c_FullFilePath = c_FileDialog.selectedFiles().at(0);
+
+         if (c_FullFilePath != "")
+         {
+            const QFileInfo c_Info(c_FullFilePath);
+            if (C_OSCUtils::h_CheckValidCName(c_Info.baseName().toStdString().c_str(),
+                                              std::numeric_limits<uint16>::max()) == true)
+            {
+               c_Retval = c_FullFilePath;
+               q_Stop = true;
+            }
+            else
+            {
+               C_OgeWiCustomMessage c_MessageBox(opc_Parent, C_OgeWiCustomMessage::eERROR);
+               c_MessageBox.SetHeading(orc_Heading);
+               c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText(
+                                                      "File name invalid. Only alphanumeric characters + \"_\" are allowed.")));
+               c_MessageBox.Execute();
+            }
+         }
+         else
+         {
+            //Unexpected
+            tgl_assert(false);
+         }
+      }
+      else
+      {
+         q_Stop = true;
+      }
+   }
+   return c_Retval;
+   //lint -e{1746} Necessary because needs default parameter and is not recognized as const
 }
 
 //-----------------------------------------------------------------------------

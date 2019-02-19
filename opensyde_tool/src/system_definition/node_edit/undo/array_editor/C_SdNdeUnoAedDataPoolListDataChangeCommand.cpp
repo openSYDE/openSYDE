@@ -25,6 +25,7 @@
 #include "C_SdNdeUnoAedDataPoolListDataChangeCommand.h"
 #include "C_PuiSdHandler.h"
 #include "C_OSCNodeDataPoolDataSet.h"
+#include "C_SdNdeDataPoolContentUtil.h"
 
 /* -- Used Namespaces ------------------------------------------------------ */
 using namespace stw_types;
@@ -136,26 +137,32 @@ void C_SdNdeUnoAedDataPoolListDataChangeCommand::m_Change(QVariant & orc_Previou
       switch (this->me_ArrayEditType)
       {
       case C_SdNdeDataPoolUtil::eARRAY_EDIT_MIN:
-         orc_PreviousData = C_SdNdeDataPoolUtil::h_ScaledDataVariable(pc_OSCData->c_MinValue, pc_OSCData->f64_Factor,
-                                                                      pc_OSCData->f64_Offset, this->mu32_ItemIndex);
+         orc_PreviousData = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(pc_OSCData->c_MinValue,
+                                                                                        pc_OSCData->f64_Factor,
+                                                                                        pc_OSCData->f64_Offset,
+                                                                                        this->mu32_ItemIndex);
          break;
       case C_SdNdeDataPoolUtil::eARRAY_EDIT_MAX:
-         orc_PreviousData = C_SdNdeDataPoolUtil::h_ScaledDataVariable(pc_OSCData->c_MaxValue, pc_OSCData->f64_Factor,
-                                                                      pc_OSCData->f64_Offset, this->mu32_ItemIndex);
+         orc_PreviousData = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(pc_OSCData->c_MaxValue,
+                                                                                        pc_OSCData->f64_Factor,
+                                                                                        pc_OSCData->f64_Offset,
+                                                                                        this->mu32_ItemIndex);
          break;
       case C_SdNdeDataPoolUtil::eARRAY_EDIT_DATA_SET:
          if (this->mu32_DataSetIndex < pc_OSCData->c_DataSetValues.size())
          {
             orc_PreviousData =
-               C_SdNdeDataPoolUtil::h_ScaledDataVariable(pc_OSCData->c_DataSetValues[this->mu32_DataSetIndex],
-                                                         pc_OSCData->f64_Factor, pc_OSCData->f64_Offset,
-                                                         this->mu32_ItemIndex);
+               C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(
+                  pc_OSCData->c_DataSetValues[this->mu32_DataSetIndex],
+                  pc_OSCData->f64_Factor, pc_OSCData->f64_Offset,
+                  this->mu32_ItemIndex);
          }
          break;
       }
       //Copy new value
-      C_SdNdeDataPoolUtil::h_SetUnscaledDataVariable(orc_NewData, c_Generic, pc_OSCData->f64_Factor,
-                                                     pc_OSCData->f64_Offset, 0);
+      C_SdNdeDataPoolContentUtil::h_SetDataVariableFromGenericWithScaling(orc_NewData, c_Generic,
+                                                                          pc_OSCData->f64_Factor,
+                                                                          pc_OSCData->f64_Offset, 0);
       switch (this->me_ArrayEditType)
       {
       case C_SdNdeDataPoolUtil::eARRAY_EDIT_MIN:
@@ -191,10 +198,11 @@ void C_SdNdeUnoAedDataPoolListDataChangeCommand::m_Change(QVariant & orc_Previou
                                                                           this->mu32_ElementIndex);
             if (pc_Element != NULL)
             {
-               const QVariant c_NewData = C_SdNdeDataPoolUtil::h_ScaledDataVariable(pc_Element->c_MinValue,
-                                                                                    pc_Element->f64_Factor,
-                                                                                    pc_Element->f64_Offset,
-                                                                                    this->mu32_ItemIndex);
+               const QVariant c_NewData = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(
+                  pc_Element->c_MinValue,
+                  pc_Element->f64_Factor,
+                  pc_Element->f64_Offset,
+                  this->mu32_ItemIndex);
                for (uint32 u32_ItDataSet = 0; u32_ItDataSet < pc_Element->c_DataSetValues.size(); ++u32_ItDataSet)
                {
                   if (C_SdNdeDataPoolUtil::h_CompareSpecifiedItemSmaller(pc_Element->c_DataSetValues[u32_ItDataSet],
@@ -224,10 +232,11 @@ void C_SdNdeUnoAedDataPoolListDataChangeCommand::m_Change(QVariant & orc_Previou
                                                                           this->mu32_ElementIndex);
             if (pc_Element != NULL)
             {
-               const QVariant c_NewData = C_SdNdeDataPoolUtil::h_ScaledDataVariable(pc_Element->c_MaxValue,
-                                                                                    pc_Element->f64_Factor,
-                                                                                    pc_Element->f64_Offset,
-                                                                                    this->mu32_ItemIndex);
+               const QVariant c_NewData = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(
+                  pc_Element->c_MaxValue,
+                  pc_Element->f64_Factor,
+                  pc_Element->f64_Offset,
+                  this->mu32_ItemIndex);
                for (uint32 u32_ItDataSet = 0; u32_ItDataSet < pc_Element->c_DataSetValues.size(); ++u32_ItDataSet)
                {
                   if (C_SdNdeDataPoolUtil::h_CompareSpecifiedItemSmaller(pc_Element->c_MaxValue,

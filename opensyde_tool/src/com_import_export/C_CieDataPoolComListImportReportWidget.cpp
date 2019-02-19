@@ -640,7 +640,7 @@ sint32 C_CieDataPoolComListImportReportWidget::m_ShowReport(void)
                c_CompleteLog += C_GtGetText::h_GetText("Eliminate spaces");
                c_CompleteLog += "<br/>";
                c_CompleteLog += "- ";
-               c_CompleteLog += C_GtGetText::h_GetText("Truncate to 31 characters");
+               c_CompleteLog += C_GtGetText::h_GetText("Cut to 31 characters");
                c_CompleteLog += "</p>";
                //Tables
                if (u32_UpdatedEntryCount > 0UL)
@@ -648,7 +648,7 @@ sint32 C_CieDataPoolComListImportReportWidget::m_ShowReport(void)
                   //Updated table
                   c_CompleteLog += "<p><b>";
                   //Translation: 1=Number of messages
-                  c_CompleteLog += QString(C_GtGetText::h_GetText("Updated Messages (%1)")).arg(u32_UpdatedEntryCount);
+                  c_CompleteLog += QString(C_GtGetText::h_GetText("Updated messages (%1)")).arg(u32_UpdatedEntryCount);
                   c_CompleteLog += "</b></p>";
                   c_CompleteLog += "<table>";
                   //Header
@@ -677,7 +677,7 @@ sint32 C_CieDataPoolComListImportReportWidget::m_ShowReport(void)
                   //New table
                   c_CompleteLog += "<p><b>";
                   //Translation: 1=Number of messages
-                  c_CompleteLog += QString(C_GtGetText::h_GetText("New Messages (%1)")).arg(u32_NewEntryCount);
+                  c_CompleteLog += QString(C_GtGetText::h_GetText("New messages (%1)")).arg(u32_NewEntryCount);
                   c_CompleteLog += "</b></p>";
                   c_CompleteLog += "<table>";
                   //Header

@@ -1,41 +1,13 @@
-/*Global Default Font Family, extra small to identify not styled fonts. Should be set to default size before Release.*/
-
-/*Generic defines should be placed before specific ones */
-stw_opensyde_gui_elements--C_OgeLeDialog, 
-stw_opensyde_gui_elements--C_OgeListWidget, 
-stw_opensyde_gui_elements--C_OgeRabDefault {
-font-size:10pt;
-}
-
-
-/*NaviFontType04 */
-/*ToolBoxFontType03 */
-/*SetupStyleFontType02 */
-/*Datapool Properties TBD*/
-stw_opensyde_gui_elements--C_OgePubUseCaseNavViewSub
-{
-font-family:"Calibri";
-font-size:10pt;
-}
-
-
-
-/*PageHeadFontType01 */
-stw_opensyde_gui_elements--C_OgeLabPageHeading {
-font-family:Calibri;
-font-size:14pt;
-font-weight:normal;
-}
-
-stw_opensyde_gui_elements--C_OgeLabHeadingGroup, 
-stw_opensyde_gui_elements--C_OgePubColorOnly,
-stw_opensyde_gui_elements--C_OgePubDialogWithIcon {
-font-size:14pt;
-}
-
-
+/* --------------------------------------------------------------------- */
 /* STYLE_GUIDE */
+/* --------------------------------------------------------------------- */
+/* Order:                   */
+/*  font size guide index   */
+/*    - regular             */
+/*    - semi-bold           */
+/*    - bold                */
 
+/* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_FONT_REGULAR_11 */
 QTextEdit#pc_TextEditDpComment,
 stw_opensyde_gui--C_SyvDaItTaView,
@@ -48,12 +20,14 @@ stw_opensyde_gui_elements--C_OgeCbxParam,
 stw_opensyde_gui_elements--C_OgeCbxParam QAbstractItemView,
 stw_opensyde_gui_elements--C_OgeLabStatusInformationSmall,
 stw_opensyde_gui_elements--C_OgeLabToolBarSearchResultSubtitle,
-stw_opensyde_gui_elements--C_OgeLabGroupSubItem {
-font-family:"Segoe UI";
+stw_opensyde_gui_elements--C_OgeLabGroupSubItem
+{
+font-family: "Segoe UI";
 font-size: 11px;
-font-weight:normal;
+font-weight: normal;
 }
 
+/* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_FONT_REGULAR_12 */
 stw_opensyde_gui--C_SdTopologyListWidget,
 stw_opensyde_gui_elements--C_OgePubNavigationHover,
@@ -64,12 +38,14 @@ stw_opensyde_gui_elements--C_OgeTedTable,
 stw_opensyde_gui_elements--C_OgeLabFrameError,
 stw_opensyde_gui_elements--C_OgeTedSdListHeader,
 stw_opensyde_gui_elements--C_OgeTedSyListHeader,
-stw_opensyde_gui_elements--C_OgeLabUpdateAppPath {
-font-family:"Segoe UI";
+stw_opensyde_gui_elements--C_OgeLabUpdateAppPath
+{
+font-family: "Segoe UI";
 font-size: 12px;
-font-weight:normal;
+font-weight: normal;
 }
 
+/* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_FONT_REGULAR_13 */
 stw_opensyde_gui_elements--C_OgePubOptions,
 stw_opensyde_gui--C_SyvDaItTaView QHeaderView,
@@ -98,8 +74,6 @@ stw_opensyde_gui--C_SdNdeDataPoolListDataSetView::item,
 stw_opensyde_gui--C_SdNdeSfoResetMessageTableView,
 stw_opensyde_gui--C_SdNdeSfoResetMessageTableView::item,
 stw_opensyde_gui_elements--C_OgeTableWidgetComIF,
-stw_opensyde_gui--C_SdNdeSfoResetMessageTableView,
-stw_opensyde_gui--C_SdNdeSfoResetMessageTableView::item,
 stw_opensyde_gui_elements--C_OgeTableWidgetComIF QCheckBox,
 stw_opensyde_gui_elements--C_OgeLabNodePropComIfTable,
 stw_opensyde_gui_elements--C_OgeTableWidgetComIF::item,
@@ -118,43 +92,41 @@ stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget,
 stw_opensyde_gui_elements--C_OgeLePropertiesToolTip,
 stw_opensyde_gui_elements--C_OgeChxDefaultSmall,
 stw_opensyde_gui_elements--C_OgeLeProperties,
-stw_opensyde_gui_elements--C_OgeTedToolTipContent {
-font-family:"Segoe UI";
+stw_opensyde_gui_elements--C_OgePubProjAction[CanMonitorButton="true"],
+stw_opensyde_gui_elements--C_OgeTedToolTipContent
+{
+font-family: "Segoe UI";
 font-size: 13px;
-font-weight:normal;
-}
-
-stw_opensyde_gui_elements--C_OgeLabNodePropComIfTable[Enabled_IP_Address_Cell="true"]:enabled {
-text-decoration:underline;
-}
-
-/* STYLE_GUIDE_FONT_BOLD_13 */
-stw_opensyde_gui_elements--C_OgePubToggleBold {
-font-family:"Segoe UI";
-font-size: 13px;
-font-weight:bold;
+font-weight: normal;
 }
 
 /* STYLE_GUIDE_FONT_SEMIBOLD_13 */
 stw_opensyde_gui_elements--C_OgePubProjAction[Border="true"],
 stw_opensyde_gui_elements--C_OgePubConfigure,
-stw_opensyde_gui_elements--C_OgeLeSearch,/*ToolFontType01 */
+stw_opensyde_gui_elements--C_OgeLeSearch,
 stw_opensyde_gui_elements--C_OgeLeToolBarSearch,
-stw_opensyde_gui_elements--C_OgePubUseCaseNavSub,/*NaviFontType03 */
-stw_opensyde_gui_elements--C_OgePubToolBar,/*ToolFontType01 */
-stw_opensyde_gui_elements--C_OgeTreeViewNaviBar, /*NaviFontType03 */
+stw_opensyde_gui_elements--C_OgePubToolBar,
 stw_opensyde_gui--C_SdNdeSfoResetMessageTableView QHeaderView,
 stw_opensyde_gui--C_SdNdeSfoResetMessageTableView QHeaderView::section,
 stw_opensyde_gui_elements--C_OgeTableWidgetComIF QHeaderView,
 stw_opensyde_gui_elements--C_OgeTableWidgetComIF QHeaderView::section,
 stw_opensyde_gui_elements--C_OgePubTreeWidgetRoot,
-stw_opensyde_gui--C_SdBueNodeSelectorWidget QLabel#pc_BueNodeSelectorTitleLabel {
-font-family:"Segoe UI Semibold";
-font-size:13px;
-font-weight:normal;
+stw_opensyde_gui--C_SdBueNodeSelectorWidget QLabel#pc_BueNodeSelectorTitleLabel
+{
+font-family: "Segoe UI Semibold";
+font-size: 13px;
+font-weight: normal;
 }
 
+/* STYLE_GUIDE_FONT_BOLD_13 */
+stw_opensyde_gui_elements--C_OgePubToggleBold
+{
+font-family: "Segoe UI";
+font-size: 13px;
+font-weight: bold;
+}
 
+/* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_FONT_REGULAR_14 */
 stw_opensyde_gui_elements--C_OgeLeNavigation,
 stw_opensyde_gui_elements--C_OgePubNavigation,
@@ -175,14 +147,12 @@ stw_opensyde_gui_elements--C_OgeCbxTable QAbstractItemView,
 stw_opensyde_gui_elements--C_OgeLabDashboardChart,
 stw_opensyde_gui_elements--C_OgeLabToolBarSearchResultTitle,
 stw_opensyde_gui_elements--C_OgeLabStateInfo,
-stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="14"][SemiBold="false"],
-stw_opensyde_gui_elements--C_OgeLabUpdateAppTitle,
-/*stw_opensyde_gui_elements--C_OgeTebMessageDetails*/
+stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="14"][SemiBold="false"][Bold="false"],
 stw_opensyde_gui_elements--C_OgeContextMenu
 {
-font-family:"Segoe UI";
+font-family: "Segoe UI";
 font-size: 14px;
-font-weight:normal;
+font-weight: normal;
 }
 
 /* STYLE_GUIDE_FONT_SEMIBOLD_14 */
@@ -190,7 +160,7 @@ stw_opensyde_gui_elements--C_OgePubOpen,
 stw_opensyde_gui_elements--C_OgePubCancel,
 stw_opensyde_gui_elements--C_OgePubDialog,
 stw_opensyde_gui_elements--C_OgePubTextOnlyUnderline,
-stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="14"][SemiBold="true"],
+stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="14"][SemiBold="true"][Bold="false"],
 QTextEdit#pc_TextEditDpName,
 stw_opensyde_gui--C_SyvDaItPaArView QLabel,
 stw_opensyde_gui--C_SdNdeDataPoolListArrayEditView QLabel,
@@ -200,24 +170,23 @@ stw_opensyde_gui--C_SdNdeDataPoolListDataSetHeaderView::section,
 stw_opensyde_gui--C_SyvDaPeUpdateModeTableHeaderView,
 stw_opensyde_gui--C_SyvDaPeUpdateModeTableHeaderView::section,
 stw_opensyde_gui--C_SdNdeSingleHeaderView,
-stw_opensyde_gui--C_SdNdeSingleHeaderView::section {
-font-family:"Segoe UI Semibold";
-font-size:14px;
-font-weight:normal;
+stw_opensyde_gui--C_SdNdeSingleHeaderView::section
+{
+font-family: "Segoe UI Semibold";
+font-size: 14px;
+font-weight: normal;
 }
 
 /* STYLE_GUIDE_FONT_BOLD_14 */
 stw_opensyde_gui_elements--C_OgeLabToolboxHeadingGroupBold
 {
-font-family:"Segoe UI";
+font-family: "Segoe UI";
 font-size: 14px;
-font-weight:bold;
+font-weight: bold;
 }
 
-
+/* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_FONT_REGULAR_16 */
-stw_opensyde_gui_elements--C_OgeCbxListHeader,
-stw_opensyde_gui_elements--C_OgeCbxListHeader QListView,
 stw_opensyde_gui_elements--C_OgeLabHeadingGroupBold,
 stw_opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled,
 stw_opensyde_gui_elements--C_OgeLabStatusInformation,
@@ -235,99 +204,86 @@ stw_opensyde_gui_elements--C_OgeLabProgressText,
 stw_opensyde_gui_elements--C_OgeTawAlternative QTabBar::tab,
 stw_opensyde_gui_elements--C_OgePubUpdate,
 stw_opensyde_gui_elements--C_OgeLabDescriptionMessage,
-stw_opensyde_gui_elements--C_OgeLabHeadingToolTip {
-font-family:"Segoe UI";
-font-size:16px;
-font-weight:normal;
+stw_opensyde_gui_elements--C_OgeLabHeadingToolTip
+{
+font-family: "Segoe UI";
+font-size: 16px;
+font-weight: normal;
 }
-
 
 /* STYLE_GUIDE_FONT_SEMIBOLD_16 */
 stw_opensyde_gui_elements--C_OgePubTextOnlyEdit,
 stw_opensyde_gui_elements--C_OgePubTextWithBorderEdit,
-/*MainFontType03 */
-stw_opensyde_gui_elements--C_OgePubTextOnly,
-/*NaviFontType02 */
 stw_opensyde_gui_elements--C_OgePubUseCaseNav,
 stw_opensyde_gui_elements--C_OgeLabReadSub,
 stw_opensyde_gui_elements--C_OgePubProjAction
 {
-font-family:"Segoe UI Semibold";
-font-size:16px;
-font-weight:normal;
+font-family: "Segoe UI Semibold";
+font-size: 16px;
+font-weight: normal;
 }
 
+/* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_FONT_REGULAR_18 */
 stw_opensyde_gui_elements--C_OgeLePropertiesName,
 stw_opensyde_gui_elements--C_OgeLeListHeader,
 stw_opensyde_gui_elements--C_OgeLabTreeNodeDataPool,
 stw_opensyde_gui_elements--C_OgeLabListHeaderHeading
 {
-font-family:"Segoe UI";
-font-size:18px;
-font-weight:normal;
+font-family: "Segoe UI";
+font-size: 18px;
+font-weight: normal;
 }
 
 /* STYLE_GUIDE_FONT_SEMIBOLD_18 */
 stw_opensyde_gui_elements--C_OgeLabHeadingWidgetSubTitle,
 stw_opensyde_gui_elements--C_OgeLabHeadingWidgetSubSubTitle,
 stw_opensyde_gui_elements--C_OgeTawSelector QTabBar[C_OgeTawSelector="true"]::tab,
-/*MainFontType02 */
 stw_opensyde_gui_elements--C_OgePubIconText,
-/*MainFontType01 */
 stw_opensyde_gui_elements--C_OgePubUseCase,
 stw_opensyde_gui_elements--C_OgeLabReadMain,
 stw_opensyde_gui_elements--C_OgeLabUpdateNodeTitle,
-stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="18"][SemiBold="true"]
+stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="18"][SemiBold="true"][Bold="false"]
 {
-font-family:"Segoe UI Semibold";
-font-size:18px;
-font-weight:normal;
+font-family: "Segoe UI Semibold";
+font-size: 18px;
+font-weight: normal;
 }
 
 /* STYLE_GUIDE_FONT_BOLD_18 */
 stw_opensyde_gui_elements--C_OgeLabHeadingMessage
 {
-font-family:"Segoe UI";
+font-family: "Segoe UI";
 font-size: 18px;
 font-weight: bold;
 }
 
-
+/* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_FONT_REGULAR_20 */
 stw_opensyde_gui_elements--C_OgeLabUpdateHeading,
-stw_opensyde_gui_elements--C_OgeTawPageNavi QTabBar::tab{
-font-family:"Segoe UI";
+stw_opensyde_gui_elements--C_OgeTawPageNavi QTabBar::tab
+{
+font-family: "Segoe UI";
 font-size: 20px;
-font-weight:normal;
+font-weight: normal;
 }
 
 /* STYLE_GUIDE_FONT_SEMIBOLD_20 */
-stw_opensyde_gui_elements--C_OgeLabHeadingProperties {
-font-family:"Segoe UI Semibold";
-font-size:20px;
-font-weight:normal;
-}
-
-/* STYLE_GUIDE_FONT_BOLD_22 */
-stw_opensyde_gui_elements--C_OgeLabHeadingWidgetTitle,
-stw_opensyde_gui_elements--C_OgeLabHeadingWidget, /*HeadFontType01 */
-stw_opensyde_gui_elements--C_OgeLabHeadingWidgetDark,
-stw_opensyde_gui_elements--C_OgeLabPopUpTitle, /*HeadFontType01 */
-stw_opensyde_gui_elements--C_OgeLabNodeType
+stw_opensyde_gui_elements--C_OgeLabHeadingProperties
 {
-font-family:"Segoe UI";
-font-size: 22px;
-font-weight:bold;
+font-family: "Segoe UI Semibold";
+font-size: 20px;
+font-weight: normal;
 }
 
+/* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_FONT_REGULAR_22 */
-stw_opensyde_gui_elements--C_OgeLabPopUpSubTitle {  /*HeadFontType02: C_OgeLabPopUpSubTitle shall be placed after C_OgeLabPopUpTitle */
-font-family:"Segoe UI";
+stw_opensyde_gui_elements--C_OgeLabPopUpSubTitle
+{
+font-family: "Segoe UI";
 font-size: 22px;
-font-weight:normal;
+font-weight: normal;
 }
-
 
 /* STYLE_GUIDE_FONT_SEMIBOLD_22 */
 stw_opensyde_gui_elements--C_OgeLabParamHeading,
@@ -336,58 +292,76 @@ stw_opensyde_gui_elements--C_OgeLabDashboardTab,
 stw_opensyde_gui_elements--C_OgeLabNodeType,
 stw_opensyde_gui_elements--C_OgeLabCategorySubHeading
 {
-font-family:"Segoe UI Semibold";
+font-family: "Segoe UI Semibold";
 font-size: 22px;
-font-weight:normal;
+font-weight: normal;
 }
 
+/* STYLE_GUIDE_FONT_BOLD_22 */
+stw_opensyde_gui_elements--C_OgeLabHeadingWidgetTitle,
+stw_opensyde_gui_elements--C_OgeLabHeadingWidget,
+stw_opensyde_gui_elements--C_OgeLabHeadingWidgetDark,
+/* the "." in front is for only styling C_OgeLabPopUpTitle, and not its subclasses (here: C_OgeLabPopUpSubTitle)
+(see https://doc.qt.io/qt-5/stylesheet-syntax.html#selector-types) */
+.stw_opensyde_gui_elements--C_OgeLabPopUpTitle,
+stw_opensyde_gui_elements--C_OgeLabNodeType
+{
+font-family: "Segoe UI";
+font-size: 22px;
+font-weight: bold;
+}
+
+/* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_FONT_REGULAR_24 */
 stw_opensyde_gui_elements--C_OgeLeDark,
-stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="24"][SemiBold="false"]
+stw_opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Font="24"][SemiBold="false"][Bold="false"]
 {
-font-family:"Segoe UI";
+font-family: "Segoe UI";
 font-size: 24px;
-font-weight:normal;
+font-weight: normal;
 }
 
+/* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_FONT_REGULAR_30 */
-stw_opensyde_gui_elements--C_OgeLabCategoryHeading {
-font-family:"Segoe UI";
+stw_opensyde_gui_elements--C_OgeLabCategoryHeading
+{
+font-family: "Segoe UI";
 font-size: 30px;
-font-weight:normal;
+font-weight: normal;
 }
 
+/* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_FONT_REGULAR_36 */
-stw_opensyde_gui_elements--C_OgeLabUpdateTime {
-font-family:"Segoe UI";
+stw_opensyde_gui_elements--C_OgeLabUpdateTime
+{
+font-family: "Segoe UI";
 font-size: 36px;
-font-weight:normal;
+font-weight: normal;
 }
 
+/* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_FONT_SEMIBOLD_40 */
-stw_opensyde_gui_elements--C_OgeLabBusType {
-font-family:"Segoe UI Semibold";
+stw_opensyde_gui_elements--C_OgeLabBusType
+{
+font-family: "Segoe UI Semibold";
 font-size: 40px;
-font-weight:normal;
+font-weight: normal;
 }
 
+/* --------------------------------------------------------------------- */
 /* STYLE_GUIDE_FONT_REGULAR */
 stw_opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox,
 stw_opensyde_gui_elements--C_OgeLabDashboardDefault,
 stw_opensyde_gui_elements--C_OgeLabDashboardDefaultNonScaling,
 stw_opensyde_gui_elements--C_OgeLabDashboardProgressBarMaximum,
-stw_opensyde_gui_elements--C_OgeLabDashboardLabelValue {
-font-family:"Segoe UI";
+stw_opensyde_gui_elements--C_OgeLabDashboardLabelValue
+{
+font-family: "Segoe UI";
 }
 
 /* STYLE_GUIDE_FONT_BOLD */
-stw_opensyde_gui_elements--C_OgeLabDashboardLabelCaption {
-font-family:"Segoe UI";
-font-weight:bold;
+stw_opensyde_gui_elements--C_OgeLabDashboardLabelCaption
+{
+font-family: "Segoe UI";
+font-weight: bold;
 }
-
-
-
-
-
-

@@ -19,6 +19,7 @@
 
 /* -- Includes ------------------------------------------------------------- */
 #include <QWidget>
+#include "stwtypes.h"
 #include "C_OgePopUpDialog.h"
 
 /* -- Namespace ------------------------------------------------------------ */
@@ -39,12 +40,14 @@ class C_NagAboutDialog :
    Q_OBJECT
 
 public:
-   explicit C_NagAboutDialog(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent);
+   explicit C_NagAboutDialog(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, const QString oc_ProductName,
+                             const QString oc_LogoUrl, const stw_types::uint32 ou32_Margin);
    ~C_NagAboutDialog(void);
 
    void InitStaticNames(void) const;
    void InitDynamicNames() const;
    void InitLogo() const;
+   void InitLayout() const;
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
@@ -62,6 +65,10 @@ private:
    //Avoid call
    C_NagAboutDialog(const C_NagAboutDialog &);
    C_NagAboutDialog & operator =(const C_NagAboutDialog &);
+
+   QString mc_ProductName;
+   QString mc_LogoUrl;
+   stw_types::uint32 mu32_Margin;
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

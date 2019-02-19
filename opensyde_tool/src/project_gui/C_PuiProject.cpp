@@ -276,6 +276,29 @@ QString C_PuiProject::GetFolderPath(void) const
 
 //-----------------------------------------------------------------------------
 /*!
+   \brief   Get current project name (name of *.syde file)
+
+   \return
+   name of project
+
+   \created     19.02.2019  STW/G.Landsgesell
+*/
+//-----------------------------------------------------------------------------
+QString C_PuiProject::GetName(void) const
+{
+   QString c_Return = "";
+
+   if (this->mc_Path != "")
+   {
+      QFileInfo c_File(this->mc_Path);
+      c_Return = c_File.baseName();
+   }
+
+   return c_Return;
+}
+
+//-----------------------------------------------------------------------------
+/*!
    \brief   Get information about project load switch.
 
    \return

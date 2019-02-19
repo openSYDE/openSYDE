@@ -59,6 +59,7 @@ C_SdNdeDataPoolComListWidget::C_SdNdeDataPoolComListWidget(QWidget * const opc_P
    this->setAttribute(Qt::WA_TranslucentBackground);
 
    this->mpc_Ui->pc_ScrollArea->DeactivateScrollbarResize();
+   this->mpc_Ui->pc_ScrollAreaWidgetContents->SetBackgroundColor(-1);
 }
 
 //-----------------------------------------------------------------------------

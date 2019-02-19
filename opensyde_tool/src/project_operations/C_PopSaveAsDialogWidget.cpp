@@ -275,7 +275,7 @@ void C_PopSaveAsDialogWidget::m_OnBrowse(void)
    QString c_Folder = m_GetValidPath(this->mpc_Ui->pc_LineEditPath->GetCompletePath());
 
    const QString c_Path =
-      QFileDialog::getExistingDirectory(this, C_GtGetText::h_GetText("Choose location to save the project"), c_Folder,
+      QFileDialog::getExistingDirectory(this, C_GtGetText::h_GetText("Select Project Location"), c_Folder,
                                         QFileDialog::ShowDirsOnly);
 
    if (c_Path.compare("") != 0)
@@ -322,7 +322,7 @@ void C_PopSaveAsDialogWidget::m_OnSave(void)
             C_OgeWiCustomMessage c_Box(this, C_OgeWiCustomMessage::E_Type::eERROR);
             c_Box.SetHeading(C_GtGetText::h_GetText("Project save"));
             c_Box.SetDescription(C_GtGetText::h_GetText(
-                                    "A project with this name already exists. Please choose another name."));
+                                    "A project with this name already exists. Choose another name."));
             c_Box.Execute();
          }
       }
@@ -332,7 +332,7 @@ void C_PopSaveAsDialogWidget::m_OnSave(void)
          C_OgeWiCustomMessage c_Box(this, C_OgeWiCustomMessage::E_Type::eERROR);
          c_Box.SetHeading(C_GtGetText::h_GetText("Project save"));
          c_Box.SetDescription(C_GtGetText::h_GetText(
-                                 "Project name invalid. Only alphanumeric characters + \"_\" are allowed."));
+                                 "Project is name invalid. Only alphanumeric characters + \"_\" are allowed."));
          c_Box.Execute();
       }
    }

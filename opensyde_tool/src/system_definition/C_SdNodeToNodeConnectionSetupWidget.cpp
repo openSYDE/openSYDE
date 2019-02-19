@@ -20,13 +20,13 @@
 #include "C_SdNodeToNodeConnectionSetupWidget.h"
 #include "ui_C_SdNodeToNodeConnectionSetupWidget.h"
 #include "constants.h"
+#include "C_Uti.h"
 #include "C_GtGetText.h"
 #include "stwerrors.h"
 #include "C_PuiSdHandler.h"
 #include "TGLUtils.h"
 #include "C_SdUtil.h"
 #include "C_OgeWiUtil.h"
-#include "C_PuiSdUtil.h"
 #include "C_OgeWiCustomMessage.h"
 
 /* -- Used Namespaces ------------------------------------------------------ */
@@ -524,9 +524,9 @@ void C_SdNodeToNodeConnectionSetupWidget::m_InitFromData(void)
          this->mpc_Ui->pc_RadioButtonSelectExisting->setEnabled(true);
       }
       //Init name
-      this->mpc_Ui->pc_LineEditBusName->setText(C_PuiSdUtil::h_GetUniqueName(C_PuiSdHandler::h_GetInstance()->
-                                                                             GetExistingBusNames(),
-                                                                             c_OSCBus.c_Name).c_str());
+      this->mpc_Ui->pc_LineEditBusName->setText(C_Uti::h_GetUniqueName(C_PuiSdHandler::h_GetInstance()->
+                                                                       GetExistingBusNames(),
+                                                                       c_OSCBus.c_Name).c_str());
    }
 }
 
@@ -857,7 +857,7 @@ bool C_SdNodeToNodeConnectionSetupWidget::m_CheckDatapoolNumberNode1(void) const
 {
    bool q_Return = false;
    uint32 u32_Counter;
-   const C_OSCNode * const pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOSCNode(mu32_Node1Index);
+   const C_OSCNode * const pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(mu32_Node1Index);
 
    if (pc_OscNode != NULL)
    {
@@ -957,7 +957,7 @@ bool C_SdNodeToNodeConnectionSetupWidget::m_CheckDatapoolNumberNode2(void) const
 {
    bool q_Return = false;
    uint32 u32_Counter;
-   const C_OSCNode * const pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOSCNode(mu32_Node2Index);
+   const C_OSCNode * const pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(mu32_Node2Index);
 
    if (pc_OscNode != NULL)
    {

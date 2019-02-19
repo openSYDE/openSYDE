@@ -48,6 +48,7 @@ public:
 
    QString GetSerialNumberString(void) const;
    QString GetDeviceName(void) const;
+   bool GetDeviceNameValid(void) const;
    bool CompareSerialNumber(const QString & orc_SerialNumber) const;
 
 protected:

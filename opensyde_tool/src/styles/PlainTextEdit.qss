@@ -1,3 +1,4 @@
-QPlainTextEdit {
+QPlainTextEdit
+{
 border-style:none;
 }

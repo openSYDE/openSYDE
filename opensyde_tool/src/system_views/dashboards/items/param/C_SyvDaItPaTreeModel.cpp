@@ -79,6 +79,22 @@ C_SyvDaItPaTreeModel::C_SyvDaItPaTreeModel(QObject * const opc_Parent) :
 
 //-----------------------------------------------------------------------------
 /*!
+   \brief   Default destructor
+
+   Clean up.
+
+   \created     06.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+C_SyvDaItPaTreeModel::~C_SyvDaItPaTreeModel(void)
+{
+   //Clean up if necessary
+   delete (this->mpc_InvisibleRootItem);
+   //lint -e{1540} Never took ownership of mpc_DataWidget
+}
+
+//-----------------------------------------------------------------------------
+/*!
    \brief   Check if model is empty
 
    \return
@@ -449,13 +465,80 @@ void C_SyvDaItPaTreeModel::PrepareChangedValues(const std::vector<C_OSCNodeDataP
                               rc_Config.c_ElementId.u32_ElementIndex);
                         if (pc_OSCElement != NULL)
                         {
-                           C_PuiSdHandler::h_GetInstance()->SetDataPoolListElementNVMValue(
-                              rc_Config.c_ElementId.u32_NodeIndex,
-                              rc_Config.c_ElementId.u32_DataPoolIndex,
-                              rc_Config.c_ElementId.u32_ListIndex,
-                              rc_Config.c_ElementId.u32_ElementIndex,
-                              *pc_SetVal);
+                           tgl_assert(C_PuiSdHandler::h_GetInstance()->SetDataPoolListElementNVMValue(
+                                         rc_Config.c_ElementId.u32_NodeIndex,
+                                         rc_Config.c_ElementId.u32_DataPoolIndex,
+                                         rc_Config.c_ElementId.u32_ListIndex,
+                                         rc_Config.c_ElementId.u32_ElementIndex,
+                                         *pc_SetVal) == C_NO_ERR);
                         }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Resets the NVM changed flag for all relevant elements
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+
+   \created     31.01.2019  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_SyvDaItPaTreeModel::RemoveValuesChangedFlag(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
+const
+{
+   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
+
+   if ((pc_ParamWidget != NULL) && (orc_ListIds.size() > 0UL))
+   {
+      const C_PuiSvDbParam * const pc_Param = pc_ParamWidget->GetParamItem();
+      if (((pc_Param != NULL) && (pc_Param->c_DataPoolElementsConfig.size() == this->mc_ECUValuesReadStatus.size())) &&
+          (this->mc_ECUValuesReadStatus.size() == this->mc_ECUValues.size()))
+      {
+         for (uint32 u32_ItConfig = 0UL; u32_ItConfig < pc_Param->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
+         {
+            const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Param->c_DataPoolElementsConfig[u32_ItConfig];
+            if (rc_Config.c_ElementId.GetIsValid() == true)
+            {
+               bool q_Found = false;
+               for (uint32 u32_ItList = 0UL; (u32_ItList < orc_ListIds.size()) && (q_Found == false); ++u32_ItList)
+               {
+                  const C_OSCNodeDataPoolListElementId & rc_InputElementId = orc_ListIds[u32_ItList];
+
+                  if (((rc_InputElementId.u32_NodeIndex == rc_Config.c_ElementId.u32_NodeIndex) &&
+                       (rc_InputElementId.u32_DataPoolIndex == rc_Config.c_ElementId.u32_DataPoolIndex)) &&
+                      (rc_InputElementId.u32_ListIndex == rc_Config.c_ElementId.u32_ListIndex))
+                  {
+                     q_Found = true;
+                  }
+               }
+               if (q_Found == true)
+               {
+                  if (this->mc_ECUValuesReadStatus[u32_ItConfig] == true)
+                  {
+                     const C_OSCNodeDataPoolListElement * const pc_OSCElement =
+                        C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
+                           rc_Config.c_ElementId.u32_NodeIndex,
+                           rc_Config.c_ElementId.u32_DataPoolIndex,
+                           rc_Config.c_ElementId.u32_ListIndex,
+                           rc_Config.c_ElementId.u32_ElementIndex);
+                     if (pc_OSCElement != NULL)
+                     {
+                        tgl_assert(C_PuiSdHandler::h_GetInstance()->SetDataPoolListElementNVMValueChanged(
+                                      rc_Config.c_ElementId.u32_NodeIndex,
+                                      rc_Config.c_ElementId.u32_DataPoolIndex,
+                                      rc_Config.c_ElementId.u32_ListIndex,
+                                      rc_Config.c_ElementId.u32_ElementIndex,
+                                      false) == C_NO_ERR);
                      }
                   }
                }
@@ -479,63 +562,67 @@ QModelIndexList C_SyvDaItPaTreeModel::GetAllAvailableIndixesForOneColumn(void) c
 {
    QModelIndexList c_Retval;
 
-   for (std::vector<C_TblTreItem *>::const_iterator c_ItAll = this->mc_InvisibleRootItem.c_Children.begin();
-        c_ItAll != this->mc_InvisibleRootItem.c_Children.end(); ++c_ItAll)
+   if (this->mpc_InvisibleRootItem != NULL)
    {
-      //Top level
-      const C_TblTreItem * const pc_AllNode = *c_ItAll;
-      if (pc_AllNode != NULL)
+      for (std::vector<C_TblTreItem *>::const_iterator c_ItAll = this->mpc_InvisibleRootItem->c_Children.begin();
+           c_ItAll != this->mpc_InvisibleRootItem->c_Children.end(); ++c_ItAll)
       {
-         uint32 u32_ItNode = 0UL;
-         QModelIndex c_AllBase = this->index(0, 0);
-         for (std::vector<C_TblTreItem *>::const_iterator c_ItNode = pc_AllNode->c_Children.begin();
-              c_ItNode != pc_AllNode->c_Children.end(); ++c_ItNode)
+         //Top level
+         const C_TblTreItem * const pc_AllNode = *c_ItAll;
+         if (pc_AllNode != NULL)
          {
-            //Node level
-            const C_TblTreItem * const pc_Node = *c_ItNode;
-            if (pc_Node != NULL)
+            uint32 u32_ItNode = 0UL;
+            QModelIndex c_AllBase = this->index(0, 0);
+            for (std::vector<C_TblTreItem *>::const_iterator c_ItNode = pc_AllNode->c_Children.begin();
+                 c_ItNode != pc_AllNode->c_Children.end(); ++c_ItNode)
             {
-               uint32 u32_ItDp = 0UL;
-               QModelIndex c_Node = this->index(static_cast<sintn>(u32_ItNode), 0, c_AllBase);
-               for (std::vector<C_TblTreItem *>::const_iterator c_ItDp = pc_Node->c_Children.begin();
-                    c_ItDp != pc_Node->c_Children.end(); ++c_ItDp)
+               //Node level
+               const C_TblTreItem * const pc_Node = *c_ItNode;
+               if (pc_Node != NULL)
                {
-                  //Data pool level
-                  const C_TblTreItem * const pc_Dp = *c_ItDp;
-                  if (pc_Dp != NULL)
+                  uint32 u32_ItDp = 0UL;
+                  QModelIndex c_Node = this->index(static_cast<sintn>(u32_ItNode), 0, c_AllBase);
+                  for (std::vector<C_TblTreItem *>::const_iterator c_ItDp = pc_Node->c_Children.begin();
+                       c_ItDp != pc_Node->c_Children.end(); ++c_ItDp)
                   {
-                     uint32 u32_ItLi = 0UL;
-                     QModelIndex c_Dp = this->index(static_cast<sintn>(u32_ItDp), 0, c_Node);
-                     for (std::vector<C_TblTreItem *>::const_iterator c_ItLi = pc_Dp->c_Children.begin();
-                          c_ItLi != pc_Dp->c_Children.end(); ++c_ItLi)
+                     //Data pool level
+                     const C_TblTreItem * const pc_Dp = *c_ItDp;
+                     if (pc_Dp != NULL)
                      {
-                        //List level
-                        const C_TblTreItem * const pc_Li = *c_ItLi;
-                        if (pc_Li != NULL)
+                        uint32 u32_ItLi = 0UL;
+                        QModelIndex c_Dp = this->index(static_cast<sintn>(u32_ItDp), 0, c_Node);
+                        for (std::vector<C_TblTreItem *>::const_iterator c_ItLi = pc_Dp->c_Children.begin();
+                             c_ItLi != pc_Dp->c_Children.end(); ++c_ItLi)
                         {
-                           QModelIndex c_Li = this->index(static_cast<sintn>(u32_ItLi), 0, c_Dp);
-                           for (uint32 u32_ItEl = 0L; u32_ItEl < pc_Li->c_Children.size(); ++u32_ItEl)
+                           //List level
+                           const C_TblTreItem * const pc_Li = *c_ItLi;
+                           if (pc_Li != NULL)
                            {
-                              //Element level
-                              QModelIndex c_El = this->index(static_cast<sintn>(u32_ItEl), 0, c_Li);
-                              c_Retval.push_back(c_El);
+                              QModelIndex c_Li = this->index(static_cast<sintn>(u32_ItLi), 0, c_Dp);
+                              for (uint32 u32_ItEl = 0L; u32_ItEl < pc_Li->c_Children.size(); ++u32_ItEl)
+                              {
+                                 //Element level
+                                 QModelIndex c_El = this->index(static_cast<sintn>(u32_ItEl), 0, c_Li);
+                                 c_Retval.push_back(c_El);
+                              }
+                              c_Retval.push_back(c_Li);
                            }
-                           c_Retval.push_back(c_Li);
+                           ++u32_ItLi;
                         }
-                        ++u32_ItLi;
+                        c_Retval.push_back(c_Dp);
                      }
-                     c_Retval.push_back(c_Dp);
+                     ++u32_ItDp;
                   }
-                  ++u32_ItDp;
+                  c_Retval.push_back(c_Node);
                }
-               c_Retval.push_back(c_Node);
+               ++u32_ItNode;
             }
-            ++u32_ItNode;
+            c_Retval.push_back(c_AllBase);
          }
-         c_Retval.push_back(c_AllBase);
       }
    }
    return c_Retval;
+   //lint -e{1763} Its a const iterator!
 }
 
 //-----------------------------------------------------------------------------
@@ -556,11 +643,11 @@ QModelIndex C_SyvDaItPaTreeModel::GetIndexForItem(const C_OSCNodeDataPoolListEle
 {
    QModelIndex c_Retval;
 
-   if (oru32_ValidLayers <= 4UL)
+   if ((oru32_ValidLayers <= 4UL) && (this->mpc_InvisibleRootItem != NULL))
    {
       uint32 u32_ItAll = 0UL;
-      for (std::vector<C_TblTreItem *>::const_iterator c_ItAll = this->mc_InvisibleRootItem.c_Children.begin();
-           c_ItAll != this->mc_InvisibleRootItem.c_Children.end(); ++c_ItAll)
+      for (std::vector<C_TblTreItem *>::const_iterator c_ItAll = this->mpc_InvisibleRootItem->c_Children.begin();
+           c_ItAll != this->mpc_InvisibleRootItem->c_Children.end(); ++c_ItAll)
       {
          //Top level
          const C_TblTreItem * const pc_AllNode = *c_ItAll;
@@ -650,6 +737,7 @@ QModelIndex C_SyvDaItPaTreeModel::GetIndexForItem(const C_OSCNodeDataPoolListEle
       }
    }
    return c_Retval;
+   //lint -e{1763} Its a const iterator!
 }
 
 //-----------------------------------------------------------------------------
@@ -1059,12 +1147,8 @@ void C_SyvDaItPaTreeModel::Init(C_PuiSvDbDataElementHandler * const opc_DataWidg
 
    this->beginResetModel();
    //Clear
-   for (std::vector<C_TblTreItem *>::const_iterator c_It = this->mc_InvisibleRootItem.c_Children.begin();
-        c_It != this->mc_InvisibleRootItem.c_Children.end(); ++c_It)
-   {
-      delete (*c_It);
-   }
-   this->mc_InvisibleRootItem.c_Children.clear();
+   delete (this->mpc_InvisibleRootItem);
+   this->mpc_InvisibleRootItem = new C_TblTreItem();
    this->mpc_DataWidget = opc_DataWidget;
    this->mc_ECUValuesString.clear();
    this->mc_ECUCRCValidStatus.clear();
@@ -1079,7 +1163,7 @@ void C_SyvDaItPaTreeModel::Init(C_PuiSvDbDataElementHandler * const opc_DataWidg
          //Create root node
          C_TblTreItem * const pc_AllNode = new C_TblTreItem();
          mh_InitAllNode(pc_AllNode, pc_ParamWidget->GetViewIndex());
-         this->mc_InvisibleRootItem.AddChild(pc_AllNode);
+         this->mpc_InvisibleRootItem->AddChild(pc_AllNode);
          //init
          this->mc_ECUValues = pc_Param->c_ListValues;
          this->mc_ECUValuesString.reserve(pc_Param->c_ListValues.size());
@@ -1304,18 +1388,18 @@ QVariant C_SyvDaItPaTreeModel::headerData(const sintn osn_Section, const Qt::Ori
             c_Retval = C_GtGetText::h_GetText("Set value (= desired value). Bold styled if != device value."
                                               "\n\nEdit Modes:"
                                               "\n - Custom values (default): values can be edited manually by user"
-                                              "\n - Dataset values (if available): Dataset values defined in System Definition are used. Cannot be adapted by user."
+                                              "\n - Dataset values (if available): Dataset values defined in SYSTEM DEFINITION are used. Cannot be adapted by user."
                                               "\n\nExecute \"Write\" command to write set values to device in parametrization step");
             break;
          case eUNIT:
             c_Retval = "";
             break;
          case eACTION_READ:
-            c_Retval = C_GtGetText::h_GetText("Triggers the read of actual device values from system NVM.");
+            c_Retval = C_GtGetText::h_GetText("Triggers the read of actual device values from System NVM.");
             break;
          case eACTION_WRITE:
             c_Retval = C_GtGetText::h_GetText(
-               "Triggers a parametrization dialog where set values (desired values) are written to system NVM");
+               "Triggers a parametrization dialog where set values (desired values) are written to System NVM");
             break;
          case eACTION_APPLY:
             c_Retval = C_GtGetText::h_GetText("Copies values from \"device values\" column to \"set values\" column");
@@ -1466,11 +1550,11 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                                  {
                                     if (this->mc_ECUCRCValidStatus[u32_ItFinalIndex] == true)
                                     {
-                                       c_Retval = C_GtGetText::h_GetText("CRC: valid");
+                                       c_Retval = C_GtGetText::h_GetText("CRC: Valid");
                                     }
                                     else
                                     {
-                                       c_Retval = C_GtGetText::h_GetText("CRC: invalid");
+                                       c_Retval = C_GtGetText::h_GetText("CRC: Invalid");
                                     }
                                  }
                               }
@@ -1485,7 +1569,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                   }
                   else
                   {
-                     c_Retval = C_GtGetText::h_GetText("CRC: unused");
+                     c_Retval = C_GtGetText::h_GetText("CRC: Unused");
                   }
                }
                break;
@@ -1646,10 +1730,10 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                                  else
                                  {
                                     //Return value for edit
-                                    c_Retval = C_SdNdeDataPoolUtil::h_ScaledDataVariable(*pc_Content,
-                                                                                         pc_OSCElement->f64_Factor,
-                                                                                         pc_OSCElement->f64_Offset,
-                                                                                         0);
+                                    c_Retval = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(*pc_Content,
+                                                                                                           pc_OSCElement->f64_Factor,
+                                                                                                           pc_OSCElement->f64_Offset,
+                                                                                                           0);
                                  }
                               }
                               else
@@ -2107,9 +2191,10 @@ bool C_SyvDaItPaTreeModel::setData(const QModelIndex & orc_Index, const QVariant
                                  rc_Config.c_ElementId.u32_ListIndex, rc_Config.c_ElementId.u32_ElementIndex);
                            if (pc_Element != NULL)
                            {
-                              C_SdNdeDataPoolUtil::h_SetUnscaledDataVariable(orc_Value, rc_Content,
-                                                                             pc_Element->f64_Factor,
-                                                                             pc_Element->f64_Offset, 0);
+                              C_SdNdeDataPoolContentUtil::h_SetDataVariableFromGenericWithScaling(orc_Value, rc_Content,
+                                                                                                  pc_Element->f64_Factor,
+                                                                                                  pc_Element->f64_Offset,
+                                                                                                  0);
                            }
                         }
                         else
@@ -3389,48 +3474,51 @@ bool C_SyvDaItPaTreeModel::m_GetListIndex(const C_OSCNodeDataPoolListElementId &
 
    oru32_Index = 0UL;
 
-   //Node
-   for (std::vector<C_TblTreItem *>::const_iterator c_ItAll = this->mc_InvisibleRootItem.c_Children.begin();
-        (c_ItAll != this->mc_InvisibleRootItem.c_Children.end()) && (q_Found == false);
-        ++c_ItAll)
+   if (this->mpc_InvisibleRootItem != NULL)
    {
-      const C_TblTreItem * const pc_AllNode = *c_ItAll;
-      if (pc_AllNode != NULL)
+      //Node
+      for (std::vector<C_TblTreItem *>::const_iterator c_ItAll = this->mpc_InvisibleRootItem->c_Children.begin();
+           (c_ItAll != this->mpc_InvisibleRootItem->c_Children.end()) && (q_Found == false);
+           ++c_ItAll)
       {
-         //Node
-         for (std::vector<C_TblTreItem *>::const_iterator c_ItNode = pc_AllNode->c_Children.begin();
-              (c_ItNode != pc_AllNode->c_Children.end()) && (q_Found == false); ++c_ItNode)
+         const C_TblTreItem * const pc_AllNode = *c_ItAll;
+         if (pc_AllNode != NULL)
          {
-            const C_TblTreItem * const pc_Node = *c_ItNode;
-            if (pc_Node != NULL)
+            //Node
+            for (std::vector<C_TblTreItem *>::const_iterator c_ItNode = pc_AllNode->c_Children.begin();
+                 (c_ItNode != pc_AllNode->c_Children.end()) && (q_Found == false); ++c_ItNode)
             {
-               //Datapool
-               for (std::vector<C_TblTreItem *>::const_iterator c_ItDp = pc_Node->c_Children.begin();
-                    (c_ItDp != pc_Node->c_Children.end()) && (q_Found == false); ++c_ItDp)
+               const C_TblTreItem * const pc_Node = *c_ItNode;
+               if (pc_Node != NULL)
                {
-                  const C_TblTreItem * const pc_Dp = *c_ItDp;
-                  if (pc_Dp != NULL)
+                  //Datapool
+                  for (std::vector<C_TblTreItem *>::const_iterator c_ItDp = pc_Node->c_Children.begin();
+                       (c_ItDp != pc_Node->c_Children.end()) && (q_Found == false); ++c_ItDp)
                   {
-                     //List
-                     for (std::vector<C_TblTreItem *>::const_iterator c_ItList = pc_Dp->c_Children.begin();
-                          (c_ItList != pc_Dp->c_Children.end()) && (q_Found == false);
-                          ++c_ItList)
+                     const C_TblTreItem * const pc_Dp = *c_ItDp;
+                     if (pc_Dp != NULL)
                      {
-                        const C_TblTreItem * const pc_List = *c_ItList;
-                        if (pc_List != NULL)
+                        //List
+                        for (std::vector<C_TblTreItem *>::const_iterator c_ItList = pc_Dp->c_Children.begin();
+                             (c_ItList != pc_Dp->c_Children.end()) && (q_Found == false);
+                             ++c_ItList)
                         {
-                           //Check match
-                           if (((pc_Node->u32_Index == orc_Id.u32_NodeIndex) &&
-                                (pc_Dp->u32_Index == orc_Id.u32_DataPoolIndex)) &&
-                               (pc_List->u32_Index == orc_Id.u32_ListIndex))
+                           const C_TblTreItem * const pc_List = *c_ItList;
+                           if (pc_List != NULL)
                            {
-                              //Stop
-                              q_Found = true;
-                           }
-                           else
-                           {
-                              //Try next one
-                              ++oru32_Index;
+                              //Check match
+                              if (((pc_Node->u32_Index == orc_Id.u32_NodeIndex) &&
+                                   (pc_Dp->u32_Index == orc_Id.u32_DataPoolIndex)) &&
+                                  (pc_List->u32_Index == orc_Id.u32_ListIndex))
+                              {
+                                 //Stop
+                                 q_Found = true;
+                              }
+                              else
+                              {
+                                 //Try next one
+                                 ++oru32_Index;
+                              }
                            }
                         }
                      }
@@ -3441,4 +3529,5 @@ bool C_SyvDaItPaTreeModel::m_GetListIndex(const C_OSCNodeDataPoolListElementId &
       }
    }
    return q_Found;
+   //lint -e{1763} Its a const iterator!
 }

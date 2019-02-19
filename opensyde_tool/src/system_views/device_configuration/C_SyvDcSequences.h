@@ -30,6 +30,7 @@
 #include "C_OSCNodeComInterfaceSettings.h"
 #include "CCAN.h"
 #include "C_OSCIpDispatcherWinSock.h"
+#include "TGLTasks.h"
 
 /* -- Namespace ------------------------------------------------------------ */
 namespace stw_opensyde_gui_logic
@@ -100,7 +101,8 @@ public:
    const;
 
    stw_types::sint32 ScanCanEnterFlashloader(const stw_types::uint32 ou32_UsedBitrate);
-
+   stw_types::sint32 ScanCanSendFlashloaderRequest(const stw_types::uint32 ou32_ScanTime, const bool oq_ScanEndless);
+   void StopScanCanSendFlashloaderRequest(void);
    stw_types::sint32 ScanCanGetInfoFromStwFlashloaderDevices(void);
    stw_types::sint32 ScanCanGetInfoFromOpenSydeDevices(void);
    stw_types::sint32 ScanEthGetInfoFromOpenSydeDevices(void);
@@ -112,12 +114,14 @@ public:
    stw_types::sint32 ConfEthOpenSydeDevices(const std::vector<C_SyvDcDeviceConfiguation> & orc_DeviceConfig,
                                             const bool oq_ConfigureAllInterfaces);
 
+   stw_types::sint32 SendOsyBroadcastRequestProgramming(bool & orq_NotAccepted) const;
    stw_types::sint32 ResetCanStwFlashloaderDevices(void);
-   stw_types::sint32 ResetCanOpenSydeDevices(void) const;
-   stw_types::sint32 ResetEthOpenSydeDevices(void) const;
+   stw_types::sint32 ResetCanOpenSydeDevices(const bool oq_ToFlashloader) const;
+   stw_types::sint32 ResetEthOpenSydeDevices(const bool oq_ToFlashloader) const;
 
-   stw_types::sint32 ReadBackCan(const stw_types::uint32 ou32_UsedBitrate,
-                                 const std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> & orc_OpenSydeIds,
+   stw_types::sint32 InitCanAndSetCanBitrate(const stw_types::uint32 ou32_Bitrate);
+
+   stw_types::sint32 ReadBackCan(const std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> & orc_OpenSydeIds,
                                  const std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> & orc_StwIds);
    stw_types::sint32 ReadBackEth(const std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> & orc_OpenSydeIds);
 
@@ -173,6 +177,7 @@ private:
    enum E_Sequence
    {
       eSCANCANENTERFLASHLOADER,
+      eSCANCANSENDFLASHLOADERREQUEST,
       eSCANCANGETINFOFROMSTWFLASHLOADERDEVICES,
       eSCANCANGETINFOFROMOPENSYDEDEVICES,
       eSCANETHGETINFOFROMOPENSYDEDEVICES,
@@ -184,6 +189,7 @@ private:
    };
 
    stw_types::sint32 m_RunScanCanEnterFlashloader(const stw_types::uint32 ou32_CanBitrate);
+   stw_types::sint32 m_RunScanCanSendFlashloaderRequest(const stw_types::uint32 ou32_ScanTime);
    stw_types::sint32 m_RunScanCanGetInfoFromStwFlashloaderDevices(void);
    stw_types::sint32 m_RunScanCanGetInfoFromStwFlashloaderDevice(const stw_types::uint8 ou8_LocalId);
    stw_types::sint32 m_RunScanCanGetInfoFromOpenSydeDevices(void);
@@ -210,6 +216,7 @@ private:
    stw_types::sint32 m_ReadBack(void);
 
    C_SyvComDriverThread * mpc_Thread;
+   stw_tgl::C_TGLCriticalSection mc_CriticalSection;
    stw_can::C_CAN * mpc_CanDllDispatcher;
    stw_opensyde_core::C_OSCIpDispatcherWinSock * mpc_EthernetDispatcher;
    // Sequence execution parameter
@@ -221,12 +228,17 @@ private:
    stw_types::uint32 mu32_CanBitrate;
    bool mq_ConfigureAllInterfaces; ///< flag if the bitrate for all connected interfaces sould be configured or
    // only interfaces connected to the current bus
+
+   // Scan flashloader request variables
+   stw_types::uint32 mu32_ScanTime;
+   bool mq_RunScanSendFlashloaderRequestEndless;
+
    // Result information of several sequences
    std::vector<C_SyvDcDeviceInformation> mc_DeviceInfoResult;
    // Service execution result
    stw_types::sint32 ms32_Result;
 
-   static const stw_types::uint32 mhu32_SCAN_TIME_MS = 5000U;
+   static const stw_types::uint32 mhu32_DEFAULT_SCAN_TIME_MS = 5000U;
    static const stw_types::uint32 mhu32_RESET_WAIT_TIME_MS = 5000U;
 };
 

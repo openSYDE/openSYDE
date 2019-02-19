@@ -64,7 +64,6 @@ private:
    void m_DataChanged(void);
    void m_ErrorChanged(const stw_types::uint32 ou32_Index);
    void m_EnableConfiguration(const bool oq_State);
-   void m_SetConfigError(const bool oq_Active);
 
    Ui::C_SyvHandlerWidget * mpc_Ui;
 

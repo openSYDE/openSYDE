@@ -120,6 +120,7 @@ C_GiSvDaRectBaseGroup::C_GiSvDaRectBaseGroup(const uint32 & oru32_ViewIndex, con
    me_WriteMode(C_PuiSvDbWidgetBase::eWM_MANUAL),
    mq_DarkMode(false),
    mf64_WriteValue(0.0),
+   mq_InitialStyleCall(true),
    ms32_IconSize(24),
    mc_CurrentSize(of64_InitWidth, of64_InitHeight),
    mq_ProxyWidgetInteractionActive(false),
@@ -194,60 +195,67 @@ bool C_GiSvDaRectBaseGroup::IsMousePosRelevantForProxyWidgetInteraction(const QP
 void C_GiSvDaRectBaseGroup::SetDisplayStyle(const stw_opensyde_gui_logic::C_PuiSvDbWidgetBase::E_Style oe_Style,
                                             const bool oq_DarkMode)
 {
-   this->me_Style = oe_Style;
-   this->mq_DarkMode = oq_DarkMode;
-
-   if (this->mpc_Widget != NULL)
+   if (((this->mq_InitialStyleCall == true) || (this->me_Style != oe_Style)) || (this->mq_DarkMode != oq_DarkMode))
    {
-      switch (oe_Style)
+      this->mq_InitialStyleCall = false;
+      this->me_Style = oe_Style;
+      this->mq_DarkMode = oq_DarkMode;
+
+      if (this->mpc_Widget != NULL)
       {
-      case C_PuiSvDbWidgetBase::eOPENSYDE:
-         if (oq_DarkMode == true)
+         switch (oe_Style)
          {
-            C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this->mpc_Widget, "Style", "OPENSYDE_DARK");
+         case C_PuiSvDbWidgetBase::eOPENSYDE:
+            if (oq_DarkMode == true)
+            {
+               C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this->mpc_Widget, "Style", "OPENSYDE_DARK");
+            }
+            else
+            {
+               C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this->mpc_Widget, "Style",
+                                                                            "OPENSYDE_BRIGHT");
+            }
+            break;
+         case C_PuiSvDbWidgetBase::eOPENSYDE_2:
+            if (oq_DarkMode == true)
+            {
+               C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this->mpc_Widget, "Style",
+                                                                            "OPENSYDE_2_DARK");
+            }
+            else
+            {
+               C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this->mpc_Widget, "Style",
+                                                                            "OPENSYDE_2_BRIGHT");
+            }
+            break;
+         case C_PuiSvDbWidgetBase::eFLAT:
+            if (oq_DarkMode == true)
+            {
+               C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this->mpc_Widget, "Style", "FLAT_DARK");
+            }
+            else
+            {
+               C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this->mpc_Widget, "Style", "FLAT_BRIGHT");
+            }
+            break;
+         case C_PuiSvDbWidgetBase::eSKEUOMORPH:
+            if (oq_DarkMode == true)
+            {
+               C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this->mpc_Widget, "Style",
+                                                                            "SKEUOMORPH_DARK");
+            }
+            else
+            {
+               C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this->mpc_Widget, "Style",
+                                                                            "SKEUOMORPH_BRIGHT");
+            }
+            break;
+         default:
+            //Use default Qt style
+            break;
          }
-         else
-         {
-            C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this->mpc_Widget, "Style", "OPENSYDE_BRIGHT");
-         }
-         break;
-      case C_PuiSvDbWidgetBase::eOPENSYDE_2:
-         if (oq_DarkMode == true)
-         {
-            C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this->mpc_Widget, "Style", "OPENSYDE_2_DARK");
-         }
-         else
-         {
-            C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this->mpc_Widget, "Style",
-                                                                         "OPENSYDE_2_BRIGHT");
-         }
-         break;
-      case C_PuiSvDbWidgetBase::eFLAT:
-         if (oq_DarkMode == true)
-         {
-            C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this->mpc_Widget, "Style", "FLAT_DARK");
-         }
-         else
-         {
-            C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this->mpc_Widget, "Style", "FLAT_BRIGHT");
-         }
-         break;
-      case C_PuiSvDbWidgetBase::eSKEUOMORPH:
-         if (oq_DarkMode == true)
-         {
-            C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this->mpc_Widget, "Style", "SKEUOMORPH_DARK");
-         }
-         else
-         {
-            C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this->mpc_Widget, "Style",
-                                                                         "SKEUOMORPH_BRIGHT");
-         }
-         break;
-      default:
-         //Use default Qt style
-         break;
+         this->ReInitializeSize();
       }
-      this->ReInitializeSize();
    }
 }
 
@@ -698,7 +706,7 @@ void C_GiSvDaRectBaseGroup::HandleManualOperationFinished(const sint32 os32_Resu
          case C_RANGE:
          case C_RD_WR:
          case C_OVERFLOW:
-            c_Description = C_GtGetText::h_GetText("Operation failed with internal error.");
+            c_Description = C_GtGetText::h_GetText("Operation failed with an internal error.");
             //Update log file
             C_OSCLoggingHandler::h_Flush();
             c_Details = QString("%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
@@ -719,24 +727,24 @@ void C_GiSvDaRectBaseGroup::HandleManualOperationFinished(const sint32 os32_Resu
                switch (ou8_NRC)
                {
                case 0x13:
-                  c_Details = C_GtGetText::h_GetText("Incorrect length of request");
+                  c_Details = C_GtGetText::h_GetText("Incorrect length of request.");
                   break;
                case 0x31:
-                  c_Details = C_GtGetText::h_GetText("Datapool element specified by data identifier is not available");
+                  c_Details = C_GtGetText::h_GetText("Datapool element specified by data identifier is not available.");
                   break;
                case 0x22:
-                  c_Details = C_GtGetText::h_GetText("Access to Datapool element blocked by application");
+                  c_Details = C_GtGetText::h_GetText("Access to Datapool element blocked by application.");
                   break;
                case 0x33:
-                  c_Details = C_GtGetText::h_GetText("Required security level was not unlocked");
+                  c_Details = C_GtGetText::h_GetText("Required security level was not unlocked.");
                   break;
                case 0x14:
                   c_Details = C_GtGetText::h_GetText(
-                     "The total length of the response message exceeds the available buffer size");
+                     "The total length of the response message exceeds the available buffer size.");
                   break;
                case 0x7F:
                   c_Details = C_GtGetText::h_GetText(
-                     "The requested service is not available in the session currently active");
+                     "The requested service is not available in the currently active session.");
                   break;
                default:
                   c_Details =
@@ -754,21 +762,21 @@ void C_GiSvDaRectBaseGroup::HandleManualOperationFinished(const sint32 os32_Resu
                                                      "match size of Datapool element.");
                   break;
                case 0x31:
-                  c_Details = C_GtGetText::h_GetText("Datapool element specified by data identifier is not available");
+                  c_Details = C_GtGetText::h_GetText("Datapool element specified by data identifier is not available.");
                   break;
                case 0x22:
-                  c_Details = C_GtGetText::h_GetText("Access to Datapool element blocked by application");
+                  c_Details = C_GtGetText::h_GetText("Access to Datapool element blocked by application.");
                   break;
                case 0x33:
-                  c_Details = C_GtGetText::h_GetText("Required security level was not unlocked");
+                  c_Details = C_GtGetText::h_GetText("Required security level was not unlocked.");
                   break;
                case 0x14:
                   c_Details = C_GtGetText::h_GetText(
-                     "The total length of the response message exceeds the available buffer size");
+                     "The total length of the response message exceeds the available buffer size.");
                   break;
                case 0x7F:
                   c_Details = C_GtGetText::h_GetText(
-                     "The requested service is not available in the session currently active");
+                     "The requested service is not available in the currently active session.");
                   break;
                default:
                   c_Details =

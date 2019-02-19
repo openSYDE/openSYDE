@@ -23,6 +23,7 @@
 #include <QGraphicsView>
 #include <QFileDialog>
 #include <QImageReader>
+#include <QElapsedTimer>
 
 #include "stwtypes.h"
 #include "gitypes.h"
@@ -1261,7 +1262,7 @@ void C_SebScene::m_AddImageWithFileDialog(const QPointF & orc_Pos)
    // convert coordinates
    tgl_assert(rc_Views.size() > 0);
 
-   c_File = QFileDialog::getOpenFileName(rc_Views[0], C_GtGetText::h_GetText("Load image"), c_Dir, c_Filter);
+   c_File = QFileDialog::getOpenFileName(rc_Views[0], C_GtGetText::h_GetText("Load Image"), c_Dir, c_Filter);
 
    if (c_File.compare("") != 0)
    {
@@ -1442,31 +1443,31 @@ void C_SebScene::m_Paste(const QPointF * const opc_Pos)
 {
    if (this->m_IsPastePossible() == true)
    {
-      const C_SebBaseCopyPasteManager * const pc_CopyPasteManager = this->m_GetCopyPasteManager();
-
-      if (pc_CopyPasteManager != NULL)
-      {
-         if (pc_CopyPasteManager->CheckValidContent() == true)
-         {
-            CopyFromManagerToScene(opc_Pos);
-         }
-         else
-         {
-            m_PasteOfClipBoard(opc_Pos);
-         }
-      }
+      CopyFromManagerToScene(opc_Pos);
    }
 }
 
 //-----------------------------------------------------------------------------
-bool C_SebScene::m_IsPastePossible(void) const
+/*!
+   \brief   Check if paste is possible
+
+   Warning: also has to check copy paste manager!
+
+   \return
+   True  Valid
+   False Invalid
+
+   \created     11.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+bool C_SebScene::m_IsPastePossible(void)
 {
    bool q_Retval = false;
-   const C_SebBaseCopyPasteManager * const pc_CopyPasteManager = this->m_GetCopyPasteManagerConst();
+   C_SebBaseCopyPasteManager * const pc_CopyPasteManager = this->m_GetCopyPasteManager();
 
    if (pc_CopyPasteManager != NULL)
    {
-      q_Retval = pc_CopyPasteManager->CheckValidContent();
+      q_Retval = pc_CopyPasteManager->CheckValidContentAndPrepareData();
    }
    return q_Retval;
 }

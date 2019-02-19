@@ -59,6 +59,8 @@ C_SdBueMessageRxList::C_SdBueMessageRxList(QWidget * const opc_Parent) :
 {
    mpc_Ui->setupUi(this);
 
+   this->mpc_Ui->pc_ScrollAreaWidget->SetBackgroundColor(-1);
+
    InitStaticNames();
 
    //Debug strings

@@ -34,8 +34,10 @@
 #include "TGLTime.h"
 #include "C_OSCUtils.h"
 #include "C_OSCLoggingHandler.h"
+#include "C_UtiFindNameHelper.h"
 
 /* -- Used Namespaces ------------------------------------------------------ */
+using namespace stw_scl;
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -76,6 +78,57 @@ void C_Uti::h_Uniqueify(std::vector<uint32> & orc_Indices)
    c_Last = std::unique(orc_Indices.begin(), orc_Indices.end());
    //lint -e{64,119,1025,1703} Function not recognized
    orc_Indices.erase(c_Last, orc_Indices.end());
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Split input into contiguous sections
+
+   Also: sorted ascending
+
+   \param[in] orc_Indices Indices
+
+   \return
+   Input as contiguous sections
+
+   \created     27.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+std::vector<std::vector<uint32> > C_Uti::h_GetContiguousSectionsAscending(const std::vector<uint32> & orc_Indices)
+{
+   std::vector<std::vector<uint32> > c_Retval;
+   std::vector<uint32> c_InProgress;
+   std::vector<uint32> c_Copy = orc_Indices;
+   C_Uti::h_Uniqueify(c_Copy);
+   for (uint32 u32_It = 0UL; u32_It < c_Copy.size(); ++u32_It)
+   {
+      if (c_InProgress.size() > 0UL)
+      {
+         if (c_Copy[u32_It] ==
+             (c_InProgress[static_cast<std::vector<uint32>::size_type>(c_InProgress.size() - 1UL)] + 1UL))
+         {
+            //Contiguous
+            c_InProgress.push_back(c_Copy[u32_It]);
+         }
+         else
+         {
+            //Not contiguous
+            c_Retval.push_back(c_InProgress);
+            c_InProgress.clear();
+            c_InProgress.push_back(c_Copy[u32_It]);
+         }
+      }
+      else
+      {
+         c_InProgress.push_back(c_Copy[u32_It]);
+      }
+   }
+   //Append currently processed one (last section)
+   if (c_InProgress.size() > 0UL)
+   {
+      c_Retval.push_back(c_InProgress);
+   }
+   return c_Retval;
 }
 
 //-----------------------------------------------------------------------------
@@ -578,13 +631,15 @@ QString C_Uti::h_GetLink(const QString & orc_DisplayedText, const QColor & orc_C
 
    Warning: only for onetime usage
 
+   \param[in] orc_Extension Extension to use for log file
+
    \return
    Absolute log file path and location
 
    \created     15.09.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-QString C_Uti::h_GetCompleteLogFileLocation(void)
+QString C_Uti::h_GetCompleteLogFileLocation(const QString & orc_Extension)
 {
    QString c_Retval;
    //Set up logging (FIRST)
@@ -601,7 +656,7 @@ QString C_Uti::h_GetCompleteLogFileLocation(void)
    c_FileBaseName = c_FileBaseName.replace(13, 1, '_');
    c_FileBaseName = c_FileBaseName.replace(16, 1, '_');
    //Add file ending
-   c_FileBaseName = c_FileBaseName.replace(19, 4, ".syde_log");
+   c_FileBaseName = c_FileBaseName.replace(19, 4, orc_Extension.toStdString().c_str());
    //Final step as this step changes the format size
    c_FileBaseName = c_FileBaseName.replace(10, 1, "__");
 
@@ -681,8 +736,9 @@ QString C_Uti::h_MinimizePath(const QString & orc_Path, const QFont & orc_Font, 
       const QStorageInfo c_StorageInfo(c_FileInfo.absoluteDir());
       QString c_DriveName = c_StorageInfo.rootPath();
 
-      // if path does not exist, drive name is empty -> try to extract drive name from string
-      if (c_DriveName == "")
+      // try to extract drive name from string in case of not existing files or relative path
+      if ((c_DriveName == "") ||             // not existing path: drive name is empty
+          (c_FileInfo.isRelative() == true)) // relative path: use characters before first "/" (e.g. "./" or "Dir")
       {
          const QStringList c_Temp = c_Path.split("/"); // c_Path is Qt style path, i.e. uses "/" as separators
          if (c_Temp.size() > 1)                        // if no "/" occurs in path, split returns a list containing one
@@ -801,76 +857,35 @@ QFont C_Uti::h_GetFontPixel(const QFont & orc_Font)
 
 //-----------------------------------------------------------------------------
 /*!
-   \brief   Utility function to convert relative file path to absolute file path if necessary
+   \brief   Utility function to convert relative path to absolute path if necessary
 
-   Warning: assuming orc_AbsoluteBaseDir is absolute
+   Warning: assuming orc_AbsoluteBaseDir is not an empty string and no file.
 
-   \param[in] orc_AbsoluteBaseDir        Base path if relative
-   \param[in] orc_RelativeOrAbsoluteFile Path which might be relative or absolute
+   \param[in] orc_AbsoluteBaseDir         Base path if relative
+   \param[in] orc_RelativeOrAbsoluteFile  Path which might be relative or absolute (and could be empty)
 
    \return
-   Always absolute dir if possible
+   Absolute file path if input fulfills assumptions
 
    \created     09.10.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-QString C_Uti::h_ConcatPathIfNecessary(const QString & orc_AbsoluteBaseDir, const QString & orc_RelativeOrAbsoluteFile)
+QString C_Uti::h_ConcatPathIfNecessary(const QString & orc_BaseDir, const QString & orc_RelativeOrAbsolutePath)
 {
    QString c_Retval;
 
-   if (QDir::isAbsolutePath(orc_RelativeOrAbsoluteFile) == false)
+   if ((orc_BaseDir.isEmpty() == false) &&
+       (QDir::isAbsolutePath(orc_RelativeOrAbsolutePath) == false) &&
+       (QFileInfo(orc_BaseDir).isFile() == false))
    {
-      //Only use base if possible
-      if (orc_AbsoluteBaseDir.isEmpty() == false)
-      {
-         QDir c_Dir(orc_AbsoluteBaseDir);
-         c_Retval = QDir::cleanPath(c_Dir.absoluteFilePath(orc_RelativeOrAbsoluteFile));
-      }
+      c_Retval = QDir::cleanPath(orc_BaseDir + "/" + orc_RelativeOrAbsolutePath);
    }
    else
    {
-      c_Retval = orc_RelativeOrAbsoluteFile;
+      c_Retval = orc_RelativeOrAbsolutePath;
    }
+
    return c_Retval;
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility function to convert data block project path to absolute path
-
-   Does nothing if the path is already absolute.
-   If the path is relative it is meant to be relative to .syde file
-   and therefore gets concatenated with this.
-   If the resulting path is still relative (because path to .syde is relative)
-   it is made absolute by Qt functionality which uses openSYDE.exe as base directory.
-
-   \param[in]     orc_ProjectPath   Path that may be relative to .syde file
-
-   \return
-   absolute path to data block path
-
-   \created     18.10.2018  STW/G.Landsgesell
-*/
-//-----------------------------------------------------------------------------
-QString C_Uti::h_GetAbsoluteProjectPath(const QString & orc_SydeProjectPath, const QString & orc_ProgramProjectPath)
-{
-   QString c_ProjectPath;
-
-   // project path relative -> relative to openSYDE project file (.syde)
-   // project path empty -> default is openSYDE project file location
-   if ((orc_ProgramProjectPath == "") || (QDir::isRelativePath(orc_ProgramProjectPath)))
-   {
-      c_ProjectPath = orc_SydeProjectPath + QDir::separator() + orc_ProgramProjectPath;
-   }
-   // path already absolute
-   else
-   {
-      c_ProjectPath = orc_ProgramProjectPath;
-   }
-
-   const QDir c_ProjectDir(c_ProjectPath); // no cleanPath because absolute path also cleans up
-
-   return c_ProjectDir.absolutePath();
 }
 
 //-----------------------------------------------------------------------------
@@ -902,6 +917,327 @@ QString C_Uti::h_ConvertVersionToSTWStyle(const QString & orc_Version)
 
    return c_Return;
 }
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get unique item name based on proposal
+
+   \param[in] orc_ExistingStrings Existing item names
+   \param[in] orc_ProposedName    Proposal for item name
+
+   \return
+   Unique node name
+
+   \created     26.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+stw_scl::C_SCLString C_Uti::h_GetUniqueName(const std::map<C_SCLString, bool> & orc_ExistingStrings,
+                                            const stw_scl::C_SCLString & orc_ProposedName)
+{
+   C_SCLString c_Retval = orc_ProposedName;
+   bool q_Conflict;
+   sint32 s32_MaxDeviation;
+   C_SCLString c_BaseStr;
+
+   std::map<C_SCLString, bool>::const_iterator c_ItString;
+
+   do
+   {
+      q_Conflict = false;
+      c_ItString = orc_ExistingStrings.find(c_Retval);
+      if (c_ItString != orc_ExistingStrings.end())
+      {
+         q_Conflict = true;
+         h_GetNumberAtStringEnd(c_ItString->first, c_BaseStr, s32_MaxDeviation);
+         //Do not use 0 and 1 for name adaptation
+         if (s32_MaxDeviation <= 0)
+         {
+            s32_MaxDeviation = 1;
+         }
+         c_Retval = c_BaseStr + '_' + C_SCLString(s32_MaxDeviation + static_cast<sint32>(1));
+      }
+   }
+   while (q_Conflict == true);
+   return c_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get unique item name based on proposal
+
+   \param[in] orc_ExistingStrings Existing item names
+   \param[in] orc_ProposedName    Proposal for item name
+
+   \return
+   Unique node name
+
+   \created     10.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+QString C_Uti::h_GetUniqueNameQ(const std::map<C_SCLString, bool> & orc_ExistingStrings,
+                                const QString & orc_ProposedName)
+{
+   C_SCLString c_Result = C_Uti::h_GetUniqueName(orc_ExistingStrings, orc_ProposedName.toStdString().c_str());
+
+   return c_Result.c_str();
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get number at string end
+
+   \param[in]  orc_ProposedName Proposal for name
+   \param[out] orc_CutString    String without number
+   \param[out] ors32_Number     Number at end (else -1)
+
+   \created     26.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_Uti::h_GetNumberAtStringEnd(const C_SCLString & orc_ProposedName, C_SCLString & orc_CutString,
+                                   sint32 & ors32_Number)
+{
+   C_SCLString c_Number;
+   bool q_UnderscoreDetected = false;
+   bool q_NumberDetected = false;
+   uint32 u32_ItStr;
+
+   //Default return
+   orc_CutString = orc_ProposedName;
+   ors32_Number = -1;
+
+   for (u32_ItStr = orc_ProposedName.Length(); u32_ItStr > 0; --u32_ItStr)
+   {
+      if ((orc_ProposedName[u32_ItStr] >= '0') && (orc_ProposedName[u32_ItStr] <= '9'))
+      {
+         //Continue
+         q_NumberDetected = true;
+      }
+      else
+      {
+         if ('_' == orc_ProposedName[u32_ItStr])
+         {
+            q_UnderscoreDetected = true;
+         }
+         //Stop
+         break;
+      }
+   }
+   if ((q_NumberDetected == true) && (q_UnderscoreDetected == true))
+   {
+      //Cut string
+      orc_CutString = orc_ProposedName.SubString(1, u32_ItStr - 1);                    //Without underscore
+      c_Number = orc_ProposedName.SubString(u32_ItStr + 1, orc_ProposedName.Length()); //Without underscore
+      try
+      {
+         ors32_Number = c_Number.ToInt();
+      }
+      catch (...)
+      {
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Create ascending sorted index map for input vector
+
+   Another attempt to explain this:
+   this class actually looks at the value stored in the vector
+   and creates and output vector with the length of that value
+   and then stores the index at the index of that value
+   e.g. first element is 7
+   -> resize output to seven elements (all initialized with minus one)
+   -> set the 7. output element to be 0 (we said this is the first found element)
+   -> and so on
+
+   Once the function is done you can iterate over the output
+   and the first non negative value you find is the index of the "lowest" value element
+   Also as you might notice this will directly make the output unique
+
+   Pre-requirement:
+   The input vector should be an assortment of unique indices.
+   Purpose:
+   The output vector:
+   -1:        index was not part of input vector
+   otherwise: index was part of input vector and the value shows at which position this index was standing
+
+   \param[in] orc_UnsortedIndices Unsorted indices
+
+   \return
+   Ascending sorted index map
+
+   \created     13.02.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+std::vector<sint32> C_Uti::h_CreateAscendingIndexMap(const std::vector<uint32> & orc_UnsortedIndices)
+{
+   std::vector<sint32> c_IndexMap;
+   c_IndexMap.resize(orc_UnsortedIndices.size(), -1);
+   for (uint32 u32_Index = 0; u32_Index < orc_UnsortedIndices.size(); ++u32_Index)
+   {
+      if (orc_UnsortedIndices[u32_Index] >= c_IndexMap.size())
+      {
+         uint32 u32_NewSize = orc_UnsortedIndices[u32_Index] + 1U;
+         c_IndexMap.resize(u32_NewSize, -1);
+      }
+      c_IndexMap[orc_UnsortedIndices[u32_Index]] = u32_Index;
+   }
+   return c_IndexMap;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Check if input vector is sorted ascending
+
+   \param[in] orc_Indices Input vector to evaluate
+
+   \return
+   true:  Sorted
+   false: Unsorted
+
+   \created     13.02.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+bool C_Uti::h_CheckSortedAscending(const std::vector<uint32> & orc_Indices)
+{
+   bool q_Retval = true;
+
+   if (orc_Indices.size() > 1)
+   {
+      uint32 u32_PrevVal = orc_Indices[0];
+
+      for (uint32 u32_It = 1; u32_It < orc_Indices.size(); ++u32_It)
+      {
+         if (u32_PrevVal <= orc_Indices[u32_It])
+         {
+            u32_PrevVal = orc_Indices[u32_It];
+         }
+         else
+         {
+            q_Retval = false;
+         }
+      }
+   }
+   return q_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Always get absolute path from path relative to executable.
+
+   \param[in] orc_Path Absolute or relative path
+
+   \return
+   Absolute path
+
+   \created     07.05.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+QString C_Uti::h_GetAbsolutePathFromExe(const QString & orc_Path)
+{
+   QString c_Folder = C_Uti::h_GetExePath(); // always absolute
+
+   return C_Uti::h_ConcatPathIfNecessary(c_Folder, orc_Path);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Handle paths after file save dialog.
+
+   Check if path could be made relative.
+
+   Note: If one of the input paths is empty this simply returns the given path and its concatenation with the directory.
+   If the reference path is a file path (ending on File.txt), behavior is undefined
+   (handling directory AND files AND existing AND non-existing did not work well).
+   If the reference path is not absolute, behavior is undefined
+   (Qt then defaults to calling path, which is often but not always the path of the executable).
+
+   \param[in]     orc_PathIn                 relative or absolute path of file or directory
+   \param[in]     orc_AbsoluteReferenceDir   absolute path of reference directory
+   \param[out]    orc_PathAbsolute           absolute path
+   \param[out]    orc_PathRelative           relative path
+
+   \return
+   true  path can be represented relative to directory
+   false path can not be represented relative to directory
+
+   \created     08.02.2019  STW/G.Landsgesell
+*/
+//-----------------------------------------------------------------------------
+bool C_Uti::h_IsPathRelativeToDir(const QString & orc_PathIn, const QString & orc_AbsoluteReferenceDir,
+                                  QString & orc_PathAbsolute, QString & orc_PathRelative)
+{
+   bool oq_Return = false;
+
+   // reset
+   orc_PathAbsolute = orc_PathIn;
+   orc_PathRelative = orc_PathIn;
+
+   if ((orc_PathIn.isEmpty() == false) && (orc_AbsoluteReferenceDir.isEmpty() == false))
+   {
+      QDir c_Dir(orc_AbsoluteReferenceDir);
+      QFileInfo c_PathInfo;
+
+      // check if path can be represented relative to given directory
+      c_PathInfo.setFile(c_Dir.relativeFilePath(orc_PathIn));
+
+      oq_Return = c_PathInfo.isRelative();
+      if (oq_Return == true)
+      {
+         orc_PathRelative = c_PathInfo.filePath();
+         orc_PathAbsolute = C_Uti::h_ConcatPathIfNecessary(orc_AbsoluteReferenceDir, orc_PathIn);
+      }
+   }
+
+   return oq_Return;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Sort indices ascending ( Sorting steps are done for the content vectors in sync)
+
+   \param[in,out] orc_IndicesTmp  Unsorted indices
+   \param[in,out] orc_SyncContent Unsorted content to sync
+
+   \created     13.02.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+template <typename T>
+void C_Uti::h_SortIndicesAscendingAndSync(std::vector<uint32> & orc_IndicesTmp, std::vector<T> & orc_SyncContent)
+{
+   if (C_Uti::h_CheckSortedAscending(orc_IndicesTmp) == false)
+   {
+      std::vector<stw_types::uint32> c_IndicesTmp;
+      std::vector<T> c_SyncContentTmp;
+      //Step 1: Fill new vector in sorted order with which element should be copied to which position
+      const std::vector<stw_types::sint32> c_IndexMap = C_Uti::h_CreateAscendingIndexMap(orc_IndicesTmp);
+      //Step 2: Copy existing elements to new structures according to plan
+      c_IndicesTmp.reserve(orc_IndicesTmp.size());
+      c_SyncContentTmp.reserve(orc_SyncContent.size());
+      for (stw_types::uint32 u32_ItIndex = 0; u32_ItIndex < c_IndexMap.size(); ++u32_ItIndex)
+      {
+         if (c_IndexMap[u32_ItIndex] >= 0)
+         {
+            const stw_types::uint32 u32_CurIndex = static_cast<stw_types::uint32>(c_IndexMap[u32_ItIndex]);
+            if ((u32_CurIndex < orc_IndicesTmp.size()) &&
+                (u32_CurIndex < orc_SyncContent.size()))
+            {
+               c_IndicesTmp.push_back(orc_IndicesTmp[u32_CurIndex]);
+               c_SyncContentTmp.push_back(orc_SyncContent[u32_CurIndex]);
+            }
+         }
+      }
+      //Step 3: Copy data structures to internal ones
+      orc_IndicesTmp = c_IndicesTmp;
+      orc_SyncContent = c_SyncContentTmp;
+   }
+}
+
+//Explicit declaration of every type usage is necessary for templates to allow split of declaration and implementation
+//lint -esym(754,stw_opensyde_gui_logic::C_Uti::h_SortIndicesAscendingAndSync*)
+template
+void C_Uti::h_SortIndicesAscendingAndSync<stw_types::uint32>(std::vector<stw_types::uint32> & orc_IndicesTmp,
+                                                             std::vector<uint32> & orc_SyncContent);
 
 //-----------------------------------------------------------------------------
 /*!

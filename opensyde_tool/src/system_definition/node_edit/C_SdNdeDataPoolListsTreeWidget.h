@@ -92,11 +92,9 @@ protected:
    virtual void dragMoveEvent(QDragMoveEvent * const opc_Event) override;
    virtual void selectionChanged(const QItemSelection & orc_Selected, const QItemSelection & orc_Deselected) override;
    virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
-   virtual void startDrag(const Qt::DropActions oc_SupportedActions) override;
    //lint -restore
 
 private:
-   std::vector<C_SdNdeDataPoolListHeaderWidget *> mc_Widgets;
    stw_opensyde_gui_logic::C_SdNdeUnoDataPoolManager mc_UndoManager;
    stw_opensyde_gui_logic::C_SdNdeDataPoolListModelViewManager mc_ModelViewManager;
    stw_types::uint32 mu32_NodeIndex;
@@ -112,7 +110,8 @@ private:
    bool mq_AllowMoveDown;
    bool mq_InitialUserSettings;
 
-   void m_OnExpandRequested(QTreeWidgetItem * const opc_Item, const bool oq_Expand);
+   void m_OnExpandRequestedHeader(const C_SdNdeDataPoolListHeaderWidget * const opc_Item, const bool oq_Expand);
+   void m_OnExpandRequestedIndex(const stw_types::sint32 os32_Index, const bool oq_Expand);
    void m_InitialItemConfigure(QTreeWidgetItem * const opc_Item, const stw_types::sint32 os32_Index);
    void m_Move(const std::vector<stw_types::uint32> & oru32_SourceIndices,
                const std::vector<stw_types::uint32> & oru32_TargetIndices);

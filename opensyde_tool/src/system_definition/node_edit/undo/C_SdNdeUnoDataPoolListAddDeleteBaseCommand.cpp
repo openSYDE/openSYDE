@@ -19,8 +19,11 @@
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
 
+#include <QElapsedTimer>
+
 #include "stwtypes.h"
 #include "stwerrors.h"
+#include "constants.h"
 #include "C_PuiSdHandler.h"
 #include "C_SdUtil.h"
 #include "TGLUtils.h"
@@ -30,6 +33,7 @@
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_tgl;
+using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
@@ -79,6 +83,13 @@ C_SdNdeUnoDataPoolListAddDeleteBaseCommand::C_SdNdeUnoDataPoolListAddDeleteBaseC
 //-----------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::Add(void)
 {
+   QElapsedTimer c_Timer;
+
+   if (mq_TIMING_OUTPUT)
+   {
+      c_Timer.start();
+   }
+
    m_SortAscending();
    for (uint32 u32_Index = 0; u32_Index < this->mc_Indices.size(); ++u32_Index)
    {
@@ -109,6 +120,10 @@ void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::Add(void)
          }
       }
    }
+   if (mq_TIMING_OUTPUT)
+   {
+      std::cout << "List add " << c_Timer.elapsed() << " ms" << &std::endl;
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -120,6 +135,13 @@ void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::Add(void)
 //-----------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::Delete(void)
 {
+   QElapsedTimer c_Timer;
+
+   if (mq_TIMING_OUTPUT)
+   {
+      c_Timer.start();
+   }
+
    this->mc_OSCContent.resize(this->mc_Indices.size());
    this->mc_UIContent.resize(this->mc_Indices.size());
    m_SortDescending();
@@ -168,6 +190,10 @@ void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::Delete(void)
             }
          }
       }
+   }
+   if (mq_TIMING_OUTPUT)
+   {
+      std::cout << "List delete " << c_Timer.elapsed() << " ms" << &std::endl;
    }
 }
 

@@ -27,6 +27,7 @@
 #include "C_OgeWiUtil.h"
 #include "C_GtGetText.h"
 #include "C_PuiSvHandler.h"
+#include "C_PuiSdHandler.h"
 #include "C_OgePopUpDialog.h"
 #include "C_UsHandler.h"
 #include "C_SyvDaDashboardToolbox.h"
@@ -90,8 +91,6 @@ C_SyvDaDashboardsWidget::C_SyvDaDashboardsWidget(const uint32 ou32_ViewIndex, QW
 
    //Init view index
    this->mpc_Ui->pc_TabWidget->SetViewIndex(this->mu32_ViewIndex);
-
-   this->m_InitToolBox();
 
    //Hide cancel button
    this->mpc_Ui->pc_PbCancel->setVisible(false);
@@ -275,11 +274,18 @@ void C_SyvDaDashboardsWidget::SetEditMode(const bool oq_Active)
 
    if (oq_Active == true)
    {
-      // TODO
-      // create copy of dashboard in case of clicking cancel
-
+      //Initially create toolbox
+      if (this->mpc_Toolbox == NULL)
+      {
+         this->m_InitToolBox();
+      }
       //Show toolbox
-      this->mpc_Toolbox->show();
+      if (this->mpc_Toolbox != NULL)
+      {
+         this->mpc_Toolbox->show();
+      }
+
+      // create copy of dashboard in case of clicking cancel
 
       this->mpc_Ui->pc_BackgroundWidget->layout()->setContentsMargins(8, 0, 8, 8);
    }
@@ -363,7 +369,6 @@ sint32 C_SyvDaDashboardsWidget::SetConnectActive(const bool oq_Value)
       connect(mpc_ComDriver, &C_SyvComDriverDiag::SigPollingFinished, this,
               &C_SyvDaDashboardsWidget::m_HandleManualOperationFinished);
 
-
       s32_Retval = this->m_InitOsyDriver(c_Message);
 
       if (s32_Retval == C_NO_ERR)
@@ -383,17 +388,94 @@ sint32 C_SyvDaDashboardsWidget::SetConnectActive(const bool oq_Value)
          QString c_ErrorDetails;
          std::vector<C_OSCNodeDataPoolListElementId> c_FailedIdRegisters;
          std::vector<QString> c_FailedIdErrorDetails;
+         std::map<stw_types::uint32, stw_types::uint32> c_FailedNodesElementNumber;
+         std::map<stw_types::uint32, stw_types::uint32> c_NodesElementNumber;
 
          // Start the asyn communication
          s32_Retval = this->mpc_ComDriver->SetUpCyclicTransmissions(c_ErrorDetails, c_FailedIdRegisters,
-                                                                    c_FailedIdErrorDetails);
+                                                                    c_FailedIdErrorDetails,
+                                                                    c_FailedNodesElementNumber,
+                                                                    c_NodesElementNumber);
 
          switch (s32_Retval)
          {
          case C_NO_ERR:
-            //Signal all widgets about c_FailedIdRegisters
-            this->mpc_Ui->pc_TabWidget->SetErrorForFailedCyclicElementIdRegistrations(c_FailedIdRegisters,
-                                                                                      c_FailedIdErrorDetails);
+            if (c_FailedIdRegisters.size() > 0)
+            {
+               uintn un_Counter;
+               uintn un_CurrentNode = 0xFFFFFFFFU;
+
+               //Signal all widgets about c_FailedIdRegisters
+               // ToDo: No visualization on the dashboard
+               //this->mpc_Ui->pc_TabWidget->SetErrorForFailedCyclicElementIdRegistrations(c_FailedIdRegisters,
+               //                                                                          c_FailedIdErrorDetails);
+
+               // Show all error information
+               c_Message =
+                  QString(C_GtGetText::h_GetText("Not all cyclic transmission could be registered. (%1 failed)")).
+                  arg(
+                     c_FailedIdRegisters.size());
+
+               for (un_Counter = 0; un_Counter < c_FailedIdRegisters.size(); ++un_Counter)
+               {
+                  const C_OSCNodeDataPoolListElementId & rc_Id = c_FailedIdRegisters[un_Counter];
+                  C_OSCNodeDataPool::E_Type e_Type;
+                  C_PuiSdHandler::h_GetInstance()->GetDataPoolType(rc_Id.u32_NodeIndex, rc_Id.u32_DataPoolIndex,
+                                                                   e_Type);
+
+                  if (un_CurrentNode != rc_Id.u32_NodeIndex)
+                  {
+                     const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+                        rc_Id.u32_NodeIndex);
+
+                     if (c_MessageDetails != "")
+                     {
+                        c_MessageDetails += "\n\n";
+                     }
+
+                     if (pc_Node != NULL)
+                     {
+                        const std::map<stw_types::uint32,
+                                       stw_types::uint32>::const_iterator c_ItFailedNodesElementNumber =
+                           c_FailedNodesElementNumber.find(rc_Id.u32_NodeIndex);
+
+                        // This information as title for all errors of this node
+                        c_MessageDetails += "Node " + QString(pc_Node->c_Properties.c_Name.c_str()) + ":\n";
+
+                        if (c_ItFailedNodesElementNumber != c_FailedNodesElementNumber.end())
+                        {
+                           c_MessageDetails += QString("The node %1 can handle maximum %2 transmissions. ").
+                                               arg(pc_Node->c_Properties.c_Name.c_str()).arg(c_FailedNodesElementNumber[
+                                                                                                rc_Id.u32_NodeIndex] -
+                                                                                             1U);
+                           c_MessageDetails += QString("Tried to register %1 transmissions.\n"
+                                                       "To fix this adjust 'Max number of cyclic/event driven "
+                                                       "transmissions' in 'Code Generation Settings' of"
+                                                       " the node properties.\n\n").
+                                               arg(c_NodesElementNumber[rc_Id.u32_NodeIndex]);
+                        }
+                     }
+                     c_MessageDetails += "Error details:\n";
+
+                     un_CurrentNode = rc_Id.u32_NodeIndex;
+                  }
+
+                  c_MessageDetails += "The initiating of the transmission of the element ";
+                  if (e_Type != C_OSCNodeDataPool::eCOM)
+                  {
+                     c_MessageDetails += C_PuiSdHandler::h_GetInstance()->GetNamespace(rc_Id);
+                  }
+                  else
+                  {
+                     c_MessageDetails += C_PuiSdHandler::h_GetInstance()->GetSignalNamespace(rc_Id);
+                  }
+
+                  c_MessageDetails += " failed: " + c_FailedIdErrorDetails[un_Counter] + "\n";
+               }
+
+               s32_Retval = C_RD_WR;
+            }
+
             break;
          case C_CONFIG:
             c_Message =
@@ -433,7 +515,7 @@ sint32 C_SyvDaDashboardsWidget::SetConnectActive(const bool oq_Value)
       if (s32_Retval == C_NO_ERR)
       {
          // When connected, no drag and drop is allowed on top level
-         Q_EMIT this->SigBlockDragAndDrop(true);
+         Q_EMIT (this->SigBlockDragAndDrop(true));
          // Inform all widgets about the connection
          this->mpc_Ui->pc_TabWidget->ConnectionActiveChanged(true);
          // Start updating the dashboard widgets
@@ -454,6 +536,8 @@ sint32 C_SyvDaDashboardsWidget::SetConnectActive(const bool oq_Value)
          c_MessageBox.SetHeading(C_GtGetText::h_GetText("Dashboard connect"));
          c_MessageBox.SetDescription(c_Message);
          c_MessageBox.SetDetails(c_MessageDetails);
+         c_MessageBox.SetCustomMinHeight(450);
+         c_MessageBox.SetCustomMinWidth(850);
          c_MessageBox.Execute();
       }
    }
@@ -465,7 +549,7 @@ sint32 C_SyvDaDashboardsWidget::SetConnectActive(const bool oq_Value)
 
       this->m_CloseOsyDriver();
 
-      Q_EMIT this->SigBlockDragAndDrop(false);
+      Q_EMIT (this->SigBlockDragAndDrop(false));
 
       // Save the time of disconnect
       C_SyvDaDashboardsWidget::mhu32_DisconnectTime = TGL_GetTickCount();
@@ -482,11 +566,10 @@ sint32 C_SyvDaDashboardsWidget::SetConnectActive(const bool oq_Value)
    \created     27.09.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-void C_SyvDaDashboardsWidget::CheckError(void)
+void C_SyvDaDashboardsWidget::CheckError(void) const
 {
    QString c_ErrorText;
    const bool q_ViewSetupError = C_SyvUtil::h_CheckViewSetupError(this->mu32_ViewIndex, c_ErrorText);
-   bool q_TooManyNodesPerRailConfigured = false;
 
    if (q_ViewSetupError == true)
    {
@@ -496,15 +579,6 @@ void C_SyvDaDashboardsWidget::CheckError(void)
    else
    {
       this->mpc_Ui->pc_ErrorFrame->setVisible(false);
-   }
-   if (C_PuiSvHandler::h_GetInstance()->CheckViewError(this->mu32_ViewIndex, NULL, NULL, NULL, NULL, NULL,
-                                                       NULL, &q_TooManyNodesPerRailConfigured) == C_NO_ERR)
-   {
-      Q_EMIT this->SigConfigError(q_TooManyNodesPerRailConfigured);
-   }
-   else
-   {
-      tgl_assert(false);
    }
 }
 
@@ -757,7 +831,9 @@ sint32 C_SyvDaDashboardsWidget::m_InitOsyDriver(QString & orc_Message)
    case C_NO_ERR:
    case C_NOACT: // C_NOACT means that no node is active, but the CAN signal interpretation is although necessary
       // Starting logging starts the CAN signal interpretation too
-      this->mpc_ComDriver->StartLogging(false);
+      // TODO: Bitrate is not necessary for initialization here and the bus load calculation is not used here.
+      //       If this is necessary, this bitrate must be adapted for the real value and not this dummy
+      this->mpc_ComDriver->StartLogging(0U);
       break;
    case C_CONFIG:
       orc_Message =
@@ -783,7 +859,7 @@ sint32 C_SyvDaDashboardsWidget::m_InitOsyDriver(QString & orc_Message)
                (q_SysDefInvalid == false)) && (q_NoNodesActive == false)) && (q_UpdateDisabledButDataBlocks == false))
          {
             orc_Message = QString(C_GtGetText::h_GetText("System View Dashboard configuration error detected. "
-                                                       "Check your Dashboard configuration settings and retry."));
+                                                         "Check your Dashboard configuration settings and retry."));
          }
          else
          {
@@ -801,7 +877,7 @@ sint32 C_SyvDaDashboardsWidget::m_InitOsyDriver(QString & orc_Message)
       orc_Message =
          QString(C_GtGetText::h_GetText(
                     "CAN initialization failed. Check your PC CAN interface configuration (System View setup - "
-                    "double click on PC)."));
+                    "double-click on PC)."));
       break;
    case C_CHECKSUM:
       orc_Message = QString(C_GtGetText::h_GetText("Internal buffer overflow detected."));
@@ -845,12 +921,12 @@ sint32 C_SyvDaDashboardsWidget::m_InitNodes(QString & orc_Message, QString & orc
    case C_BUSY:
       orc_Message = QString(C_GtGetText::h_GetText("Connecting to at least one node failed!"));
       orc_MessageDetails = QString(C_GtGetText::h_GetText("Affected node(s):\n"
-                                                        "%1\n"
-                                                        "\n"
-                                                        "Possible scenarios:\n"
-                                                        "- Wrong configured IP address\n"
-                                                        "- Gateway address of node is not configured properly"))
-                         .arg(c_ErrorDetails);
+                                                          "%1\n"
+                                                          "\n"
+                                                          "Possible scenarios:\n"
+                                                          "- Wrong configured IP address\n"
+                                                          "- Gateway address of node is not configured properly"))
+                           .arg(c_ErrorDetails);
       break;
    case C_CHECKSUM:
       orc_Message =
@@ -862,21 +938,22 @@ sint32 C_SyvDaDashboardsWidget::m_InitNodes(QString & orc_Message, QString & orc
    case C_COM:
       orc_Message = QString(C_GtGetText::h_GetText("Service error response detected."));
       orc_MessageDetails = QString(C_GtGetText::h_GetText("Affected node(s):\n"
-                                                        "%1\n"
-                                                        "\n"
-                                                        "Possible scenario:\n"
-                                                        "- If these nodes are in Flashloader (Try restarting those nodes to fix this error)"))
-                         .arg(c_ErrorDetails);
+                                                          "%1\n"
+                                                          "\n"
+                                                          "Possible scenario:\n"
+                                                          "If these nodes are in Flashloader (Try restarting those nodes to fix this error)"))
+                           .arg(c_ErrorDetails);
       break;
    case C_RD_WR:
       orc_Message = QString(C_GtGetText::h_GetText("Unexpected protocol response detected."));
       orc_MessageDetails = QString(C_GtGetText::h_GetText("Possible scenario:\n"
-                                                        "- If there are multiple nodes with the same node ID connected to the same bus"));
+                                                          "If there are multiple nodes with the same node ID connected to the same bus"));
       break;
    case C_WARN:
       orc_Message = QString(C_GtGetText::h_GetText("Protocol error response detected."));
       orc_MessageDetails = QString(C_GtGetText::h_GetText("Possible scenario:\n"
-                                                        "- Node can currently not enter diagnostic session"));
+                                                          "- Node can currently not enter diagnostic session\n"
+                                                          "- A Data Pool defined in the openSYDE tool is not available on the Node"));
       break;
    default:
       orc_Message = QString(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Retval));

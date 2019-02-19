@@ -28,10 +28,11 @@
 #include "TGLTasks.h"
 
 #include "C_OSCComMessageLogger.h"
+#include "C_OSCComMessageLoggerData.h"
+
 #include "C_SyvComDriverThread.h"
 #include "C_OSCSystemBus.h"
 #include "C_CieConverter.h"
-#include "C_OSCCanSignal.h"
 
 /* -- Namespace ------------------------------------------------------------ */
 namespace stw_opensyde_gui_logic
@@ -40,45 +41,6 @@ namespace stw_opensyde_gui_logic
 
 /* -- Types ---------------------------------------------------------------- */
 
-class C_SyvComMessageMonitorDataSignal
-{
-public:
-   C_SyvComMessageMonitorDataSignal(void);
-
-   QString c_Name;
-   QString c_Value;
-   QString c_Unit;
-   QString c_RawValueDec;
-   QString c_RawValueHex;
-   QString c_Comment;
-   bool q_DlcError;
-
-   stw_opensyde_core::C_OSCCanSignal c_OscSignal;
-};
-
-class C_SyvComMessageMonitorData
-{
-public:
-   C_SyvComMessageMonitorData(void);
-
-   QString c_TimeStampRelative;
-   QString c_TimeStampAbsolute;
-   QString c_CanIdDec;
-   QString c_CanIdHex;
-   QString c_CanDlc;
-   QString c_CanDataDec;
-   QString c_CanDataHex;
-   QString c_Name;
-   QString c_ProtocolTextDec;
-   QString c_ProtocolTextHex;
-   QString c_Counter;
-
-   std::vector<C_SyvComMessageMonitorDataSignal> c_Signals;
-
-   stw_can::T_STWCAN_Msg_RX c_CanMsg;
-   bool q_IsTx;
-};
-
 class C_SyvComMessageMonitor :
    public stw_opensyde_core::C_OSCComMessageLogger
 {
@@ -86,46 +48,69 @@ public:
    C_SyvComMessageMonitor(void);
    virtual ~C_SyvComMessageMonitor(void);
 
+   virtual void Start(void) override;
    virtual void Stop(void) override;
 
    // openSYDE system definition handling
+   stw_types::sint32 StartAddOsySysDef(const stw_scl::C_SCLString & orc_PathSystemDefinition);
    stw_types::sint32 StartAddOsySysDef(const stw_scl::C_SCLString & orc_PathSystemDefinition,
-                                       const stw_scl::C_SCLString & orc_PathDeviceDefinitions);
-   stw_types::sint32 StartAddOsySysDef(const stw_scl::C_SCLString & orc_PathSystemDefinition,
-                                       const stw_scl::C_SCLString & orc_PathDeviceDefinitions,
                                        const stw_types::uint32 ou32_BusIndex);
 
    virtual stw_types::sint32 SetOsySysDefBus(const stw_scl::C_SCLString & orc_PathSystemDefinition,
-                                             const stw_types::uint32 ou32_BusIndex);
-   virtual stw_types::sint32 RemoveOsySysDef(const stw_scl::C_SCLString & orc_PathSystemDefinition);
+                                             const stw_types::uint32 ou32_BusIndex) override;
+   virtual stw_types::sint32 GetOsySysDef(const stw_scl::C_SCLString & orc_PathSystemDefinition,
+                                          stw_opensyde_core::C_OSCComMessageLoggerOsySysDefConfig & orc_SystemDefinition)
+   override;
 
    // DBC handling
    stw_types::sint32 StartAddDbcFile(const stw_scl::C_SCLString & orc_PathDbc);
-   stw_types::sint32 RemoveDbcFile(const stw_scl::C_SCLString & orc_PathDbc);
+   stw_types::sint32 GetDbcFile(const stw_scl::C_SCLString & orc_PathDbc,
+                                C_CieConverter::C_CIECommDefinition & orc_DbcDefinition);
+
+   // Generic database handling
+   virtual stw_types::sint32 RemoveDatabase(const stw_scl::C_SCLString & orc_Path) override;
+   virtual stw_types::sint32 ActivateDatabase(const stw_scl::C_SCLString & orc_Path, const bool oq_Active) override;
+
+   // Logging handling
+   virtual stw_types::sint32 AddLogFileAsc(const stw_scl::C_SCLString & orc_FilePath, const bool oq_HexActive,
+                                           const bool oq_RelativeTimeStampActive) override;
+   virtual stw_types::sint32 AddLogFileBlf(const stw_scl::C_SCLString & orc_FilePath);
+   virtual stw_types::sint32 RemoveLogFile(const stw_scl::C_SCLString & orc_FilePath) override;
+   virtual void RemoveAllLogFiles(void) override;
 
    // Filter handling
    virtual void AddFilter(const stw_opensyde_core::C_OSCComMessageLoggerFilter & orc_Filter) override;
    virtual void RemoveFilter(const stw_opensyde_core::C_OSCComMessageLoggerFilter & orc_Filter) override;
+   virtual void RemoveAllFilter(void) override;
+   virtual stw_types::uint32 GetFilteredMessages(void) const override;
 
+   // CAN bus handling
    virtual stw_types::sint32 HandleCanMessage(const stw_can::T_STWCAN_Msg_RX & orc_Msg, const bool oq_IsTx) override;
+   virtual void ResetCounter(void) override;
+   virtual void UpdateBusLoad(const stw_types::uint8 ou8_BusLoad) override;
+   virtual void UpdateTxErrors(const stw_types::uint32 ou32_TxErrors) override;
+
+   stw_types::uint8 GetBusLoad(void) const;
+   stw_types::uint32 GetTxErrors(void) const;
 
    stw_types::sint32 GetResults(stw_types::sint32 & ors32_Result) const;
    stw_types::sint32 GetResultBusses(std::vector<stw_opensyde_core::C_OSCSystemBus> & orc_Busses) const;
 
 protected:
-   stw_types::sint32 m_GetCanMessage(C_SyvComMessageMonitorData & orc_Message);
-   void m_GetCanMessages(QVector<C_SyvComMessageMonitorData> & orc_Messages);
+   stw_types::sint32 m_GetCanMessage(stw_opensyde_core::C_OSCComMessageLoggerData & orc_Message);
+   void m_GetCanMessages(QVector<stw_opensyde_core::C_OSCComMessageLoggerData> & orc_Messages);
 
-   void m_UpdateProtocolString(C_SyvComMessageMonitorData & orc_MessageData) const;
+   void m_UpdateProtocolString(stw_opensyde_core::C_OSCComMessageLoggerData & orc_MessageData) const;
 
-   virtual bool m_CheckFilter(const stw_can::T_STWCAN_Msg_RX & orc_Msg) const override;
+   virtual bool m_CheckFilter(const stw_can::T_STWCAN_Msg_RX & orc_Msg) override;
 
    virtual void m_InsertOsySysDef(const stw_scl::C_SCLString & orc_PathSystemDefinition,
                                   const stw_opensyde_core::C_OSCSystemDefinition & orc_OsySysDef,
                                   const stw_types::uint32 ou32_BusIndex) override;
    virtual bool m_CheckSysDef(const stw_can::T_STWCAN_Msg_RX & orc_Msg) override;
+   virtual bool m_InterpretSysDef(stw_opensyde_core::C_OSCComMessageLoggerData & orc_MessageData) const override;
 
-   virtual void m_CheckInterpretation(const stw_can::T_STWCAN_Msg_RX & orc_Msg) override;
+   virtual bool m_CheckInterpretation(stw_opensyde_core::C_OSCComMessageLoggerData & orc_MessageData) override;
    virtual stw_scl::C_SCLString m_GetProtocolStringHexHook(void) const override;
    virtual stw_scl::C_SCLString m_GetProtocolStringDecHook(void) const override;
 
@@ -142,17 +127,10 @@ private:
    C_SyvComMessageMonitor(const C_SyvComMessageMonitor &);
    C_SyvComMessageMonitor & operator =(const C_SyvComMessageMonitor &);
 
-   bool m_InterpretSysDef(C_SyvComMessageMonitorData & orc_MessageData) const;
-
    stw_types::sint32 m_AddDbcFile(const stw_scl::C_SCLString & orc_PathDbc);
-   void m_CheckDbcFile(const stw_can::T_STWCAN_Msg_RX & orc_Msg);
-   bool m_InterpretDbcFile(C_SyvComMessageMonitorData & orc_MessageData) const;
-
-   static void mh_InterpretCanSignalValue(C_SyvComMessageMonitorDataSignal & orc_Signal,
-                                          const stw_types::uint8(&orau8_CanDb)[8], const stw_types::uint8 ou8_CanDlc,
-                                          const stw_opensyde_core::C_OSCCanSignal & orc_OscSignal,
-                                          const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_OscValue,
-                                          const stw_types::float64 of64_Factor, const stw_types::float64 of64_Offset);
+   const C_CieConverter::C_CIECanMessage * m_CheckDbcFile(const stw_can::T_STWCAN_Msg_RX & orc_Msg);
+   bool m_InterpretDbcFile(const C_CieConverter::C_CIECanMessage * const opc_DbcMessage,
+                           stw_opensyde_core::C_OSCComMessageLoggerData & orc_MessageData) const;
 
    static void mh_ThreadFunc(void * const opv_Instance);
    void m_ThreadFunc(void);
@@ -162,7 +140,6 @@ private:
 
    // Loading execution parameter
    stw_scl::C_SCLString mc_Path;
-   stw_scl::C_SCLString mc_PathDeviceDefinitions;
    stw_types::uint32 mu32_BusIndex;
 
    // Loading execution result
@@ -173,19 +150,17 @@ private:
    // must be non const and that is not wanted.
    mutable stw_tgl::C_TGLCriticalSection mc_CriticalSectionMsg;
    mutable stw_tgl::C_TGLCriticalSection mc_CriticalSectionConfig;
+   mutable stw_tgl::C_TGLCriticalSection mc_CriticalSectionMeta;
+   mutable stw_tgl::C_TGLCriticalSection mc_CriticalSectionCounter;
 
-   QList<C_SyvComMessageMonitorData> mc_ReceivedMessages;
-   stw_types::uint64 mu64_LastTimeStamp;
+   QList<stw_opensyde_core::C_OSCComMessageLoggerData> mc_ReceivedMessages;
+
+   stw_types::uint8 mu8_BusLoad;
+   stw_types::uint32 mu32_TxErrors;
+   stw_types::uint32 mu32_FilteredMessages;
 
    // DBC files
    std::map<stw_scl::C_SCLString, C_CieConverter::C_CIECommDefinition> mc_DbcFiles;
-
-   // DBC file interpretation check result
-   const C_CieConverter::C_CIECanMessage * mpc_DbcMessage;
-
-   // Message counting
-   std::vector<stw_types::uint32> mc_MsgCounterStandardId;
-   std::map<stw_types::uint32, stw_types::uint32> mc_MsgCounterExtendedId;
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

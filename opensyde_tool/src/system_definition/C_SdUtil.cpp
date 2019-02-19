@@ -22,6 +22,8 @@
 #include <set>
 #include <limits>
 
+#include <QElapsedTimer>
+
 #include "stwerrors.h"
 #include "constants.h"
 #include "C_SdUtil.h"
@@ -33,6 +35,7 @@
 #include "C_PuiSdUtil.h"
 #include "C_Uti.h"
 #include "C_GtGetText.h"
+#include "C_SdTooltipUtil.h"
 #include "C_OgeWiCustomMessage.h"
 #include "C_SdNdeDataPoolContentUtil.h"
 #include "C_SdNdeDataPoolUtil.h"
@@ -342,7 +345,7 @@ void C_SdUtil::h_GetErrorToolTipDataPools(const uint32 ou32_NodeIndex, const std
    orc_Content = "";
    if (oq_NvmSizeInvalid == true)
    {
-      orc_Content += C_GtGetText::h_GetText("NVM datapool sizes over node limit.\n");
+      orc_Content += C_GtGetText::h_GetText("NVM Datapool sizes over node limit.\n");
    }
    for (uint32 u32_ItDataPool = 0;
         (u32_ItDataPool < orc_Indices.size()) && (u32_ItDataPool < mu32_TOOL_TIP_MAXIMUM_ITEMS);
@@ -364,41 +367,6 @@ void C_SdUtil::h_GetErrorToolTipDataPools(const uint32 ou32_NodeIndex, const std
 
 //-----------------------------------------------------------------------------
 /*!
-   \brief   Create ascending sorted index map for input vector
-
-   Pre-requirement:
-   The input vector should be an assortment of unique indices.
-   Purpose:
-   The output vector:
-   -1:        index was not part of input vector
-   otherwise: index was part of input vector and the value shows at which position this index was standing
-
-   \param[in] orc_UnsortedIndices Unsorted indices
-
-   \return
-   Ascending sorted index map
-
-   \created     13.02.2017  STW/M.Echtler
-*/
-//-----------------------------------------------------------------------------
-std::vector<sint32> C_SdUtil::h_CreateAscendingIndexMap(const std::vector<uint32> & orc_UnsortedIndices)
-{
-   std::vector<sint32> c_IndexMap;
-   c_IndexMap.resize(orc_UnsortedIndices.size(), -1);
-   for (uint32 u32_Index = 0; u32_Index < orc_UnsortedIndices.size(); ++u32_Index)
-   {
-      if (orc_UnsortedIndices[u32_Index] >= c_IndexMap.size())
-      {
-         uint32 u32_NewSize = orc_UnsortedIndices[u32_Index] + 1U;
-         c_IndexMap.resize(u32_NewSize, -1);
-      }
-      c_IndexMap[orc_UnsortedIndices[u32_Index]] = u32_Index;
-   }
-   return c_IndexMap;
-}
-
-//-----------------------------------------------------------------------------
-/*!
    \brief   Sort source vector descending ( Sorting steps are done for the target vector in sync)
 
    \param[in,out] orc_Source Unsorted source indices
@@ -413,7 +381,7 @@ void C_SdUtil::h_SortSourceDescending(std::vector<uint32> & orc_Source, std::vec
    {
       std::vector<uint32> c_NewSource;
       std::vector<uint32> c_NewTarget;
-      const std::vector<sint32> c_IndexMap = C_SdUtil::h_CreateAscendingIndexMap(orc_Source);
+      const std::vector<sint32> c_IndexMap = C_Uti::h_CreateAscendingIndexMap(orc_Source);
       c_NewSource.reserve(orc_Source.size());
       c_NewTarget.reserve(orc_Target.size());
       //Reposition
@@ -474,42 +442,6 @@ bool C_SdUtil::h_CheckSortedDescending(const std::vector<uint32> & orc_Indices)
 
 //-----------------------------------------------------------------------------
 /*!
-   \brief   Check if input vector is sorted ascending
-
-   \param[in] orc_Indices Input vector to evaluate
-
-   \return
-   true:  Sorted
-   false: Unsorted
-
-   \created     13.02.2017  STW/M.Echtler
-*/
-//-----------------------------------------------------------------------------
-bool C_SdUtil::h_CheckSortedAscending(const std::vector<uint32> & orc_Indices)
-{
-   bool q_Retval = true;
-
-   if (orc_Indices.size() > 1)
-   {
-      uint32 u32_PrevVal = orc_Indices[0];
-
-      for (uint32 u32_It = 1; u32_It < orc_Indices.size(); ++u32_It)
-      {
-         if (u32_PrevVal <= orc_Indices[u32_It])
-         {
-            u32_PrevVal = orc_Indices[u32_It];
-         }
-         else
-         {
-            q_Retval = false;
-         }
-      }
-   }
-   return q_Retval;
-}
-
-//-----------------------------------------------------------------------------
-/*!
    \brief   Sort indices ascending
 
    \param[in,out] orc_IndicesTmp Unsorted indices
@@ -519,11 +451,11 @@ bool C_SdUtil::h_CheckSortedAscending(const std::vector<uint32> & orc_Indices)
 //-----------------------------------------------------------------------------
 void C_SdUtil::h_SortIndicesAscending(std::vector<uint32> & orc_IndicesTmp)
 {
-   if (h_CheckSortedAscending(orc_IndicesTmp) == false)
+   if (C_Uti::h_CheckSortedAscending(orc_IndicesTmp) == false)
    {
       std::vector<stw_types::uint32> c_IndicesTmp;
       //Step 1: Fill new vector in sorted order with which element should be copied to which position
-      const std::vector<stw_types::sint32> c_IndexMap = C_SdUtil::h_CreateAscendingIndexMap(orc_IndicesTmp);
+      const std::vector<stw_types::sint32> c_IndexMap = C_Uti::h_CreateAscendingIndexMap(orc_IndicesTmp);
       //Step 2: Copy existing elements to new structures according to plan
       c_IndicesTmp.reserve(orc_IndicesTmp.size());
       for (stw_types::uint32 u32_ItIndex = 0; u32_ItIndex < c_IndexMap.size(); ++u32_ItIndex)
@@ -713,7 +645,7 @@ bool C_SdUtil::h_InitNodeInterfaceComboBox(const C_OSCNode & orc_Node, const C_O
 
    if (q_Retval == false)
    {
-      opc_ComboBox->addItem(C_GtGetText::h_GetText("No Interface available"));
+      opc_ComboBox->addItem(C_GtGetText::h_GetText("No interface available"));
    }
 
    return q_Retval;
@@ -1054,6 +986,39 @@ uint32 C_SdUtil::h_GetNextFreeNodeId(const std::vector<C_OSCNodeComInterfaceSett
 
 //-----------------------------------------------------------------------------
 /*!
+   \brief   Check if node has at least one connection of this bus type
+
+   \param[in] orc_Node  Node for check
+   \param[in] oe_Type   Bus type
+
+   \return
+   true     Node has connection of this type
+   false    Node has not a connection of this type
+
+
+   \created     15.02.2019  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+bool C_SdUtil::h_HasConnectionType(const C_OSCNode & orc_Node, const C_OSCSystemBus::E_Type oe_Type)
+{
+   bool q_Return = false;
+   uint32 u32_IntfCounter;
+
+   // Search an interface of the specified type
+   for (u32_IntfCounter = 0U; u32_IntfCounter < orc_Node.c_Properties.c_ComInterfaces.size(); ++u32_IntfCounter)
+   {
+      if (orc_Node.c_Properties.c_ComInterfaces[u32_IntfCounter].e_InterfaceType == oe_Type)
+      {
+         q_Return = true;
+         break;
+      }
+   }
+
+   return q_Return;
+}
+
+//-----------------------------------------------------------------------------
+/*!
    \brief   Check if any com interfaces for the specified bus type are available and free
 
    \param[in] orc_ComInterfaces Com interfaces
@@ -1173,6 +1138,12 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
    bool q_NameConflict;
    bool q_NameEmpty;
    bool q_NodeIdInvalid;
+   QElapsedTimer c_Timer;
+
+   if (mq_TIMING_OUTPUT)
+   {
+      c_Timer.start();
+   }
    bool q_DataPoolsSizeConflict =
       C_PuiSdHandler::h_GetInstance()->CheckNodeNvmDataPoolsSizeConflict(oru32_NodeIndex);
    bool q_DataPoolsInvalid;
@@ -1259,6 +1230,10 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
       orq_ErrorDetected = true;
       orc_Text = C_GtGetText::h_GetText("Unknown");
    }
+   if (mq_TIMING_OUTPUT)
+   {
+      std::cout << "Node tooltip error check " << c_Timer.elapsed() << " ms" << &std::endl;
+   }
    return s32_Retval;
 }
 
@@ -1284,8 +1259,9 @@ void C_SdUtil::h_GetErrorToolTipBus(const uint32 & oru32_BusIndex, QString & orc
 
    std::vector<QString> c_InvalidNodesForBitRate;
    std::vector<stw_opensyde_core::C_OSCCanProtocol::E_Type> c_InvalidProtocols;
-   C_PuiSdHandler::h_GetInstance()->CheckBusConflict(oru32_BusIndex, &q_NameConflict, &q_NameEmpty, &q_IdInvalid,
-                                                     &c_InvalidNodesForBitRate, &c_InvalidProtocols);
+   C_PuiSdHandler::h_GetInstance()->CheckBusConflictDetailed(oru32_BusIndex, &q_NameConflict, &q_NameEmpty,
+                                                             &q_IdInvalid, &c_InvalidNodesForBitRate,
+                                                             &c_InvalidProtocols);
    if ((((q_NameConflict == true) || (q_NameEmpty == true)) || (q_IdInvalid == true)) ||
        (c_InvalidNodesForBitRate.size() > 0UL))
    {
@@ -1663,49 +1639,7 @@ QString C_SdUtil::h_GetToolTipContentMessage(const C_OSCCanMessageIdentification
 
    if (pc_Message != NULL)
    {
-      QString c_Tmp;
-      // Comment
-      if (pc_Message->c_Comment.IsEmpty() == false)
-      {
-         c_ToolTipContent = pc_Message->c_Comment.c_str();
-         c_ToolTipContent.append("\n\n");
-      }
-
-      //CAN settings
-      c_ToolTipContent += C_GtGetText::h_GetText("Message Properties:\n");
-      if (pc_Message->q_IsExtended == true)
-      {
-         c_Tmp = C_GtGetText::h_GetText("Extended (29 bit)");
-      }
-      else
-      {
-         c_Tmp = C_GtGetText::h_GetText("Standard (11 bit)");
-      }
-      c_ToolTipContent += QString(QString("   ") + C_GtGetText::h_GetText("Type: %1\n")).arg(c_Tmp);
-      c_ToolTipContent +=
-         QString(QString("   ") +
-                 C_GtGetText::h_GetText("CAN ID: 0x%1\n")).arg(QString::number(pc_Message->u32_CanId, 16));
-      c_ToolTipContent +=
-         QString(QString("   ") + C_GtGetText::h_GetText("DLC: %1 Bytes\n")).arg(pc_Message->u16_Dlc);
-      switch (pc_Message->e_TxMethod)
-      {
-      case C_OSCCanMessage::eTX_METHOD_ON_EVENT:
-         c_ToolTipContent += QString(QString("   ") + C_GtGetText::h_GetText("TX-Method: On Event\n"));
-         break;
-      case C_OSCCanMessage::eTX_METHOD_CYCLIC:
-         c_ToolTipContent += QString(QString("   ") + C_GtGetText::h_GetText("TX-Method: Cyclic\n"));
-         c_ToolTipContent += QString(QString("   ") + C_GtGetText::h_GetText("Cycle Time: %1\n")).arg(
-            pc_Message->u32_CycleTimeMs);
-         break;
-      case C_OSCCanMessage::eTX_METHOD_ON_CHANGE:
-         c_ToolTipContent += QString(QString("   ") + C_GtGetText::h_GetText("TX-Method: On Change\n"));
-         c_ToolTipContent += QString(QString("   ") + C_GtGetText::h_GetText("Not earlier than: %1\n")).arg(
-            pc_Message->u16_DelayTimeMs);
-         c_ToolTipContent +=
-            QString(QString("   ") +
-                    C_GtGetText::h_GetText("But not later than: %1\n")).arg(pc_Message->u32_CycleTimeMs);
-         break;
-      }
+      c_ToolTipContent = C_SdTooltipUtil::h_GetToolTipContentMessage(*pc_Message);
    }
    return c_ToolTipContent;
 }
@@ -1738,175 +1672,27 @@ QString C_SdUtil::h_GetToolTipContentSignal(const C_OSCCanMessageIdentificationI
       C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(orc_MessageId, oru32_SignalIndex);
    const C_PuiSdNodeDataPoolListElement * const pc_DpListElementUi =
       C_PuiSdHandler::h_GetInstance()->GetUiCanDataPoolListElement(orc_MessageId, oru32_SignalIndex);
-   float64 f64_Value = 0.0;
 
    if ((pc_Message != NULL) &&
        (pc_Signal != NULL) &&
        (pc_DpListElement != NULL))
    {
-      // Comment
-      if (pc_DpListElement->c_Comment.IsEmpty() == false)
-      {
-         c_ToolTipContent = pc_DpListElement->c_Comment.c_str();
-         c_ToolTipContent.append("\n\n");
-      }
-
-      //additional info
-      if (orc_AdditionalInformation.isEmpty() == false)
-      {
-         c_ToolTipContent.append(orc_AdditionalInformation);
-         c_ToolTipContent.append("\n\n");
-      }
-
-      // Value information
-      c_ToolTipContent.append(C_GtGetText::h_GetText("Signal Properties: \n"));
-      c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Auto min/max: "));
+      QString c_AutoMinMaxInfo;
+      c_AutoMinMaxInfo.append(QString("   ") + C_GtGetText::h_GetText("Auto min/max: "));
       if (pc_DpListElementUi->q_AutoMinMaxActive == true)
       {
-         c_ToolTipContent.append(C_GtGetText::h_GetText("Enabled"));
+         c_AutoMinMaxInfo.append(C_GtGetText::h_GetText("Enabled"));
       }
       else
       {
-         c_ToolTipContent.append(C_GtGetText::h_GetText("Disabled"));
+         c_AutoMinMaxInfo.append(C_GtGetText::h_GetText("Disabled"));
       }
-      c_ToolTipContent.append("\n");
-
-      c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Min: "));
-      if (C_SdNdeDataPoolContentUtil::h_GetValueAsFloat64(pc_DpListElement->c_MinValue, f64_Value) == C_NO_ERR)
-      {
-         c_ToolTipContent.append(QString::number(f64_Value));
-      }
-      c_ToolTipContent.append("\n");
-
-      c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Max: "));
-      if (C_SdNdeDataPoolContentUtil::h_GetValueAsFloat64(pc_DpListElement->c_MaxValue, f64_Value) == C_NO_ERR)
-      {
-         c_ToolTipContent.append(QString::number(f64_Value));
-      }
-      c_ToolTipContent.append("\n");
-
-      c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Factor: "));
-      c_ToolTipContent.append(QString::number(pc_DpListElement->f64_Factor));
-      c_ToolTipContent.append("\n");
-
-      c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Offset: "));
-      c_ToolTipContent.append(QString::number(pc_DpListElement->f64_Offset));
-      c_ToolTipContent.append("\n");
-
-      c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Init Value: "));
-      if (C_SdNdeDataPoolContentUtil::h_GetValueAsFloat64(pc_DpListElement->c_Value, f64_Value) == C_NO_ERR)
-      {
-         c_ToolTipContent.append(QString::number(f64_Value));
-      }
-
-      if (pc_DpListElement->c_Unit.IsEmpty() == false)
-      {
-         c_ToolTipContent.append("\n");
-         c_ToolTipContent.append(C_GtGetText::h_GetText("Unit: "));
-         c_ToolTipContent.append(pc_DpListElement->c_Unit.c_str());
-      }
-      c_ToolTipContent.append("\n");
-
-      // Value type information
-      c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Byte Order: "));
-      if (pc_Signal->e_ComByteOrder == C_OSCCanSignal::eBYTE_ORDER_INTEL)
-      {
-         c_ToolTipContent.append(C_GtGetText::h_GetText("Intel"));
-      }
-      else
-      {
-         c_ToolTipContent.append(C_GtGetText::h_GetText("Motorola"));
-      }
-      c_ToolTipContent.append("\n");
-
-      c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Type: "));
-      c_ToolTipContent.append(C_SdNdeDataPoolUtil::h_ConvertTypeToNameSimplified(pc_DpListElement->c_Value.GetType()));
-      c_ToolTipContent.append("\n");
-
-      c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Length: "));
-      c_ToolTipContent.append(QString::number(pc_Signal->u16_ComBitLength));
-      c_ToolTipContent.append(C_GtGetText::h_GetText(" Bit\n"));
-
-      // Layout information
-      c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Message: "));
-      c_ToolTipContent.append(pc_Message->c_Name.c_str());
-      c_ToolTipContent.append("\n");
-
-      c_ToolTipContent.append(QString("   ") + C_GtGetText::h_GetText("Start Bit: "));
-      c_ToolTipContent.append(QString::number(pc_Signal->u16_ComBitStart));
+      c_ToolTipContent = C_SdTooltipUtil::h_GetToolTipContentSignal(*pc_Signal, *pc_Message, *pc_DpListElement,
+                                                                    c_AutoMinMaxInfo,
+                                                                    orc_AdditionalInformation);
    }
 
    return c_ToolTipContent;
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get save file name via QFileDialog
-
-   \param[in,out] opc_Parent          Parent widget
-   \param[in]     orc_Heading         QFileDialog heading
-   \param[in]     orc_StartingFolder  QFileDialog starting folder
-   \param[in]     orc_Filter          QFileDialog filter
-   \param[in]     orc_DefaultFileName QFileDialog default file name
-   \param[in]     oc_Option           QFileDialog option
-
-   \return
-   Get save file name (empty if aborted)
-
-   \created     05.11.2018  STW/M.Echtler
-*/
-//-----------------------------------------------------------------------------
-QString C_SdUtil::h_GetSaveFileName(QWidget * const opc_Parent, const QString & orc_Heading,
-                                    const QString & orc_StartingFolder, const QString & orc_Filter,
-                                    const QString & orc_DefaultFileName, const QFileDialog::Options oc_Option)
-{
-   QString c_Retval;
-   bool q_Stop = false;
-   QFileDialog c_FileDialog(opc_Parent, orc_Heading, orc_StartingFolder, orc_Filter);
-
-   c_FileDialog.setFileMode(QFileDialog::AnyFile);
-   c_FileDialog.setAcceptMode(QFileDialog::AcceptSave);
-   c_FileDialog.setOptions(oc_Option);
-   c_FileDialog.selectFile(orc_DefaultFileName);
-   while (q_Stop == false)
-   {
-      const sintn sn_UserChoice = c_FileDialog.exec();
-      if (sn_UserChoice == static_cast<sintn>(QDialog::Accepted))
-      {
-         // take file name (we save only one file therefore take first entry)
-         const QString c_FullFilePath = c_FileDialog.selectedFiles().at(0);
-
-         if (c_FullFilePath != "")
-         {
-            const QFileInfo c_Info(c_FullFilePath);
-            if (C_OSCUtils::h_CheckValidCName(c_Info.baseName().toStdString().c_str(),
-                                              std::numeric_limits<uint16>::max()) == true)
-            {
-               c_Retval = c_FullFilePath;
-               q_Stop = true;
-            }
-            else
-            {
-               C_OgeWiCustomMessage c_MessageBox(opc_Parent, C_OgeWiCustomMessage::eERROR);
-               c_MessageBox.SetHeading(orc_Heading);
-               c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText(
-                                                      "File name invalid. Only alphanumeric characters + \"_\" are allowed.")));
-               c_MessageBox.Execute();
-            }
-         }
-         else
-         {
-            //Unexpected
-            tgl_assert(false);
-         }
-      }
-      else
-      {
-         q_Stop = true;
-      }
-   }
-   return c_Retval;
-   //lint -e{1746} Necessary because needs default parameter and is not recognized as const
 }
 
 //-----------------------------------------------------------------------------
@@ -1930,7 +1716,7 @@ void C_SdUtil::h_SortIndicesDescendingAndSync(std::vector<stw_types::uint32> & o
       std::vector<T> c_OSCContentTmp;
       std::vector<U> c_UIContentTmp;
       //Step 1: Fill new vector in sorted order with which element should be copied to which position
-      const std::vector<stw_types::sint32> c_IndexMap = C_SdUtil::h_CreateAscendingIndexMap(orc_IndicesTmp);
+      const std::vector<stw_types::sint32> c_IndexMap = C_Uti::h_CreateAscendingIndexMap(orc_IndicesTmp);
       //Step 2: Copy existing elements to new structures according to plan
       c_IndicesTmp.reserve(orc_IndicesTmp.size());
       c_OSCContentTmp.reserve(orc_OSCContentTmp.size());
@@ -1991,13 +1777,13 @@ template <typename T, typename U>
 void C_SdUtil::h_SortIndicesAscendingAndSync(std::vector<stw_types::uint32> & orc_IndicesTmp,
                                              std::vector<T> & orc_OSCContentTmp, std::vector<U> & orc_UIContentTmp)
 {
-   if (h_CheckSortedAscending(orc_IndicesTmp) == false)
+   if (C_Uti::h_CheckSortedAscending(orc_IndicesTmp) == false)
    {
       std::vector<stw_types::uint32> c_IndicesTmp;
       std::vector<T> c_OSCContentTmp;
       std::vector<U> c_UIContentTmp;
       //Step 1: Fill new vector in sorted order with which element should be copied to which position
-      const std::vector<stw_types::sint32> c_IndexMap = C_SdUtil::h_CreateAscendingIndexMap(orc_IndicesTmp);
+      const std::vector<stw_types::sint32> c_IndexMap = C_Uti::h_CreateAscendingIndexMap(orc_IndicesTmp);
       //Step 2: Copy existing elements to new structures according to plan
       c_IndicesTmp.reserve(orc_IndicesTmp.size());
       c_OSCContentTmp.reserve(orc_OSCContentTmp.size());

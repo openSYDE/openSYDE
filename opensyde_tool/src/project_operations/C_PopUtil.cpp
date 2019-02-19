@@ -18,6 +18,7 @@
 #include "precomp_headers.h"
 
 #include <QApplication>
+#include <QFileInfo>
 
 #include "C_PopErrorHandling.h"
 #include "C_PopUtil.h"
@@ -71,8 +72,8 @@ bool C_PopUtil::h_AskUserToContinue(QWidget * const opc_Parent, const bool oq_Al
    {
       C_OgeWiCustomMessage c_MessageBox(opc_Parent, C_OgeWiCustomMessage::E_Type::eQUESTION);
       C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
+      QString c_Description = "";
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Unsaved changes"));
-      c_MessageBox.SetDescription(C_GtGetText::h_GetText("Do you want to save the changes of the current project?"));
       if (oq_AllowContinueWithoutSaving == true)
       {
          c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Save"));
@@ -81,9 +82,19 @@ bool C_PopUtil::h_AskUserToContinue(QWidget * const opc_Parent, const bool oq_Al
       }
       else
       {
+         c_Description = C_GtGetText::h_GetText("To continue the current project changes have to be saved. ");
          c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Save and Continue"));
          c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
       }
+      c_Description += QString(C_GtGetText::h_GetText("Do you want to save the changes of the current project"));
+
+      if (C_PuiProject::h_GetInstance()->IsEmptyProject() == false)
+      {
+         c_MessageBox.SetDetails(C_GtGetText::h_GetText("Project path: ") + C_PuiProject::h_GetInstance()->GetPath());
+         c_Description += " \"" + C_PuiProject::h_GetInstance()->GetName() + "\"";
+      }
+      c_Description += "?";
+      c_MessageBox.SetDescription(c_Description);
       e_ReturnMessageBox = c_MessageBox.Execute();
 
       switch (e_ReturnMessageBox)

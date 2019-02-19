@@ -532,7 +532,7 @@ p, li { white-space: pre-wrap; }
              <property name="widgetResizable">
               <bool>true</bool>
              </property>
-             <widget class="QWidget" name="pc_ScrollAreaWidgetContents">
+             <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_ScrollAreaWidgetContents">
               <property name="geometry">
                <rect>
                 <x>0</x>
@@ -552,7 +552,7 @@ p, li { white-space: pre-wrap; }
                 <number>0</number>
                </property>
                <property name="rightMargin">
-                <number>0</number>
+                <number>6</number>
                </property>
                <property name="bottomMargin">
                 <number>0</number>
@@ -633,6 +633,9 @@ p, li { white-space: pre-wrap; }
                </property>
                <property name="text">
                 <string>TextLabel</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
                </property>
                <property name="wordWrap">
                 <bool>true</bool>
@@ -1686,6 +1689,27 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
+   <extends>QGroupBox</extends>
+   <header>C_OgeGbxTransparent.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubSvgIconOnly</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubSvgIconOnly.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGroupItem.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeSpxNumber</class>
+   <extends>QSpinBox</extends>
+   <header>C_OgeSpxNumber.h</header>
+  </customwidget>
+  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
    <extends>QLabel</extends>
    <header>C_OgeLabHeadingGroupBold.h</header>
@@ -1697,30 +1721,9 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
-   <extends>QGroupBox</extends>
-   <header>C_OgeGbxTransparent.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeTedPropertiesComment</class>
-   <extends>QTextEdit</extends>
-   <header>C_OgeTedPropertiesComment.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLePropertiesName</class>
-   <extends>QLineEdit</extends>
-   <header>C_OgeLePropertiesName.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeSpxNumber</class>
-   <extends>QSpinBox</extends>
-   <header>C_OgeSpxNumber.h</header>
+   <class>stw_opensyde_gui_elements::C_OgePubCancel</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubCancel.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgePubDialog</class>
@@ -1734,9 +1737,26 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubCancel</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubCancel.h</header>
+   <class>stw_opensyde_gui_elements::C_OgeWiOnlyBackground</class>
+   <extends>QWidget</extends>
+   <header>C_OgeWiOnlyBackground.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeTransparentScrollArea</class>
+   <extends>QScrollArea</extends>
+   <header>C_OgeTransparentScrollArea.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeTedPropertiesComment</class>
+   <extends>QTextEdit</extends>
+   <header>C_OgeTedPropertiesComment.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLePropertiesName</class>
+   <extends>QLineEdit</extends>
+   <header>C_OgeLePropertiesName.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgePubConfigure</class>
@@ -1749,20 +1769,9 @@ p, li { white-space: pre-wrap; }
    <header>C_OgeLabGroupItemValue.h</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeTransparentScrollArea</class>
-   <extends>QScrollArea</extends>
-   <header>C_OgeTransparentScrollArea.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLeFilePathWrapper</class>
    <extends>QLineEdit</extends>
    <header>C_OgeLeFilePathWrapper.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubSvgIconOnly</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubSvgIconOnly.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLeProperties</class>

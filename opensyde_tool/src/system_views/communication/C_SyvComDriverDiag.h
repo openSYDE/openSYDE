@@ -53,7 +53,7 @@ public:
 
    stw_types::sint32 SetDiagnosticMode(QString & orc_ErrorDetails);
    stw_types::sint32 SetUpCyclicTransmissions(QString & orc_ErrorDetails,
-                                              std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_FailedIdRegisters, std::vector<QString> & orc_FailedIdErrorDetails);
+                                              std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_FailedIdRegisters, std::vector<QString> & orc_FailedIdErrorDetails, std::map<stw_types::uint32, stw_types::uint32> & orc_FailedNodesElementNumber, std::map<stw_types::uint32, stw_types::uint32> & orc_NodesElementNumber);
    stw_types::sint32 StopCyclicTransmissions(void);
    stw_types::sint32 StopDiagnosisServer(void);
 
@@ -155,7 +155,7 @@ private:
                                                      // as many entries as we
                                                      // have nodes.
 
-   std::set<stw_types::uint32> mc_DiagNodes; ///< Nodes which has used datapool elements
+   std::set<stw_types::uint32> mc_DiagNodes;         ///< Nodes which has used datapool elements
    std::set<stw_types::uint32> mc_DefectNodeIndices; ///< Nodes which could not be reached on start
 
    const stw_types::uint32 mu32_ViewIndex;
@@ -169,8 +169,7 @@ private:
    void m_InitDiagProtocolKfx(stw_opensyde_core::C_OSCDiagProtocolKfx * const opc_DiagProtocolKefex) const;
    stw_types::sint32 m_InitDiagProtocol(void);
    stw_types::sint32 m_InitDataDealer(void);
-   stw_types::sint32 m_StartRoutingDiag(QString & orc_ErrorDetails,
-                                        std::set<stw_types::uint32> & orc_ErrorActiveNodes);
+   stw_types::sint32 m_StartRoutingDiag(QString & orc_ErrorDetails, std::set<stw_types::uint32> & orc_ErrorActiveNodes);
    stw_types::sint32 m_StartDiagServers(QString & orc_ErrorDetails);
 
    stw_types::sint32 m_Cycle(void);

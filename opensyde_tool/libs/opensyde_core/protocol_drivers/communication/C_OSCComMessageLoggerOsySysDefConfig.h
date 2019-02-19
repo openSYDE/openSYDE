@@ -35,7 +35,7 @@ public:
    C_OSCComMessageLoggerOsySysDefConfig(const C_OSCSystemDefinition & orc_OsySysDef,
                                         const stw_types::uint32 ou32_BusIndex);
 
-   const C_OSCSystemDefinition c_OsySysDef;
+   C_OSCSystemDefinition c_OsySysDef;
    stw_types::uint32 u32_BusIndex;
 };
 

@@ -37,6 +37,7 @@ public:
    ~C_TblTreItem(void);
 
    void AddChild(C_TblTreItem * const opc_Child);
+   void ReserveChildrenSpace(const stw_types::uint32 ou32_Space);
    void SetChild(const stw_types::uint32 ou32_Index, C_TblTreItem * const opc_Child);
    stw_types::sint32 GetIndexInParentNumber(void);
    static stw_types::sint32 h_GetIndex(const std::vector<C_TblTreItem *> & orc_Vector,

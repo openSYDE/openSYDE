@@ -93,6 +93,8 @@ C_SdBueMessageSelectorWidget::C_SdBueMessageSelectorWidget(QWidget * const opc_P
 
    connect(this->mpc_Ui->pc_PbTreeWidgetRoot, &stw_opensyde_gui_elements::C_OgePubTreeWidgetRoot::clicked,
            this, &C_SdBueMessageSelectorWidget::m_MessagesButtonClicked);
+   connect(this->mpc_Ui->pc_MessageTreeWidget, &C_SdBueMessageSelectorTreeWidget::SigErrorChanged,
+           this, &C_SdBueMessageSelectorWidget::SigErrorChanged);
    connect(this->mpc_Ui->pc_MessageTreeWidget, &C_SdBueMessageSelectorTreeWidget::SigSelectionChanged,
            this, &C_SdBueMessageSelectorWidget::m_MessagesSelectionChanged);
    //Selection signals
@@ -519,7 +521,7 @@ void C_SdBueMessageSelectorWidget::m_AddMessageButtonClicked(void) const
    {
       C_OgeWiCustomMessage c_MessageBox(this->parentWidget());
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Message add"));
-      c_MessageBox.SetDescription(C_GtGetText::h_GetText("Cannot add new message. Please select an active node."));
+      c_MessageBox.SetDescription(C_GtGetText::h_GetText("Cannot add new message. Select an active node."));
       c_MessageBox.Execute();
    }
 }
@@ -733,7 +735,7 @@ void C_SdBueMessageSelectorWidget::m_OnCustomContextMenuRequested(const QPoint &
       {
          C_OgeWiCustomMessage c_MessageBox(this);
          c_MessageBox.SetHeading(C_GtGetText::h_GetText("No actions available"));
-         c_MessageBox.SetDescription(C_GtGetText::h_GetText("Please select an active node and retry."));
+         c_MessageBox.SetDescription(C_GtGetText::h_GetText("Select an active node and retry."));
          c_MessageBox.Execute();
       }
    }

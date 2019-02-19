@@ -116,7 +116,7 @@ void C_SdBueMessageRxEntry::InitStaticNames(void) const
    //Tool tips
    this->mpc_Ui->pc_LabelTimeoutModeDescription->SetToolTipInformation(C_GtGetText::h_GetText("Timeout Mode"),
                                                                        C_GtGetText::h_GetText(
-                                                                          "There are following receive time out modes: "
+                                                                          "Available modes for receive timeout: "
                                                                           "\nAuto: Auto calculation of timeout value. "
                                                                           "(3*Cyclic Time) + 10ms"
                                                                           "\nCustom: User specific timeout value"));

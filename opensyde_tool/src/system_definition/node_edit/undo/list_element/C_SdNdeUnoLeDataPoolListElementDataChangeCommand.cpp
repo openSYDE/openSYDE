@@ -26,6 +26,7 @@
 #include "C_SdNdeUnoLeDataPoolListElementDataChangeCommand.h"
 #include "C_PuiSdHandler.h"
 #include "TGLUtils.h"
+#include "C_SdNdeDataPoolContentUtil.h"
 
 /* -- Used Namespaces ------------------------------------------------------ */
 using namespace stw_types;
@@ -138,8 +139,8 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_P
       bool q_ApplyMaxToDataSet = false;
       bool q_AutoAdaptArraySize = false;
       //Copy previous value
-      C_SdNdeDataPoolUtil::h_ConvertToGeneric(c_OSCElement, c_UIElement, this->me_DataChangeType,
-                                              orc_PreviousData, this->mu32_ArrayIndex, this->ms32_DataSetIndex);
+      C_SdNdeDataPoolUtil::h_ConvertToElementGeneric(c_OSCElement, c_UIElement, this->me_DataChangeType,
+                                                     orc_PreviousData, this->mu32_ArrayIndex, this->ms32_DataSetIndex);
       switch (this->me_DataChangeType)
       {
       case C_SdNdeDataPoolUtil::eELEMENT_NAME:
@@ -235,20 +236,28 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_P
          break;
       case C_SdNdeDataPoolUtil::eELEMENT_MIN:
          //Save scaled value
-         orc_PreviousData = C_SdNdeDataPoolUtil::h_ScaledDataVariable(c_OSCElement.c_MinValue, c_OSCElement.f64_Factor,
-                                                                      c_OSCElement.f64_Offset, this->mu32_ArrayIndex);
+         orc_PreviousData = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(c_OSCElement.c_MinValue,
+                                                                                        c_OSCElement.f64_Factor,
+                                                                                        c_OSCElement.f64_Offset,
+                                                                                        this->mu32_ArrayIndex);
          //Update value
-         C_SdNdeDataPoolUtil::h_SetUnscaledDataVariable(orc_NewData, c_OSCElement.c_MinValue, c_OSCElement.f64_Factor,
-                                                        c_OSCElement.f64_Offset, this->mu32_ArrayIndex);
+         C_SdNdeDataPoolContentUtil::h_SetDataVariableFromGenericWithScaling(orc_NewData, c_OSCElement.c_MinValue,
+                                                                             c_OSCElement.f64_Factor,
+                                                                             c_OSCElement.f64_Offset,
+                                                                             this->mu32_ArrayIndex);
          q_ApplyMinToDataSet = true;
          break;
       case C_SdNdeDataPoolUtil::eELEMENT_MAX:
          //Save scaled value
-         orc_PreviousData = C_SdNdeDataPoolUtil::h_ScaledDataVariable(c_OSCElement.c_MaxValue, c_OSCElement.f64_Factor,
-                                                                      c_OSCElement.f64_Offset, this->mu32_ArrayIndex);
+         orc_PreviousData = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(c_OSCElement.c_MaxValue,
+                                                                                        c_OSCElement.f64_Factor,
+                                                                                        c_OSCElement.f64_Offset,
+                                                                                        this->mu32_ArrayIndex);
          //Update value
-         C_SdNdeDataPoolUtil::h_SetUnscaledDataVariable(orc_NewData, c_OSCElement.c_MaxValue, c_OSCElement.f64_Factor,
-                                                        c_OSCElement.f64_Offset, this->mu32_ArrayIndex);
+         C_SdNdeDataPoolContentUtil::h_SetDataVariableFromGenericWithScaling(orc_NewData, c_OSCElement.c_MaxValue,
+                                                                             c_OSCElement.f64_Factor,
+                                                                             c_OSCElement.f64_Offset,
+                                                                             this->mu32_ArrayIndex);
          q_ApplyMaxToDataSet = true;
          break;
       case C_SdNdeDataPoolUtil::eELEMENT_FACTOR:
@@ -274,13 +283,17 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_P
                const uint32 u32_DataSetIndex = static_cast<uint32>(this->ms32_DataSetIndex);
                //Save scaled value
                orc_PreviousData =
-                  C_SdNdeDataPoolUtil::h_ScaledDataVariable(c_OSCElement.c_DataSetValues[u32_DataSetIndex],
-                                                            c_OSCElement.f64_Factor,
-                                                            c_OSCElement.f64_Offset, this->mu32_ArrayIndex);
-               C_SdNdeDataPoolUtil::h_SetUnscaledDataVariable(orc_NewData,
-                                                              c_OSCElement.c_DataSetValues[u32_DataSetIndex],
-                                                              c_OSCElement.f64_Factor, c_OSCElement.f64_Offset,
-                                                              this->mu32_ArrayIndex);
+                  C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(c_OSCElement.c_DataSetValues[
+                                                                                 u32_DataSetIndex],
+                                                                              c_OSCElement.f64_Factor,
+                                                                              c_OSCElement.f64_Offset,
+                                                                              this->mu32_ArrayIndex);
+               C_SdNdeDataPoolContentUtil::h_SetDataVariableFromGenericWithScaling(orc_NewData,
+                                                                                   c_OSCElement.c_DataSetValues[
+                                                                                      u32_DataSetIndex],
+                                                                                   c_OSCElement.f64_Factor,
+                                                                                   c_OSCElement.f64_Offset,
+                                                                                   this->mu32_ArrayIndex);
             }
          }
          break;
@@ -322,10 +335,11 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_P
          //Adapt data set values to min/max changes (only if necessary)
          if (q_ApplyMinToDataSet == true)
          {
-            const QVariant c_NewData = C_SdNdeDataPoolUtil::h_ScaledDataVariable(c_OSCElement.c_MinValue,
-                                                                                 c_OSCElement.f64_Factor,
-                                                                                 c_OSCElement.f64_Offset,
-                                                                                 this->mu32_ArrayIndex);
+            const QVariant c_NewData = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(
+               c_OSCElement.c_MinValue,
+               c_OSCElement.f64_Factor,
+               c_OSCElement.f64_Offset,
+               this->mu32_ArrayIndex);
             for (uint32 u32_ItDataSet = 0; u32_ItDataSet < c_OSCElement.c_DataSetValues.size(); ++u32_ItDataSet)
             {
                if (C_SdNdeDataPoolUtil::h_CompareSpecifiedItemSmaller(c_OSCElement.c_DataSetValues[u32_ItDataSet],
@@ -343,10 +357,11 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_P
          }
          if (q_ApplyMaxToDataSet == true)
          {
-            const QVariant c_NewData = C_SdNdeDataPoolUtil::h_ScaledDataVariable(c_OSCElement.c_MaxValue,
-                                                                                 c_OSCElement.f64_Factor,
-                                                                                 c_OSCElement.f64_Offset,
-                                                                                 this->mu32_ArrayIndex);
+            const QVariant c_NewData = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(
+               c_OSCElement.c_MaxValue,
+               c_OSCElement.f64_Factor,
+               c_OSCElement.f64_Offset,
+               this->mu32_ArrayIndex);
             for (uint32 u32_ItDataSet = 0; u32_ItDataSet < c_OSCElement.c_DataSetValues.size(); ++u32_ItDataSet)
             {
                if (C_SdNdeDataPoolUtil::h_CompareSpecifiedItemSmaller(c_OSCElement.c_MaxValue,
@@ -460,8 +475,9 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_ApplyAutoMin(void)
    {
       QVariant c_Data;
       const C_OSCNodeDataPoolContent c_TemporaryElement = GetCurrentTypeMinGeneric();
-      c_Data = C_SdNdeDataPoolUtil::h_ScaledDataVariable(c_TemporaryElement, pc_OSCElement->f64_Factor,
-                                                         pc_OSCElement->f64_Offset, 0);
+      c_Data = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(c_TemporaryElement,
+                                                                           pc_OSCElement->f64_Factor,
+                                                                           pc_OSCElement->f64_Offset, 0);
 
       //Append to current command
       if (pc_OSCElement->c_MinValue.GetArray() == false)
@@ -507,8 +523,9 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_ApplyAutoMax(void)
    {
       QVariant c_Data;
       const C_OSCNodeDataPoolContent c_TemporaryElement = GetCurrentTypeMaxGeneric();
-      c_Data = C_SdNdeDataPoolUtil::h_ScaledDataVariable(c_TemporaryElement, pc_OSCElement->f64_Factor,
-                                                         pc_OSCElement->f64_Offset, 0);
+      c_Data = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(c_TemporaryElement,
+                                                                           pc_OSCElement->f64_Factor,
+                                                                           pc_OSCElement->f64_Offset, 0);
 
       //Append to current command
       if (pc_OSCElement->c_MaxValue.GetArray() == false)

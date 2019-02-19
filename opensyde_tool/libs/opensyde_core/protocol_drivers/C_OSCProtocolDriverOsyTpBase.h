@@ -115,7 +115,6 @@ public:
 
    void SetBroadcastTimeout(const stw_types::uint32 ou32_TimeoutMs);
 
-
    //-----------------------------------------------------------------------------
    /*!
       \brief   Perform cyclic communication tasks

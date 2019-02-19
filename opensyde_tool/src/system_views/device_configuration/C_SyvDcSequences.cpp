@@ -241,6 +241,7 @@ C_SyvDcSequences::C_SyvDcSequences(void) :
    me_Sequence(eSCANCANENTERFLASHLOADER),
    mu32_CanBitrate(0U),
    mq_ConfigureAllInterfaces(false),
+   mq_RunScanSendFlashloaderRequestEndless(false),
    ms32_Result(C_NOACT)
 {
    mpc_Thread = new C_SyvComDriverThread(&C_SyvDcSequences::mh_ThreadFunc, this);
@@ -313,9 +314,11 @@ sint32 C_SyvDcSequences::InitDcSequences(const uint32 ou32_ViewIndex)
 
    std::vector<uint8> c_ActiveNodes;
 
+   // No CAN initialization due to initialization in the sequences itself
    s32_Return = C_SyvComDriverUtil::h_GetOSCComDriverParamFromView(ou32_ViewIndex, u32_ActiveBusIndex, c_ActiveNodes,
                                                                    &this->mpc_CanDllDispatcher,
-                                                                   &this->mpc_EthernetDispatcher);
+                                                                   &this->mpc_EthernetDispatcher,
+                                                                   false);
 
    if (s32_Return == C_NO_ERR)
    {
@@ -362,7 +365,7 @@ sint32 C_SyvDcSequences::FillDeviceConfig(C_SyvDcDeviceConfiguation & orc_Config
 
       if (this->mpc_ComDriver->GetNodeIndex(c_ServerId, u32_NodeIndex) == true)
       {
-         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(u32_NodeIndex);
+         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
          const C_OSCSystemBus * const pc_UsedBus =
             C_PuiSdHandler::h_GetInstance()->GetOSCBus(this->mu32_ActiveBusIndex);
 
@@ -442,16 +445,22 @@ sint32 C_SyvDcSequences::FillDeviceConfig(C_SyvDcDeviceConfiguation & orc_Config
                   }
                }
             }
-            else if (pc_UsedBus->e_Type == C_OSCSystemBus::eCAN)
-            {
-               // STW Flashloader can only be configured on the current used interface
-               orc_Config.c_BusIds.push_back(0);
-               orc_Config.c_CanBitrates.push_back(static_cast<uint32>(pc_UsedBus->u64_BitRate));
-            }
             else
             {
-               // Error: STW flashloader does not support Ethernet
-               s32_Return = C_CONFIG;
+               //Flashloader type "none" is supported by the device structure, but not the UI
+               tgl_assert(ore_Flashloader == C_OSCNodeProperties::eFL_STW);
+
+               if (pc_UsedBus->e_Type == C_OSCSystemBus::eCAN)
+               {
+                  // STW Flashloader can only be configured on the current used interface
+                  orc_Config.c_BusIds.push_back(0);
+                  orc_Config.c_CanBitrates.push_back(static_cast<uint32>(pc_UsedBus->u64_BitRate));
+               }
+               else
+               {
+                  // Error: STW flashloader does not support Ethernet
+                  s32_Return = C_CONFIG;
+               }
             }
          }
       }
@@ -492,6 +501,63 @@ sint32 C_SyvDcSequences::ScanCanEnterFlashloader(const uint32 ou32_UsedBitrate)
       this->mpc_Thread->start();
    }
    return s32_Return;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Starts thread to send flashloader request messages
+
+   Supports openSYDE CAN-TP and STW Flashloader protocols.
+
+   Concrete implementation is in function m_RunScanCanSendFlashloaderReqeust
+
+   \param[in]  ou32_ScanTime    Time till stop sending the requests in ms
+   \param[in]  oq_ScanEndless   Flag if sending of the request shall not stop if the time is over
+                                Can be stopped by StopScanCanSendFlashloaderRequest
+
+   \return
+   C_NO_ERR   started sequence
+   C_BUSY     previously started sequence still going on
+
+   \created     06.12.2018  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+sint32 C_SyvDcSequences::ScanCanSendFlashloaderRequest(const uint32 ou32_ScanTime, const bool oq_ScanEndless)
+{
+   sint32 s32_Return = C_NO_ERR;
+
+   if (this->mpc_Thread->isRunning() == true)
+   {
+      s32_Return = C_BUSY;
+   }
+   else
+   {
+      this->me_Sequence = eSCANCANSENDFLASHLOADERREQUEST;
+      this->mu32_ScanTime = ou32_ScanTime;
+      this->mq_RunScanSendFlashloaderRequestEndless = oq_ScanEndless;
+      this->mpc_Thread->start();
+   }
+   return s32_Return;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Sets the flag for stopping ScanCanSendFlashloaderRequest
+
+   When ScanCanSendFlashloaderRequest is still running an the flag mq_RunScanSendFlashloaderRequestEndless
+   is not set to false, the function sets it to true.
+   The ScanCanSendFlashloaderRequest will then be stopped when the scan time is over too.
+
+   This function is thread safe
+
+   \created     06.12.2018  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_SyvDcSequences::StopScanCanSendFlashloaderRequest(void)
+{
+   this->mc_CriticalSection.Acquire();
+   this->mq_RunScanSendFlashloaderRequestEndless = false;
+   this->mc_CriticalSection.Release();
 }
 
 //-----------------------------------------------------------------------------
@@ -734,6 +800,51 @@ sint32 C_SyvDcSequences::ConfEthOpenSydeDevices(const std::vector<C_SyvDcDeviceC
 
 //-----------------------------------------------------------------------------
 /*!
+   \brief   Sends the service broadcast requestProgramming
+
+   \param[out]    orq_NotAccepted   true: at least one "not accepted" response was received
+                                    false: no "not accepted" response was received
+
+   \return
+   C_NO_ERR   Request programming flag sent and set
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in TX queue ...
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_CONFIG   no transport protocol installed or broadcast protocol not initialized
+
+   \created     07.12.2018  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+sint32 C_SyvDcSequences::SendOsyBroadcastRequestProgramming(bool & orq_NotAccepted) const
+{
+   sint32 s32_Return = C_NO_ERR;
+
+   if (this->mpc_Thread->isRunning() == true)
+   {
+      s32_Return = C_BUSY;
+   }
+   else
+   {
+      s32_Return = this->mpc_ComDriver->SendOsyBroadcastRequestProgramming(orq_NotAccepted);
+
+      if (s32_Return == C_NO_ERR)
+      {
+         osc_write_log_info("Send openSYDE request programming flag",
+                            "openSYDE broadcast request programming flag sent.");
+      }
+      else
+      {
+         osc_write_log_error("Send openSYDE request programming flag",
+                             "Sending openSYDE broadcast request programming flag failed with error: " +
+                             C_SCLString::IntToStr(s32_Return));
+      }
+   }
+   return s32_Return;
+}
+
+//-----------------------------------------------------------------------------
+/*!
    \brief   Resets all STW flashloader devices
 
    Function returns immediately with the result. It will not be run in the separate thread.
@@ -797,7 +908,7 @@ sint32 C_SyvDcSequences::ResetCanStwFlashloaderDevices(void)
    \created     06.12.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
-sint32 C_SyvDcSequences::ResetCanOpenSydeDevices(void) const
+sint32 C_SyvDcSequences::ResetCanOpenSydeDevices(const bool oq_ToFlashloader) const
 {
    sint32 s32_Return = C_NO_ERR;
 
@@ -807,8 +918,18 @@ sint32 C_SyvDcSequences::ResetCanOpenSydeDevices(void) const
    }
    else
    {
-      s32_Return = this->mpc_ComDriver->SendOsyBroadcastEcuReset(
-         C_OSCProtocolDriverOsyTpBase::hu8_OSY_RESET_TYPE_KEY_OFF_ON);
+      uint8 u8_ResetType;
+
+      if (oq_ToFlashloader == true)
+      {
+         u8_ResetType = C_OSCProtocolDriverOsyTpBase::hu8_OSY_RESET_TYPE_RESET_TO_FLASHLOADER;
+      }
+      else
+      {
+         u8_ResetType = C_OSCProtocolDriverOsyTpBase::hu8_OSY_RESET_TYPE_KEY_OFF_ON;
+      }
+
+      s32_Return = this->mpc_ComDriver->SendOsyBroadcastEcuReset(u8_ResetType);
       if (s32_Return == C_NO_ERR)
       {
          osc_write_log_info("Reset CAN openSYDE devices", "openSYDE broadcast ECU reset sent.");
@@ -835,7 +956,7 @@ sint32 C_SyvDcSequences::ResetCanOpenSydeDevices(void) const
    \created     06.12.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
-sint32 C_SyvDcSequences::ResetEthOpenSydeDevices(void) const
+sint32 C_SyvDcSequences::ResetEthOpenSydeDevices(const bool oq_ToFlashloader) const
 {
    sint32 s32_Return = C_NO_ERR;
 
@@ -845,8 +966,18 @@ sint32 C_SyvDcSequences::ResetEthOpenSydeDevices(void) const
    }
    else
    {
-      s32_Return = this->mpc_ComDriver->SendOsyBroadcastEcuReset(
-         C_OSCProtocolDriverOsyTpBase::hu8_OSY_RESET_TYPE_KEY_OFF_ON);
+      uint8 u8_ResetType;
+
+      if (oq_ToFlashloader == true)
+      {
+         u8_ResetType = C_OSCProtocolDriverOsyTpBase::hu8_OSY_RESET_TYPE_RESET_TO_FLASHLOADER;
+      }
+      else
+      {
+         u8_ResetType = C_OSCProtocolDriverOsyTpBase::hu8_OSY_RESET_TYPE_KEY_OFF_ON;
+      }
+
+      s32_Return = this->mpc_ComDriver->SendOsyBroadcastEcuReset(u8_ResetType);
       if (s32_Return == C_NO_ERR)
       {
          osc_write_log_info("Reset ETH openSYDE devices", "openSYDE broadcast ECU reset sent.");
@@ -855,6 +986,45 @@ sint32 C_SyvDcSequences::ResetEthOpenSydeDevices(void) const
       {
          osc_write_log_error("Reset ETH openSYDE devices",
                              "openSYDE broadcast ECU reset failed with error: " + C_SCLString::IntToStr(s32_Return));
+      }
+   }
+   return s32_Return;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Sets the new CAN bitrate
+
+   \param[in] ou32_Bitrate      Bitrate in kBit/s
+
+   \return
+   C_NO_ERR    Bitrate set
+   C_BUSY      previously started sequence still going on
+   C_COM       Error on reading bitrate
+   C_CONFIG    No dispatcher installed
+
+   \created     07.12.2018  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+sint32 C_SyvDcSequences::InitCanAndSetCanBitrate(const stw_types::uint32 ou32_Bitrate)
+{
+   sint32 s32_Return = C_NO_ERR;
+
+   if (this->mpc_Thread->isRunning() == true)
+   {
+      s32_Return = C_BUSY;
+   }
+   else
+   {
+      s32_Return = this->mpc_ComDriver->InitCanAndSetCanBitrate(ou32_Bitrate);
+      if (s32_Return == C_NO_ERR)
+      {
+         osc_write_log_info("Init CAN and set new bitrate", "CAN initialized successfully.");
+      }
+      else
+      {
+         osc_write_log_error("Init CAN and set new bitrate",
+                             "CAN initialization failed: " + C_SCLString::IntToStr(s32_Return));
       }
    }
    return s32_Return;
@@ -877,8 +1047,7 @@ sint32 C_SyvDcSequences::ResetEthOpenSydeDevices(void) const
    \created     23.11.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
-sint32 C_SyvDcSequences::ReadBackCan(const uint32 ou32_UsedBitrate,
-                                     const std::vector<C_OSCProtocolDriverOsyNode> & orc_OpenSydeIds,
+sint32 C_SyvDcSequences::ReadBackCan(const std::vector<C_OSCProtocolDriverOsyNode> & orc_OpenSydeIds,
                                      const std::vector<C_OSCProtocolDriverOsyNode> & orc_StwIds)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -894,7 +1063,6 @@ sint32 C_SyvDcSequences::ReadBackCan(const uint32 ou32_UsedBitrate,
       this->mc_StwIds.clear();
       this->mc_OpenSydeIds = orc_OpenSydeIds;
       this->mc_StwIds = orc_StwIds;
-      this->mu32_CanBitrate = ou32_UsedBitrate;
 
       this->mpc_Thread->start();
    }
@@ -1133,6 +1301,9 @@ void C_SyvDcSequences::m_ThreadFunc(void)
       case eSCANCANENTERFLASHLOADER:
          this->ms32_Result = this->m_RunScanCanEnterFlashloader(this->mu32_CanBitrate);
          break;
+      case eSCANCANSENDFLASHLOADERREQUEST:
+         this->ms32_Result = this->m_RunScanCanSendFlashloaderRequest(this->mu32_ScanTime);
+         break;
       case eSCANCANGETINFOFROMSTWFLASHLOADERDEVICES:
          this->ms32_Result = this->m_RunScanCanGetInfoFromStwFlashloaderDevices();
          break;
@@ -1196,15 +1367,12 @@ void C_SyvDcSequences::m_ThreadFunc(void)
    C_RANGE    Broadcast protocol not initialized
    C_COM      could not send request
 
-
    \created     24.11.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_RunScanCanEnterFlashloader(const uint32 ou32_CanBitrate)
 {
    sint32 s32_Return = C_CONFIG;
-   uint32 u32_StartTime;
-   uint32 u32_CurTime;
 
    osc_write_log_info("Scan CAN enter Flashloader", "Sequence started");
 
@@ -1260,48 +1428,8 @@ sint32 C_SyvDcSequences::m_RunScanCanEnterFlashloader(const uint32 ou32_CanBitra
 
       if (s32_Return == C_NO_ERR)
       {
-         u32_StartTime = stw_tgl::TGL_GetTickCount();
-
-         do
-         {
-            // send STW Flashloader "FLASH" and
-            if (this->mq_StwFlashloaderDevicesActiveOnLocalBus == true)
-            {
-               s32_Return = this->mpc_ComDriver->SendStwSendFlash(this->mc_StwFlashloaderDeviceOnLocalBus);
-            }
-
-            if (s32_Return == C_NO_ERR)
-            {
-               if (this->mq_OpenSydeDevicesActive == true)
-               {
-                  // openSYDE "DiagnosticSessionControl(PreProgramming)" broadcast for 5 seconds every 5 milliseconds
-                  s32_Return = this->mpc_ComDriver->SendOsyCanBroadcastEnterPreProgrammingSession();
-               }
-            }
-            else
-            {
-               osc_write_log_error("Scan CAN enter Flashloader",
-                                   "STW send flash failed with error: " + C_SCLString::IntToStr(s32_Return));
-            }
-
-            stw_tgl::TGL_Sleep(5);
-
-            // Possible answers are not necessary and can disturb next services
-            this->mpc_ComDriver->ClearDispatcherQueue();
-
-            if (s32_Return == C_NO_ERR)
-            {
-               u32_CurTime = stw_tgl::TGL_GetTickCount();
-            }
-            else
-            {
-               osc_write_log_error("Scan CAN enter Flashloader",
-                                   "openSYDE diagnostic session control broadcast failed with error: " +
-                                   C_SCLString::IntToStr(s32_Return));
-               break;
-            }
-         }
-         while (u32_CurTime < (mhu32_SCAN_TIME_MS + u32_StartTime));
+         this->mq_RunScanSendFlashloaderRequestEndless = false;
+         s32_Return = this->m_RunScanCanSendFlashloaderRequest(mhu32_DEFAULT_SCAN_TIME_MS);
       }
    }
 
@@ -1309,6 +1437,81 @@ sint32 C_SyvDcSequences::m_RunScanCanEnterFlashloader(const uint32 ou32_CanBitra
    {
       osc_write_log_info("Scan CAN enter Flashloader", "Sequence finished");
    }
+
+   return s32_Return;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Sending of "Flash" and "PreProgrammingSession" request
+
+   Sending the STW flashloader request "FLASH" and the openSYDE broadcast service PreProgrammingSession
+   till at least the scan time is over and the flag mq_RunScanSendFlashloaderRequestEndless is set to false.
+
+   \param[in]  ou32_ScanTime    Time till stop sending the requests in ms
+
+   \return
+   C_NO_ERR   Sequence finished
+   C_CONFIG   no transport protocol installed or no dispatcher installed
+              no com driver installed
+   C_COM      could not send request
+
+   \created     06.12.2018  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+sint32 C_SyvDcSequences::m_RunScanCanSendFlashloaderRequest(const uint32 ou32_ScanTime)
+{
+   sint32 s32_Return = C_NO_ERR;
+   const uint32 u32_StartTime = stw_tgl::TGL_GetTickCount();
+   uint32 u32_CurTime;
+   bool q_RunEndless;
+
+   do
+   {
+      // send STW Flashloader "FLASH" and
+      if (this->mq_StwFlashloaderDevicesActiveOnLocalBus == true)
+      {
+         s32_Return = this->mpc_ComDriver->SendStwSendFlash(this->mc_StwFlashloaderDeviceOnLocalBus);
+      }
+
+      if (s32_Return == C_NO_ERR)
+      {
+         if (this->mq_OpenSydeDevicesActive == true)
+         {
+            // openSYDE "DiagnosticSessionControl(PreProgramming)" broadcast for 5 seconds every 5 milliseconds
+            s32_Return = this->mpc_ComDriver->SendOsyCanBroadcastEnterPreProgrammingSession();
+         }
+      }
+      else
+      {
+         osc_write_log_error("Scan CAN enter Flashloader",
+                             "STW send flash failed with error: " + C_SCLString::IntToStr(s32_Return));
+      }
+
+      stw_tgl::TGL_Sleep(5);
+
+      // Possible answers are not necessary and can disturb next services
+      this->mpc_ComDriver->ClearDispatcherQueue();
+
+      if (s32_Return == C_NO_ERR)
+      {
+         u32_CurTime = stw_tgl::TGL_GetTickCount();
+      }
+      else
+      {
+         osc_write_log_error("Scan CAN enter Flashloader",
+                             "openSYDE diagnostic session control broadcast failed with error: " +
+                             C_SCLString::IntToStr(s32_Return));
+         break;
+      }
+
+      this->mc_CriticalSection.Acquire();
+      // Check flag, which can be set by other thread at any time
+      q_RunEndless = this->mq_RunScanSendFlashloaderRequestEndless;
+      this->mc_CriticalSection.Release();
+   }
+   while ((q_RunEndless == true) ||
+          (u32_CurTime < (ou32_ScanTime + u32_StartTime)));
 
    return s32_Return;
 }
@@ -1828,7 +2031,7 @@ sint32 C_SyvDcSequences::m_RunConfEthOpenSydeDevices(void)
 
                   if (this->mpc_ComDriver->GetNodeIndex(c_ServerIdOfCurBus, u32_NodeIndex) == true)
                   {
-                     const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(
+                     const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
                         u32_NodeIndex);
 
                      if (pc_Node != NULL)
@@ -2403,7 +2606,7 @@ sint32 C_SyvDcSequences::m_RunConfCanOpenSydeDevices(void)
 
                   if (this->GetNodeIndex(c_ServerIdOfCurBus, u32_NodeIndex) == true)
                   {
-                     const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(u32_NodeIndex);
+                     const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
 
                      c_UsedServerIds.push_back(c_ServerIdOfCurBus);
                      s32_Return = this->mpc_ComDriver->SendOsyCanBroadcastSetNodeIdBySerialNumber(
@@ -2553,7 +2756,7 @@ sint32 C_SyvDcSequences::m_CheckConfOpenSydeDevices(
                 (this->mpc_ComDriver->GetNodeIndex(c_ServerIdOfCurBus, u32_NodeIndex) == true))
             {
                // All connected interfaces of the node must be in the device configuration
-               const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(u32_NodeIndex);
+               const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
 
                if (pc_Node != NULL)
                {
@@ -2668,7 +2871,7 @@ sint32 C_SyvDcSequences::m_SetCanOpenSydeBitrate(const C_OSCProtocolDriverOsyNod
       if (this->mpc_ComDriver->GetNodeIndex(orc_ServerId, u32_NodeIndex) == true)
       {
          // All connected interfaces of the node must be in the device configuration
-         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(u32_NodeIndex);
+         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
 
          if (pc_Node != NULL)
          {
@@ -2792,7 +2995,7 @@ sint32 C_SyvDcSequences::m_SetEthOpenSydeIpAddress(const C_OSCProtocolDriverOsyN
       if (this->mpc_ComDriver->GetNodeIndex(orc_ServerId, u32_NodeIndex) == true)
       {
          // All connected interfaces of the node must be in the device configuration
-         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(u32_NodeIndex);
+         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
 
          if (pc_Node != NULL)
          {
@@ -2893,7 +3096,7 @@ sint32 C_SyvDcSequences::m_SetOpenSydeNodeIds(const C_OSCProtocolDriverOsyNode &
       if (this->mpc_ComDriver->GetNodeIndex(orc_ServerId, u32_NodeIndex) == true)
       {
          // All connected interfaces of the node must be in the device configuration
-         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(u32_NodeIndex);
+         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
 
          if (pc_Node != NULL)
          {
@@ -3010,13 +3213,7 @@ sint32 C_SyvDcSequences::m_ReadBackCan(void)
 
    if (this->mpc_ComDriver != NULL)
    {
-      // * bring nodes into flashloader (same sequence as in "ScanCanEnterFlashloader")
-      s32_Return = this->m_RunScanCanEnterFlashloader(this->mu32_CanBitrate);
-
-      if (s32_Return == C_NO_ERR)
-      {
-         s32_Return = this->m_ReadBack();
-      }
+      s32_Return = this->m_ReadBack();
    }
 
    if (s32_Return == C_NO_ERR)
@@ -3225,6 +3422,8 @@ sint32 C_SyvDcSequences::m_ReadBack(void)
    {
       uint32 u32_DeviceCounter;
       uint8 au8_SerialNumber[6];
+
+      s32_Return = C_NO_ERR;
 
       // * for all openSYDE nodes:
       for (u32_DeviceCounter = 0U; u32_DeviceCounter < this->mc_OpenSydeIds.size(); ++u32_DeviceCounter)

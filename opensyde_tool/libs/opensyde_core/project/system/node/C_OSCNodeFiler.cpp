@@ -175,7 +175,18 @@ sint32 C_OSCNodeFiler::h_LoadNodeComProtocols(std::vector<C_OSCCanProtocol> & or
 {
    sint32 s32_Retval = C_NO_ERR;
 
-   C_SCLString c_CurNodeComProtocol = orc_XMLParser.SelectNodeChild("com-protocol");
+   C_SCLString c_CurNodeComProtocol;
+   uint32 u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+
+   //Check optional length
+   if (q_ExpectedSizeHere == true)
+   {
+      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      orc_NodeComProtocols.reserve(u32_ExpectedSize);
+   }
+
+   c_CurNodeComProtocol = orc_XMLParser.SelectNodeChild("com-protocol");
 
    //Clear
    orc_NodeComProtocols.clear();
@@ -199,6 +210,17 @@ sint32 C_OSCNodeFiler::h_LoadNodeComProtocols(std::vector<C_OSCCanProtocol> & or
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "com-protocols");
    }
+   //Compare length
+   if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
+   {
+      if (u32_ExpectedSize != orc_NodeComProtocols.size())
+      {
+         C_SCLString c_Tmp;
+         c_Tmp.PrintFormatted("Unexpected comm protocol count, expected: %i, got %i", u32_ExpectedSize,
+                              orc_NodeComProtocols.size());
+         osc_write_log_warning("Load file", c_Tmp.c_str());
+      }
+   }
    return s32_Retval;
 }
 
@@ -219,6 +241,7 @@ sint32 C_OSCNodeFiler::h_LoadNodeComProtocols(std::vector<C_OSCCanProtocol> & or
 void C_OSCNodeFiler::h_SaveNodeComProtocols(const std::vector<C_OSCCanProtocol> & orc_NodeComProtocols,
                                             C_OSCXMLParserBase & orc_XMLParser)
 {
+   orc_XMLParser.SetAttributeUint32("length", orc_NodeComProtocols.size());
    for (uint32 u32_ItComProtocol = 0; u32_ItComProtocol < orc_NodeComProtocols.size(); ++u32_ItComProtocol)
    {
       orc_XMLParser.CreateAndSelectNodeChild("com-protocol");
@@ -329,7 +352,18 @@ sint32 C_OSCNodeFiler::h_LoadNodeComMessageContainers(
 {
    sint32 s32_Retval = C_NO_ERR;
 
-   C_SCLString c_CurNodeComMessageContainer = orc_XMLParser.SelectNodeChild("com-message-container");
+   C_SCLString c_CurNodeComMessageContainer;
+   uint32 u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+
+   //Check optional length
+   if (q_ExpectedSizeHere == true)
+   {
+      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      orc_NodeComMessageContainers.reserve(u32_ExpectedSize);
+   }
+
+   c_CurNodeComMessageContainer = orc_XMLParser.SelectNodeChild("com-message-container");
 
    //Clear
    orc_NodeComMessageContainers.clear();
@@ -353,6 +387,17 @@ sint32 C_OSCNodeFiler::h_LoadNodeComMessageContainers(
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "com-message-containers");
    }
+   //Compare length
+   if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
+   {
+      if (u32_ExpectedSize != orc_NodeComMessageContainers.size())
+      {
+         C_SCLString c_Tmp;
+         c_Tmp.PrintFormatted("Unexpected comm message container count, expected: %i, got %i", u32_ExpectedSize,
+                              orc_NodeComMessageContainers.size());
+         osc_write_log_warning("Load file", c_Tmp.c_str());
+      }
+   }
    return s32_Retval;
 }
 
@@ -373,6 +418,7 @@ sint32 C_OSCNodeFiler::h_LoadNodeComMessageContainers(
 void C_OSCNodeFiler::h_SaveNodeComMessageContainers(
    const std::vector<C_OSCCanMessageContainer> & orc_NodeComMessageContainers, C_OSCXMLParserBase & orc_XMLParser)
 {
+   orc_XMLParser.SetAttributeUint32("length", orc_NodeComMessageContainers.size());
    for (uint32 u32_ItComMessageContainer = 0; u32_ItComMessageContainer < orc_NodeComMessageContainers.size();
         ++u32_ItComMessageContainer)
    {
@@ -495,7 +541,18 @@ sint32 C_OSCNodeFiler::h_LoadNodeComMessages(std::vector<C_OSCCanMessage> & orc_
 {
    sint32 s32_Retval = C_NO_ERR;
 
-   C_SCLString c_CurNodeComMessage = orc_XMLParser.SelectNodeChild("com-message");
+   C_SCLString c_CurNodeComMessage;
+   uint32 u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+
+   //Check optional length
+   if (q_ExpectedSizeHere == true)
+   {
+      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      orc_NodeComMessages.reserve(u32_ExpectedSize);
+   }
+
+   c_CurNodeComMessage = orc_XMLParser.SelectNodeChild("com-message");
 
    //Clear
    orc_NodeComMessages.clear();
@@ -520,6 +577,17 @@ sint32 C_OSCNodeFiler::h_LoadNodeComMessages(std::vector<C_OSCCanMessage> & orc_
       //Return
       orc_XMLParser.SelectNodeParent();
    }
+   //Compare length
+   if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
+   {
+      if (u32_ExpectedSize != orc_NodeComMessages.size())
+      {
+         C_SCLString c_Tmp;
+         c_Tmp.PrintFormatted("Unexpected messages count, expected: %i, got %i", u32_ExpectedSize,
+                              orc_NodeComMessages.size());
+         osc_write_log_warning("Load file", c_Tmp.c_str());
+      }
+   }
    return s32_Retval;
 }
 
@@ -540,6 +608,7 @@ sint32 C_OSCNodeFiler::h_LoadNodeComMessages(std::vector<C_OSCCanMessage> & orc_
 void C_OSCNodeFiler::h_SaveNodeComMessages(const std::vector<C_OSCCanMessage> & orc_NodeComMessages,
                                            C_OSCXMLParserBase & orc_XMLParser)
 {
+   orc_XMLParser.SetAttributeUint32("length", orc_NodeComMessages.size());
    for (uint32 u32_ItComMessage = 0; u32_ItComMessage < orc_NodeComMessages.size(); ++u32_ItComMessage)
    {
       orc_XMLParser.CreateAndSelectNodeChild("com-message");
@@ -605,7 +674,8 @@ sint32 C_OSCNodeFiler::h_LoadNodeComMessage(C_OSCCanMessage & orc_NodeComMessage
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "com-message");
    }
-   if (orc_XMLParser.SelectNodeChild("tx-method") == "tx-method")
+   if ((orc_XMLParser.SelectNodeChild("tx-method") == "tx-method") &&
+       (s32_Retval == C_NO_ERR))
    {
       s32_Retval = mh_StringToNodeComMessageTxMethod(orc_XMLParser.GetNodeContent(), orc_NodeComMessage.e_TxMethod);
       //Return
@@ -689,7 +759,18 @@ sint32 C_OSCNodeFiler::h_LoadNodeComSignals(std::vector<C_OSCCanSignal> & orc_No
 {
    sint32 s32_Retval = C_NO_ERR;
 
-   C_SCLString c_CurNodeComSignal = orc_XMLParser.SelectNodeChild("com-signal");
+   C_SCLString c_CurNodeComSignal;
+   uint32 u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+
+   //Check optional length
+   if (q_ExpectedSizeHere == true)
+   {
+      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      orc_NodeComSignals.reserve(u32_ExpectedSize);
+   }
+
+   c_CurNodeComSignal = orc_XMLParser.SelectNodeChild("com-signal");
 
    //Clear
    orc_NodeComSignals.clear();
@@ -714,6 +795,17 @@ sint32 C_OSCNodeFiler::h_LoadNodeComSignals(std::vector<C_OSCCanSignal> & orc_No
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "com-signals");
    }
+   //Compare length
+   if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
+   {
+      if (u32_ExpectedSize != orc_NodeComSignals.size())
+      {
+         C_SCLString c_Tmp;
+         c_Tmp.PrintFormatted("Unexpected comm signal count, expected: %i, got %i", u32_ExpectedSize,
+                              orc_NodeComSignals.size());
+         osc_write_log_warning("Load file", c_Tmp.c_str());
+      }
+   }
    return s32_Retval;
 }
 
@@ -734,6 +826,7 @@ sint32 C_OSCNodeFiler::h_LoadNodeComSignals(std::vector<C_OSCCanSignal> & orc_No
 void C_OSCNodeFiler::h_SaveNodeComSignals(const std::vector<C_OSCCanSignal> & orc_NodeComSignals,
                                           C_OSCXMLParserBase & orc_XMLParser)
 {
+   orc_XMLParser.SetAttributeUint32("length", orc_NodeComSignals.size());
    for (uint32 u32_ItComSignal = 0; u32_ItComSignal < orc_NodeComSignals.size(); ++u32_ItComSignal)
    {
       orc_XMLParser.CreateAndSelectNodeChild("com-signal");
@@ -1037,23 +1130,6 @@ sint32 C_OSCNodeFiler::mh_LoadProperties(C_OSCNodeProperties & orc_NodePropertie
                   c_ComInterface.c_Ip.au8_DefaultGateway[2] = 0U;
                   c_ComInterface.c_Ip.au8_DefaultGateway[3] = 0U;
                }
-
-               //Communication protocol
-               if (orc_XMLParser.SelectNodeChild("communication-protocol") == "communication-protocol")
-               {
-                  c_ComInterface.q_IsComProtocolL2Enabled = orc_XMLParser.GetAttributeBool("layer-2-available");
-                  c_ComInterface.q_IsComProtocolECeSEnabled = orc_XMLParser.GetAttributeBool("eces-available");
-                  c_ComInterface.q_IsComProtocolCANOpenSafetyEnabled = orc_XMLParser.GetAttributeBool(
-                     "can-open-safety-available");
-                  //Return
-                  tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
-               }
-               else
-               {
-                  osc_write_log_error("Loading node definition",
-                                      "Could not find \"communication-interface\".\"communication-protocol\" node.");
-                  s32_Retval = C_CONFIG;
-               }
                //Bus
                if (orc_XMLParser.SelectNodeChild("bus") == "bus")
                {
@@ -1097,7 +1173,7 @@ sint32 C_OSCNodeFiler::mh_LoadProperties(C_OSCNodeProperties & orc_NodePropertie
          }
          else
          {
-            orc_NodeProperties.c_OpenSYDEServerSettings.u8_MaxParallelTransmissions = 16;
+            orc_NodeProperties.c_OpenSYDEServerSettings.u8_MaxParallelTransmissions = 64;
          }
          if (orc_XMLParser.AttributeExists("application-index") == true)
          {
@@ -1213,11 +1289,8 @@ void C_OSCNodeFiler::mh_SaveProperties(const C_OSCNodeProperties & orc_NodePrope
          //Return
          tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
       }
+      //Create this section for compatibility reasons (had content and was required by previous openSYDE versions)
       orc_XMLParser.CreateAndSelectNodeChild("communication-protocol");
-      orc_XMLParser.SetAttributeBool("layer-2-available", rc_CurComInterface.q_IsComProtocolL2Enabled);
-      orc_XMLParser.SetAttributeBool("eces-available", rc_CurComInterface.q_IsComProtocolECeSEnabled);
-      orc_XMLParser.SetAttributeBool("can-open-safety-available",
-                                     rc_CurComInterface.q_IsComProtocolCANOpenSafetyEnabled);
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
       orc_XMLParser.CreateAndSelectNodeChild("bus");
@@ -1423,7 +1496,18 @@ sint32 C_OSCNodeFiler::mh_LoadApplications(std::vector<C_OSCNodeApplication> & o
 
    if (orc_XMLParser.SelectNodeChild("applications") == "applications")
    {
-      C_SCLString c_CurNode = orc_XMLParser.SelectNodeChild("application");
+      C_SCLString c_CurNode;
+      uint32 u32_ExpectedSize = 0UL;
+      const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+
+      //Check optional length
+      if (q_ExpectedSizeHere == true)
+      {
+         u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+         orc_NodeApplications.reserve(u32_ExpectedSize);
+      }
+
+      c_CurNode = orc_XMLParser.SelectNodeChild("application");
       if (c_CurNode == "application")
       {
          do
@@ -1552,6 +1636,17 @@ sint32 C_OSCNodeFiler::mh_LoadApplications(std::vector<C_OSCNodeApplication> & o
          //Return
          tgl_assert(orc_XMLParser.SelectNodeParent() == "applications");
       }
+      //Compare length
+      if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
+      {
+         if (u32_ExpectedSize != orc_NodeApplications.size())
+         {
+            C_SCLString c_Tmp;
+            c_Tmp.PrintFormatted("Unexpected application count, expected: %i, got %i", u32_ExpectedSize,
+                                 orc_NodeApplications.size());
+            osc_write_log_warning("Load file", c_Tmp.c_str());
+         }
+      }
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "core");
    }
@@ -1581,6 +1676,7 @@ void C_OSCNodeFiler::mh_SaveApplications(const std::vector<C_OSCNodeApplication>
                                          C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_XMLParser.CreateAndSelectNodeChild("applications");
+   orc_XMLParser.SetAttributeUint32("length", orc_NodeApplications.size());
    for (uint32 u32_ItApplication = 0; u32_ItApplication < orc_NodeApplications.size(); ++u32_ItApplication)
    {
       const C_OSCNodeApplication & rc_CurApplication = orc_NodeApplications[u32_ItApplication];
@@ -1630,7 +1726,18 @@ sint32 C_OSCNodeFiler::mh_LoadDataPools(const uint16 ou16_XmlFormatVersion, C_OS
    orc_Node.c_DataPools.clear();
    if (orc_XMLParser.SelectNodeChild("data-pools") == "data-pools")
    {
-      C_SCLString c_CurNode = orc_XMLParser.SelectNodeChild("data-pool");
+      C_SCLString c_CurNode;
+      uint32 u32_ExpectedSize = 0UL;
+      const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+
+      //Check optional length
+      if (q_ExpectedSizeHere == true)
+      {
+         u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+         orc_Node.c_DataPools.reserve(u32_ExpectedSize);
+      }
+
+      c_CurNode = orc_XMLParser.SelectNodeChild("data-pool");
       if (c_CurNode == "data-pool")
       {
          do
@@ -1656,6 +1763,16 @@ sint32 C_OSCNodeFiler::mh_LoadDataPools(const uint16 ou16_XmlFormatVersion, C_OS
       }
       if (s32_Retval == C_NO_ERR)
       {
+         if (q_ExpectedSizeHere == true)
+         {
+            if (u32_ExpectedSize != orc_Node.c_DataPools.size())
+            {
+               C_SCLString c_Tmp;
+               c_Tmp.PrintFormatted("Unexpected Datapool count, expected: %i, got %i", u32_ExpectedSize,
+                                    orc_Node.c_DataPools.size());
+               osc_write_log_warning("Load file", c_Tmp.c_str());
+            }
+         }
          //Return
          tgl_assert(orc_XMLParser.SelectNodeParent() == "core");
       }
@@ -1687,6 +1804,7 @@ void C_OSCNodeFiler::mh_SaveDataPools(const std::vector<C_OSCNodeDataPool> & orc
                                       C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_XMLParser.CreateAndSelectNodeChild("data-pools");
+   orc_XMLParser.SetAttributeString("length", orc_NodeDataPools.size());
    for (uint32 u32_ItDataPool = 0; u32_ItDataPool < orc_NodeDataPools.size(); ++u32_ItDataPool)
    {
       orc_XMLParser.CreateAndSelectNodeChild("data-pool");
@@ -1723,6 +1841,9 @@ C_SCLString C_OSCNodeFiler::mh_DiagnosticServerToString(
    case C_OSCNodeProperties::eDS_KEFEX:
       c_Retval = "kefex";
       break;
+   case C_OSCNodeProperties::eDS_NONE:
+      c_Retval = "none";
+      break;
    default:
       c_Retval = "invalid";
       break;
@@ -1756,6 +1877,10 @@ sint32 C_OSCNodeFiler::mh_StringToDiagnosticServer(const C_SCLString & orc_Strin
    else if (orc_String == "open-syde")
    {
       ore_Type = C_OSCNodeProperties::eDS_OPEN_SYDE;
+   }
+   else if (orc_String == "none")
+   {
+      ore_Type = C_OSCNodeProperties::eDS_NONE;
    }
    else
    {
@@ -1791,6 +1916,9 @@ C_SCLString C_OSCNodeFiler::mh_FlashLoaderToString(const C_OSCNodeProperties::E_
    case C_OSCNodeProperties::eFL_STW:
       c_Retval = "stw";
       break;
+   case C_OSCNodeProperties::eFL_NONE:
+      c_Retval = "none";
+      break;
    default:
       c_Retval = "invalid";
       break;
@@ -1825,10 +1953,14 @@ sint32 C_OSCNodeFiler::mh_StringToFlashLoader(const C_SCLString & orc_String,
    {
       ore_Type = C_OSCNodeProperties::eFL_OPEN_SYDE;
    }
+   else if (orc_String == "none")
+   {
+      ore_Type = C_OSCNodeProperties::eFL_NONE;
+   }
    else
    {
       osc_write_log_error("Loading node definition",
-                          "Invalid value for \"propertiesr\".\"flash-loader\":" + orc_String);
+                          "Invalid value for \"properties\".\"flash-loader\":" + orc_String);
       s32_Retval = C_RANGE;
    }
 

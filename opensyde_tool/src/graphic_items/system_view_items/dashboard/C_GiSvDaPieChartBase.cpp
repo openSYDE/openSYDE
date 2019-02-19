@@ -338,6 +338,8 @@ bool C_GiSvDaPieChartBase::CallProperties(void)
                c_Box.c_DataPoolElementsConfig.clear();
                c_Box.c_DataPoolElementsConfig.push_back(c_Tmp);
 
+               //Force update
+               this->mq_InitialStyleCall = true;
                //Apply
                this->SetDisplayStyle(this->me_Style, this->mq_DarkMode);
                if (this->mpc_PieChartWidget != NULL)

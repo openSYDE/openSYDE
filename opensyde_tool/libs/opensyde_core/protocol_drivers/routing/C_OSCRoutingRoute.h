@@ -53,7 +53,7 @@ public:
 class C_OSCRoutingRoute
 {
 public:
-   C_OSCRoutingRoute(const stw_types::uint32 ou32_TargetNodeIndex);
+   explicit C_OSCRoutingRoute(const stw_types::uint32 ou32_TargetNodeIndex);
 
    bool operator ==(const C_OSCRoutingRoute & orc_Cmp) const;
 

@@ -22,6 +22,7 @@
 #include <fstream>
 
 #include "TGLFile.h"
+#define MINIZ_NO_ZLIB_COMPATIBLE_NAMES //prevent namespace pollution
 #include "miniz.h"
 #include "stwtypes.h"
 #include "stwerrors.h"
@@ -89,6 +90,7 @@ sint32 C_OSCZipFile::h_CreateZipFile(const C_SCLString & orc_SourcePath, const s
                                      const C_SCLString & orc_ZipArchivePath, stw_scl::C_SCLString * const opc_ErrorText)
 {
    sint32 s32_Return = C_NO_ERR;
+
    std::set<C_SCLString>::const_iterator c_Iter;
 
    // check whether input file(s) exist:

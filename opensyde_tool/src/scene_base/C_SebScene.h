@@ -159,7 +159,7 @@ protected:
    virtual void m_Copy(void) = 0;
    virtual void m_Cut(void) = 0;
    virtual void m_Paste(const QPointF * const opc_Pos);
-   virtual bool m_IsPastePossible(void) const;
+   virtual bool m_IsPastePossible(void);
    virtual bool m_IsUndoAvailable(void) const;
    virtual bool m_HandleDeleteUserConfirmation(const QList<QGraphicsItem *> & orc_SelectedItems) const;
    //lint -e{1735} Suppression, because default parameters are identical

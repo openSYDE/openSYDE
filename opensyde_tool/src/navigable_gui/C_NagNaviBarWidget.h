@@ -28,9 +28,6 @@
 #include <QHBoxLayout>
 
 #include "C_OgeGbxTransparent.h"
-#include "C_OgePubUseCaseNavSub.h"
-#include "C_OgePubUseCaseNavViewSub.h"
-#include "C_OgeTreeViewItemNaviBar.h"
 #include "stwtypes.h"
 
 /* -- Namespace ------------------------------------------------------------ */
@@ -57,8 +54,9 @@ public:
 
    void InitSysView(void);
    void UpdateNames(void) const;
-   void UpdateViewIcons(void) const;
-   void UpdateAllViewIcons(const bool oq_CheckAll) const;
+   void UpdateViewIcons(const stw_types::uint32 ou32_ViewIndex) const;
+   void UpdateAllViewsIcons(void) const;
+   void UpdateAllScreenIcons(const bool oq_CheckAll) const;
 
    void SetMode(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode = 0,
                 const stw_types::uint32 ou32_Index = 0U);
@@ -116,6 +114,7 @@ private:
    void m_BussesChanged(void) const;
 
    void m_AddViewClicked(void);
+   void m_OpenCanMonitor(void);
    void m_SysViewRenameClicked(const stw_types::uint32 ou32_ViewIndex, const QString & orc_Name);
    void m_SysViewDeleteClicked(const stw_types::uint32 ou32_ViewIndex);
    void m_SysViewDuplicateClicked(const stw_types::uint32 ou32_ViewIndex);
@@ -131,6 +130,7 @@ private:
    void m_OnClickNode(const stw_types::sintn osn_Index);
    void m_SelectView(const stw_types::uint32 ou32_ViewIndex, const stw_types::sint32 os32_SubMode,
                      const QString & orc_Name, const QString & orc_SubSubItemName);
+   void m_UpdateViewIcons(const bool oq_CheckOnlyThisView, const stw_types::uint32 ou32_ViewIndex) const;
 
    stw_types::sint32 ms32_ActiveMode;
    stw_types::sint32 ms32_ActiveSubMode;

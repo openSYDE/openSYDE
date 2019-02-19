@@ -22,6 +22,9 @@
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
 
+#include <iostream>
+
+#include <QElapsedTimer>
 #include <QApplication>
 #include <QFileInfo>
 #include <QDesktopWidget>
@@ -56,6 +59,7 @@
 #include "C_NagToolTip.h"
 #include "C_OgeWiCustomMessage.h"
 #include "C_PopUtil.h"
+#include "C_TblTreDataElementModel.h"
 
 /* -- Used Namespaces ------------------------------------------------------ */
 using namespace stw_tgl;
@@ -103,11 +107,21 @@ C_NagMainWindow::C_NagMainWindow(void) :
    mu32_SvIndex(0U),
    mu32_SvFlag(0U)
 {
+   QElapsedTimer c_Timer;
+
+   if (mq_TIMING_OUTPUT)
+   {
+      c_Timer.start();
+   }
+
    mpc_Ui->setupUi(this);
 
    //Configure collapse-ability
-   mpc_Ui->splitter->setCollapsible(0, true);
-   mpc_Ui->splitter->setCollapsible(1, false);
+   mpc_Ui->pc_Splitter->setCollapsible(0, true);
+   mpc_Ui->pc_Splitter->setCollapsible(1, false);
+   // if there is more space stretch right widget (i.e. index 1)
+   this->mpc_Ui->pc_Splitter->setStretchFactor(0, 0);
+   this->mpc_Ui->pc_Splitter->setStretchFactor(1, 1);
 
    // load devices so they are known to UI
    stw_opensyde_core::C_OSCSystemDefinition::hc_Devices.LoadFromFile(
@@ -142,7 +156,7 @@ C_NagMainWindow::C_NagMainWindow(void) :
            &C_NagNaviBarWidget::InitSysView);
    connect(this->mpc_Ui->pc_NaviBar, &C_NagNaviBarWidget::SigChangeUseCase, this, &C_NagMainWindow::m_ChangeUseCase);
    connect(this->mpc_Ui->pc_NaviBar, &C_NagNaviBarWidget::SigCheckSysViews, this->mpc_Ui->pc_NaviBar,
-           &C_NagNaviBarWidget::UpdateViewIcons);
+           &C_NagNaviBarWidget::UpdateAllViewsIcons);
    connect(this->mpc_Ui->pc_NaviBar, &C_NagNaviBarWidget::SigRenameView, this, &C_NagMainWindow::m_HandleRenameView);
    connect(this->mpc_Ui->pc_NaviBar, &C_NagNaviBarWidget::SigAddViewClicked, this,
            &C_NagMainWindow::m_HandleAddViewRequest);
@@ -182,18 +196,19 @@ C_NagMainWindow::C_NagMainWindow(void) :
    connect(this->mpc_MainWidget, &C_NagMainWidget::SigNewApplicationName, this, &C_NagMainWindow::setWindowTitle);
 
    // Project
-   // first initialization
+   // first initialization (for project load)
    C_PuiProject::h_GetInstance();
    this->m_ProjectLoaded(C_PuiProject::h_GetInstance()->GetSwitchUseCaseFlag());
 
    // init dynamic text of main widget and window title
    this->mpc_MainWidget->UpdateRecentProjects();
 
-   //Trigger sys view check (initial)
-   this->mpc_Ui->pc_NaviBar->UpdateAllViewIcons(true);
-
    //Window icon
    C_OgeWiUtil::h_SetWindowIcon(this);
+   if (mq_TIMING_OUTPUT)
+   {
+      std::cout << "Main:" << c_Timer.elapsed() << " ms" << &std::endl;
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -212,7 +227,7 @@ C_NagMainWindow::~C_NagMainWindow()
    // store (only if useful!)
    if ((this->mpc_MainWidget == NULL) || (this->mpc_MainWidget->isVisible() == false))
    {
-      this->mpc_Ui->splitter->StoreUserSettings();
+      this->mpc_Ui->pc_Splitter->StoreUserSettings();
       this->mpc_Ui->pc_NaviBar->SaveUserSettings();
    }
 
@@ -224,6 +239,7 @@ C_NagMainWindow::~C_NagMainWindow()
    //Clean up singleton
    stw_opensyde_gui_logic::C_PuiProject::h_Destroy();
    C_UsHandler::h_Destroy();
+   C_TblTreDataElementModel::h_CleanUp();
 
    //lint -e{1579}  no memory leak because of the parent all elements and the Qt memory management
 }
@@ -237,27 +253,42 @@ C_NagMainWindow::~C_NagMainWindow()
 //-----------------------------------------------------------------------------
 void C_NagMainWindow::m_ShowStartView()
 {
-   //Store user settings (only if useful!)
-   if ((this->mpc_MainWidget == NULL) || (this->mpc_MainWidget->isVisible() == false))
+   bool q_Continue;
+
+   if (this->mpc_ActiveWidget != NULL)
    {
-      this->mpc_Ui->splitter->StoreUserSettings();
-      this->mpc_Ui->pc_NaviBar->SaveUserSettings();
+      // a change of mode or submode will happen
+      // is a change possible at the moment?
+      q_Continue = this->mpc_ActiveWidget->PrepareToClose();
    }
+   else
+   {
+      q_Continue = true;
+   }
+   if (q_Continue)
+   {
+      //Store user settings (only if useful!)
+      if ((this->mpc_MainWidget == NULL) || (this->mpc_MainWidget->isVisible() == false))
+      {
+         this->mpc_Ui->pc_Splitter->StoreUserSettings();
+         this->mpc_Ui->pc_NaviBar->SaveUserSettings();
+      }
 
-   // deactivate use case view widget
-   this->mpc_Ui->pc_NaviBar->setVisible(false);
-   this->mpc_Ui->pc_TopToolBar->HideAllButtonsAndStoreState();
-   this->mpc_Ui->pc_TopToolBar->SetDarkTheme();
-   this->mpc_UseCaseWidget->setVisible(false);
+      // deactivate use case view widget
+      this->mpc_Ui->pc_NaviBar->setVisible(false);
+      this->mpc_Ui->pc_TopToolBar->HideAllButtonsAndStoreState();
+      this->mpc_Ui->pc_TopToolBar->SetDarkTheme();
+      this->mpc_UseCaseWidget->setVisible(false);
 
-   // activate main widget
-   this->mpc_Ui->pc_workAreaWidget->layout()->addWidget(this->mpc_MainWidget);
-   this->mpc_MainWidget->setVisible(true);
+      // activate main widget
+      this->mpc_Ui->pc_workAreaWidget->layout()->addWidget(this->mpc_MainWidget);
+      this->mpc_MainWidget->setVisible(true);
 
-   this->mq_StartView = true;
+      this->mq_StartView = true;
 
-   // update recent projects
-   this->mpc_MainWidget->UpdateRecentProjects();
+      // update recent projects
+      this->mpc_MainWidget->UpdateRecentProjects();
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -427,7 +458,7 @@ void C_NagMainWindow::closeEvent(QCloseEvent * const opc_Event)
    {
       if (this->m_CheckProjectForChanges() == true)
       {
-         const bool q_Close = m_AskUserToContinue();
+         const bool q_Close = C_PopUtil::h_AskUserToContinue(this);
 
          if (q_Close == true)
          {
@@ -685,7 +716,7 @@ void C_NagMainWindow::m_AdaptParameter(const sint32 os32_Mode, sint32 & ors32_Su
          if (ors32_SubMode == ms32_SUBMODE_SYSDEF_NODEEDIT)
          {
             const stw_opensyde_core::C_OSCNode * const pc_Node =
-               C_PuiSdHandler::h_GetInstance()->GetOSCNode(oru32_Index);
+               C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(oru32_Index);
             if (pc_Node != NULL)
             {
                orc_Name = pc_Node->c_Properties.c_Name.c_str();
@@ -820,6 +851,9 @@ void C_NagMainWindow::m_ShowSysViewItem(sint32 & ors32_SubMode, const uint32 ou3
       this->m_PrepareForSpecificWidget();
       pc_Handler = new C_SyvHandlerWidget(NULL);
       this->mpc_ActiveWidget = pc_Handler;
+      //Do system view switch specific actions
+      C_PuiSvHandler::h_GetInstance()->UpdateSystemDefintionErrors();
+      //Do switch
       this->m_SetNewSpecificWidget(ms32_MODE_SYSVIEW, ors32_SubMode, orc_Name, orc_SubSubModeName, ou32_Index);
    }
    else if (this->mq_StartView == true)
@@ -923,67 +957,6 @@ bool C_NagMainWindow::m_CheckProjectForChanges(void) const
 
 //-----------------------------------------------------------------------------
 /*!
-   \brief   Asks the user if the changes shall be saved, rejected or canceled
-
-   \return
-   true     Action can be continued
-   false    Cancel the action
-
-   \created     13.03.2017  STW/B.Bayer
-*/
-//-----------------------------------------------------------------------------
-bool C_NagMainWindow::m_AskUserToContinue(void)
-{
-   C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
-
-   //   sintn e_ReturnMessageBox;
-   C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
-   bool q_Return = false;
-
-   c_MessageBox.SetHeading(C_GtGetText::h_GetText("Unsaved changes"));
-   c_MessageBox.SetDescription(C_GtGetText::h_GetText("Do you want to save the project changes?"));
-   c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Save"));
-   c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Don't Save"));
-   c_MessageBox.ShowCancelButton();
-   e_ReturnMessageBox = c_MessageBox.Execute();
-
-   switch (e_ReturnMessageBox)
-   {
-   case C_OgeWiCustomMessage::eYES:
-      // close and save
-      if (this->mpc_ActiveWidget != NULL)
-      {
-         this->mpc_ActiveWidget->Save();
-      }
-      else
-      {
-         if (C_PuiProject::h_GetInstance()->IsEmptyProject() == true)
-         {
-            this->mpc_MainWidget->OnSaveProjAs();
-         }
-         else
-         {
-            C_PopErrorHandling::mh_ProjectSaveErr(C_PuiProject::h_GetInstance()->Save(), this);
-         }
-      }
-      q_Return = true;
-      break;
-   case C_OgeWiCustomMessage::eNO:
-      // close and do nothing
-      q_Return = true;
-      break;
-   case C_OgeWiCustomMessage::eCANCEL:
-      // do not continue and do nothing
-      break;
-   default:
-      break;
-   }
-
-   return q_Return;
-}
-
-//-----------------------------------------------------------------------------
-/*!
    \brief   An other project will be loaded. Save project specific user settings.
 
    \created     31.01.2018  STW/B.Bayer
@@ -1032,7 +1005,7 @@ void C_NagMainWindow::m_ProjectLoaded(const bool & orq_SwitchToLastKnownMode)
 
    // Check the indexes for existence
    if ((this->ms32_SdSubMode == ms32_SUBMODE_SYSDEF_NODEEDIT) &&
-       (C_PuiSdHandler::h_GetInstance()->GetOSCNode(this->mu32_SdIndex) == NULL))
+       (C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_SdIndex) == NULL))
    {
       this->ms32_SdSubMode = ms32_SUBMODE_SYSDEF_TOPOLOGY;
       this->mu32_SdIndex = 0U;
@@ -1238,6 +1211,7 @@ void C_NagMainWindow::m_HandleDeleteSysViewRequest(const uint32 ou32_Index, cons
 {
    bool q_Continue;
 
+   //Only prepare to delete if: not last view, deleting view before current view & active widget valid
    if (this->mpc_ActiveWidget != NULL)
    {
       q_Continue = this->mpc_ActiveWidget->PrepareToClose();
@@ -1246,6 +1220,7 @@ void C_NagMainWindow::m_HandleDeleteSysViewRequest(const uint32 ou32_Index, cons
    {
       q_Continue = true;
    }
+
    if (q_Continue == true)
    {
       this->mc_SystemViewManager.DeleteSysView(ou32_Index, os32_SelectedSubMode, ou32_SelectedIndex, this);
@@ -1284,25 +1259,43 @@ void C_NagMainWindow::m_ChangeMode(const stw_types::sint32 os32_Mode, const sint
                                    const uint32 ou32_Index, const QString & orc_Name, const QString & orc_SubSubName,
                                    const uint32 ou32_Flag)
 {
-   bool q_Continue = true;
+   QElapsedTimer c_Timer;
+   bool q_Continue;
    sint32 s32_SubMode = os32_SubMode;
    uint32 u32_Index = ou32_Index;
    QString c_Name = orc_Name;
    QString c_SubSubName = orc_SubSubName;
    uint32 u32_Flag = ou32_Flag;
 
+   if (mq_TIMING_OUTPUT)
+   {
+      c_Timer.start();
+   }
+
    // Get the previous parameter for each use case, if a change from the main widget was triggered
    this->m_AdaptParameter(os32_Mode, s32_SubMode, u32_Index, c_Name, c_SubSubName, u32_Flag);
 
-   //Flag values of 1 indicate the prepare to close event was already handled
-   if ((((os32_Mode != this->ms32_Mode) ||
-         (s32_SubMode != this->ms32_SubMode) ||
-         (u32_Index != this->mu32_Index)) &&
-        (this->mpc_ActiveWidget != NULL)) && ((os32_Mode != ms32_MODE_SYSVIEW) || (ou32_Flag != 1UL)))
+   if (((os32_Mode != this->ms32_Mode) ||
+        (s32_SubMode != this->ms32_SubMode) ||
+        (u32_Index != this->mu32_Index)) || (this->mq_StartView == true))
    {
-      // a change of mode or submode will happen
-      // is a change possible at the moment?
-      q_Continue = this->mpc_ActiveWidget->PrepareToClose();
+      //Flag values of 1 indicate the prepare to close event was already handled
+      if ((this->mpc_ActiveWidget != NULL) && ((os32_Mode != ms32_MODE_SYSVIEW) || (ou32_Flag != 1UL)))
+      {
+         // a change of mode or submode will happen
+         // is a change possible at the moment?
+         q_Continue = this->mpc_ActiveWidget->PrepareToClose();
+      }
+      else
+      {
+         //New mode
+         q_Continue = true;
+      }
+   }
+   else
+   {
+      //Same mode
+      q_Continue = false;
    }
 
    if (q_Continue == true)
@@ -1311,14 +1304,8 @@ void C_NagMainWindow::m_ChangeMode(const stw_types::sint32 os32_Mode, const sint
       // useful!)
       if ((this->mpc_MainWidget == NULL) || (this->mpc_MainWidget->isVisible() == false))
       {
-         this->mpc_Ui->splitter->StoreUserSettings();
+         this->mpc_Ui->pc_Splitter->StoreUserSettings();
          this->mpc_Ui->pc_NaviBar->SaveUserSettings();
-      }
-      //Handle check error on mode change from SD to SV
-      if ((this->ms32_Mode == ms32_MODE_SYSDEF) && (os32_Mode == ms32_MODE_SYSVIEW))
-      {
-         //Do explicit check because SD items might now be invalid
-         this->mpc_Ui->pc_NaviBar->UpdateAllViewIcons(false);
       }
       // change the mode
       if (os32_Mode == ms32_MODE_SYSDEF)
@@ -1336,6 +1323,8 @@ void C_NagMainWindow::m_ChangeMode(const stw_types::sint32 os32_Mode, const sint
          // update Navigationbar
          this->mpc_Ui->pc_NaviBar->SetMode(os32_Mode, s32_SubMode, u32_Index);
          this->mpc_Ui->pc_TopToolBar->ShowSearch(false);
+         //Do explicit update system view items
+         this->mpc_Ui->pc_NaviBar->UpdateAllScreenIcons(false);
       }
       else
       {
@@ -1349,12 +1338,12 @@ void C_NagMainWindow::m_ChangeMode(const stw_types::sint32 os32_Mode, const sint
       this->mq_StartView = false;
 
       //Restore user settings
-      this->mpc_Ui->splitter->LoadUserSettings();
+      this->mpc_Ui->pc_Splitter->LoadUserSettings();
       this->mpc_Ui->pc_NaviBar->LoadUserSettings();
    }
-   else
+
+   if (mq_TIMING_OUTPUT)
    {
-      // No change of mode was made. Reset the current set mode in navigation bar
-      this->mpc_Ui->pc_NaviBar->SetMode(this->ms32_Mode, this->ms32_SubMode, this->mu32_Index);
+      std::cout << "Switch " << c_Timer.elapsed() << " ms" << &std::endl;
    }
 }

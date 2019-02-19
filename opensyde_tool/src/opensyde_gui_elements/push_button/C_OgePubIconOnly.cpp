@@ -121,7 +121,7 @@ void C_OgePubIconOnly::paintEvent(QPaintEvent * const opc_Event)
 
    Q_UNUSED(opc_Event)
 
-   // TODO GS deactivated because we need more time to adapt all icon-only-buttons
+   // TODO icon states: deactivated because we need more time to adapt all icon-only-buttons
    if (this->isEnabled() == false)
    {
       c_Pixmap = this->mc_IconDisabled;
@@ -160,7 +160,7 @@ void C_OgePubIconOnly::SetCustomIcons(QString oc_IconPathNormal, QString oc_Icon
 
    mc_IconNormal = QIcon(oc_IconPathNormal).pixmap(c_Size);
    this->setIcon(mc_IconNormal);
-   // TODO GS deactivated because we need more time to adapt all icon-only-buttons
+   // TODO icon states: because we need more time to adapt all icon-only-buttons
    Q_UNUSED(oc_IconPathHovered)
    Q_UNUSED(oc_IconPathClicked)
    //   mc_IconHovered = QIcon(oc_IconPathHovered).pixmap(c_Size);

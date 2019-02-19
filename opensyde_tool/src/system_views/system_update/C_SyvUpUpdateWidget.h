@@ -114,6 +114,7 @@ private:
    void m_CleanUpToolBox(void);
    void m_AddProgressLogConnectEntry(const stw_types::uint32 ou32_NodeIndex);
 
+   void m_ReplaceOriginalWithTempPaths(void);
    void m_DiscardInfo(const stw_types::uint32 ou32_NodeIndex);
 
    std::vector<bool> m_GetIsFileBasedFlagForEach(void) const;
@@ -150,6 +151,8 @@ private:
    bool mq_ConnectFailed;
 
    std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> mc_NodesToFlash;
+   std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> mc_NodesWithAllApplications;
+   std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> mc_NodesWithAllApplicationsAndTempPath;
    std::vector<stw_types::uint32> mc_NodesOrder;
 
    stw_types::uint32 mu32_DisconnectTime;

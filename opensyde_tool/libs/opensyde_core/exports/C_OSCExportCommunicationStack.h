@@ -38,8 +38,10 @@ public:
    C_OSCExportCommunicationStack(void);
    virtual ~C_OSCExportCommunicationStack(void);
 
-   static void h_GetFileName(const stw_types::uint8 ou8_InterfaceIndex, const C_OSCCanProtocol::E_Type & ore_Protocol,
-                             stw_scl::C_SCLString & orc_FileName);
+   static stw_scl::C_SCLString h_GetFileName(const stw_types::uint8 ou8_InterfaceIndex,
+                                             const C_OSCCanProtocol::E_Type & ore_ProtocolType);
+   static stw_scl::C_SCLString h_GetConfigurationName(const stw_types::uint8 ou8_InterfaceIndex,
+                                                      const C_OSCCanProtocol::E_Type & ore_ProtocolType);
    static stw_types::sint32 h_CreateSourceCode(const stw_scl::C_SCLString & orc_Path, const C_OSCNode & orc_Node,
                                                const stw_types::uint8 ou8_InterfaceIndex,
                                                const C_OSCCanProtocol::E_Type & ore_Protocol);

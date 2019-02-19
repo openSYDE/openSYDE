@@ -24,6 +24,7 @@
 #include "C_SdNdeDbListWidget.h"
 #include "C_SdNdeDbWidget.h"
 #include "C_PuiSdHandler.h"
+#include "C_OgeWiUtil.h"
 
 /* -- Used Namespaces ------------------------------------------------------ */
 using namespace stw_types;
@@ -77,6 +78,9 @@ C_SdNdeDbListWidget::C_SdNdeDbListWidget(QWidget * const opc_Parent) :
    // Deactivate custom context menu of scroll bar
    this->verticalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);
    this->horizontalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);
+
+   // scroll bar style
+   C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this, "C_SdNdeDbWidget", true);
 }
 
 //-----------------------------------------------------------------------------

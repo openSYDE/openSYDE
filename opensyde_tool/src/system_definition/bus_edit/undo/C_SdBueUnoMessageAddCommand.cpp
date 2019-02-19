@@ -161,6 +161,23 @@ void C_SdBueUnoMessageAddCommand::SetInitialData(const C_OSCCanMessage & orc_Mes
 
 //-----------------------------------------------------------------------------
 /*!
+   \brief   Get the last known value for the message index
+
+   Warning: use this function carefully as the message index cannot be relied on
+
+   \return
+   Last known value for the message index
+
+   \created     19.02.2019  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+C_OSCCanMessageIdentificationIndices C_SdBueUnoMessageAddCommand::GetLastMessageId(void) const
+{
+   return this->mc_LastMessageId;
+}
+
+//-----------------------------------------------------------------------------
+/*!
    \brief   Redo add
 
    \created     20.04.2017  STW/M.Echtler

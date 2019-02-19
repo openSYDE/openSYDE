@@ -3,41 +3,48 @@ stw_opensyde_gui_elements--C_OgeLePropertiesToolTip,
 stw_opensyde_gui_elements--C_OgeLePropertiesName,
 stw_opensyde_gui_elements--C_OgeLeNavigation,
 stw_opensyde_gui_elements--C_OgeLeDark,
-stw_opensyde_gui_elements--C_OgeLeProperties{
-border-style:solid;
+stw_opensyde_gui_elements--C_OgeLeProperties
+{
+border-style: solid;
 border-width: 1px;
 }
 
+/* --------------------------------------------------------------------- */
 stw_opensyde_gui_elements--C_OgeLeDark,
 stw_opensyde_gui_elements--C_OgeLeNavigation,
-stw_opensyde_gui_elements--C_OgeLePropertiesName {
-padding-left:10px;
-padding-right:10px;
+stw_opensyde_gui_elements--C_OgeLePropertiesName
+{
+padding-left: 10px;
+padding-right: 10px;
 }
 
+/* --------------------------------------------------------------------- */
 stw_opensyde_gui_elements--C_OgeLePropertiesToolTip,
-stw_opensyde_gui_elements--C_OgeLeProperties{
-padding-left:6px;
-padding-right:6px;
-padding-bottom:1px;
+stw_opensyde_gui_elements--C_OgeLeProperties
+{
+padding-left: 6px;
+padding-right: 6px;
+padding-bottom: 1px;
 }
 
-stw_opensyde_gui_elements--C_OgeLeDialog {
-border-style:solid;
-border-width:1px;
-}
-stw_opensyde_gui_elements--C_OgeLeListHeader {
-border-style:solid;
-border-width:1px;
+/* --------------------------------------------------------------------- */
+stw_opensyde_gui_elements--C_OgeLeListHeader
+{
+border-style: solid;
+border-width: 1px;
 }
 
+/* --------------------------------------------------------------------- */
 QTextEdit#pc_TextEditDpName,
-QTextEdit#pc_TextEditDpComment {
-border-style:none;
-border-width:0px;
+QTextEdit#pc_TextEditDpComment
+{
+border-style: none;
+border-width: 0px;
 }
 
-stw_opensyde_gui_elements--C_OgeLeTable {
+/* --------------------------------------------------------------------- */
+stw_opensyde_gui_elements--C_OgeLeTable
+{
 border-style: solid;
 border-width: 1px;
 padding: 0px;
@@ -45,8 +52,9 @@ margin-top: 3px;
 margin-bottom: 3px;
 }
 
-/* Custom param widget style */
-stw_opensyde_gui_elements--C_OgeLeParam {
+/* --------------------------------------------------------------------- */
+stw_opensyde_gui_elements--C_OgeLeParam
+{
 border-style: solid;
 border-width: 1px;
 padding: 0px;

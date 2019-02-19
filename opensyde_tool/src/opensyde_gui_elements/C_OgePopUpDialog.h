@@ -45,7 +45,8 @@ class C_OgePopUpDialog :
    Q_OBJECT
 
 public:
-   explicit C_OgePopUpDialog(QWidget * const opc_Parent = NULL, QWidget * const opc_EffectTargetChild = NULL);
+   explicit C_OgePopUpDialog(QWidget * const opc_Parent = NULL, QWidget * const opc_EffectTargetChild = NULL,
+                             const bool oq_AddShadow = true);
    virtual ~C_OgePopUpDialog();
 
    void SetWidget(QWidget * const opc_Widget);
@@ -87,7 +88,6 @@ private:
    QString mc_Subtitle;
    QString mc_WidgetClassName;
    bool mq_NotifyAndBlockClose;
-
 
    void m_SetWindowTitle();
 

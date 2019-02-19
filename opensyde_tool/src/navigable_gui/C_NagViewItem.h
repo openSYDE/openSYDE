@@ -83,6 +83,7 @@ private:
    static const stw_types::sintn hsn_SizeTop;
    static const stw_types::sintn hsn_SizeSub;
    static const stw_types::sintn hsn_FixSizeBottom;
+   bool mq_ButtonPressed;
 
    //Avoid call
    C_NagViewItem(const C_NagViewItem &);
@@ -100,6 +101,9 @@ private:
    void m_OnSetupClicked(void);
    void m_OnUpdateClicked(void);
    void m_OnDashboardClicked(void);
+
+   void m_ButtonPressed(void);
+   void m_ButtonReleased(void);
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

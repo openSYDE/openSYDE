@@ -128,7 +128,7 @@ void C_SdNdeDbViewWidget::InitStaticNames(void) const
                                                                    "   Application developed by using the openSYDE \"code generation\" feature.\n"
                                                                    "   Available for devices with programming support. \n\n"
                                                                    " - Binary\n"
-                                                                   "   Any kind of application or data created by an other tool chain.\n\n"
+                                                                   "   Any kind of application or data created by another tool chain.\n\n"
                                                                    " - File Container \n"
                                                                    "   A file container for any number of files you want to transfer to your file based device.\n"
                                                                    "   Available for file based devices. \n"));
@@ -261,7 +261,7 @@ void C_SdNdeDbViewWidget::AddApp(void)
       {
          //no fbl support
          c_MessageBox.SetType(C_OgeWiCustomMessage::E_Type::eWARNING);
-         c_MessageBox.SetHeading(C_GtGetText::h_GetText("Data blocks add"));
+         c_MessageBox.SetHeading(C_GtGetText::h_GetText("Data Blocks add"));
          c_MessageBox.SetDescription(C_GtGetText::h_GetText(
                                         "There is no Flashloader support for this device type. Data Blocks cannot be added."));
          c_MessageBox.Execute();
@@ -298,10 +298,10 @@ void C_SdNdeDbViewWidget::m_HandleNoDatablocksLabel(void) const
       //are there any data blocks?
       if (pc_Node->c_Applications.empty() == true)
       {
-         //no datablocks display label
+         //no data blocks display label
          this->mpc_Ui->pc_LabelNoDatablocks->setVisible(true);
          this->mpc_Ui->pc_LabelNoDatablocks->setText(C_GtGetText::h_GetText(
-                                                        "No Data Block declared. You may add any via the '+' button"));
+                                                        "No Data Block declared. \nAdd any via the '+' button"));
       }
       else
       {

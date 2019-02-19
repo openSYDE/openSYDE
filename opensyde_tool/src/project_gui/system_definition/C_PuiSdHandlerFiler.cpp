@@ -24,6 +24,7 @@
 #include "stwtypes.h"
 #include "stwerrors.h"
 #include "TGLUtils.h"
+#include "C_OSCLoggingHandler.h"
 #include "C_PuiSdHandlerFiler.h"
 #include "C_PuiBsElementsFiler.h"
 
@@ -81,7 +82,18 @@ sint32 C_PuiSdHandlerFiler::h_LoadDataPools(std::vector<C_PuiSdNodeDataPool> & o
    orc_DataPools.clear();
    if (orc_XMLParser.SelectNodeChild("data-pools") == "data-pools")
    {
-      C_SCLString c_CurrentDataPoolNode = orc_XMLParser.SelectNodeChild("data-pool");
+      C_SCLString c_CurrentDataPoolNode;
+      uint32 u32_ExpectedSize = 0UL;
+      const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+
+      //Check optional length
+      if (q_ExpectedSizeHere == true)
+      {
+         u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+         orc_DataPools.reserve(u32_ExpectedSize);
+      }
+
+      c_CurrentDataPoolNode = orc_XMLParser.SelectNodeChild("data-pool");
       if (c_CurrentDataPoolNode == "data-pool")
       {
          uint32 u32_DataPoolIndex;
@@ -96,9 +108,20 @@ sint32 C_PuiSdHandlerFiler::h_LoadDataPools(std::vector<C_PuiSdNodeDataPool> & o
             //Next
             c_CurrentDataPoolNode = orc_XMLParser.SelectNodeNext("data-pool");
          }
-         while (c_CurrentDataPoolNode == "data-pool");
+         while ((s32_Retval == C_NO_ERR) && (c_CurrentDataPoolNode == "data-pool"));
          //Return
          tgl_assert(orc_XMLParser.SelectNodeParent() == "data-pools");
+      }
+      //Compare length
+      if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
+      {
+         if (u32_ExpectedSize != orc_DataPools.size())
+         {
+            C_SCLString c_Tmp;
+            c_Tmp.PrintFormatted("Unexpected UI Datapool count, expected: %i, got %i", u32_ExpectedSize,
+                                 orc_DataPools.size());
+            osc_write_log_warning("Load file", c_Tmp.c_str());
+         }
       }
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "gui");
@@ -161,7 +184,18 @@ sint32 C_PuiSdHandlerFiler::h_LoadDataPoolLists(std::vector<C_PuiSdNodeDataPoolL
 {
    sint32 s32_Retval = C_NO_ERR;
 
-   C_SCLString c_CurrentDataPoolListNode = orc_XMLParser.SelectNodeChild("list");
+   C_SCLString c_CurrentDataPoolListNode;
+   uint32 u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+
+   //Check optional length
+   if (q_ExpectedSizeHere == true)
+   {
+      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      orc_DataPoolLists.reserve(u32_ExpectedSize);
+   }
+
+   c_CurrentDataPoolListNode = orc_XMLParser.SelectNodeChild("list");
 
    orc_DataPoolLists.clear();
    if (c_CurrentDataPoolListNode == "list")
@@ -185,6 +219,17 @@ sint32 C_PuiSdHandlerFiler::h_LoadDataPoolLists(std::vector<C_PuiSdNodeDataPoolL
       while (c_CurrentDataPoolListNode == "list");
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "lists");
+   }
+   //Compare length
+   if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
+   {
+      if (u32_ExpectedSize != orc_DataPoolLists.size())
+      {
+         C_SCLString c_Tmp;
+         c_Tmp.PrintFormatted("Unexpected UI list count, expected: %i, got %i", u32_ExpectedSize,
+                              orc_DataPoolLists.size());
+         osc_write_log_warning("Load file", c_Tmp.c_str());
+      }
    }
    return s32_Retval;
 }
@@ -240,7 +285,18 @@ sint32 C_PuiSdHandlerFiler::h_LoadDataPoolListElements(
 {
    sint32 s32_Retval = C_NO_ERR;
 
-   C_SCLString c_CurrentDataPoolListElementNode = orc_XMLParser.SelectNodeChild("data-element");
+   C_SCLString c_CurrentDataPoolListElementNode;
+   uint32 u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+
+   //Check optional length
+   if (q_ExpectedSizeHere == true)
+   {
+      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      orc_DataPoolListElements.reserve(u32_ExpectedSize);
+   }
+
+   c_CurrentDataPoolListElementNode = orc_XMLParser.SelectNodeChild("data-element");
 
    orc_DataPoolListElements.clear();
    if (c_CurrentDataPoolListElementNode == "data-element")
@@ -263,6 +319,17 @@ sint32 C_PuiSdHandlerFiler::h_LoadDataPoolListElements(
       while (c_CurrentDataPoolListElementNode == "data-element");
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "data-elements");
+   }
+   //Compare length
+   if (q_ExpectedSizeHere == true)
+   {
+      if (u32_ExpectedSize != orc_DataPoolListElements.size())
+      {
+         C_SCLString c_Tmp;
+         c_Tmp.PrintFormatted("Unexpected UI data element count, expected: %i, got %i", u32_ExpectedSize,
+                              orc_DataPoolListElements.size());
+         osc_write_log_warning("Load file", c_Tmp.c_str());
+      }
    }
    return s32_Retval;
 }
@@ -302,6 +369,7 @@ void C_PuiSdHandlerFiler::h_SaveDataPools(const std::vector<C_PuiSdNodeDataPool>
                                           C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_XMLParser.CreateAndSelectNodeChild("data-pools");
+   orc_XMLParser.SetAttributeUint32("length", orc_DataPools.size());
    for (uint32 u32_ItDataPool = 0; u32_ItDataPool < orc_DataPools.size(); ++u32_ItDataPool)
    {
       orc_XMLParser.CreateAndSelectNodeChild("data-pool");
@@ -347,6 +415,7 @@ void C_PuiSdHandlerFiler::h_SaveDataPool(const C_PuiSdNodeDataPool & orc_DataPoo
 void C_PuiSdHandlerFiler::h_SaveDataPoolLists(const std::vector<C_PuiSdNodeDataPoolList> & orc_DataPoolLists,
                                               C_OSCXMLParserBase & orc_XMLParser)
 {
+   orc_XMLParser.SetAttributeUint32("length", orc_DataPoolLists.size());
    for (uint32 u32_ItDataPoolList = 0; u32_ItDataPoolList < orc_DataPoolLists.size();
         ++u32_ItDataPoolList)
    {
@@ -390,6 +459,7 @@ void C_PuiSdHandlerFiler::h_SaveDataPoolList(const C_PuiSdNodeDataPoolList & orc
 void C_PuiSdHandlerFiler::h_SaveDataPoolListElements(
    const std::vector<C_PuiSdNodeDataPoolListElement> & orc_DataPoolListElements, C_OSCXMLParserBase & orc_XMLParser)
 {
+   orc_XMLParser.SetAttributeUint32("length", orc_DataPoolListElements.size());
    for (uint32 u32_ItDataPoolListElement = 0;
         u32_ItDataPoolListElement < orc_DataPoolListElements.size();
         ++u32_ItDataPoolListElement)
@@ -442,7 +512,18 @@ sint32 C_PuiSdHandlerFiler::h_LoadCanProtocols(std::vector<C_PuiSdNodeCanProtoco
    orc_CanProtocols.clear();
    if (orc_XMLParser.SelectNodeChild("com-protocols") == "com-protocols")
    {
-      C_SCLString c_CurrentCanProtocolNode = orc_XMLParser.SelectNodeChild("com-protocol");
+      C_SCLString c_CurrentCanProtocolNode;
+      uint32 u32_ExpectedSize = 0UL;
+      const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+
+      //Check optional length
+      if (q_ExpectedSizeHere == true)
+      {
+         u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+         orc_CanProtocols.reserve(u32_ExpectedSize);
+      }
+
+      c_CurrentCanProtocolNode = orc_XMLParser.SelectNodeChild("com-protocol");
       if (c_CurrentCanProtocolNode == "com-protocol")
       {
          do
@@ -462,6 +543,17 @@ sint32 C_PuiSdHandlerFiler::h_LoadCanProtocols(std::vector<C_PuiSdNodeCanProtoco
          while (c_CurrentCanProtocolNode == "com-protocol");
          //Return
          tgl_assert(orc_XMLParser.SelectNodeParent() == "com-protocols");
+      }
+      //Compare length
+      if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
+      {
+         if (u32_ExpectedSize != orc_CanProtocols.size())
+         {
+            C_SCLString c_Tmp;
+            c_Tmp.PrintFormatted("Unexpected UI protocol count, expected: %i, got %i", u32_ExpectedSize,
+                                 orc_CanProtocols.size());
+            osc_write_log_warning("Load file", c_Tmp.c_str());
+         }
       }
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "gui");
@@ -526,7 +618,18 @@ sint32 C_PuiSdHandlerFiler::h_LoadCanMessageContainers(
 {
    sint32 s32_Retval = C_NO_ERR;
 
-   C_SCLString c_CurrentCanMessageContainerNode = orc_XMLParser.SelectNodeChild("com-message-container");
+   C_SCLString c_CurrentCanMessageContainerNode;
+   uint32 u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+
+   //Check optional length
+   if (q_ExpectedSizeHere == true)
+   {
+      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      orc_CanMessageContainers.reserve(u32_ExpectedSize);
+   }
+
+   c_CurrentCanMessageContainerNode = orc_XMLParser.SelectNodeChild("com-message-container");
 
    orc_CanMessageContainers.clear();
    if (c_CurrentCanMessageContainerNode == "com-message-container")
@@ -550,6 +653,17 @@ sint32 C_PuiSdHandlerFiler::h_LoadCanMessageContainers(
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "com-message-containers");
    }
+   //Compare length
+   if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
+   {
+      if (u32_ExpectedSize != orc_CanMessageContainers.size())
+      {
+         C_SCLString c_Tmp;
+         c_Tmp.PrintFormatted("Unexpected data element count, expected: %i, got %i", u32_ExpectedSize,
+                              orc_CanMessageContainers.size());
+         osc_write_log_warning("Load file", c_Tmp.c_str());
+      }
+   }
    return s32_Retval;
 }
 
@@ -571,7 +685,7 @@ sint32 C_PuiSdHandlerFiler::h_LoadCanMessageContainers(
 sint32 C_PuiSdHandlerFiler::h_LoadCanMessageContainer(C_PuiSdNodeCanMessageContainer & orc_CanMessageContainer,
                                                       C_OSCXMLParserBase & orc_XMLParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   sint32 s32_Retval;
 
    if (orc_XMLParser.SelectNodeChild("tx-messages") == "tx-messages")
    {
@@ -583,7 +697,7 @@ sint32 C_PuiSdHandlerFiler::h_LoadCanMessageContainer(C_PuiSdNodeCanMessageConta
    {
       s32_Retval = C_CONFIG;
    }
-   if (orc_XMLParser.SelectNodeChild("rx-messages") == "rx-messages")
+   if ((orc_XMLParser.SelectNodeChild("rx-messages") == "rx-messages") && (s32_Retval == C_NO_ERR))
    {
       s32_Retval = h_LoadCanMessages(orc_CanMessageContainer.c_RxMessages, orc_XMLParser);
       //Return
@@ -615,7 +729,18 @@ sint32 C_PuiSdHandlerFiler::h_LoadCanMessages(std::vector<C_PuiSdNodeCanMessage>
 {
    sint32 s32_Retval = C_NO_ERR;
 
-   C_SCLString c_CurrentCanMessageNode = orc_XMLParser.SelectNodeChild("com-message");
+   C_SCLString c_CurrentCanMessageNode;
+   uint32 u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+
+   //Check optional length
+   if (q_ExpectedSizeHere == true)
+   {
+      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      orc_CanMessages.reserve(u32_ExpectedSize);
+   }
+
+   c_CurrentCanMessageNode = orc_XMLParser.SelectNodeChild("com-message");
 
    orc_CanMessages.clear();
    if (c_CurrentCanMessageNode == "com-message")
@@ -637,6 +762,17 @@ sint32 C_PuiSdHandlerFiler::h_LoadCanMessages(std::vector<C_PuiSdNodeCanMessage>
       while (c_CurrentCanMessageNode == "com-message");
       //Return
       orc_XMLParser.SelectNodeParent();
+   }
+   //Compare length
+   if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
+   {
+      if (u32_ExpectedSize != orc_CanMessages.size())
+      {
+         C_SCLString c_Tmp;
+         c_Tmp.PrintFormatted("Unexpected UI messages count, expected: %i, got %i", u32_ExpectedSize,
+                              orc_CanMessages.size());
+         osc_write_log_warning("Load file", c_Tmp.c_str());
+      }
    }
    return s32_Retval;
 }
@@ -700,7 +836,18 @@ sint32 C_PuiSdHandlerFiler::h_LoadCanMessage(C_PuiSdNodeCanMessage & orc_CanMess
 void C_PuiSdHandlerFiler::h_LoadCanSignals(std::vector<C_PuiSdNodeCanSignal> & orc_CanSignals,
                                            C_OSCXMLParserBase & orc_XMLParser)
 {
-   C_SCLString c_CurrentDataPoolListElementNode = orc_XMLParser.SelectNodeChild("com-signal");
+   C_SCLString c_CurrentDataPoolListElementNode;
+   uint32 u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+
+   //Check optional length
+   if (q_ExpectedSizeHere == true)
+   {
+      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      orc_CanSignals.reserve(u32_ExpectedSize);
+   }
+
+   c_CurrentDataPoolListElementNode = orc_XMLParser.SelectNodeChild("com-signal");
 
    if (c_CurrentDataPoolListElementNode == "com-signal")
    {
@@ -716,6 +863,17 @@ void C_PuiSdHandlerFiler::h_LoadCanSignals(std::vector<C_PuiSdNodeCanSignal> & o
       while (c_CurrentDataPoolListElementNode == "com-signal");
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "com-signals");
+   }
+   //Compare length
+   if (q_ExpectedSizeHere == true)
+   {
+      if (u32_ExpectedSize != orc_CanSignals.size())
+      {
+         C_SCLString c_Tmp;
+         c_Tmp.PrintFormatted("Unexpected data element count, expected: %i, got %i", u32_ExpectedSize,
+                              orc_CanSignals.size());
+         osc_write_log_warning("Load file", c_Tmp.c_str());
+      }
    }
 }
 
@@ -753,6 +911,7 @@ void C_PuiSdHandlerFiler::h_SaveCanProtocols(const std::vector<C_PuiSdNodeCanPro
                                              C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_XMLParser.CreateAndSelectNodeChild("com-protocols");
+   orc_XMLParser.SetAttributeUint32("length", orc_CanProtocols.size());
    for (uint32 u32_ItCanProtocol = 0; u32_ItCanProtocol < orc_CanProtocols.size(); ++u32_ItCanProtocol)
    {
       orc_XMLParser.CreateAndSelectNodeChild("com-protocol");
@@ -799,6 +958,7 @@ void C_PuiSdHandlerFiler::h_SaveCanProtocol(const C_PuiSdNodeCanProtocol & orc_C
 void C_PuiSdHandlerFiler::h_SaveCanMessageContainers(
    const std::vector<C_PuiSdNodeCanMessageContainer> & orc_CanMessageContainers, C_OSCXMLParserBase & orc_XMLParser)
 {
+   orc_XMLParser.SetAttributeUint32("length", orc_CanMessageContainers.size());
    for (uint32 u32_ItCanMessageContainer = 0; u32_ItCanMessageContainer < orc_CanMessageContainers.size();
         ++u32_ItCanMessageContainer)
    {
@@ -845,6 +1005,7 @@ void C_PuiSdHandlerFiler::h_SaveCanMessageContainer(const C_PuiSdNodeCanMessageC
 void C_PuiSdHandlerFiler::h_SaveCanMessages(const std::vector<C_PuiSdNodeCanMessage> & orc_CanMessages,
                                             C_OSCXMLParserBase & orc_XMLParser)
 {
+   orc_XMLParser.SetAttributeUint32("length", orc_CanMessages.size());
    for (uint32 u32_ItMessage = 0; u32_ItMessage < orc_CanMessages.size();
         ++u32_ItMessage)
    {
@@ -890,6 +1051,7 @@ void C_PuiSdHandlerFiler::h_SaveCanMessage(const C_PuiSdNodeCanMessage & orc_Can
 void C_PuiSdHandlerFiler::h_SaveCanSignals(const std::vector<C_PuiSdNodeCanSignal> & orc_CanSignals,
                                            C_OSCXMLParserBase & orc_XMLParser)
 {
+   orc_XMLParser.SetAttributeUint32("length", orc_CanSignals.size());
    for (uint32 u32_ItDataPoolListElement = 0;
         u32_ItDataPoolListElement < orc_CanSignals.size();
         ++u32_ItDataPoolListElement)
@@ -934,7 +1096,18 @@ void C_PuiSdHandlerFiler::h_SaveCanSignal(const C_PuiSdNodeCanSignal & orc_CanSi
 sint32 C_PuiSdHandlerFiler::h_LoadNodes(std::vector<C_PuiSdNode> & orc_Nodes, C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
-   C_SCLString c_SelectedNode = orc_XMLParser.SelectNodeChild("node");
+   C_SCLString c_SelectedNode;
+   uint32 u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+
+   //Check optional length
+   if (q_ExpectedSizeHere == true)
+   {
+      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      orc_Nodes.reserve(u32_ExpectedSize);
+   }
+
+   c_SelectedNode = orc_XMLParser.SelectNodeChild("node");
 
    orc_Nodes.clear();
    if (c_SelectedNode == "node")
@@ -954,6 +1127,17 @@ sint32 C_PuiSdHandlerFiler::h_LoadNodes(std::vector<C_PuiSdNode> & orc_Nodes, C_
       while (c_SelectedNode == "node");
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "nodes");
+   }
+   //Compare length
+   if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
+   {
+      if (u32_ExpectedSize != orc_Nodes.size())
+      {
+         C_SCLString c_Tmp;
+         c_Tmp.PrintFormatted("Unexpected UI nodes count, expected: %i, got %i", u32_ExpectedSize,
+                              orc_Nodes.size());
+         osc_write_log_warning("Load file", c_Tmp.c_str());
+      }
    }
    return s32_Retval;
 }
@@ -976,6 +1160,7 @@ void C_PuiSdHandlerFiler::h_SaveNodes(const std::vector<C_PuiSdNode> & orc_Nodes
 {
    if (orc_Nodes.size() > 0)
    {
+      orc_XMLParser.SetAttributeUint32("length", orc_Nodes.size());
       tgl_assert(orc_XMLParser.SelectNodeChild("node") == "node"); //first node ...
       for (uint32 u32_Index = 0U; u32_Index < orc_Nodes.size(); u32_Index++)
       {
@@ -1009,7 +1194,18 @@ void C_PuiSdHandlerFiler::h_SaveNodes(const std::vector<C_PuiSdNode> & orc_Nodes
 sint32 C_PuiSdHandlerFiler::h_LoadBuses(std::vector<C_PuiSdBus> & orc_Buses, C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
-   C_SCLString c_SelectedNode = orc_XMLParser.SelectNodeChild("bus");
+   C_SCLString c_SelectedNode;
+   uint32 u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+
+   //Check optional length
+   if (q_ExpectedSizeHere == true)
+   {
+      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      orc_Buses.reserve(u32_ExpectedSize);
+   }
+
+   c_SelectedNode = orc_XMLParser.SelectNodeChild("bus");
 
    orc_Buses.clear();
    if (c_SelectedNode == "bus")
@@ -1029,6 +1225,17 @@ sint32 C_PuiSdHandlerFiler::h_LoadBuses(std::vector<C_PuiSdBus> & orc_Buses, C_O
       while (c_SelectedNode == "bus");
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "buses");
+   }
+   //Compare length
+   if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
+   {
+      if (u32_ExpectedSize != orc_Buses.size())
+      {
+         C_SCLString c_Tmp;
+         c_Tmp.PrintFormatted("Unexpected bus count, expected: %i, got %i", u32_ExpectedSize,
+                              orc_Buses.size());
+         osc_write_log_warning("Load file", c_Tmp.c_str());
+      }
    }
    return s32_Retval;
 }
@@ -1054,6 +1261,7 @@ void C_PuiSdHandlerFiler::h_SaveBuses(const std::vector<C_PuiSdBus> & orc_Buses,
 {
    if (orc_Buses.size() > 0)
    {
+      orc_XMLParser.SetAttributeUint32("length", orc_Buses.size());
       tgl_assert(orc_XMLParser.SelectNodeChild("bus") == "bus"); //first bus ...
       for (uint32 u32_Index = 0U; u32_Index < orc_Buses.size(); u32_Index++)
       {
@@ -1085,7 +1293,18 @@ sint32 C_PuiSdHandlerFiler::h_LoadBusTextElements(std::vector<C_PuiSdTextElement
                                                   C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
-   C_SCLString c_SelectedNode = orc_XMLParser.SelectNodeChild("bus-text-element");
+   C_SCLString c_SelectedNode;
+   uint32 u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+
+   //Check optional length
+   if (q_ExpectedSizeHere == true)
+   {
+      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      orc_BusTextElements.reserve(u32_ExpectedSize);
+   }
+
+   c_SelectedNode = orc_XMLParser.SelectNodeChild("bus-text-element");
 
    orc_BusTextElements.clear();
    if (c_SelectedNode == "bus-text-element")
@@ -1106,6 +1325,17 @@ sint32 C_PuiSdHandlerFiler::h_LoadBusTextElements(std::vector<C_PuiSdTextElement
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "bus-text-elements");
    }
+   //Compare length
+   if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
+   {
+      if (u32_ExpectedSize != orc_BusTextElements.size())
+      {
+         C_SCLString c_Tmp;
+         c_Tmp.PrintFormatted("Unexpected bus text element count, expected: %i, got %i", u32_ExpectedSize,
+                              orc_BusTextElements.size());
+         osc_write_log_warning("Load file", c_Tmp.c_str());
+      }
+   }
    return s32_Retval;
 }
 
@@ -1122,6 +1352,7 @@ sint32 C_PuiSdHandlerFiler::h_LoadBusTextElements(std::vector<C_PuiSdTextElement
 void C_PuiSdHandlerFiler::h_SaveBusTextElements(const std::vector<C_PuiSdTextElementBus> & orc_BusTextElements,
                                                 C_OSCXMLParserBase & orc_XMLParser)
 {
+   orc_XMLParser.SetAttributeUint32("length", orc_BusTextElements.size());
    for (uint32 u32_Index = 0U; u32_Index < orc_BusTextElements.size(); ++u32_Index)
    {
       orc_XMLParser.CreateAndSelectNodeChild("bus-text-element");

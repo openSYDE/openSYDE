@@ -144,7 +144,7 @@ void C_SyvDaDashboardTabProperties::InitStaticNames(void)
    this->mpc_Ui->pc_LabelName->setText(C_GtGetText::h_GetText("Name"));
    this->mpc_Ui->pc_LabelComment->setText(C_GtGetText::h_GetText("Comment"));
    this->mpc_Ui->pc_LabelHintComment->setText(
-      C_GtGetText::h_GetText("Note: Comment is shown in tool-tip on tab hover."));
+      C_GtGetText::h_GetText("Note: Comment is shown in tooltip on tab hover."));
 
    //Tool tips
    this->mpc_Ui->pc_LabelName->SetToolTipInformation(C_GtGetText::h_GetText("Name"),
@@ -153,7 +153,7 @@ void C_SyvDaDashboardTabProperties::InitStaticNames(void)
 
    this->mpc_Ui->pc_LabelComment->SetToolTipInformation(C_GtGetText::h_GetText("Comment"),
                                                         C_GtGetText::h_GetText("Comment for this Dashboard tab, that "
-                                                                               "is shown in tool-tip on tab hover."));
+                                                                               "is shown in tooltip on tab hover."));
 }
 //-----------------------------------------------------------------------------
 /*!
@@ -241,7 +241,7 @@ void C_SyvDaDashboardTabProperties::m_OkClicked(void)
       C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR);
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Dashboard rename"));
       c_MessageBox.SetDescription(C_GtGetText::h_GetText(
-                                     "This dashboard name is already used. Please choose another name."));
+                                     "This Dashboard name is already exists. Choose another name."));
       c_MessageBox.Execute();
    }
 }

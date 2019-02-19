@@ -31,6 +31,10 @@
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
 
+#include <iostream>
+
+#include <QElapsedTimer>
+
 #include "stwtypes.h"
 #include "stwerrors.h"
 #include "TGLUtils.h"
@@ -64,10 +68,13 @@ using namespace stw_opensyde_core;
 /*!
    \brief   Default constructor
 
+   \param[in,out] opc_Parent Optional pointer to parent
+
    \created     19.04.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-C_PuiSdNodeCanMessageSyncManager::C_PuiSdNodeCanMessageSyncManager(void) :
+C_PuiSdNodeCanMessageSyncManager::C_PuiSdNodeCanMessageSyncManager(QObject * const opc_Parent) :
+   QObject(opc_Parent),
    mq_SingleNodeMode(false),
    me_Protocol(C_OSCCanProtocol::eLAYER2)
 {
@@ -279,7 +286,7 @@ void C_PuiSdNodeCanMessageSyncManager::h_GetConnectedAndActiveInterfaces(const u
 sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageDirection(
    const C_OSCCanMessageIdentificationIndices & orc_MessageId, const bool & orq_NewMessageIsTx)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   sint32 s32_Retval = C_RANGE;
    const C_OSCCanMessage * const pc_CanMessage = C_PuiSdHandler::h_GetInstance()->GetCanMessage(orc_MessageId);
    const uint32 u32_ItDifferentMessage = m_GetMatchingMessageVectorIndex(orc_MessageId);
 
@@ -291,7 +298,7 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageDirection(
       std::vector<C_OSCCanMessageIdentificationIndices> & rc_MatchingMessageIds =
          this->mc_MessageMatches[u32_ItDifferentMessage];
 
-      for (uint32 u32_ItMessageId = 0; (u32_ItMessageId < rc_MatchingMessageIds.size()) && (s32_Retval == C_NO_ERR);
+      for (uint32 u32_ItMessageId = 0; u32_ItMessageId < rc_MatchingMessageIds.size();
            ++u32_ItMessageId)
       {
          C_OSCCanMessageIdentificationIndices & rc_MatchingMessage = rc_MatchingMessageIds[u32_ItMessageId];
@@ -317,6 +324,9 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageDirection(
                   rc_MatchingMessage.u32_MessageIndex = rc_Messages.size() - 1UL;
                }
             }
+            //There should be only one entry with this node index and interface index
+            //-> this should also just affect one item
+            break;
          }
       }
       //Resync matching node & com protocol & not new messageistx flag because of array size change
@@ -346,12 +356,12 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageDirection(
 sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessagePropertiesWithoutDirectionChangeAndWithoutTimeoutChange(
    const C_OSCCanMessageIdentificationIndices & orc_MessageId, const C_OSCCanMessage & orc_Message) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   sint32 s32_Retval = C_RANGE;
    const std::vector<C_OSCCanMessageIdentificationIndices> c_MatchingMessageIds = this->GetMatchingMessageVector(
       orc_MessageId);
    C_OSCCanMessage c_Copy = orc_Message;
 
-   for (uint32 u32_ItMessageId = 0; (u32_ItMessageId < c_MatchingMessageIds.size()) && (s32_Retval == C_NO_ERR);
+   for (uint32 u32_ItMessageId = 0; u32_ItMessageId < c_MatchingMessageIds.size();
         ++u32_ItMessageId)
    {
       const C_OSCCanMessageIdentificationIndices & rc_CurMessageId = c_MatchingMessageIds[u32_ItMessageId];
@@ -367,6 +377,11 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessagePropertiesWithoutDirection
       else
       {
          s32_Retval = C_RANGE;
+      }
+      //Stop on error
+      if (s32_Retval != C_NO_ERR)
+      {
+         break;
       }
    }
    return s32_Retval;
@@ -392,13 +407,13 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageReceiveTimeout(
    const C_OSCCanMessageIdentificationIndices & orc_MessageId, const uint32 ou32_NodeIndex,
    const uint32 ou32_InterfaceIndex, const uint32 ou32_ReceiveTimeout) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   sint32 s32_Retval = C_RANGE;
    //Get all matching Ids
    const std::vector<C_OSCCanMessageIdentificationIndices> c_MatchingMessageIds = this->GetMatchingMessageVector(
       orc_MessageId);
 
    //Look for specific receiver
-   for (uint32 u32_ItMessageId = 0; (u32_ItMessageId < c_MatchingMessageIds.size()) && (s32_Retval == C_NO_ERR);
+   for (uint32 u32_ItMessageId = 0; u32_ItMessageId < c_MatchingMessageIds.size();
         ++u32_ItMessageId)
    {
       const C_OSCCanMessageIdentificationIndices & rc_CurMessageId = c_MatchingMessageIds[u32_ItMessageId];
@@ -419,6 +434,11 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageReceiveTimeout(
          else
          {
             s32_Retval = C_RANGE;
+         }
+         //Stop on error
+         if (s32_Retval != C_NO_ERR)
+         {
+            break;
          }
       }
    }
@@ -445,13 +465,13 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageReceiveTimeoutAutoFlag(
    const C_OSCCanMessageIdentificationIndices & orc_MessageId, const uint32 ou32_NodeIndex,
    const uint32 ou32_InterfaceIndex, const bool oq_UseAutoReceiveTimeout) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   sint32 s32_Retval = C_RANGE;
    //Get all matching Ids
    const std::vector<C_OSCCanMessageIdentificationIndices> c_MatchingMessageIds = this->GetMatchingMessageVector(
       orc_MessageId);
 
    //Look for specific receiver
-   for (uint32 u32_ItMessageId = 0; (u32_ItMessageId < c_MatchingMessageIds.size()) && (s32_Retval == C_NO_ERR);
+   for (uint32 u32_ItMessageId = 0; u32_ItMessageId < c_MatchingMessageIds.size();
         ++u32_ItMessageId)
    {
       const C_OSCCanMessageIdentificationIndices & rc_CurMessageId = c_MatchingMessageIds[u32_ItMessageId];
@@ -472,6 +492,11 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanMessageReceiveTimeoutAutoFlag(
          else
          {
             s32_Retval = C_RANGE;
+         }
+         //Stop on error
+         if (s32_Retval != C_NO_ERR)
+         {
+            break;
          }
       }
    }
@@ -503,16 +528,21 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanSignal(const C_OSCCanMessageIdent
                                                       const C_PuiSdNodeDataPoolListElement & orc_UISignalCommon,
                                                       const C_PuiSdNodeCanSignal & orc_UISignal) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   sint32 s32_Retval = C_RANGE;
    const std::vector<C_OSCCanMessageIdentificationIndices> c_MatchingMessageIds = this->GetMatchingMessageVector(
       orc_MessageId);
 
-   for (uint32 u32_ItMessageId = 0; (u32_ItMessageId < c_MatchingMessageIds.size()) && (s32_Retval == C_NO_ERR);
+   for (uint32 u32_ItMessageId = 0; u32_ItMessageId < c_MatchingMessageIds.size();
         ++u32_ItMessageId)
    {
       s32_Retval = C_PuiSdHandler::h_GetInstance()->SetCanSignal(c_MatchingMessageIds[u32_ItMessageId],
                                                                  oru32_SignalIndex, orc_OSCSignal,
                                                                  orc_OSCSignalCommon, orc_UISignalCommon, orc_UISignal);
+      //Stop on error
+      if (s32_Retval != C_NO_ERR)
+      {
+         break;
+      }
    }
    return s32_Retval;
 }
@@ -539,16 +569,21 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanSignalCommon(const C_OSCCanMessag
                                                             const C_PuiSdNodeDataPoolListElement & orc_UISignalCommon)
 const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   sint32 s32_Retval = C_RANGE;
    const std::vector<C_OSCCanMessageIdentificationIndices> c_MatchingMessageIds = this->GetMatchingMessageVector(
       orc_MessageId);
 
-   for (uint32 u32_ItMessageId = 0; (u32_ItMessageId < c_MatchingMessageIds.size()) && (s32_Retval == C_NO_ERR);
+   for (uint32 u32_ItMessageId = 0; u32_ItMessageId < c_MatchingMessageIds.size();
         ++u32_ItMessageId)
    {
       s32_Retval = C_PuiSdHandler::h_GetInstance()->SetCanSignalCommon(c_MatchingMessageIds[u32_ItMessageId],
                                                                        oru32_SignalIndex, orc_OSCSignalCommon,
                                                                        orc_UISignalCommon);
+      //Stop on error
+      if (s32_Retval != C_NO_ERR)
+      {
+         break;
+      }
    }
    return s32_Retval;
 }
@@ -573,16 +608,21 @@ sint32 C_PuiSdNodeCanMessageSyncManager::SetCanSignalPosition(
    const C_OSCCanMessageIdentificationIndices & orc_MessageId, const uint32 & oru32_SignalIndex,
    const C_OSCCanSignal & orc_OSCSignal, const C_PuiSdNodeCanSignal & orc_UISignal) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   sint32 s32_Retval = C_RANGE;
    const std::vector<C_OSCCanMessageIdentificationIndices> c_MatchingMessageIds = this->GetMatchingMessageVector(
       orc_MessageId);
 
-   for (uint32 u32_ItMessageId = 0; (u32_ItMessageId < c_MatchingMessageIds.size()) && (s32_Retval == C_NO_ERR);
+   for (uint32 u32_ItMessageId = 0; u32_ItMessageId < c_MatchingMessageIds.size();
         ++u32_ItMessageId)
    {
       s32_Retval = C_PuiSdHandler::h_GetInstance()->SetCanSignalPosition(c_MatchingMessageIds[u32_ItMessageId],
                                                                          oru32_SignalIndex, orc_OSCSignal,
                                                                          orc_UISignal);
+      //Stop on error
+      if (s32_Retval != C_NO_ERR)
+      {
+         break;
+      }
    }
    return s32_Retval;
 }
@@ -616,7 +656,7 @@ sint32 C_PuiSdNodeCanMessageSyncManager::AddCanMessage(const uint32 & oru32_Node
                                                        const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCSignalCommons, const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons, const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals,
                                                        uint32 & oru32_MessageIndex)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   sint32 s32_Retval = C_RANGE;
    const C_OSCCanMessageContainer * const pc_MessageContainer =
       C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(oru32_NodeIndex, ore_ComType,
                                                                       oru32_InterfaceIndex);
@@ -685,14 +725,19 @@ sint32 C_PuiSdNodeCanMessageSyncManager::InsertCanMessage(const C_OSCCanMessageI
 //-----------------------------------------------------------------------------
 sint32 C_PuiSdNodeCanMessageSyncManager::DeleteCanMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   sint32 s32_Retval = C_RANGE;
    const std::vector<C_OSCCanMessageIdentificationIndices> c_MatchingMessageIds = this->GetMatchingMessageVector(
       orc_MessageId);
 
-   for (uint32 u32_ItMessageId = 0; (u32_ItMessageId < c_MatchingMessageIds.size()) && (s32_Retval == C_NO_ERR);
+   for (uint32 u32_ItMessageId = 0; u32_ItMessageId < c_MatchingMessageIds.size();
         ++u32_ItMessageId)
    {
       s32_Retval = m_DeleteCanMessage(c_MatchingMessageIds[u32_ItMessageId], true);
+      //Stop on error
+      if (s32_Retval != C_NO_ERR)
+      {
+         break;
+      }
    }
    return s32_Retval;
 }
@@ -800,6 +845,10 @@ sint32 C_PuiSdNodeCanMessageSyncManager::ChangeCanMessageTx(const C_OSCCanMessag
          this->mc_MessageMatchUniqueIds.push_back(this->m_GetNewUniqueId());
       }
    }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
    return s32_Retval;
 }
 
@@ -840,17 +889,6 @@ sint32 C_PuiSdNodeCanMessageSyncManager::AddCanMessageRx(const C_OSCCanMessageId
       std::vector<C_OSCNodeDataPoolListElement> c_OSCSignalCommons;
       std::vector<C_PuiSdNodeDataPoolListElement> c_UISignalCommons;
       std::vector<C_PuiSdNodeCanSignal> c_UISignals;
-      std::vector<C_OSCCanMessageIdentificationIndices> c_MatchingMessageIds;
-
-      //Get matching message ids
-      if (u32_MatchingMessageIdsIndex < this->mc_MessageMatches.size())
-      {
-         c_MatchingMessageIds = this->mc_MessageMatches[u32_MatchingMessageIdsIndex];
-      }
-      else
-      {
-         c_MatchingMessageIds.push_back(orc_MessageId);
-      }
 
       //Get complete message
       tgl_assert(C_PuiSdHandler::h_GetInstance()->GetCanMessageComplete(orc_MessageId, c_Message, c_OSCSignalCommons,
@@ -866,6 +904,8 @@ sint32 C_PuiSdNodeCanMessageSyncManager::AddCanMessageRx(const C_OSCCanMessageId
       }
       else
       {
+         std::vector<C_OSCCanMessageIdentificationIndices> c_MatchingMessageIds;
+         c_MatchingMessageIds.push_back(orc_MessageId);
          this->mc_MessageMatches.push_back(c_MatchingMessageIds);
          this->mc_MessageMatchUniqueIds.push_back(this->m_GetNewUniqueId());
       }
@@ -907,6 +947,8 @@ sint32 C_PuiSdNodeCanMessageSyncManager::DeleteCanMessageRx(const C_OSCCanMessag
         ++u32_ItMessageId)
    {
       const C_OSCCanMessageIdentificationIndices & rc_MessageId = c_MatchingMessageIds[u32_ItMessageId];
+
+      //protocol does not need to be checked as the matching messages should only match if they are of the same protocol
       if (((rc_MessageId.q_MessageIsTx == false) && (rc_MessageId.u32_NodeIndex == oru32_NodeIndex)) &&
           (rc_MessageId.u32_InterfaceIndex == oru32_InterfaceIndex))
       {
@@ -940,16 +982,21 @@ sint32 C_PuiSdNodeCanMessageSyncManager::AddCanSignal(const C_OSCCanMessageIdent
                                                       const C_PuiSdNodeDataPoolListElement & orc_UISignalCommon,
                                                       const C_PuiSdNodeCanSignal & orc_UISignal) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   sint32 s32_Retval = C_RANGE;
    const std::vector<C_OSCCanMessageIdentificationIndices> c_MatchingMessageIds = this->GetMatchingMessageVector(
       orc_MessageId);
 
-   for (uint32 u32_ItMessageId = 0; (u32_ItMessageId < c_MatchingMessageIds.size()) && (s32_Retval == C_NO_ERR);
+   for (uint32 u32_ItMessageId = 0; u32_ItMessageId < c_MatchingMessageIds.size();
         ++u32_ItMessageId)
    {
       s32_Retval = C_PuiSdHandler::h_GetInstance()->AddCanSignal(c_MatchingMessageIds[u32_ItMessageId], orc_Signal,
                                                                  orc_OSCSignalCommon,
                                                                  orc_UISignalCommon, orc_UISignal);
+      //Stop on error
+      if (s32_Retval != C_NO_ERR)
+      {
+         break;
+      }
    }
    return s32_Retval;
 }
@@ -979,17 +1026,22 @@ sint32 C_PuiSdNodeCanMessageSyncManager::InsertCanSignal(const C_OSCCanMessageId
                                                          const C_PuiSdNodeDataPoolListElement & orc_UISignalCommon,
                                                          const C_PuiSdNodeCanSignal & orc_UISignal) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   sint32 s32_Retval = C_RANGE;
    const std::vector<C_OSCCanMessageIdentificationIndices> c_MatchingMessageIds = this->GetMatchingMessageVector(
       orc_MessageId);
 
-   for (uint32 u32_ItMessageId = 0; (u32_ItMessageId < c_MatchingMessageIds.size()) && (s32_Retval == C_NO_ERR);
+   for (uint32 u32_ItMessageId = 0; u32_ItMessageId < c_MatchingMessageIds.size();
         ++u32_ItMessageId)
    {
       s32_Retval = C_PuiSdHandler::h_GetInstance()->InsertCanSignal(c_MatchingMessageIds[u32_ItMessageId],
                                                                     oru32_SignalIndex, orc_Signal,
                                                                     orc_OSCSignalCommon, orc_UISignalCommon,
                                                                     orc_UISignal);
+      //Stop on error
+      if (s32_Retval != C_NO_ERR)
+      {
+         break;
+      }
    }
    return s32_Retval;
 }
@@ -1011,15 +1063,20 @@ sint32 C_PuiSdNodeCanMessageSyncManager::InsertCanSignal(const C_OSCCanMessageId
 sint32 C_PuiSdNodeCanMessageSyncManager::DeleteCanSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                          const uint32 & oru32_SignalIndex) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   sint32 s32_Retval = C_RANGE;
    const std::vector<C_OSCCanMessageIdentificationIndices> c_MatchingMessageIds = this->GetMatchingMessageVector(
       orc_MessageId);
 
-   for (uint32 u32_ItMessageId = 0; (u32_ItMessageId < c_MatchingMessageIds.size()) && (s32_Retval == C_NO_ERR);
+   for (uint32 u32_ItMessageId = 0; u32_ItMessageId < c_MatchingMessageIds.size();
         ++u32_ItMessageId)
    {
       s32_Retval = C_PuiSdHandler::h_GetInstance()->DeleteCanSignal(c_MatchingMessageIds[u32_ItMessageId],
                                                                     oru32_SignalIndex);
+      //Stop on error
+      if (s32_Retval != C_NO_ERR)
+      {
+         break;
+      }
    }
    return s32_Retval;
 }
@@ -1118,46 +1175,59 @@ void C_PuiSdNodeCanMessageSyncManager::CheckErrorBus(bool * const opq_MessageNam
                                                      bool * const opq_MessageSignalInvalid,
                                                      const stw_types::uint32 ou32_CANMessageValidSignalsDLCOffset) const
 {
-   const std::vector<C_OSCCanMessageIdentificationIndices> c_UniqueMessageIds =
-      this->GetUniqueMessages();
+   QElapsedTimer c_Timer;
 
-   if (opq_MessageNameInvalid != NULL)
+   std::vector<C_OSCCanMessageIdentificationIndices> c_UniqueMessageIds;
+
+   if (mq_TIMING_OUTPUT)
    {
-      *opq_MessageNameInvalid = false;
+      c_Timer.start();
+   }
+   c_UniqueMessageIds = this->GetUniqueMessages();
+
+   if ((opq_MessageNameInvalid != NULL) || (opq_MessageIdInvalid != NULL))
+   {
+      if (opq_MessageNameInvalid != NULL)
+      {
+         *opq_MessageNameInvalid = false;
+      }
+      if (opq_MessageIdInvalid != NULL)
+      {
+         *opq_MessageIdInvalid = false;
+      }
       for (uint32 u32_ItUniqueMessageId = 0; u32_ItUniqueMessageId < c_UniqueMessageIds.size(); ++u32_ItUniqueMessageId)
       {
          const C_OSCCanMessage * const pc_Message =
             C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_UniqueMessageIds[u32_ItUniqueMessageId]);
          if (pc_Message != NULL)
          {
-            bool q_MessageNameValid;
-            this->CheckMessageNameBus(pc_Message->c_Name, q_MessageNameValid,
-                                      &c_UniqueMessageIds[u32_ItUniqueMessageId]);
-            if (q_MessageNameValid == false)
+            if (opq_MessageNameInvalid != NULL)
             {
-               *opq_MessageNameInvalid = true;
+               bool q_MessageNameValid;
+               this->CheckMessageNameBus(pc_Message->c_Name, q_MessageNameValid,
+                                         &c_UniqueMessageIds[u32_ItUniqueMessageId]);
+               if (q_MessageNameValid == false)
+               {
+                  *opq_MessageNameInvalid = true;
+               }
+            }
+            if (opq_MessageIdInvalid != NULL)
+            {
+               bool q_MessageIdValid;
+               this->CheckMessageIdBus(pc_Message->u32_CanId, q_MessageIdValid,
+                                       &c_UniqueMessageIds[u32_ItUniqueMessageId]);
+               if (q_MessageIdValid == false)
+               {
+                  *opq_MessageIdInvalid = true;
+               }
             }
          }
       }
    }
-   if (opq_MessageIdInvalid != NULL)
+
+   if (mq_TIMING_OUTPUT)
    {
-      *opq_MessageIdInvalid = false;
-      for (uint32 u32_ItUniqueMessageId = 0; u32_ItUniqueMessageId < c_UniqueMessageIds.size(); ++u32_ItUniqueMessageId)
-      {
-         const C_OSCCanMessage * const pc_Message =
-            C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_UniqueMessageIds[u32_ItUniqueMessageId]);
-         if (pc_Message != NULL)
-         {
-            bool q_MessageIdValid;
-            this->CheckMessageIdBus(pc_Message->u32_CanId, q_MessageIdValid,
-                                    &c_UniqueMessageIds[u32_ItUniqueMessageId]);
-            if (q_MessageIdValid == false)
-            {
-               *opq_MessageIdInvalid = true;
-            }
-         }
-      }
+      std::cout << "Message name & id check:" << c_Timer.elapsed() << &std::endl;
    }
    if (opq_MessagesHaveNoTx != NULL)
    {
@@ -1185,6 +1255,7 @@ void C_PuiSdNodeCanMessageSyncManager::CheckErrorBus(bool * const opq_MessageNam
          if (pc_MessageContainer != NULL)
          {
             bool q_DelayTimeInvalid;
+            //Don't use opq_DelayTimeInvalid directly as this might then reset a previous error
             pc_MessageContainer->CheckMessageLocalError(NULL, rc_MessageId.u32_MessageIndex, rc_MessageId.q_MessageIsTx,
                                                         NULL, NULL, &q_DelayTimeInvalid, NULL, NULL, NULL,
                                                         ou32_CANMessageValidSignalsDLCOffset);
@@ -1210,22 +1281,7 @@ void C_PuiSdNodeCanMessageSyncManager::CheckErrorBus(bool * const opq_MessageNam
          {
             for (uint32 u32_ItSignal = 0; u32_ItSignal < pc_Message->c_Signals.size(); ++u32_ItSignal)
             {
-               bool q_SignalValid;
-               bool q_LayoutConflict = false;
-               bool q_BorderConflict = false;
-               bool q_NameConflict = false;
-               bool q_NameInvalid = false;
-               bool q_MinOverMax = false;
-               bool q_ValueBelowMin = false;
-               bool q_ValueOverMax = false;
-               pc_Message->CheckErrorSignal(pc_List, u32_ItSignal, &q_LayoutConflict, &q_BorderConflict,
-                                            &q_NameConflict, &q_NameInvalid, &q_MinOverMax, &q_ValueBelowMin,
-                                            &q_ValueOverMax, ou32_CANMessageValidSignalsDLCOffset);
-               q_SignalValid =
-                  (((((((q_LayoutConflict == false) && (q_BorderConflict == false)) && (q_NameConflict == false)) &&
-                      (q_NameInvalid == false)) && (q_MinOverMax == false)) && (q_ValueBelowMin == false)) &&
-                   (q_ValueOverMax == false));
-               if (q_SignalValid == false)
+               if (pc_Message->CheckErrorSignal(pc_List, u32_ItSignal, ou32_CANMessageValidSignalsDLCOffset))
                {
                   *opq_MessageSignalInvalid = true;
                }
@@ -1239,10 +1295,13 @@ void C_PuiSdNodeCanMessageSyncManager::CheckErrorBus(bool * const opq_MessageNam
 /*!
    \brief   Check if message id valid
 
-   \param[in]  oru32_MessageId Message id
-   \param[out] orq_Valid       Flag if valid
-   \param[in]  opc_SkipMessage Optional parameter to skip one message
-                               (Use-case: skip current message to avoid conflict with itself)
+   \param[in]     oru32_MessageId       Message id
+   \param[out]    orq_Valid             Flag if valid
+   \param[in]     opc_SkipMessage       Optional parameter to skip one message
+                                        (Use-case: skip current message to avoid conflict with itself)
+   \param[in,out] opq_EcosRangeError    Optional output for ECOS range check result
+   \param[in,out] opq_EcosEvenError     Optional output for ECOS even check result
+   \param[in,out] opq_DuplicateDetected Optional output for duplicate check result
 
    \created     28.04.2017  STW/M.Echtler
 */
@@ -1334,10 +1393,12 @@ const
 /*!
    \brief   Check if message name valid
 
-   \param[in]  orc_MessageName Message name
-   \param[out] orq_Valid       Flag if valid
-   \param[in]  opc_SkipMessage Optional parameter to skip one message
-                               (Use-case: skip current message to avoid conflict with itself)
+   \param[in]  orc_MessageName      Message name
+   \param[out] orq_Valid            Flag if valid
+   \param[in]  opc_SkipMessage      Optional parameter to skip one message
+                                    (Use-case: skip current message to avoid conflict with itself)
+   \param[in,out] opq_InvalidName   Optional output for invalid name check result
+   \param[in,out] opq_DuplicateName Optional output for duplicate name check result
 
    \created     28.04.2017  STW/M.Echtler
 */
@@ -1456,7 +1517,7 @@ uint32 C_PuiSdNodeCanMessageSyncManager::GetNextValidMessageId(const bool & orq_
 
    std::vector<uint32> c_MessageIds;
 
-   //Extract message ids once for perfromance reasons
+   //Extract message ids once for performance reasons
    c_MessageIds.reserve(c_Messages.size());
    for (uint32 u32_ItMessage = 0; u32_ItMessage < c_Messages.size(); ++u32_ItMessage)
    {
@@ -1524,8 +1585,8 @@ uint32 C_PuiSdNodeCanMessageSyncManager::GetNextValidMessageId(const bool & orq_
    \param[out] orc_NewMessageId New message identification indices to use instead of the old ones if necessary
 
    \return
-   True  Message identification indices no longer valid
-   False Message identification indices still valid
+   True  The input message identification index is no longer valid (use the output parameter instead)
+   False The input message identification index is still valid
 
    \created     26.09.2017  STW/M.Echtler
 */
@@ -1599,6 +1660,8 @@ bool C_PuiSdNodeCanMessageSyncManager::RecheckCriticalMessage(
                      std::vector<C_OSCCanMessageIdentificationIndices> c_ToBeDeleted;
 
                      //Clean up all RX for this message
+                     //-> critical message matches can not have RX items as the assignment which transmitter
+                     //   cannot be performed
                      for (std::vector<C_OSCCanMessageIdentificationIndices>::const_iterator c_ItMatchingMessage =
                              c_ItUniqueMessage->begin(); c_ItMatchingMessage != c_ItUniqueMessage->end();
                           ++c_ItMatchingMessage)
@@ -1625,6 +1688,9 @@ bool C_PuiSdNodeCanMessageSyncManager::RecheckCriticalMessage(
                            tgl_assert(DeleteCanMessageRx(c_Alternative, c_ItDelteMessage->u32_NodeIndex,
                                                          c_ItDelteMessage->u32_InterfaceIndex) == C_NO_ERR);
                            //Check if message matches current message ID and set alternative as new
+                           //The currently known message id for the caller might be a RX message which just might have
+                           //been deleted therefore its better to return the first found transmitter (still the same
+                           //message)
                            if (*c_ItDelteMessage == orc_MessageId)
                            {
                               orc_NewMessageId = c_Alternative;
@@ -1763,7 +1829,7 @@ sint32 C_PuiSdNodeCanMessageSyncManager::GetMessageIdForMessageName(const QStrin
    \param[in] orc_MessageId Message identification indices to search for
 
    \return
-   Index of vector of matching message ids (otherwise out of range)
+   Index of vector of matching message ids (otherwise out of range -> size of mc_MessageMatches)
 
    \created     19.04.2017  STW/M.Echtler
 */
@@ -1884,6 +1950,7 @@ bool C_PuiSdNodeCanMessageSyncManager::mh_CheckIfAlreadyExisting(
 
    \param[in]     orc_MessageId              Message identification indices to register
    \param[in,out] orc_Output                 Message vector to update
+   \param[in,out] opc_OutputUniqueIds        Optional vector to store the new unique IDs in
    \param[in,out] opc_CriticalMessageMatches Optional vector for critical messages with two transmitter
 
    \created     19.04.2017  STW/M.Echtler
@@ -2039,6 +2106,7 @@ sint32 C_PuiSdNodeCanMessageSyncManager::mh_GetNodeIndexesMatchingForMessage(
             c_NodeIndices.push_back(orc_MessageId.u32_NodeIndex);
             c_InterfaceIndices.push_back(orc_MessageId.u32_InterfaceIndex);
          }
+
          if (c_NodeIndices.size() == c_InterfaceIndices.size())
          {
             for (uint32 u32_ItNode = 0; u32_ItNode < c_NodeIndices.size(); ++u32_ItNode)
@@ -2106,8 +2174,9 @@ sint32 C_PuiSdNodeCanMessageSyncManager::mh_GetNodeIndexesMatchingForMessage(
    if (q_CriticalMatchFoundASecondTime == true)
    {
       //Remove all rx informations
-      for (std::vector<C_OSCCanMessageIdentificationIndices>::iterator
-           c_ItMessageId = orc_MatchingMessageIds.begin();
+      //For the second message which causes the critical message all receivers were deleted and therefore the
+      //matching message vector has to be cleaned up as well
+      for (std::vector<C_OSCCanMessageIdentificationIndices>::iterator c_ItMessageId = orc_MatchingMessageIds.begin();
            c_ItMessageId != orc_MatchingMessageIds.end();)
       {
          if (c_ItMessageId->q_MessageIsTx == false)
@@ -2275,6 +2344,9 @@ void C_PuiSdNodeCanMessageSyncManager::mh_UpdateIndicesToCanMessageDirectionChan
    \param[in]     oru32_BusIndex             Bus index
    \param[in]     ore_ComProtocol            Protocol type
    \param[out]    orc_Output                 Created message vector
+                                             1./Outer layer: all non unique messages
+                                             2./Inner layer: all matching IDs for one unique message
+   \param[in,out] opc_OutputUniqueIds        Optional vector to store the new unique IDs in
    \param[in,out] opc_CriticalMessageMatches Optional vector for critical messages with two transmitter
 
    \created     19.04.2017  STW/M.Echtler
@@ -2291,6 +2363,7 @@ void C_PuiSdNodeCanMessageSyncManager::mh_Init(const uint32 & oru32_BusIndex,
    C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(oru32_BusIndex,
                                                                                       c_NodeIndexes,
                                                                                       c_InterfaceIndexes);
+
    if (c_NodeIndexes.size() == c_InterfaceIndexes.size())
    {
       for (uint32 u32_ItNode = 0; u32_ItNode < c_NodeIndexes.size(); ++u32_ItNode)
@@ -2478,7 +2551,7 @@ void C_PuiSdNodeCanMessageSyncManager::mh_Append(const std::vector<C_OSCCanMessa
    \param[in]     orc_MessageIdNew                  Message identification indices (Current iteration)
    \param[in,out] opc_MatchingMessageIds            Vector for matching message IDs
    \param[in,out] opc_CriticalMessageMatches        Vector for critical message matches
-   \param[in,out] opq_CriticalMatchFoundASecondTime Flag if current critical match is second occurance
+   \param[in,out] opq_CriticalMatchFoundASecondTime Flag if current critical match is second occurrence
    \param[in,out] opq_CriticalMatchFound            Flag if current comparison was a critical match
 
    \created     26.09.2017  STW/M.Echtler
@@ -2497,7 +2570,7 @@ void C_PuiSdNodeCanMessageSyncManager::mh_HandleMessageComparison(
    {
       *opq_CriticalMatchFound = false;
    }
-   //Compare members
+   //Compare members with TX check active
    tgl_assert(C_PuiSdHandler::h_GetInstance()->CheckMessageMatch(orc_MessageIdReference,
                                                                  orc_MessageIdNew,
                                                                  q_Match) == C_NO_ERR);
@@ -2614,24 +2687,6 @@ bool C_PuiSdNodeCanMessageSyncManager::m_RecheckCriticalMessage(
 //-----------------------------------------------------------------------------
 uint64 C_PuiSdNodeCanMessageSyncManager::m_GetNewUniqueId(void) const
 {
-   uint64 u64_Retval = 1ULL;
-   bool q_Found;
-
-   //If performance is an issue you might use a static variable instead
-   do
-   {
-      q_Found = false;
-      for (uint32 u32_ItExistingId = 0; u32_ItExistingId < this->mc_MessageMatchUniqueIds.size(); ++u32_ItExistingId)
-      {
-         if (u64_Retval == this->mc_MessageMatchUniqueIds[u32_ItExistingId])
-         {
-            q_Found = true;
-            ++u64_Retval;
-            break;
-         }
-      }
-   }
-   while (q_Found == true);
    return mh_GetNewUniqueId(this->mc_MessageMatchUniqueIds);
 }
 

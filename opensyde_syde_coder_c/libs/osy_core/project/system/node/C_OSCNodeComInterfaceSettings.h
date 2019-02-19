@@ -54,15 +54,11 @@ public:
 
    C_IpAddress c_Ip; ///< only used with interface type ethernet
 
-   bool q_IsUpdateEnabled;                   ///< Flag for update enabled using this bus
-   bool q_IsRoutingEnabled;                  ///< Flag for routing enabled using this bus
-   bool q_IsDiagnosisEnabled;                ///< Flag for diagnosis enabled using this bus
-   bool q_IsComProtocolL2Enabled;            ///< Flag for communication protocol L2 enabled using this bus
-   bool q_IsComProtocolCANOpenSafetyEnabled; ///< Flag for communication protocol CANOpenSafety enabled
-   ///< using this bus
-   bool q_IsComProtocolECeSEnabled; ///< Flag for communication protocol ECeS enabled using this bus
-   bool q_IsBusConnected;           ///< Flag if there is a valid bus connected to this interface
-   stw_types::uint32 u32_BusIndex;  ///< Target bus index this interface connects to
+   bool q_IsUpdateEnabled;         ///< Flag for update enabled using this bus
+   bool q_IsRoutingEnabled;        ///< Flag for routing enabled using this bus
+   bool q_IsDiagnosisEnabled;      ///< Flag for diagnosis enabled using this bus
+   bool q_IsBusConnected;          ///< Flag if there is a valid bus connected to this interface
+   stw_types::uint32 u32_BusIndex; ///< Target bus index this interface connects to
    ///< (index in system definition)
    ///< Only valid if bus flag q_IsBusConnected is true
 

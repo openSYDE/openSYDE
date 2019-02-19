@@ -77,7 +77,7 @@ C_OgeContextMenu::C_OgeContextMenu(QWidget * const opc_Parent) :
       // make sure blur-radius <= offset (the "-7" in above example is the difference of blur and offset and maybe
       // cannot be negative)
       // compare to https://bugreports.qt.io/browse/QTBUG-58602
-      c_Color = mc_STYLE_GUIDE_COLOR_34;
+      c_Color = mc_STYLE_GUIDE_COLOR_31;
       c_Color.setAlpha(50); // lower than for tool-tip because blur-radius is needed to be small
       pc_Shadow->setColor(c_Color);
       this->setGraphicsEffect(pc_Shadow);
@@ -97,4 +97,3 @@ C_OgeContextMenu::C_OgeContextMenu(QWidget * const opc_Parent) :
 C_OgeContextMenu::~C_OgeContextMenu()
 {
 }
-

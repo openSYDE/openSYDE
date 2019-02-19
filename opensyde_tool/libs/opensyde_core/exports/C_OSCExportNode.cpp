@@ -279,8 +279,8 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
                      if (s32_Retval == C_NO_ERR)
                      {
                         C_SCLString c_FileName;
-                        C_OSCExportCommunicationStack::h_GetFileName(static_cast<uint8>(u32_ItInterface),
-                                                                     rc_Protocol.e_Type, c_FileName);
+                        c_FileName = C_OSCExportCommunicationStack::h_GetFileName(static_cast<uint8>(u32_ItInterface),
+                                                                                  rc_Protocol.e_Type);
                         c_FileName = TGL_FileIncludeTrailingDelimiter(orc_Path) + c_FileName;
                         orc_Files.push_back(c_FileName + ".h");
                         orc_Files.push_back(c_FileName + ".c");

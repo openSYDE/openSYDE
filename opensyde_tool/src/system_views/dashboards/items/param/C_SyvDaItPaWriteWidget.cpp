@@ -542,10 +542,11 @@ void C_SyvDaItPaWriteWidget::m_ReadBackElementsOfNode(void)
                                                                          mc_STYLE_GUIDE_COLOR_13);
                   this->mpc_Ui->pc_LabelHeadingSteps->setText(C_GtGetText::h_GetText("Confirm"));
                   this->mpc_Ui->pc_LabelStepDescription->setText(
-                     C_GtGetText::h_GetText("Parameter values have been written to NVM memory. "
-                                            "Please verify the read back values, activate \"Parameter values are valid\" "
-                                            "if values are OK and click \"Continue\" to update the list CRCs "
-                                            "(if required in list definition) and mark NVM memory data as valid."));
+                     C_GtGetText::h_GetText(
+                        "Parameter values have been written to NVM memory. Verify the read back values. "
+                        "Activate \"Parameter values are valid\" when the values are OK and click \"Continue\". "
+                        "If list checksum is enabled in list definition, the checksum will be updated and the "
+                        "NVM data is marked as valid. "));
                   this->mpc_Ui->pc_PbConfirm->setText(QString(C_GtGetText::h_GetText("Continue")));
                   this->mpc_Ui->pc_CbConfirm->setVisible(true);
                   this->mpc_Ui->pc_PbConfirm->setVisible(true);
@@ -565,7 +566,9 @@ void C_SyvDaItPaWriteWidget::m_ReadBackElementsOfNode(void)
                      c_Message.SetHeading(C_GtGetText::h_GetText("Verify parameter values"));
                      c_Message.SetCustomMinWidth(700);
                      c_Message.SetDescription(C_GtGetText::h_GetText(
-                                                 "There were some detected suspect values.\nIn these cases the read values from target are different from the written set values."));
+                                                 "There were some suspect values detected.\n "
+                                                 "In these cases the read values from target are different from "
+                                                 "the written set values."));
                      c_Message.SetDetails(c_SuspectElementsReport);
                      c_Message.Execute();
                   }
@@ -1313,35 +1316,35 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteChangedValues(const sint32
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_OVERFLOW:
       c_Description += "At least one value is out of the defined minimum and maximum range.";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_BUSY:
       c_Description += "Client: No changed value found and no additional lists specified";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_TIMEOUT:
       c_Description += "Expected server response not received within timeout";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_NOACT:
       c_Description += "Could not send request (e.g. TX buffer full)";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_WARN:
       switch (u8_NRC)
@@ -1371,21 +1374,21 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteChangedValues(const sint32
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("\nSee log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                     mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                    "file://" + c_Log);
+                                                                                                    c_Log);
       break;
    case C_RD_WR:
       c_Description += "Unexpected content in server response";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_COM:
       c_Description += "Communication driver reported error";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    default:
       //Should not happen
@@ -1432,14 +1435,14 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeReadValues(const sint32 os32_Er
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_OVERFLOW:
       c_Description += "At least one list has no elements.";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_RD_WR:
       c_Description += "No list contains Datapool elements that were";
@@ -1447,7 +1450,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeReadValues(const sint32 os32_Er
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_RANGE:
       c_Description += "At least one index of a Datapool or a list of changed lists is invalid or";
@@ -1455,21 +1458,21 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeReadValues(const sint32 os32_Er
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_TIMEOUT:
       c_Description += "Expected server response not received within timeout";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_NOACT:
       c_Description += "Could not send request (e.g. TX buffer full)";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_WARN:
       c_Description += "Server sent error response or malformed protocol response";
@@ -1499,14 +1502,14 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeReadValues(const sint32 os32_Er
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("\nSee log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                     mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                    "file://" + c_Log);
+                                                                                                    c_Log);
       break;
    case C_COM:
       c_Description += "Communication driver reported error";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    default:
       //Should not happen
@@ -1553,7 +1556,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteCrcs(const sint32 os32_Err
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_CHECKSUM:
       c_Description += "At least one Datapool of type \"NVM\" has the flag q_IsSafety set to true and";
@@ -1561,7 +1564,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteCrcs(const sint32 os32_Err
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_RANGE:
       c_Description +=
@@ -1572,7 +1575,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteCrcs(const sint32 os32_Err
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_BUSY:
       c_Description += "No list contains Datapool elements that were";
@@ -1580,28 +1583,28 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteCrcs(const sint32 os32_Err
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_OVERFLOW:
       c_Description += "At least one changed list has no elements.";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_DEFAULT:
       c_Description += "At least one element of the changed lists has the flag q_IsValid set to false.";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_TIMEOUT:
       c_Description += "Expected server response not received within timeout";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_NOACT:
       c_Description += "Could not send request (e.g. TX buffer full)";
@@ -1634,21 +1637,21 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteCrcs(const sint32 os32_Err
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("\nSee log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                     mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                    "file://" + c_Log);
+                                                                                                    c_Log);
       break;
    case C_RD_WR:
       c_Description += "Unexpected content in server response";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_COM:
       c_Description += "Communication driver reported error";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    default:
       //Should not happen
@@ -1695,21 +1698,21 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmNotifyOfChanges(const sint32 os32_E
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_TIMEOUT:
       c_Description += "Expected server response not received within timeout";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_NOACT:
       c_Description += "Could not send request (e.g. TX buffer full)";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_WARN:
       c_Description += "Server sent error response";
@@ -1725,7 +1728,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmNotifyOfChanges(const sint32 os32_E
          c_Details = C_GtGetText::h_GetText("Required security level was not unlocked");
          break;
       case 0x7F:
-         c_Details = C_GtGetText::h_GetText("The requested service is not available in the session currently active\n"
+         c_Details = C_GtGetText::h_GetText("The requested service is not available in the currently active session.\n"
                                             "RoutineControl identifier is not available");
          break;
       case 0x12:
@@ -1744,21 +1747,21 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmNotifyOfChanges(const sint32 os32_E
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("\nSee log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                     mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                    "file://" + c_Log);
+                                                                                                    c_Log);
       break;
    case C_RD_WR:
       c_Description += "Unexpected content in server response (here: wrong Datapool index)";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_COM:
       c_Description += "Communication driver reported error";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    default:
       //Should not happen

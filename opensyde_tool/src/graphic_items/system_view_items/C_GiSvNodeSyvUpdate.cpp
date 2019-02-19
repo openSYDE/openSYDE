@@ -483,7 +483,7 @@ void C_GiSvNodeSyvUpdate::UpdateInitialPackageStatus(const C_SyvUpDeviceInfo & o
                      const C_OSCNodeApplication & rc_Application = pc_Node->c_Applications[u32_ItApplication];
                      c_FinalApplicationPaths.push_back(
                         C_Uti::h_ConcatPathIfNecessary(
-                           C_ImpUtil::h_GetAbsoluteProjectPath(rc_Application.c_ProjectPath.c_str()),
+                           C_ImpUtil::h_GetAbsolutePathFromProject(rc_Application.c_ProjectPath.c_str()),
                            rc_Application.c_ResultPath.c_str()));
                   }
                   else
@@ -918,7 +918,7 @@ void C_GiSvNodeSyvUpdate::m_UpdateIcons(void)
       switch (this->me_UpdateStatus)
       {
       case eU_UP_TO_DATE:
-         this->mpc_IconBottom->SetText(C_GtGetText::h_GetText("Up-to-date"));
+         this->mpc_IconBottom->SetText(C_GtGetText::h_GetText("Up to date"));
          this->mpc_IconBottom->SetSvg("://images/system_views/UpdateUpToDate.svg");
          break;
       case eU_UPDATE_SUCCESS:

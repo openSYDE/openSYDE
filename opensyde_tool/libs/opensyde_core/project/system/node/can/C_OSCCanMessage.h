@@ -37,11 +37,14 @@ public:
    C_OSCCanMessage(void);
 
    void CalcHash(stw_types::uint32 & oru32_HashValue) const;
-   void CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_List, const stw_types::uint32 & oru32_SignalIndex,
-                         bool * const opq_LayoutConflict, bool * const opq_BorderConflict,
-                         bool * const opq_NameConflict, bool * const opq_NameInvalid, bool * const opq_MinOverMax,
-                         bool * const opq_ValueBelowMin, bool * const opq_ValueOverMax,
+   bool CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_List, const stw_types::uint32 & oru32_SignalIndex,
                          const stw_types::uint32 ou32_CANMessageValidSignalsDLCOffset) const;
+   void CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * const opc_List,
+                                 const stw_types::uint32 & oru32_SignalIndex, bool * const opq_LayoutConflict,
+                                 bool * const opq_BorderConflict, bool * const opq_NameConflict,
+                                 bool * const opq_NameInvalid, bool * const opq_MinOverMax,
+                                 bool * const opq_ValueBelowMin, bool * const opq_ValueOverMax,
+                                 const stw_types::uint32 ou32_CANMessageValidSignalsDLCOffset) const;
 
    enum E_TxMethodType ///< Transmission trigger type
    {
@@ -69,6 +72,10 @@ public:
    ///< ONLY used if transmission trigger is eTX_METHOD_CYCLIC
    ///< or eTX_METHOD_ON_CHANGE.
    std::vector<C_OSCCanSignal> c_Signals; ///< Communication signals
+
+private:
+   std::vector<stw_types::uint32> m_GetSignalHashes(const C_OSCNodeDataPoolList * const opc_List,
+                                                    const stw_types::uint32 & oru32_SignalIndex) const;
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

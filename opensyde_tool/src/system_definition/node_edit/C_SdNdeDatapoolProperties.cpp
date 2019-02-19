@@ -278,7 +278,7 @@ void C_SdNdeDatapoolProperties::InitStaticNames(void)
 
    this->mpc_Ui->pc_LabelComProt->SetToolTipInformation(
       C_GtGetText::h_GetText("Communication Protocol"),
-      C_GtGetText::h_GetText("Type of process data exchange CAN protocol."
+      C_GtGetText::h_GetText("Type of process data exchange CAN protocol:"
                              "\n - OSI Layer 2 - Layer 2 CAN data"
                              "\n - ECeS - ESX CAN efficient safety protocol"
                              "\n - ECoS - ESX CANopen safety protocol"));
@@ -289,7 +289,7 @@ void C_SdNdeDatapoolProperties::InitStaticNames(void)
 
    this->mpc_Ui->pc_LabelDataPoolUsage->SetToolTipInformation(
       C_GtGetText::h_GetText("Resulting Datapool Usage"),
-      C_GtGetText::h_GetText("Resulting datapool usage in percent based on Datapool reservation size and "
+      C_GtGetText::h_GetText("Resulting Datapool usage in percent based on Datapool reservation size and "
                              "\ncurrent Datapool usage (size of declared parameters)"
                              "\nValues greater than 100% will cause Datapool reservation size error."));
 
@@ -867,8 +867,8 @@ void C_SdNdeDatapoolProperties::m_OnSafetyChange(const bool oq_IsSafety) const
       C_OgeWiCustomMessage::E_Outputs e_Output;
       c_Message.SetHeading(C_GtGetText::h_GetText("Safety property enable"));
       c_Message.SetDescription(C_GtGetText::h_GetText(
-                                  "With safety property activation access permission of all existing Data elements of "
-                                  "this Datapool will be changed to RO (read only).\n"
+                                  "When enabling the safety property, the access permission of all existing data "
+                                  "elements of this Datapool will be changed to RO (read only).\n"
                                   "Do you want to enable the safety property?"));
       c_Message.SetOKButtonText(C_GtGetText::h_GetText("Enable"));
       c_Message.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));

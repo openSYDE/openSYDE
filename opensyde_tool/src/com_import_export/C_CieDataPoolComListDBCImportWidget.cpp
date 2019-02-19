@@ -17,7 +17,6 @@
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
 
-#include <QFileDialog>
 #include <vector>
 
 #include "stwerrors.h"
@@ -78,7 +77,7 @@ C_CieDataPoolComListDBCImportWidget::C_CieDataPoolComListDBCImportWidget(
    this->mrc_ParentDialog.SetWidget(this);
 
    // set main title
-   this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("Import from DBC File"));
+   this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("Import from DBC file"));
    this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Node Selection"));
 
    // set standard configurations
@@ -125,7 +124,7 @@ C_CieDataPoolComListDBCImportWidget::~C_CieDataPoolComListDBCImportWidget(void)
 void C_CieDataPoolComListDBCImportWidget::InitStaticNames(void)
 {
    // window title
-   this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("Import from DBC File"));
+   this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("Import from DBC file"));
    this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Node selection"));
 
    // labels

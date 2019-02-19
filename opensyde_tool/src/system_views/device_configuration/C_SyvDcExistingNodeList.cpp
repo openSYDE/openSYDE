@@ -216,6 +216,51 @@ std::vector<C_SyvDcDeviceConfiguation> C_SyvDcExistingNodeList::GetConfigs(void)
 
 //-----------------------------------------------------------------------------
 /*!
+   \brief   Prepares the widget for starting drag and drop of connected nodes
+
+   \param[in]     orc_DeviceName         Device name (device type)
+   \param[in]     oq_DeviceNameValid     Flag if device name is valid
+
+   \created     06.02.2019  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_SyvDcExistingNodeList::StartDrag(const QString & orc_DeviceName, const bool oq_DeviceNameValid) const
+{
+   for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
+   {
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      const C_SyvDcExistingNodeWidget * const pc_Widget =
+         dynamic_cast<const C_SyvDcExistingNodeWidget * const>(this->itemWidget(this->item(sn_It)));
+      if (pc_Widget != NULL)
+      {
+         pc_Widget->StartDrag(orc_DeviceName, oq_DeviceNameValid);
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Handles the stop of drag and drop of connected nodes
+
+   \created     06.02.2019  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_SyvDcExistingNodeList::StopDrag(void) const
+{
+   for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
+   {
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      const C_SyvDcExistingNodeWidget * const pc_Widget =
+         dynamic_cast<const C_SyvDcExistingNodeWidget * const>(this->itemWidget(this->item(sn_It)));
+      if (pc_Widget != NULL)
+      {
+         pc_Widget->StopDrag();
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
    \brief   Init step
 
    \return

@@ -63,7 +63,6 @@ private:
    Ui::C_SdNdeDbAddNewProject * mpc_Ui;
    stw_types::sint32 ms32_TSPReadResult;
    QString mc_TSPPath;
-   QString mc_CreateInPath;
    const stw_types::uint32 mu32_NodeIndex;
    stw_opensyde_core::C_OSCTargetSupportPackage mc_Package;
    //lint -e{1725} Only problematic if copy or assignment is allowed
@@ -78,14 +77,11 @@ private:
    void m_OnLoadTSP(void);
    void m_AddTopSection(QString & orc_Content) const;
    void m_AddTemplateSection(QString & orc_Content) const;
-   void m_Init(const stw_types::uint32 ou32_NodeIndex);
+   void m_Init(const stw_types::uint32 ou32_NodeIndex) const;
 
    void m_EditTSPPathFocusOn(void) const;
    void m_EditTSPPathFocusOff(void);
-   void m_EditCreateInPathFocusOn(void) const;
-   void m_EditCreateInPathFocusOff(void);
    void m_SetTSPPath(const QString & orc_New);
-   void m_SetCreateInPath(const QString & orc_New);
 
    //Avoid call
    C_SdNdeDbAddNewProject(const C_SdNdeDbAddNewProject &);

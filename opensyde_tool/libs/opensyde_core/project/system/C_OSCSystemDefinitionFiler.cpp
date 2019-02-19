@@ -58,6 +58,11 @@ using namespace stw_scl;
    \param[out]    orc_SystemDefinition       Pointer to storage
    \param[in]     orc_PathSystemDefinition   Path to system definition
    \param[in]     orc_PathDeviceDefinitions  Path to device definition description file
+   \param[in]     oq_UseDeviceDefinitions    Flag for using device definitions, if the flag is true
+                                             orc_PathDeviceDefinitions can be an empty string.
+                                             It is highly recommended to use the device definitions.
+                                             Purpose for not using the device definition is when only read
+                                             access to a part of the system definition is necessary.
 
    \return
    C_NO_ERR    data read
@@ -72,7 +77,8 @@ using namespace stw_scl;
 //-----------------------------------------------------------------------------
 sint32 C_OSCSystemDefinitionFiler::h_LoadSystemDefinitionFile(C_OSCSystemDefinition & orc_SystemDefinition,
                                                               const stw_scl::C_SCLString & orc_PathSystemDefinition,
-                                                              const stw_scl::C_SCLString & orc_PathDeviceDefinitions)
+                                                              const stw_scl::C_SCLString & orc_PathDeviceDefinitions,
+                                                              const bool oq_UseDeviceDefinitions)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -82,7 +88,8 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadSystemDefinitionFile(C_OSCSystemDefinit
       s32_Retval = c_XMLParser.LoadFromFile(orc_PathSystemDefinition);
       if (s32_Retval == C_NO_ERR)
       {
-         s32_Retval = mh_LoadSystemDefinition(orc_SystemDefinition, c_XMLParser, orc_PathDeviceDefinitions);
+         s32_Retval = h_LoadSystemDefinition(orc_SystemDefinition, c_XMLParser, orc_PathDeviceDefinitions,
+                                             oq_UseDeviceDefinitions);
       }
       else
       {
@@ -137,7 +144,7 @@ sint32 C_OSCSystemDefinitionFiler::h_SaveSystemDefinitionFile(const C_OSCSystemD
    if (s32_Return == C_NO_ERR)
    {
       C_OSCXMLParser c_XMLParser;
-      mh_SaveSystemDefinition(orc_SystemDefinition, c_XMLParser);
+      h_SaveSystemDefinition(orc_SystemDefinition, c_XMLParser);
 
       s32_Return = c_XMLParser.SaveToFile(orc_Path);
       if (s32_Return != C_NO_ERR)
@@ -160,6 +167,11 @@ sint32 C_OSCSystemDefinitionFiler::h_SaveSystemDefinitionFile(const C_OSCSystemD
    \param[out]    orc_SystemDefinition       Pointer to storage
    \param[in]     orc_Content                XML Content string
    \param[in]     orc_PathDeviceDefinitions  Path to device definition description file
+   \param[in]     oq_UseDeviceDefinitions    Flag for using device definitions, if the flag is true
+                                             orc_PathDeviceDefinitions can be an empty string.
+                                             It is highly recommended to use the device definitions.
+                                             Purpose for not using the device definition is when only read
+                                             access to a part of the system definition is necessary.
 
    \return
    C_NO_ERR   data read
@@ -171,7 +183,8 @@ sint32 C_OSCSystemDefinitionFiler::h_SaveSystemDefinitionFile(const C_OSCSystemD
 //-----------------------------------------------------------------------------
 sint32 C_OSCSystemDefinitionFiler::h_LoadSystemDefinitionString(C_OSCSystemDefinition & orc_SystemDefinition,
                                                                 const C_SCLString & orc_Content,
-                                                                const stw_scl::C_SCLString & orc_PathDeviceDefinitions)
+                                                                const stw_scl::C_SCLString & orc_PathDeviceDefinitions,
+                                                                const bool oq_UseDeviceDefinitions)
 {
    sint32 s32_Retval;
    //Set up parser
@@ -180,7 +193,8 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadSystemDefinitionString(C_OSCSystemDefin
    s32_Retval = c_XMLParser.LoadFromString(orc_Content);
    if (s32_Retval == C_NO_ERR)
    {
-      s32_Retval = mh_LoadSystemDefinition(orc_SystemDefinition, c_XMLParser, orc_PathDeviceDefinitions);
+      s32_Retval = h_LoadSystemDefinition(orc_SystemDefinition, c_XMLParser, orc_PathDeviceDefinitions,
+                                          oq_UseDeviceDefinitions);
    }
    else
    {
@@ -209,7 +223,7 @@ void C_OSCSystemDefinitionFiler::h_SaveSystemDefinitionString(const C_OSCSystemD
    //Set up parser
    C_OSCXMLParserString c_XMLParser;
 
-   mh_SaveSystemDefinition(orc_SystemDefinition, c_XMLParser);
+   h_SaveSystemDefinition(orc_SystemDefinition, c_XMLParser);
    c_XMLParser.SaveToString(orc_Content);
 }
 
@@ -224,10 +238,11 @@ void C_OSCSystemDefinitionFiler::h_SaveSystemDefinitionString(const C_OSCSystemD
     The caller is responsible to provide a static life-time of orc_DeviceDefinitions.
     Otherwise the "device definition" pointers in C_OSCNode will point to invalid data.
 
-   \param[in]     ou16_XmlFormatVersion  version of XML format
-   \param[out]    orc_Nodes              data storage
-   \param[in,out] orc_XMLParser          XML with "nodes" active
-   \param[in]     orc_DeviceDefinitions  List of known devices (must contain all device types used by nodes)
+   \param[in]     ou16_XmlFormatVersion     version of XML format
+   \param[out]    orc_Nodes                 data storage
+   \param[in,out] orc_XMLParser             XML with "nodes" active
+   \param[in]     orc_DeviceDefinitions     List of known devices (must contain all device types used by nodes)
+   \param[in]     oq_UseDeviceDefinitions   Flag for using device definitions
 
    \return
    C_NO_ERR    no error
@@ -239,11 +254,23 @@ void C_OSCSystemDefinitionFiler::h_SaveSystemDefinitionString(const C_OSCSystemD
 //-----------------------------------------------------------------------------
 sint32 C_OSCSystemDefinitionFiler::h_LoadNodes(const uint16 ou16_XmlFormatVersion, std::vector<C_OSCNode> & orc_Nodes,
                                                C_OSCXMLParserBase & orc_XMLParser,
-                                               const C_OSCDeviceManager & orc_DeviceDefinitions)
+                                               const C_OSCDeviceManager & orc_DeviceDefinitions,
+                                               const bool oq_UseDeviceDefinitions)
 
 {
    sint32 s32_Retval = C_NO_ERR;
-   C_SCLString c_SelectedNode = orc_XMLParser.SelectNodeChild("node");
+   C_SCLString c_SelectedNode;
+   uint32 u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+
+   //Check optional length
+   if (q_ExpectedSizeHere == true)
+   {
+      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      orc_Nodes.reserve(u32_ExpectedSize);
+   }
+
+   c_SelectedNode = orc_XMLParser.SelectNodeChild("node");
 
    //clear list of nodes:
    orc_Nodes.clear();
@@ -269,8 +296,20 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadNodes(const uint16 ou16_XmlFormatVersio
          tgl_assert(orc_XMLParser.SelectNodeParent() == "nodes");
       }
    }
+   //Compare length
+   if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
+   {
+      if (u32_ExpectedSize != orc_Nodes.size())
+      {
+         C_SCLString c_Tmp;
+         c_Tmp.PrintFormatted("Unexpected nodes count, expected: %i, got %i", u32_ExpectedSize,
+                              orc_Nodes.size());
+         osc_write_log_warning("Load file", c_Tmp.c_str());
+      }
+   }
 
-   if (s32_Retval == C_NO_ERR)
+   if ((oq_UseDeviceDefinitions == true) &&
+       (s32_Retval == C_NO_ERR))
    {
       //set pointers to device definitions
       for (uint32 u32_NodeIndex = 0U; u32_NodeIndex < orc_Nodes.size(); u32_NodeIndex++)
@@ -317,7 +356,18 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadBuses(std::vector<C_OSCSystemBus> & orc
                                                C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
-   C_SCLString c_SelectedNode = orc_XMLParser.SelectNodeChild("bus");
+   C_SCLString c_SelectedNode;
+   uint32 u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+
+   //Check optional length
+   if (q_ExpectedSizeHere == true)
+   {
+      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      orc_Buses.reserve(u32_ExpectedSize);
+   }
+
+   c_SelectedNode = orc_XMLParser.SelectNodeChild("bus");
 
    orc_Buses.clear();
    if (c_SelectedNode == "bus")
@@ -337,6 +387,17 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadBuses(std::vector<C_OSCSystemBus> & orc
       while (c_SelectedNode == "bus");
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "buses");
+   }
+   //Compare length
+   if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
+   {
+      if (u32_ExpectedSize != orc_Buses.size())
+      {
+         C_SCLString c_Tmp;
+         c_Tmp.PrintFormatted("Unexpected bus count, expected: %i, got %i", u32_ExpectedSize,
+                              orc_Buses.size());
+         osc_write_log_warning("Load file", c_Tmp.c_str());
+      }
    }
    return s32_Retval;
 }
@@ -361,6 +422,7 @@ sint32 C_OSCSystemDefinitionFiler::h_LoadBuses(std::vector<C_OSCSystemBus> & orc
 void C_OSCSystemDefinitionFiler::h_SaveNodes(const std::vector<C_OSCNode> & orc_Nodes,
                                              C_OSCXMLParserBase & orc_XMLParser)
 {
+   orc_XMLParser.SetAttributeUint32("length", orc_Nodes.size());
    for (uint32 u32_Index = 0U; u32_Index < orc_Nodes.size(); u32_Index++)
    {
       tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("node") == "node");
@@ -390,6 +452,7 @@ void C_OSCSystemDefinitionFiler::h_SaveNodes(const std::vector<C_OSCNode> & orc_
 void C_OSCSystemDefinitionFiler::h_SaveBuses(const std::vector<C_OSCSystemBus> & orc_Buses,
                                              C_OSCXMLParserBase & orc_XMLParser)
 {
+   orc_XMLParser.SetAttributeUint32("length", orc_Buses.size());
    for (uint32 u32_Index = 0U; u32_Index < orc_Buses.size(); u32_Index++)
    {
       tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("bus") == "bus");
@@ -411,6 +474,7 @@ void C_OSCSystemDefinitionFiler::h_SaveBuses(const std::vector<C_OSCSystemBus> &
    \param[out]    orc_SystemDefinition   Pointer to storage
    \param[in,out] orc_XMLParser          XML with default state
    \param[in]     orc_PathDeviceDefinitions  Path to device definition description file
+   \param[in]     oq_UseDeviceDefinitions    Flag for using device definitions
 
    \return
    C_NO_ERR    data read
@@ -421,15 +485,17 @@ void C_OSCSystemDefinitionFiler::h_SaveBuses(const std::vector<C_OSCSystemBus> &
    \created     01.09.2016  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-sint32 C_OSCSystemDefinitionFiler::mh_LoadSystemDefinition(C_OSCSystemDefinition & orc_SystemDefinition,
-                                                           C_OSCXMLParserBase & orc_XMLParser,
-                                                           const stw_scl::C_SCLString & orc_PathDeviceDefinitions)
+sint32 C_OSCSystemDefinitionFiler::h_LoadSystemDefinition(C_OSCSystemDefinition & orc_SystemDefinition,
+                                                          C_OSCXMLParserBase & orc_XMLParser,
+                                                          const stw_scl::C_SCLString & orc_PathDeviceDefinitions,
+                                                          const bool oq_UseDeviceDefinitions)
 {
    sint32 s32_Retval = C_NO_ERR;
    uint16 u16_FileVersion = 0U;
 
    //do we need to load the device definitions ?
-   if (C_OSCSystemDefinition::hc_Devices.WasLoaded() == false)
+   if ((oq_UseDeviceDefinitions == true) &&
+       (C_OSCSystemDefinition::hc_Devices.WasLoaded() == false))
    {
       s32_Retval = C_OSCSystemDefinition::hc_Devices.LoadFromFile(orc_PathDeviceDefinitions);
       if (s32_Retval != C_NO_ERR)
@@ -482,7 +548,7 @@ sint32 C_OSCSystemDefinitionFiler::mh_LoadSystemDefinition(C_OSCSystemDefinition
          if (orc_XMLParser.SelectNodeChild("nodes") == "nodes")
          {
             s32_Retval = h_LoadNodes(u16_FileVersion, orc_SystemDefinition.c_Nodes, orc_XMLParser,
-                                     C_OSCSystemDefinition::hc_Devices);
+                                     C_OSCSystemDefinition::hc_Devices, oq_UseDeviceDefinitions);
             if (s32_Retval == C_NO_ERR)
             {
                //Return
@@ -537,8 +603,8 @@ sint32 C_OSCSystemDefinitionFiler::mh_LoadSystemDefinition(C_OSCSystemDefinition
    \created     01.09.2016  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-void C_OSCSystemDefinitionFiler::mh_SaveSystemDefinition(const C_OSCSystemDefinition & orc_SystemDefinition,
-                                                         C_OSCXMLParserBase & orc_XMLParser)
+void C_OSCSystemDefinitionFiler::h_SaveSystemDefinition(const C_OSCSystemDefinition & orc_SystemDefinition,
+                                                        C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_XMLParser.CreateNodeChild("opensyde-system-definition");
    tgl_assert(orc_XMLParser.SelectRoot() == "opensyde-system-definition");

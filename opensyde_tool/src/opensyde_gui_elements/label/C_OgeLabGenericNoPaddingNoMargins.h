@@ -39,7 +39,7 @@ public:
 
    void SetForegroundColor(const stw_types::sintn osn_Value);
    void SetBackgroundColor(const stw_types::sintn osn_Value);
-   void SetFontPixel(const stw_types::sintn osn_Value, const bool oq_SemiBold = false);
+   void SetFontPixel(const stw_types::sintn osn_Value, const bool oq_SemiBold = false, const bool oq_Bold = false);
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

@@ -39,7 +39,7 @@ public:
    virtual const C_PuiBsElements * GetSnapshot(QWidget * const opc_Parent) = 0;
    QPointF GetDiff(const QPointF & orc_Position) const;
    virtual void CopyFromSceneToManager(const QList<QGraphicsItem *> & orc_SelectedItems) = 0;
-   virtual bool CheckValidContent(void) const = 0;
+   virtual bool CheckValidContentAndPrepareData(void) = 0;
 
    stw_types::uint32 GetPasteCounter(void) const;
    void IncrementPasteCounter(void);

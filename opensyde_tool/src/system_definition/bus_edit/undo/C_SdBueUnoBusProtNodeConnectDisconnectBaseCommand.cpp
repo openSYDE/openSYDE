@@ -164,20 +164,9 @@ void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_DoDeleteDataPool(void)
 //-----------------------------------------------------------------------------
 void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_SetComProtocolUsedByInterfaceFlag(const bool oq_Flag) const
 {
-   C_OSCNode c_AdaptedNode = *C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-
-   // get necessary datapool
-   C_OSCCanProtocol * const pc_Protocol = c_AdaptedNode.GetCANProtocol(this->me_Protocol);
-
-   if (pc_Protocol != NULL)
-   {
-      if (this->mu32_InterfaceIndex < pc_Protocol->c_ComMessages.size())
-      {
-         // set the flag
-         pc_Protocol->c_ComMessages[this->mu32_InterfaceIndex].q_IsComProtocolUsedByInterface = oq_Flag;
-         C_PuiSdHandler::h_GetInstance()->SetOSCNode(this->mu32_NodeIndex, c_AdaptedNode);
-      }
-   }
+   C_PuiSdHandler::h_GetInstance()->SetCanProtocolMessageContainerConnected(this->mu32_NodeIndex,
+                                                                            this->me_Protocol,
+                                                                            this->mu32_InterfaceIndex, oq_Flag);
 }
 
 //-----------------------------------------------------------------------------

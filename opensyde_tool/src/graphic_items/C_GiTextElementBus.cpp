@@ -65,10 +65,10 @@ C_GiTextElementBus::C_GiTextElementBus(const sint32 & ors32_Index, const uint64 
    C_GiBiTextElement(oru64_ID, false, opc_Parent),
    C_PuiSdDataElement(ors32_Index, C_PuiSdDataElement::eTEXT_ELEMENT_BUS),
    C_GiBiCustomToolTip(),
+   mq_ErrorIconHovered(false),
    mu32_BusIndex(0U),
    mq_ErrorState(false),
    mq_ErrorResized(false),
-   mq_ErrorIconHovered(false),
    mpc_SvgRenderer(NULL)
 {
    QFont c_Font;
@@ -212,7 +212,7 @@ void C_GiTextElementBus::GenerateHint(void)
    {
       QString c_Content;
       C_SdUtil::h_GetErrorToolTipBus(this->ms32_Index, c_Content);
-      this->SetDefaultToolTipHeading(C_GtGetText::h_GetText("Bus has invalid content"));
+      this->SetDefaultToolTipHeading(C_GtGetText::h_GetText("Invalid Bus Content"));
       this->SetDefaultToolTipContent(c_Content);
       this->SetDefaultToolTipType(C_NagToolTip::eERROR);
    }

@@ -46,7 +46,7 @@ class C_SdNdeDataPoolListHeaderWidget :
 
 public:
    explicit C_SdNdeDataPoolListHeaderWidget(QWidget * const opc_Parent = NULL,
-                                            QTreeWidgetItem * const opc_ListWidgetItem = NULL,
+                                            QTreeWidget * const opc_ListWidget = NULL,
                                             stw_opensyde_gui_logic::C_SdNdeUnoDataPoolManager * const opc_UndoManager = NULL, stw_opensyde_gui_logic::C_SdNdeDataPoolListModelViewManager * const opc_ModelViewManager = NULL, const stw_types::uint32 ou32_NodeIndex = 0, const stw_types::uint32 ou32_DataPoolIndex = 0,
                                             const stw_types::uint32 ou32_ListIndex = 0);
    ~C_SdNdeDataPoolListHeaderWidget(void);
@@ -72,8 +72,8 @@ public:
 
 Q_SIGNALS:
    //lint -restore
-   void SigNewHeight(const QTreeWidgetItem * const opc_Item);
-   void SigExpand(QTreeWidgetItem * const opc_Item, const bool oq_Expand);
+   void SigNewHeight(const C_SdNdeDataPoolListHeaderWidget * const opc_Item);
+   void SigExpand(const C_SdNdeDataPoolListHeaderWidget * const opc_Item, const bool oq_Expand);
    void SigUpdateAddress(void);
    void SigErrorChange(void);
    void SigClose(void);
@@ -85,7 +85,6 @@ Q_SIGNALS:
 
 private:
    Ui::C_SdNdeDataPoolListHeaderWidget * const mpc_Ui;
-   QTreeWidgetItem * const mpc_TreeWidgetItem;
    QTreeWidget * mpc_TreeWidget;
    stw_opensyde_gui_logic::C_SdNdeUnoDataPoolManager * mpc_UndoManager;
    stw_opensyde_gui_logic::C_SdNdeDataPoolListModelViewManager * mpc_ModelViewManager;

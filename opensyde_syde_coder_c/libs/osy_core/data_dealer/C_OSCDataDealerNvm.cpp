@@ -209,7 +209,7 @@ sint32 C_OSCDataDealerNvm::NvmReadList(const uint32 ou32_DataPoolIndex, const ui
    C_NOACT    Could not send request (e.g. TX buffer full)
    C_WARN     Server sent error response
    C_RD_WR    unexpected content in server response (here: wrong data pool index)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     09.11.2017  STW/B.Bayer
 */

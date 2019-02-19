@@ -107,6 +107,20 @@ public:
                                                     stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Value,
                                                     C_SdNdeDataPoolContentUtil::E_ValueChangedTo & ore_ValueChangedTo, const C_SdNdeDataPoolContentUtil::E_SetValue oe_SetValue =
                                                        E_SetValue::eLEAVE_VALUE);
+   static QVariant h_ConvertContentToGeneric(const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Input,
+                                             const stw_types::uint32 & oru32_Index);
+   static QVariant h_ConvertScaledContentToGeneric(const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Input,
+                                                   const stw_types::float64 of64_Factor,
+                                                   const stw_types::float64 of64_Offset,
+                                                   const stw_types::uint32 & oru32_Index);
+   static stw_types::sint32 h_SetDataVariableFromGeneric(const QVariant & orc_Value,
+                                                         stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Output,
+                                                         const stw_types::uint32 & oru32_Index);
+   static stw_types::sint32 h_SetDataVariableFromGenericWithScaling(const QVariant & orc_Value,
+                                                                    stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Output, const stw_types::float64 of64_Factor, const stw_types::float64 of64_Offset, const stw_types::uint32 & oru32_Index);
+   static QString h_GetAllContentAsString(const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Input);
+   static stw_types::sint32 h_SetAllContentFromString(const QString & orc_Input,
+                                                      stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Output);
 
 private:
    static const stw_types::float64 mhf64_Epsilon;

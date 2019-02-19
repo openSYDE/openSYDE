@@ -97,6 +97,9 @@ C_GiSvPc::C_GiSvPc(const uint64 ou64_UniqueID, const uint32 ou32_ViewIndex) :
    }
    this->SetEditMode(false);
 
+   //Allow hover events for tool tip hide
+   this->setAcceptHoverEvents(true);
+
    //Conflict icon
    this->m_DetectIconSize();
    this->m_InitConflictIcon();
@@ -305,8 +308,8 @@ bool C_GiSvPc::OpenDialog(void) const
          QGraphicsView * const pc_GraphicsView = this->scene()->views().at(0);
          C_OgeWiCustomMessage c_Message(pc_GraphicsView);
          c_Message.SetHeading(C_GtGetText::h_GetText("Ethernet settings"));
-         c_Message.SetDescription(C_GtGetText::h_GetText("Setup your Ethernet adapter settings in the System "
-                                                         "network configuration dialog."));
+         c_Message.SetDescription(C_GtGetText::h_GetText("Setup your Ethernet adapter settings in Windows system "
+                                                         "network configuration."));
          c_Message.Execute();
       }
    }
@@ -314,8 +317,8 @@ bool C_GiSvPc::OpenDialog(void) const
    {
       QGraphicsView * const pc_GraphicsView = this->scene()->views().at(0);
       C_OgeWiCustomMessage c_Message(pc_GraphicsView);
-      c_Message.SetHeading(C_GtGetText::h_GetText("Configure comm settings"));
-      c_Message.SetDescription(C_GtGetText::h_GetText("Not available while being connected"));
+      c_Message.SetHeading(C_GtGetText::h_GetText("Configure PC Interface settings"));
+      c_Message.SetDescription(C_GtGetText::h_GetText("Not available while being connected."));
       c_Message.Execute();
    }
 
@@ -413,6 +416,47 @@ void C_GiSvPc::SetEditMode(const bool oq_EditMode)
 
 //-----------------------------------------------------------------------------
 /*!
+   \brief   Generate hint to display as tool tip.
+
+   \created     18.02.2019  STW/G.Landsgesell
+*/
+//-----------------------------------------------------------------------------
+void C_GiSvPc::GenerateHint()
+{
+   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+
+   if (pc_View != NULL)
+   {
+      QString c_ToolTipContent;
+      C_PuiSvPc c_PcData = pc_View->GetPcData();
+
+      // content
+      c_ToolTipContent += C_GtGetText::h_GetText("CAN Interface: ");
+      switch (c_PcData.GetCANDllType())
+      {
+      case C_PuiSvPc::ePEAK:
+         c_ToolTipContent += "PEAK";
+         break;
+      case C_PuiSvPc::eVECTOR:
+         c_ToolTipContent += "Vector";
+         break;
+      case C_PuiSvPc::eOTHER:
+         c_ToolTipContent += QString(C_GtGetText::h_GetText("Other (%1)")).arg(c_PcData.GetCustomCANDllPath());
+         break;
+      default:
+         break;
+      }
+
+      c_ToolTipContent += C_GtGetText::h_GetText("\nDouble click on PC to enter CAN interface settings.");
+      this->SetDefaultToolTipContent(c_ToolTipContent);
+
+      // heading
+      this->SetDefaultToolTipHeading(C_GtGetText::h_GetText("openSYDE Client PC"));
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
    \brief   Resize update slot
 
    \param[in] of64_DiffWidth  Width difference
@@ -424,6 +468,44 @@ void C_GiSvPc::SetEditMode(const bool oq_EditMode)
 void C_GiSvPc::m_ResizeUpdateItems(const float64 of64_DiffWidth, const float64 of64_DiffHeight)
 {
    this->m_UpdateItems(of64_DiffWidth, of64_DiffHeight, false);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Overridden mouse press event.
+
+   Here: hide tool tip
+
+   \param[in,out]    opc_Event Event   identification and information
+
+   \created     18.02.2019  STW/G.Landsgesell
+*/
+//-----------------------------------------------------------------------------
+void C_GiSvPc::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
+{
+   C_GiImageGroupWithoutData::mousePressEvent(opc_Event);
+
+   // hide tooltip
+   Q_EMIT (this->SigHideToolTip());
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Overridden hover leave event.
+
+   Here: hide tool tip
+
+   \param[in,out]    opc_Event Event   identification and information
+
+   \created     18.02.2019  STW/G.Landsgesell
+*/
+//-----------------------------------------------------------------------------
+void C_GiSvPc::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event)
+{
+   C_GiImageGroupWithoutData::hoverLeaveEvent(opc_Event);
+
+   // hide tooltip
+   Q_EMIT (this->SigHideToolTip());
 }
 
 //-----------------------------------------------------------------------------
@@ -450,7 +532,8 @@ bool C_GiSvPc::m_OpenCANDllDialog(void) const
       C_SyvSeDllConfigurationDialog * const pc_DllWidget = new C_SyvSeDllConfigurationDialog(*c_DllDialog);
 
       // Initialize the data
-      pc_DllWidget->SetDllPath(c_PcData.GetCANDll());
+      pc_DllWidget->SetDllType(c_PcData.GetCANDllType());
+      pc_DllWidget->SetCustomDllPath(c_PcData.GetCustomCANDllPath());
       // Bitrate
       if (c_PcData.GetConnected() == true)
       {
@@ -468,7 +551,8 @@ bool C_GiSvPc::m_OpenCANDllDialog(void) const
       if (c_DllDialog->exec() == static_cast<sintn>(QDialog::Accepted))
       {
          // Update the data
-         C_PuiSvHandler::h_GetInstance()->SetViewPCCANDll(this->mu32_ViewIndex, pc_DllWidget->GetDllPath());
+         C_PuiSvHandler::h_GetInstance()->SetViewPCCANDll(this->mu32_ViewIndex,
+                                                          pc_DllWidget->GetDllType(), pc_DllWidget->GetCustomDllPath());
          q_Retval = true;
       }
 

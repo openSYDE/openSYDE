@@ -43,6 +43,7 @@ using namespace stw_opensyde_gui_elements;
 /* -- Module Global Constants ---------------------------------------------- */
 const QString C_SyvDcExistingNodeWidget::mhc_MimeData = "stw_opensyde_connected_node";
 const QString C_SyvDcExistingNodeWidget::mhc_MimeDataDevice = "stw_opensyde_connected_node_device";
+const QString C_SyvDcExistingNodeWidget::mhc_MimeDataDeviceValid = "stw_opensyde_connected_node_device_valid";
 
 /* -- Types ---------------------------------------------------------------- */
 
@@ -251,6 +252,37 @@ void C_SyvDcExistingNodeWidget::AppendDeviceConfig(std::vector<C_SyvDcDeviceConf
 
 //-----------------------------------------------------------------------------
 /*!
+   \brief   Prepares the widget for starting drag and drop of connected nodes
+
+   \param[in]     orc_DeviceName         Device name (device type)
+   \param[in]     oq_DeviceNameValid     Flag if device name is valid
+
+   \created     06.02.2019  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_SyvDcExistingNodeWidget::StartDrag(const QString & orc_DeviceName, const bool oq_DeviceNameValid) const
+{
+   // Allow only matching devices or devices with unknown device names because of same node ids
+   const bool q_Visible = ((this->mc_DeviceName.compare(orc_DeviceName) == 0) ||
+                           (oq_DeviceNameValid == false));
+
+   this->mpc_Ui->pc_GroupBoxSerialNumber->setVisible(q_Visible);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Handles the stop of drag and drop of connected nodes
+
+   \created     06.02.2019  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_SyvDcExistingNodeWidget::StopDrag(void) const
+{
+   this->mpc_Ui->pc_GroupBoxSerialNumber->setVisible(true);
+}
+
+//-----------------------------------------------------------------------------
+/*!
    \brief   Overwritten paint event slot
 
    Here: draw background
@@ -285,8 +317,16 @@ void C_SyvDcExistingNodeWidget::dragEnterEvent(QDragEnterEvent * const opc_Event
 
    if ((pc_Mime != NULL) && (pc_Mime->hasFormat(C_SyvDcExistingNodeWidget::mhc_MimeDataDevice) == true))
    {
-      opc_Event->acceptProposedAction();
-      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_WidgetSerialNumber, "Hovered", true);
+      const QString c_DroppedDevice = pc_Mime->data(C_SyvDcExistingNodeWidget::mhc_MimeDataDevice);
+      const QString c_DroppedDeviceValid = pc_Mime->data(C_SyvDcExistingNodeWidget::mhc_MimeDataDeviceValid);
+
+      // Allow only matching devices or devices with unknown device names because of same node ids
+      if ((this->mc_DeviceName.compare(c_DroppedDevice) == 0) ||
+          (c_DroppedDeviceValid == "0"))
+      {
+         opc_Event->acceptProposedAction();
+         C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_WidgetSerialNumber, "Hovered", true);
+      }
    }
    QWidget::dragEnterEvent(opc_Event);
 }
@@ -348,14 +388,21 @@ void C_SyvDcExistingNodeWidget::dropEvent(QDropEvent * const opc_Event)
    if ((pc_Mime != NULL) && (pc_Mime->hasFormat(C_SyvDcExistingNodeWidget::mhc_MimeDataDevice) == true))
    {
       const QString c_DroppedDevice = pc_Mime->data(C_SyvDcExistingNodeWidget::mhc_MimeDataDevice);
+      const QString c_DroppedDeviceValid = pc_Mime->data(C_SyvDcExistingNodeWidget::mhc_MimeDataDeviceValid);
+
       //Disconnect previous one
       if (this->mpc_Ui->pc_WidgetSerialNumber->IsAssigned() == true)
       {
          Q_EMIT this->SigDisconnect(this->mu32_NodeIndex,
                                     this->mpc_Ui->pc_WidgetSerialNumber->GetPureSerialNumber());
       }
-      if (this->mc_DeviceName.compare(c_DroppedDevice) == 0)
+      if ((this->mc_DeviceName.compare(c_DroppedDevice) == 0) ||
+          (c_DroppedDeviceValid == "0"))
       {
+         // Device type matches or the found device type is invalid
+         // The device type can be invalid if at least two nodes are found with the same node it
+         // In this case, it is not possible to read the device name
+
          QString c_SerialNumber;
          //Connect new one
          if (pc_Mime->hasFormat(C_SyvDcExistingNodeWidget::mhc_MimeData) == true)

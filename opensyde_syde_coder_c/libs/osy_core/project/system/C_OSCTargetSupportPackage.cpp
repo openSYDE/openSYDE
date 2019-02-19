@@ -47,6 +47,7 @@ using namespace stw_opensyde_core;
 */
 //-----------------------------------------------------------------------------
 C_OSCTSPApplication::C_OSCTSPApplication(void) :
+   q_IsProgrammable(true),
    u8_ProcessId(0),
    c_Name(""),
    c_Comment(""),
@@ -73,8 +74,8 @@ C_OSCTargetSupportPackage::C_OSCTargetSupportPackage(void) :
    c_Comment(""),
    u8_ApplicationIndex(0U),
    u8_MaxParallelTransmissions(16U),
-   u16_MaxMessageBufferTx(512U),
-   u16_MaxRoutingMessageBufferRx(512U),
+   u16_MaxMessageBufferTx(585U),
+   u16_MaxRoutingMessageBufferRx(585U),
    c_TemplatePath("")
 {
    c_Applications.clear();
@@ -97,8 +98,8 @@ void C_OSCTargetSupportPackage::Clear(void)
 
    u8_ApplicationIndex = 0U;
    u8_MaxParallelTransmissions = 16U;
-   u16_MaxMessageBufferTx = 512U;
-   u16_MaxRoutingMessageBufferRx = 512U;
+   u16_MaxMessageBufferTx = 585U;
+   u16_MaxRoutingMessageBufferRx = 585U;
 
    c_Applications.clear();
 }

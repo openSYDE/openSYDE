@@ -19,7 +19,10 @@
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
 
+#include <iostream>
+
 #include <QDrag>
+#include <QElapsedTimer>
 #include <QDragMoveEvent>
 #include <QScrollBar>
 
@@ -85,8 +88,8 @@ C_SdNdeDataPoolListsTreeWidget::C_SdNdeDataPoolListsTreeWidget(QWidget * const o
 {
    //UI Settings
    this->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
-   this->setDragEnabled(true);
-   this->setDragDropMode(QAbstractItemView::DragDropMode::DragDrop);
+   this->setDragEnabled(false);
+   this->setDragDropMode(QAbstractItemView::NoDragDrop);
    this->setDefaultDropAction(Qt::TargetMoveAction);
    this->setAlternatingRowColors(true);
    this->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
@@ -158,6 +161,12 @@ C_SdNdeDataPoolListsTreeWidget::~C_SdNdeDataPoolListsTreeWidget(void)
 //-----------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::SetDataPool(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex)
 {
+   QElapsedTimer c_Timer;
+
+   if (mq_TIMING_OUTPUT)
+   {
+      c_Timer.start();
+   }
    if (this->mq_InitialUserSettings == true)
    {
       this->mq_InitialUserSettings = false;
@@ -176,6 +185,10 @@ void C_SdNdeDataPoolListsTreeWidget::SetDataPool(const uint32 & oru32_NodeIndex,
    this->mc_Delegate.SetDataPool(this->mu32_NodeIndex, this->mu32_DataPoolIndex);
    m_InitFromData();
    m_RestoreUserSettings();
+   if (mq_TIMING_OUTPUT)
+   {
+      std::cout << "List switch DP(" << this->mu32_DataPoolIndex << ") " << c_Timer.elapsed() << " ms" << &std::endl;
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -299,22 +312,19 @@ void C_SdNdeDataPoolListsTreeWidget::Copy(void) const
       {
          std::vector<C_OSCNodeDataPoolList> c_OSCContentVec;
          std::vector<C_PuiSdNodeDataPoolList> c_UIContentVec;
-         C_OSCNodeDataPoolList c_OSCContent;
-         C_PuiSdNodeDataPoolList c_UIContent;
          std::vector<uint32> c_SelectedIndices = m_GetSelectedIndices();
 
          //Sort to have "correct" copy order
          C_SdUtil::h_SortIndicesAscending(c_SelectedIndices);
+         //Reserve
+         c_OSCContentVec.resize(c_SelectedIndices.size());
+         c_UIContentVec.resize(c_SelectedIndices.size());
          for (uint32 u32_ItIndex = 0; u32_ItIndex < c_SelectedIndices.size(); ++u32_ItIndex)
          {
-            if (C_PuiSdHandler::h_GetInstance()->GetDataPoolList(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
-                                                                 c_SelectedIndices[u32_ItIndex],
-                                                                 c_OSCContent,
-                                                                 c_UIContent) == C_NO_ERR)
-            {
-               c_OSCContentVec.push_back(c_OSCContent);
-               c_UIContentVec.push_back(c_UIContent);
-            }
+            tgl_assert(C_PuiSdHandler::h_GetInstance()->GetDataPoolList(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
+                                                                        c_SelectedIndices[u32_ItIndex],
+                                                                        c_OSCContentVec[u32_ItIndex],
+                                                                        c_UIContentVec[u32_ItIndex]) == C_NO_ERR);
          }
          C_SdClipBoardHelper::h_StoreDataPoolLists(c_OSCContentVec, c_UIContentVec, pc_DataPool->e_Type);
       }
@@ -694,7 +704,7 @@ void C_SdNdeDataPoolListsTreeWidget::OpenDetail(const sint32 os32_ListIndex, con
       {
          pc_Item->setSelected(true);
       }
-      this->m_OnExpandRequested(pc_Item, true);
+      this->m_OnExpandRequestedIndex(os32_ListIndex, true);
 
       // scroll to the end first to see the expanded list always too
       this->scrollToBottom();
@@ -1081,50 +1091,52 @@ void C_SdNdeDataPoolListsTreeWidget::keyPressEvent(QKeyEvent * const opc_Event)
 
 //-----------------------------------------------------------------------------
 /*!
-   \brief   Overwritten start drag event
-
-   Here: start drag manually (for custom preview)
-
-   \param[in] oc_SupportedActions Supported actions
-
-   \created     14.03.2017  STW/M.Echtler
-*/
-//-----------------------------------------------------------------------------
-void C_SdNdeDataPoolListsTreeWidget::startDrag(const Qt::DropActions oc_SupportedActions)
-{
-   const QList<QTreeWidgetItem *> c_SelectedItems = this->selectedItems();
-
-   if (c_SelectedItems.size() > 0)
-   {
-      //Manual drag
-      QDrag * const pc_Drag = new QDrag(this);
-
-      pc_Drag->setMimeData(this->mimeData(c_SelectedItems));
-      pc_Drag->exec(oc_SupportedActions, this->defaultDropAction());
-      //lint -e{429}  no memory leak because of the parent of pc_Drag and the Qt memory management
-   }
-}
-
-//-----------------------------------------------------------------------------
-/*!
    \brief   Handle expand request
 
    \param[in] opc_Item  Affected tree item widget
    \param[in] oq_Expand true: expand
                         false collapse
 
+   \created     16.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_SdNdeDataPoolListsTreeWidget::m_OnExpandRequestedHeader(const C_SdNdeDataPoolListHeaderWidget * const opc_Item,
+                                                               const bool oq_Expand)
+{
+   sint32 s32_It = 0UL;
+
+   for (; s32_It < this->topLevelItemCount(); ++s32_It)
+   {
+      if (this->itemWidget(this->topLevelItem(s32_It), 0) == opc_Item)
+      {
+         break;
+      }
+   }
+   m_OnExpandRequestedIndex(s32_It, oq_Expand);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Handle expand request
+
+   \param[in] os32_Index Index
+   \param[in] oq_Expand  true: expand
+                         false collapse
+
    \created     25.01.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-void C_SdNdeDataPoolListsTreeWidget::m_OnExpandRequested(QTreeWidgetItem * const opc_Item, const bool oq_Expand)
+void C_SdNdeDataPoolListsTreeWidget::m_OnExpandRequestedIndex(const sint32 os32_Index, const bool oq_Expand)
 {
    if (oq_Expand == true)
    {
-      this->expand(this->indexFromItem(opc_Item));
+      //Do not use the item interface "expandItem" (does not work)
+      this->expand(this->indexFromItem(this->topLevelItem(os32_Index)));
    }
    else
    {
-      this->collapse(this->indexFromItem(opc_Item));
+      //Do not use the item interface "collapseItem" (does not work)
+      this->collapse(this->indexFromItem(this->topLevelItem(os32_Index)));
    }
 }
 
@@ -1140,7 +1152,7 @@ void C_SdNdeDataPoolListsTreeWidget::m_OnExpandRequested(QTreeWidgetItem * const
 //-----------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_InitialItemConfigure(QTreeWidgetItem * const opc_Item, const sint32 os32_Index)
 {
-   C_SdNdeDataPoolListHeaderWidget * const pc_ListItem = new C_SdNdeDataPoolListHeaderWidget(NULL, opc_Item,
+   C_SdNdeDataPoolListHeaderWidget * const pc_ListItem = new C_SdNdeDataPoolListHeaderWidget(NULL, this,
                                                                                              &this->mc_UndoManager,
                                                                                              &this->mc_ModelViewManager,
                                                                                              this->mu32_NodeIndex,
@@ -1152,7 +1164,7 @@ void C_SdNdeDataPoolListsTreeWidget::m_InitialItemConfigure(QTreeWidgetItem * co
    connect(pc_ListItem, &C_SdNdeDataPoolListHeaderWidget::SigSaveAs, this,
            &C_SdNdeDataPoolListsTreeWidget::SigSaveAs);
    connect(pc_ListItem, &C_SdNdeDataPoolListHeaderWidget::SigExpand, this,
-           &C_SdNdeDataPoolListsTreeWidget::m_OnExpandRequested);
+           &C_SdNdeDataPoolListsTreeWidget::m_OnExpandRequestedHeader);
    connect(pc_ListItem, &C_SdNdeDataPoolListHeaderWidget::SigUpdateAddress, this,
            &C_SdNdeDataPoolListsTreeWidget::m_UpdateAddress);
    //Connect error change
@@ -1165,21 +1177,16 @@ void C_SdNdeDataPoolListsTreeWidget::m_InitialItemConfigure(QTreeWidgetItem * co
    connect(pc_ListItem, &C_SdNdeDataPoolListHeaderWidget::SigExclusiveSelection, this,
            &C_SdNdeDataPoolListsTreeWidget::m_HandleExclusiveListSelection);
 
-   //Drag
-   //Skip drop enabled
-   opc_Item->setFlags(opc_Item->flags() ^ Qt::ItemIsDropEnabled);
-
    this->setItemWidget(opc_Item, 0, pc_ListItem);
    {
       //Table
       QTreeWidgetItem * const pc_Table =
          new QTreeWidgetItem(opc_Item, static_cast<sintn>(QTreeWidgetItem::ItemType::UserType));
-      C_SdNdeDataPoolListTableWidget * const pc_TableWidget = new C_SdNdeDataPoolListTableWidget(NULL, pc_Table,
-                                                                                                 &this->mc_UndoManager);
+      C_SdNdeDataPoolListTableWidget * const pc_TableWidget = new C_SdNdeDataPoolListTableWidget(NULL, this,
+                                                                                                 &this->mc_UndoManager,
+                                                                                                 false);
 
-      //Init list index first!
-      pc_TableWidget->SetList(this->mu32_NodeIndex, this->mu32_DataPoolIndex, static_cast<uint32>(os32_Index));
-      //Init table manager
+      //Set the current model view manager!
       pc_TableWidget->SetModelViewManager(&this->mc_ModelViewManager);
 
       //Connect error change
@@ -1202,12 +1209,10 @@ void C_SdNdeDataPoolListsTreeWidget::m_InitialItemConfigure(QTreeWidgetItem * co
       connect(pc_ListItem, &C_SdNdeDataPoolListHeaderWidget::SigUpdateTable, pc_TableWidget,
               &C_SdNdeDataPoolListTableWidget::Reset);
 
-      //Disable drag & drop
-      pc_Table->setFlags(pc_Table->flags() ^ Qt::ItemIsDragEnabled);
-      pc_Table->setFlags(pc_Table->flags() ^ Qt::ItemIsDropEnabled);
-
       this->setItemWidget(pc_Table, 0, pc_TableWidget);
+      //lint -e{429}  no memory leak because setItemWidget takes ownership
    }
+   //lint -e{429}  no memory leak because setItemWidget takes ownership
 }
 
 //-----------------------------------------------------------------------------
@@ -1236,15 +1241,19 @@ void C_SdNdeDataPoolListsTreeWidget::m_Move(const std::vector<uint32> & oru32_So
 //-----------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_InitFromData(void)
 {
-   C_OSCNodeDataPool c_OSCDataPool;
-   C_PuiSdNodeDataPool c_UIDataPool;
+   //QElapsedTimer c_Timer;
 
-   if (C_PuiSdHandler::h_GetInstance()->GetDataPool(this->mu32_NodeIndex, this->mu32_DataPoolIndex, c_OSCDataPool,
-                                                    c_UIDataPool) == C_NO_ERR)
+   //c_Timer.start();
+   const C_OSCNodeDataPool * const pc_OSCDataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+      this->mu32_NodeIndex,
+      this->mu32_DataPoolIndex);
+
+   if (pc_OSCDataPool != NULL)
    {
-      for (uint32 u32_It = 0; u32_It < c_OSCDataPool.c_Lists.size(); ++u32_It)
+      for (uint32 u32_It = 0; u32_It < pc_OSCDataPool->c_Lists.size(); ++u32_It)
       {
          this->AddEntry();
+         //std::cout << "List" << u32_It << ": generic - " << c_Timer.restart() << " ms" << &std::endl;
          {
             QTreeWidgetItem * const pc_HeaderItem = this->topLevelItem(u32_It);
 
@@ -1277,6 +1286,7 @@ void C_SdNdeDataPoolListsTreeWidget::m_InitFromData(void)
                }
             }
          }
+         //std::cout << "List" << u32_It << ": specific - " << c_Timer.restart() << " ms" << &std::endl;
       }
    }
 }

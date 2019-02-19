@@ -73,7 +73,7 @@ C_OSCTargetSupportPackage::C_OSCTargetSupportPackage(void) :
    c_DeviceName(""),
    c_Comment(""),
    u8_ApplicationIndex(0U),
-   u8_MaxParallelTransmissions(16U),
+   u8_MaxParallelTransmissions(64U),
    u16_MaxMessageBufferTx(585U),
    u16_MaxRoutingMessageBufferRx(585U),
    c_TemplatePath("")
@@ -97,7 +97,7 @@ void C_OSCTargetSupportPackage::Clear(void)
    c_TemplatePath = "";
 
    u8_ApplicationIndex = 0U;
-   u8_MaxParallelTransmissions = 16U;
+   u8_MaxParallelTransmissions = 64U;
    u16_MaxMessageBufferTx = 585U;
    u16_MaxRoutingMessageBufferRx = 585U;
 

@@ -19,13 +19,18 @@
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
 
+#include <QElapsedTimer>
+
+#include "C_Uti.h"
 #include "stwtypes.h"
+#include "constants.h"
 #include "C_SdNdeUnoLeDataPoolListElementMoveCommand.h"
 #include "C_PuiSdHandler.h"
 #include "C_SdNdeUnoUtil.h"
 
 /* -- Used Namespaces ------------------------------------------------------ */
 using namespace stw_types;
+using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants ---------------------------------------------- */
@@ -83,12 +88,29 @@ C_SdNdeUnoLeDataPoolListElementMoveCommand::C_SdNdeUnoLeDataPoolListElementMoveC
 //-----------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementMoveCommand::redo(void)
 {
-   //DELETE
-   this->SetIndices(mc_SourceRow);
-   this->Delete();
-   //ADD
-   this->SetIndices(mc_TargetRow);
-   this->Add();
+   if (this->mpc_DataPoolListModelViewManager != NULL)
+   {
+      C_SdNdeDataPoolListTableModel * const pc_Model = this->mpc_DataPoolListModelViewManager->GetElementModel(
+         this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
+      if (pc_Model != NULL)
+      {
+         std::vector<std::vector<uint32> > c_Items;
+         QElapsedTimer c_Timer;
+
+         if (mq_TIMING_OUTPUT)
+         {
+            c_Timer.start();
+         }
+         pc_Model->DoMoveRows(mc_SourceRow, mc_TargetRow);
+         //Sort ascending, only done for the "source" row which is not necessary here
+         c_Items = C_Uti::h_GetContiguousSectionsAscending(C_Uti::h_UniquifyAndSortAscending(mc_TargetRow));
+         m_ReSelect(c_Items, false);
+         if (mq_TIMING_OUTPUT)
+         {
+            std::cout << "Move elements " << c_Timer.restart() << " ms" << &std::endl;
+         }
+      }
+   }
    C_SdNdeUnoLeDataPoolListElementBaseCommand::redo();
 }
 
@@ -102,10 +124,26 @@ void C_SdNdeUnoLeDataPoolListElementMoveCommand::redo(void)
 void C_SdNdeUnoLeDataPoolListElementMoveCommand::undo(void)
 {
    C_SdNdeUnoLeDataPoolListElementBaseCommand::undo();
-   //DELETE
-   this->SetIndices(mc_TargetRow);
-   this->Delete();
-   //ADD
-   this->SetIndices(mc_SourceRow);
-   this->Add();
+   if (this->mpc_DataPoolListModelViewManager != NULL)
+   {
+      C_SdNdeDataPoolListTableModel * const pc_Model = this->mpc_DataPoolListModelViewManager->GetElementModel(
+         this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
+      if (pc_Model != NULL)
+      {
+         std::vector<std::vector<uint32> > c_Items;
+         QElapsedTimer c_Timer;
+         if (mq_TIMING_OUTPUT)
+         {
+            c_Timer.start();
+         }
+         pc_Model->DoMoveRows(mc_TargetRow, mc_SourceRow);
+         //Sort ascending, only done for the "source" row which is not necessary here
+         c_Items = C_Uti::h_GetContiguousSectionsAscending(C_Uti::h_UniquifyAndSortAscending(mc_SourceRow));
+         m_ReSelect(c_Items, false);
+         if (mq_TIMING_OUTPUT)
+         {
+            std::cout << "Move elements " << c_Timer.restart() << " ms" << &std::endl;
+         }
+      }
+   }
 }

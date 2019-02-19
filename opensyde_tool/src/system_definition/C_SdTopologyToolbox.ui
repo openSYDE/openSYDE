@@ -163,7 +163,7 @@
       <enum>Qt::NoFocus</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="pc_TabNodes">
       <attribute name="title">
@@ -193,13 +193,13 @@
          <property name="widgetResizable">
           <bool>true</bool>
          </property>
-         <widget class="QWidget" name="pc_ScrollAreaWidget1">
+         <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_ScrollAreaNodesWidget">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>0</y>
             <width>394</width>
-            <height>313</height>
+            <height>278</height>
            </rect>
           </property>
           <property name="autoFillBackground">
@@ -222,7 +222,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="pc_TabBuses">
       <attribute name="title">
        <string>Buses</string>
       </attribute>
@@ -240,7 +240,7 @@
         <number>0</number>
        </property>
        <item row="0" column="0">
-        <widget class="stw_opensyde_gui_elements::C_OgeSmoothScrollArea" name="pc_ScrollAreaNodes_2">
+        <widget class="stw_opensyde_gui_elements::C_OgeSmoothScrollArea" name="pc_ScrollAreaBuses">
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
@@ -250,13 +250,13 @@
          <property name="widgetResizable">
           <bool>true</bool>
          </property>
-         <widget class="QWidget" name="pc_ScrollAreaWidget1_3">
+         <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_ScrollAreaBusesWidget">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>0</y>
             <width>394</width>
-            <height>313</height>
+            <height>278</height>
            </rect>
           </property>
           <property name="autoFillBackground">
@@ -307,13 +307,13 @@
          <property name="widgetResizable">
           <bool>true</bool>
          </property>
-         <widget class="QWidget" name="pc_ScrollAreaWidget2">
+         <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_ScrollAreaDrawingWidget">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>0</y>
             <width>394</width>
-            <height>313</height>
+            <height>278</height>
            </rect>
           </property>
           <property name="autoFillBackground">
@@ -452,6 +452,12 @@
    <class>stw_opensyde_gui_elements::C_OgeSmoothScrollArea</class>
    <extends>QScrollArea</extends>
    <header>C_OgeSmoothScrollArea.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeWiOnlyBackground</class>
+   <extends>QWidget</extends>
+   <header>C_OgeWiOnlyBackground.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -107,8 +107,8 @@ C_SyvUpUpdatePackageListNodeWidget::C_SyvUpUpdatePackageListNodeWidget(const uin
    this->InitStaticNames();
 
    stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_FrameSperator,
-                                                                "HasColor8Background",
-                                                                true);
+                                                                  "HasColor8Background",
+                                                                  true);
 
    this->m_UpdateTitle();
 
@@ -477,7 +477,7 @@ void C_SyvUpUpdatePackageListNodeWidget::UpdatePositionNumber(const uint32 ou32_
 //-----------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeWidget::AddFile(const QString & orc_File)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(this->mu32_NodeIndex);
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
    if ((this->mq_FileBased == true) &&
@@ -561,9 +561,7 @@ void C_SyvUpUpdatePackageListNodeWidget::AdaptFile(const QString & orc_File,
       {
          // Reporting of other errors not necessary here. Will be handled in C_SyvUpUpdatePackageListNodeAppWidget.
          C_OsyHexFile * const pc_HexFile = new C_OsyHexFile();
-         QString c_AbsolutePath;
-
-         C_SyvUpUpdatePackageListNodeAppWidget::h_GetAbsolutePath(orc_File, c_AbsolutePath);
+         const QString c_AbsolutePath = C_ImpUtil::h_GetAbsolutePathFromProject(orc_File);
 
          if (pc_HexFile->LoadFromFile(c_AbsolutePath.toStdString().c_str()) == stw_hex_file::NO_ERR)
          {
@@ -573,13 +571,14 @@ void C_SyvUpUpdatePackageListNodeWidget::AdaptFile(const QString & orc_File,
             {
                if (this->mc_DeviceType != c_FileApplicationInfo.acn_DeviceID)
                {
-                  C_OgeWiCustomMessage c_MessageBox(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eQUESTION);
+                  C_OgeWiCustomMessage c_MessageBox(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eWARNING);
                   C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
 
                   c_MessageBox.SetHeading(C_GtGetText::h_GetText("Update Package configuration"));
-                  c_MessageBox.SetDescription(C_GtGetText::h_GetText("Device Type of selected HEX file does not "
-                                                                     "match the node type. Do you want to use the "
-                                                                     "HEX file anyway?"));
+                  c_MessageBox.SetDescription(C_GtGetText::h_GetText(
+                                                 "STW Flashloader compatibility mode: Device type of selected HEX file does not "
+                                                 "match the node type. Do you want to use the "
+                                                 "HEX file anyway?"));
                   c_MessageBox.SetDetails(QString(C_GtGetText::h_GetText(
                                                      "Device type of %1 does not match node type %2."))
                                           .arg(c_FileApplicationInfo.acn_DeviceID, this->mc_DeviceType));
@@ -656,7 +655,7 @@ void C_SyvUpUpdatePackageListNodeWidget::RevertFile(C_SyvUpUpdatePackageListNode
          C_PuiSvNodeUpdate c_UpdateInfo = *pc_View->GetNodeUpdateInformation(this->mu32_NodeIndex);
          std::vector<QString> c_ViewAppPaths = c_UpdateInfo.GetApplicationPaths();
          uint32 u32_AppNumber = opc_App->GetAppNumber();
-         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(this->mu32_NodeIndex);
+         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
 
          // Remove the view specific path
          if (u32_AppNumber < c_ViewAppPaths.size())
@@ -673,10 +672,8 @@ void C_SyvUpUpdatePackageListNodeWidget::RevertFile(C_SyvUpUpdatePackageListNode
              (u32_AppNumber < pc_Node->c_Applications.size()))
          {
             opc_App->SetAppFile(
-               C_Uti::h_ConcatPathIfNecessary(
-                  C_ImpUtil::h_GetAbsoluteProjectPath(pc_Node->c_Applications[u32_AppNumber].c_ProjectPath.c_str()),
-                  pc_Node->c_Applications[u32_AppNumber].c_ResultPath.c_str()),
-               true);
+               C_Uti::h_ConcatPathIfNecessary(pc_Node->c_Applications[u32_AppNumber].c_ProjectPath.c_str(),
+                                              pc_Node->c_Applications[u32_AppNumber].c_ResultPath.c_str()), true);
          }
       }
    }
@@ -1110,16 +1107,18 @@ bool C_SyvUpUpdatePackageListNodeWidget::IsFileBased(void) const
    \brief   Creates and returns the update package with all information for the system update for the concrete node
 
    \param[out]    orc_ApplicationsToWrite       Vector with node update configuration
+   \param[out]    orc_ApplicationsToWrite       Optional vector with all node applications
 
    \return
    C_NO_ERR    Update package with all information created
    C_RD_WR     At least one file does not exist
-   C_NOACT     No files for applications added
+   C_NOACT     No files for applications to write added
 
    \created     23.02.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
-sint32 C_SyvUpUpdatePackageListNodeWidget::GetUpdatePackage(C_OSCSuSequences::C_DoFlash & orc_ApplicationsToWrite)
+sint32 C_SyvUpUpdatePackageListNodeWidget::GetUpdatePackage(C_OSCSuSequences::C_DoFlash & orc_ApplicationsToWrite,
+                                                            C_OSCSuSequences::C_DoFlash * const opc_AllApplications)
 {
    sint32 s32_Return = C_NO_ERR;
    sintn sn_Counter;
@@ -1140,42 +1139,48 @@ sint32 C_SyvUpUpdatePackageListNodeWidget::GetUpdatePackage(C_OSCSuSequences::C_
          // necessary.
          if (pc_App != NULL)
          {
-            if (pc_App->GetState() != C_SyvUpUpdatePackageListNodeAppWidget::hu32_STATE_FINISHED)
+            const QString c_Path = pc_App->GetAppAbsoluteFilePath();
+            QFileInfo c_File(c_Path);
+
+            // Check file
+            if ((c_File.exists() == true) &&
+                (c_File.isFile() == true))
             {
-               const QString c_Path = pc_App->GetAppAbsoluteFilePath();
-               QFileInfo c_File(c_Path);
+               const QString c_LogEntry =
+                  "Generate Update Package: For node \"%1\" and application \"%2\" used file: %3";
 
-               // Check file
-               if ((c_File.exists() == true) &&
-                   (c_File.isFile() == true))
+               if (pc_App->GetState() != C_SyvUpUpdatePackageListNodeAppWidget::hu32_STATE_FINISHED)
                {
-                  const QString c_LogEntry =
-                     "Generate Update Package: For node \"%1\" and application \"%2\" used file: %3";
-
                   orc_ApplicationsToWrite.c_FilesToFlash.push_back(stw_scl::C_SCLString(c_Path.toStdString().c_str()));
-
-                  osc_write_log_info("Generate Update Package",
-                                     C_GtGetText::h_GetText(c_LogEntry.arg(this->mc_NodeName,
-                                                                           pc_App->GetAppName(),
-                                                                           c_Path).toStdString().c_str()));
                }
                else
                {
-                  const QString c_LogEntry =
-                     "Generate Update Package: The path of Node \"%1\" and application \"%2\" is invalid: %3";
-
-                  osc_write_log_info("Generate Update Package",
-                                     C_GtGetText::h_GetText(c_LogEntry.arg(this->mc_NodeName,
-                                                                           pc_App->GetAppName(),
-                                                                           c_Path).toStdString().c_str()));
-
-                  s32_Return = C_RD_WR;
+                  // Update of application is not necessary
+                  ++this->mu32_AppsUpdated;
                }
+
+               if (opc_AllApplications != NULL)
+               {
+                  // Fill vector with all applications independent of the state
+                  opc_AllApplications->c_FilesToFlash.push_back(stw_scl::C_SCLString(c_Path.toStdString().c_str()));
+               }
+
+               osc_write_log_info("Generate Update Package",
+                                  C_GtGetText::h_GetText(c_LogEntry.arg(this->mc_NodeName,
+                                                                        pc_App->GetAppName(),
+                                                                        c_Path).toStdString().c_str()));
             }
             else
             {
-               // Update of application is not necessary
-               ++this->mu32_AppsUpdated;
+               const QString c_LogEntry =
+                  "Generate Update Package: The path of Node \"%1\" and application \"%2\" is invalid: %3";
+
+               osc_write_log_info("Generate Update Package",
+                                  C_GtGetText::h_GetText(c_LogEntry.arg(this->mc_NodeName,
+                                                                        pc_App->GetAppName(),
+                                                                        c_Path).toStdString().c_str()));
+
+               s32_Return = C_RD_WR;
             }
          }
       }
@@ -1328,12 +1333,9 @@ void C_SyvUpUpdatePackageListNodeWidget::dropEvent(QDropEvent * const opc_Event)
          {
             if (c_FilePaths[sn_FileCounter] != "")
             {
-               // If possible make the path relative
-               if (c_FilePaths[sn_FileCounter].contains(c_Folder, Qt::CaseInsensitive) == true)
-               {
-                  // Remove project path
-                  c_FilePaths[sn_FileCounter] = c_FilePaths[sn_FileCounter].remove(c_Folder, Qt::CaseInsensitive);
-               }
+               // check if relative path is possible and appreciated
+               c_FilePaths[sn_FileCounter] = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_FilePaths[sn_FileCounter],
+                                                                                    c_Folder);
             }
          }
 
@@ -1368,7 +1370,7 @@ void C_SyvUpUpdatePackageListNodeWidget::dropEvent(QDropEvent * const opc_Event)
 //-----------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeWidget::m_InitApplications(void)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(this->mu32_NodeIndex);
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
    QSpacerItem * const pc_Spacer = new QSpacerItem(0, 3, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
    tgl_assert(pc_Node != NULL);
@@ -1421,21 +1423,18 @@ void C_SyvUpUpdatePackageListNodeWidget::m_InitApplications(void)
                   }
                   else
                   {
-                     pc_AppWidget->SetAppFile(
-                        C_Uti::h_ConcatPathIfNecessary(C_ImpUtil::h_GetAbsoluteProjectPath(pc_App->c_ProjectPath.c_str()),
-                                                       pc_App->c_ResultPath.c_str()), true);
+                     pc_AppWidget->SetAppFile(C_Uti::h_ConcatPathIfNecessary(pc_App->c_ProjectPath.c_str(),
+                                                                             pc_App->c_ResultPath.c_str()), true);
                   }
 
                   // Set the default path for comparing with import configuration
-                  pc_AppWidget->SetDefaultFile(
-                     C_Uti::h_ConcatPathIfNecessary(C_ImpUtil::h_GetAbsoluteProjectPath(pc_App->c_ProjectPath.c_str()),
-                                                    pc_App->c_ResultPath.c_str()));
+                  pc_AppWidget->SetDefaultFile(C_Uti::h_ConcatPathIfNecessary(pc_App->c_ProjectPath.c_str(),
+                                                                              pc_App->c_ResultPath.c_str()));
                }
                else
                {
                   QFileInfo c_File(c_ViewAppPaths[u32_Counter]);
                   pc_App = &pc_Node->c_Applications[0];
-
                   pc_AppWidget->SetAppFile(c_ViewAppPaths[u32_Counter], false);
                   pc_AppWidget->SetAppName(c_File.fileName());
                }

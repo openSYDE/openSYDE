@@ -44,6 +44,8 @@ public:
                        const std::vector<stw_types::uint32> & orc_OwnerNodeInterfaceIndex,
                        const std::vector<bool> & orc_OwnerIsTxFlag);
 
+   stw_opensyde_core::C_OSCCanMessageIdentificationIndices GetLastMessageId(void) const;
+
    virtual void redo(void);
    virtual void undo(void);
 };

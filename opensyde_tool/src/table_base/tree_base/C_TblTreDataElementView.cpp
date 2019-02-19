@@ -177,16 +177,21 @@ void C_TblTreDataElementView::Search(const QString & orc_Text)
 /*!
    \brief   Switch displayed content
 
-   \param[in] ore_Mode New mode
+   \param[in] ore_Mode                 New mode
+   \param[in] oq_ShowOnlyWriteElements Optional flag to show only writable elements
+   \param[in] oq_ShowArrayElements     Optional flag to hide all array elements (if false)
+   \param[in] oq_Show64BitValues       Optional flag to hide all 64 bit elements (if false)
 
    \created     07.09.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-void C_TblTreDataElementView::SwitchMode(const C_TblTreDataElementModel::E_Mode & ore_Mode)
+void C_TblTreDataElementView::SwitchMode(const C_TblTreDataElementModel::E_Mode & ore_Mode,
+                                         const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
+                                         const bool oq_Show64BitValues)
 {
    this->me_Mode = ore_Mode;
-   this->mc_Model.InitSV(this->mu32_ViewIndex, ore_Mode, this->mq_ShowOnlyWriteElements, this->mq_ShowArrayElements,
-                         this->mq_Show64BitValues);
+   this->mc_Model.InitSV(this->mu32_ViewIndex, ore_Mode, oq_ShowOnlyWriteElements, oq_ShowArrayElements,
+                         oq_Show64BitValues);
    m_RestoreExpandedIndices();
 }
 

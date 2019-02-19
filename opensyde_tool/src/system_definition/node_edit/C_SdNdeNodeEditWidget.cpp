@@ -161,6 +161,10 @@ C_SdNdeNodeEditWidget::~C_SdNdeNodeEditWidget()
    //Other
    if (this->mpc_Ui->pc_TabWidgetPageNavi->count() >= 2)
    {
+      // disconnect tab changed because this signal is emitted on delete and therefore leads to crash
+      // (m_CurrentTabChanged updates tabs sub widgets which may not exist anymore)
+      disconnect(this->mpc_Ui->pc_TabWidgetPageNavi, &stw_opensyde_gui_elements::C_OgeTawPageNavi::currentChanged,
+                 this, &C_SdNdeNodeEditWidget::m_CurrentTabChanged);
       // delete the widget if not in the tab with no parent
       delete this->mpc_TabThreeWidget;
    }
@@ -407,8 +411,25 @@ void C_SdNdeNodeEditWidget::m_EditComDataPool(const uint32 ou32_DataPoolIndex, c
 }
 
 //-----------------------------------------------------------------------------
+/*!
+   \brief   Slot for tab change of pc_TabWidgetPageNavi
+
+   Adapt the visibility of the tab options
+
+   The not shown widget in the other tab cause a resize of the tab widget itself.
+   This function sets the size policy of all not shown widgets to ignore to achieve that the hided but visible
+   widgets have no impact on the current size of the tab widget.
+   The changed widget of the current tab must be reseted to the preferred size
+
+   \param[in]     osn_Index         Index of selected tab
+
+   \created     23.01.2019  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::m_CurrentTabChanged(const sintn osn_Index) const
 {
+   sintn sn_Counter;
+
    // remove the COM datapool edit widget if it is visible
    if ((osn_Index < 2) &&
        (this->mpc_Ui->pc_TabWidgetPageNavi->count() >= 2))
@@ -424,6 +445,19 @@ void C_SdNdeNodeEditWidget::m_CurrentTabChanged(const sintn osn_Index) const
    }
    //Simple trigger update
    this->mpc_Ui->pc_WidgetApplications->UpdateApplications();
+
+   // Adjust the size of the hided but visible widgets of the other tabs
+   for (sn_Counter = 0; sn_Counter < this->mpc_Ui->pc_TabWidgetPageNavi->count(); ++sn_Counter)
+   {
+      if (sn_Counter != osn_Index)
+      {
+         this->mpc_Ui->pc_TabWidgetPageNavi->widget(sn_Counter)->setSizePolicy(QSizePolicy::Ignored,
+                                                                               QSizePolicy::Ignored);
+      }
+   }
+   this->mpc_Ui->pc_TabWidgetPageNavi->widget(osn_Index)->setSizePolicy(QSizePolicy::Preferred,
+                                                                        QSizePolicy::Preferred);
+   this->mpc_Ui->pc_TabWidgetPageNavi->widget(osn_Index)->adjustSize();
 }
 
 //-----------------------------------------------------------------------------

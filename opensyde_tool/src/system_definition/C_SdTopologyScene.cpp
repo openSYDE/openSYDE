@@ -25,8 +25,8 @@
 #include <QToolTip>
 #include <QApplication>
 #include <QGraphicsView>
+#include <QElapsedTimer>
 
-#include "stwerrors.h"
 #include "constants.h"
 #include "gitypes.h"
 
@@ -38,7 +38,6 @@
 #include "C_GiBiCustomToolTip.h"
 #include "C_GiLiTemporaryLine.h"
 #include "C_GiCustomFunctions.h"
-#include "C_PopErrorHandling.h"
 #include "C_PuiSdNode.h"
 #include "C_PuiSdBus.h"
 #include "C_GtGetText.h"
@@ -62,7 +61,6 @@ using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_core;
 using namespace stw_types;
 using namespace stw_tgl;
-using namespace stw_errors;
 
 /* -- Module Global Constants ---------------------------------------------- */
 const QString mc_CAN_BUS = "CAN Bus";
@@ -138,6 +136,10 @@ C_SdTopologyScene::C_SdTopologyScene(const bool & orq_LoadSystemDefintion, QObje
    connect(&(this->mc_BusConnectorReconnectManager),
            &C_SdManTopologyBusConnectorReconnectManager::SigCleanUpTemporaryLine,
            this, &C_SdTopologyScene::m_RemoveConnectorAndLeaveConnectState);
+
+   //error handling
+   connect(&this->mc_UndoManager, &C_SdManUnoTopologyManager::SigErrorChanged, this,
+           &C_SdTopologyScene::SigErrorChange);
 
    // selection changed
    connect(this, &C_SdTopologyScene::selectionChanged, this, &C_SdTopologyScene::m_SelectionChanged);
@@ -264,7 +266,7 @@ void C_SdTopologyScene::AddCanBus(const QPointF & orc_Pos, const stw_types::uint
    // Create specific text element for showing bus name
 
    //Configure bus
-   pc_CANBus = new C_GiLiCANBus(s32_Index, u64_UniqueID, opc_TextElementBus, &c_Points);
+   pc_CANBus = new C_GiLiCANBus(s32_Index, u64_UniqueID, opc_TextElementBus, true, &c_Points);
    pc_CANBus->SetWidth(6);
    pc_CANBus->SetColor(mc_STYLE_GUIDE_COLOR_10);
 
@@ -320,7 +322,7 @@ void C_SdTopologyScene::AddEthernetBus(const QPointF & orc_Pos, const stw_types:
    s32_Index = C_PuiSdHandler::h_GetInstance()->AddBusAndSort(c_OSCBus, c_UIBus, opc_NameProposal);
    this->m_SyncIndex(C_GiLiEthernetBus::eBUS, s32_Index, C_GiLiEthernetBus::eADD);
    //Configure bus
-   pc_EthernetBus = new C_GiLiEthernetBus(s32_Index, u64_UniqueID, opc_TextElementBus, &c_Points);
+   pc_EthernetBus = new C_GiLiEthernetBus(s32_Index, u64_UniqueID, opc_TextElementBus, true, &c_Points);
    pc_EthernetBus->SetWidth(6);
    pc_EthernetBus->SetColor(mc_STYLE_GUIDE_COLOR_5413);
 
@@ -459,7 +461,7 @@ C_GiTextElementBus * C_SdTopologyScene::AddTextElementBus(const uint64 * const o
    C_PuiSdHandler::h_GetInstance()->c_BusTextElements.resize(static_cast<uintn>(s32_Index) + 1U);
 
    this->m_SyncIndex(C_PuiSdDataElement::eTEXT_ELEMENT_BUS, s32_Index, C_PuiSdDataElement::eADD);
-   pc_Item = new C_GiTextElementBus(s32_Index, u64_UniqueID);
+   pc_Item = this->m_CreateBusTextElement(s32_Index, u64_UniqueID, NULL);
 
    m_AddBusTextElementToScene(pc_Item);
 
@@ -652,6 +654,7 @@ void C_SdTopologyScene::CopyFromManagerToScene(const QPointF * const opc_Pos)
 {
    QGraphicsView * const pc_View = this->views().at(0);
    const C_PuiBsElements * const pc_Data = this->mc_CopyPasteManager.GetSnapshot(pc_View);
+
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    const C_SdTopologyDataSnapshot * const pc_SnapShot =
       dynamic_cast<const C_SdTopologyDataSnapshot * const>(pc_Data);
@@ -681,7 +684,6 @@ void C_SdTopologyScene::CopyFromManagerToScene(const QPointF * const opc_Pos)
       }
       this->mc_UndoManager.DoAddSnapshot(c_UniqueIDs, *pc_SnapShot, c_TotalOffset);
    }
-   delete (pc_Data);
 }
 
 //-----------------------------------------------------------------------------
@@ -739,21 +741,21 @@ void C_SdTopologyScene::CopyFromSnapshotToScene(const stw_opensyde_gui_logic::C_
       //Replace old connection names to new ones and remove connection if bus was not copied
       if ((pc_OSCNode != NULL) && (pc_UINode != NULL))
       {
-         C_OSCNode c_OSCAdaptedNode = *pc_OSCNode;
-         C_PuiSdNode c_UIAdaptedNode = *pc_UINode;
-         for (std::vector<C_PuiSdNodeConnection>::iterator c_ItConn = c_UIAdaptedNode.c_UIBusConnections.begin();
-              c_ItConn != c_UIAdaptedNode.c_UIBusConnections.end();)
+         C_OSCNodeProperties c_OSCAdaptedNodeproperties = pc_OSCNode->c_Properties;
+         std::vector<C_PuiSdNodeConnection> c_UIAdaptedNodeConnections = pc_UINode->c_UIBusConnections;
+         for (std::vector<C_PuiSdNodeConnection>::iterator c_ItConn = c_UIAdaptedNodeConnections.begin();
+              c_ItConn != c_UIAdaptedNodeConnections.end();)
          {
             uint32 u32_BusIndex = std::numeric_limits<uint32>::max();
             C_PuiSdNodeConnection & rc_CurConn = *c_ItConn;
 
             //Get according bus index
             for (uint32 u32_ItComInterface = 0;
-                 u32_ItComInterface < c_OSCAdaptedNode.c_Properties.c_ComInterfaces.size();
+                 u32_ItComInterface < c_OSCAdaptedNodeproperties.c_ComInterfaces.size();
                  ++u32_ItComInterface)
             {
                C_OSCNodeComInterfaceSettings & rc_ComInt =
-                  c_OSCAdaptedNode.c_Properties.c_ComInterfaces[u32_ItComInterface];
+                  c_OSCAdaptedNodeproperties.c_ComInterfaces[u32_ItComInterface];
                if (rc_ComInt.q_IsBusConnected == true)
                {
                   if ((rc_CurConn.c_ConnectionID.e_InterfaceType == rc_ComInt.e_InterfaceType) &&
@@ -771,17 +773,17 @@ void C_SdTopologyScene::CopyFromSnapshotToScene(const stw_opensyde_gui_logic::C_
             if (u32_BusIndex == std::numeric_limits<uint32>::max())
             {
                //Sync core and UI data
-               c_OSCAdaptedNode.c_Properties.DisconnectComInterface(rc_CurConn.c_ConnectionID.e_InterfaceType,
-                                                                    rc_CurConn.c_ConnectionID.u8_InterfaceNumber);
-               c_ItConn = c_UIAdaptedNode.c_UIBusConnections.erase(c_ItConn);
+               c_OSCAdaptedNodeproperties.DisconnectComInterface(rc_CurConn.c_ConnectionID.e_InterfaceType,
+                                                                 rc_CurConn.c_ConnectionID.u8_InterfaceNumber);
+               c_ItConn = c_UIAdaptedNodeConnections.erase(c_ItConn);
             }
             else
             {
                ++c_ItConn;
             }
          }
-         C_PuiSdHandler::h_GetInstance()->SetOSCNode(u32_NewNodeIndex, c_OSCAdaptedNode);
-         C_PuiSdHandler::h_GetInstance()->SetUINode(u32_NewNodeIndex, c_UIAdaptedNode);
+         C_PuiSdHandler::h_GetInstance()->SetOSCNodeProperties(u32_NewNodeIndex, c_OSCAdaptedNodeproperties);
+         C_PuiSdHandler::h_GetInstance()->SetUINodeConnections(u32_NewNodeIndex, c_UIAdaptedNodeConnections);
       }
    }
    //Copy other elements
@@ -1375,8 +1377,8 @@ void C_SdTopologyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_E
             C_OgeWiCustomMessage c_MessageBox(pc_View, C_OgeWiCustomMessage::E_Type::eINFORMATION);
             c_MessageBox.SetHeading(C_GtGetText::h_GetText("Link Use"));
             c_MessageBox.SetDescription(C_GtGetText::h_GetText(
-                                           "Connect existing elements easily. Click on link icon and while holding down the left mouse button,"
-                                           "\ndrag to either an existing node or bus element."));
+                                           "Connect existing elements: Click on the link icon and drag and drop it "
+                                           "\neither to an existing node or to a bus element."));
             c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("OK"));
             c_MessageBox.Execute();
          }
@@ -1842,6 +1844,71 @@ C_GiNode * C_SdTopologyScene::m_CreateNode(const sint32 & ors32_Index, const uin
                                            QGraphicsItem * const opc_Parent)
 {
    return new C_GiNode(ors32_Index, oru64_ID, orf64_Width, orf64_Height, opc_Parent);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get specific CAN bus
+
+   \param[in]     ors32_Index          Index of data element in system definition
+   \param[in]     oru64_ID             Unique ID
+   \param[in]     opc_TextElementName  Pointer to text element for showing bus name
+   \param[in]     opc_Points           Points for line
+   \param[in,out] opc_Parent           Optional pointer to parent
+
+   \return
+   Specific CAN bus
+
+   \created     15.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+C_GiLiCANBus * C_SdTopologyScene::m_CreateCANBus(const sint32 & ors32_Index, const uint64 & oru64_ID,
+                                                 C_GiTextElementBus * const opc_TextElementName,
+                                                 const std::vector<QPointF> * const opc_Points,
+                                                 QGraphicsItem * const opc_Parent)
+{
+   return new C_GiLiCANBus(ors32_Index, oru64_ID, opc_TextElementName, true, opc_Points, opc_Parent);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get specific ethernet bus
+
+   \param[in]     ors32_Index          Index of data element in system definition
+   \param[in]     oru64_ID             Unique ID
+   \param[in]     opc_TextElementName  Pointer to text element for showing bus name
+   \param[in]     opc_Points           Points for line
+   \param[in,out] opc_Parent           Optional pointer to parent
+
+   \return
+   Specific ethernet bus
+
+   \created     15.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+C_GiLiEthernetBus * C_SdTopologyScene::m_CreateEthernetBus(const sint32 & ors32_Index, const uint64 & oru64_ID,
+                                                           C_GiTextElementBus * const opc_TextElementName,
+                                                           const std::vector<QPointF> * const opc_Points,
+                                                           QGraphicsItem * const opc_Parent)
+{
+   return new C_GiLiEthernetBus(ors32_Index, oru64_ID, opc_TextElementName, true, opc_Points, opc_Parent);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get specific bus text element
+
+   \param[in]       ors32_Index          Index of data element in system definition
+   \param[in]       oru64_ID             Unique ID
+   \param[in,out]   opc_parent           Optional pointer to parent
+
+   \created     15.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+C_GiTextElementBus * C_SdTopologyScene::m_CreateBusTextElement(const sint32 & ors32_Index, const uint64 & oru64_ID,
+                                                               QGraphicsItem * const opc_Parent)
+{
+   return new C_GiTextElementBus(ors32_Index, oru64_ID, opc_Parent);
 }
 
 //-----------------------------------------------------------------------------
@@ -3169,7 +3236,7 @@ void C_SdTopologyScene::m_ConfiugreComDatapool(const C_GiNode * const opc_Node, 
 {
    uint32 u32_Counter;
    const uint32 u32_NodeIndex = opc_Node->GetIndex();
-   const C_OSCNode * const pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOSCNode(u32_NodeIndex);
+   const C_OSCNode * const pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
    bool q_ProtocolFound = false;
    bool q_ActiveForInterface = false;
 
@@ -3587,7 +3654,7 @@ void C_SdTopologyScene::m_RevertOverrideCursor(void)
    \brief   Init Node Com interface setting
 
    This function is called after node create.
-   Default concept: Activate all services if they are supported by the devce type
+   Default concept: Activate all services if they are supported by the device type
 
    \param[in,out] orc_OSCNode      newly created node
 
@@ -3610,6 +3677,7 @@ void C_SdTopologyScene::m_InitNodeComIfSettings(C_OSCNode & orc_OSCNode) const
    {
       orc_OSCNode.c_Properties.CreateComInterfaces(*(pc_DeviceDefinition));
 
+      // In case of both protocols are supported, openSYDE is default
       //server and flashloader: Device Type settings = node settings.
       if (pc_DeviceDefinition->q_DiagnosticProtocolOpenSydeCan == true)
       {
@@ -3624,6 +3692,7 @@ void C_SdTopologyScene::m_InitNodeComIfSettings(C_OSCNode & orc_OSCNode) const
       else
       {
          //not supported
+         orc_OSCNode.c_Properties.e_DiagnosticServer = C_OSCNodeProperties::eDS_NONE;
       }
 
       //flashloader
@@ -3640,6 +3709,7 @@ void C_SdTopologyScene::m_InitNodeComIfSettings(C_OSCNode & orc_OSCNode) const
       else
       {
          //not supported
+         orc_OSCNode.c_Properties.e_FlashLoader = C_OSCNodeProperties::eFL_NONE;
       }
 
       //init interfaces
@@ -3647,7 +3717,7 @@ void C_SdTopologyScene::m_InitNodeComIfSettings(C_OSCNode & orc_OSCNode) const
       {
          C_OSCNodeComInterfaceSettings & rc_CurInterface = orc_OSCNode.c_Properties.c_ComInterfaces[u32_Index];
          const bool q_IsUpdateAvailable    = pc_DeviceDefinition->IsUpdateAvailable(rc_CurInterface.e_InterfaceType);
-         const bool q_IsRoutingAvailable   = pc_DeviceDefinition->IsRoutingAvailable(rc_CurInterface.e_InterfaceType);
+         const bool q_IsRoutingAvailable   = orc_OSCNode.IsRoutingAvailable(rc_CurInterface.e_InterfaceType);
          const bool q_IsDiagnosisAvailable = pc_DeviceDefinition->IsDiagnosisAvailable(rc_CurInterface.e_InterfaceType);
          rc_CurInterface.q_IsUpdateEnabled = q_IsUpdateAvailable;
          rc_CurInterface.q_IsRoutingEnabled = q_IsRoutingAvailable;

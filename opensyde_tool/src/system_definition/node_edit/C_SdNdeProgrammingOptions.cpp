@@ -153,9 +153,7 @@ void C_SdNdeProgrammingOptions::InitStaticNames(void) const
                                                        "Max number of cyclic/event driven transmissions in parallel"),
                                                     C_GtGetText::h_GetText(
                                                        "This refers to the maximum number of parallel cyclic and event driven diagnostic transmissions you are allowed to configure for this server.\n"
-                                                       "This restricts the number transmissions in \"System Commissioning - Dashboards\" screen (openSYDE PC client)."
-                                                       "\nDefault value: 16"));
-
+                                                       "\nDefault value: 64"));
    this->mpc_Ui->pc_LabelCPD->SetToolTipInformation(C_GtGetText::h_GetText("Process Data Exchange Stacks"),
                                                     C_GtGetText::h_GetText(
                                                        "The process data exchange stacks provide drivers for sending and receiving CAN messages containing process data.\n"

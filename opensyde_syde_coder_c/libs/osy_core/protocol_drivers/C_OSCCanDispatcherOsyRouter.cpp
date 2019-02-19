@@ -35,6 +35,7 @@
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
+using namespace stw_can;
 
 /* -- Module Global Constants ---------------------------------------------- */
 
@@ -131,7 +132,7 @@ void C_OSCCanDispatcherOsyRouter::SetFilterParameters(const uint8 ou8_RoutingCha
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     01.08.2017  STW/B.Bayer
 */
@@ -174,7 +175,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Init(const sint32 os32_BitrateKBitS)
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     01.08.2017  STW/B.Bayer
 */
@@ -224,7 +225,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Reset(void)
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     01.08.2017  STW/B.Bayer
 */

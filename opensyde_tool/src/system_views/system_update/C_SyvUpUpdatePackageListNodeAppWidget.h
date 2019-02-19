@@ -76,8 +76,6 @@ public:
    bool IsAppIdentical(const QString & orc_AppName, const QString & orc_AppVersion, const QString & orc_AppBuildTime,
                        const QString & orc_AppBuildDate) const;
 
-   static bool h_GetAbsolutePath(const QString & orc_InputPath, QString & orc_OutputPath);
-
    static const stw_types::uint32 hu32_STATE_DEFAULT = 0U;
    static const stw_types::uint32 hu32_STATE_ERROR = 1U;
    static const stw_types::uint32 hu32_STATE_FINISHED = 2U;
@@ -96,7 +94,7 @@ private:
    C_SyvUpUpdatePackageListNodeAppWidget(const C_SyvUpUpdatePackageListNodeAppWidget &);
    C_SyvUpUpdatePackageListNodeAppWidget & operator =(const C_SyvUpUpdatePackageListNodeAppWidget &);
 
-   bool m_UpdateAbsolutePath(void);
+   void m_UpdateAbsolutePath(void);
    void m_UpdateTitle(void);
    bool m_LoadApplicationInformation(void);
    void m_UpdateToolTip(void);

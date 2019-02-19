@@ -185,6 +185,7 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Init(void)
    stw_opensyde_core::C_OSCLoggingHandler::h_SetWriteToFileActive(true);
    stw_opensyde_core::C_OSCLoggingHandler::h_SetWriteToConsoleActive(false);
    stw_opensyde_core::C_OSCLoggingHandler::h_SetCompleteLogFileLocation(mc_LogFileName);
+   osc_write_log_info("Starting tool", mc_ExeName + " Version: " + mc_ExeVersion);
 
    //try to remove list-of-files file if it already exists
    if (stw_tgl::TGL_FileExists(mc_ListOfFilesFileName) == true)
@@ -622,12 +623,10 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Exit(const E_ResultCode o
       catch (...)
       {
          e_Return = eRESULT_WRITE_FILE_LIST_ERROR;
-         std::cout << "Error: could not write file with list of generated files (" << mc_ListOfFilesFileName.c_str() <<
-            ").";
       }
    }
 
-   switch (oe_ResultCode)
+   switch (e_Return)
    {
    case eRESULT_OK:
       c_Text += "(Code was generated)";
@@ -636,10 +635,10 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Exit(const E_ResultCode o
       c_Text += "(Help requested)";
       break;
    case eRESULT_ERASE_FILE_LIST_ERROR:
-      c_Text += "(Could not remove pre-existing file list file)";
+      c_Text += "(Could not remove pre-existing file list file \"" + mc_ListOfFilesFileName + "\")";
       break;
    case eRESULT_WRITE_FILE_LIST_ERROR:
-      c_Text += "(Could not write file list file)";
+      c_Text += "(Could not write file with list of generated files \"" + mc_ListOfFilesFileName + "\")";
       break;
    case eRESULT_ERASE_TARGET_FOLDER_ERROR:
       c_Text += "(could not erase pre-existing target folder)";

@@ -22,7 +22,6 @@
 #include "stwerrors.h"
 #include "C_PuiSdUtil.h"
 #include "C_PuiSdHandler.h"
-#include "C_PuiBsFindNameHelper.h"
 #include "C_GtGetText.h"
 
 /* -- Used Namespaces ------------------------------------------------------ */
@@ -43,88 +42,6 @@ using namespace stw_scl;
 /* -- Module Global Function Prototypes ------------------------------------ */
 
 /* -- Implementation ------------------------------------------------------- */
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get unique item name based on proposal
-
-   \param[in] orc_ExistingStrings Existing item names
-   \param[in] orc_ProposedName    Proposal for item name
-
-   \return
-   Unique node name
-
-   \created     08.09.2016  STW/M.Echtler
-*/
-//-----------------------------------------------------------------------------
-C_SCLString C_PuiSdUtil::h_GetUniqueName(const std::vector<const C_SCLString *> & orc_ExistingStrings,
-                                         const C_SCLString & orc_ProposedName)
-{
-   C_SCLString c_Retval = orc_ProposedName;
-   bool q_Conflict;
-   sint32 s32_MaxDeviation;
-   C_SCLString c_BaseStr;
-
-   std::vector<const C_SCLString *>::const_iterator c_ItString;
-
-   do
-   {
-      q_Conflict = false;
-      c_ItString =
-         std::find_if(orc_ExistingStrings.begin(), orc_ExistingStrings.end(), C_PuiBsFindNameHelper(c_Retval));
-      if (c_ItString != orc_ExistingStrings.end())
-      {
-         q_Conflict = true;
-         h_GetNumberAtStringEnd(**c_ItString, c_BaseStr, s32_MaxDeviation);
-         //Do not use 0 and 1 for name adaptation
-         if (s32_MaxDeviation <= 0)
-         {
-            s32_MaxDeviation = 1;
-         }
-         c_Retval = c_BaseStr + '_' + C_SCLString(s32_MaxDeviation + static_cast<sint32>(1));
-      }
-   }
-   while (q_Conflict == true);
-   return c_Retval;
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get unique item name based on proposal
-
-   \param[in] orc_ExistingStrings Existing item names
-   \param[in] orc_ProposedName    Proposal for item name
-
-   \return
-   Unique node name
-
-   \created     22.06.2017  STW/M.Echtler
-*/
-//-----------------------------------------------------------------------------
-QString C_PuiSdUtil::h_GetUniqueName(const std::vector<const QString *> & orc_ExistingStrings,
-                                     const QString & orc_ProposedName)
-{
-   std::vector<const stw_scl::C_SCLString *> c_TmpStrings;
-   const stw_scl::C_SCLString c_Proposal = orc_ProposedName.toStdString().c_str();
-   stw_scl::C_SCLString c_Result;
-   //Copy
-   c_TmpStrings.reserve(orc_ExistingStrings.size());
-   for (uint32 u32_ItString = 0; u32_ItString < orc_ExistingStrings.size(); ++u32_ItString)
-   {
-      const QString * const pc_CurString = orc_ExistingStrings[u32_ItString];
-      if (pc_CurString != NULL)
-      {
-         c_TmpStrings.push_back(new stw_scl::C_SCLString(pc_CurString->toStdString().c_str()));
-      }
-   }
-   c_Result = C_PuiSdUtil::h_GetUniqueName(c_TmpStrings, c_Proposal);
-   //Clean up
-   for (uint32 u32_ItString = 0; u32_ItString < c_TmpStrings.size(); ++u32_ItString)
-   {
-      delete (c_TmpStrings[u32_ItString]);
-   }
-   return c_Result.c_str();
-}
 
 //-----------------------------------------------------------------------------
 /*!
@@ -171,61 +88,6 @@ bool C_PuiSdUtil::h_CheckNameAvailable(const std::vector<const QString *> & orc_
       }
    }
    return q_Retval;
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get number at string end
-
-   \param[in]  orc_ProposedName Proposal for name
-   \param[out] orc_CutString    String without number
-   \param[out] ors32_Number     Number at end (else -1)
-
-   \created     08.09.2016  STW/M.Echtler
-*/
-//-----------------------------------------------------------------------------
-void C_PuiSdUtil::h_GetNumberAtStringEnd(const C_SCLString & orc_ProposedName, C_SCLString & orc_CutString,
-                                         sint32 & ors32_Number)
-{
-   C_SCLString c_Number;
-   bool q_UnderscoreDetected = false;
-   bool q_NumberDetected = false;
-   uint32 u32_ItStr;
-
-   //Default return
-   orc_CutString = orc_ProposedName;
-   ors32_Number = -1;
-
-   for (u32_ItStr = orc_ProposedName.Length(); u32_ItStr > 0; --u32_ItStr)
-   {
-      if ((orc_ProposedName[u32_ItStr] >= '0') && (orc_ProposedName[u32_ItStr] <= '9'))
-      {
-         //Continue
-         q_NumberDetected = true;
-      }
-      else
-      {
-         if ('_' == orc_ProposedName[u32_ItStr])
-         {
-            q_UnderscoreDetected = true;
-         }
-         //Stop
-         break;
-      }
-   }
-   if ((q_NumberDetected == true) && (q_UnderscoreDetected == true))
-   {
-      //Cut string
-      orc_CutString = orc_ProposedName.SubString(1, u32_ItStr - 1);                    //Without underscore
-      c_Number = orc_ProposedName.SubString(u32_ItStr + 1, orc_ProposedName.Length()); //Without underscore
-      try
-      {
-         ors32_Number = c_Number.ToInt();
-      }
-      catch (...)
-      {
-      }
-   }
 }
 
 //-----------------------------------------------------------------------------

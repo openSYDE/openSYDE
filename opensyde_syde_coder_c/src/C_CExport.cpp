@@ -48,8 +48,7 @@ class C_CExport :
    public C_OsyCodeExportBase
 {
 protected:
-   virtual E_ResultCode m_CreateApplicationCode(const C_OSCNode & orc_Node,
-                                                const uint16 ou16_ApplicationIndex,
+   virtual E_ResultCode m_CreateApplicationCode(const C_OSCNode & orc_Node, const uint16 ou16_ApplicationIndex,
                                                 const C_SCLString & orc_OutputPath,
                                                 std::vector<C_SCLString> & orc_CreatedFiles);
    virtual void m_PrintBanner(void);
@@ -134,21 +133,25 @@ void C_CExport::m_PrintBanner(void)
 sintn main(const sintn osn_Argc, charn * const oapcn_Argv[])
 {
    C_CExport c_TheCExport;
+
    C_CExport::E_ResultCode e_Result;
 
-   c_TheCExport.Init();
+   e_Result = c_TheCExport.Init();
 
-   e_Result = c_TheCExport.ParseCommandLine(osn_Argc, oapcn_Argv);
+   if (e_Result == C_OsyCodeExportBase::eRESULT_OK)
+   {
+      e_Result = c_TheCExport.ParseCommandLine(osn_Argc, oapcn_Argv);
+   }
    if (e_Result == C_OsyCodeExportBase::eRESULT_OK)
    {
       e_Result = c_TheCExport.LoadSystemDefinition();
-      if (e_Result == C_OsyCodeExportBase::eRESULT_OK)
-      {
-         e_Result = c_TheCExport.GenerateSourceCode();
-      }
+   }
+   if (e_Result == C_OsyCodeExportBase::eRESULT_OK)
+   {
+      e_Result = c_TheCExport.GenerateSourceCode();
    }
 
-   c_TheCExport.Exit(e_Result);
+   e_Result = c_TheCExport.Exit(e_Result);
 
    return static_cast<uint8>(e_Result);
 }

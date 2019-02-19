@@ -21,7 +21,6 @@
 #include "ui_C_SdNodeComIfSetupWidget.h"
 #include "constants.h"
 #include "C_GtGetText.h"
-#include "stwerrors.h"
 #include "C_PuiSdHandler.h"
 #include "C_PuiSdUtil.h"
 #include "C_SdUtil.h"
@@ -29,8 +28,6 @@
 #include "C_OgeWiUtil.h"
 
 /* -- Used Namespaces ------------------------------------------------------ */
-
-using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
@@ -361,7 +358,7 @@ bool C_SdNodeComIfSetupWidget::m_CheckDatapoolNumber(void) const
 {
    bool q_Return = false;
    uint32 u32_Counter;
-   const C_OSCNode * const pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOSCNode(mu32_NodeIndex);
+   const C_OSCNode * const pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(mu32_NodeIndex);
 
    if (pc_OscNode != NULL)
    {

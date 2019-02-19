@@ -310,7 +310,10 @@ sint32 TGL_PACKAGE stw_tgl::TGL_FileFind(const C_SCLString & orc_SearchPattern,
    \brief   Append trailing path delimiter
 
    Append path delimiter to path if it does not already end in one.
-   The path separator character can be target specific (e.g. backslash for Windows; slash for Linux)
+   The path separator character can be target specific.
+
+   Here:
+   Windows supports backslash and slash (at least in most scenarios).
 
    \param[in]     orc_Path       path (with or without ending delimiter)
 
@@ -326,7 +329,8 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_FileIncludeTrailingDelimiter(const C_SCLStr
    {
       return "\\";
    }
-   if (orc_Path.operator [](orc_Path.Length()) != '\\')
+   if ((orc_Path.operator [](orc_Path.Length()) != '\\') &&
+       (orc_Path.operator [](orc_Path.Length()) != '/'))
    {
       return orc_Path + "\\";
    }

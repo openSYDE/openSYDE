@@ -1,0 +1,90 @@
+/* --------------------------------------------------------------------- */
+stw_opensyde_gui--C_CamMetTreeView
+{
+border-style: solid;
+border-top-width: 0px;
+border-bottom-width: 1px;
+border-left-width: 0px;
+border-right-width: 0px;
+}
+
+stw_opensyde_gui--C_CamMetTreeView QHeaderView::section
+{
+margin-top: 1px;
+margin-bottom: 1px;
+padding-bottom: 4px;
+padding-top: 2px;
+padding-left: 4px;
+border-style: solid;
+border-top-width: 0px;
+border-bottom-width: 0px;
+border-left-width: 0px;
+border-right-width: 1px;
+}
+
+stw_opensyde_gui--C_CamMetTreeView QHeaderView::section:first
+{
+padding-left: 8px;
+}
+
+stw_opensyde_gui--C_CamMetTreeView QHeaderView
+{
+border-style: solid;
+border-top-width: 1px;
+border-bottom-width: 1px;
+border-left-width: 0px;
+border-right-width: 0px;
+}
+
+stw_opensyde_gui--C_CamMosDatabaseSelectionView,
+stw_opensyde_gui--C_CamMetTreeView
+{
+outline:none;
+}
+
+/* Database selection tree */
+stw_opensyde_gui--C_CamMosDatabaseSelectionView {
+border-style: none;
+}
+
+stw_opensyde_gui--C_CamMosDatabaseSelectionView::item {
+border-style: none;
+margin-top: 3px;
+margin-bottom: 3px;
+}
+
+stw_opensyde_gui--C_CamMosDatabaseSelectionView::branch {
+margin-top:3px;
+margin-bottom:3px;
+}
+
+/* Icons */
+/* closed */
+stw_opensyde_gui--C_CamMetTreeView::branch:has-children:!has-siblings:closed,
+stw_opensyde_gui--C_CamMetTreeView::branch:closed:has-children:has-siblings
+{
+border-image: none;
+image:url(:/images/IconArrowSmallOpen.png);
+}
+
+stw_opensyde_gui--C_CamMosDatabaseSelectionView::branch:has-children:!has-siblings:closed,
+stw_opensyde_gui--C_CamMosDatabaseSelectionView::branch:closed:has-children:has-siblings
+{
+border-image: none;
+image:url(://images/IconArrowSmallOpenBlue.png);
+}
+
+/* open */
+stw_opensyde_gui--C_CamMetTreeView::branch:has-children:!has-siblings:open,
+stw_opensyde_gui--C_CamMetTreeView::branch:open:has-children:has-siblings
+{
+border-image: none;
+image:url(:/images/IconArrowSmallCloseGray.png);
+}
+
+stw_opensyde_gui--C_CamMosDatabaseSelectionView::branch:open:has-children:!has-siblings,
+stw_opensyde_gui--C_CamMosDatabaseSelectionView::branch:open:has-children:has-siblings
+{
+border-image: none;
+image:url(://images/IconArrowSmallClose.png);
+}

@@ -68,14 +68,14 @@ void C_OgeSpxInt64Factor::InterpretValue(void)
    {
       if (this->GetValue().toULongLong() == 0ULL)
       {
-         this->SetValue(1ULL);
+         this->SetValue(1ULL, true);
       }
    }
    else
    {
       if (this->GetValue().toLongLong() == 0LL)
       {
-         this->SetValue(1ULL);
+         this->SetValue(1ULL, true);
       }
    }
 }
@@ -100,7 +100,7 @@ void C_OgeSpxInt64Factor::stepBy(const sintn osn_Steps)
       {
          if (osn_Steps != 0)
          {
-            this->SetValue(1ULL);
+            this->SetValue(1ULL, true);
          }
          else
          {
@@ -114,11 +114,11 @@ void C_OgeSpxInt64Factor::stepBy(const sintn osn_Steps)
       {
          if (osn_Steps > 0)
          {
-            this->SetValue(1LL);
+            this->SetValue(1LL, true);
          }
          else if (osn_Steps < 0)
          {
-            this->SetValue(-1LL);
+            this->SetValue(-1LL, true);
          }
          else
          {

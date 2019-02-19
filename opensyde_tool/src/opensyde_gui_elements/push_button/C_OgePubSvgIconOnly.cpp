@@ -52,12 +52,15 @@ using namespace stw_opensyde_gui_elements;
 C_OgePubSvgIconOnly::C_OgePubSvgIconOnly(QWidget * const opc_Parent) :
    C_OgePubToolTipBase(opc_Parent),
    mq_Hovered(false),
+   mq_Pressed(false),
    mpc_SvgRendererEnabled(NULL),
    mpc_SvgRendererDisabeld(NULL),
    mpc_SvgRendererHovered(NULL),
+   mpc_SvgRendererPressed(NULL),
    mpc_SvgRendererCheckedEnabled(NULL),
    mpc_SvgRendererCheckedDisabeld(NULL),
-   mpc_SvgRendererCheckedHovered(NULL)
+   mpc_SvgRendererCheckedHovered(NULL),
+   mpc_SvgRendererCheckedPressed(NULL)
 {
    this->setAttribute(Qt::WA_Hover, true);
 }
@@ -74,9 +77,11 @@ C_OgePubSvgIconOnly::~C_OgePubSvgIconOnly(void)
    delete (mpc_SvgRendererEnabled);
    delete (mpc_SvgRendererDisabeld);
    delete (mpc_SvgRendererHovered);
+   delete (mpc_SvgRendererPressed);
    delete (mpc_SvgRendererCheckedEnabled);
    delete (mpc_SvgRendererCheckedDisabeld);
    delete (mpc_SvgRendererCheckedHovered);
+   delete (mpc_SvgRendererCheckedPressed);
 }
 
 //-----------------------------------------------------------------------------
@@ -86,16 +91,19 @@ C_OgePubSvgIconOnly::~C_OgePubSvgIconOnly(void)
    \param[in] orc_PathEnabled         New SVG path for enabled state
    \param[in] orc_PathDisabled        New SVG path for disabled state
    \param[in] orc_PathHovered         New SVG path for hovered state
-   \param[in] orc_PathToggledEnabled  New SVG path for enabled and checked state
-   \param[in] orc_PathToggledDisabled New SVG path for disabled and checked state
-   \param[in] orc_PathToggledHovered  New SVG path for hovered and checked stat
+   \param[in] orc_PathCheckedEnabled  New SVG path for enabled and checked state
+   \param[in] orc_PathCheckedDisabled New SVG path for disabled and checked state
+   \param[in] orc_PathCheckedHovered  New SVG path for hovered and checked state
+   \param[in] orc_PathPressed         New SVG path for pressed state
+   \param[in] orc_PathCheckedPressed  New SVG path for pressed and checked state
 
    \created     10.07.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OgePubSvgIconOnly::SetSvg(const QString & orc_PathEnabled, const QString & orc_PathDisabled,
                                  const QString & orc_PathHovered, const QString & orc_PathCheckedEnabled,
-                                 const QString & orc_PathCheckedDisabled, const QString & orc_PathCheckedHovered)
+                                 const QString & orc_PathCheckedDisabled, const QString & orc_PathCheckedHovered,
+                                 const QString & orc_PathPressed, const QString & orc_PathCheckedPressed)
 {
    delete (mpc_SvgRendererEnabled);
    this->mpc_SvgRendererEnabled = new QSvgRenderer(orc_PathEnabled);
@@ -144,6 +152,26 @@ void C_OgePubSvgIconOnly::SetSvg(const QString & orc_PathEnabled, const QString 
    {
       this->mpc_SvgRendererCheckedHovered = NULL;
    }
+
+   delete (mpc_SvgRendererPressed);
+   if (orc_PathPressed.compare("") != 0)
+   {
+      this->mpc_SvgRendererPressed = new QSvgRenderer(orc_PathPressed);
+   }
+   else
+   {
+      this->mpc_SvgRendererPressed = NULL;
+   }
+
+   delete (mpc_SvgRendererCheckedPressed);
+   if (orc_PathCheckedPressed.compare("") != 0)
+   {
+      this->mpc_SvgRendererCheckedPressed = new QSvgRenderer(orc_PathCheckedPressed);
+   }
+   else
+   {
+      this->mpc_SvgRendererCheckedPressed = NULL;
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -169,6 +197,10 @@ void C_OgePubSvgIconOnly::paintEvent(QPaintEvent * const opc_Event)
          {
             this->mpc_SvgRendererCheckedDisabeld->render(&c_Painter, this->rect());
          }
+         else if ((this->mpc_SvgRendererCheckedPressed != NULL) && (this->mq_Pressed == true))
+         {
+            this->mpc_SvgRendererCheckedPressed->render(&c_Painter, this->rect());
+         }
          else if ((this->mpc_SvgRendererCheckedHovered != NULL) && (this->mq_Hovered == true))
          {
             this->mpc_SvgRendererCheckedHovered->render(&c_Painter, this->rect());
@@ -187,6 +219,10 @@ void C_OgePubSvgIconOnly::paintEvent(QPaintEvent * const opc_Event)
          if ((this->mpc_SvgRendererDisabeld != NULL) && (this->isEnabled() == false))
          {
             this->mpc_SvgRendererDisabeld->render(&c_Painter, this->rect());
+         }
+         else if ((this->mpc_SvgRendererPressed != NULL) && (this->mq_Pressed == true))
+         {
+            this->mpc_SvgRendererPressed->render(&c_Painter, this->rect());
          }
          else if ((this->mpc_SvgRendererHovered != NULL) && (this->mq_Hovered == true))
          {
@@ -234,6 +270,18 @@ bool C_OgePubSvgIconOnly::event(QEvent * const opc_Event)
    else if (opc_Event->type() == QEvent::HoverEnter)
    {
       this->mq_Hovered = true;
+   }
+   else if (opc_Event->type() == QEvent::MouseButtonPress)
+   {
+      this->mq_Pressed = true;
+      // Press and release event does not cause a repaint
+      this->repaint();
+   }
+   else if (opc_Event->type() == QEvent::MouseButtonRelease)
+   {
+      this->mq_Pressed = false;
+      //SSI: causes crash of inSYDEview (see open issues list)
+      //this->repaint();
    }
    else
    {

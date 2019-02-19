@@ -23,7 +23,6 @@
 #include <QIcon>
 #include <QLabel>
 #include <QComboBox>
-#include <QFileDialog>
 #include "stwtypes.h"
 #include "C_OSCCanMessage.h"
 #include "C_OSCSystemBus.h"
@@ -56,13 +55,9 @@ public:
                                           const std::vector<stw_types::uint32> & orc_Indices,
                                           const bool oq_NvmSizeInvalid, QString & orc_Heading, QString & orc_Content);
 
-   static std::vector<stw_types::sint32> h_CreateAscendingIndexMap(
-      const std::vector<stw_types::uint32> & orc_UnsortedIndices);
-
    static void h_SortSourceDescending(std::vector<stw_types::uint32> & orc_Source,
                                       std::vector<stw_types::uint32> & orc_Target);
    static bool h_CheckSortedDescending(const std::vector<stw_types::uint32> & orc_Indices);
-   static bool h_CheckSortedAscending(const std::vector<stw_types::uint32> & orc_Indices);
    static void h_SortIndicesAscending(std::vector<stw_types::uint32> & orc_IndicesTmp);
    static stw_types::uint8 h_GetNodeIdMaximum(const stw_types::uint32 & oru32_NodeIndex);
    static stw_types::uint32 h_GetActiveNodeInterface(const QComboBox & orc_ComboBox,
@@ -90,6 +85,8 @@ public:
    static stw_types::uint32 h_GetNextFreeNodeId(
       const std::vector<stw_opensyde_core::C_OSCNodeComInterfaceSettings> & orc_Interfaces,
       const std::vector<stw_types::uint32> & orc_UsedNodeIds, const stw_types::sint32 & ors32_SpecialInterface);
+   static bool h_HasConnectionType(const stw_opensyde_core::C_OSCNode & orc_Node,
+                                   const stw_opensyde_core::C_OSCSystemBus::E_Type oe_Type);
    static bool h_CheckNodeInterfaceAvailable(
       const std::vector<stw_opensyde_core::C_OSCNodeComInterfaceSettings> & orc_ComInterfaces,
       const stw_opensyde_core::C_OSCSystemBus::E_Type & ore_BusType);
@@ -110,10 +107,6 @@ public:
    static QString h_GetToolTipContentSignal(
       const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
       const stw_types::uint32 & oru32_SignalIndex, const QString & orc_AdditionalInformation = "");
-   static QString h_GetSaveFileName(QWidget * const opc_Parent, const QString & orc_Heading,
-                                    const QString & orc_StartingFolder, const QString & orc_Filter,
-                                    const QString & orc_DefaultFileName,
-                                    const QFileDialog::Options oc_Option = QFileDialog::Options());
    template <typename T, typename U>
    static void h_SortIndicesDescendingAndSync(std::vector<stw_types::uint32> & orc_IndicesTmp,
                                               std::vector<T> & orc_OSCContentTmp, std::vector<U> & orc_UIContentTmp);

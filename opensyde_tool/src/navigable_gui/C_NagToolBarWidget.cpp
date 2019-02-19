@@ -131,7 +131,7 @@ C_NagToolBarWidget::~C_NagToolBarWidget()
 //-----------------------------------------------------------------------------
 void C_NagToolBarWidget::InitText(void) const
 {
-   this->mpc_Ui->pc_LineEditSearch->setPlaceholderText(C_GtGetText::h_GetText("Search in System Definition"));
+   this->mpc_Ui->pc_LineEditSearch->setPlaceholderText(C_GtGetText::h_GetText("Search in SYSTEM DEFINITION"));
 }
 
 //-----------------------------------------------------------------------------
@@ -159,6 +159,8 @@ void stw_opensyde_gui::C_NagToolBarWidget::ConfigureButtons(C_NagUseCaseWidget *
            this, &C_NagToolBarWidget::m_ShowBackgroundOfBtn);
    connect(this->mpc_ActUseCaseWidget, &C_NagUseCaseWidget::SigSetIconForUserInputFunc,
            this, &C_NagToolBarWidget::m_SetIconForBtn);
+   connect(this->mpc_ActUseCaseWidget, &C_NagUseCaseWidget::SigSetToolTipForUserInputFunc,
+           this, &C_NagToolBarWidget::m_SetToolTipForBtn);
 
    // get function names
    c_VecFuncs = this->mpc_ActUseCaseWidget->GetVecToolBarFuncNames();
@@ -550,6 +552,30 @@ void C_NagToolBarWidget::m_SetIconForBtn(const uint32 ou32_Index, const QIcon & 
       // set the new icon
       this->mc_VecButtons.at(static_cast<sintn>(sn_Index))->setIcon(orc_Icon);
       this->mc_VecButtons.at(static_cast<sintn>(sn_Index))->setIconSize(mc_ICON_SIZE_24);
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Updates the tool tip of the button
+
+   \param[in]     ou32_Index            Index of button
+   \param[in]     orc_ToolTipHeading    New tool tip heading
+   \param[in]     orc_ToolTipContent    New tool tip content
+
+   \created     06.02.2019  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_NagToolBarWidget::m_SetToolTipForBtn(const uint32 ou32_Index, const QString & orc_ToolTipHeading,
+                                            const QString & orc_ToolTipContent) const
+{
+   const sintn sn_Index = static_cast<sintn>(ou32_Index);
+
+   if (this->mc_VecButtons.size() > sn_Index)
+   {
+      // set the new icon
+      this->mc_VecButtons.at(static_cast<sintn>(sn_Index))->SetToolTipInformation(orc_ToolTipHeading,
+                                                                                  orc_ToolTipContent);
    }
 }
 

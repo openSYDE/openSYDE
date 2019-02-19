@@ -19,8 +19,13 @@
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
 
+#include <iostream>
+
+#include <QElapsedTimer>
+
 #include "stwtypes.h"
 #include "stwerrors.h"
+#include "C_Uti.h"
 #include "TGLFile.h"
 #include "TGLUtils.h"
 #include "constants.h"
@@ -30,7 +35,6 @@
 #include "C_SyvRoRouteCalculation.h"
 #include "C_OSCRoutingCalculation.h"
 #include "C_OSCXMLParser.h"
-#include "C_PuiSdUtil.h"
 #include "C_PuiSdHandler.h"
 
 /* -- Used Namespaces ------------------------------------------------------ */
@@ -395,14 +399,16 @@ sint32 C_PuiSvHandler::SetViewPCConnected(const uint32 ou32_Index, const bool oq
    \created     05.07.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetViewPCCANDll(const uint32 ou32_Index, const QString & orc_DllPath)
+sint32 C_PuiSvHandler::SetViewPCCANDll(const uint32 ou32_Index, const C_PuiSvPc::E_CANDllType oe_Type,
+                                       const QString & orc_DllPath)
 {
    sint32 s32_Retval = C_RANGE;
 
    if (ou32_Index < this->mc_Views.size())
    {
       C_PuiSvData & rc_View = this->mc_Views[ou32_Index];
-      rc_View.SetPCCANDll(orc_DllPath);
+      rc_View.SetPCCANDllType(oe_Type);
+      rc_View.SetPCCANDllPath(orc_DllPath);
 
       s32_Retval = C_NO_ERR;
    }
@@ -1027,7 +1033,7 @@ sint32 C_PuiSvHandler::InsertView(const uint32 ou32_Index, const C_PuiSvData & o
       }
       if (oq_AutoAdaptName == true)
       {
-         c_TmpView.SetName(C_PuiSdUtil::h_GetUniqueName(this->m_GetExistingViewNames(), c_TmpView.GetName()));
+         c_TmpView.SetName(C_Uti::h_GetUniqueNameQ(this->m_GetExistingViewNames(), c_TmpView.GetName()));
       }
       this->mc_Views.insert(this->mc_Views.begin() + ou32_Index, c_TmpView);
    }
@@ -1798,6 +1804,87 @@ sint32 C_PuiSvHandler::SyncDashboardScalingInformation(const uint32 ou32_ViewInd
 
 //-----------------------------------------------------------------------------
 /*!
+   \brief   Update system definition errors
+
+   \created     15.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvHandler::UpdateSystemDefintionErrors(void)
+{
+   const uint32 u32_SysDefHash = C_PuiSdHandler::h_GetInstance()->CalcHashSystemDefinition();
+
+   if (u32_SysDefHash != this->mu32_PreviousSystemDefintionHash)
+   {
+      //Clear! Important!
+      this->mc_SdNodeErrors.clear();
+      this->mc_SdBusErrors.clear();
+      //Node error
+      this->mc_SdNodeErrors.reserve(C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize());
+      for (uint32 u32_ItNode = 0; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize(); ++u32_ItNode)
+      {
+         const bool q_Error = C_PuiSdHandler::h_GetInstance()->CheckNodeConflict(u32_ItNode);
+         this->mc_SdNodeErrors.push_back(q_Error);
+      }
+      //Bus error
+      this->mc_SdBusErrors.reserve(C_PuiSdHandler::h_GetInstance()->GetOSCBusesSize());
+      for (uint32 u32_ItBus = 0; u32_ItBus < C_PuiSdHandler::h_GetInstance()->GetOSCBusesSize(); ++u32_ItBus)
+      {
+         const bool q_Error = C_PuiSdHandler::h_GetInstance()->CheckBusConflict(u32_ItBus);
+         this->mc_SdBusErrors.push_back(q_Error);
+      }
+      //Clear all previous view errors (might have changed with new SD)
+      this->mc_PreviousErrorCheckResults.clear();
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get buffered error for node
+
+   \param[in] ou32_Index Index
+
+   \return
+   Buffered error for node
+
+   \created     15.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+bool C_PuiSvHandler::GetErrorNode(const uint32 ou32_Index) const
+{
+   bool q_Retval = true;
+
+   if (ou32_Index < this->mc_SdNodeErrors.size())
+   {
+      q_Retval = this->mc_SdNodeErrors[ou32_Index];
+   }
+   return q_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get buffered error for bus
+
+   \param[in] ou32_Index Index
+
+   \return
+   Buffered error for bus
+
+   \created     15.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+bool C_PuiSvHandler::GetErrorBus(const uint32 ou32_Index) const
+{
+   bool q_Retval = true;
+
+   if (ou32_Index < this->mc_SdBusErrors.size())
+   {
+      q_Retval = this->mc_SdBusErrors[ou32_Index];
+   }
+   return q_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
    \brief   Check view error
 
    \param[in]     ou32_Index                        View index
@@ -1807,7 +1894,8 @@ sint32 C_PuiSvHandler::SyncDashboardScalingInformation(const uint32 ou32_ViewInd
    \param[in,out] opq_UpdateDisabledButDataBlocks   No interface supports update but there are data blocks
    \param[in,out] opq_SysDefInvalid                 System definition invalid
    \param[in,out] opq_NoNodesActive                 No nodes active
-   \param[in,out] opq_TooManyNodesPerRailConfigured Too many nodes assigned to one rail
+   \param[in,out] opc_RoutingErrorDetails           Error details for routing error if any
+                                                     Warning: only set if routing error checked
 
    \return
    C_NO_ERR Operation success
@@ -1819,17 +1907,30 @@ sint32 C_PuiSvHandler::SyncDashboardScalingInformation(const uint32 ou32_ViewInd
 sint32 C_PuiSvHandler::CheckViewError(const uint32 ou32_Index, bool * const opq_NameInvalid,
                                       bool * const opq_PCNotConnected, bool * const opq_RoutingInvalid,
                                       bool * const opq_UpdateDisabledButDataBlocks, bool * const opq_SysDefInvalid,
-                                      bool * const opq_NoNodesActive,
-                                      bool * const opq_TooManyNodesPerRailConfigured) const
+                                      bool * const opq_NoNodesActive, QString * const opc_RoutingErrorDetails)
 {
    sint32 s32_Retval = C_NO_ERR;
+   QElapsedTimer c_Timer;
+
+   if (mq_TIMING_OUTPUT)
+   {
+      c_Timer.start();
+   }
 
    if (ou32_Index < this->mc_Views.size())
    {
-      const C_PuiSvData & rc_CheckedData = this->mc_Views[ou32_Index];
-      if (opq_NameInvalid != NULL)
+      const uint32 u32_Hash = this->GetViewHash(ou32_Index);
+      const QMap<stw_types::uint32,
+                 C_PuiSvViewErrorDetails>::const_iterator c_It = this->mc_PreviousErrorCheckResults.find(u32_Hash);
+      if (c_It == this->mc_PreviousErrorCheckResults.end())
       {
-         *opq_NameInvalid = false;
+         const C_PuiSvData & rc_CheckedData = this->mc_Views[ou32_Index];
+         C_PuiSvViewErrorDetails c_Details;
+         QString c_Text;
+         bool q_Error = true;
+         const std::vector<uint8> & rc_NodeActiveFlags = rc_CheckedData.GetNodeActiveFlags();
+         //Name check
+         c_Details.q_NameInvalid = false;
          for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
          {
             if (u32_ItView != ou32_Index)
@@ -1837,102 +1938,84 @@ sint32 C_PuiSvHandler::CheckViewError(const uint32 ou32_Index, bool * const opq_
                const C_PuiSvData & rc_CurData = this->mc_Views[u32_ItView];
                if (rc_CurData.GetName().compare(rc_CheckedData.GetName()) == 0)
                {
-                  *opq_NameInvalid = true;
+                  c_Details.q_NameInvalid = true;
                }
             }
          }
-      }
-      if (opq_PCNotConnected != NULL)
-      {
-         *opq_PCNotConnected = !rc_CheckedData.GetPcData().GetConnected();
-      }
-      if (opq_RoutingInvalid != NULL)
-      {
-         QString c_Text;
-         bool q_Error = true;
+         //Check PC connected
+         c_Details.q_PCNotConnected = !rc_CheckedData.GetPcData().GetConnected();
+         //Check all routing details
          tgl_assert(this->CheckRouting(ou32_Index, q_Error, c_Text) == C_NO_ERR);
-         *opq_RoutingInvalid = q_Error;
-      }
-      if (opq_UpdateDisabledButDataBlocks != NULL)
-      {
-         QString c_Text;
-         bool q_Error = true;
+         c_Details.q_RoutingInvalid = q_Error;
+         c_Details.c_RoutingErrorDetails = c_Text;
+         //Check data block issues
          CheckUpdateEnabledForDataBlocks(ou32_Index, q_Error, c_Text);
-         *opq_UpdateDisabledButDataBlocks = q_Error;
-      }
-      if (opq_SysDefInvalid != NULL)
-      {
-         const std::vector<uint8> & rc_NodeActiveFlags = rc_CheckedData.GetNodeActiveFlags();
-         *opq_SysDefInvalid = false;
+         c_Details.q_UpdateDisabledButDataBlocks = q_Error;
+         //Check system definition
+         c_Details.q_SysDefInvalid = false;
          //Node error
          for (uint32 u32_ItNode = 0; u32_ItNode < rc_NodeActiveFlags.size(); ++u32_ItNode)
          {
             if (rc_NodeActiveFlags[u32_ItNode] == true)
             {
-               if (C_PuiSdHandler::h_GetInstance()->CheckNodeConflict(u32_ItNode) == true)
+               if (this->GetErrorNode(u32_ItNode) == true)
                {
-                  *opq_SysDefInvalid = true;
+                  c_Details.q_SysDefInvalid = true;
                   break;
                }
             }
          }
          //Bus error
-         if (*opq_SysDefInvalid == false)
+         if (c_Details.q_SysDefInvalid == false)
          {
             for (uint32 u32_ItBus = 0; u32_ItBus < C_PuiSdHandler::h_GetInstance()->GetOSCBusesSize(); ++u32_ItBus)
             {
                if (this->CheckBusDisabled(ou32_Index, u32_ItBus) == false)
                {
-                  if (C_PuiSdHandler::h_GetInstance()->CheckBusConflict(u32_ItBus) == true)
+                  if (this->GetErrorBus(u32_ItBus) == true)
                   {
-                     *opq_SysDefInvalid = true;
+                     c_Details.q_SysDefInvalid = true;
                      break;
                   }
                }
             }
          }
-      }
-      if (opq_NoNodesActive != NULL)
-      {
-         const std::vector<uint8> & rc_NodeActiveFlags = rc_CheckedData.GetNodeActiveFlags();
-         *opq_NoNodesActive = true;
+         //Check any nodes active
+         c_Details.q_NoNodesActive = true;
          //Node error
          for (uint32 u32_ItNode = 0; u32_ItNode < rc_NodeActiveFlags.size(); ++u32_ItNode)
          {
             if (rc_NodeActiveFlags[u32_ItNode] == true)
             {
-               *opq_NoNodesActive = false;
+               c_Details.q_NoNodesActive = false;
                break;
             }
          }
+
+         //Return error details
+         c_Details.GetResults(opq_NameInvalid, opq_PCNotConnected, opq_RoutingInvalid,
+                              opq_UpdateDisabledButDataBlocks, opq_SysDefInvalid, opq_NoNodesActive,
+                              opc_RoutingErrorDetails);
+         //Store results
+         this->mc_PreviousErrorCheckResults.insert(u32_Hash, c_Details);
       }
-      if (opq_TooManyNodesPerRailConfigured != NULL)
+      else
       {
-         const std::vector<uint8> & rc_NodeActiveFlags = rc_CheckedData.GetNodeActiveFlags();
-         *opq_TooManyNodesPerRailConfigured = false;
-         for (uint32 u32_ItNode = 0; u32_ItNode < rc_NodeActiveFlags.size(); ++u32_ItNode)
-         {
-            if (rc_NodeActiveFlags[u32_ItNode] == true)
-            {
-               const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_ItNode);
-               if (pc_Node != NULL)
-               {
-                  const uint32 u32_ActiveCyclicTransmissionCount = rc_CheckedData.CountCyclicTransmissions(u32_ItNode);
-                  if (u32_ActiveCyclicTransmissionCount >
-                      pc_Node->c_Properties.c_OpenSYDEServerSettings.u8_MaxParallelTransmissions)
-                  {
-                     *opq_TooManyNodesPerRailConfigured = true;
-                     break;
-                  }
-               }
-            }
-         }
+         c_It.value().GetResults(opq_NameInvalid, opq_PCNotConnected, opq_RoutingInvalid,
+                                 opq_UpdateDisabledButDataBlocks, opq_SysDefInvalid, opq_NoNodesActive,
+                                 opc_RoutingErrorDetails);
       }
    }
    else
    {
       s32_Retval = C_RANGE;
    }
+
+   if (mq_TIMING_OUTPUT)
+   {
+      std::cout << "CheckView " << c_Timer.elapsed() << " ms" << &std::endl;
+   }
+
    return s32_Retval;
 }
 
@@ -2254,6 +2337,30 @@ sint32 C_PuiSvHandler::AddViewDashboardParamNewDataPoolElement(const uint32 ou32
       s32_Retval = C_RANGE;
    }
    return s32_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get hash for view
+
+   \param[in] ou32_ViewIndex Index
+
+   \return
+   Hash for view
+
+   \created     22.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+uint32 C_PuiSvHandler::GetViewHash(const uint32 ou32_ViewIndex) const
+{
+   uint32 u32_Retval = 0xFFFFFFFFU;
+
+   if (ou32_ViewIndex < this->mc_Views.size())
+   {
+      const C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
+      rc_View.CalcHash(u32_Retval);
+   }
+   return u32_Retval;
 }
 
 //-----------------------------------------------------------------------------
@@ -2905,14 +3012,65 @@ void C_PuiSvHandler::m_FixInvalidRailConfig(void)
    \created     22.06.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-std::vector<const QString *> C_PuiSvHandler::m_GetExistingViewNames(void) const
+std::map<stw_scl::C_SCLString, bool> C_PuiSvHandler::m_GetExistingViewNames(void) const
 {
-   std::vector<const QString *> c_Retval;
-   c_Retval.reserve(this->mc_Views.size());
+   std::map<stw_scl::C_SCLString, bool> c_Retval;
    for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       const C_PuiSvData & rc_Data = this->mc_Views[u32_ItView];
-      c_Retval.push_back(&rc_Data.GetName());
+      c_Retval[rc_Data.GetName().toStdString().c_str()] = true;
    }
    return c_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   short description of function
+
+   long description of function within several lines
+
+   \param[in]     ou8_Aa         input parameter description
+   \param[out]    opu32_Bb       output parameter description
+   \param[in,out] opu16_Cc       input/output parameter description
+
+   \return
+   possible return value(s) and description
+
+   \created     22.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvHandler::C_PuiSvViewErrorDetails::GetResults(bool * const opq_NameInvalid, bool * const opq_PCNotConnected,
+                                                         bool * const opq_RoutingInvalid,
+                                                         bool * const opq_UpdateDisabledButDataBlocks,
+                                                         bool * const opq_SysDefInvalid, bool * const opq_NoNodesActive,
+                                                         QString * const opc_RoutingErrorDetails) const
+{
+   if (opq_NameInvalid != NULL)
+   {
+      *opq_NameInvalid = this->q_NameInvalid;
+   }
+   if (opq_PCNotConnected != NULL)
+   {
+      *opq_PCNotConnected = this->q_PCNotConnected;
+   }
+   if (opq_RoutingInvalid != NULL)
+   {
+      *opq_RoutingInvalid = this->q_RoutingInvalid;
+      if (opc_RoutingErrorDetails != NULL)
+      {
+         *opc_RoutingErrorDetails = this->c_RoutingErrorDetails;
+      }
+   }
+   if (opq_UpdateDisabledButDataBlocks != NULL)
+   {
+      *opq_UpdateDisabledButDataBlocks = this->q_UpdateDisabledButDataBlocks;
+   }
+   if (opq_SysDefInvalid != NULL)
+   {
+      *opq_SysDefInvalid = this->q_SysDefInvalid;
+   }
+   if (opq_NoNodesActive != NULL)
+   {
+      *opq_NoNodesActive = this->q_NoNodesActive;
+   }
 }

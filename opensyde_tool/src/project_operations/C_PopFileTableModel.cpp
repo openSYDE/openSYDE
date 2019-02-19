@@ -247,7 +247,7 @@ QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const sintn os
                c_ProjectFileInfo.setFile(rc_RecentFilePaths);
                QString c_TooltipContent;
                c_TooltipContent = QString(C_GtGetText::h_GetText("Version: %1 \nAuthor: %2 \nCreated: %3 \n"
-                                                                 "Last Modified: %4 \nUsed openSYDE version: %5")).
+                                                                 "Last modified: %4 \nUsed openSYDE version: %5")).
                                   arg(rc_RecentProjects.c_Version.c_str()).
                                   arg(rc_RecentProjects.c_Author.c_str()).
                                   arg(C_OSCProject::h_GetTimeFormatted(rc_RecentProjects.c_CreationTime).c_str()).

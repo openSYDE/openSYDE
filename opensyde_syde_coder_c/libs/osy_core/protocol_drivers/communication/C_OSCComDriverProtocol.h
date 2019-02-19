@@ -19,6 +19,7 @@
 
 /* -- Includes ------------------------------------------------------------- */
 #include <vector>
+#include <set>
 #include <map>
 #include "stwtypes.h"
 #include "C_OSCRoutingRoute.h"
@@ -52,7 +53,7 @@ public:
                                   const std::vector<stw_types::uint8> & orc_ActiveNodes,
                                   stw_can::C_CAN_Dispatcher * const opc_CanDispatcher,
                                   C_OSCIpDispatcher * const opc_IpDispatcher);
-   stw_types::sint32 SendTesterPresent(void);
+   stw_types::sint32 SendTesterPresent(const std::set<stw_types::uint32> * const opc_SkipNodes = NULL);
    stw_types::sint32 StartRouting(const stw_types::uint32 ou32_NodeIndex,
                                   stw_types::uint32 * const opu32_ErrorNodeIndex = NULL);
    stw_types::sint32 StopRouting(const stw_types::uint32 ou32_NodeIndex);
@@ -122,7 +123,7 @@ protected:
    stw_types::sint32 m_SetNodeSessionId(const stw_types::uint32 ou32_ActiveNode, const stw_types::uint8 ou8_SessionId,
                                         const bool oq_CheckForSession, stw_types::uint8 * const opu8_NrCode) const;
    stw_types::sint32 m_SetNodesSessionId(const stw_types::uint8 ou8_SessionId, const bool oq_CheckForSession,
-                                         std::vector<stw_types::uint32> & orc_DefectNodeIndices) const;
+                                         std::set<stw_types::uint32> & orc_DefectNodeIndices) const;
    stw_types::sint32 m_SetNodeSessionIdWithExpectation(const stw_types::uint32 ou32_ActiveNode,
                                                        const stw_types::uint8 ou8_ExpectedNeededSession) const;
    stw_types::sint32 m_SetNodeSecurityAccess(const stw_types::uint32 ou32_ActiveNode,

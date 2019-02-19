@@ -127,6 +127,22 @@ QString C_SyvDcConnectedNodeWidget::GetDeviceName(void) const
 
 //-----------------------------------------------------------------------------
 /*!
+   \brief   Returns the valid state of the device name
+
+   \return
+   true     Device name is valid
+   false    Device name is not valid
+
+   \created     05.02.2019  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+bool C_SyvDcConnectedNodeWidget::GetDeviceNameValid(void) const
+{
+   return this->mc_Info.q_DeviceNameValid;
+}
+
+//-----------------------------------------------------------------------------
+/*!
    \brief   Compare if widget matches to serial number
 
    \param[in] orc_SerialNumber Serial number

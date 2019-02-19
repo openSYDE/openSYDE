@@ -67,6 +67,7 @@ C_SyvUpProgressLog::C_SyvUpProgressLog(QWidget * const opc_Parent) :
 {
    mpc_Ui->setupUi(this);
    this->mpc_Ui->pc_ScrollArea->DeactivateScrollbarResize();
+   this->mpc_Ui->pc_ScrollAreaWidget->SetBackgroundColor(-1);
 
    //initially disable heading
    this->mpc_Ui->pc_LabelPreview->setVisible(false);

@@ -95,7 +95,6 @@ private:
    void m_BlockDragAndDrop(const bool oq_Block);
 
    bool m_CheckProjectForChanges(void) const;
-   bool m_AskUserToContinue(void);
    void m_PrepareProjectLoad(void);
    void m_CloseAndPrepareProjectLoad(void);
    void m_ProjectLoaded(const bool & orq_SwitchToLastKnownMode);

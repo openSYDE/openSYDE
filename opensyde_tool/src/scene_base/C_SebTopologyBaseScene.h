@@ -21,6 +21,8 @@
 #include <QVector>
 
 #include "C_SebScene.h"
+#include "C_GiLiCANBus.h"
+#include "C_GiLiEthernetBus.h"
 
 #include "C_PuiSdCompleteBusConnectionData.h"
 #include "C_SdManTopologyBusConnectorReconnectManager.h"
@@ -71,6 +73,18 @@ protected:
    virtual C_GiNode * m_CreateNode(const stw_types::sint32 & ors32_Index, const stw_types::uint64 & oru64_ID,
                                    const stw_types::float64 & orf64_Width, const stw_types::float64 & orf64_Height,
                                    QGraphicsItem * const opc_Parent) = 0;
+   virtual C_GiLiCANBus * m_CreateCANBus(const stw_types::sint32 & ors32_Index, const stw_types::uint64 & oru64_ID,
+                                         C_GiTextElementBus * const opc_TextElementName,
+                                         const std::vector<QPointF> * const opc_Points,
+                                         QGraphicsItem * const opc_Parent) = 0;
+   virtual C_GiLiEthernetBus * m_CreateEthernetBus(const stw_types::sint32 & ors32_Index,
+                                                   const stw_types::uint64 & oru64_ID,
+                                                   C_GiTextElementBus * const opc_TextElementName,
+                                                   const std::vector<QPointF> * const opc_Points,
+                                                   QGraphicsItem * const opc_Parent) = 0;
+   virtual C_GiTextElementBus * m_CreateBusTextElement(const stw_types::sint32 & ors32_Index,
+                                                       const stw_types::uint64 & oru64_ID,
+                                                       QGraphicsItem * const opc_Parent) = 0;
 
    virtual void m_AddBusTextElementToScene(C_GiTextElementBus * const opc_Item);
    virtual void m_AddNodeToScene(C_GiNode * const opc_NodeGraphicsItem);

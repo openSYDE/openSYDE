@@ -53,6 +53,9 @@ public:
    bool IsAssigned(void) const;
    void AppendDeviceConfig(std::vector<stw_opensyde_gui_logic::C_SyvDcDeviceConfiguation> & orc_Configs) const;
 
+   void StartDrag(const QString & orc_DeviceName, const bool oq_DeviceNameValid) const;
+   void StopDrag(void) const;
+
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 
@@ -80,6 +83,7 @@ private:
    QString mc_DeviceName;
    static const QString mhc_MimeData;
    static const QString mhc_MimeDataDevice;
+   static const QString mhc_MimeDataDeviceValid;
 
    stw_types::sint32 m_Init(void);
    void m_OnDisconnectRequest(const QString & orc_SerialNumber);

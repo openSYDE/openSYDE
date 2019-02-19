@@ -160,7 +160,7 @@ void C_SdNdeDataPoolListDataSetWidget::InitStaticNames(void) const
    }
    mrc_Parent.SetSubTitle(QString(C_GtGetText::h_GetText("Dataset Configuration")));
    this->mpc_Ui->pc_LabelReplacement->setText(C_GtGetText::h_GetText(
-                                                 "No Dataset is declared, you may add any via the '+' button"));
+                                                 "No Dataset is declared, add any via the '+' button"));
    this->mpc_Ui->pc_PushButtonAdd->SetToolTipInformation(C_GtGetText::h_GetText("Add"), "");
    this->mpc_Ui->pc_PushButtonCopy->SetToolTipInformation(C_GtGetText::h_GetText("Copy"), "");
    this->mpc_Ui->pc_PushButtonCut->SetToolTipInformation(C_GtGetText::h_GetText("Cut"), "");
@@ -314,7 +314,7 @@ void C_SdNdeDataPoolListDataSetWidget::keyPressEvent(QKeyEvent * const opc_Event
 //-----------------------------------------------------------------------------
 void C_SdNdeDataPoolListDataSetWidget::m_InitButtonIcons(void) const
 {
-   // TODO GS svg icons move left and move right; 4 different states
+   // TODO icon states: svg icons move left and move right; 4 different states
    this->mpc_Ui->pc_PushButtonAdd->SetCustomIcons("://images/IconAddEnabled.svg", "://images/IconAddHovered.svg",
                                                   "://images/IconAddClicked.svg", "://images/IconAddDisabled.svg");
    this->mpc_Ui->pc_PushButtonCopy->SetCustomIcons("://images/system_definition/NodeEdit/lists/Copy.svg",

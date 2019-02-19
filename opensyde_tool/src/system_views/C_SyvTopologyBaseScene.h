@@ -49,6 +49,19 @@ protected:
    virtual stw_opensyde_gui_logic::C_SebBaseCopyPasteManager * m_GetCopyPasteManager(void) override;
    virtual const stw_opensyde_gui_logic::C_SebBaseCopyPasteManager * m_GetCopyPasteManagerConst(void) const override;
 
+   virtual C_GiLiCANBus * m_CreateCANBus(const stw_types::sint32 & ors32_Index, const stw_types::uint64 & oru64_ID,
+                                         C_GiTextElementBus * const opc_TextElementName,
+                                         const std::vector<QPointF> * const opc_Points,
+                                         QGraphicsItem * const opc_Parent) override;
+   virtual C_GiLiEthernetBus * m_CreateEthernetBus(const stw_types::sint32 & ors32_Index,
+                                                   const stw_types::uint64 & oru64_ID,
+                                                   C_GiTextElementBus * const opc_TextElementName,
+                                                   const std::vector<QPointF> * const opc_Points,
+                                                   QGraphicsItem * const opc_Parent) override;
+   virtual C_GiTextElementBus * m_CreateBusTextElement(const stw_types::sint32 & ors32_Index,
+                                                       const stw_types::uint64 & oru64_ID,
+                                                       QGraphicsItem * const opc_Parent) override;
+
    virtual void m_AddBusToScene(C_GiLiBus * const opc_BusGraphicsItem) override;
    virtual void m_AddBusConnectorToScene(C_GiLiBusConnector * const opc_BusConnectorGraphicsItem) override;
    virtual void m_AddTextElementToScene(C_GiBiTextElement * const opc_Item) override;

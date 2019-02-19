@@ -238,10 +238,12 @@ void C_SyvManager::DeleteSysView(const uint32 ou32_Index, const sint32 os32_Sele
             }
             else
             {
-               C_SyvUtil::h_GetViewDisplayName(ou32_SelectedIndex - 1UL, os32_SelectedSubMode, c_SubMode, c_SubSubMode);
+               C_SyvUtil::h_GetViewDisplayName(ou32_SelectedIndex - 1UL, os32_SelectedSubMode, c_SubMode,
+                                               c_SubSubMode);
 
                //Flag = 1 -> do not trigger widget prepare to close (has to have happened before this call)
-               Q_EMIT this->SigChangeMode(ms32_MODE_SYSVIEW, os32_SelectedSubMode, ou32_SelectedIndex - 1UL, c_SubMode,
+               Q_EMIT this->SigChangeMode(ms32_MODE_SYSVIEW, os32_SelectedSubMode, ou32_SelectedIndex - 1UL,
+                                          c_SubMode,
                                           c_SubSubMode, 1UL);
             }
          }
@@ -251,7 +253,7 @@ void C_SyvManager::DeleteSysView(const uint32 ou32_Index, const sint32 os32_Sele
    {
       C_OgeWiCustomMessage c_MessageBox(opc_Parent, C_OgeWiCustomMessage::E_Type::eINFORMATION);
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("View delete"));
-      c_MessageBox.SetDescription(C_GtGetText::h_GetText("You can't delete the last view."));
+      c_MessageBox.SetDescription(C_GtGetText::h_GetText("You cannot delete the last view."));
       c_MessageBox.Execute();
    }
 }

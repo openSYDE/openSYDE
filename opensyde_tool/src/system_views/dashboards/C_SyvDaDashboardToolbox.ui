@@ -32,7 +32,7 @@
       <enum>Qt::NoFocus</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="pc_TabWidgets">
       <attribute name="title">
@@ -62,7 +62,7 @@
          <property name="widgetResizable">
           <bool>true</bool>
          </property>
-         <widget class="QWidget" name="pc_ScrollAreaWidgets1_2">
+         <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_ScrollAreaWidgetsWidget">
           <property name="geometry">
            <rect>
             <x>0</x>
@@ -119,7 +119,7 @@
          <property name="widgetResizable">
           <bool>true</bool>
          </property>
-         <widget class="QWidget" name="pc_ScrollAreaFunctionBlocks1_2">
+         <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_ScrollAreaFunctionBlocksWidget">
           <property name="geometry">
            <rect>
             <x>0</x>
@@ -176,7 +176,7 @@
          <property name="widgetResizable">
           <bool>true</bool>
          </property>
-         <widget class="QWidget" name="pc_ScrollAreaWidget2">
+         <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_ScrollAreaDrawingWidget">
           <property name="geometry">
            <rect>
             <x>0</x>
@@ -260,6 +260,12 @@
    <class>stw_opensyde_gui_elements::C_OgeSmoothScrollArea</class>
    <extends>QScrollArea</extends>
    <header>C_OgeSmoothScrollArea.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeWiOnlyBackground</class>
+   <extends>QWidget</extends>
+   <header>C_OgeWiOnlyBackground.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

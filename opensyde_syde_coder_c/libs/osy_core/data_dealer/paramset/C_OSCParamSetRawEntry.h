@@ -27,7 +27,7 @@ namespace stw_opensyde_core
 /* -- Global Constants ----------------------------------------------------- */
 
 /* -- Types ---------------------------------------------------------------- */
-
+///Describes one raw (black box) entry in a parameter set file
 class C_OSCParamSetRawEntry
 {
 public:

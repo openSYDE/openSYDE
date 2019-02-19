@@ -144,7 +144,7 @@ bool C_OSCCanOpenObject::operator <(const C_OSCCanOpenObject & orc_Object) const
    C_NO_ERR    file loaded, content stored in c_Objects
    C_RANGE     file does not exist
    C_CONFIG    could not parse file (is it a valid EDS file ?)
-                use ::GetLastErrorText to get details
+                use GetLastErrorText() to get details
 
    \created     xx.xx.200x  STW/A.Stangl
 */
@@ -162,21 +162,20 @@ sint32 C_OSCCanOpenObjectDictionary::LoadFromFile(const C_SCLString & orc_File)
    }
    else
    {
-      C_SCLIniFile * const pt_IniFile = new C_SCLIniFile(orc_File);
-      s32_Return  = m_AppendEDSBlock("MandatoryObjects", *pt_IniFile);
+      C_SCLIniFile c_IniFile(orc_File);
+      s32_Return = m_AppendEDSBlock("MandatoryObjects", c_IniFile);
       if (s32_Return == C_NO_ERR)
       {
-         s32_Return = m_AppendEDSBlock("OptionalObjects", *pt_IniFile);
+         s32_Return = m_AppendEDSBlock("OptionalObjects", c_IniFile);
       }
       if (s32_Return == C_NO_ERR)
       {
-         s32_Return = m_AppendEDSBlock("ManufacturerObjects", *pt_IniFile);
+         s32_Return = m_AppendEDSBlock("ManufacturerObjects", c_IniFile);
       }
       if (s32_Return != C_NO_ERR)
       {
          s32_Return = C_CONFIG;
       }
-      delete pt_IniFile;
    }
 
    if (s32_Return == C_NO_ERR)

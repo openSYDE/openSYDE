@@ -52,7 +52,7 @@ public:
                      QTreeWidget * const opc_MessageTreeWidget);
    void DoPasteMessages(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                         const std::vector<stw_opensyde_core::C_OSCCanMessage> & orc_Messages,
-                        const std::vector<std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> > & orc_OSCSignalCommons, const std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UISignalCommons, const std::vector<std::vector<C_PuiSdNodeCanSignal> > & orc_UISignals, const std::vector<std::vector<QString> > & orc_OwnerNodeName, const std::vector<std::vector<stw_types::uint32> > & orc_OwnerNodeInterfaceIndex, const std::vector<std::vector<bool> > & orc_OwnerIsTxFlag, C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager, QTreeWidget * const opc_MessageTreeWidget);
+                        const std::vector<std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> > & orc_OSCSignalCommons, const std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UISignalCommons, const std::vector<std::vector<C_PuiSdNodeCanSignal> > & orc_UISignals, const std::vector<std::vector<QString> > & orc_OwnerNodeName, const std::vector<std::vector<stw_types::uint32> > & orc_OwnerNodeInterfaceIndex, const std::vector<std::vector<bool> > & orc_OwnerIsTxFlag, C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager, QTreeWidget * const opc_MessageTreeWidget, std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> & orc_NewIds);
    void DoPasteSignals(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                        const stw_types::uint32 & oru32_SignalIndex,
                        const std::vector<stw_opensyde_core::C_OSCCanSignal> & orc_Signals,
@@ -86,6 +86,13 @@ private:
    QUndoCommand * m_GetDeleteCommand(void);
    static void mh_PatchMessageId(const C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
                                  stw_opensyde_core::C_OSCCanMessage & orc_Message);
+
+   static void mh_HandleLastOwnersValidation(
+      const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
+      const std::vector<QString> & orc_LastOwnerNodeName,
+      const std::vector<stw_types::uint32> & orc_LastOwnerNodeInterfaceIndex,
+      const std::vector<bool> & orc_LastOwnerIsTxFlag, std::vector<QString> & orc_NewOwnerNodeName,
+      std::vector<stw_types::uint32> & orc_NewOwnerNodeInterfaceIndex, std::vector<bool> & orc_NewOwnerIsTxFlag);
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

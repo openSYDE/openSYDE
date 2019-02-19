@@ -69,6 +69,9 @@ private:
    static const stw_types::sintn mhsn_INDEX_DATAPOOL_ELEMENT;
    static const stw_types::sintn mhsn_INDEX_BUS_SIGNAL;
    static stw_types::sint32 mhs32_LastSelectedComboBoxIndex;
+   bool mq_ShowOnlyWriteElements;
+   bool mq_ShowArrayElements;
+   bool mq_Show64BitValues;
 
    void m_OkClicked(void);
    void m_HandleHiding(void) const;

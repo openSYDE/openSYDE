@@ -65,6 +65,7 @@ Q_SIGNALS:
    void SigBusDeleted(const stw_types::uint32 ou32_Index);
    void SigNodeChanged(const stw_types::uint32 ou32_Index);
    void SigBusChanged(const stw_types::uint32 ou32_Index);
+   void SigErrorChange(void);
 
 private:
    //Avoid call

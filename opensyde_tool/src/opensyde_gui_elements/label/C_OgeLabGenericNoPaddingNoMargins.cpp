@@ -87,14 +87,16 @@ void C_OgeLabGenericNoPaddingNoMargins::SetBackgroundColor(const sintn osn_Value
 /*!
    \brief   Set font in pixel
 
-   \param[in] osn_Value   New value
-   \param[in] oq_SemiBold Flag if semibold
+   \param[in] osn_Value    New value
+   \param[in] oq_SemiBold  Flag if semibold
+   \param[in] oq_Bold      Flag if bold
 
    \created     25.07.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-void C_OgeLabGenericNoPaddingNoMargins::SetFontPixel(const sintn osn_Value, const bool oq_SemiBold)
+void C_OgeLabGenericNoPaddingNoMargins::SetFontPixel(const sintn osn_Value, const bool oq_SemiBold, const bool oq_Bold)
 {
    C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Font", osn_Value);
    C_OgeWiUtil::h_ApplyStylesheetProperty(this, "SemiBold", oq_SemiBold);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Bold", oq_Bold);
 }

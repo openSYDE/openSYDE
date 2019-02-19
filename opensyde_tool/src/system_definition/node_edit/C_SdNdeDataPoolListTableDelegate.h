@@ -51,13 +51,11 @@ public:
                       const QModelIndex & orc_Index) const override;
    //lint -restore
 
-   bool SetHoveredRow(const stw_types::sint32 & ors32_Value);
    void SetModel(C_SdNdeDataPoolListTableModel * const opc_Value);
 
+   void SetUndoStack(QUndoStack * const opc_Value);
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
-
-   void SetUndoStack(QUndoStack * const opc_Value);
 
 Q_SIGNALS:
    //lint -restore
@@ -73,7 +71,6 @@ private:
    const QPixmap mc_DisabledPixmapDark;
    const QPixmap mc_DisabledPixmapLight;
    const QPixmap mc_CheckMark;
-   stw_types::sint32 ms32_HoveredRow;
    stw_types::sint32 ms32_EditCount;
    stw_types::sint32 ms32_UndoStartIndex;
    QModelIndex mc_Edit;

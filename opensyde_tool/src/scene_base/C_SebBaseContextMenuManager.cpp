@@ -73,11 +73,11 @@ C_SebBaseContextMenuManager::C_SebBaseContextMenuManager() :
                                                                   "Setup Style"), this,
                                                                &C_SebBaseContextMenuManager::m_SetupStyle);
    this->mpc_ActionBendLine = this->mc_ContextMenu.addAction(C_GtGetText::h_GetText(
-                                                                "Bend Line at Cursor"), this,
+                                                                "Bend Line at cursor"), this,
                                                              &C_SebBaseContextMenuManager::m_BendLine);
 
    this->mpc_ActionRemoveBendLine = this->mc_ContextMenu.addAction(C_GtGetText::h_GetText(
-                                                                      "Straighten Line at Cursor"),
+                                                                      "Straighten line at cursor"),
                                                                    this,
                                                                    &C_SebBaseContextMenuManager::m_RemoveBendLine);
 

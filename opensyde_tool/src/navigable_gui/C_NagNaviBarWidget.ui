@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>290</width>
-    <height>1312</height>
+    <height>795</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -255,7 +255,7 @@
     <number>32</number>
    </property>
    <item>
-    <layout class="QVBoxLayout" name="pc_VerticalLayout" stretch="0,0,0,1000,1,0">
+    <layout class="QVBoxLayout" name="pc_VerticalLayout" stretch="0,0,0,1000,1,0,0">
      <property name="spacing">
       <number>0</number>
      </property>
@@ -364,7 +364,7 @@
       </layout>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeScNaviBar" name="pc_ScrollArea">
+      <widget class="stw_opensyde_gui_elements::C_OgeSaNaviBar" name="pc_ScrollArea">
        <property name="sizeAdjustPolicy">
         <enum>QAbstractScrollArea::AdjustToContents</enum>
        </property>
@@ -376,8 +376,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>286</width>
-          <height>927</height>
+          <width>269</width>
+          <height>374</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="pc_VerticalLayout2" stretch="1,1">
@@ -842,6 +842,76 @@
       </widget>
      </item>
      <item>
+      <widget class="stw_opensyde_gui_elements::C_OgeGbxNavigationSection" name="pc_GroupBoxOpenCanMonitorOutside">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="title">
+        <string/>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_11">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="stw_opensyde_gui_elements::C_OgeGbxNavigationTab" name="pc_GroupBoxOpenCanMonitor">
+          <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="1">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="stw_opensyde_gui_elements::C_OgePubProjAction" name="pc_PushButtonCanMonitor">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>40</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>PushButton</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
       <widget class="stw_opensyde_gui_elements::C_OgeGbxNavigationSection" name="groupBox_3">
        <property name="title">
         <string/>
@@ -947,10 +1017,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxNavigationTab</class>
-   <extends>QGroupBox</extends>
-   <header>C_OgeGbxNavigationTab.h</header>
-   <container>1</container>
+   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgePubProjAction</class>
@@ -958,9 +1027,10 @@
    <header>C_OgePubProjAction.h</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+   <class>stw_opensyde_gui_elements::C_OgeGbxNavigationTab</class>
+   <extends>QGroupBox</extends>
+   <header>C_OgeGbxNavigationTab.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgePubTextOnlyUnderline</class>
@@ -968,9 +1038,9 @@
    <header>C_OgePubTextOnlyUnderline.h</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeScNaviBar</class>
+   <class>stw_opensyde_gui_elements::C_OgeSaNaviBar</class>
    <extends>QScrollArea</extends>
-   <header>C_OgeScNaviBar.h</header>
+   <header>C_OgeSaNaviBar.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

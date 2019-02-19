@@ -20,7 +20,9 @@
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
 
+#include <map>
 #include <algorithm>
+
 #include "stwtypes.h"
 #include "stwerrors.h"
 #include "CSCLString.h"
@@ -497,6 +499,8 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
          bool q_DataPoolNameInvalid;
          bool q_DataPoolListError;
          bool q_ResultError = false;
+         static std::map<std::vector<uint32>, bool> hc_PreviousCommChecks;
+         static std::map<uint32, bool> hc_PreviousCommonChecks;
 
          // check all datapools for errors
          for (u32_Counter = 0U;
@@ -504,68 +508,132 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
               ((q_ResultError == false) || (opc_InvalidDataPoolIndices != NULL));
               ++u32_Counter)
          {
+            const uint32 u32_Hash = this->m_GetDataPoolHash(ou32_NodeIndex, u32_Counter);
             bool q_AlreadyAdded = false;
             bool q_Skip = false;
-            const C_OSCNodeDataPool & rc_DataPool = rc_CheckedNode.c_DataPools[u32_Counter];
             //Com data pool:
             //Exception if bus connected
+            //Note: this error cannot be computed inside the comm datapool as it requires the protocol
+            // which is outside the datapool reach
             if (orq_AllowComDataPoolException == true)
             {
+               const C_OSCNodeDataPool & rc_DataPool = rc_CheckedNode.c_DataPools[u32_Counter];
                if (rc_DataPool.e_Type == C_OSCNodeDataPool::eCOM)
                {
-                  const C_OSCCanProtocol * const pc_Protocol = rc_CheckedNode.GetRelatedCANProtocolConst(u32_Counter);
-                  if (pc_Protocol != NULL)
+                  //Get Hash for all relevant data
+                  const uint32 u32_ProtocolHash = this->m_GetRelatedProtocolHash(ou32_NodeIndex, u32_Counter);
+                  std::map<std::vector<uint32>, bool>::const_iterator c_It;
+                  std::vector<uint32> c_Hashes;
+                  c_Hashes.push_back(u32_Hash);
+                  c_Hashes.push_back(u32_ProtocolHash);
+
+                  //Check if check was already performed in the past
+                  c_It = hc_PreviousCommChecks.find(c_Hashes);
+                  if (c_It == hc_PreviousCommChecks.end())
                   {
-                     //Matching data pool to protocol
-                     for (uint32 u32_ItInterface = 0;
-                          (u32_ItInterface < pc_Protocol->c_ComMessages.size()) &&
-                          ((q_ResultError == false) || (opc_InvalidDataPoolIndices != NULL));
-                          ++u32_ItInterface)
+                     bool q_CurRes = false;
+                     const C_OSCCanProtocol * const pc_Protocol =
+                        rc_CheckedNode.GetRelatedCANProtocolConst(u32_Counter);
+                     if (pc_Protocol != NULL)
                      {
-                        const C_OSCCanMessageContainer & rc_MessageContainer =
-                           pc_Protocol->c_ComMessages[u32_ItInterface];
-                        //only check if not connected to bus
-                        if (rc_MessageContainer.q_IsComProtocolUsedByInterface == false)
+                        //Matching data pool to protocol
+                        for (uint32 u32_ItInterface = 0;
+                             (u32_ItInterface < pc_Protocol->c_ComMessages.size()) &&
+                             ((q_ResultError == false) || (opc_InvalidDataPoolIndices != NULL));
+                             ++u32_ItInterface)
                         {
-                           //Check both lists here
-                           const C_OSCNodeDataPoolList * const pc_TxList = C_OSCCanProtocol::h_GetComListConst(
-                              rc_DataPool, u32_ItInterface, true);
-                           const C_OSCNodeDataPoolList * const pc_RxList = C_OSCCanProtocol::h_GetComListConst(
-                              rc_DataPool, u32_ItInterface, false);
-                           if ((pc_TxList != NULL) && (pc_RxList != NULL))
+                           const C_OSCCanMessageContainer & rc_MessageContainer =
+                              pc_Protocol->c_ComMessages[u32_ItInterface];
+                           //only check if not connected to bus
+                           if (rc_MessageContainer.q_IsComProtocolUsedByInterface == false)
                            {
-                              if (rc_MessageContainer.CheckLocalError(*pc_TxList, *pc_RxList,
-                                                                      C_OSCCanProtocol::
-                                                                      h_GetCANMessageValidSignalsDLCOffset(
-                                                                         pc_Protocol->e_Type)) == true)
+                              //Check both lists here
+                              const C_OSCNodeDataPoolList * const pc_TxList = C_OSCCanProtocol::h_GetComListConst(
+                                 rc_DataPool, u32_ItInterface, true);
+                              const C_OSCNodeDataPoolList * const pc_RxList = C_OSCCanProtocol::h_GetComListConst(
+                                 rc_DataPool, u32_ItInterface, false);
+                              if ((pc_TxList != NULL) && (pc_RxList != NULL))
                               {
-                                 q_ResultError = true;
-                                 q_AlreadyAdded = true;
-                                 if (opc_InvalidDataPoolIndices != NULL)
+                                 if (rc_MessageContainer.CheckLocalError(*pc_TxList, *pc_RxList,
+                                                                         C_OSCCanProtocol::
+                                                                         h_GetCANMessageValidSignalsDLCOffset(
+                                                                            pc_Protocol->e_Type)) == true)
                                  {
-                                    opc_InvalidDataPoolIndices->push_back(u32_Counter);
+                                    q_ResultError = true;
+                                    q_CurRes = true;
+                                    q_AlreadyAdded = true;
+                                    if (opc_InvalidDataPoolIndices != NULL)
+                                    {
+                                       opc_InvalidDataPoolIndices->push_back(u32_Counter);
+                                    }
                                  }
                               }
                            }
                         }
+                     }
+                     //Append for possible reusing this result
+                     hc_PreviousCommChecks[c_Hashes] = q_CurRes;
+                  }
+                  else
+                  {
+                     //Do not reset error
+                     q_ResultError = q_ResultError || c_It->second;
+                     if ((opc_InvalidDataPoolIndices != NULL) && (c_It->second))
+                     {
+                        opc_InvalidDataPoolIndices->push_back(u32_Counter);
                      }
                   }
 
                   q_Skip = true;
                }
             }
+            //Default check
             if ((q_Skip == false) && (q_AlreadyAdded == false))
             {
-               rc_CheckedNode.CheckErrorDataPool(u32_Counter, &q_DataPoolNameConflict, &q_DataPoolNameInvalid,
-                                                 &q_DataPoolListError, NULL);
-
-               if (((q_DataPoolNameConflict == true) || (q_DataPoolNameInvalid == true)) ||
-                   (q_DataPoolListError == true))
+               //Check if check was already performed in the past
+               const std::map<uint32, bool>::const_iterator c_It = hc_PreviousCommonChecks.find(u32_Hash);
+               if (c_It == hc_PreviousCommonChecks.end())
                {
-                  q_ResultError = true;
-                  if (opc_InvalidDataPoolIndices != NULL)
+                  rc_CheckedNode.CheckErrorDataPool(u32_Counter, &q_DataPoolNameConflict, &q_DataPoolNameInvalid,
+                                                    &q_DataPoolListError, NULL);
+
+                  if (((q_DataPoolNameConflict == true) || (q_DataPoolNameInvalid == true)) ||
+                      (q_DataPoolListError == true))
                   {
-                     opc_InvalidDataPoolIndices->push_back(u32_Counter);
+                     q_ResultError = true;
+                     if (opc_InvalidDataPoolIndices != NULL)
+                     {
+                        opc_InvalidDataPoolIndices->push_back(u32_Counter);
+                     }
+                  }
+                  //Append for possible reusing this result (without conflict checks)
+                  if ((q_DataPoolNameInvalid == true) || (q_DataPoolListError == true))
+                  {
+                     hc_PreviousCommonChecks[u32_Hash] = true;
+                  }
+                  else
+                  {
+                     hc_PreviousCommonChecks[u32_Hash] = false;
+                  }
+               }
+               else
+               {
+                  //ALWAYS do datapool name conflict check
+                  rc_CheckedNode.CheckErrorDataPool(u32_Counter, &q_DataPoolNameConflict, NULL, NULL, NULL);
+
+                  if (q_DataPoolNameConflict == true)
+                  {
+                     //Signal datapool conflict error
+                     q_ResultError = true;
+                  }
+                  else
+                  {
+                     //Do not reset error
+                     q_ResultError = q_ResultError || c_It->second;
+                     if ((opc_InvalidDataPoolIndices != NULL) && (c_It->second))
+                     {
+                        opc_InvalidDataPoolIndices->push_back(u32_Counter);
+                     }
                   }
                }
             }
@@ -604,11 +672,11 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
 /*!
    \brief   Check error for bus & connected node data pools
 
-   \param[in]  ou32_BusIndex        Bus index
-   \param[out] opq_NameConflict     Name conflict
-   \param[out] opq_NameInvalid      Name not usable as variable
-   \param[out] opq_IdInvalid        Id out of range
-   \param[out] opq_DataPoolsInvalid An error found for a data pool
+   \param[in]     ou32_BusIndex        Bus index
+   \param[out]    opq_NameConflict     Name conflict
+   \param[out]    opq_NameInvalid      Name not usable as variable
+   \param[out]    opq_IdInvalid        Id out of range
+   \param[out]    opq_DataPoolsInvalid An error found for a data pool
 
    \return
    C_NO_ERR Done
@@ -1410,4 +1478,63 @@ void C_OSCSystemDefinition::AddNode(C_OSCNode & orc_Node)
    orc_Node.pc_DeviceDefinition = C_OSCSystemDefinition::hc_Devices.LookForDevice(orc_Node.c_DeviceType);
    tgl_assert(orc_Node.pc_DeviceDefinition != NULL);
    this->c_Nodes.push_back(orc_Node);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get hash for datapool
+
+   \param[in] ou32_NodeIndex     Node index
+   \param[in] ou32_DataPoolIndex Data pool index
+
+   \return
+   Hash for datapool
+
+   \created     20.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+uint32 C_OSCSystemDefinition::m_GetDataPoolHash(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex) const
+{
+   uint32 u32_Retval = 0xFFFFFFFFUL;
+
+   if (ou32_NodeIndex < this->c_Nodes.size())
+   {
+      const C_OSCNode & rc_Node = this->c_Nodes[ou32_NodeIndex];
+      if (ou32_DataPoolIndex < rc_Node.c_DataPools.size())
+      {
+         const C_OSCNodeDataPool & rc_DataPool = rc_Node.c_DataPools[ou32_DataPoolIndex];
+         rc_DataPool.CalcHash(u32_Retval);
+      }
+   }
+   return u32_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get hash for protocol
+
+   \param[in] ou32_NodeIndex     Node index
+   \param[in] ou32_DataPoolIndex Data pool index
+
+   \return
+   Hash for protocol
+
+   \created     20.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+uint32 C_OSCSystemDefinition::m_GetRelatedProtocolHash(const uint32 ou32_NodeIndex,
+                                                       const uint32 ou32_DataPoolIndex) const
+{
+   uint32 u32_Retval = 0xFFFFFFFFUL;
+
+   if (ou32_NodeIndex < this->c_Nodes.size())
+   {
+      const C_OSCNode & rc_Node = this->c_Nodes[ou32_NodeIndex];
+      const C_OSCCanProtocol * const pc_ProToCol = rc_Node.GetRelatedCANProtocolConst(ou32_DataPoolIndex);
+      if (pc_ProToCol != NULL)
+      {
+         pc_ProToCol->CalcHash(u32_Retval);
+      }
+   }
+   return u32_Retval;
 }

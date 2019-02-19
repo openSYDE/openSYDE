@@ -453,7 +453,7 @@
              <widget class="stw_opensyde_gui::C_SyvUpSummaryWidget" name="pc_WidgetUpdateSummary" native="true">
               <property name="minimumSize">
                <size>
-                <width>320</width>
+                <width>310</width>
                 <height>0</height>
                </size>
               </property>

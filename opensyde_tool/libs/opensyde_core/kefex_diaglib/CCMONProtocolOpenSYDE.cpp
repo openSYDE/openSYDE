@@ -564,7 +564,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_ServiceDataToText(const uint8 * const opu8
             else
             {
                bool q_IsChange = false;
-               switch(opu8_ServiceData[1])
+               switch (opu8_ServiceData[1])
                {
                case 1:
                   c_Text += "cyclic rail1";
@@ -603,7 +603,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_ServiceDataToText(const uint8 * const opu8
                   c_Text += m_DataPoolIdentifierToText(u32_DpIndex, q_IsResponse, ort_CanAddressInformation);
                   if (q_IsChange == true)
                   {
-                     if (ou8_ServiceSize < 8U)
+                     if (ou8_ServiceSize < 6U)
                      {
                         c_Text += " error: DLC too short (no changeDrivenThreshold)";
                      }

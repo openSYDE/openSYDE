@@ -1,0 +1,16 @@
+/* --------------------------------------------------------------------- */
+stw_opensyde_gui_elements--C_OgeLabPopUpTitle
+{
+padding-left:20px;
+padding-top:15px;
+padding-right:0px;
+padding-bottom:15px;
+}
+
+stw_opensyde_gui_elements--C_OgeLabPopUpSubTitle
+{
+padding-left:0px;
+padding-top:15px;
+padding-right:0px;
+padding-bottom:15px;
+}

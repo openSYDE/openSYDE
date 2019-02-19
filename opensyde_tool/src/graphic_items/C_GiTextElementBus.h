@@ -83,11 +83,12 @@ protected:
    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event) override;
    //lint -restore
 
+   bool mq_ErrorIconHovered;
+
 private:
    stw_types::uint32 mu32_BusIndex;
    bool mq_ErrorState;
    bool mq_ErrorResized;
-   bool mq_ErrorIconHovered;
    QPixmap mc_ErrorIcon;
 
    QColor mc_OriginalColor;

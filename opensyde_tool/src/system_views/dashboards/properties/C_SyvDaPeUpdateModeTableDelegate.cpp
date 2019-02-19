@@ -115,7 +115,7 @@ QWidget * C_SyvDaPeUpdateModeTableDelegate::createEditor(QWidget * const opc_Par
       case C_SyvDaPeUpdateModeTableModel::eTHRESHOLD:
          {
             const QVariant c_Data = orc_Index.data(static_cast<sintn>(Qt::EditRole));
-            const QVariant c_Max = orc_Index.data(msn_USER_ROLE_MAXIMUM_VALUE);
+            const QVariant c_Max = orc_Index.data(msn_USER_ROLE_INTERACTION_MAXIMUM_VALUE);
             if (c_Data.type() == QVariant::Type::Double)
             {
                C_OgeSpxFactorTable * const pc_SpinBox = new C_OgeSpxFactorTable(opc_Parent);
@@ -223,7 +223,7 @@ void C_SyvDaPeUpdateModeTableDelegate::setEditorData(QWidget * const opc_Editor,
          }
          if (pc_Int64SpinBox != NULL)
          {
-            pc_Int64SpinBox->SetValue(orc_Index.data(static_cast<sintn>(Qt::EditRole)));
+            pc_Int64SpinBox->SetValue(orc_Index.data(static_cast<sintn>(Qt::EditRole)), false);
          }
          break;
       default:

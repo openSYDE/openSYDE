@@ -51,7 +51,7 @@ private:
    QString mc_ToolTipAdditionalContent;
    stw_opensyde_gui::C_NagToolTip::E_Type me_ToolTipAdditionalType;
 
-   void m_ApplyToolTipInfo(void) const;
+   void m_ApplyToolTipInfo(void);
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

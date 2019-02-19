@@ -39,14 +39,18 @@ public:
                                  stw_opensyde_gui::C_NagToolTip::eDEFAULT);
 
 protected:
-   void m_CreateToolTip(void);
    void m_HideToolTip(void);
+   stw_opensyde_gui::C_NagToolTip * m_GetToolTip(void);
 
-   stw_opensyde_gui::C_NagToolTip * mpc_ToolTip;
    QString mc_ToolTipHeading;
    QString mc_ToolTipContent;
    stw_opensyde_gui::C_NagToolTip::E_Type me_ToolTipType;
    bool mq_ToolTipActive;
+
+private:
+   stw_opensyde_gui::C_NagToolTip * mpc_ToolTip;
+
+   void m_CreateToolTip(void);
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

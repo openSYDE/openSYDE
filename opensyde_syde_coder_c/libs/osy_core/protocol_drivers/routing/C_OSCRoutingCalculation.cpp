@@ -48,6 +48,8 @@ using namespace stw_opensyde_core;
 /*!
    \brief   Default constructor
 
+   Use local only! (uses reference on nodes)
+
    \param[in]     orc_AllNodes         All nodes in the system definition
    \param[in]     orc_ActiveNodes      Flags for all available nodes in the system
    \param[in]     ou32_StartBusIndex   Start bus for the routing
@@ -65,8 +67,8 @@ C_OSCRoutingCalculation::C_OSCRoutingCalculation(const vector<C_OSCNode> & orc_A
    me_Mode(oe_Mode),
    ms32_ResultState(C_COM),
    mq_PcBus(true),
-   mc_AllNodes(orc_AllNodes),
-   mc_ActiveNodes(orc_ActiveNodes)
+   mrc_AllNodes(orc_AllNodes),
+   mrc_ActiveNodes(orc_ActiveNodes)
 {
    this->m_SearchRoute();
 }
@@ -247,7 +249,7 @@ void C_OSCRoutingCalculation::m_SearchRoute(void)
    this->mc_RoutesToTarget.clear();
    this->mc_AllOpenRoutes.clear();
 
-   if (this->mu32_TargetNodeIndex < this->mc_AllNodes.size())
+   if (this->mu32_TargetNodeIndex < this->mrc_AllNodes.size())
    {
       // Is the node configured for update or diagnostic on its connected buses and is connected to a bus
       const sint32 s32_Result = this->m_CheckTargetNodeConfig();
@@ -301,7 +303,7 @@ sint32 C_OSCRoutingCalculation::m_CheckTargetNodeConfig(void) const
    sint32 s32_Return;
    bool q_UsableBusFound = false;
    bool q_MinimumOneFunctionActive = false;
-   const C_OSCNode * const pc_Node = &this->mc_AllNodes[this->mu32_TargetNodeIndex];
+   const C_OSCNode * const pc_Node = &this->mrc_AllNodes[this->mu32_TargetNodeIndex];
    uint32 u32_Counter;
 
    for (u32_Counter = 0U; u32_Counter < pc_Node->c_Properties.c_ComInterfaces.size(); ++u32_Counter)
@@ -374,12 +376,12 @@ void C_OSCRoutingCalculation::m_SearchRoutePointsOnBus(const uint32 ou32_BusInde
    set<uint32>::const_iterator c_ItBusToSearch;
 
    // search all nodes connected to the bus
-   for (u32_NodeCounter = 0U; u32_NodeCounter < this->mc_AllNodes.size(); ++u32_NodeCounter)
+   for (u32_NodeCounter = 0U; u32_NodeCounter < this->mrc_AllNodes.size(); ++u32_NodeCounter)
    {
-      if (this->mc_ActiveNodes[u32_NodeCounter] == 1U)
+      if (this->mrc_ActiveNodes[u32_NodeCounter] == 1U)
       {
          uint32 u32_InItfCounter;
-         const C_OSCNode * const pc_ActNode = &this->mc_AllNodes[u32_NodeCounter];
+         const C_OSCNode * const pc_ActNode = &this->mrc_AllNodes[u32_NodeCounter];
 
          for (u32_InItfCounter = 0U;
               u32_InItfCounter < pc_ActNode->c_Properties.c_ComInterfaces.size();
@@ -428,7 +430,7 @@ vector<uint32> C_OSCRoutingCalculation::m_GetAllRoutePointsOfNodeOnOneInput(cons
                                                                             const uint32 ou32_InItfNumber)
 {
    uint32 u32_OutItfCounter;
-   const C_OSCNode * const pc_ActNode = &this->mc_AllNodes[orc_InPoint.u32_NodeIndex];
+   const C_OSCNode * const pc_ActNode = &this->mrc_AllNodes[orc_InPoint.u32_NodeIndex];
 
    vector<uint32> c_VecBussesToSearch;
    C_OSCRoutingRoutePoint c_Point = orc_InPoint;

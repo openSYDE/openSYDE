@@ -28,6 +28,7 @@
 #include "C_PuiSdHandler.h"
 #include "C_PuiSvHandler.h"
 #include "C_SdNdeDataPoolUtil.h"
+#include "C_SdNdeDataPoolContentUtil.h"
 #include "C_SyvDaPeUpdateModeTableModel.h"
 
 /* -- Used Namespaces ------------------------------------------------------ */
@@ -207,16 +208,16 @@ QVariant C_SyvDaPeUpdateModeTableModel::headerData(const sintn osn_Section, cons
             c_Retval = C_GtGetText::h_GetText("Item number");
             break;
          case eNAME:
-            c_Retval = C_GtGetText::h_GetText("Data element namespace from system definition");
+            c_Retval = C_GtGetText::h_GetText("Data element namespace from SYSTEM DEFINITION");
             break;
          case eVALUE_TYPE:
-            c_Retval = C_GtGetText::h_GetText("Data element value type from system definition");
+            c_Retval = C_GtGetText::h_GetText("Data element value type from SYSTEM DEFINITION");
             break;
          case eARRAY_SIZE:
-            c_Retval = C_GtGetText::h_GetText("Data element array size from system definition");
+            c_Retval = C_GtGetText::h_GetText("Data element array size from SYSTEM DEFINITION");
             break;
          case eDATA_POOL:
-            c_Retval = C_GtGetText::h_GetText("Parent datapool name from system definition");
+            c_Retval = C_GtGetText::h_GetText("Parent Datapool name from SYSTEM DEFINITION");
             break;
          case eTRANSMISSION_MODE:
             c_Retval = C_GtGetText::h_GetText("Used transmission mode:\n"
@@ -227,14 +228,14 @@ QVariant C_SyvDaPeUpdateModeTableModel::headerData(const sintn osn_Section, cons
          case eCYCLIC_INTERVAL:
             c_Retval = C_GtGetText::h_GetText(
                "Fix time interval for transmission.\n"
-               "Only necessary if transmission mode: \"On Change\" or \"Cyclic\"");
+               "Only necessary if transmission mode is \"On Change\" or \"Cyclic\"");
             break;
          case eTHRESHOLD:
             c_Retval = C_GtGetText::h_GetText("Threshold for detected change to trigger a value update.\n"
-                                              "Only necessary if transmission mode: \"On Change\"");
+                                              "Only necessary if transmission mode is \"On Change\"");
             break;
          case eUSAGE:
-            c_Retval = C_GtGetText::h_GetText("Number of items on each dashboard which uses this data element");
+            c_Retval = C_GtGetText::h_GetText("Number of items on each Dashboard which uses this data element");
             break;
          default:
             break;
@@ -402,7 +403,8 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
                case eTHRESHOLD:
                   if (rc_CurConfig.e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_ON_CHANGE)
                   {
-                     c_Retval = C_SdNdeDataPoolUtil::h_DataVariable(rc_CurConfig.c_ChangeThreshold, 0);
+                     c_Retval =
+                        C_SdNdeDataPoolContentUtil::h_ConvertContentToGeneric(rc_CurConfig.c_ChangeThreshold, 0);
                   }
                   else
                   {
@@ -455,7 +457,7 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
                   c_Retval = static_cast<sintn>(rc_CurConfig.u8_RailIndex);
                   break;
                case eTHRESHOLD:
-                  c_Retval = C_SdNdeDataPoolUtil::h_DataVariable(rc_CurConfig.c_ChangeThreshold, 0);
+                  c_Retval = C_SdNdeDataPoolContentUtil::h_ConvertContentToGeneric(rc_CurConfig.c_ChangeThreshold, 0);
                   break;
                default:
                   //Not necessary
@@ -519,7 +521,7 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
             {
                c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
             }
-            else if (osn_Role == msn_USER_ROLE_MAXIMUM_VALUE)
+            else if (osn_Role == msn_USER_ROLE_INTERACTION_MAXIMUM_VALUE)
             {
                //Max requested
                switch (e_Col)
@@ -631,7 +633,8 @@ bool C_SyvDaPeUpdateModeTableModel::setData(const QModelIndex & orc_Index, const
                   rc_CurConfig.u8_RailIndex = static_cast<uint8>(orc_Value.toInt());
                   break;
                case eTHRESHOLD:
-                  C_SdNdeDataPoolUtil::h_SetDataVariable(orc_Value, rc_CurConfig.c_ChangeThreshold, 0);
+                  C_SdNdeDataPoolContentUtil::h_SetDataVariableFromGeneric(orc_Value, rc_CurConfig.c_ChangeThreshold,
+                                                                           0);
                   break;
                default:
                   //No action

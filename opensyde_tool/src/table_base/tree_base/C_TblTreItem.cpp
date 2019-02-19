@@ -92,6 +92,20 @@ void C_TblTreItem::AddChild(C_TblTreItem * const opc_Child)
 
 //-----------------------------------------------------------------------------
 /*!
+   \brief   Handle children space reservation (performance)
+
+   \param[in] ou32_Space Number of items to reserve for
+
+   \created     05.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_TblTreItem::ReserveChildrenSpace(const uint32 ou32_Space)
+{
+   this->c_Children.reserve(ou32_Space);
+}
+
+//-----------------------------------------------------------------------------
+/*!
    \brief   Set child and take ownership
 
    Warning: this will delete the previous item at this position

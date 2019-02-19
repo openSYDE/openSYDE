@@ -78,7 +78,7 @@ void C_HeHandler::CallSpecificHelpPage(const QString & orc_ClassName)
    const QString c_PageName = orc_ClassName;
 
    //Debug helper
-   //std::cout << c_PageName.toStdString().c_str() << std::endl;
+   //std::cout << c_PageName.toStdString().c_str() << &std::endl;
    QMap<QString, QString>::const_iterator c_Page = this->mc_LookUpHelpPageName.find(c_PageName);
    if (c_Page != this->mc_LookUpHelpPageName.end())
    {
@@ -92,7 +92,7 @@ void C_HeHandler::CallSpecificHelpPage(const QString & orc_ClassName)
    {
       if (c_PageSearchName.compare("") == 0)
       {
-         this->mpr_HtmlHelp(GetDesktopWindow(), mh_GetHelpLocation().toStdString().c_str(), HH_DISPLAY_TOPIC, 0);
+         this->mpr_HtmlHelp(GetDesktopWindow(), this->m_GetHelpLocation().toStdString().c_str(), HH_DISPLAY_TOPIC, 0);
       }
       else
       {
@@ -117,7 +117,7 @@ void C_HeHandler::CallSpecificHelpPage(const QString & orc_ClassName)
          //this->mpr_HtmlHelp(GetDesktopWindow(), mh_GetHelpLocation().toStdString().c_str(), HH_DISPLAY_TOPIC, 0);
          //lint -e{923,1924} Required by API interface
          this->mpr_HtmlHelp(GetDesktopWindow(),
-                            mh_GetHelpLocation().toStdString().c_str(), HH_KEYWORD_LOOKUP, (DWORD) &c_Link);
+                            this->m_GetHelpLocation().toStdString().c_str(), HH_KEYWORD_LOOKUP, (DWORD) &c_Link);
          delete[] (pcn_Text);
       }
    }
@@ -154,6 +154,20 @@ bool C_HeHandler::CheckHelpKey(const QKeyEvent * const opc_KeyEvent)
 
 //-----------------------------------------------------------------------------
 /*!
+   \brief   Check help key press
+
+   \param[in] orc_RelPath    Relative path to help file
+
+   \created     06.02.2019  STW/S.Singer
+*/
+//-----------------------------------------------------------------------------
+void C_HeHandler::SetHelpFileRelPath(const QString & orc_RelPath)
+{
+   this->mc_HelpFileRelPath = orc_RelPath;
+}
+
+//-----------------------------------------------------------------------------
+/*!
    \brief   Default constructor
 
    \created     03.11.2016  STW/M.Echtler
@@ -161,6 +175,9 @@ bool C_HeHandler::CheckHelpKey(const QKeyEvent * const opc_KeyEvent)
 //-----------------------------------------------------------------------------
 C_HeHandler::C_HeHandler()
 {
+   //set default path
+   mc_HelpFileRelPath = "/Help/openSYDE PC Tool.chm";
+
    InitSpecialHelpPages();
 
    //Load DLL
@@ -221,6 +238,7 @@ void C_HeHandler::InitSpecialHelpPages(void)
                                       "Node to Node - Connection Setup");
    this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNdeDatapoolProperties", "Datapool Properties");
    this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNdeDataPoolListDataSetWidget", "Datasets");
+   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNdeProgrammingOptions", "Code Generation - Settings");
 
    //System Commissioning
    this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SyvSeSetupWidget", "Setup");
@@ -231,6 +249,12 @@ void C_HeHandler::InitSpecialHelpPages(void)
    this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SyvDaPeUpdateModeConfiguration", "Dashboards Configuration");
    this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SyvDaItPaWriteWidget",
                                       "Parametrization - Write Values to Device");
+   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SyvDcWidget", "Configure Device");
+
+   //openSYDE CAN Monitor
+   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_CamMainWindow", "openSYDE CAN Monitor");
+   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_CamMosFilterPopup", "openSYDE CAN Monitor");
+   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_CamTitleBarWidget", "openSYDE CAN Monitor");
 }
 
 //-----------------------------------------------------------------------------
@@ -240,7 +264,7 @@ void C_HeHandler::InitSpecialHelpPages(void)
    \created     16.05.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-QString C_HeHandler::mh_GetHelpLocation(void)
+QString C_HeHandler::m_GetHelpLocation(void) const
 {
-   return C_Uti::h_GetExePath() + "/Help/openSYDE PC Tool.chm";
+   return C_Uti::h_GetExePath() + mc_HelpFileRelPath;
 }

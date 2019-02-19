@@ -396,7 +396,8 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteChangedValues(
                   }
                }
 
-               if (s32_Return != C_NO_ERR)
+               //Stop if service failure, continue with C_BUSY (don't stop if no elements found in first datapool)
+               if ((s32_Return != C_NO_ERR) && (s32_Return != C_BUSY))
                {
                   // Service failed. Abort writing.
                   break;
@@ -989,8 +990,8 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadParameterValues(const std::vector<C_OS
    C_NO_ERR   data saved
    C_OVERFLOW Wrong sequence of function calls
    C_CONFIG   Internal data invalid
-   C_RD_WR    file already exists
-              could not write to file (e.g. missing write permissions; missing folder)
+   C_BUSY     file already exists
+   C_RD_WR    could not write to file (e.g. missing write permissions; missing folder)
 
    \created     24.10.2017  STW/M.Echtler
 */
@@ -1019,7 +1020,7 @@ sint32 C_OSCDataDealerNvmSafe::h_NvmSafeCreateCleanFileWithoutCRC(const C_SCLStr
    }
    else
    {
-      s32_Retval = C_RD_WR;
+      s32_Retval = C_BUSY;
    }
    return s32_Retval;
 }

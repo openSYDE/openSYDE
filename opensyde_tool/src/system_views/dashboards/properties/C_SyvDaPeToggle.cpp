@@ -179,9 +179,10 @@ void C_SyvDaPeToggle::m_UpdatePreview(void)
    const QSize c_ViewSize = C_SyvDaPeBase::h_GetSceneViewSize();
    C_GiSvDaToggleBase * pc_Item = new C_GiSvDaToggleBase(0UL, 0UL, -1L, 0ULL, NULL);
    const QSizeF c_ItemSize(150.0, 100.0);
+   // 20 =  Vertical center adjustment
    const QPointF c_ItemPos(
       ((static_cast<float64>(c_ViewSize.width()) - c_ItemSize.width()) / 2.0) + (f64_IconOffset / 2.0),
-      (static_cast<float64>(c_ViewSize.height()) - c_ItemSize.height()) / 2.0 + 20.0); // 20 =  Vertical center adjustment
+      ((static_cast<float64>(c_ViewSize.height()) - c_ItemSize.height()) / 2.0) + 20.0);
 
    pc_Item->SetDisplayStyle(this->mrc_ParentDialog.GetTheme(), this->mq_DarkMode);
    pc_Item->UpdateType(this->GetType());

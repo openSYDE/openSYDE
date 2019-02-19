@@ -55,6 +55,7 @@ private:
    static const stw_types::sint32 mhs32_PR_INDEX_DISABLED;
    static const stw_types::sint32 mhs32_PR_INDEX_ENABLED;
 
+   void m_SupportedProtocolChange(void);
    void m_CheckNodeName(void);
    void m_TrimNodeName(void) const;
    void m_RegisterChange(void);

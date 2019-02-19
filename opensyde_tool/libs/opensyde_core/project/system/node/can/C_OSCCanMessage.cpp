@@ -19,6 +19,8 @@
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
 
+#include <map>
+
 #include "C_OSCCanMessage.h"
 #include "CSCLChecksums.h"
 
@@ -96,6 +98,84 @@ void C_OSCCanMessage::CalcHash(uint32 & oru32_HashValue) const
    \param[in]  opc_List                             Node data pool list containing signal data
                                                     (Optional as it is only required by some checks)
    \param[in]  oru32_SignalIndex                    Signal index
+   \param[in]  ou32_CANMessageValidSignalsDLCOffset CAN message DLC offset for valid signal range check
+
+   \return
+   True  Error
+   False No error
+
+   \created     21.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+bool C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_List, const uint32 & oru32_SignalIndex,
+                                       const uint32 ou32_CANMessageValidSignalsDLCOffset) const
+{
+   bool q_Retval;
+   bool q_LayoutConflict;
+   bool q_NameConflict;
+   //Get Hash for all relevant data
+   const std::vector<uint32> c_Hashes = this->m_GetSignalHashes(opc_List, oru32_SignalIndex);
+   static std::map<std::vector<uint32>, bool> hc_PreviousResults;
+   //Check if check was already performed in the past
+   const std::map<std::vector<uint32>, bool>::const_iterator c_It = hc_PreviousResults.find(c_Hashes);
+
+   if (c_It == hc_PreviousResults.end())
+   {
+      bool q_BorderConflict;
+      bool q_NameInvalid;
+      bool q_MinOverMax;
+      bool q_ValueBelowMin;
+      bool q_ValueOverMax;
+      this->CheckErrorSignalDetailed(opc_List, oru32_SignalIndex, &q_LayoutConflict, &q_BorderConflict,
+                                     &q_NameConflict, &q_NameInvalid, &q_MinOverMax, &q_ValueBelowMin,
+                                     &q_ValueOverMax, ou32_CANMessageValidSignalsDLCOffset);
+      if (((((((q_LayoutConflict == false) && (q_BorderConflict == false)) &&
+              (q_NameConflict == false)) &&
+             (q_NameInvalid == false)) && (q_MinOverMax == false)) && (q_ValueBelowMin == false)) &&
+          (q_ValueOverMax == false))
+      {
+         q_Retval = false;
+      }
+      else
+      {
+         q_Retval = true;
+      }
+      //Append for possible reusing this result (without conflict checks)
+      if (((((q_BorderConflict == false) && (q_NameInvalid == false)) && (q_MinOverMax == false)) &&
+           (q_ValueBelowMin == false)) && (q_ValueOverMax == false))
+      {
+         hc_PreviousResults[c_Hashes] = false;
+      }
+      else
+      {
+         hc_PreviousResults[c_Hashes] = true;
+      }
+   }
+   else
+   {
+      //Do separate conflict checks, then reuse previous non conflict value
+      this->CheckErrorSignalDetailed(opc_List, oru32_SignalIndex, &q_LayoutConflict, NULL, &q_NameConflict, NULL, NULL,
+                                     NULL, NULL, ou32_CANMessageValidSignalsDLCOffset);
+      if ((q_NameConflict == true) || (q_LayoutConflict == true))
+      {
+         q_Retval = true;
+      }
+      else
+      {
+         q_Retval = c_It->second;
+      }
+   }
+
+   return q_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Check detailed error for specified signal
+
+   \param[in]  opc_List                             Node data pool list containing signal data
+                                                    (Optional as it is only required by some checks)
+   \param[in]  oru32_SignalIndex                    Signal index
    \param[out] opq_LayoutConflict                   Layout conflict
    \param[out] opq_BorderConflict                   Border not usable as variable
    \param[out] opq_NameConflict                     Name conflict
@@ -108,12 +188,12 @@ void C_OSCCanMessage::CalcHash(uint32 & oru32_HashValue) const
    \created     23.02.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-void C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_List, const uint32 & oru32_SignalIndex,
-                                       bool * const opq_LayoutConflict, bool * const opq_BorderConflict,
-                                       bool * const opq_NameConflict, bool * const opq_NameInvalid,
-                                       bool * const opq_MinOverMax, bool * const opq_ValueBelowMin,
-                                       bool * const opq_ValueOverMax,
-                                       const uint32 ou32_CANMessageValidSignalsDLCOffset) const
+void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * const opc_List,
+                                               const uint32 & oru32_SignalIndex, bool * const opq_LayoutConflict,
+                                               bool * const opq_BorderConflict, bool * const opq_NameConflict,
+                                               bool * const opq_NameInvalid, bool * const opq_MinOverMax,
+                                               bool * const opq_ValueBelowMin, bool * const opq_ValueOverMax,
+                                               const uint32 ou32_CANMessageValidSignalsDLCOffset) const
 {
    if (opq_LayoutConflict != NULL)
    {
@@ -219,4 +299,41 @@ void C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_L
          }
       }
    }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get hashes for signal
+
+   \param[in]  opc_List         Node data pool list containing signal data
+   \param[in] oru32_SignalIndex Signal index
+
+   \return
+   Hashes for signal
+
+   \created     21.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+std::vector<uint32> C_OSCCanMessage::m_GetSignalHashes(const C_OSCNodeDataPoolList * const opc_List,
+                                                       const uint32 & oru32_SignalIndex) const
+{
+   std::vector<uint32> c_Retval;
+   if (opc_List != NULL)
+   {
+      uint32 u32_HashSig = 0xFFFFFFFFUL;
+      uint32 u32_HashSigCo = 0xFFFFFFFFUL;
+      if (oru32_SignalIndex < this->c_Signals.size())
+      {
+         const C_OSCCanSignal & rc_Signal = this->c_Signals[oru32_SignalIndex];
+         rc_Signal.CalcHash(u32_HashSig);
+         if (rc_Signal.u32_ComDataElementIndex < opc_List->c_Elements.size())
+         {
+            const C_OSCNodeDataPoolListElement & rc_Element = opc_List->c_Elements[rc_Signal.u32_ComDataElementIndex];
+            rc_Element.CalcHash(u32_HashSigCo);
+            c_Retval.push_back(u32_HashSig);
+            c_Retval.push_back(u32_HashSigCo);
+         }
+      }
+   }
+   return c_Retval;
 }

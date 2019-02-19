@@ -375,6 +375,8 @@ bool C_GiSvDaSliderBase::CallProperties(void)
             c_Box.c_DataPoolElementsConfig.push_back(c_Tmp);
             c_Box.e_ElementWriteMode = pc_Dialog->GetWriteMode();
 
+            //Force update
+            this->mq_InitialStyleCall = true;
             //Apply
             this->me_WriteMode = pc_Dialog->GetWriteMode();
             this->SetDisplayStyle(this->me_Style, this->mq_DarkMode);

@@ -540,8 +540,7 @@ Qt::ItemFlags C_SdNdeDataPoolListDataSetModel::flags(const QModelIndex & orc_Ind
    {
       const C_SdNdeDataPoolListDataSetModel::E_Rows e_Row = h_RowToEnum(orc_Index.row());
       //Each item
-      c_Retval = QAbstractTableModel::flags(orc_Index) | Qt::ItemIsEnabled | Qt::ItemIsSelectable |
-                 Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+      c_Retval = QAbstractTableModel::flags(orc_Index) | Qt::ItemIsEnabled | Qt::ItemIsSelectable;
       //Add edit
       switch (e_Row)
       {

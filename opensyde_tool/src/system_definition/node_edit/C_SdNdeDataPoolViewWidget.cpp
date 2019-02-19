@@ -102,9 +102,9 @@ C_SdNdeDataPoolViewWidget::C_SdNdeDataPoolViewWidget(QWidget * const opc_Parent)
 
    this->mpc_Ui->pc_BtnMinMaxDbSelector->SetToolTipInformation(C_GtGetText::h_GetText("Switch View"),
                                                                C_GtGetText::h_GetText("Show more or less Datapool "
-                                                                                      "informations."));
+                                                                                      "information."));
 
-   // TODO GS svg icons; 4 different states; also update in m_MinMaxClicked
+   // TODO icon states: svg icons; 4 different states; also update in m_MinMaxClicked
    this->mpc_Ui->pc_BtnMinMaxDbSelector->SetCustomIcons(":images/IconDataPoolSelOpenView.png",
                                                         ":images/IconDataPoolSelOpenView.png",
                                                         ":images/IconDataPoolSelOpenView.png",
@@ -232,8 +232,7 @@ void C_SdNdeDataPoolViewWidget::SetNode(const uint32 ou32_NodeIndex)
             {
                this->mapc_Selectors[s32_Counter]->SetActive(true);
             }
-            this->m_EmitActualDataPool(static_cast<stw_opensyde_core::C_OSCNodeDataPool::E_Type>(s32_Counter),
-                                       u32_RestoredDataPoolTypeIndex);
+            //No emit of selection necessary because datapool selection will trigger the signal implicitly
          }
       }
    }
@@ -363,7 +362,6 @@ void C_SdNdeDataPoolViewWidget::m_MinMaxClicked(void)
                                                            ":images/IconDataPoolSelOpenView.png",
                                                            ":images/IconDataPoolSelOpenView.png",
                                                            ":images/IconDataPoolSelOpenView.png");
-
    }
    else
    {

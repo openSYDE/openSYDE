@@ -88,7 +88,24 @@ C_SdHandlerWidget::C_SdHandlerWidget(QWidget * const opc_Parent) :
    msn_BusEditTabIndex(0),
    ms32_SubMode(-1),
    mu32_Index(0U),
-   mq_DataChanged(false)
+   mq_DataChanged(false),
+   mc_TOOLTIP_GENERAT_CODE_HEADING(C_GtGetText::h_GetText("Generate Code")),
+   mc_TOOLTIP_GENERAT_CODE_CONTENT_SYSDEF(C_GtGetText::h_GetText(
+                                             "Generate Code for all nodes with programming support based on defined SYSTEM DEFINITION."
+                                             "\n - openSYDE server initialization wrapper"
+                                             "\n   Create a .c and .h file providing initialization structures for the OSS DPD and DPH init functions."
+                                             "\n - COMM stack definition"
+                                             "\n   Create a .c and .h file providing entire communication stack configuration."
+                                             "\n - Datapools"
+                                             "\n   Generate code for Datapool settings of an openSYDE node.")),
+   mc_TOOLTIP_GENERAT_CODE_CONTENT_NODE(C_GtGetText::h_GetText(
+                                           "Generate Code for current node based on defined SYSTEM DEFINITION."
+                                           "\n - openSYDE server initialization wrapper"
+                                           "\n   Create a .c and .h file providing initialization structures for the OSS DPD and DPH init functions."
+                                           "\n - COMM stack definition"
+                                           "\n   Create a .c and .h file providing entire communication stack configuration."
+                                           "\n - Datapools"
+                                           "\n   Generate code for Datapool settings of current openSYDE node."))
 {
    sintn sn_Index;
 
@@ -102,6 +119,8 @@ C_SdHandlerWidget::C_SdHandlerWidget(QWidget * const opc_Parent) :
    connect(this->mpc_Topology, &C_SdTopologyWidget::SigChangeMode, this, &C_SdHandlerWidget::SigChangeMode);
    connect(this->mpc_Topology, &C_SdTopologyWidget::SigNodeChanged, this, &C_SdHandlerWidget::m_NodeChanged);
    connect(this->mpc_Topology, &C_SdTopologyWidget::SigBusChanged, this, &C_SdHandlerWidget::m_BusChanged);
+   connect(this->mpc_Topology, &C_SdTopologyWidget::SigErrorChange, this,
+           &C_SdHandlerWidget::m_ErrorChange);
 
    sn_Index = this->mpc_Ui->pc_VerticalLayout->indexOf(this->mpc_Topology);
    this->mpc_Ui->pc_VerticalLayout->setStretch(sn_Index, 1);
@@ -120,14 +139,8 @@ C_SdHandlerWidget::C_SdHandlerWidget(QWidget * const opc_Parent) :
 
    // Function index 1: mhu32_USER_INPUT_FUNC_GENERATE_CODE
    c_ButtonProperties.c_ButtonText = C_GtGetText::h_GetText("Generate Code");
-   c_ButtonProperties.c_ToolTipHeading = C_GtGetText::h_GetText("Generate Code");
-   c_ButtonProperties.c_ToolTipContent = C_GtGetText::h_GetText("Generate Code for nodes with programming support based on defined System Definition."
-                                                                "\n - openSYDE server initialization wrapper"
-                                                                "\n   Create a .c and .h file providing initialization structures for the OSS DPD and DPH init functions."
-                                                                "\n - COMM stack definition"
-                                                                "\n   Create a .c and .h file providing entire communication stack configuration."
-                                                                "\n - Datapools"
-                                                                "\n   Generate code for Datapool settings of an openSYDE node.");
+   c_ButtonProperties.c_ToolTipHeading = mc_TOOLTIP_GENERAT_CODE_HEADING;
+   c_ButtonProperties.c_ToolTipContent = mc_TOOLTIP_GENERAT_CODE_CONTENT_SYSDEF;
    this->mc_VecUserInputFuncNames.append(c_ButtonProperties);
 
    // Function index 2: mhu32_USER_INPUT_FUNC_EXPORT
@@ -138,9 +151,9 @@ C_SdHandlerWidget::C_SdHandlerWidget(QWidget * const opc_Parent) :
    this->mc_VecUserInputFuncNames.append(c_ButtonProperties);
 
    // Function index 3: mhu32_USER_INPUT_FUNC_RTF_EXPORT
-   c_ButtonProperties.c_ButtonText = C_GtGetText::h_GetText("System Definition Report");
-   c_ButtonProperties.c_ToolTipHeading = C_GtGetText::h_GetText("System Definition Report");
-   c_ButtonProperties.c_ToolTipContent = C_GtGetText::h_GetText("Export System Definition as RTF document file.");
+   c_ButtonProperties.c_ButtonText = C_GtGetText::h_GetText("Report");
+   c_ButtonProperties.c_ToolTipHeading = C_GtGetText::h_GetText("Report");
+   c_ButtonProperties.c_ToolTipContent = C_GtGetText::h_GetText("Export the SYSTEM DEFINITION as RTF document file.");
    this->mc_VecUserInputFuncNames.append(c_ButtonProperties);
 }
 
@@ -348,10 +361,10 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
    const QIcon c_IconRtfExport("://images/IconExportRtf.svg");
 
    // set the icons. this can not be done in constructor
-   Q_EMIT this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_APPLY, c_IconSave);
-   Q_EMIT this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE, c_IconCompile);
-   Q_EMIT this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_EXPORT, c_IconExport);
-   Q_EMIT this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_RTF_EXPORT, c_IconRtfExport);
+   Q_EMIT (this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_APPLY, c_IconSave));
+   Q_EMIT (this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE, c_IconCompile));
+   Q_EMIT (this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_EXPORT, c_IconExport));
+   Q_EMIT (this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_RTF_EXPORT, c_IconRtfExport));
 
    // if the submode is topology it can be the initial call or a kind of refresh because
    // of the toolbar, so do it always
@@ -422,9 +435,9 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
       }
 
       //Clean up buttons
-      Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE, false);
-      Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_EXPORT, false);
-      Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_RTF_EXPORT, false);
+      Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE, false));
+      Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_EXPORT, false));
+      Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_RTF_EXPORT, false));
 
       if (os32_SubMode == ms32_SUBMODE_SYSDEF_TOPOLOGY)
       {
@@ -433,8 +446,12 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
             this->mpc_Topology->HideAll(false);
          }
          //Buttons
-         Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE, true);
-         Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_RTF_EXPORT, true);
+         Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE, true));
+         Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_RTF_EXPORT, true));
+
+         Q_EMIT (this->SigSetToolTipForUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE,
+                                                     this->mc_TOOLTIP_GENERAT_CODE_HEADING,
+                                                     this->mc_TOOLTIP_GENERAT_CODE_CONTENT_SYSDEF));
       }
       else if (os32_SubMode == ms32_SUBMODE_SYSDEF_NODEEDIT)
       {
@@ -458,7 +475,10 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
                  &C_SdHandlerWidget::SaveAs);
 
          //Buttons
-         Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE, true);
+         Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE, true));
+         Q_EMIT (this->SigSetToolTipForUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE,
+                                                     this->mc_TOOLTIP_GENERAT_CODE_HEADING,
+                                                     this->mc_TOOLTIP_GENERAT_CODE_CONTENT_NODE));
 
          if (this->mpc_ActNodeEdit != NULL)
          {
@@ -485,7 +505,7 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
          // show button for DBC file export, Ethernet is not supported yet!
          if (pc_Bus->e_Type == C_OSCSystemBus::E_Type::eCAN)
          {
-            Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_EXPORT, true);
+            Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_EXPORT, true));
          }
 
          if (this->mpc_ActBusEdit != NULL)
@@ -776,7 +796,7 @@ void C_SdHandlerWidget::Export(void)
                      C_OgeWiCustomMessage c_ExportWarnings(this, C_OgeWiCustomMessage::E_Type::eWARNING);
                      c_ExportWarnings.SetHeading(C_GtGetText::h_GetText("DBC file export"));
                      c_ExportWarnings.SetDescription(C_GtGetText::h_GetText(
-                                                        "There occurred warning(s) on DBC file export."));
+                                                        "Warnings occurred during DBC file export."));
                      c_ExportWarnings.SetDetails(c_Warnings.GetText().c_str());
                      c_ExportWarnings.Execute();
                   }
@@ -811,7 +831,7 @@ void C_SdHandlerWidget::RtfExport(void)
          c_Message.SetDescription(C_GtGetText::h_GetText("Cannot export RTF file without a valid project path. "
                                                          "Save project to continue."));
          c_Message.SetDetails(C_GtGetText::h_GetText(
-                                 "For RTF file export the System Definition must be saved to disk."));
+                                 "For RTF file export the SYSTEM DEFINITION must be saved to disk."));
          c_Message.Execute();
       }
       else
@@ -898,7 +918,7 @@ void C_SdHandlerWidget::RtfExport(void)
 
                C_OgeWiCustomMessage c_MessageResult(this, C_OgeWiCustomMessage::E_Type::eWARNING);
                c_MessageResult.SetHeading(C_GtGetText::h_GetText("RTF File Export"));
-               c_MessageResult.SetDescription(C_GtGetText::h_GetText("Warning(s) occurred on RTF File Export."));
+               c_MessageResult.SetDescription(C_GtGetText::h_GetText("Warnings occurred on RTF File Export."));
                c_MessageResult.SetDetails(C_GtGetText::h_GetText(c_Details.c_str()));
                c_MessageResult.Execute();
             }
@@ -906,7 +926,7 @@ void C_SdHandlerWidget::RtfExport(void)
             {
                C_OgeWiCustomMessage c_MessageResult(this, C_OgeWiCustomMessage::E_Type::eERROR);
                c_MessageResult.SetHeading(C_GtGetText::h_GetText("RTF File Export"));
-               c_MessageResult.SetDescription(C_GtGetText::h_GetText("Error occurred on RTF File Export."));
+               c_MessageResult.SetDescription(C_GtGetText::h_GetText("RTF file export error occurred."));
                c_MessageResult.SetDetails(C_GtGetText::h_GetText(c_Error.c_str()));
                c_MessageResult.Execute();
             }
@@ -938,7 +958,7 @@ void C_SdHandlerWidget::CallHelp(void)
          stw_opensyde_gui_logic::C_HeHandler::GetInstance().CallSpecificHelpPage(
             "stw_opensyde_gui::C_SdNdeDbViewWidget");
       }
-      else if (this->mpc_ActNodeEdit->GetTabIndex() == 2)//TabIndex == COMM
+      else if (this->mpc_ActNodeEdit->GetTabIndex() == 2) //TabIndex == COMM
       {
          stw_opensyde_gui_logic::C_HeHandler::GetInstance().CallSpecificHelpPage(
             "stw_opensyde_gui::C_SdBueComIfDescriptionWidget");

@@ -21,6 +21,7 @@
 
 #include "stwtypes.h"
 
+#include "C_PuiSvPc.h"
 #include "C_OgePopUpDialog.h"
 
 /* -- Namespace ------------------------------------------------------------ */
@@ -46,9 +47,11 @@ public:
    ~C_SyvSeDllConfigurationDialog();
 
    void InitText() const;
-   void SetDllPath(const QString & orc_Path) const;
-   QString GetDllPath(void) const;
+   void SetDllType(const stw_opensyde_gui_logic::C_PuiSvPc::E_CANDllType oe_Type) const;
+   void SetCustomDllPath(const QString & orc_Path) const;
    void SetBitrate(const stw_types::uint64 ou64_Bitrate);
+   stw_opensyde_gui_logic::C_PuiSvPc::E_CANDllType GetDllType(void) const;
+   QString GetCustomDllPath(void) const;
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
@@ -69,16 +72,14 @@ private:
    void m_OtherDllClicked(void) const;
 
    void m_ShowCustomDllPath(const bool oq_Active) const;
-   static QString mh_GetAbsolutePathFromExe(const QString & orc_Path);
+   void m_OnBrowse(void);
+   QString m_GetAbsoluteDllPath(void) const;
 
    Ui::C_SyvSeDllConfigurationDialog * mpc_Ui;
    //lint -e{1725} Only problematic if copy or assignment is allowed
    stw_opensyde_gui_elements::C_OgePopUpDialog & mrc_ParentDialog;
 
    stw_types::uint64 mu64_Bitrate;
-
-   static const QString mhc_DLL_PATH_PEAK;
-   static const QString mhc_DLL_PATH_VECTOR;
 };
 }
 

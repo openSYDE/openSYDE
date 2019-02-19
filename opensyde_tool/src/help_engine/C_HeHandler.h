@@ -38,16 +38,18 @@ public:
    static C_HeHandler & GetInstance(void);
    void CallSpecificHelpPage(const QString & orc_ClassName);
    static bool CheckHelpKey(const QKeyEvent * const opc_KeyEvent);
+   void SetHelpFileRelPath(const QString & orc_RelPath);
 
 private:
    C_HeHandler();
    virtual ~C_HeHandler();
    void InitSpecialHelpPages(void);
-   static QString mh_GetHelpLocation(void);
+   QString m_GetHelpLocation(void) const;
    static C_HeHandler mhc_Instance;
    QMap<QString, QString> mc_LookUpHelpPageName;
    HINSTANCE mpv_InstHtmlHelp; ///< Pointer for DLL
    PR_HtmlHelp mpr_HtmlHelp;   ///< Function pointer for HtmlHelp
+   QString mc_HelpFileRelPath;
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

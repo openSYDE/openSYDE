@@ -76,21 +76,44 @@ C_OSCExportCommunicationStack::~C_OSCExportCommunicationStack(void)
    Compose target file name for code generation.
 
    \param[in]  ou8_InterfaceIndex      index of interface
-   \param[in]  ore_Protocol            protocol type (CL2, ECeS, ECoS)
-   \param[out] orc_FileName            assembled filename
+   \param[in]  ore_ProtocolType        protocol type (CL2, ECeS, ECoS)
+   \return           assembled filename
 
    \created     20.10.2017  STW/U.Roesch
 */
 //-----------------------------------------------------------------------------
-void C_OSCExportCommunicationStack::h_GetFileName(const uint8 ou8_InterfaceIndex,
-                                                  const C_OSCCanProtocol::E_Type & ore_Protocol,
-                                                  C_SCLString & orc_FileName)
+C_SCLString C_OSCExportCommunicationStack::h_GetFileName(const uint8 ou8_InterfaceIndex,
+                                                         const C_OSCCanProtocol::E_Type & ore_ProtocolType)
 {
    // assemble filename
    // add data pool name + protocol name + node index
-   const C_SCLString c_ProtocolName = mh_GetProtocolNameByType(ore_Protocol).LowerCase();
+   const C_SCLString c_Text = "comm_" + mh_GetProtocolNameByType(ore_ProtocolType).LowerCase() + "_can" +
+                              C_SCLString::IntToStr(ou8_InterfaceIndex + 1L);
 
-   orc_FileName = "comm_" + c_ProtocolName + "_can" + C_SCLString::IntToStr(ou8_InterfaceIndex + 1L);
+   return c_Text;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Return name of configuration structure
+
+   Compose name of configuration structure for code generation.
+
+   \param[in]  ou8_InterfaceIndex      index of interface
+   \param[in]  ore_ProtocolType        protocol type (CL2, ECeS, ECoS)
+
+   \return   assembled configuration structure name
+
+   \created     28.11.2018  STW/A.Stangl
+*/
+//-----------------------------------------------------------------------------
+C_SCLString C_OSCExportCommunicationStack::h_GetConfigurationName(const uint8 ou8_InterfaceIndex,
+                                                                  const C_OSCCanProtocol::E_Type & ore_ProtocolType)
+{
+   const C_SCLString c_Name = "gt_comm_" + mh_GetProtocolNameByType(ore_ProtocolType).LowerCase() + "_can" +
+                              C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + "_ProtocolConfiguration";
+
+   return c_Name;
 }
 
 //-----------------------------------------------------------------------------
@@ -174,7 +197,6 @@ sint32 C_OSCExportCommunicationStack::mh_CreateHeaderFile(const C_SCLString & or
 {
    sint32 s32_Retval;
    C_SCLStringList c_Data;
-   const C_SCLString c_ProtocolName = mh_GetProtocolNameByType(ore_Protocol);
 
    c_Data.Clear();
 
@@ -202,8 +224,8 @@ sint32 C_OSCExportCommunicationStack::mh_CreateHeaderFile(const C_SCLString & or
    c_Data.Append(
       "/* -- Global Variables ---------------------------------------------------------------------------------------------- */");
    c_Data.Append("///Stack configuration");
-   c_Data.Append("extern const T_osy_com_protocol_configuration gt_comm_" +
-                 c_ProtocolName + "_can" + C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + "_ProtocolConfiguration;");
+   c_Data.Append("extern const T_osy_com_protocol_configuration " +
+                 h_GetConfigurationName(ou8_InterfaceIndex, ore_Protocol) + ";");
    c_Data.Append("");
 
    // add function prototypes
@@ -628,8 +650,8 @@ void C_OSCExportCommunicationStack::mh_AddCGlobalVariables(C_SCLStringList & orc
    orc_Data.Append(
       "/* -- Global Variables ---------------------------------------------------------------------------------------------- */");
    orc_Data.Append("///Stack configuration");
-   orc_Data.Append("const T_osy_com_protocol_configuration gt_comm_" + c_ProtocolName +
-                   "_can" + C_SCLString::IntToStr(ou8_InterfaceIndex + 1L) + "_ProtocolConfiguration =");
+   orc_Data.Append("const T_osy_com_protocol_configuration " +
+                   h_GetConfigurationName(ou8_InterfaceIndex, ore_Protocol) + " =");
    orc_Data.Append("{");
    orc_Data.Append("   " + C_SCLString::IntToStr(ou8_InterfaceIndex) + "U,  ///< selected CAN channel");
    orc_Data.Append("   OSY_COM_PROTOCOL_TYPE_" + c_ProtocolName.UpperCase() + ",  ///< protocol type for this stack"
@@ -710,7 +732,7 @@ sint32 C_OSCExportCommunicationStack::mh_SaveToFile(C_SCLStringList & orc_Data, 
    C_SCLString c_FileName;
 
    // assemble filename
-   h_GetFileName(ou8_InterfaceIndex, ore_Protocol, c_FileName);
+   c_FileName = h_GetFileName(ou8_InterfaceIndex, ore_Protocol);
 
    // assemble path and filename
    // add path + add filename + extension

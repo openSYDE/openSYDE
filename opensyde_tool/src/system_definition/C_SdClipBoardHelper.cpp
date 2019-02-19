@@ -944,6 +944,8 @@ sint32 C_SdClipBoardHelper::h_LoadMessages(std::vector<C_OSCCanMessage> & orc_Me
                                              c_CurrentNode2 = c_StringXml.SelectNodeNext("message-parent");
                                           }
                                           while (c_CurrentNode2 == "message-parent");
+                                          //Return
+                                          tgl_assert(c_StringXml.SelectNodeParent() == "message-parents");
                                        }
                                        orc_OwnerNodeName.push_back(c_OwnerNodeName);
                                        orc_OwnerNodeInterfaceIndex.push_back(c_OwnerNodeInterfaceIndex);

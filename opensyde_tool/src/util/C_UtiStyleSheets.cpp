@@ -65,7 +65,6 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollAreaElements(
    "stw_opensyde_gui--C_SyvUpUpdatePackageListWidget",
    "stw_opensyde_gui--C_SyvUpUpdatePackageListNodeWidget",
    "stw_opensyde_gui--C_SyvDaItChartDataSelectorWidget",
-   "stw_opensyde_gui_elements--C_OgeCbxListHeader",
    "stw_opensyde_gui_elements--C_OgeCbxText QAbstractItemView",
    "stw_opensyde_gui_elements--C_OgeSmoothScrollArea",
    "stw_opensyde_gui--C_SdBueNodeSelectorCheckBoxListWidget QAbstractScrollArea",
@@ -77,7 +76,7 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollAreaElements(
    "stw_opensyde_gui--C_SdBueMlvGraphicsView",
    "stw_opensyde_gui_elements--C_OgeDarkScrollArea",
    "stw_opensyde_gui_logic--C_PopFileTableView",
-   "stw_opensyde_gui_elements--C_OgeScNaviBar"
+   "stw_opensyde_gui_elements--C_OgeSaNaviBar"
 }
    );
 //lint -e{36,155}  c++11 feature
@@ -193,7 +192,6 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollBarElementsBright(
    "stw_opensyde_gui--C_SyvDaItChartDataSelectorWidget QScrollBar[Style=\"FLAT_BRIGHT\"]",
    "stw_opensyde_gui--C_SyvDaItChartDataSelectorWidget QScrollBar[Style=\"SKEUOMORPH_BRIGHT\"]",
    "stw_opensyde_gui--C_SyvDaItChartDataSelectorWidget QScrollBar[Style=\"OPENSYDE_2_BRIGHT\"]",
-   "stw_opensyde_gui_elements--C_OgeCbxListHeader QScrollBar",
    "stw_opensyde_gui_elements--C_OgeCbxText QAbstractItemView QScrollBar",
    "stw_opensyde_gui_elements--C_OgeSmoothScrollArea[DarkMode=\"false\"] QScrollBar",
    "stw_opensyde_gui_elements--C_OgeCbxFontProperties QAbstractItemView QScrollBar",
@@ -259,7 +257,7 @@ const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets
 const std::vector<QString> C_UtiStyleSheets::mhc_ScrollBarElementsMainNavi(
 {
    "stw_opensyde_gui_logic--C_PopFileTableView QScrollBar",
-   "stw_opensyde_gui_elements--C_OgeScNaviBar QScrollBar"
+   "stw_opensyde_gui_elements--C_OgeSaNaviBar QScrollBar"
 }
    );
 //lint -e{36,155}  c++11 feature
@@ -315,12 +313,10 @@ QString C_UtiStyleSheets::h_GetStylesheet(void)
    mh_AppendStylesheet("://styles/Font.qss", c_Stylesheet);
    mh_AppendStylesheet("://styles/Frame.qss", c_Stylesheet);
    mh_AppendStylesheet("://styles/GroupBox.qss", c_Stylesheet);
-   mh_AppendStylesheet("://styles/Html.qss", c_Stylesheet);
    mh_AppendStylesheet("://styles/Label.qss", c_Stylesheet);
    mh_AppendStylesheet("://styles/LineEdit.qss", c_Stylesheet);
    mh_AppendStylesheet("://styles/ListWidget.qss", c_Stylesheet);
    mh_AppendStylesheet("://styles/Menu.qss", c_Stylesheet);
-   mh_AppendStylesheet("://styles/Misc.qss", c_Stylesheet);
    mh_AppendStylesheet("://styles/PlainTextEdit.qss", c_Stylesheet);
    mh_AppendStylesheet("://styles/ProgressBar.qss", c_Stylesheet);
    mh_AppendStylesheet("://styles/PushButton.qss", c_Stylesheet);
@@ -329,11 +325,9 @@ QString C_UtiStyleSheets::h_GetStylesheet(void)
    mh_AppendStylesheet("://styles/ScrollBar.qss", c_Stylesheet);
    mh_AppendStylesheet("://styles/Slider.qss", c_Stylesheet);
    mh_AppendStylesheet("://styles/SpinBox.qss", c_Stylesheet);
-   mh_AppendStylesheet("://styles/Splitter.qss", c_Stylesheet);
    mh_AppendStylesheet("://styles/Table.qss", c_Stylesheet);
    mh_AppendStylesheet("://styles/TabWidget.qss", c_Stylesheet);
    mh_AppendStylesheet("://styles/TextEdit.qss", c_Stylesheet);
-   mh_AppendStylesheet("://styles/ToolTip.qss", c_Stylesheet);
    mh_AppendStylesheet("://styles/TreeWidget.qss", c_Stylesheet);
    mh_AppendStylesheet("://styles/Widget.qss", c_Stylesheet);
    mh_AppendStylesheet("://styles/TextBrowser.qss", c_Stylesheet);

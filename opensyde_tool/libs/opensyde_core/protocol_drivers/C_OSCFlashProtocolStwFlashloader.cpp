@@ -97,14 +97,14 @@ C_OSCFlashProtocolStwFlashloader::~C_OSCFlashProtocolStwFlashloader(void)
    \created     12.02.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
-sint32 C_OSCFlashProtocolStwFlashloader::TRG_ReportProgress(const uint16 ou16_Progress1By1000,
+sint32 C_OSCFlashProtocolStwFlashloader::TRG_ReportProgress(const uint16 ou16_Progress1_1000,
                                                             const C_SCLString & orc_AdditionalText)
 {
    sint32 s32_Return = C_NO_ERR;
 
    if (mpr_ReportProgress != NULL)
    {
-      s32_Return = mpr_ReportProgress(mpv_ReportProgressInstance, static_cast<uint8>(ou16_Progress1By1000 / 10U),
+      s32_Return = mpr_ReportProgress(mpv_ReportProgressInstance, static_cast<uint8>(ou16_Progress1_1000 / 10U),
                                       "Information: " + orc_AdditionalText);
    }
    return s32_Return;

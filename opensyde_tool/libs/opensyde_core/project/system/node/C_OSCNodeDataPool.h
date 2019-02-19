@@ -65,11 +65,14 @@ public:
    stw_types::sint32 s32_RelatedDataBlockIndex; ///< Related application index
    ///< -1, No application selected
    ///< Else valid application assumed
-   bool q_IsSafety;                                  ///< Flag if data pool contains safety relevant content
-   stw_types::uint32 u32_NvMStartAddress;            ///< NvM start address of data pool
-   stw_types::uint32 u32_NvMSize;                    ///< NvM size of data pool
-   std::vector<C_OSCNodeDataPoolList> c_Lists;       ///< Data pool lists
+   bool q_IsSafety;                            ///< Flag if data pool contains safety relevant content
+   stw_types::uint32 u32_NvMStartAddress;      ///< NvM start address of data pool
+   stw_types::uint32 u32_NvMSize;              ///< NvM size of data pool
+   std::vector<C_OSCNodeDataPoolList> c_Lists; ///< Data pool lists
+
 private:
+   stw_types::uint32 m_GetElementHash(const stw_types::uint32 ou32_ListIndex,
+                                      const stw_types::uint32 ou32_ElementIndex) const;
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

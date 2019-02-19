@@ -28,7 +28,7 @@
 #include "C_SyvUpUpdatePackageListNodeWidget.h"
 
 #include "TGLUtils.h"
-#include "C_SdUtil.h"
+#include "C_OgeWiUtil.h"
 #include "C_PuiSvHandler.h"
 #include "C_PuiSdHandler.h"
 #include "C_PuiProject.h"
@@ -41,6 +41,7 @@
 #include "C_OSCSuServiceUpdatePackage.h"
 #include "TGLFile.h"
 #include "C_OgeWiCustomMessage.h"
+#include "C_ImpUtil.h"
 
 /* -- Used Namespaces ------------------------------------------------------ */
 using namespace stw_types;
@@ -147,7 +148,8 @@ void C_SyvUpUpdatePackageListWidget::SetViewIndex(const uint32 ou32_ViewIndex)
             {
                if (c_ActiveNodes[u32_NodeUpdateCounter] == true)
                {
-                  const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(u32_NodeUpdateCounter);
+                  const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+                     u32_NodeUpdateCounter);
 
                   if ((pc_Node != NULL) &&
                       (pc_Node->c_Applications.size() > 0))
@@ -544,12 +546,10 @@ void C_SyvUpUpdatePackageListWidget::RemoveAllFiles(void) const
 void C_SyvUpUpdatePackageListWidget::ExportConfig(void)
 {
    const QString c_Folder = this->m_GetDialogPath();
-   QString c_FileName = C_SdUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText(
-                                                       "Export Update Package Configuration"),
-                                                    c_Folder,
-                                                    QString(C_GtGetText::h_GetText(
-                                                               "openSYDE Update Package Configuration File")) +
-                                                    " (*" + mhc_CONFIG_FILE_TYPE + ")", "");
+   QString c_FileName =
+      C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText("Export Update Package Configuration"), c_Folder,
+                                     QString(C_GtGetText::h_GetText("openSYDE Update Package Configuration File")) +
+                                     " (*" + mhc_CONFIG_FILE_TYPE + ")", "");
 
    if (c_FileName != "")
    {
@@ -715,14 +715,14 @@ void C_SyvUpUpdatePackageListWidget::CreateServiceUpdatePackage(void)
    }
 
    c_DefaultFilename += "_ServiceUpdatePackage" + QString(C_OSCSuServiceUpdatePackage::h_GetPackageExtension().c_str());
-   const QString c_FilterName = QString(C_GtGetText::h_GetText("openSYDE service Update Package File")) + " (*" +
+   const QString c_FilterName = QString(C_GtGetText::h_GetText("openSYDE Service Update Package File")) + " (*" +
                                 QString(C_GtGetText::h_GetText(C_OSCSuServiceUpdatePackage::h_GetPackageExtension().
                                                                c_str())) + ")";
    const QString c_Folder = this->m_GetDialogPath();
    const QString c_FullPackagePath =
-      C_SdUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText(
-                                     "Select folder for service Update Package"), c_Folder, c_FilterName,
-                                  c_DefaultFilename);
+      C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText(
+                                        "Select Directory for Service Update Package"), c_Folder, c_FilterName,
+                                     c_DefaultFilename);
 
    // check for user abort (empty string)
    if (c_FullPackagePath != "")
@@ -739,7 +739,7 @@ void C_SyvUpUpdatePackageListWidget::CreateServiceUpdatePackage(void)
          {
             C_OgeWiCustomMessage c_MessageResult(this, C_OgeWiCustomMessage::E_Type::eERROR);
             c_MessageResult.SetHeading(C_GtGetText::h_GetText("Create Service Update Package"));
-            c_MessageResult.SetDescription(C_GtGetText::h_GetText("Could not delete old service Update Package."));
+            c_MessageResult.SetDescription(C_GtGetText::h_GetText("Could not delete old Service Update Package."));
             c_MessageResult.SetDetails(C_GtGetText::h_GetText("Could not delete ") + c_FullPackagePath);
             c_MessageResult.Execute();
 
@@ -876,6 +876,7 @@ sint32 C_SyvUpUpdatePackageListWidget::CheckAllPaths(uint32 & oru32_CountMissing
 
    \param[out]    orc_ApplicationsToWrite Vector with node update configuration
    \param[out]    orc_NodesOrder          Vector with node update order (index is update position, value is node index)
+   \param[out]    opc_AllApplications     Optional vector with all node applications
 
    \return
    C_NO_ERR    Update package with all information created
@@ -887,7 +888,8 @@ sint32 C_SyvUpUpdatePackageListWidget::CheckAllPaths(uint32 & oru32_CountMissing
 */
 //-----------------------------------------------------------------------------
 sint32 C_SyvUpUpdatePackageListWidget::GetUpdatePackage(
-   std::vector<C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite, std::vector<uint32> & orc_NodesOrder) const
+   std::vector<C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite, std::vector<uint32> & orc_NodesOrder,
+   std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> * const opc_AllApplications) const
 {
    sint32 s32_Return = C_NOACT;
    sintn sn_Counter;
@@ -902,6 +904,11 @@ sint32 C_SyvUpUpdatePackageListWidget::GetUpdatePackage(
    // The order position of inactive nodes is not used. Initial value is -1 to differentiate to the active nodes
    orc_NodesOrder.reserve(this->count());
 
+   if (opc_AllApplications != NULL)
+   {
+      *opc_AllApplications = orc_ApplicationsToWrite;
+   }
+
    for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
    {
       QListWidgetItem * const pc_Item = this->item(sn_Counter);
@@ -912,15 +919,21 @@ sint32 C_SyvUpUpdatePackageListWidget::GetUpdatePackage(
       if (pc_WidgetItem != NULL)
       {
          const uint32 u32_NodeIndex = pc_WidgetItem->GetNodeIndex();
-         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(u32_NodeIndex);
+         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
 
          tgl_assert(pc_Node != NULL);
          if (pc_Node != NULL)
          {
             C_OSCSuSequences::C_DoFlash & rc_Flash = orc_ApplicationsToWrite[u32_NodeIndex];
+            C_OSCSuSequences::C_DoFlash * pc_AllApplications = NULL;
+
+            if (opc_AllApplications != NULL)
+            {
+               pc_AllApplications = &((*opc_AllApplications)[u32_NodeIndex]);
+            }
 
             // Add the applications of the node
-            s32_Return = pc_WidgetItem->GetUpdatePackage(rc_Flash);
+            s32_Return = pc_WidgetItem->GetUpdatePackage(rc_Flash, pc_AllApplications);
 
             if (s32_Return == C_NO_ERR)
             {
@@ -1323,31 +1336,31 @@ void C_SyvUpUpdatePackageListWidget::m_AddFileButton(C_SyvUpUpdatePackageListNod
 //-----------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListWidget::m_AddFile(void)
 {
-   Q_EMIT this->SigStartCheck(false);
+   Q_EMIT (this->SigStartCheck(false));
 
    if (this->mpc_SelectedNode != NULL)
    {
       const QString c_ProjectPath = C_PuiProject::h_GetInstance()->GetFolderPath();
       const QString c_Folder = this->m_GetDialogPath();
-      QString c_File = QFileDialog::getOpenFileName(this, C_GtGetText::h_GetText("Get file path"), c_Folder,
+      QString c_File = QFileDialog::getOpenFileName(this, C_GtGetText::h_GetText("Add File"), c_Folder,
                                                     QString(C_GtGetText::h_GetText("All files")) + " (*.*)");
 
       if (c_File != "")
       {
          this->mc_LastPath = TGL_ExtractFilePath(c_File.toStdString().c_str()).c_str();
 
-         // If possible make the path relative
-         if (c_File.contains(c_ProjectPath, Qt::CaseInsensitive) == true)
-         {
-            // Remove project path
-            c_File = c_File.remove(c_ProjectPath, Qt::CaseInsensitive);
-         }
+         // check if relative path is possible and appreciated
+         c_File = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_File, c_ProjectPath);
 
+         // remember path
+         this->mc_LastPath = TGL_ExtractFilePath(c_File.toStdString().c_str()).c_str();
+
+         // add file
          this->mpc_SelectedNode->AddFile(c_File);
       }
    }
 
-   Q_EMIT this->SigStartCheck(true);
+   Q_EMIT (this->SigStartCheck(true));
 }
 
 //-----------------------------------------------------------------------------
@@ -1355,7 +1368,7 @@ void C_SyvUpUpdatePackageListWidget::m_SelectFile(void)
 {
    QString c_Filter = QString(C_GtGetText::h_GetText("All files")) + " (*.*)";
 
-   Q_EMIT this->SigStartCheck(false);
+   Q_EMIT (this->SigStartCheck(false));
 
    if (this->mpc_SelectedNode != NULL)
    {
@@ -1371,7 +1384,7 @@ void C_SyvUpUpdatePackageListWidget::m_SelectFile(void)
          QString c_File = "";
 
          // do not use QFileDialog::getOpenFileName because it does not support default suffix
-         QFileDialog c_Dialog(this, C_GtGetText::h_GetText("Choose file"), c_Folder, c_Filter);
+         QFileDialog c_Dialog(this, C_GtGetText::h_GetText("Select File"), c_Folder, c_Filter);
          if (this->mpc_SelectedNode->IsFileBased() == false)
          {
             c_Dialog.setDefaultSuffix("hex");
@@ -1380,23 +1393,19 @@ void C_SyvUpUpdatePackageListWidget::m_SelectFile(void)
          if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
          {
             c_File = c_Dialog.selectedFiles().at(0); // multi-selection is not possible
-         }
 
-         if (c_File != "")
-         {
+            // remember path
             this->mc_LastPath = TGL_ExtractFilePath(c_File.toStdString().c_str()).c_str();
 
-            // If possible make the path relative
-            if (c_File.contains(c_ProjectPath, Qt::CaseInsensitive) == true)
-            {
-               // Remove project path
-               c_File = c_File.remove(c_ProjectPath, Qt::CaseInsensitive);
-            }
+            // check if relative path is possible and appreciated
+            c_File = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_File, c_ProjectPath);
+
+            // adapt file
             this->m_AdaptFile(c_File);
          }
       }
    }
-   Q_EMIT this->SigStartCheck(true);
+   Q_EMIT (this->SigStartCheck(true));
 }
 
 //-----------------------------------------------------------------------------
@@ -1479,17 +1488,27 @@ void C_SyvUpUpdatePackageListWidget::m_AdaptFile(const QString & orc_Path)
 }
 
 //-----------------------------------------------------------------------------
-QString C_SyvUpUpdatePackageListWidget::m_GetDialogPath(void) const
+QString C_SyvUpUpdatePackageListWidget::m_GetDialogPath(void)
 {
    QString c_Folder;
-   QFileInfo c_File(this->mc_LastPath);
+   QFileInfo c_File;
 
+   // first favorite: path of selected app
+   if (this->mpc_SelectedApp != NULL)
+   {
+      this->mc_LastPath =
+         TGL_ExtractFilePath(this->mpc_SelectedApp->GetAppAbsoluteFilePath().toStdString().c_str()).c_str();
+   }
+
+   c_File.setFile(this->mc_LastPath);
+   // second favorite: last path
    if ((this->mc_LastPath != "") &&
        (c_File.exists() == true) &&
        (c_File.isDir() == true))
    {
       c_Folder = this->mc_LastPath;
    }
+   // third favorite: project path (defaults to exe if project is not saved yet)
    else
    {
       c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath();

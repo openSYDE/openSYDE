@@ -210,23 +210,6 @@ void C_SyvDaItDashboardLabelWidget::resizeEvent(QResizeEvent * const opc_Event)
 
 //-----------------------------------------------------------------------------
 /*!
-   \brief   Overwritten show event slot
-
-   Here: Adapt caption based on value label
-
-   \param[in,out] opc_Event Event identification and information
-
-   \created     11.08.2017  STW/M.Echtler
-*/
-//-----------------------------------------------------------------------------
-void C_SyvDaItDashboardLabelWidget::showEvent(QShowEvent * const opc_Event)
-{
-   QWidget::showEvent(opc_Event);
-   this->AdjustFontToSize();
-}
-
-//-----------------------------------------------------------------------------
-/*!
    \brief   Overwritten paint event slot
 
    Here: draw background

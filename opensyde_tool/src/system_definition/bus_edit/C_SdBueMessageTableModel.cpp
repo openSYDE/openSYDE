@@ -19,6 +19,10 @@
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
 
+#include <iostream>
+
+#include <QElapsedTimer>
+
 #include "stwtypes.h"
 #include "stwerrors.h"
 #include "constants.h"
@@ -453,26 +457,9 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const sin
                            {
                               for (uint32 u32_ItSignal = 0; u32_ItSignal < pc_Message->c_Signals.size(); ++u32_ItSignal)
                               {
-                                 bool q_LayoutConflict;
-                                 bool q_BorderConflict;
-                                 bool q_NameConflict;
-                                 bool q_NameInvalid;
-                                 bool q_MinOverMax;
-                                 bool q_ValueBelowMin;
-                                 bool q_ValueOverMax;
-                                 bool q_SignalValid;
-                                 pc_Message->CheckErrorSignal(pc_List, u32_ItSignal, &q_LayoutConflict,
-                                                              &q_BorderConflict,
-                                                              &q_NameConflict, &q_NameInvalid, &q_MinOverMax,
-                                                              &q_ValueBelowMin, &q_ValueOverMax, C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
-                                                                 rc_MessageId.e_ComProtocol));
-                                 q_SignalValid =
-                                    (((((((q_LayoutConflict == false) && (q_BorderConflict == false)) &&
-                                         (q_NameConflict == false)) &&
-                                        (q_NameInvalid == false)) && (q_MinOverMax == false)) &&
-                                      (q_ValueBelowMin == false)) &&
-                                     (q_ValueOverMax == false));
-                                 if (q_SignalValid == false)
+                                 if (pc_Message->CheckErrorSignal(pc_List, u32_ItSignal,
+                                                                  C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                                                                     rc_MessageId.e_ComProtocol)))
                                  {
                                     q_SignalsValid = false;
                                  }

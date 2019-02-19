@@ -46,7 +46,7 @@ const stw_types::sintn msn_WHITE_EDGE_WIDTH = 100;
 //zoom parameters
 const stw_types::sintn msn_MIN_ZOOM_IN_PERCENT = 10;
 const stw_types::sintn msn_MAX_ZOOM_IN_PERCENT = 1000;
-const stw_types::sintn msn_ZOOM_STEP_IN_PERCENT = 10;
+const stw_types::sintn msn_ZOOM_STEP_IN_PERCENT = 5;
 //Background
 const QColor C_SebGraphicsView::mhc_GradientColorLight = mc_STYLE_GUIDE_COLOR_0;
 const QColor C_SebGraphicsView::mhc_GradientColorDark = mc_STYLE_GUIDE_COLOR_52;

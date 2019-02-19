@@ -24,6 +24,7 @@
 #include "stwerrors.h"
 #include "TGLUtils.h"
 #include "CSCLString.h"
+#include "constants.h"
 #include "C_OSCNodeDataPoolFiler.h"
 #include "C_PuiSvHandlerFiler.h"
 #include "C_PuiBsElementsFiler.h"
@@ -79,10 +80,21 @@ C_PuiSvHandlerFiler::C_PuiSvHandlerFiler(void)
 sint32 C_PuiSvHandlerFiler::h_LoadViews(std::vector<C_PuiSvData> & orc_Views, C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
+   C_SCLString c_CurrentViewNode;
+   uint32 u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+
+   //Check optional length
+   if (q_ExpectedSizeHere == true)
+   {
+      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      orc_Views.reserve(u32_ExpectedSize);
+   }
 
    //Clear last views
    orc_Views.clear();
-   C_SCLString c_CurrentViewNode = orc_XMLParser.SelectNodeChild("opensyde-system-view");
+
+   c_CurrentViewNode = orc_XMLParser.SelectNodeChild("opensyde-system-view");
    if (c_CurrentViewNode == "opensyde-system-view")
    {
       do
@@ -96,6 +108,17 @@ sint32 C_PuiSvHandlerFiler::h_LoadViews(std::vector<C_PuiSvData> & orc_Views, C_
       while ((c_CurrentViewNode == "opensyde-system-view") && (s32_Retval == C_NO_ERR));
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "opensyde-system-views");
+   }
+   //Compare length
+   if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
+   {
+      if (u32_ExpectedSize != orc_Views.size())
+      {
+         C_SCLString c_Tmp;
+         c_Tmp.PrintFormatted("Unexpected view count, expected: %i, got %i", u32_ExpectedSize,
+                              orc_Views.size());
+         osc_write_log_warning("Load file", c_Tmp.c_str());
+      }
    }
 
    return s32_Retval;
@@ -113,6 +136,7 @@ sint32 C_PuiSvHandlerFiler::h_LoadViews(std::vector<C_PuiSvData> & orc_Views, C_
 //-----------------------------------------------------------------------------
 void C_PuiSvHandlerFiler::h_SaveViews(const std::vector<C_PuiSvData> & orc_Views, C_OSCXMLParserBase & orc_XMLParser)
 {
+   orc_XMLParser.SetAttributeUint32("length", orc_Views.size());
    for (uint32 u32_ItView = 0; u32_ItView < orc_Views.size(); ++u32_ItView)
    {
       orc_XMLParser.CreateAndSelectNodeChild("opensyde-system-view");
@@ -485,7 +509,7 @@ sint32 C_PuiSvHandlerFiler::mh_LoadNodeUpdateInformation(std::vector<C_PuiSvNode
 
          do
          {
-            const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(u32_Counter);
+            const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_Counter);
 
             if (pc_Node != NULL)
             {
@@ -523,7 +547,7 @@ sint32 C_PuiSvHandlerFiler::mh_LoadNodeUpdateInformation(std::vector<C_PuiSvNode
 
             do
             {
-               const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(u32_Counter);
+               const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_Counter);
 
                if (pc_Node != NULL)
                {
@@ -816,7 +840,30 @@ sint32 C_PuiSvHandlerFiler::mh_LoadPc(C_PuiSvPc & orc_Pc, C_OSCXMLParserBase & o
                        true);
    if (orc_XMLParser.SelectNodeChild("dll-path") == "dll-path")
    {
-      orc_Pc.SetCANDll(orc_XMLParser.GetNodeContent().c_str());
+      QString c_Path = orc_XMLParser.GetNodeContent().c_str();
+      if (orc_XMLParser.AttributeExists("type"))
+      {
+         orc_Pc.SetCANDllType(static_cast<C_PuiSvPc::E_CANDllType>(orc_XMLParser.GetAttributeSint32("type")));
+      }
+      else
+      {
+         // translate from path to type+path for compatibility reasons (type was not present in old openSYDE versions)
+         if ((c_Path == stw_opensyde_gui::mc_DLL_PATH_PEAK) || (c_Path.isEmpty() == true))
+         {
+            orc_Pc.SetCANDllType(C_PuiSvPc::E_CANDllType::ePEAK);
+            c_Path = "";
+         }
+         else if (c_Path == stw_opensyde_gui::mc_DLL_PATH_VECTOR)
+         {
+            orc_Pc.SetCANDllType(C_PuiSvPc::E_CANDllType::eVECTOR);
+            c_Path = "";
+         }
+         else
+         {
+            orc_Pc.SetCANDllType(C_PuiSvPc::E_CANDllType::eOTHER);
+         }
+      }
+      orc_Pc.SetCustomCANDllPath(c_Path);
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "pc");
    }
@@ -2543,7 +2590,12 @@ void C_PuiSvHandlerFiler::mh_SavePc(const C_PuiSvPc & orc_Pc, C_OSCXMLParserBase
 {
    orc_XMLParser.SetAttributeBool("connected", orc_Pc.GetConnected());
    orc_XMLParser.SetAttributeUint32("bus-index", orc_Pc.GetBusIndex());
-   orc_XMLParser.CreateNodeChild("dll-path", orc_Pc.GetCANDll().toStdString().c_str());
+
+   orc_XMLParser.CreateAndSelectNodeChild("dll-path");
+   orc_XMLParser.SetAttributeSint32("type", static_cast<sint32>(orc_Pc.GetCANDllType()));
+   orc_XMLParser.SetNodeContent(orc_Pc.GetCustomCANDllPath().toStdString().c_str());
+   //Return
+   tgl_assert(orc_XMLParser.SelectNodeParent() == "pc");
    orc_XMLParser.CreateAndSelectNodeChild("box");
    C_PuiBsElementsFiler::h_SaveBoxBase(orc_Pc, orc_XMLParser);
    //Return

@@ -80,8 +80,8 @@ C_SdBueBusEditWidget::C_SdBueBusEditWidget(const uint32 ou32_BusIndex, const sin
    connect(this->mpc_Ui->pc_BusPropertiesWidget, &C_SdBueBusEditPropertiesWidget::SigNameChanged,
            this, &C_SdBueBusEditWidget::SigNameChanged);
 
-   this->me_BusTye = pc_Bus->e_Type;
-   if (this->me_BusTye == stw_opensyde_core::C_OSCSystemBus::eCAN)
+   this->me_BusType = pc_Bus->e_Type;
+   if (this->me_BusType == stw_opensyde_core::C_OSCSystemBus::eCAN)
    {
       stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TabWidgetPageNavi->tabBar(),
                                                                      "LastItemBig", true);
@@ -96,6 +96,7 @@ C_SdBueBusEditWidget::C_SdBueBusEditWidget(const uint32 ou32_BusIndex, const sin
 
       // show the initial tab
       this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(osn_TabIndex);
+      this->m_TabChanged(osn_TabIndex);
    }
    else
    {
@@ -107,6 +108,11 @@ C_SdBueBusEditWidget::C_SdBueBusEditWidget(const uint32 ou32_BusIndex, const sin
                                                                      "OnlyOneItem",
                                                                      true);
    }
+
+   // Connect after setCurrentIndex. The signal will not be sent if the index is not changed, but we need the call
+   // in both cases
+   connect(this->mpc_Ui->pc_TabWidgetPageNavi, &stw_opensyde_gui_elements::C_OgeTawPageNavi::currentChanged,
+           this, &C_SdBueBusEditWidget::m_TabChanged);
 }
 
 //-----------------------------------------------------------------------------
@@ -238,7 +244,7 @@ void C_SdBueBusEditWidget::OpenDetail(const sint32 os32_NodeIndex, const sint32 
                                       const sint32 os32_ListIndex, const sint32 os32_ElementIndex,
                                       const sint32 os32_Flag) const
 {
-   if (this->me_BusTye == stw_opensyde_core::C_OSCSystemBus::eCAN)
+   if (this->me_BusType == stw_opensyde_core::C_OSCSystemBus::eCAN)
    {
       // open the interface description widget
       this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(1);
@@ -267,6 +273,37 @@ void C_SdBueBusEditWidget::m_DataChanged(void)
 {
    this->mq_DataChanged = true;
    Q_EMIT this->SigChanged();
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Slot for tab change of pc_TabWidgetPageNavi
+
+   The not shown widget in the other tab cause a resize of the tab widget itself.
+   This function sets the size policy of all not shown widgets to ignore to achieve that the hided but visible
+   widgets have no impact on the current size of the tab widget.
+   The changed widget of the current tab must be reseted to the preferred size
+
+   \param[in]     osn_Index         Index of selected tab
+
+   \created     23.01.2019  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_SdBueBusEditWidget::m_TabChanged(const sintn osn_Index) const
+{
+   sintn sn_Counter;
+
+   for (sn_Counter = 0; sn_Counter < this->mpc_Ui->pc_TabWidgetPageNavi->count(); ++sn_Counter)
+   {
+      if (sn_Counter != osn_Index)
+      {
+         this->mpc_Ui->pc_TabWidgetPageNavi->widget(sn_Counter)->setSizePolicy(QSizePolicy::Ignored,
+                                                                               QSizePolicy::Ignored);
+      }
+   }
+   this->mpc_Ui->pc_TabWidgetPageNavi->widget(osn_Index)->setSizePolicy(QSizePolicy::Preferred,
+                                                                       QSizePolicy::Preferred);
+   this->mpc_Ui->pc_TabWidgetPageNavi->widget(osn_Index)->adjustSize();
 }
 
 //-----------------------------------------------------------------------------

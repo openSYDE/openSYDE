@@ -304,15 +304,29 @@ sint32 C_OSCTargetSupportPackageFiler::mh_ParseApplication(C_OSCTargetSupportPac
    C_SCLString c_Text;
    C_OSCTSPApplication c_Application;
 
-   // process id
-   if (orc_XMLParser.AttributeExists("process-id") == false)
+   // is-programmable
+   if (orc_XMLParser.AttributeExists("is-programmable") == false)
    {
-      osc_write_log_error("Loading target support package", "XML attribute \"process-id\" not found.");
+      osc_write_log_error("Loading target support package", "XML attribute \"is-programmable\" not found.");
       s32_Return = C_CONFIG;
    }
    else
    {
-      c_Application.u8_ProcessId = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("process-id"));
+      c_Application.q_IsProgrammable = static_cast<bool>(orc_XMLParser.GetAttributeBool("is-programmable"));
+   }
+
+   // process id (required if and only if programmable)
+   if ((s32_Return == C_NO_ERR) && (c_Application.q_IsProgrammable == true))
+   {
+      if (orc_XMLParser.AttributeExists("process-id") == false)
+      {
+         osc_write_log_error("Loading target support package", "XML attribute \"process-id\" not found.");
+         s32_Return = C_CONFIG;
+      }
+      else
+      {
+         c_Application.u8_ProcessId = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("process-id"));
+      }
    }
 
    // display name of application
@@ -363,8 +377,8 @@ sint32 C_OSCTargetSupportPackageFiler::mh_ParseApplication(C_OSCTargetSupportPac
       orc_XMLParser.SelectNodeParent(); //back to parent
    }
 
-   // code generation
-   if (s32_Return == C_NO_ERR)
+   // code generation (required if and only if programmable)
+   if ((s32_Return == C_NO_ERR) && (c_Application.q_IsProgrammable == true))
    {
       c_Text = orc_XMLParser.SelectNodeChild("code-generation");
       if (c_Text != "code-generation")
@@ -433,8 +447,8 @@ sint32 C_OSCTargetSupportPackageFiler::mh_ParseApplication(C_OSCTargetSupportPac
       orc_XMLParser.SelectNodeParent(); //back to parent
    }
 
-   // generate
-   if (s32_Return == C_NO_ERR)
+   // generate (required if and only if programmable)
+   if ((s32_Return == C_NO_ERR) && (c_Application.q_IsProgrammable == true))
    {
       c_Text = orc_XMLParser.SelectNodeChild("generate");
       if (c_Text != "generate")

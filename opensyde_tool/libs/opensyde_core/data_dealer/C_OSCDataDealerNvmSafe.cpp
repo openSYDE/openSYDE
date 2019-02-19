@@ -396,7 +396,8 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteChangedValues(
                   }
                }
 
-               if (s32_Return != C_NO_ERR)
+               //Stop if service failure, continue with C_BUSY (don't stop if no elements found in first datapool)
+               if ((s32_Return != C_NO_ERR) && (s32_Return != C_BUSY))
                {
                   // Service failed. Abort writing.
                   break;

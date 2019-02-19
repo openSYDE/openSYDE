@@ -633,6 +633,7 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeHex(const stw_hex_file::C_HexData
             orc_HexDataDump.at_Blocks[s32_Area].u32_AddressOffset,
             orc_HexDataDump.at_Blocks[s32_Area].au8_Data.GetLength(),
             u32_MaxBlockLength, &u8_NrCode);
+
          if (s32_Return != C_NO_ERR)
          {
             C_SCLString c_Error;
@@ -674,7 +675,7 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeHex(const stw_hex_file::C_HexData
             }
             else
             {
-               if (u32_RemainingBytes > u32_MaxBlockLength)
+               if (u32_RemainingBytes > (u32_MaxBlockLength - 5U))
                {
                   c_Data.resize(static_cast<size_t>(u32_MaxBlockLength - 5U));
                }
@@ -962,6 +963,7 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeFile(const C_SCLString & orc_File
          s32_Return = this->mpc_ComDriver->SendOsyRequestFileTransfer(
             mc_CurrentNode, TGL_ExtractFileName(orc_FileToFlash), u32_TotalNumberOfBytes, u32_MaxBlockLength,
             &u8_NrCode);
+
          if (s32_Return != C_NO_ERR)
          {
             C_SCLString c_Error;
@@ -1012,7 +1014,7 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeFile(const C_SCLString & orc_File
          }
          else
          {
-            if (u32_RemainingBytes > u32_MaxBlockLength)
+            if (u32_RemainingBytes > (u32_MaxBlockLength - 5U))
             {
                c_Data.resize(static_cast<size_t>(u32_MaxBlockLength - 5U));
             }
@@ -2325,7 +2327,7 @@ stw_types::sint32 C_OSCSuSequences::ActivateFlashloader(const bool oq_FailOnFirs
    C_BUSY     aborted by user
    C_WARN     reading failed for at least one node
    C_NO_ERR   information read
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     18.12.2017  STW/A.Stangl
 */
@@ -3282,7 +3284,7 @@ bool C_OSCSuSequences::C_ApplicationProperties::operator ==(const C_ApplicationP
    C_NO_ERR   re-connected or no reconnect necessary
    C_BUSY     could not re-connect to node
    C_RANGE    node not found or no openSYDE protocol installed
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     09.04.2018  STW/B.Bayer
 */

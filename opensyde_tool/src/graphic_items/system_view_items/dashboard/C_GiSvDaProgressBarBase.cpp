@@ -342,6 +342,8 @@ bool C_GiSvDaProgressBarBase::CallProperties(void)
             c_Box.c_DataPoolElementsConfig.push_back(c_Tmp);
             c_Box.e_ElementWriteMode = pc_Dialog->GetWriteMode();
 
+            //Force update
+            this->mq_InitialStyleCall = true;
             //Apply
             this->SetDisplayStyle(this->me_Style, this->mq_DarkMode);
             this->UpdateTypePe(c_Box.e_Type, c_Box.e_Alignment, c_Box.q_ShowMinMax);

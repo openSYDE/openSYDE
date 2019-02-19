@@ -25,6 +25,7 @@
 #include "stwtypes.h"
 #include "C_PuiSvPc.h"
 #include "CSCLChecksums.h"
+#include "constants.h"
 
 /* -- Used Namespaces ------------------------------------------------------ */
 using namespace stw_types;
@@ -53,7 +54,8 @@ C_PuiSvPc::C_PuiSvPc(void) :
    C_PuiBsBox(),
    mq_Connected(false),
    mu32_BusIndex(std::numeric_limits<uint32>::max()),
-   mc_CANDllPath("STW_dlls\\stwpeak2\\stwpeak2.dll")
+   me_CANDllType(ePEAK),
+   mc_CustomCANDllPath("")
 {
 }
 
@@ -70,10 +72,12 @@ C_PuiSvPc::C_PuiSvPc(void) :
 //-----------------------------------------------------------------------------
 void C_PuiSvPc::CalcHash(uint32 & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(this->mc_CANDllPath.toStdString().c_str(),
-                                      this->mc_CANDllPath.length(), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(&this->me_CANDllType, sizeof(this->me_CANDllType), oru32_HashValue);
+   stw_scl::C_SCLChecksums::CalcCRC32(this->mc_CustomCANDllPath.toStdString().c_str(),
+                                      this->mc_CustomCANDllPath.length(), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->mq_Connected, sizeof(this->mq_Connected), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->mu32_BusIndex, sizeof(this->mu32_BusIndex), oru32_HashValue);
+
    this->mc_ConnectionData.CalcHash(oru32_HashValue);
 
    C_PuiBsBox::CalcHash(oru32_HashValue);
@@ -160,6 +164,20 @@ void C_PuiSvPc::SetConnected(const bool oq_Connected, const uint32 ou32_BusIndex
 
 //-----------------------------------------------------------------------------
 /*!
+   \brief   Get CAN Dll type. (PEAK = 0,Vector = 1, Other = 2)
+
+   \return   CAN Dll type
+
+   \created     07.02.2019  STW/G.Landsgesell
+*/
+//-----------------------------------------------------------------------------
+C_PuiSvPc::E_CANDllType C_PuiSvPc::GetCANDllType() const
+{
+   return this->me_CANDllType;
+}
+
+//-----------------------------------------------------------------------------
+/*!
    \brief   Returns the CAN DLL path
 
    \return
@@ -170,7 +188,39 @@ void C_PuiSvPc::SetConnected(const bool oq_Connected, const uint32 ou32_BusIndex
 //-----------------------------------------------------------------------------
 QString C_PuiSvPc::GetCANDll(void) const
 {
-   return this->mc_CANDllPath;
+   QString c_Return;
+
+   switch (this->me_CANDllType)
+   {
+   case ePEAK:
+      c_Return = stw_opensyde_gui::mc_DLL_PATH_PEAK;
+      break;
+   case eVECTOR:
+      c_Return = stw_opensyde_gui::mc_DLL_PATH_VECTOR;
+      break;
+   case eOTHER:
+      c_Return = this->mc_CustomCANDllPath;
+      break;
+   default:
+      c_Return = stw_opensyde_gui::mc_DLL_PATH_PEAK;
+      break;
+   }
+
+   return c_Return;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get custom CAN DLL Path
+
+   \return Custom CAN DLL Path string
+
+   \created     07.02.2019  STW/G.Landsgesell
+*/
+//-----------------------------------------------------------------------------
+QString C_PuiSvPc::GetCustomCANDllPath() const
+{
+   return this->mc_CustomCANDllPath;
 }
 
 //-----------------------------------------------------------------------------
@@ -185,26 +235,33 @@ QString C_PuiSvPc::GetCANDll(void) const
 //-----------------------------------------------------------------------------
 QString C_PuiSvPc::GetCANDllAbsolute(void) const
 {
-   QString c_Retval;
+   QString c_Retval = this->GetCANDll();
 
-   if (this->mc_CANDllPath.compare("") != 0)
+   if (c_Retval.compare("") != 0)
    {
-      const QFileInfo c_Info(this->mc_CANDllPath);
+      const QFileInfo c_Info(c_Retval);
 
       if (c_Info.isRelative() == true)
       {
-         c_Retval = C_Uti::h_GetExePath() + '\\' + this->mc_CANDllPath;
-      }
-      else
-      {
-         c_Retval = this->mc_CANDllPath;
+         c_Retval = C_Uti::h_GetExePath() + '\\' + c_Retval;
       }
    }
-   else
-   {
-      c_Retval = this->mc_CANDllPath;
-   }
+
    return c_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set DLL type. See get for type definition.
+
+   \param[in]     ors32_CanDllType   CAN DLL type
+
+   \created     07.02.2019  STW/G.Landsgesell
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvPc::SetCANDllType(const C_PuiSvPc::E_CANDllType oe_Type)
+{
+   this->me_CANDllType = oe_Type;
 }
 
 //-----------------------------------------------------------------------------
@@ -216,9 +273,9 @@ QString C_PuiSvPc::GetCANDllAbsolute(void) const
    \created     05.07.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
-void C_PuiSvPc::SetCANDll(const QString & orc_DllPath)
+void C_PuiSvPc::SetCustomCANDllPath(const QString & orc_Path)
 {
-   this->mc_CANDllPath = orc_DllPath;
+   this->mc_CustomCANDllPath = orc_Path;
 }
 
 //-----------------------------------------------------------------------------

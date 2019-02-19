@@ -15,7 +15,7 @@ TEMPLATE = app
 
 DESTDIR = ../result/tool
 
-VERSION = 1.00.0
+VERSION = 1.03.0
 
 DEFINES += APPLICATION_VERSION=\\\"$$VERSION\\\"
 
@@ -52,8 +52,6 @@ SOURCES += ../src/main.cpp\
     ../src/opensyde_gui_elements/push_button/C_OgePubToolBar.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubUseCase.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubUseCaseNav.cpp \
-    ../src/opensyde_gui_elements/push_button/C_OgePubUseCaseNavSub.cpp \
-    ../src/opensyde_gui_elements/push_button/C_OgePubUseCaseNavViewSub.cpp \
     ../src/system_definition/C_SdTopologyToolbox.cpp \
     ../src/graphic_items/C_GiPort.cpp \
     ../src/graphic_items/C_GiNode.cpp \
@@ -97,19 +95,15 @@ SOURCES += ../src/main.cpp\
     ../src/system_definition/C_SdContextMenuEntry.cpp \
     ../src/graphic_items/base_items/C_GiBiCustomToolTip.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubZoomNotification.cpp \
-    ../src/opensyde_gui_elements/push_button/C_OgePubTextOnly.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubCancel.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubColorOnly.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubDialog.cpp \
-    ../src/opensyde_gui_elements/push_button/C_OgePubDialogWithIcon.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubIconOnly.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabHeadingWidget.cpp \
-    ../src/opensyde_gui_elements/label/C_OgeLabHeadingGroup.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabHeadingGroupBold.cpp \
     ../src/opensyde_gui_elements/C_OgeFrame.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabHeadingWidgetSubTitle.cpp \
     ../src/graphic_items/line_items/C_GiLiLineGroup.cpp \
-    ../src/opensyde_gui_elements/C_OgeListWidget.cpp \
     ../src/project_operations/C_PopErrorHandling.cpp \
     ../src/graphic_items/style_setup/C_GiSyBaseWidget.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubTextOnlyUnderline.cpp \
@@ -123,7 +117,6 @@ SOURCES += ../src/main.cpp\
     ../src/graphic_items/C_GiRect.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabPopUpSubTitle.cpp \
     ../src/graphic_items/style_setup/C_GiSyBoundaryWidget.cpp \
-    ../src/opensyde_gui_elements/label/C_OgeLabPageHeading.cpp \
     ../src/help_engine/C_HeHandler.cpp \
     ../src/graphic_items/C_GiText.cpp \
     ../src/graphic_items/style_setup/C_GiSyTextElementWidget.cpp \
@@ -184,7 +177,6 @@ SOURCES += ../src/main.cpp\
     ../src/system_definition/node_edit/undo/C_SdNdeUnoDataPoolListBaseCommand.cpp \
     ../src/system_definition/node_edit/undo/C_SdNdeUnoDataPoolListAddDeleteBaseCommand.cpp \
     ../src/system_definition/node_edit/undo/C_SdNdeUnoDataPoolListAddCommand.cpp \
-    ../src/opensyde_gui_elements/C_OgeTreeViewNaviBar.cpp \
     ../src/system_definition/node_edit/C_SdNdeNodeEditWidget.cpp \
     ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorWidget.cpp \
     ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorListWidget.cpp \
@@ -214,7 +206,6 @@ SOURCES += ../src/main.cpp\
     ../src/opensyde_gui_elements/group_box/C_OgeGbxGrayed.cpp \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxTransparent.cpp \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxToolTip.cpp \
-    ../src/opensyde_gui_elements/line_edit/C_OgeLeDialog.cpp \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeListHeader.cpp \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeProperties.cpp \
     ../src/opensyde_gui_elements/line_edit/C_OgeLePropertiesName.cpp \
@@ -256,7 +247,6 @@ SOURCES += ../src/main.cpp\
     ../src/opensyde_gui_elements/text_edit/C_OgeTedTable.cpp \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxInt64.cpp \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxTableDouble.cpp \
-    ../src/opensyde_gui_elements/C_OgeTreeViewItemNaviBar.cpp \
     ../src/opensyde_gui_elements/check_box/C_OgeChxTristateTransparentToggle.cpp \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxNumber.cpp \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxTableComIf.cpp \
@@ -374,7 +364,6 @@ SOURCES += ../src/main.cpp\
     ../src/system_definition/bus_edit/C_SdBusMessageSelectorTreeWidgetItem.cpp \
     ../src/graphic_items/widgets/C_GiWiProxyBase.cpp \
     ../src/opensyde_gui_elements/radio_button/C_OgeRabCheckBox.cpp \
-    ../src/opensyde_gui_elements/radio_button/C_OgeRabDefault.cpp \
     ../src/system_definition/bus_edit/C_SdBueMessageTableModel.cpp \
     ../src/system_definition/bus_edit/C_SdBueMessageTableView.cpp \
     ../src/system_definition/bus_edit/C_SdBueSignalTableModel.cpp \
@@ -460,7 +449,6 @@ SOURCES += ../src/main.cpp\
     ../src/scene_base/undo/C_SebUnoRemoveBendPointCommand.cpp \
     ../src/scene_base/undo/C_SebUnoResizeLineCommand.cpp \
     ../src/project_gui/base/C_PuiBsBoundary.cpp \
-    ../src/project_gui/base/C_PuiBsFindNameHelper.cpp \
     ../src/project_gui/base/C_PuiBsImage.cpp \
     ../src/project_gui/base/C_PuiBsLineArrow.cpp \
     ../src/project_gui/base/C_PuiBsLineBase.cpp \
@@ -527,7 +515,6 @@ SOURCES += ../src/main.cpp\
     ../src/project_gui/system_views/dashboard/C_PuiSvDbSlider.cpp \
     ../src/graphic_items/system_view_items/dashboard/C_GiSvDaSliderBase.cpp \
     ../src/opensyde_gui_elements/slider/C_OgeSliDashboard.cpp \
-    ../src/opensyde_gui_elements/slider/C_OgeSliDefault.cpp \
     ../src/opensyde_gui_elements/widget/C_OgeWiSpinBoxGroup.cpp \
     ../src/opensyde_gui_elements/widget/C_OgeWiDashboardSpinBoxGroup.cpp \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbProgressBar.cpp \
@@ -624,7 +611,6 @@ SOURCES += ../src/main.cpp\
     ../src/opensyde_gui_elements/C_OgeDarkScrollArea.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabTreeNode.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabTreeNodeDataPool.cpp \
-    ../src/opensyde_gui_elements/combo_box/C_OgeCbxListHeader.cpp \
     ../libs/opensyde_core/kefex_diaglib/CXFLProtocol.cpp \
     ../libs/opensyde_core/kefex_diaglib/CHexFile.cpp \
     ../libs/opensyde_core/kefex_diaglib/CDLReportEvents.cpp \
@@ -720,7 +706,7 @@ SOURCES += ../src/main.cpp\
     ../src/opensyde_gui_elements/label/C_OgeLabToolTipBase.cpp \
     ../src/opensyde_gui_elements/tab_widget/C_OgeTawToolTipBase.cpp \
     ../src/table_base/C_TblViewToolTipBase.cpp \
-    ../src/opensyde_gui_elements/scroll_area/C_OgeScMain.cpp \
+    ../src/opensyde_gui_elements/scroll_area/C_OgeSaMain.cpp \
     ../src/system_definition/node_edit/C_SdNdeProgrammingOptions.cpp \
     ../libs/opensyde_core/miniz/miniz.c \
     ../libs/opensyde_core/protocol_drivers/system_update/C_OSCSuServiceUpdatePackage.cpp \
@@ -787,7 +773,7 @@ SOURCES += ../src/main.cpp\
     ../src/opensyde_gui_elements/widget/C_OgeWiNavigationTab.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabSvgOnly.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabGenericNoPaddingNoMargins.cpp \
-    ../src/opensyde_gui_elements/scroll_area/C_OgeScNaviBar.cpp \
+    ../src/opensyde_gui_elements/scroll_area/C_OgeSaNaviBar.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubProjAction.cpp \
     ../src/navigable_gui/C_NagViewList.cpp \
     ../src/navigable_gui/C_NagViewListDelegate.cpp \
@@ -817,10 +803,12 @@ SOURCES += ../src/main.cpp\
     ../src/opensyde_gui_elements/label/C_OgeLabHeadingWidgetSubSubTitle.cpp \
     ../libs/opensyde_core/protocol_drivers/communication/C_OSCComDriverBase.cpp \
     ../libs/opensyde_core/protocol_drivers/communication/C_OSCComMessageLogger.cpp \
+    ../libs/opensyde_core/protocol_drivers/communication/C_OSCComMessageLoggerData.cpp \
     ../libs/opensyde_core/protocol_drivers/communication/C_OSCComMessageLoggerOsySysDefConfig.cpp \
     ../libs/opensyde_core/protocol_drivers/communication/C_OSCComLoggerProtocols.cpp \
     ../libs/opensyde_core/protocol_drivers/communication/C_OSCComLoggerProtocolOpenSYDE.cpp \
-    ../src/system_views/communication/C_SyvComMessageMonitor.cpp \
+    ../libs/opensyde_core/protocol_drivers/communication/C_OSCComMessageLoggerFileBase.cpp \
+    ../libs/opensyde_core/protocol_drivers/communication/C_OSCComMessageLoggerFileAsc.cpp \
     ../libs/opensyde_core/kefex_diaglib/CCMONProtocol.cpp \
     ../libs/opensyde_core/kefex_diaglib/CCMONProtocolBase.cpp \
     ../libs/opensyde_core/kefex_diaglib/CCMONProtocolCANopen.cpp \
@@ -857,7 +845,14 @@ SOURCES += ../src/main.cpp\
     ../src/opensyde_gui_elements/widget/C_OgeWiParamSpinBoxGroup.cpp \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeParam.cpp \
     ../src/system_views/dashboards/items/param/C_SyvDaItPaValuePairs.cpp \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListsTreeDelegate.cpp
+    ../src/system_definition/node_edit/C_SdNdeDataPoolListsTreeDelegate.cpp \
+    ../src/graphic_items/system_view_items/C_GiSvCANBus.cpp \
+    ../src/graphic_items/system_view_items/C_GiSvEthernetBus.cpp \
+    ../src/graphic_items/system_view_items/C_GiSvTextElementBus.cpp \
+    ../src/util/C_UtiFindNameHelper.cpp \
+    ../src/opensyde_gui_elements/combo_box/C_OgeCbxResizingView.cpp \
+    ../src/table_base/C_TblModelAction.cpp \
+    ../src/system_definition/C_SdTooltipUtil.cpp
 
 PRECOMPILED_HEADER = ../src/precompiled_headers/gui/precomp_headers.h
 
@@ -899,8 +894,6 @@ HEADERS  += \
     ../src/opensyde_gui_elements/push_button/C_OgePubToolBar.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubUseCase.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubUseCaseNav.h \
-    ../src/opensyde_gui_elements/push_button/C_OgePubUseCaseNavSub.h \
-    ../src/opensyde_gui_elements/push_button/C_OgePubUseCaseNavViewSub.h \
     ../src/system_definition/C_SdTopologyToolbox.h \
     ../src/graphic_items/C_GiPort.h \
     ../src/graphic_items/C_GiNode.h \
@@ -941,19 +934,15 @@ HEADERS  += \
     ../src/system_definition/C_SdContextMenuEntry.h \
     ../src/graphic_items/base_items/C_GiBiCustomToolTip.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubZoomNotification.h \
-    ../src/opensyde_gui_elements/push_button/C_OgePubTextOnly.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubCancel.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubColorOnly.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubDialog.h \
-    ../src/opensyde_gui_elements/push_button/C_OgePubDialogWithIcon.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubIconOnly.h \
     ../src/opensyde_gui_elements/label/C_OgeLabHeadingWidget.h \
-    ../src/opensyde_gui_elements/label/C_OgeLabHeadingGroup.h \
     ../src/opensyde_gui_elements/label/C_OgeLabHeadingGroupBold.h \
     ../src/opensyde_gui_elements/C_OgeFrame.h \
     ../src/opensyde_gui_elements/label/C_OgeLabHeadingWidgetSubTitle.h \
     ../src/graphic_items/line_items/C_GiLiLineGroup.h \
-    ../src/opensyde_gui_elements/C_OgeListWidget.h \
     ../src/project_operations/C_PopErrorHandling.h \
     ../src/graphic_items/style_setup/C_GiSyBaseWidget.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubTextOnlyUnderline.h \
@@ -967,7 +956,6 @@ HEADERS  += \
     ../src/graphic_items/C_GiRect.h \
     ../src/opensyde_gui_elements/label/C_OgeLabPopUpSubTitle.h \
     ../src/graphic_items/style_setup/C_GiSyBoundaryWidget.h \
-    ../src/opensyde_gui_elements/label/C_OgeLabPageHeading.h \
     ../src/help_engine/C_HeHandler.h \
     ../src/graphic_items/C_GiText.h \
     ../src/graphic_items/style_setup/C_GiSyTextElementWidget.h \
@@ -1028,7 +1016,6 @@ HEADERS  += \
     ../src/system_definition/node_edit/undo/C_SdNdeUnoDataPoolListBaseCommand.h \
     ../src/system_definition/node_edit/undo/C_SdNdeUnoDataPoolListAddDeleteBaseCommand.h \
     ../src/system_definition/node_edit/undo/C_SdNdeUnoDataPoolListAddCommand.h \
-    ../src/opensyde_gui_elements/C_OgeTreeViewNaviBar.h \
     ../src/system_definition/node_edit/C_SdNdeNodeEditWidget.h \
     ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorWidget.h \
     ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorListWidget.h \
@@ -1058,7 +1045,6 @@ HEADERS  += \
     ../src/opensyde_gui_elements/combo_box/C_OgeCbxIconOnly.h \
     ../src/opensyde_gui_elements/combo_box/C_OgeCbxIconDelegate.h \
     ../src/opensyde_gui_elements/combo_box/C_OgeCbxLine.h \
-    ../src/opensyde_gui_elements/line_edit/C_OgeLeDialog.h \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeListHeader.h \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeProperties.h \
     ../src/opensyde_gui_elements/line_edit/C_OgeLePropertiesName.h \
@@ -1100,7 +1086,6 @@ HEADERS  += \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedTable.h \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxInt64.h \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxTableDouble.h \
-    ../src/opensyde_gui_elements/C_OgeTreeViewItemNaviBar.h \
     ../src/opensyde_gui_elements/check_box/C_OgeChxTristateTransparentToggle.h \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxNumber.h \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxTableComIf.h \
@@ -1218,7 +1203,6 @@ HEADERS  += \
     ../src/system_definition/bus_edit/C_SdBusMessageSelectorTreeWidgetItem.h \
     ../src/graphic_items/widgets/C_GiWiProxyBase.h \
     ../src/opensyde_gui_elements/radio_button/C_OgeRabCheckBox.h \
-    ../src/opensyde_gui_elements/radio_button/C_OgeRabDefault.h \
     ../src/system_definition/bus_edit/C_SdBueMessageTableModel.h \
     ../src/system_definition/bus_edit/C_SdBueMessageTableView.h \
     ../src/system_definition/bus_edit/C_SdBueSignalTableModel.h \
@@ -1306,7 +1290,6 @@ HEADERS  += \
     ../src/scene_base/undo/C_SebUnoResizeLineCommand.h \
     ../src/project_gui/base/C_PuiBsTextElement.h \
     ../src/project_gui/base/C_PuiBsBoundary.h \
-    ../src/project_gui/base/C_PuiBsFindNameHelper.h \
     ../src/project_gui/base/C_PuiBsImage.h \
     ../src/project_gui/base/C_PuiBsLineArrow.h \
     ../src/project_gui/base/C_PuiBsLineBase.h \
@@ -1373,7 +1356,6 @@ HEADERS  += \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbSlider.h \
     ../src/graphic_items/system_view_items/dashboard/C_GiSvDaSliderBase.h \
     ../src/opensyde_gui_elements/slider/C_OgeSliDashboard.h \
-    ../src/opensyde_gui_elements/slider/C_OgeSliDefault.h \
     ../src/opensyde_gui_elements/widget/C_OgeWiSpinBoxGroup.h \
     ../src/opensyde_gui_elements/widget/C_OgeWiDashboardSpinBoxGroup.h \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbProgressBar.h \
@@ -1470,7 +1452,6 @@ HEADERS  += \
     ../src/opensyde_gui_elements/C_OgeDarkScrollArea.h \
     ../src/opensyde_gui_elements/label/C_OgeLabTreeNode.h \
     ../src/opensyde_gui_elements/label/C_OgeLabTreeNodeDataPool.h \
-    ../src/opensyde_gui_elements/combo_box/C_OgeCbxListHeader.h \
     ../libs/opensyde_core/kefex_diaglib/CXFLProtocol.h \
     ../libs/opensyde_core/kefex_diaglib/CHexFile.h \
     ../libs/opensyde_core/kefex_diaglib/CDLReportEvents.h \
@@ -1568,7 +1549,7 @@ HEADERS  += \
     ../src/opensyde_gui_elements/label/C_OgeLabToolTipBase.h \
     ../src/opensyde_gui_elements/tab_widget/C_OgeTawToolTipBase.h \
     ../src/table_base/C_TblViewToolTipBase.h \
-    ../src/opensyde_gui_elements/scroll_area/C_OgeScMain.h \
+    ../src/opensyde_gui_elements/scroll_area/C_OgeSaMain.h \
     ../src/system_definition/node_edit/C_SdNdeProgrammingOptions.h \
     ../libs/opensyde_core/miniz/miniz.h \
     ../libs/opensyde_core/protocol_drivers/system_update/C_OSCSuServiceUpdatePackage.h \
@@ -1645,7 +1626,7 @@ HEADERS  += \
     ../src/opensyde_gui_elements/widget/C_OgeWiNavigationTab.h \
     ../src/opensyde_gui_elements/label/C_OgeLabSvgOnly.h \
     ../src/opensyde_gui_elements/label/C_OgeLabGenericNoPaddingNoMargins.h \
-    ../src/opensyde_gui_elements/scroll_area/C_OgeScNaviBar.h \
+    ../src/opensyde_gui_elements/scroll_area/C_OgeSaNaviBar.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubProjAction.h \
     ../src/navigable_gui/C_NagViewList.h \
     ../src/navigable_gui/C_NagViewListDelegate.h \
@@ -1675,10 +1656,12 @@ HEADERS  += \
     ../src/opensyde_gui_elements/label/C_OgeLabHeadingWidgetSubSubTitle.h \
     ../libs/opensyde_core/protocol_drivers/communication/C_OSCComDriverBase.h \
     ../libs/opensyde_core/protocol_drivers/communication/C_OSCComMessageLogger.h \
+    ../libs/opensyde_core/protocol_drivers/communication/C_OSCComMessageLoggerData.h \
     ../libs/opensyde_core/protocol_drivers/communication/C_OSCComMessageLoggerOsySysDefConfig.h \
     ../libs/opensyde_core/protocol_drivers/communication/C_OSCComLoggerProtocols.h \
     ../libs/opensyde_core/protocol_drivers/communication/C_OSCComLoggerProtocolOpenSYDE.h \
-    ../src/system_views/communication/C_SyvComMessageMonitor.h \
+    ../libs/opensyde_core/protocol_drivers/communication/C_OSCComMessageLoggerFileBase.h \
+    ../libs/opensyde_core/protocol_drivers/communication/C_OSCComMessageLoggerFileAsc.h \
     ../libs/opensyde_core/kefex_diaglib/CCMONProtocol.h \
     ../libs/opensyde_core/kefex_diaglib/CCMONProtocolBase.h \
     ../libs/opensyde_core/kefex_diaglib/CCMONProtocolCANopen.h \
@@ -1716,7 +1699,14 @@ HEADERS  += \
     ../src/opensyde_gui_elements/widget/C_OgeWiParamSpinBoxGroup.h \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeParam.h \
     ../src/system_views/dashboards/items/param/C_SyvDaItPaValuePairs.h \
-    ../src/system_definition/node_edit/C_SdNdeDataPoolListsTreeDelegate.h
+    ../src/system_definition/node_edit/C_SdNdeDataPoolListsTreeDelegate.h \
+    ../src/graphic_items/system_view_items/C_GiSvCANBus.h \
+    ../src/graphic_items/system_view_items/C_GiSvEthernetBus.h \
+    ../src/graphic_items/system_view_items/C_GiSvTextElementBus.h \
+    ../src/util/C_UtiFindNameHelper.h \
+    ../src/opensyde_gui_elements/combo_box/C_OgeCbxResizingView.h \
+    ../src/table_base/C_TblModelAction.h \
+    ../src/system_definition/C_SdTooltipUtil.h
 
 FORMS    += \
     ../src/system_definition/C_SdTopologyWidget.ui \

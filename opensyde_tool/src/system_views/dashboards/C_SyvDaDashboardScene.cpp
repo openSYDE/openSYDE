@@ -17,12 +17,15 @@
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
 
+#include <iostream>
+
 #include <QGraphicsItem>
 #include <QGraphicsRectItem>
 #include <QMimeData>
 
 // test elements
 #include <QLineEdit>
+#include <QElapsedTimer>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsItemGroup>
 #include <QSpinBox>
@@ -678,7 +681,6 @@ void C_SyvDaDashboardScene::CopyFromManagerToScene(const QPointF * const opc_Pos
          this->mc_UndoManager.DoAddSnapshot(c_UniqueIDs, *pc_SnapShot, c_Rails, c_TotalOffset);
       }
    }
-   delete (pc_Data);
 }
 
 //-----------------------------------------------------------------------------
@@ -1312,7 +1314,7 @@ void C_SyvDaDashboardScene::m_Cut(void)
    \created     28.09.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-bool C_SyvDaDashboardScene::m_IsPastePossible(void) const
+bool C_SyvDaDashboardScene::m_IsPastePossible(void)
 {
    bool q_Retval = false;
 

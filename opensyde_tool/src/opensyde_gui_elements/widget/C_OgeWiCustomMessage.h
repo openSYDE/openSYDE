@@ -94,9 +94,6 @@ private:
 
    bool mq_ShowCancelButton;
 
-   QString mc_PathExpandIcon;
-   QString mc_PathMinimizeIcon;
-
    QPixmap mc_PixmapIcon;
    QString mc_Style;
    QString mc_TypeString;
@@ -110,7 +107,7 @@ private:
    void m_SetText(const QString & orc_Heading, const QString & orc_Description, const QString & orc_Details);
    void m_InitButtons(void);
    void m_SetMessageType(const E_Type & ore_MessageType);
-   void m_ExpandCollapseDetails(void) const;
+   void m_ExpandCollapseDetails(const bool & orq_Expand) const;
    void m_OKClicked(void);
    void m_NOClicked(void);
    void m_CancelClicked(void);

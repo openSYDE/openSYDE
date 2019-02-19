@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>C_NagAboutDialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="pc_VerticalLayout">
    <property name="leftMargin">
     <number>27</number>
    </property>
@@ -69,7 +69,7 @@
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>21</width>
+            <width>6</width>
             <height>20</height>
            </size>
           </property>
@@ -84,69 +84,31 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QLabel" name="pc_LabelLogo">
-            <property name="text">
-             <string>TextLabel</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0,1">
+           <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0,0,1">
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_2">
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0">
-                <property name="spacing">
-                 <number>6</number>
+               <spacer name="verticalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
                 </property>
-                <item>
-                 <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelDescOpenSYDEVersion">
-                  <property name="text">
-                   <string>Used openSYDE version:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_4">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeType">
-                   <enum>QSizePolicy::Expanding</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>30</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_13">
-                <item>
-                 <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_AboutCopyright">
-                  <property name="text">
-                   <string>About Copyright</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_8">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
+               <widget class="QLabel" name="pc_LabelLogo">
+                <property name="text">
+                 <string>Logo</string>
+                </property>
+               </widget>
               </item>
               <item>
                <spacer name="verticalSpacer_4">
@@ -164,6 +126,19 @@
              </layout>
             </item>
             <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>6</width>
+                <height>25</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
              <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0">
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -173,7 +148,7 @@
                    <number>6</number>
                   </property>
                   <item>
-                   <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItemValue" name="pc_LabelValOpenSYDEVersion">
+                   <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelValOpenSYDEVersion">
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
@@ -333,7 +308,7 @@
     </layout>
    </item>
    <item>
-    <spacer name="verticalSpacer_7">
+    <spacer name="pc_VerticalSpacerBottom">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
@@ -352,11 +327,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabGroupItemValue</class>
    <extends>QLabel</extends>
    <header>C_OgeLabGroupItemValue.h</header>
@@ -371,6 +341,11 @@
    <extends>QGroupBox</extends>
    <header>C_OgeGbx.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabHeadingGroupBold.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

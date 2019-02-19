@@ -104,7 +104,7 @@ void C_SdNdeDbAdd::InitStaticNames(void) const
    this->mpc_Ui->pc_BushButtonOk->setText(C_GtGetText::h_GetText("Continue"));
    this->mpc_Ui->pc_BushButtonCancel->setText(C_GtGetText::h_GetText("Cancel"));
 
-   this->mpc_Ui->pc_LabelHeading->setText(C_GtGetText::h_GetText("Choose Type"));
+   this->mpc_Ui->pc_LabelHeading->setText(C_GtGetText::h_GetText("Select Type"));
    this->mpc_Ui->pc_RadioButtonProgramming_TSP->setText(C_GtGetText::h_GetText(
                                                            "Programmable application(s) (extracted from openSYDE Target Support Package)"));
    this->mpc_Ui->pc_RadioButtonProgramming_Manual->setText(C_GtGetText::h_GetText(
@@ -121,12 +121,12 @@ void C_SdNdeDbAdd::InitStaticNames(void) const
          this->mpc_Ui->pc_RadioButtonProgramming_TSP->SetToolTipInformation(
             C_GtGetText::h_GetText("Programmable application(s) (extracted from openSYDE Target Support Package)"),
             C_GtGetText::h_GetText(
-               "A programmable application developed by using the openSYDE \"code generation\" feature."
+               "A programmable application developed by using the openSYDE feature \"Generate Code\"."
                "\nConfiguration is extracted from openSYDE Target Support Package."));
          this->mpc_Ui->pc_RadioButtonProgramming_Manual->SetToolTipInformation(
             C_GtGetText::h_GetText("Programmable application (configure manually)"),
             C_GtGetText::h_GetText(
-               "A programmable application developed by using the openSYDE \"code generation\" feature."
+               "A programmable application developed by using the openSYDE feature \"Generate Code\"."
                "\nConfiguration is made manually by the user."));
       }
       else
@@ -139,12 +139,12 @@ void C_SdNdeDbAdd::InitStaticNames(void) const
          this->mpc_Ui->pc_RadioButtonProgramming_TSP->SetToolTipInformation(
             C_GtGetText::h_GetText("Programmable application(s) (extracted from openSYDE Target Support Package)"),
             C_GtGetText::h_GetText(
-               "A programmable application developed by using the openSYDE \"code generation\" feature."
+               "A programmable application developed by using the openSYDE feature \"Generate Code\"."
                "\nConfiguration is extracted from openSYDE Target Support Package."));
          this->mpc_Ui->pc_RadioButtonProgramming_Manual->SetToolTipInformation(
             C_GtGetText::h_GetText("Programmable application (configure manually)"),
             C_GtGetText::h_GetText(
-               "A programmable application developed by using the openSYDE \"code generation\" feature."
+               "A programmable application developed by using the openSYDE feature \"Generate Code\"."
                "\nConfiguration is made manually by the user."));
       }
       if (pc_Node->pc_DeviceDefinition->q_FlashloaderOpenSydeIsFileBased == true)
@@ -178,14 +178,14 @@ void C_SdNdeDbAdd::InitStaticNames(void) const
          //Tool tips
          this->mpc_Ui->pc_RadioButtonBinary->SetToolTipInformation(
             C_GtGetText::h_GetText("Binary"),
-            C_GtGetText::h_GetText("Any kind of application or data created by an other tool chain."));
+            C_GtGetText::h_GetText("Any kind of application or data created by another tool chain."));
       }
    }
 
    //Tool tips
    //this->mpc_Ui->pc_LabelHeading->SetToolTipInformation(C_GtGetText::h_GetText("Choose Type"),
    //                                                     C_GtGetText::h_GetText(
-   //                                                        "Please select the type of Data Block you want this device
+   //                                                        "Select the type of Data Block you want this device
    // to contain"));
 }
 
@@ -310,7 +310,9 @@ void C_SdNdeDbAdd::m_OkClicked(void)
          c_Message.SetDescription(C_GtGetText::h_GetText(
                                      "Before creating new Data Block(s) from openSYDE Target Support Package, "
                                      "all existing Data Blocks of type programming application will be deleted. "
-                                     "\nDo you really want to continue?"));
+                                     "\n\nDo you really want to continue?"));
+         c_Message.SetCustomMinHeight(280);
+         c_Message.SetCustomMinWidth(700);
          e_Output = c_Message.Execute();
          if (e_Output == C_OgeWiCustomMessage::eYES)
          {

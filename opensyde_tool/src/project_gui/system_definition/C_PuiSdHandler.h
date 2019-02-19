@@ -49,10 +49,13 @@ class C_PuiSdHandler :
    Q_OBJECT
 
 public:
-   void SetUINode(const stw_types::uint32 & oru32_Index, const C_PuiSdNode & orc_Item);
-   void SetOSCNode(const stw_types::uint32 & oru32_Index, const stw_opensyde_core::C_OSCNode & orc_Item);
-   void SetUIBus(const stw_types::uint32 & oru32_Index, const C_PuiSdBus & orc_Item);
-   void SetOSCBus(const stw_types::uint32 & oru32_Index, const stw_opensyde_core::C_OSCSystemBus & orc_Item);
+   void SetOSCNodeEthernetConfiguration(const stw_types::uint32 ou32_NodeIndex,
+                                        const stw_types::uint32 ou32_InterfaceIndex,
+                                        const std::vector<stw_types::sint32> & orc_Ip,
+                                        const std::vector<stw_types::sint32> & orc_NetMask,
+                                        const std::vector<stw_types::sint32> & orc_DefaultGateway);
+   void SetUIBus(const stw_types::uint32 ou32_Index, const C_PuiSdBus & orc_Item);
+   void SetOSCBus(const stw_types::uint32 ou32_Index, const stw_opensyde_core::C_OSCSystemBus & orc_Item);
    const C_PuiSdNode * GetUINode(const stw_types::uint32 & oru32_Index) const;
    const stw_opensyde_core::C_OSCNode * GetOSCNodeConst(const stw_types::uint32 & oru32_Index) const;
    stw_types::sint32 GetSortedOSCNodeConst(const stw_types::uint32 & oru32_Index,
@@ -93,21 +96,34 @@ public:
    void ChangeCompleteConnection(const stw_types::uint32 ou32_NodeIndex, const C_PuiSdNodeConnectionId & orc_PrevID,
                                  const C_PuiSdNodeConnectionId & orc_NewID, const stw_types::uint8 & oru8_NodeId,
                                  const stw_types::uint32 & oru32_BusIndex = 0xFFFFFFFFUL);
+   void SetOSCNodeProperties(const stw_types::uint32 ou32_NodeIndex,
+                             const stw_opensyde_core::C_OSCNodeProperties & orc_Properties);
+   void SetOSCNodePropertiesDetailed(const stw_types::uint32 ou32_NodeIndex, const QString & orc_Name,
+                                     const QString & orc_Comment,
+                                     const stw_opensyde_core::C_OSCNodeProperties::E_DiagnosticServerProtocol oe_DiagnosticServer, const stw_opensyde_core::C_OSCNodeProperties::E_FlashLoaderProtocol oe_FlashLoader, const std::vector<stw_types::uint8> & orc_NodeIds, const std::vector<bool> & orc_UpdateFlags, const std::vector<bool> & orc_RoutingFlags, const std::vector<bool> & orc_DiagnosisFlags);
+   void SetUINodeBox(const stw_types::uint32 ou32_NodeIndex, const C_PuiBsBox & orc_Box);
+   void SetUINodeConnections(const stw_types::uint32 ou32_NodeIndex,
+                             const std::vector<C_PuiSdNodeConnection> & orc_Connections);
+   void SetUINodeConnectionId(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_ConnectionIndex,
+                              const C_PuiSdNodeConnectionId & orc_Id);
    stw_types::uint32 AddNodeAndSort(stw_opensyde_core::C_OSCNode & orc_OSCNode, const C_PuiSdNode & orc_UINode);
    void RemoveNode(const stw_types::uint32 ou32_NodeIndex);
    stw_types::uint32 AddBusAndSort(stw_opensyde_core::C_OSCSystemBus & orc_OSCBus, const C_PuiSdBus & orc_UIBus,
                                    const QString * const opc_Name = NULL, const bool oq_AllowBusIdAdaption = true);
-   std::vector<const stw_scl::C_SCLString *> GetExistingBusNames(void) const;
+   std::map<stw_scl::C_SCLString, bool> GetExistingBusNames(void) const;
    std::vector<const stw_opensyde_core::C_OSCNodeApplication *> GetProgrammableApplications(
       const stw_types::uint32 ou32_NodeIndex) const;
    std::vector<stw_types::uint32> GetProgrammableAppIndices(const stw_types::uint32 ou32_NodeIndex) const;
    void RemoveBus(const stw_types::uint32 ou32_BusIndex);
-   bool CheckNodeConflict(const stw_types::uint32 & oru32_NodeIndex) const;
+   bool CheckNodeConflict(const stw_types::uint32 & oru32_NodeIndex)
+   const;
    bool CheckNodeNvmDataPoolsSizeConflict(const stw_types::uint32 ou32_NodeIndex) const;
-   bool CheckBusConflict(const stw_types::uint32 ou32_BusIndex, bool * const opq_NameConflict = NULL,
-                         bool * const opq_NameEmpty = NULL, bool * const opq_IdInvalid = NULL,
-                         std::vector<QString> * const opc_InvalidNodesForBitRate = NULL, std::vector<stw_opensyde_core::C_OSCCanProtocol::E_Type> * const opc_InvalidProtocols =
-                            NULL) const;
+   bool CheckBusConflict(const stw_types::uint32 ou32_BusIndex) const;
+   stw_types::sint32 CheckBusConflictDetailed(const stw_types::uint32 ou32_BusIndex,
+                                              bool * const opq_NameConflict = NULL, bool * const opq_NameEmpty = NULL,
+                                              bool * const opq_IdInvalid = NULL,
+                                              std::vector<QString> * const opc_InvalidNodesForBitRate = NULL, std::vector<stw_opensyde_core::C_OSCCanProtocol::E_Type> * const opc_InvalidProtocols =
+                                                 NULL) const;
    void GetSupportedCanBitrates(const std::vector<stw_types::uint32> & orc_Nodes,
                                 std::vector<stw_types::uint32> & orc_Bitrates) const;
    stw_types::sint32 AddDataPool(const stw_types::uint32 & oru32_NodeIndex,
@@ -190,6 +206,20 @@ public:
                                      const stw_types::uint32 & oru32_DataPoolListIndex,
                                      const stw_opensyde_core::C_OSCNodeDataPoolList & orc_OSCContent,
                                      const C_PuiSdNodeDataPoolList & orc_UIContent);
+   stw_types::sint32 SetDataPoolListName(const stw_types::uint32 & oru32_NodeIndex,
+                                         const stw_types::uint32 & oru32_DataPoolIndex,
+                                         const stw_types::uint32 & oru32_DataPoolListIndex, const QString & orc_Value);
+   stw_types::sint32 SetDataPoolListComment(const stw_types::uint32 & oru32_NodeIndex,
+                                            const stw_types::uint32 & oru32_DataPoolIndex,
+                                            const stw_types::uint32 & oru32_DataPoolListIndex,
+                                            const QString & orc_Value);
+   stw_types::sint32 SetDataPoolListNVMSize(const stw_types::uint32 & oru32_NodeIndex,
+                                            const stw_types::uint32 & oru32_DataPoolIndex,
+                                            const stw_types::uint32 & oru32_DataPoolListIndex,
+                                            const stw_types::uint32 ou32_Value);
+   stw_types::sint32 SetDataPoolListNVMCRC(const stw_types::uint32 & oru32_NodeIndex,
+                                           const stw_types::uint32 & oru32_DataPoolIndex,
+                                           const stw_types::uint32 & oru32_DataPoolListIndex, const bool oq_Value);
    stw_types::sint32 GetDataPoolList(const stw_types::uint32 & oru32_NodeIndex,
                                      const stw_types::uint32 & oru32_DataPoolIndex,
                                      const stw_types::uint32 & oru32_DataPoolListIndex,
@@ -237,6 +267,10 @@ public:
                                       const stw_types::uint32 & oru32_DataPoolIndex,
                                       const stw_types::uint32 & oru32_SourceIndex,
                                       const stw_types::uint32 & oru32_TargetIndex);
+   stw_types::sint32 ReserveDataPoolListElements(const stw_types::uint32 & oru32_NodeIndex,
+                                                 const stw_types::uint32 & oru32_DataPoolIndex,
+                                                 const stw_types::uint32 & oru32_DataPoolListIndex,
+                                                 const stw_types::uint32 & oru32_AdditionalElements);
    stw_types::sint32 InsertDataPoolListElement(const stw_types::uint32 & oru32_NodeIndex,
                                                const stw_types::uint32 & oru32_DataPoolIndex,
                                                const stw_types::uint32 & oru32_DataPoolListIndex,
@@ -286,6 +320,11 @@ public:
                                                     const stw_types::uint32 & oru32_DataPoolListIndex,
                                                     const stw_types::uint32 & oru32_DataPoolListElementIndex,
                                                     const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_OSCContent);
+   stw_types::sint32 SetDataPoolListElementNVMValueChanged(const stw_types::uint32 & oru32_NodeIndex,
+                                                           const stw_types::uint32 & oru32_DataPoolIndex,
+                                                           const stw_types::uint32 & oru32_DataPoolListIndex,
+                                                           const stw_types::uint32 & oru32_DataPoolListElementIndex,
+                                                           const bool oq_NvmValueChanged);
    const stw_opensyde_core::C_OSCNodeDataPoolListElement * GetOSCDataPoolListElement(
       const stw_types::uint32 & oru32_NodeIndex, const stw_types::uint32 & oru32_DataPoolIndex,
       const stw_types::uint32 & oru32_DataPoolListIndex,
@@ -359,6 +398,9 @@ public:
                                        bool & orq_IsMatch, const bool oq_IgnoreMessageDirection = false) const;
 
    //Can protocol setter
+   void SetCanProtocolMessageContainerConnected(const stw_types::uint32 ou32_NodeIndex,
+                                                const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_ComType,
+                                                const stw_types::uint32 ou32_InterfaceIndex, const bool oq_Value);
    stw_types::sint32 ChangeCanProtocolType(const stw_types::uint32 & oru32_NodeIndex,
                                            const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_PreviousComType,
                                            const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_NewComType);
@@ -423,6 +465,7 @@ public:
    stw_types::sint32 LoadFromFile(const stw_scl::C_SCLString & orc_Path);
    stw_types::sint32 SaveToFile(const stw_scl::C_SCLString & orc_Path);
    bool HasHashChanged(void) const;
+   stw_types::uint32 CalcHashSystemDefinition(void) const;
    const stw_opensyde_core::C_OSCSystemDefinition & GetOSCSystemDefinitionConst(void) const;
 
    static C_PuiSdHandler * h_GetInstance(void);
@@ -444,27 +487,26 @@ protected:
    virtual ~C_PuiSdHandler(void);
 
 private:
-   std::vector<const stw_scl::C_SCLString *> m_GetExistingNodeNames(void) const;
-   std::vector<const stw_scl::C_SCLString *> m_GetExistingNodeApplicationNames(
-      const stw_types::uint32 & oru32_NodeIndex)
+   std::map<stw_scl::C_SCLString, bool> m_GetExistingNodeNames(void) const;
+   std::map<stw_scl::C_SCLString, bool> m_GetExistingNodeApplicationNames(const stw_types::uint32 & oru32_NodeIndex)
    const;
-   std::vector<const stw_scl::C_SCLString *> m_GetExistingNodeDataPoolNames(const stw_types::uint32 & oru32_NodeIndex)
+   std::map<stw_scl::C_SCLString, bool> m_GetExistingNodeDataPoolNames(const stw_types::uint32 & oru32_NodeIndex)
    const;
-   std::vector<const stw_scl::C_SCLString *> m_GetExistingNodeDataPoolListNames(
-      const stw_types::uint32 & oru32_NodeIndex, const stw_types::uint32 & oru32_DataPoolIndex) const;
-   std::vector<const stw_scl::C_SCLString *> m_GetExistingNodeDataPoolListDataSetNames(
+   std::map<stw_scl::C_SCLString, bool> m_GetExistingNodeDataPoolListNames(const stw_types::uint32 & oru32_NodeIndex,
+                                                                           const stw_types::uint32 & oru32_DataPoolIndex)
+   const;
+   std::map<stw_scl::C_SCLString, bool> m_GetExistingNodeDataPoolListDataSetNames(
       const stw_types::uint32 & oru32_NodeIndex, const stw_types::uint32 & oru32_DataPoolIndex,
       const stw_types::uint32 & oru32_DataPoolListIndex) const;
-   std::vector<const stw_scl::C_SCLString *> m_GetExistingNodeDataPoolListVariableNames(
+   std::map<stw_scl::C_SCLString, bool> m_GetExistingNodeDataPoolListVariableNames(
       const stw_types::uint32 & oru32_NodeIndex, const stw_types::uint32 & oru32_DataPoolIndex,
       const stw_types::uint32 & oru32_DataPoolListIndex) const;
-   std::vector<const stw_scl::C_SCLString *> m_GetExistingMessageNames(const stw_types::uint32 & oru32_NodeIndex,
-                                                                       const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType, const stw_types::uint32 & oru32_InterfaceIndex)
+   std::map<stw_scl::C_SCLString, bool> m_GetExistingMessageNames(const stw_types::uint32 & oru32_NodeIndex,
+                                                                  const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComType, const stw_types::uint32 & oru32_InterfaceIndex)
    const;
-   std::vector<const stw_scl::C_SCLString *> m_GetExistingSignalNames(
+   std::map<stw_scl::C_SCLString, bool> m_GetExistingSignalNames(
       const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
 
-   stw_types::uint32 m_CalcHashSystemDefinition(void) const;
    void m_SetUpComDataPool(const stw_types::uint32 & oru32_NodeIndex, const stw_types::uint32 & oru32_DataPoolIndex,
                            const bool & orq_AllowDataAdaptation = false, const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComProtocolType =
                               stw_opensyde_core::C_OSCCanProtocol::eLAYER2);
@@ -491,6 +533,8 @@ private:
    void m_FixAddressIssues(void);
    void m_FixCommInconsistencyErrors(void);
    static stw_types::sint32 mh_SortMessagesByName(stw_opensyde_core::C_OSCNode & orc_OSCNode, C_PuiSdNode & orc_UiNode);
+   stw_types::uint32 m_GetHashNode(const stw_types::uint32 ou32_NodeIndex) const;
+   stw_types::uint32 m_GetHashBus(const stw_types::uint32 ou32_BusIndex) const;
 
    //Avoid call
    C_PuiSdHandler(const C_PuiSdHandler &);

@@ -145,6 +145,8 @@ sint32 C_OSCComDriverFlash::Init(const C_OSCSystemDefinition & orc_SystemDefinit
 /*!
    \brief   Sets the new CAN bitrate
 
+   An old connection will be closed.
+
    \param[in] ou32_Bitrate      Bitrate in kBit/s
 
    \return
@@ -162,6 +164,7 @@ sint32 C_OSCComDriverFlash::InitCanAndSetCanBitrate(const uint32 ou32_Bitrate)
 
    if (pc_CanDispatcher != NULL)
    {
+      pc_CanDispatcher->CAN_Exit();
       s32_Return = pc_CanDispatcher->CAN_Init(static_cast<sint32>(ou32_Bitrate));
 
       if (s32_Return != C_NO_ERR)
@@ -668,7 +671,7 @@ sint32 C_OSCComDriverFlash::SendOsyEthBroadcastSetIpAddress(const uint8 (&orau8_
    C_NOACT     Could not put request in TX queue
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
-   C_COM       expected response not received because of communication error
+   C_COM       communication driver reported error
 
    \created     14.12.2017  STW/A.Stangl
 */
@@ -705,7 +708,7 @@ sint32 C_OSCComDriverFlash::SendOsyRequestProgramming(const C_OSCProtocolDriverO
    C_NOACT     Could not put request in TX queue
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     18.12.2017  STW/A.Stangl
 */
@@ -742,7 +745,7 @@ sint32 C_OSCComDriverFlash::SendOsyReadActiveDiagnosticSession(const C_OSCProtoc
    C_NOACT     Could not put request in TX queue
    C_WARN      Error response received (except for requestOutOfRange for block > 0)
    C_TIMEOUT   Expected response not received within timeout
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     18.12.2017  STW/A.Stangl
 */
@@ -808,7 +811,7 @@ const
    C_NOACT     Could not put request in TX queue
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
-   C_COM       expected response not received because of communication error
+   C_COM       communication driver reported error
 
    \created     18.12.2017  STW/A.Stangl
 */
@@ -884,7 +887,7 @@ sint32 C_OSCComDriverFlash::SendOsyReadInformationFromFlashloader(const C_OSCPro
    C_NOACT     Could not put request in TX queue
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
-   C_COM       expected response not received because of communication error
+   C_COM       communication driver reported error
 
    \created     19.12.2017  STW/A.Stangl
 */
@@ -922,7 +925,7 @@ sint32 C_OSCComDriverFlash::SendOsyCheckFlashMemoryAvailable(const C_OSCProtocol
    C_NOACT     Could not put request in TX queue
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
-   C_COM       expected response not received because of communication error
+   C_COM       communication driver reported error
 
    \created     19.12.2017  STW/A.Stangl
 */
@@ -961,7 +964,7 @@ sint32 C_OSCComDriverFlash::SendOsyWriteApplicationSoftwareFingerprint(const C_O
    C_NOACT     Could not put request in TX queue
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
-   C_COM       expected response not received because of communication error
+   C_COM       communication driver reported error
 
    \created     19.12.2017  STW/A.Stangl
 */
@@ -998,7 +1001,7 @@ sint32 C_OSCComDriverFlash::SendOsyRequestDownload(const C_OSCProtocolDriverOsyN
    C_NOACT     Could not put request in TX queue
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
-   C_COM       expected response not received because of communication error
+   C_COM       communication driver reported error
 
    \created     23.02.2018  STW/A.Stangl
 */
@@ -1034,7 +1037,7 @@ sint32 C_OSCComDriverFlash::SendOsyRequestFileTransfer(const C_OSCProtocolDriver
    C_NOACT     Could not put request in TX queue
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
-   C_COM       expected response not received because of communication error
+   C_COM       communication driver reported error
 
    \created     19.12.2017  STW/A.Stangl
 */
@@ -1072,7 +1075,7 @@ sint32 C_OSCComDriverFlash::SendOsyTransferData(const C_OSCProtocolDriverOsyNode
    C_NOACT     Could not put request in TX queue
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
-   C_COM       expected response not received because of communication error
+   C_COM       communication driver reported error
 
    \created     19.12.2017  STW/A.Stangl
 */
@@ -1108,7 +1111,7 @@ sint32 C_OSCComDriverFlash::SendOsyRequestTransferExitAddressBased(const C_OSCPr
    C_NOACT     Could not put request in TX queue
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
-   C_COM       expected response not received because of communication error
+   C_COM       communication driver reported error
 
    \created     23.02.2018  STW/A.Stangl
 */
@@ -1300,7 +1303,7 @@ sint32 C_OSCComDriverFlash::SendOsySetSecurityLevel(const C_OSCProtocolDriverOsy
    C_CONFIG   no transport protocol installed
    C_WARN     error response
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     04.12.2017  STW/B.Bayer
 */
@@ -1341,7 +1344,7 @@ sint32 C_OSCComDriverFlash::SendOsySetBitrate(const C_OSCProtocolDriverOsyNode &
    C_CONFIG   no transport protocol installed
    C_WARN     error response
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     04.12.2017  STW/B.Bayer
 */
@@ -1384,7 +1387,7 @@ sint32 C_OSCComDriverFlash::SendOsySetIpAddressForChannel(const C_OSCProtocolDri
    C_CONFIG   no transport protocol installed
    C_WARN     error response
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     05.12.2017  STW/B.Bayer
 */
@@ -1760,6 +1763,7 @@ sint32 C_OSCComDriverFlash::SendStwGetDeviceId(const C_OSCProtocolDriverOsyNode 
    C_OSCFlashProtocolStwFlashloader c_StwProtocol(mpr_XflReportProgress, mpv_XflReportProgressInstance);
    C_OSCFlashProtocolStwFlashloader * pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
    uint16 u16_ProtocolVersion;
+   bool q_LongId;
 
    if (pc_ExistingProtocol == NULL)
    {
@@ -1768,13 +1772,14 @@ sint32 C_OSCComDriverFlash::SendStwGetDeviceId(const C_OSCProtocolDriverOsyNode 
       pc_ExistingProtocol = &c_StwProtocol;
    }
 
-   orc_DeviceName = "";
+   //check for supported version of service depending on the protocol version:
    s32_Return = pc_ExistingProtocol->GetImplementationInformationProtocolVersion(u16_ProtocolVersion);
-   if (s32_Return == C_NO_ERR)
-   {
-      const bool q_LongId = u16_ProtocolVersion >= mhu16_STW_FLASHLOADER_PROTOCOL_VERSION_3_00;
-      s32_Return = pc_ExistingProtocol->GetDeviceID(q_LongId, orc_DeviceName);
-   }
+
+   //no response or error response: we have to assume we have a version <= V3.00r0
+   q_LongId = ((s32_Return == C_NO_ERR) && (u16_ProtocolVersion >= mhu16_STW_FLASHLOADER_PROTOCOL_VERSION_3_00));
+   orc_DeviceName = "";
+   s32_Return = pc_ExistingProtocol->GetDeviceID(q_LongId, orc_DeviceName);
+
    return s32_Return;
 }
 

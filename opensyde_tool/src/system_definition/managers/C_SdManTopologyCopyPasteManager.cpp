@@ -96,16 +96,8 @@ C_SdManTopologyCopyPasteManager::~C_SdManTopologyCopyPasteManager(void)
 //-----------------------------------------------------------------------------
 const C_PuiBsElements * C_SdManTopologyCopyPasteManager::GetSnapshot(QWidget * const opc_Parent)
 {
-   C_SdTopologyDataSnapshot * pc_Retval = new C_SdTopologyDataSnapshot();
-
    Q_UNUSED(opc_Parent)
-   if (C_SdClipBoardHelper::h_LoadDataSnapShotFromClipboard(*pc_Retval) != C_NO_ERR)
-   {
-      delete (pc_Retval);
-      pc_Retval = NULL;
-   }
-
-   return pc_Retval;
+   return &this->mc_LastKnownData;
 }
 
 //-----------------------------------------------------------------------------
@@ -301,6 +293,8 @@ void C_SdManTopologyCopyPasteManager::CopyFromSceneToManager(const QList<QGraphi
 /*!
    \brief   Indicator if copy paste manager has some content
 
+   Warning: is expected to be called bevore getting any data
+
    \return
    true: content
    false: no content
@@ -308,11 +302,10 @@ void C_SdManTopologyCopyPasteManager::CopyFromSceneToManager(const QList<QGraphi
    \created     14.11.2016  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-bool C_SdManTopologyCopyPasteManager::CheckValidContent(void) const
+bool C_SdManTopologyCopyPasteManager::CheckValidContentAndPrepareData(void)
 {
-   C_SdTopologyDataSnapshot c_Tmp;
-
-   return (C_SdClipBoardHelper::h_LoadDataSnapShotFromClipboard(c_Tmp) == C_NO_ERR);
+   this->mc_LastKnownData.Clear();
+   return (C_SdClipBoardHelper::h_LoadDataSnapShotFromClipboard(this->mc_LastKnownData) == C_NO_ERR);
 }
 
 //-----------------------------------------------------------------------------

@@ -44,7 +44,7 @@ protected:
    //reporting functions from STW Flashloader protocol driver
    ///Report progress in 1/1000; return a value != C_NO_ERR to signal the flashing procedure to abort.
    ///This is just for informational purposes and not necessarily exactly linear to the actual progress.
-   virtual stw_types::sint32 TRG_ReportProgress(const stw_types::uint16 ou16_Progress1By1000,
+   virtual stw_types::sint32 TRG_ReportProgress(const stw_types::uint16 ou16_Progress1_1000,
                                                 const stw_scl::C_SCLString & orc_AdditionalText);
    ///report status as text; can be used for logging what's going on
    virtual void TRG_ReportStatus(const stw_scl::C_SCLString & orc_Text, const stw_types::uint8 ou8_Type);

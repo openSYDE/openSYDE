@@ -78,11 +78,12 @@ private:
    C_SdBueBusEditWidget & operator =(const C_SdBueBusEditWidget &);
 
    void m_DataChanged(void);
+   void m_TabChanged(const stw_types::sintn osn_Index) const;
 
    Ui::C_SdBueBusEditWidget * mpc_Ui;
    const stw_types::uint32 mu32_BusIndex;
    bool mq_DataChanged;
-   stw_opensyde_core::C_OSCSystemBus::E_Type me_BusTye;
+   stw_opensyde_core::C_OSCSystemBus::E_Type me_BusType;
 };
 }
 

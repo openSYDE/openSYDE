@@ -40,21 +40,12 @@ using namespace stw_opensyde_gui_logic;
 
 //-----------------------------------------------------------------------------
 /*!
-   \brief   short description of function
-
-   long description of function within several lines
-
-   \param[in]     ou8_Aa         input parameter description
-   \param[out]    opu32_Bb       output parameter description
-   \param[in,out] opu16_Cc       input/output parameter description
-
-   \return
-   possible return value(s) and description
+   \brief   Default constructor
 
    \created     24.07.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-C_UtiClipBoardHelper::C_UtiClipBoardHelper()
+C_UtiClipBoardHelper::C_UtiClipBoardHelper(void)
 {
 }
 

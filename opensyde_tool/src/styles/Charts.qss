@@ -1,6 +1,6 @@
 /* --------------------------------------------------------------------- */
-
-stw_opensyde_gui--C_SyvDaItChartWidget[Style="FLAT_BRIGHT"] {
+stw_opensyde_gui--C_SyvDaItChartWidget[Style="FLAT_BRIGHT"]
+{
 border-width: 1px;
 border-style: solid;
 }

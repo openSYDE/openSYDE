@@ -39,12 +39,14 @@ public:
    virtual ~C_SdManTopologyCopyPasteManager(void);
    virtual const C_PuiBsElements * GetSnapshot(QWidget * const opc_Parent) override;
    virtual void CopyFromSceneToManager(const QList<QGraphicsItem *> & orc_SelectedItems) override;
-   virtual bool CheckValidContent(void) const override;
+   virtual bool CheckValidContentAndPrepareData(void) override;
 
 protected:
    virtual void m_CalcOriginalPosition(const C_PuiBsElements * const opc_Data) override;
 
 private:
+   C_SdTopologyDataSnapshot mc_LastKnownData;
+
    static void mh_RemoveConnection(C_SdTopologyDataSnapshot & orc_Data, const stw_types::uint32 & oru32_NodeIndex,
                                    const C_PuiSdNodeConnectionId & orc_ConnectionId);
 };

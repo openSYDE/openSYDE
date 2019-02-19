@@ -19,6 +19,7 @@
 
 /* -- Includes ------------------------------------------------------------- */
 #include "C_OgePubToolTipBase.h"
+#include "stwtypes.h"
 
 /* -- Namespace ------------------------------------------------------------ */
 namespace stw_opensyde_gui_elements
@@ -36,6 +37,7 @@ public:
    explicit C_OgePubProjAction(QWidget * const opc_Parent = NULL);
 
    void SetCustomIcon(QString oc_IconPathEnabled, QString oc_IconPathDisabled);
+   void SetIconPaddingLeft(const stw_types::sintn osn_Value);
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
@@ -46,6 +48,7 @@ protected:
 private:
    QIcon mc_IconEnabled;
    QIcon mc_IconDisabled;
+   stw_types::sintn msn_IconPaddingLeft;
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

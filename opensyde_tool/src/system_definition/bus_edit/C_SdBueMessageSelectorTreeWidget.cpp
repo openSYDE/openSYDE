@@ -958,10 +958,13 @@ void C_SdBueMessageSelectorTreeWidget::Paste(void)
             //Valid messages
             if (GetMessageIdForAdd(c_MessageId) == C_NO_ERR)
             {
+               std::vector<C_OSCCanMessageIdentificationIndices> c_NewIds;
                this->mpc_UndoManager->DoPasteMessages(c_MessageId, c_Messages, c_OSCMsgSignalCommons,
                                                       c_UIMsgSignalCommons,
                                                       c_UIMsgSignals, c_OwnerNodeName, c_OwnerNodeInterfaceIndex,
-                                                      c_OwnerIsTxFlag, this->mpc_MessageSyncManager, this);
+                                                      c_OwnerIsTxFlag, this->mpc_MessageSyncManager, this, c_NewIds);
+               //Selection
+               this->SelectMessages(c_NewIds);
             }
          }
       }
@@ -1080,9 +1083,11 @@ void C_SdBueMessageSelectorTreeWidget::InternalAddMessage(const C_OSCCanMessageI
       //Ui update trigger
       this->updateGeometry();
       //Error handling
-      RecheckErrorGlobal();
+      RecheckErrorGlobal(false);
       //Signal
       Q_EMIT this->SigMessageCountChanged();
+      //Otherwise there is no error update
+      Q_EMIT SigErrorChanged();
    }
 }
 
@@ -1107,9 +1112,11 @@ void C_SdBueMessageSelectorTreeWidget::InternalDeleteMessage(const C_OSCCanMessa
       //Ui update trigger
       this->updateGeometry();
       //Error handling
-      RecheckErrorGlobal();
+      RecheckErrorGlobal(false);
       //Signal
       Q_EMIT this->SigMessageCountChanged();
+      //Otherwise there is no error update
+      Q_EMIT SigErrorChanged();
       //Select near u32_InternalMessageIndex
       if (u32_InternalMessageIndex < static_cast<uint32>(this->topLevelItemCount()))
       {
@@ -1164,9 +1171,10 @@ void C_SdBueMessageSelectorTreeWidget::InternalAddSignal(const C_OSCCanMessageId
             //Ui update trigger
             this->updateGeometry();
             //Error handling
-            RecheckErrorGlobal();
+            RecheckErrorGlobal(false);
             //Signal
             Q_EMIT this->SigSignalCountOfMessageChanged(orc_MessageId);
+            Q_EMIT SigErrorChanged();
          }
       }
    }
@@ -1199,9 +1207,10 @@ void C_SdBueMessageSelectorTreeWidget::InternalDeleteSignal(const C_OSCCanMessag
             //Ui update trigger
             this->updateGeometry();
             //Error handling
-            RecheckErrorGlobal();
+            RecheckErrorGlobal(false);
             //Signal
             Q_EMIT this->SigSignalCountOfMessageChanged(orc_MessageId);
+            Q_EMIT SigErrorChanged();
             //Handle selection
             if (pc_Parent->childCount() > 0)
             {
@@ -1303,6 +1312,9 @@ void C_SdBueMessageSelectorTreeWidget::OnSignalNameChange(const C_OSCCanMessageI
 /*!
    \brief   Trigger global error check (icons only)
 
+   \param[in] orq_HandleSelection Flag to change selection
+                                   (use-case: message name change -> new position of selected item!)
+
    \created     28.04.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
@@ -1319,7 +1331,7 @@ void C_SdBueMessageSelectorTreeWidget::RecheckErrorGlobal(const bool & orq_Handl
    }
    if (orq_HandleSelection == true)
    {
-      m_RestoreSelection();
+      m_RestoreSelection(true);
    }
 }
 
@@ -1328,7 +1340,7 @@ void C_SdBueMessageSelectorTreeWidget::RecheckErrorGlobal(const bool & orq_Handl
    \brief   Trigger recheck of error values for tree
 
    \param[in] orc_MessageId            Message identification indices
-   \param[in] orq_AllowMessageIdUpdate Message identification indices
+   \param[in] orq_AllowMessageIdUpdate Flag to allow message ID changes using when using this function
 
    \created     28.04.2017  STW/M.Echtler
 */
@@ -1387,26 +1399,9 @@ void C_SdBueMessageSelectorTreeWidget::RecheckError(const C_OSCCanMessageIdentif
                                                                                          u32_SignalInternalIndex));
                         if (pc_ChildItem != NULL)
                         {
-                           bool q_SignalValid;
-                           bool q_LayoutConflict = false;
-                           bool q_BorderConflict = false;
-                           bool q_NameConflict = false;
-                           bool q_NameInvalid = false;
-                           bool q_MinOverMax = false;
-                           bool q_ValueBelowMin = false;
-                           bool q_ValueOverMax = false;
-                           pc_Message->CheckErrorSignal(pc_List, u32_ItSignal, &q_LayoutConflict, &q_BorderConflict,
-                                                        &q_NameConflict, &q_NameInvalid, &q_MinOverMax,
-                                                        &q_ValueBelowMin,
-                                                        &q_ValueOverMax, C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
-                                                           orc_MessageId.e_ComProtocol));
-                           q_SignalValid =
-                              (((((((q_LayoutConflict == false) && (q_BorderConflict == false)) &&
-                                   (q_NameConflict == false)) &&
-                                  (q_NameInvalid == false)) && (q_MinOverMax == false)) &&
-                                (q_ValueBelowMin == false)) &&
-                               (q_ValueOverMax == false));
-                           if (q_SignalValid == false)
+                           if (pc_Message->CheckErrorSignal(pc_List, u32_ItSignal,
+                                                            C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                                                               orc_MessageId.e_ComProtocol)))
                            {
                               //Error
                               pc_ChildItem->SetError(true);
@@ -1497,10 +1492,10 @@ bool C_SdBueMessageSelectorTreeWidget::CheckIfAnyNodeConnected(void) const
 
 //-----------------------------------------------------------------------------
 /*!
-   \brief   Handle selection change with all aspects
+   \brief   Handle single message selection change with all aspects
 
-   \param[in] orc_MessageId   Message identification indices
-   \param[in] oq_BlockSignal  Optional flag for blocking the signal for changed selection
+   \param[in] orc_MessageId  Message identification indices
+   \param[in] oq_BlockSignal Optional flag for blocking the signal for changed selection
 
    \created     08.05.2017  STW/M.Echtler
 */
@@ -1514,6 +1509,39 @@ void C_SdBueMessageSelectorTreeWidget::SelectMessage(const C_OSCCanMessageIdenti
    this->mc_SelectedSignals.clear();
    this->mc_SelectedMessageIds.push_back(orc_MessageId);
    this->mc_SelectedSignals.push_back(c_Signal);
+
+   //Do not trigger selection
+   if (oq_BlockSignal == true)
+   {
+      m_DisconnectSelection();
+   }
+   m_RestoreSelection(true);
+
+   this->mc_SelectedMessageIds.clear();
+   this->mc_SelectedSignals.clear();
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Handle multi message selection change with all aspects
+
+   \param[in] orc_MessageIds Multiple message identification indices
+   \param[in] oq_BlockSignal Optional flag for blocking the signal for changed selection
+
+   \created     19.02.2019  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_SdBueMessageSelectorTreeWidget::SelectMessages(
+   const std::vector<C_OSCCanMessageIdentificationIndices> & orc_MessageIds, const bool oq_BlockSignal)
+{
+   this->mc_SelectedMessageIds.clear();
+   this->mc_SelectedSignals.clear();
+   for (uint32 u32_ItMessage = 0UL; u32_ItMessage < orc_MessageIds.size(); ++u32_ItMessage)
+   {
+      const std::vector<stw_types::uint32> c_Signal;
+      this->mc_SelectedMessageIds.push_back(orc_MessageIds[u32_ItMessage]);
+      this->mc_SelectedSignals.push_back(c_Signal);
+   }
 
    //Do not trigger selection
    if (oq_BlockSignal == true)
@@ -2468,6 +2496,11 @@ void C_SdBueMessageSelectorTreeWidget::m_SaveSelection(void)
 //-----------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_RestoreSelection(const bool oq_AlsoSetCurrent)
 {
+   if (oq_AlsoSetCurrent)
+   {
+      //Wait for all events -> otherwise widget size is invalid so scrolling does not work properly
+      QApplication::processEvents();
+   }
    this->clearSelection();
    tgl_assert(this->mc_SelectedMessageIds.size() == this->mc_SelectedSignals.size());
    if (this->mc_SelectedMessageIds.size() == this->mc_SelectedSignals.size())
@@ -2491,11 +2524,11 @@ void C_SdBueMessageSelectorTreeWidget::m_RestoreSelection(const bool oq_AlsoSetC
                   if (rc_Signals.size() == 0)
                   {
                      //Message
+                     pc_TopLevelItem->setSelected(true);
                      if (oq_AlsoSetCurrent == true)
                      {
-                        this->setCurrentItem(pc_TopLevelItem);
+                        this->scrollToItem(pc_TopLevelItem);
                      }
-                     pc_TopLevelItem->setSelected(true);
                   }
                   else
                   {
@@ -2512,11 +2545,11 @@ void C_SdBueMessageSelectorTreeWidget::m_RestoreSelection(const bool oq_AlsoSetC
                            QTreeWidgetItem * const pc_ChildItem = pc_TopLevelItem->child(u32_SignalInternalIndex);
                            if (pc_ChildItem != NULL)
                            {
+                              pc_ChildItem->setSelected(true);
                               if (oq_AlsoSetCurrent == true)
                               {
-                                 this->setCurrentItem(pc_ChildItem);
+                                 this->scrollToItem(pc_ChildItem);
                               }
-                              pc_ChildItem->setSelected(true);
                            }
                         }
                      }

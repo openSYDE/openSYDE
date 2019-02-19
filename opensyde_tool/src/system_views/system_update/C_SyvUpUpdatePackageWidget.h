@@ -65,7 +65,8 @@ public:
 
    stw_types::sint32 GetUpdatePackage(
       std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
-      std::vector<stw_types::uint32> & orc_NodesOrder) const;
+      std::vector<stw_types::uint32> & orc_NodesOrder,
+      std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> * const opc_AllApplications = NULL) const;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

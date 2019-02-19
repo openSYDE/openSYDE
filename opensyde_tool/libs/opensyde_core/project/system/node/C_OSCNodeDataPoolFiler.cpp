@@ -581,8 +581,18 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolLists(const uint16 ou16_XmlFormatVe
                                                    C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
+   C_SCLString c_CurNodeList;
+   uint32 u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
 
-   C_SCLString c_CurNodeList = orc_XMLParser.SelectNodeChild("list");
+   //Check optional length
+   if (q_ExpectedSizeHere == true)
+   {
+      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      orc_NodeDataPoolLists.reserve(u32_ExpectedSize);
+   }
+
+   c_CurNodeList = orc_XMLParser.SelectNodeChild("list");
 
    //Clear
    orc_NodeDataPoolLists.clear();
@@ -609,7 +619,17 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolLists(const uint16 ou16_XmlFormatVe
          tgl_assert(orc_XMLParser.SelectNodeParent() == "lists");
       }
    }
-
+   //Compare length
+   if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
+   {
+      if (u32_ExpectedSize != orc_NodeDataPoolLists.size())
+      {
+         C_SCLString c_Tmp;
+         c_Tmp.PrintFormatted("Unexpected list count, expected: %i, got %i", u32_ExpectedSize,
+                              orc_NodeDataPoolLists.size());
+         osc_write_log_warning("Load file", c_Tmp.c_str());
+      }
+   }
    return s32_Retval;
 }
 
@@ -630,6 +650,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolLists(const uint16 ou16_XmlFormatVe
 void C_OSCNodeDataPoolFiler::h_SaveDataPoolLists(const std::vector<C_OSCNodeDataPoolList> & orc_NodeDataPoolLists,
                                                  C_OSCXMLParserBase & orc_XMLParser)
 {
+   orc_XMLParser.SetAttributeUint32("length", orc_NodeDataPoolLists.size());
    for (uint32 u32_ItList = 0; u32_ItList < orc_NodeDataPoolLists.size(); ++u32_ItList)
    {
       orc_XMLParser.CreateAndSelectNodeChild("list");
@@ -663,8 +684,18 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListElements(const uint16 ou16_XmlF
                                                           C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
+   C_SCLString c_CurNodeDataElement;
+   uint32 u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
 
-   C_SCLString c_CurNodeDataElement = orc_XMLParser.SelectNodeChild("data-element");
+   //Check optional length
+   if (q_ExpectedSizeHere == true)
+   {
+      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      orc_NodeDataPoolListElements.reserve(u32_ExpectedSize);
+   }
+
+   c_CurNodeDataElement = orc_XMLParser.SelectNodeChild("data-element");
 
    //Clear
    orc_NodeDataPoolListElements.clear();
@@ -689,6 +720,17 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListElements(const uint16 ou16_XmlF
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "data-elements");
    }
+   //Compare length
+   if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
+   {
+      if (u32_ExpectedSize != orc_NodeDataPoolListElements.size())
+      {
+         C_SCLString c_Tmp;
+         c_Tmp.PrintFormatted("Unexpected data element count, expected: %i, got %i", u32_ExpectedSize,
+                              orc_NodeDataPoolListElements.size());
+         osc_write_log_warning("Load file", c_Tmp.c_str());
+      }
+   }
    return s32_Retval;
 }
 
@@ -709,6 +751,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListElements(const uint16 ou16_XmlF
 void C_OSCNodeDataPoolFiler::h_SaveDataPoolListElements(
    const std::vector<C_OSCNodeDataPoolListElement> & orc_NodeDataPoolListElements, C_OSCXMLParserBase & orc_XMLParser)
 {
+   orc_XMLParser.SetAttributeUint32("length", orc_NodeDataPoolListElements.size());
    for (uint32 u32_ItDataElement = 0; u32_ItDataElement < orc_NodeDataPoolListElements.size();
         ++u32_ItDataElement)
    {

@@ -35,7 +35,7 @@ class C_GiLiEthernetBus :
 {
 public:
    C_GiLiEthernetBus(const stw_types::sint32 & ors32_Index, const stw_types::uint64 & oru64_ID,
-                     C_GiTextElementBus * const opc_TextElementName,
+                     C_GiTextElementBus * const opc_TextElementName, const bool oq_DoErrorCheck,
                      const std::vector<QPointF> * const opc_Points = NULL, QGraphicsItem * const opc_Parent = NULL);
    virtual ~C_GiLiEthernetBus();
 

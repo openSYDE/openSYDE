@@ -282,6 +282,22 @@ void C_SyvDaItPaTreeView::PrepareChangedValues(const std::vector<C_OSCNodeDataPo
 
 //-----------------------------------------------------------------------------
 /*!
+   \brief   Resets the NVM changed flag for all relevant elements
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+
+   \created     31.01.2019  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_SyvDaItPaTreeView::RemoveValuesChangedFlag(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds) const
+{
+   this->mc_Model.RemoveValuesChangedFlag(orc_ListIds);
+}
+
+//-----------------------------------------------------------------------------
+/*!
    \brief   Set dark flag value
 
    \param[in] oq_Value New dark flag value

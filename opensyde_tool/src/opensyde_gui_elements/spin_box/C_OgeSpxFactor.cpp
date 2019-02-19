@@ -77,20 +77,30 @@ C_OgeSpxFactor::C_OgeSpxFactor(QWidget * const opc_Parent) :
 //-----------------------------------------------------------------------------
 void C_OgeSpxFactor::stepBy(const sintn osn_Steps)
 {
-   C_OgeSpxDoubleToolTipBase::stepBy(osn_Steps);
-   if (C_OSCUtils::h_IsFloat64NearlyEqual(this->value(), 0.0) == true)
+   //Only allow step if resulting value is ABOVE zero
+   float64 f64_CurValue = this->value();
+
+   if (osn_Steps > 0)
    {
-      if (osn_Steps > 0)
+      C_OgeSpxDoubleToolTipBase::stepBy(osn_Steps);
+   }
+   else
+   {
+      const sintn sn_StepsPos = osn_Steps * -1;
+      if (f64_CurValue > (static_cast<float64>(sn_StepsPos) * 1.0))
       {
-         this->setValue(1.0);
-      }
-      else if (osn_Steps < 0)
-      {
-         this->setValue(-1.0);
+         C_OgeSpxDoubleToolTipBase::stepBy(osn_Steps);
       }
       else
       {
-         //No step
+         //Convert to max allowed number of steps
+         sintn sn_MaxStepsPossible = 0;
+         while (f64_CurValue > 0.0)
+         {
+            f64_CurValue -= 1.0;
+            ++sn_MaxStepsPossible;
+         }
+         C_OgeSpxDoubleToolTipBase::stepBy(sn_MaxStepsPossible);
       }
    }
 }
@@ -117,4 +127,30 @@ QValidator::State C_OgeSpxFactor::validate(QString & orc_Text, sintn & orsn_Pos)
       e_Retval = QValidator::State::Intermediate;
    }
    return e_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Return allowed step actions
+
+   \return
+   StepDownEnabled                 Down action allowed
+   StepUpEnabled                   Up action allowed
+   StepUpEnabled | StepDownEnabled Up and down actions allowed
+
+   \created     30.01.2019  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+QAbstractSpinBox::StepEnabled C_OgeSpxFactor::stepEnabled(void) const
+{
+   QAbstractSpinBox::StepEnabled c_Retval;
+   if (this->value() > 1.0)
+   {
+      c_Retval = StepUpEnabled | StepDownEnabled;
+   }
+   else
+   {
+      c_Retval = StepUpEnabled;
+   }
+   return c_Retval;
 }

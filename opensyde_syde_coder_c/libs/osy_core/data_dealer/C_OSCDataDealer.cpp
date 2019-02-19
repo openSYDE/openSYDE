@@ -245,7 +245,7 @@ sint32 C_OSCDataDealer::DataPoolRead(const uint8 ou8_DataPoolIndex, const uint16
    C_NOACT     could not send request (e.g. TX buffer full)
    C_RD_WR     protocol driver reported protocol violation
    C_WARN      error response received
-   C_COM       expected response not received because of communication error
+   C_COM       communication driver reported error
 
    \created     21.08.2017  STW/A.Stangl
 */

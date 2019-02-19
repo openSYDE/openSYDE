@@ -35,17 +35,9 @@ class C_OgeSpiHorizontalNavigation :
 public:
    C_OgeSpiHorizontalNavigation(QWidget * const opc_Parent = NULL);
 
-   //The signals keyword is necessary for Qt signal slot functionality
-   //lint -save -e1736
-
-Q_SIGNALS:
-   //lint -restore
-   void SigShow(void);
-
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
    //lint -save -e1960
-   virtual void showEvent(QShowEvent * const opc_Event) override;
    virtual QSplitterHandle * createHandle(void) override;
    //lint -restore
 };

@@ -62,11 +62,11 @@ C_OgeSpxInt64::C_OgeSpxInt64(QWidget * const opc_Parent, const bool & orq_IsUnsi
    m_ResetMinMax();
    if (this->mq_IsUnsigned == true)
    {
-      this->SetValue(QVariant(0ULL));
+      this->SetValue(QVariant(0ULL), false);
    }
    else
    {
-      this->SetValue(QVariant(0LL));
+      this->SetValue(QVariant(0LL), false);
    }
    connect(this->lineEdit(), &QLineEdit::editingFinished, this, &C_OgeSpxInt64::SigValueChanged);
 }
@@ -91,12 +91,13 @@ bool C_OgeSpxInt64::GetIsUnsigned(void) const
 /*!
    \brief   Set new internal value
 
-   \param[in] orc_Value New value
+   \param[in] orc_Value           New value
+   \param[in] oq_AllowValueUpdate Flag to suppress or request value update signals
 
    \created     15.02.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-void C_OgeSpxInt64::SetValue(const QVariant & orc_Value)
+void C_OgeSpxInt64::SetValue(const QVariant & orc_Value, const bool oq_AllowValueUpdate)
 {
    QString c_ValueStr;
    QVariant c_Value = m_PrepareValue(orc_Value);
@@ -152,7 +153,7 @@ void C_OgeSpxInt64::SetValue(const QVariant & orc_Value)
       pc_LineEdit->setText(QString("%1 %2").arg(c_ValueStr, this->mc_Suffix));
    }
    //Behave as double spin box, only send changes if any
-   if (q_Change == true)
+   if ((q_Change == true) && (oq_AllowValueUpdate))
    {
       Q_EMIT this->SigValueChanged();
    }
@@ -435,7 +436,7 @@ void C_OgeSpxInt64::stepBy(const sintn osn_Steps)
    {
       //No change
    }
-   this->SetValue(c_Tmp);
+   this->SetValue(c_Tmp, true);
 }
 
 //-----------------------------------------------------------------------------
@@ -577,7 +578,7 @@ void C_OgeSpxInt64::SetIsUnsigned(const bool & orq_Value)
    this->mq_IsUnsigned = orq_Value;
    m_ResetMinMax();
    //Reset value
-   this->SetValue(this->GetValue());
+   this->SetValue(this->GetValue(), true);
 }
 
 //-----------------------------------------------------------------------------

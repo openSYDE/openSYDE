@@ -36,6 +36,7 @@ public:
    C_OgeSpiBase(QWidget * const opc_Parent = NULL);
 
    void SetFirstSegment(const stw_types::sint32 os32_Width);
+   void SetSecondSegment(const stw_types::sint32 os32_Width);
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

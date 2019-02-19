@@ -101,6 +101,8 @@ C_SdBueComIfDescriptionWidget::C_SdBueComIfDescriptionWidget(QWidget * const opc
            this, &C_SdBueComIfDescriptionWidget::m_AddDataPool);
    connect(this->mpc_Ui->pc_NodeSelectorWidget, &C_SdBueNodeSelectorWidget::SigReload,
            this, &C_SdBueComIfDescriptionWidget::Reload);
+   connect(this->mpc_Ui->pc_NodeSelectorWidget, &C_SdBueNodeSelectorWidget::SigErrorChange,
+           this, &C_SdBueComIfDescriptionWidget::SigErrorChange);
 
    connect(this->mpc_Ui->pc_ProtocolTabWidget, &stw_opensyde_gui_elements::C_OgeTawSelector::currentChanged,
            this, &C_SdBueComIfDescriptionWidget::m_ProtocolChanged);
@@ -138,6 +140,8 @@ C_SdBueComIfDescriptionWidget::C_SdBueComIfDescriptionWidget(QWidget * const opc
            this, &C_SdBueComIfDescriptionWidget::m_OnMessageRxChanged);
 
    //Signal
+   connect(this->mpc_Ui->pc_MessageSelectorWidget, &C_SdBueMessageSelectorWidget::SigErrorChanged, this,
+           &C_SdBueComIfDescriptionWidget::SigErrorChange);
    connect(this->mpc_Ui->pc_MessageSelectorWidget, &C_SdBueMessageSelectorWidget::SigSignalCountOfMessageChanged, this,
            &C_SdBueComIfDescriptionWidget::m_OnSignalCountOfMessageChanged);
    connect(this->mpc_Ui->pc_MessageSelectorWidget, &C_SdBueMessageSelectorWidget::SigMessageCountChanged, this,
@@ -378,6 +382,8 @@ void C_SdBueComIfDescriptionWidget::PartialReload(void)
    //Update node check marks
    this->mpc_Ui->pc_NodeSelectorWidget->SetProtocol(this->GetActProtocol());
    m_ReloadMessages();
+   //Update error
+   Q_EMIT this->SigErrorChange();
 }
 
 //-----------------------------------------------------------------------------
@@ -413,7 +419,7 @@ void C_SdBueComIfDescriptionWidget::SelectMessage(const uint32 ou32_NodeIndex, c
 {
    C_OSCCanMessageIdentificationIndices c_MessageId;
 
-   // fills all informations except the message index
+   // fills all information except the message index
    m_PrepareMessageId(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex, c_MessageId);
 
    c_MessageId.u32_MessageIndex = ou32_MessageIndex;
@@ -1199,24 +1205,25 @@ const
 
       if (pc_MessageContainer != NULL)
       {
-         C_OSCNodeDataPoolList c_OscList;
-         C_PuiSdNodeDataPoolList c_UiList;
-
-         C_PuiSdHandler::h_GetInstance()->GetDataPoolList(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex, c_OscList,
-                                                          c_UiList);
-
-         orc_MessageId.u32_NodeIndex = ou32_NodeIndex;
-
-         orc_MessageId.q_MessageIsTx = C_OSCCanProtocol::h_ListIsComTx(c_OscList);
-
-         // search the matching signal
-         if (orc_MessageId.q_MessageIsTx == true)
+         const C_OSCNodeDataPoolList * const pc_OscList = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+            ou32_NodeIndex,
+            ou32_DataPoolIndex,
+            ou32_ListIndex);
+         if (pc_OscList != NULL)
          {
-            pc_Messages = &pc_MessageContainer->c_TxMessages;
-         }
-         else
-         {
-            pc_Messages = &pc_MessageContainer->c_RxMessages;
+            orc_MessageId.u32_NodeIndex = ou32_NodeIndex;
+
+            orc_MessageId.q_MessageIsTx = C_OSCCanProtocol::h_ListIsComTx(*pc_OscList);
+
+            // search the matching signal
+            if (orc_MessageId.q_MessageIsTx == true)
+            {
+               pc_Messages = &pc_MessageContainer->c_TxMessages;
+            }
+            else
+            {
+               pc_Messages = &pc_MessageContainer->c_RxMessages;
+            }
          }
       }
    }

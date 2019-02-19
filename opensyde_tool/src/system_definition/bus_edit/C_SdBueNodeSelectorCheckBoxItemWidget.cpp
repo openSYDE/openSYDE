@@ -194,10 +194,10 @@ void C_SdBueNodeSelectorCheckBoxItemWidget::UpdateToolTip(void)
 {
    uint32 u32_NodeIndex;
    uint32 u32_InterfaceIndex;
-   C_OSCNode * pc_Node;
+   const C_OSCNode * pc_Node;
 
    this->mpc_CheckBox->GetIndexes(u32_NodeIndex, u32_InterfaceIndex);
-   pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(u32_NodeIndex);
+   pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
 
    tgl_assert(pc_Node != NULL);
    if (pc_Node != NULL)

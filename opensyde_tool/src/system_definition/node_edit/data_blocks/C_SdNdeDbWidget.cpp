@@ -17,8 +17,6 @@
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
 
-#include <QFileDialog>
-
 #include "C_Uti.h"
 #include "C_PuiSdUtil.h"
 #include "stwerrors.h"
@@ -82,6 +80,9 @@ C_SdNdeDbWidget::C_SdNdeDbWidget(const uint32 ou32_NodeIndex, const uint32 ou32_
    const QIcon c_IconError = QIcon("://images/Error_iconV2.svg");
 
    this->mpc_Ui->setupUi(this);
+
+   this->mpc_Ui->pc_ScrollAreaCommentWidget->SetBackgroundColor(-1);
+   this->mpc_Ui->pc_ScrollAreaDataPoolWidget->SetBackgroundColor(-1);
 
    InitStaticNames();
 
@@ -701,7 +702,7 @@ void C_SdNdeDbWidget::m_OnOpenIdeClicked(void)
    if (c_IDECall == "")
    {
       C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eERROR,
-                                        C_GtGetText::h_GetText("No IDE provided. Please edit Data Block Properties and "
+                                        C_GtGetText::h_GetText("No IDE provided. Edit Data Block Properties and "
                                                                "insert an IDE Call."));
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Open IDE"));
       c_MessageBox.Execute();
@@ -709,8 +710,8 @@ void C_SdNdeDbWidget::m_OnOpenIdeClicked(void)
    else if (C_ImpUtil::h_OpenIDE(c_IDECall) != C_NO_ERR)
    {
       C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eERROR,
-                                        C_GtGetText::h_GetText("Could not start IDE most likely due to insufficient "
-                                                               "permissions or the executable is missing."));
+                                        C_GtGetText::h_GetText(
+                                           "Could not start IDE. Reason: Most likely due to insufficient permissions or the executable is missing."));
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Open IDE"));
       c_MessageBox.SetDetails(QString(C_GtGetText::h_GetText(
                                          "The following call returned an error: \n%1")).arg(c_IDECall));

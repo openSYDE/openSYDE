@@ -207,7 +207,7 @@ void C_OgeWiSpinBoxGroup::SetValue(const QVariant & orc_Value) const
 {
    if (this->mq_DoubleMode == false)
    {
-      this->mpc_Ui->pc_SpinBox64->SetValue(orc_Value);
+      this->mpc_Ui->pc_SpinBox64->SetValue(orc_Value, false);
    }
    else
    {
@@ -490,12 +490,12 @@ void C_OgeWiSpinBoxGroup::focusOutEvent(QFocusEvent * const opc_Event)
    \created     27.04.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-void C_OgeWiSpinBoxGroup::m_ResizeToDefault(void) const
+void C_OgeWiSpinBoxGroup::m_ResizeToDefault(const stw_types::sintn osn_Height) const
 {
-   this->mpc_Ui->pc_SpinBox64->setMinimumHeight(30);
-   this->mpc_Ui->pc_DoubleSpinBox->setMinimumHeight(30);
-   this->mpc_Ui->pc_SpinBox64->setMaximumHeight(30);
-   this->mpc_Ui->pc_DoubleSpinBox->setMaximumHeight(30);
+   this->mpc_Ui->pc_SpinBox64->setMinimumHeight(osn_Height);
+   this->mpc_Ui->pc_DoubleSpinBox->setMinimumHeight(osn_Height);
+   this->mpc_Ui->pc_SpinBox64->setMaximumHeight(osn_Height);
+   this->mpc_Ui->pc_DoubleSpinBox->setMaximumHeight(osn_Height);
 }
 
 //-----------------------------------------------------------------------------

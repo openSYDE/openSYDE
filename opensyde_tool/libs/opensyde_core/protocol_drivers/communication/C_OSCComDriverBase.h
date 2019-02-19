@@ -34,6 +34,17 @@ namespace stw_opensyde_core
 
 /* -- Types ---------------------------------------------------------------- */
 
+class C_OSCComDriverBaseCanMessage
+{
+public:
+   C_OSCComDriverBaseCanMessage(void);
+   bool operator ==(const C_OSCComDriverBaseCanMessage & orc_Cmp) const;
+
+   stw_can::T_STWCAN_Msg_TX c_Msg;
+   stw_types::uint32 u32_TimeToSend; // First time to send message in ms. Can be used for an offset
+   stw_types::uint32 u32_Interval;   // Cyclic interval time in ms
+};
+
 class C_OSCComDriverBase
 {
 public:
@@ -44,15 +55,22 @@ public:
 
    void RegisterLogger(C_OSCComMessageLogger * const opc_Logger);
 
-   stw_types::sint32 StartLogging(const bool oq_InitCan);
-   void StopLogging(const bool oq_ExitCan);
+   virtual stw_types::sint32 StartLogging(const stw_types::sint32 os32_Bitrate);
+   virtual void StopLogging(void);
 
-   void ContinueLogging(void);
-   void PauseLogging(void);
+   virtual void ContinueLogging(void);
+   virtual void PauseLogging(void);
+
+   virtual void UpdateBitrate(const stw_types::sint32 os32_Bitrate);
 
    virtual void DistributeMessages(void);
    virtual void SendCanMessageQueued(const stw_can::T_STWCAN_Msg_TX & orc_Msg);
-   stw_types::sint32 SendCanMessage(const stw_can::T_STWCAN_Msg_TX & orc_Msg);
+   stw_types::sint32 SendCanMessageDirect(const stw_can::T_STWCAN_Msg_TX & orc_Msg);
+
+   virtual void SendCanMessage(const C_OSCComDriverBaseCanMessage & orc_MsgCfg);
+   virtual void AddCyclicCanMessage(const C_OSCComDriverBaseCanMessage & orc_MsgCfg);
+   virtual void RemoveCyclicCanMessage(const C_OSCComDriverBaseCanMessage & orc_MsgCfg);
+   virtual void RemoveAllCyclicCanMessages(void);
 
    virtual void PrepareForDestruction(void);
 
@@ -66,6 +84,10 @@ private:
    C_OSCComDriverBase(const C_OSCComDriverBase &);
    C_OSCComDriverBase & operator =(const C_OSCComDriverBase &);
 
+   void m_HandleCanMessagesForSending(void);
+
+   static stw_types::uint32 mh_GetCanMessageSizeInBits(const stw_can::T_STWCAN_Msg_RX & orc_Msg);
+
    // Handling the CAN message logging and monitoring
    std::vector<C_OSCComMessageLogger *> mc_Logger;
    stw_types::uint16 mu16_DispatcherClientHandle;
@@ -74,6 +96,14 @@ private:
 
    // Sending of CAN messages
    std::list<stw_can::T_STWCAN_Msg_TX> mc_CanMessages;
+   // Sending of configured CAN messages
+   std::list<C_OSCComDriverBaseCanMessage> mc_CanMessageConfigs;
+
+   // Bus load information
+   stw_types::uint32 mu32_CanMessageBits;
+   stw_types::sint32 ms32_CanBitrate;
+
+   stw_types::uint32 mu32_CanTxErrrors;
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

@@ -116,21 +116,21 @@ bool C_TblViewToolTipBase::event(QEvent * const opc_Event)
 
    if (opc_Event->type() == QEvent::ToolTip)
    {
-      //show tooltip
-      if (mpc_ToolTip == NULL)
-      {
-         mpc_ToolTip = new C_NagToolTip();
-      }
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      QHelpEvent * const pc_HelpEvent = dynamic_cast<QHelpEvent * const>(opc_Event);
 
-      if (this->mpc_ToolTip->isVisible() == false)
+      if (pc_HelpEvent != NULL)
       {
-         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-         QHelpEvent * const pc_HelpEvent = dynamic_cast<QHelpEvent * const>(opc_Event);
-
-         if (pc_HelpEvent != NULL)
+         //Never use global pos directly as this seems to ignore transformations
+         const QPoint c_GlobalPos = this->mapToGlobal(pc_HelpEvent->pos());
+         //show tooltip
+         if (mpc_ToolTip == NULL)
          {
-            //Never use global pos directly as this seems to ignore transformations
-            const QPoint c_GlobalPos = this->mapToGlobal(pc_HelpEvent->pos());
+            mpc_ToolTip = new C_NagToolTip();
+         }
+
+         if (this->mpc_ToolTip->isVisible() == false)
+         {
             //Check first header
             if ((this->verticalHeader()->isVisible() == true) &&
                 (this->verticalHeader()->geometry().contains(
@@ -219,6 +219,10 @@ bool C_TblViewToolTipBase::event(QEvent * const opc_Event)
                   }
                }
             }
+         }
+         else
+         {
+            m_HandleMouseMoveToolTip(c_GlobalPos);
          }
       }
 

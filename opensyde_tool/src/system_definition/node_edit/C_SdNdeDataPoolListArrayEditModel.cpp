@@ -28,6 +28,7 @@
 #include "C_GtGetText.h"
 #include "C_Uti.h"
 #include "C_SdNdeUnoUtil.h"
+#include "C_SdNdeDataPoolContentUtil.h"
 
 /* -- Used Namespaces ------------------------------------------------------ */
 using namespace stw_types;
@@ -278,21 +279,23 @@ QVariant C_SdNdeDataPoolListArrayEditModel::data(const QModelIndex & orc_Index, 
                {
                case C_SdNdeDataPoolUtil::eARRAY_EDIT_MIN:
                   c_Retval =
-                     C_SdNdeDataPoolUtil::h_ScaledDataVariable(pc_OSCElement->c_MinValue, pc_OSCElement->f64_Factor,
-                                                               pc_OSCElement->f64_Offset,
-                                                               static_cast<uint32>(orc_Index.column()));
+                     C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(pc_OSCElement->c_MinValue,
+                                                                                 pc_OSCElement->f64_Factor,
+                                                                                 pc_OSCElement->f64_Offset,
+                                                                                 static_cast<uint32>(orc_Index.column()));
                   break;
                case C_SdNdeDataPoolUtil::eARRAY_EDIT_MAX:
                   c_Retval =
-                     C_SdNdeDataPoolUtil::h_ScaledDataVariable(pc_OSCElement->c_MaxValue, pc_OSCElement->f64_Factor,
-                                                               pc_OSCElement->f64_Offset,
-                                                               static_cast<uint32>(orc_Index.column()));
+                     C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(pc_OSCElement->c_MaxValue,
+                                                                                 pc_OSCElement->f64_Factor,
+                                                                                 pc_OSCElement->f64_Offset,
+                                                                                 static_cast<uint32>(orc_Index.column()));
                   break;
                case C_SdNdeDataPoolUtil::eARRAY_EDIT_DATA_SET:
                   if (this->mu32_DataSetIndex < pc_OSCElement->c_DataSetValues.size())
                   {
                      c_Retval =
-                        C_SdNdeDataPoolUtil::h_ScaledDataVariable(
+                        C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(
                            pc_OSCElement->c_DataSetValues[this->mu32_DataSetIndex], pc_OSCElement->f64_Factor,
                            pc_OSCElement->f64_Offset, static_cast<uint32>(orc_Index.column()));
                   }

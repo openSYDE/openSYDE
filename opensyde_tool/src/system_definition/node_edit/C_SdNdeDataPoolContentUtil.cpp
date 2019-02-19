@@ -27,6 +27,8 @@
 #include "stwtypes.h"
 #include "stwerrors.h"
 #include "C_OSCUtils.h"
+#include "C_OSCXMLParser.h"
+#include "C_OSCNodeDataPoolFiler.h"
 #include "C_SdNdeDataPoolContentUtil.h"
 
 /* -- Used Namespaces ------------------------------------------------------ */
@@ -2200,4 +2202,703 @@ sint32 C_SdNdeDataPoolContentUtil::h_SetValueInMinMaxRange(const C_OSCNodeDataPo
    }
 
    return s32_Return;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Convert node data pool content type to QVariant
+
+   \param[in] orc_Input   Node data pool content type
+   \param[in] oru32_Index Optional array index
+
+   \return
+   QVariant content
+
+   \created     15.02.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+QVariant C_SdNdeDataPoolContentUtil::h_ConvertContentToGeneric(const C_OSCNodeDataPoolContent & orc_Input,
+                                                               const uint32 & oru32_Index)
+{
+   QVariant c_Retval;
+
+   if (orc_Input.GetArray() == false)
+   {
+      switch (orc_Input.GetType())
+      {
+      case C_OSCNodeDataPoolContent::E_Type::eUINT8:
+         c_Retval = static_cast<uint64>(orc_Input.GetValueU8());
+         break;
+      case C_OSCNodeDataPoolContent::E_Type::eUINT16:
+         c_Retval = static_cast<uint64>(orc_Input.GetValueU16());
+         break;
+      case C_OSCNodeDataPoolContent::E_Type::eUINT32:
+         c_Retval = static_cast<uint64>(orc_Input.GetValueU32());
+         break;
+      case C_OSCNodeDataPoolContent::E_Type::eUINT64:
+         c_Retval = orc_Input.GetValueU64();
+         break;
+      case C_OSCNodeDataPoolContent::E_Type::eSINT8:
+         c_Retval = static_cast<sint64>(orc_Input.GetValueS8());
+         break;
+      case C_OSCNodeDataPoolContent::E_Type::eSINT16:
+         c_Retval = static_cast<sint64>(orc_Input.GetValueS16());
+         break;
+      case C_OSCNodeDataPoolContent::E_Type::eSINT32:
+         c_Retval = static_cast<sint64>(orc_Input.GetValueS32());
+         break;
+      case C_OSCNodeDataPoolContent::E_Type::eSINT64:
+         c_Retval = orc_Input.GetValueS64();
+         break;
+      case C_OSCNodeDataPoolContent::E_Type::eFLOAT32:
+         c_Retval = static_cast<float64>(orc_Input.GetValueF32());
+         break;
+      case C_OSCNodeDataPoolContent::E_Type::eFLOAT64:
+         c_Retval = orc_Input.GetValueF64();
+         break;
+      default:
+         //Nothing to do
+         break;
+      }
+   }
+   else
+   {
+      switch (orc_Input.GetType())
+      {
+      case C_OSCNodeDataPoolContent::E_Type::eUINT8:
+         c_Retval = static_cast<uint64>(orc_Input.GetValueAU8Element(oru32_Index));
+         break;
+      case C_OSCNodeDataPoolContent::E_Type::eUINT16:
+         c_Retval = static_cast<uint64>(orc_Input.GetValueAU16Element(oru32_Index));
+         break;
+      case C_OSCNodeDataPoolContent::E_Type::eUINT32:
+         c_Retval = static_cast<uint64>(orc_Input.GetValueAU32Element(oru32_Index));
+         break;
+      case C_OSCNodeDataPoolContent::E_Type::eUINT64:
+         c_Retval = orc_Input.GetValueAU64Element(oru32_Index);
+         break;
+      case C_OSCNodeDataPoolContent::E_Type::eSINT8:
+         c_Retval = static_cast<sint64>(orc_Input.GetValueAS8Element(oru32_Index));
+         break;
+      case C_OSCNodeDataPoolContent::E_Type::eSINT16:
+         c_Retval = static_cast<sint64>(orc_Input.GetValueAS16Element(oru32_Index));
+         break;
+      case C_OSCNodeDataPoolContent::E_Type::eSINT32:
+         c_Retval = static_cast<sint64>(orc_Input.GetValueAS32Element(oru32_Index));
+         break;
+      case C_OSCNodeDataPoolContent::E_Type::eSINT64:
+         c_Retval = orc_Input.GetValueAS64Element(oru32_Index);
+         break;
+      case C_OSCNodeDataPoolContent::E_Type::eFLOAT32:
+         c_Retval = static_cast<float64>(orc_Input.GetValueAF32Element(oru32_Index));
+         break;
+      case C_OSCNodeDataPoolContent::E_Type::eFLOAT64:
+         c_Retval = orc_Input.GetValueAF64Element(oru32_Index);
+         break;
+      default:
+         //Nothing to do
+         break;
+      }
+   }
+   return c_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Convert node data pool content type to QVariant using scaling
+
+   \param[in] orc_Input   Node data pool content type
+   \param[in] of64_Factor Factor
+   \param[in] of64_Offset Offset
+   \param[in] oru32_Index Optional array index
+
+   \return
+   QVariant content
+
+   \created     13.11.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+QVariant C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(const C_OSCNodeDataPoolContent & orc_Input,
+                                                                     const float64 of64_Factor,
+                                                                     const float64 of64_Offset,
+                                                                     const uint32 & oru32_Index)
+{
+   QVariant c_Retval;
+
+   if (C_OSCUtils::h_IsScalingActive(of64_Factor, of64_Offset) == false)
+   {
+      c_Retval = C_SdNdeDataPoolContentUtil::h_ConvertContentToGeneric(orc_Input, oru32_Index);
+   }
+   else
+   {
+      std::vector<float64> c_Values;
+      C_SdNdeDataPoolContentUtil::h_GetValuesAsFloat64(orc_Input, c_Values);
+      if (oru32_Index < c_Values.size())
+      {
+         const float64 f64_ScaledValue = C_OSCUtils::h_GetValueScaled(c_Values[oru32_Index], of64_Factor, of64_Offset);
+         if (C_Uti::h_CheckFloatHasNoFractionPart(f64_ScaledValue) == false)
+         {
+            c_Retval = f64_ScaledValue;
+         }
+         else
+         {
+            //Int is possible but only if in range
+            if (((f64_ScaledValue < 0.0) &&
+                 (f64_ScaledValue >= static_cast<float64>(std::numeric_limits<sint64>::min()))) &&
+                (f64_ScaledValue <= static_cast<float64>(std::numeric_limits<sint64>::max())))
+            {
+               c_Retval = static_cast<sint64>(f64_ScaledValue);
+            }
+            else if ((f64_ScaledValue >= static_cast<float64>(std::numeric_limits<uint64>::min())) &&
+                     (f64_ScaledValue <= static_cast<float64>(std::numeric_limits<uint64>::max())))
+            {
+               c_Retval = static_cast<uint64>(f64_ScaledValue);
+            }
+            else
+            {
+               c_Retval = f64_ScaledValue;
+            }
+         }
+      }
+   }
+   return c_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set node data pool content according to QVariant data
+
+   \param[in]  orc_Value    Variant value
+   \param[out] orc_Output   Node data pool content to set
+   \param[in]  oru32_Index  Optional array index
+
+   \created     15.02.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+sint32 C_SdNdeDataPoolContentUtil::h_SetDataVariableFromGeneric(const QVariant & orc_Value, C_OSCNodeDataPoolContent & orc_Output,
+                                                     const uint32 & oru32_Index)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   switch (orc_Value.type())
+   {
+   case QVariant::ULongLong:
+      if (orc_Output.GetArray() == false)
+      {
+         switch (orc_Output.GetType())
+         {
+         case C_OSCNodeDataPoolContent::E_Type::eUINT8:
+            orc_Output.SetValueU8(static_cast<uint8>(orc_Value.toULongLong()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT16:
+            orc_Output.SetValueU16(static_cast<uint16>(orc_Value.toULongLong()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT32:
+            orc_Output.SetValueU32(static_cast<uint32>(orc_Value.toULongLong()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT64:
+            orc_Output.SetValueU64(static_cast<uint64>(orc_Value.toULongLong()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT8:
+            orc_Output.SetValueS8(static_cast<sint8>(orc_Value.toULongLong()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT16:
+            orc_Output.SetValueS16(static_cast<sint16>(orc_Value.toULongLong()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT32:
+            orc_Output.SetValueS32(static_cast<sint32>(orc_Value.toULongLong()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT64:
+            orc_Output.SetValueS64(static_cast<sint64>(orc_Value.toULongLong()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eFLOAT32:
+            orc_Output.SetValueF32(static_cast<float32>(orc_Value.toULongLong()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eFLOAT64:
+            orc_Output.SetValueF64(static_cast<float64>(orc_Value.toULongLong()));
+            break;
+         default:
+            //Nothing to do
+            break;
+         }
+      }
+      else
+      {
+         switch (orc_Output.GetType())
+         {
+         case C_OSCNodeDataPoolContent::E_Type::eUINT8:
+            orc_Output.SetValueAU8Element(static_cast<uint8>(orc_Value.toULongLong()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT16:
+            orc_Output.SetValueAU16Element(static_cast<uint16>(orc_Value.toULongLong()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT32:
+            orc_Output.SetValueAU32Element(static_cast<uint32>(orc_Value.toULongLong()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT64:
+            orc_Output.SetValueAU64Element(static_cast<uint64>(orc_Value.toULongLong()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT8:
+            orc_Output.SetValueAS8Element(static_cast<sint8>(orc_Value.toULongLong()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT16:
+            orc_Output.SetValueAS16Element(static_cast<sint16>(orc_Value.toULongLong()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT32:
+            orc_Output.SetValueAS32Element(static_cast<sint32>(orc_Value.toULongLong()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT64:
+            orc_Output.SetValueAS64Element(static_cast<sint64>(orc_Value.toULongLong()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eFLOAT32:
+            orc_Output.SetValueAF32Element(static_cast<float32>(orc_Value.toULongLong()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eFLOAT64:
+            orc_Output.SetValueAF64Element(static_cast<float64>(orc_Value.toULongLong()), oru32_Index);
+            break;
+         default:
+            //Nothing to do
+            break;
+         }
+      }
+      break;
+   case QVariant::LongLong:
+      if (orc_Output.GetArray() == false)
+      {
+         switch (orc_Output.GetType())
+         {
+         case C_OSCNodeDataPoolContent::E_Type::eUINT8:
+            orc_Output.SetValueU8(static_cast<uint8>(orc_Value.toLongLong()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT16:
+            orc_Output.SetValueU16(static_cast<uint16>(orc_Value.toLongLong()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT32:
+            orc_Output.SetValueU32(static_cast<uint32>(orc_Value.toLongLong()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT64:
+            orc_Output.SetValueU64(static_cast<uint64>(orc_Value.toLongLong()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT8:
+            orc_Output.SetValueS8(static_cast<sint8>(orc_Value.toLongLong()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT16:
+            orc_Output.SetValueS16(static_cast<sint16>(orc_Value.toLongLong()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT32:
+            orc_Output.SetValueS32(static_cast<sint32>(orc_Value.toLongLong()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT64:
+            orc_Output.SetValueS64(static_cast<sint64>(orc_Value.toLongLong()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eFLOAT32:
+            orc_Output.SetValueF32(static_cast<float32>(orc_Value.toLongLong()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eFLOAT64:
+            orc_Output.SetValueF64(static_cast<float64>(orc_Value.toLongLong()));
+            break;
+         default:
+            //Nothing to do
+            break;
+         }
+      }
+      else
+      {
+         switch (orc_Output.GetType())
+         {
+         case C_OSCNodeDataPoolContent::E_Type::eUINT8:
+            orc_Output.SetValueAU8Element(static_cast<uint8>(orc_Value.toLongLong()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT16:
+            orc_Output.SetValueAU16Element(static_cast<uint16>(orc_Value.toLongLong()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT32:
+            orc_Output.SetValueAU32Element(static_cast<uint32>(orc_Value.toLongLong()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT64:
+            orc_Output.SetValueAU64Element(static_cast<uint64>(orc_Value.toLongLong()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT8:
+            orc_Output.SetValueAS8Element(static_cast<sint8>(orc_Value.toLongLong()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT16:
+            orc_Output.SetValueAS16Element(static_cast<sint16>(orc_Value.toLongLong()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT32:
+            orc_Output.SetValueAS32Element(static_cast<sint32>(orc_Value.toLongLong()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT64:
+            orc_Output.SetValueAS64Element(static_cast<sint64>(orc_Value.toLongLong()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eFLOAT32:
+            orc_Output.SetValueAF32Element(static_cast<float32>(orc_Value.toLongLong()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eFLOAT64:
+            orc_Output.SetValueAF64Element(static_cast<float64>(orc_Value.toLongLong()), oru32_Index);
+            break;
+         default:
+            //Nothing to do
+            break;
+         }
+      }
+      break;
+   case QVariant::UInt:
+      if (orc_Output.GetArray() == false)
+      {
+         switch (orc_Output.GetType())
+         {
+         case C_OSCNodeDataPoolContent::E_Type::eUINT8:
+            orc_Output.SetValueU8(static_cast<uint8>(orc_Value.toUInt()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT16:
+            orc_Output.SetValueU16(static_cast<uint16>(orc_Value.toUInt()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT32:
+            orc_Output.SetValueU32(static_cast<uint32>(orc_Value.toUInt()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT64:
+            orc_Output.SetValueU64(static_cast<uint64>(orc_Value.toUInt()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT8:
+            orc_Output.SetValueS8(static_cast<sint8>(orc_Value.toUInt()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT16:
+            orc_Output.SetValueS16(static_cast<sint16>(orc_Value.toUInt()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT32:
+            orc_Output.SetValueS32(static_cast<sint32>(orc_Value.toUInt()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT64:
+            orc_Output.SetValueS64(static_cast<sint64>(orc_Value.toUInt()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eFLOAT32:
+            orc_Output.SetValueF32(static_cast<float32>(orc_Value.toUInt()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eFLOAT64:
+            orc_Output.SetValueF64(static_cast<float64>(orc_Value.toUInt()));
+            break;
+         default:
+            //Nothing to do
+            break;
+         }
+      }
+      else
+      {
+         switch (orc_Output.GetType())
+         {
+         case C_OSCNodeDataPoolContent::E_Type::eUINT8:
+            orc_Output.SetValueAU8Element(static_cast<uint8>(orc_Value.toUInt()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT16:
+            orc_Output.SetValueAU16Element(static_cast<uint16>(orc_Value.toUInt()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT32:
+            orc_Output.SetValueAU32Element(static_cast<uint32>(orc_Value.toUInt()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT64:
+            orc_Output.SetValueAU64Element(static_cast<uint64>(orc_Value.toUInt()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT8:
+            orc_Output.SetValueAS8Element(static_cast<sint8>(orc_Value.toUInt()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT16:
+            orc_Output.SetValueAS16Element(static_cast<sint16>(orc_Value.toUInt()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT32:
+            orc_Output.SetValueAS32Element(static_cast<sint32>(orc_Value.toUInt()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT64:
+            orc_Output.SetValueAS64Element(static_cast<sint64>(orc_Value.toUInt()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eFLOAT32:
+            orc_Output.SetValueAF32Element(static_cast<float32>(orc_Value.toUInt()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eFLOAT64:
+            orc_Output.SetValueAF64Element(static_cast<float64>(orc_Value.toUInt()), oru32_Index);
+            break;
+         default:
+            //Nothing to do
+            break;
+         }
+      }
+      break;
+   case QVariant::Int:
+      if (orc_Output.GetArray() == false)
+      {
+         switch (orc_Output.GetType())
+         {
+         case C_OSCNodeDataPoolContent::E_Type::eUINT8:
+            orc_Output.SetValueU8(static_cast<uint8>(orc_Value.toInt()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT16:
+            orc_Output.SetValueU16(static_cast<uint16>(orc_Value.toInt()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT32:
+            orc_Output.SetValueU32(static_cast<uint32>(orc_Value.toInt()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT64:
+            orc_Output.SetValueU64(static_cast<uint64>(static_cast<uint32>(orc_Value.toInt())));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT8:
+            orc_Output.SetValueS8(static_cast<sint8>(orc_Value.toInt()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT16:
+            orc_Output.SetValueS16(static_cast<sint16>(orc_Value.toInt()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT32:
+            orc_Output.SetValueS32(static_cast<sint32>(orc_Value.toInt()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT64:
+            orc_Output.SetValueS64(static_cast<sint64>(orc_Value.toInt()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eFLOAT32:
+            orc_Output.SetValueF32(static_cast<float32>(orc_Value.toInt()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eFLOAT64:
+            orc_Output.SetValueF64(static_cast<float64>(orc_Value.toInt()));
+            break;
+         default:
+            //Nothing to do
+            break;
+         }
+      }
+      else
+      {
+         switch (orc_Output.GetType())
+         {
+         case C_OSCNodeDataPoolContent::E_Type::eUINT8:
+            orc_Output.SetValueAU8Element(static_cast<uint8>(orc_Value.toInt()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT16:
+            orc_Output.SetValueAU16Element(static_cast<uint16>(orc_Value.toInt()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT32:
+            orc_Output.SetValueAU32Element(static_cast<uint32>(orc_Value.toInt()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT64:
+            orc_Output.SetValueAU64Element(static_cast<uint64>(static_cast<uint32>(orc_Value.toInt())), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT8:
+            orc_Output.SetValueAS8Element(static_cast<sint8>(orc_Value.toInt()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT16:
+            orc_Output.SetValueAS16Element(static_cast<sint16>(orc_Value.toInt()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT32:
+            orc_Output.SetValueAS32Element(static_cast<sint32>(orc_Value.toInt()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT64:
+            orc_Output.SetValueAS64Element(static_cast<sint64>(orc_Value.toInt()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eFLOAT32:
+            orc_Output.SetValueAF32Element(static_cast<float32>(orc_Value.toInt()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eFLOAT64:
+            orc_Output.SetValueAF64Element(static_cast<float64>(orc_Value.toInt()), oru32_Index);
+            break;
+         default:
+            //Nothing to do
+            break;
+         }
+      }
+      break;
+   case QVariant::Double:
+      if (orc_Output.GetArray() == false)
+      {
+         switch (orc_Output.GetType())
+         {
+         case C_OSCNodeDataPoolContent::E_Type::eUINT8:
+            orc_Output.SetValueU8(static_cast<uint8>(orc_Value.toDouble()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT16:
+            orc_Output.SetValueU16(static_cast<uint16>(orc_Value.toDouble()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT32:
+            orc_Output.SetValueU32(static_cast<uint32>(orc_Value.toDouble()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT64:
+            orc_Output.SetValueU64(static_cast<uint64>(orc_Value.toDouble()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT8:
+            orc_Output.SetValueS8(static_cast<sint8>(orc_Value.toDouble()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT16:
+            orc_Output.SetValueS16(static_cast<sint16>(orc_Value.toDouble()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT32:
+            orc_Output.SetValueS32(static_cast<sint32>(orc_Value.toDouble()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT64:
+            orc_Output.SetValueS64(static_cast<sint64>(orc_Value.toDouble()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eFLOAT32:
+            orc_Output.SetValueF32(static_cast<float32>(orc_Value.toDouble()));
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eFLOAT64:
+            orc_Output.SetValueF64(static_cast<float64>(orc_Value.toDouble()));
+            break;
+         default:
+            //Nothing to do
+            break;
+         }
+      }
+      else
+      {
+         switch (orc_Output.GetType())
+         {
+         case C_OSCNodeDataPoolContent::E_Type::eUINT8:
+            orc_Output.SetValueAU8Element(static_cast<uint8>(orc_Value.toDouble()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT16:
+            orc_Output.SetValueAU16Element(static_cast<uint16>(orc_Value.toDouble()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT32:
+            orc_Output.SetValueAU32Element(static_cast<uint32>(orc_Value.toDouble()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eUINT64:
+            orc_Output.SetValueAU64Element(static_cast<uint64>(orc_Value.toDouble()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT8:
+            orc_Output.SetValueAS8Element(static_cast<sint8>(orc_Value.toDouble()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT16:
+            orc_Output.SetValueAS16Element(static_cast<sint16>(orc_Value.toDouble()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT32:
+            orc_Output.SetValueAS32Element(static_cast<sint32>(orc_Value.toDouble()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eSINT64:
+            orc_Output.SetValueAS64Element(static_cast<sint64>(orc_Value.toDouble()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eFLOAT32:
+            orc_Output.SetValueAF32Element(static_cast<float32>(orc_Value.toDouble()), oru32_Index);
+            break;
+         case C_OSCNodeDataPoolContent::E_Type::eFLOAT64:
+            orc_Output.SetValueAF64Element(static_cast<float64>(orc_Value.toDouble()), oru32_Index);
+            break;
+         default:
+            //Nothing to do
+            break;
+         }
+      }
+      break;
+   default:
+      //Unknown conversion
+      s32_Retval = C_RANGE;
+      break;
+   }
+   return s32_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Set node data pool content according to QVariant data using scaling
+
+   \param[in]  orc_Value    Variant value
+   \param[out] orc_Output   Node data pool content to set
+   \param[in]  of64_Factor  Factor
+   \param[in]  of64_Offset  Offset
+   \param[in]  oru32_Index  Optional array index
+
+   \created     13.11.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+sint32 C_SdNdeDataPoolContentUtil::h_SetDataVariableFromGenericWithScaling(const QVariant & orc_Value,
+                                                             C_OSCNodeDataPoolContent & orc_Output,
+                                                             const float64 of64_Factor, const float64 of64_Offset,
+                                                             const uint32 & oru32_Index)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (C_OSCUtils::h_IsScalingActive(of64_Factor, of64_Offset) == false)
+   {
+      C_SdNdeDataPoolContentUtil::h_SetDataVariableFromGeneric(orc_Value, orc_Output, oru32_Index);
+   }
+   else
+   {
+      float64 f64_TmpValue = 0.0;
+      bool q_Success;
+
+      switch (orc_Value.type())
+      {
+      case QVariant::Int:
+         f64_TmpValue = static_cast<float64>(orc_Value.toInt(&q_Success));
+         break;
+      case QVariant::UInt:
+         f64_TmpValue = static_cast<float64>(orc_Value.toUInt(&q_Success));
+         break;
+      case QVariant::LongLong:
+         f64_TmpValue = static_cast<float64>(orc_Value.toLongLong(&q_Success));
+         break;
+      case QVariant::ULongLong:
+         f64_TmpValue = static_cast<float64>(orc_Value.toULongLong(&q_Success));
+         break;
+      case QVariant::Double:
+         f64_TmpValue = orc_Value.toDouble(&q_Success);
+         break;
+      default:
+         q_Success = false;
+         break;
+      }
+      if (q_Success == true)
+      {
+         C_SdNdeDataPoolContentUtil::h_SetScaledValueInContent(f64_TmpValue, orc_Output, of64_Factor, of64_Offset,
+                                                               oru32_Index);
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   return s32_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Store current content as string
+
+   Use case: store to string to later use the same string to restore the same content
+
+   \param[in] orc_Source Content to store
+
+   \return
+   Current content encoded as string
+
+   \created     16.01.2019  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+QString C_SdNdeDataPoolContentUtil::h_GetAllContentAsString(const C_OSCNodeDataPoolContent & orc_Input)
+{
+   stw_scl::C_SCLString c_Retval;
+   C_OSCXMLParserString c_XML;
+   c_XML.CreateAndSelectNodeChild("opensyde-content");
+   C_OSCNodeDataPoolFiler::h_SaveDataPoolContentV1(orc_Input, c_XML);
+   c_XML.SaveToString(c_Retval);
+   return c_Retval.c_str();
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Restore content from string
+
+   Use case: store to string to later use the same string to restore the same content
+
+   \param[in]  orc_Input  String to base restoration on
+   \param[out] orc_Output Output of restoration
+
+   \return
+   C_NO_ERR   data read
+   C_CONFIG   content of file is invalid or incomplete
+
+   \created     16.01.2019  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+sint32 C_SdNdeDataPoolContentUtil::h_SetAllContentFromString(const QString & orc_Input,
+                                                             C_OSCNodeDataPoolContent & orc_Output)
+{
+   C_OSCXMLParserString c_XML;
+
+   c_XML.LoadFromString(orc_Input.toStdString().c_str());
+   c_XML.SelectRoot();
+   return C_OSCNodeDataPoolFiler::h_LoadDataPoolContentV1(orc_Output, c_XML);
 }

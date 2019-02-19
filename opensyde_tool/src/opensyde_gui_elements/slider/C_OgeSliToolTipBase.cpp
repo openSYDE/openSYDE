@@ -127,9 +127,7 @@ bool C_OgeSliToolTipBase::event(QEvent * const opc_Event)
       if (opc_Event->type() == QEvent::ToolTip)
       {
          //show tooltip
-         this->m_CreateToolTip();
-
-         if (this->mpc_ToolTip->isVisible() == false)
+         if (this->m_GetToolTip()->isVisible() == false)
          {
             //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
             QHelpEvent * const pc_HelpEvent = dynamic_cast<QHelpEvent * const>(opc_Event);
@@ -138,9 +136,10 @@ bool C_OgeSliToolTipBase::event(QEvent * const opc_Event)
             {
                this->setMouseTracking(true);
 
-               this->mpc_ToolTip->SetHeading(this->mc_ToolTipHeading);
-               this->mpc_ToolTip->SetContent(this->mc_ToolTipContent);
-               this->mpc_ToolTip->show();
+               this->m_GetToolTip()->SetHeading(this->mc_ToolTipHeading);
+               this->m_GetToolTip()->SetContent(this->mc_ToolTipContent);
+               this->m_GetToolTip()->SetType(this->me_ToolTipType);
+               this->m_GetToolTip()->show();
                this->ms32_ToolTipCoordY = pc_HelpEvent->pos().y();
                this->m_MoveToolTip();
             }
@@ -194,9 +193,9 @@ void C_OgeSliToolTipBase::m_OnValueChange(void)
 
    this->SetToolTipInformation("", c_Content);
    //Update directly
-   if (this->mpc_ToolTip != NULL)
+   if (this->m_GetToolTip() != NULL)
    {
-      this->mpc_ToolTip->SetContent(c_Content);
+      this->m_GetToolTip()->SetContent(c_Content);
    }
 
    // Update tooltip position
@@ -212,13 +211,13 @@ void C_OgeSliToolTipBase::m_OnValueChange(void)
 //-----------------------------------------------------------------------------
 void C_OgeSliToolTipBase::m_MoveToolTip(void)
 {
-   if (this->mpc_ToolTip != NULL)
+   if (this->m_GetToolTip() != NULL)
    {
       QPoint c_ToolTipPos;
 
       c_ToolTipPos.setX(QStyle::sliderPositionFromValue(this->minimum(), this->maximum(), this->value(),
                                                         this->width() - 12)); // 2x border width + 2x margin
       c_ToolTipPos.setY(ms32_ToolTipCoordY);
-      this->mpc_ToolTip->DoMove(this->mapToGlobal(c_ToolTipPos));
+      this->m_GetToolTip()->DoMove(this->mapToGlobal(c_ToolTipPos));
    }
 }

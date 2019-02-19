@@ -217,7 +217,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolReadNumeric(const uint8 ou8_DataPoolIndex, 
    C_CONFIG   transport protocol not installed
    C_WARN     error response
    C_RD_WR    malformed protocol response (e.g. reported size does not match expected size)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolOsy::DataPoolReadArray(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
@@ -257,7 +257,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolReadArray(const uint8 ou8_DataPoolIndex, co
    C_CONFIG   transport protocol not installed
    C_WARN     error response
    C_RD_WR    malformed protocol response
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolOsy::DataPoolWriteNumeric(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
@@ -288,7 +288,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolWriteNumeric(const uint8 ou8_DataPoolIndex,
    C_CONFIG   transport protocol not installed
    C_WARN     error response
    C_RD_WR    malformed protocol response
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolOsy::DataPoolWriteArray(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
@@ -321,7 +321,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolWriteArray(const uint8 ou8_DataPoolIndex, c
    C_CONFIG   pre-requisites not correct; e.g. driver not initialized
    C_WARN     error response
    C_RD_WR    malformed protocol response
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolOsy::DataPoolSetEventDataRate(const uint8 ou8_Rail, const uint16 ou16_IntervalMs)
@@ -352,7 +352,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolSetEventDataRate(const uint8 ou8_Rail, cons
    C_CONFIG   pre-requisites not correct; e.g. driver not initialized
    C_WARN     error response
    C_RD_WR    malformed protocol response
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolOsy::DataPoolReadCyclic(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
@@ -387,7 +387,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolReadCyclic(const uint8 ou8_DataPoolIndex, c
    C_CONFIG   pre-requisites not correct; e.g. driver not initialized
    C_WARN     error response
    C_RD_WR    malformed protocol response
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolOsy::DataPoolReadChangeDriven(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
@@ -413,7 +413,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolReadChangeDriven(const uint8 ou8_DataPoolIn
    C_CONFIG   pre-requisites not correct; e.g. driver not initialized
    C_WARN     error response
    C_RD_WR    malformed protocol response
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolOsy::DataPoolStopEventDriven(void)
@@ -494,7 +494,7 @@ sint32 C_OSCDiagProtocolOsy::NvmWriteStartTransaction(const uint8 ou8_DataPoolIn
    C_WARN     error response
    C_RD_WR    unexpected content in response
    C_RANGE    orc_DataRecord empty
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     17.07.2017  STW/M.Echtler
 */
@@ -543,7 +543,7 @@ sint32 C_OSCDiagProtocolOsy::NvmWriteFinalizeTransaction(void)
    C_NOACT    could not put request in TX queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     17.07.2017  STW/M.Echtler
 */
@@ -586,7 +586,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolReadVersion(const uint8 ou8_DataPoolIndex, 
    C_CONFIG   no transport protocol installed
    C_WARN     error response
    C_RD_WR    unexpected content in response (here: wrong data pool index)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     17.07.2017  STW/M.Echtler
 */
@@ -622,7 +622,7 @@ sint32 C_OSCDiagProtocolOsy::DataPoolVerify(const uint8 ou8_DataPoolIndex, const
    C_CONFIG   no transport protocol installed
    C_WARN     error response
    C_RD_WR    unexpected content in response (here: wrong data pool or list index)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     17.07.2017  STW/M.Echtler
 */

@@ -83,23 +83,11 @@ public:
    static bool h_CheckConnected(const std::vector<stw_types::uint32> & orc_Items);
    static std::vector<stw_types::uint32> h_ConvertVector(const QModelIndexList & orc_Items,
                                                          const bool & orq_Rows = true);
-   static void h_ConvertToGeneric(const stw_opensyde_core::C_OSCNodeDataPoolListElement & orc_OSCElement,
-                                  const C_PuiSdNodeDataPoolListElement & orc_UIElement,
-                                  const E_ElementDataChangeType & ore_Type, QVariant & orc_Generic,
-                                  const stw_types::uint32 & oru32_Index, const stw_types::sint32 & ors32_DataSetIndex);
-   static QVariant h_DataVariable(const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Input,
-                                  const stw_types::uint32 & oru32_Index);
-   static QVariant h_ScaledDataVariable(const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Input,
-                                        const stw_types::float64 of64_Factor, const stw_types::float64 of64_Offset,
-                                        const stw_types::uint32 & oru32_Index);
-   static stw_types::sint32 h_SetDataVariable(const QVariant & orc_Value,
-                                              stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Output,
-                                              const stw_types::uint32 & oru32_Index);
-   static stw_types::sint32 h_SetUnscaledDataVariable(const QVariant & orc_Value,
-                                                      stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Output,
-                                                      const stw_types::float64 of64_Factor,
-                                                      const stw_types::float64 of64_Offset,
-                                                      const stw_types::uint32 & oru32_Index);
+   static void h_ConvertToElementGeneric(const stw_opensyde_core::C_OSCNodeDataPoolListElement & orc_OSCElement,
+                                         const C_PuiSdNodeDataPoolListElement & orc_UIElement,
+                                         const E_ElementDataChangeType & ore_Type, QVariant & orc_Generic,
+                                         const stw_types::uint32 & oru32_Index,
+                                         const stw_types::sint32 & ors32_DataSetIndex);
    static stw_types::sint8 h_ConvertContentTypeToComboBox(
       const stw_opensyde_core::C_OSCNodeDataPoolContent::E_Type & ore_Type);
    static stw_opensyde_core::C_OSCNodeDataPoolContent::E_Type h_ConvertContentTypeFromComboBox(
@@ -111,9 +99,6 @@ public:
    static QString h_ConvertContentTypeToString(const stw_opensyde_core::C_OSCNodeDataPoolContent::E_Type & ore_Type);
    static QString h_ConvertElementAccessToString(
       const stw_opensyde_core::C_OSCNodeDataPoolListElement::E_Access & ore_Type);
-   static void h_DrawList(QPainter * const opc_Painter, const QRect & orc_Rectangle,
-                          const stw_types::uint32 & oru32_NodeIndex, const stw_types::uint32 & oru32_DataPoolIndex,
-                          const stw_types::uint32 & oru32_ListIndex);
    static QWidget * h_CreateGenericEditor(QWidget * const opc_Parent, const QModelIndex & orc_Index,
                                           const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Min,
                                           const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Max,
@@ -125,7 +110,6 @@ public:
    static QString h_ConvertToString(const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Data);
    static void h_SetString(const QString & orc_String, stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Output);
    static QString h_ConvertToString(const std::vector<stw_types::sint8> & orc_Data);
-   static QString h_ConvertTypeToNameSimplified(const stw_opensyde_core::C_OSCNodeDataPoolContent::E_Type & ore_Type);
    static void h_DrawTableBoolean(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
                                   const QModelIndex & orc_Index, const QPixmap & orc_CheckMark,
                                   const bool & orq_IsEditing);

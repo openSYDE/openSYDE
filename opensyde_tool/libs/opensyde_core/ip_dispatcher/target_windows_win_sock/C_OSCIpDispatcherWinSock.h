@@ -45,6 +45,8 @@ private:
    class C_TcpConnection
    {
    public:
+      C_TcpConnection(void);
+
       SOCKET un_Socket;                  ///< client socket
       stw_types::uint8 au8_IpAddress[4]; ///< server's IP (remembered for reconnecting)
    };

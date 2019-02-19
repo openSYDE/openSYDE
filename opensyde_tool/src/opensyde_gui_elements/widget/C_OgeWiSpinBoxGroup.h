@@ -69,7 +69,7 @@ protected:
    virtual void focusInEvent(QFocusEvent * const opc_Event) override;
    virtual void focusOutEvent(QFocusEvent * const opc_Event) override;
 
-   void m_ResizeToDefault(void) const;
+   void m_ResizeToDefault(const stw_types::sintn osn_Height = 30) const;
    stw_types::sintn GetSpinButtonWidth(void) const;
 
 private:

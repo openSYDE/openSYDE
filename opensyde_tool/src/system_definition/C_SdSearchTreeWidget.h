@@ -92,6 +92,7 @@ private:
                                 const stw_types::uint8 ou8_Type);
    void m_AddApplicationResult(const QString & orc_ApplicationName, const stw_types::uint32 ou32_ApplicationIndex,
                                const QString & orc_NodeName, const stw_types::uint32 ou32_NodeIndex);
+   void m_SetupStartingState(void);
 
    QTreeWidgetItem * mpc_TreeItemRootNodes;
    QTreeWidgetItem * mpc_TreeItemRootBusses;

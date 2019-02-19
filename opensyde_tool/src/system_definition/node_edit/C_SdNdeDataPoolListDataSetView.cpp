@@ -86,9 +86,9 @@ C_SdNdeDataPoolListDataSetView::C_SdNdeDataPoolListDataSetView(QWidget * const o
    this->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectColumns);
    this->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
    this->setAlternatingRowColors(true);
-   this->setDragDropMode(QAbstractItemView::DragDropMode::DragDrop);
+   this->setDragDropMode(QAbstractItemView::NoDragDrop);
    this->setDefaultDropAction(Qt::DropAction::MoveAction);
-   this->setDragEnabled(true);
+   this->setDragEnabled(false);
    this->setLineWidth(0);
    this->setFrameShadow(QAbstractItemView::Shadow::Plain);
    this->setFrameShape(QAbstractItemView::Shape::NoFrame);

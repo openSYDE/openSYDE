@@ -150,13 +150,13 @@
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
-          <widget class="QWidget" name="scrollAreaWidgetContents">
+          <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_ScrollAreaWidget">
            <property name="geometry">
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>560</width>
-             <height>521</height>
+             <width>564</width>
+             <height>542</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -202,26 +202,32 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabHeadingGroupBold.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeFrameSeparator</class>
    <extends>QFrame</extends>
    <header>C_OgeFrameSeparator.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbx</class>
-   <extends>QGroupBox</extends>
-   <header>C_OgeGbx.h</header>
+   <class>stw_opensyde_gui_elements::C_OgeWiOnlyBackground</class>
+   <extends>QWidget</extends>
+   <header>C_OgeWiOnlyBackground.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeTransparentScrollArea</class>
    <extends>QScrollArea</extends>
    <header>C_OgeTransparentScrollArea.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabHeadingGroupBold.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeGbx</class>
+   <extends>QGroupBox</extends>
+   <header>C_OgeGbx.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

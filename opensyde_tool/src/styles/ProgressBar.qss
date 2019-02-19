@@ -1,16 +1,12 @@
 /* --------------------------------------------------------------------- */
-
 stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style="OPENSYDE_2_BRIGHT"],
 stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style="OPENSYDE_2_DARK"],
 stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style="SKEUOMORPH_BRIGHT"]:horizontal,
 stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style="SKEUOMORPH_BRIGHT"]:vertical,
 stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style="SKEUOMORPH_DARK"]:horizontal,
-stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style="SKEUOMORPH_DARK"]:vertical {
+stw_opensyde_gui_elements--C_OgeDashboardProgressBar[Style="SKEUOMORPH_DARK"]:vertical
+{
 border-width: 1px;
 border-style: solid;
 }
-
-
-
-
 /* --------------------------------------------------------------------- */

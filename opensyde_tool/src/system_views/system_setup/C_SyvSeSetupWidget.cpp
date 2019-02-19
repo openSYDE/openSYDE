@@ -304,10 +304,11 @@ void C_SyvSeSetupWidget::StartDeviceConfiguration(void)
    if (q_CanInterface == false)
    {
       C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eWARNING);
-      c_Message.SetHeading(C_GtGetText::h_GetText("Device Configuration via Ethernet is not available"));
+      c_Message.SetHeading(C_GtGetText::h_GetText("Device configuration via Ethernet is not available"));
       c_Message.SetDescription(C_GtGetText::h_GetText(
-                                  "This tool version does not support the Ethernet device configuration. "
-                                  "Will be supported soon. Please use a CAN bus for device configuration."));
+                                  "This version of the tool does not support the Ethernet device configuration. "
+                                  "Support of Ethernet device configuration will come soon. In this case use a CAN bus "
+                                  "for device configuration."));
       c_Message.Execute();
    }
    else
@@ -381,7 +382,6 @@ void C_SyvSeSetupWidget::keyPressEvent(QKeyEvent * const opc_Event)
 //-----------------------------------------------------------------------------
 void C_SyvSeSetupWidget::m_ViewChanged(void)
 {
-   this->m_CheckViewForError();
    Q_EMIT this->SigChanged();
 }
 

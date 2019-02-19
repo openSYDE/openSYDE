@@ -399,19 +399,7 @@ void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolLis
          for (uint32 u32_ItSignal = 0; (u32_ItSignal < rc_Message.c_Signals.size()) && (*opq_SignalInvalid == false);
               ++u32_ItSignal)
          {
-            bool q_LayoutConflict = false;
-            bool q_BorderConflict = false;
-            bool q_NameConflict = false;
-            bool q_NameInvalid = false;
-            bool q_MinOverMax = false;
-            bool q_ValueBelowMin = false;
-            bool q_ValueOverMax = false;
-            rc_Message.CheckErrorSignal(opc_List, u32_ItSignal, &q_LayoutConflict, &q_BorderConflict, &q_NameConflict,
-                                        &q_NameInvalid, &q_MinOverMax, &q_ValueBelowMin, &q_ValueOverMax,
-                                        ou32_CANMessageValidSignalsDLCOffset);
-            if (((((((q_LayoutConflict == true) || (q_BorderConflict == true)) || (q_NameConflict == true)) ||
-                   (q_NameInvalid == true)) || (q_MinOverMax == true)) || (q_ValueBelowMin == true)) ||
-                (q_ValueOverMax == true))
+            if (rc_Message.CheckErrorSignal(opc_List, u32_ItSignal, ou32_CANMessageValidSignalsDLCOffset))
             {
                *opq_SignalInvalid = true;
             }
@@ -492,4 +480,26 @@ bool C_OSCCanMessageContainer::CheckLocalError(const C_OSCNodeDataPoolList & orc
       }
    }
    return q_Error;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Check whether container contains at least one TX or RX message
+
+   \return
+   true   at least one TX or RX message is defined
+   false  else
+
+   \created     28.11.2018  STW/A.Stangl
+*/
+//-----------------------------------------------------------------------------
+bool C_OSCCanMessageContainer::ContainsAtLeastOneMessage(void) const
+{
+   bool q_Result = false;
+
+   if ((this->c_TxMessages.size() > 0) || (this->c_RxMessages.size() > 0))
+   {
+      q_Result = true;
+   }
+   return q_Result;
 }

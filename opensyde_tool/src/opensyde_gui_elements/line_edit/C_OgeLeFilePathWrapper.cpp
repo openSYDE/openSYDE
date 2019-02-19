@@ -69,7 +69,8 @@ C_OgeLeFilePathWrapper::C_OgeLeFilePathWrapper(QWidget * const opc_Parent) :
 
    For appropriate QLineEdit the minimized path is shown.
 
-   \param[in] orc_New New value
+   \param[in] orc_New         New value
+   \param[in] orc_RelativeTo  Optional directory where path is relative to if it is relative
 
    \created     04.10.2018  STW/M.Echtler
 */

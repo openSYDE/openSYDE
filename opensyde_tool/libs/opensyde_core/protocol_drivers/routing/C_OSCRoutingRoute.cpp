@@ -120,16 +120,8 @@ bool C_OSCRoutingRoutePoint::operator ==(const C_OSCRoutingRoutePoint & orc_Cmp)
 
    return q_Return;
 }
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
 
-   \param[in]  ou32_TargetNodeIndex   index of target node
-
-   \created     10.07.2017  STW/B.Bayer
-*/
-//-----------------------------------------------------------------------------
-C_OSCRoutingRoute::C_OSCRoutingRoute(const stw_types::uint32 ou32_TargetNodeIndex) :
+C_OSCRoutingRoute::C_OSCRoutingRoute(const uint32 ou32_TargetNodeIndex) :
    u32_TargetNodeIndex(ou32_TargetNodeIndex)
 {
 }

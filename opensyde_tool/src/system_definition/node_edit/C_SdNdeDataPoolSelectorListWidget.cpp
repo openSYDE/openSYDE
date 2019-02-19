@@ -19,6 +19,7 @@
 
 #include <QPainter>
 #include <QApplication>
+#include <QScrollBar>
 
 #include "stwtypes.h"
 #include "stwerrors.h"
@@ -283,14 +284,10 @@ void C_SdNdeDataPoolSelectorListWidget::UpdateActualDataPool(void)
 //-----------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorListWidget::m_AddDataPoolWidget(const uint32 ou32_DataPoolIndex)
 {
-   C_OSCNodeDataPool c_OSCDataPool;
-   C_PuiSdNodeDataPool c_UIDataPool;
-   sint32 s32_Return;
+   const C_OSCNodeDataPool * const pc_OSCDataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+      this->mu32_NodeIndex, ou32_DataPoolIndex);
 
-   s32_Return = C_PuiSdHandler::h_GetInstance()->GetDataPool(this->mu32_NodeIndex, ou32_DataPoolIndex, c_OSCDataPool,
-                                                             c_UIDataPool);
-
-   if (s32_Return == C_NO_ERR)
+   if (pc_OSCDataPool != NULL)
    {
       // TODO how to detect conflict of datapool?
       QListWidgetItem * pc_Item = new QListWidgetItem(NULL, static_cast<sintn>(QListWidgetItem::ItemType::UserType));
@@ -300,7 +297,7 @@ void C_SdNdeDataPoolSelectorListWidget::m_AddDataPoolWidget(const uint32 ou32_Da
       const sintn sn_Number = this->count() + 1;
 
       pc_ItemWidget->SetNumber(sn_Number);
-      pc_ItemWidget->SetData(c_OSCDataPool);
+      pc_ItemWidget->SetData(*pc_OSCDataPool);
       pc_ItemWidget->SetMaximized(this->mq_Maximized);
       connect(pc_ItemWidget, &C_SdNdeDataPoolSelectorItemWidget::SigUpdateErrorToolTip, this,
               &C_SdNdeDataPoolSelectorListWidget::m_UpdateItemErrorToolTip);
@@ -345,14 +342,10 @@ void C_SdNdeDataPoolSelectorListWidget::m_AddDataPoolWidget(const uint32 ou32_Da
 void C_SdNdeDataPoolSelectorListWidget::m_UpdateDataPoolWidget(const uint32 ou32_DataPoolIndex,
                                                                const sintn osn_DataPoolWidgetIndex) const
 {
-   C_OSCNodeDataPool c_OSCDataPool;
-   C_PuiSdNodeDataPool c_UIDataPool;
-   sint32 s32_Return;
+   const C_OSCNodeDataPool * const pc_OSCDataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+      this->mu32_NodeIndex, ou32_DataPoolIndex);
 
-   s32_Return = C_PuiSdHandler::h_GetInstance()->GetDataPool(this->mu32_NodeIndex, ou32_DataPoolIndex, c_OSCDataPool,
-                                                             c_UIDataPool);
-
-   if (s32_Return == C_NO_ERR)
+   if (pc_OSCDataPool != NULL)
    {
       C_SdNdeDataPoolSelectorItemWidget * pc_WidgetItem;
       QListWidgetItem * pc_Item;
@@ -363,7 +356,7 @@ void C_SdNdeDataPoolSelectorListWidget::m_UpdateDataPoolWidget(const uint32 ou32
       pc_WidgetItem = dynamic_cast<C_SdNdeDataPoolSelectorItemWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
       {
-         pc_WidgetItem->SetData(c_OSCDataPool);
+         pc_WidgetItem->SetData(*pc_OSCDataPool);
       }
    }
 }
@@ -767,7 +760,7 @@ void C_SdNdeDataPoolSelectorListWidget::paintEvent(QPaintEvent * const opc_Event
          c_Text = QString(C_GtGetText::h_GetText("No")) + QString(" ") +
                   C_PuiSdUtil::h_ConvertDataPoolTypeToString(this->me_DataPoolType) +
                   QString(C_GtGetText::h_GetText(
-                             " Datapool is declared.\nYou may add any via the '+' button."));
+                             " Datapool is declared.\nAdd any via the '+' button."));
       }
       else
       {
@@ -802,11 +795,12 @@ void C_SdNdeDataPoolSelectorListWidget::paintEvent(QPaintEvent * const opc_Event
 //-----------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorListWidget::resizeEvent(QResizeEvent * const opc_Event)
 {
+   QListWidget::resizeEvent(opc_Event);
+
    this->m_UpdateCounters();
+   this->ScrollToItem(this->currentRow());
 
    Q_EMIT this->SigListChanged();
-
-   QListWidget::resizeEvent(opc_Event);
 }
 
 //-----------------------------------------------------------------------------
@@ -1008,7 +1002,7 @@ bool C_SdNdeDataPoolSelectorListWidget::m_OpenDataPoolDialog(C_OSCNodeDataPool &
    bool q_Return = false;
 
    QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
-   C_SdNdeDatapoolProperties * const pc_Dialog = new C_SdNdeDatapoolProperties(*c_New, "DATAPOOL", &orc_OSCDataPool,
+   C_SdNdeDatapoolProperties * const pc_Dialog = new C_SdNdeDatapoolProperties(*c_New, "Datapool", &orc_OSCDataPool,
                                                                                &orc_UiDataPool,
                                                                                &this->me_ProtocolType,
                                                                                this->me_DataPoolType,
@@ -1299,9 +1293,6 @@ void C_SdNdeDataPoolSelectorListWidget::m_Copy(void) const
 {
    if (this->me_DataPoolType != C_OSCNodeDataPool::eCOM)
    {
-      C_OSCNodeDataPool c_OSCContent;
-      C_PuiSdNodeDataPool c_UIContent;
-
       const sint32 s32_DpIndex = C_PuiSdHandler::h_GetInstance()->GetDataPoolIndex(this->mu32_NodeIndex,
                                                                                    this->me_DataPoolType,
                                                                                    this->currentRow());
@@ -1310,10 +1301,13 @@ void C_SdNdeDataPoolSelectorListWidget::m_Copy(void) const
 
       if (s32_DpIndex >= 0)
       {
-         if (C_PuiSdHandler::h_GetInstance()->GetDataPool(this->mu32_NodeIndex, s32_DpIndex,
-                                                          c_OSCContent, c_UIContent) == C_NO_ERR)
+         const C_OSCNodeDataPool * const pc_OSCDataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+            this->mu32_NodeIndex, s32_DpIndex);
+         const C_PuiSdNodeDataPool * const pc_UIDataPool = C_PuiSdHandler::h_GetInstance()->GetUIDataPool(
+            this->mu32_NodeIndex, s32_DpIndex);
+         if ((pc_OSCDataPool != NULL) && (pc_UIDataPool != NULL))
          {
-            C_SdClipBoardHelper::h_StoreDataPool(c_OSCContent, c_UIContent);
+            C_SdClipBoardHelper::h_StoreDataPool(*pc_OSCDataPool, *pc_UIDataPool);
          }
       }
 
@@ -1448,12 +1442,22 @@ void C_SdNdeDataPoolSelectorListWidget::m_ItemDoubleClicked(QListWidgetItem * co
 void C_SdNdeDataPoolSelectorListWidget::m_MoveDatapool(const sintn osn_SourceIndex, const sintn osn_TargetIndex,
                                                        const bool oq_Reinit)
 {
-   const sint32 s32_SourceDpIndex = C_PuiSdHandler::h_GetInstance()->GetDataPoolIndex(this->mu32_NodeIndex,
-                                                                                      this->me_DataPoolType,
-                                                                                      osn_SourceIndex);
-   const sint32 s32_TargetDpIndex = C_PuiSdHandler::h_GetInstance()->GetDataPoolIndex(this->mu32_NodeIndex,
-                                                                                      this->me_DataPoolType,
-                                                                                      osn_TargetIndex);
+   sintn osn_TargetIndexAdapted = osn_TargetIndex;
+   sint32 s32_SourceDpIndex;
+   sint32 s32_TargetDpIndex;
+
+   if (osn_TargetIndexAdapted >= this->count())
+   {
+      // Move 'below' the end cause an invalid index. It equals the number of elements
+      --osn_TargetIndexAdapted;
+   }
+
+   s32_SourceDpIndex = C_PuiSdHandler::h_GetInstance()->GetDataPoolIndex(this->mu32_NodeIndex,
+                                                                         this->me_DataPoolType,
+                                                                         osn_SourceIndex);
+   s32_TargetDpIndex = C_PuiSdHandler::h_GetInstance()->GetDataPoolIndex(this->mu32_NodeIndex,
+                                                                         this->me_DataPoolType,
+                                                                         osn_TargetIndexAdapted);
 
    QApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -1467,9 +1471,10 @@ void C_SdNdeDataPoolSelectorListWidget::m_MoveDatapool(const sintn osn_SourceInd
          // reload data. swapping in the list is not possible without loosing the widget
          this->m_InitFromData(true);
       }
-      this->setCurrentRow(osn_TargetIndex);
+      this->setCurrentRow(osn_TargetIndexAdapted);
       Q_EMIT this->SigListChanged();
       Q_EMIT this->SigDataPoolChanged();
+      Q_EMIT this->SigWidgetFocused(osn_TargetIndexAdapted);
    }
 
    QApplication::restoreOverrideCursor();
@@ -1603,6 +1608,9 @@ void C_SdNdeDataPoolSelectorListWidget::m_UpdateCounters()
    {
       ++this->msn_CountLines;
    }
+
+   // Update the current line
+   this->msn_ActualLine = this->verticalScrollBar()->value();
 }
 
 //-----------------------------------------------------------------------------

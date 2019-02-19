@@ -71,7 +71,6 @@ C_SdNdeDataPoolListTableDelegate::C_SdNdeDataPoolListTableDelegate(QObject * con
    mc_DisabledPixmapDark(":/images/CheckBoxDisabledNotChecked.svg"),
    mc_DisabledPixmapLight(":/images/CheckBoxDisabledNotCheckedAlternative.svg"),
    mc_CheckMark("://images/CheckBoxActiveWithoutBackground.svg"),
-   ms32_HoveredRow(-1),
    ms32_EditCount(0),
    ms32_UndoStartIndex(-1),
    mq_ChangeInProgress(false),
@@ -206,7 +205,7 @@ QWidget * C_SdNdeDataPoolListTableDelegate::createEditor(QWidget * const opc_Par
          break;
       case C_SdNdeDataPoolListTableModel::eACCESS:
          pc_ComboBox = new C_OgeCbxTable(opc_Parent);
-         pc_ComboBox->addItem(C_GtGetText::h_GetText("RW - read / write access"));
+         pc_ComboBox->addItem(C_GtGetText::h_GetText("RW - read/write access"));
          pc_ComboBox->addItem(C_GtGetText::h_GetText("RO - read only access"));
          pc_ComboBox->ResizeViewToContents();
          pc_Retval = pc_ComboBox;
@@ -627,35 +626,6 @@ void C_SdNdeDataPoolListTableDelegate::paint(QPainter * const opc_Painter, const
       //Original
       QStyledItemDelegate::paint(opc_Painter, orc_Option, orc_Index);
    }
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set hovered row index
-
-   \param[in] orc_Value New hovered row index
-
-   \return
-   true  Change
-   false No change
-
-   \created     22.02.2017  STW/M.Echtler
-*/
-//-----------------------------------------------------------------------------
-bool C_SdNdeDataPoolListTableDelegate::SetHoveredRow(const stw_types::sint32 & ors32_Value)
-{
-   bool q_Retval;
-
-   if (this->ms32_HoveredRow == ors32_Value)
-   {
-      q_Retval = false;
-   }
-   else
-   {
-      q_Retval = true;
-   }
-   this->ms32_HoveredRow = ors32_Value;
-   return q_Retval;
 }
 
 //-----------------------------------------------------------------------------

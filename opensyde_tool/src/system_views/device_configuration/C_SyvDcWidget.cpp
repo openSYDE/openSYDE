@@ -32,6 +32,7 @@
 #include "C_PuiSvHandler.h"
 #include "TGLUtils.h"
 #include "TGLTime.h"
+#include "CSCLString.h"
 #include "C_PuiSdUtil.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_OgeWiCustomMessage.h"
@@ -39,6 +40,7 @@
 /* -- Used Namespaces ------------------------------------------------------ */
 using namespace stw_types;
 using namespace stw_errors;
+using namespace stw_scl;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
@@ -182,6 +184,10 @@ C_SyvDcWidget::C_SyvDcWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_P
                                                                       sintn)>(&QComboBox::currentIndexChanged), this,
            &C_SyvDcWidget::m_OnDeviceConfigModeChanged);
    connect(this->mpc_ParentDialog, &C_OgePopUpDialog::SigCloseIgnored, this, &C_SyvDcWidget::m_OnCloseIgnored);
+   connect(this->mpc_Ui->pc_ListWidgetConnectedNodesAssignment, &C_SyvDcConnectedNodeList::SigStartDrag,
+           this->mpc_Ui->pc_ListWidgetExistingNodesAssignment, &C_SyvDcExistingNodeList::StartDrag);
+   connect(this->mpc_Ui->pc_ListWidgetConnectedNodesAssignment, &C_SyvDcConnectedNodeList::SigStopDrag,
+           this->mpc_Ui->pc_ListWidgetExistingNodesAssignment, &C_SyvDcExistingNodeList::StopDrag);
 
    this->mc_Timer.setInterval(10);
 }
@@ -270,7 +276,7 @@ void C_SyvDcWidget::InitText(void)
          "All interfaces which are connected to the bus which is used"
          " by the current device configuration.\n"
          "All connected interfaces: "
-         "\nAll interfaces which are connected to any bus in the System Definition.\n"));
+         "\nAll interfaces which are connected to any bus in the SYSTEM DEFINITION.\n"));
 }
 
 //-----------------------------------------------------------------------------
@@ -356,7 +362,7 @@ sint32 C_SyvDcWidget::m_InitSequence(void)
       case C_NO_ERR:
          break;
       case C_CONFIG:
-         c_Message = QString(C_GtGetText::h_GetText("Invalid System Definition/View configuration."));
+         c_Message = QString(C_GtGetText::h_GetText("Invalid SYSTEM DEFINITION/View configuration."));
          break;
       case C_RD_WR:
          c_Message =
@@ -365,7 +371,7 @@ sint32 C_SyvDcWidget::m_InitSequence(void)
       case C_OVERFLOW:
          c_Message =
             QString(C_GtGetText::h_GetText(
-                       "Unknown transport protocol or unknown diagnostic server for at least one Node."));
+                       "Unknown transport protocol or unknown diagnostic server for at least one node."));
          break;
       case C_NOACT:
          c_Message = QString(C_GtGetText::h_GetText("System View is invalid. Action cannot be performed."));
@@ -374,7 +380,7 @@ sint32 C_SyvDcWidget::m_InitSequence(void)
          c_Message =
             QString(C_GtGetText::h_GetText(
                        "CAN initialization failed. Check your PC CAN interface configuration "
-                       "(System View setup - double click on PC)."));
+                       "(System View setup - double-click on PC)."));
          break;
       case C_CHECKSUM:
          c_Message = QString(C_GtGetText::h_GetText("Internal buffer overflow detected."));
@@ -536,7 +542,7 @@ void C_SyvDcWidget::m_ScanFinished(void)
    else if (this->mc_FoundDevices.size() < static_cast<uint32>(this->mpc_Ui->pc_ListWidgetExistingNodes->count()))
    {
       //Less
-      m_EnterScanErrorState(C_GtGetText::h_GetText("Warning: Less devices found than defined by the System View!"
+      m_EnterScanErrorState(C_GtGetText::h_GetText("Warning: Fewer devices found than defined by the System View!"
                                                    " Check connection of connected devices and retry."));
    }
    else if (this->mc_FoundDevices.size() > static_cast<uint32>(this->mpc_Ui->pc_ListWidgetExistingNodes->count()))
@@ -553,8 +559,8 @@ void C_SyvDcWidget::m_ScanFinished(void)
       {
          //Same serial number error
          m_EnterScanErrorState(
-            C_GtGetText::h_GetText("Warning: Devices with duplicate serial numbers found! Please ensure each device "
-                                   "is only connected by one interface for device configuration and retry."));
+            C_GtGetText::h_GetText("Warning: Devices with duplicate serial numbers found! Make sure that each device "
+                                   "is connected only through one interface to the device configuration and try again."));
       }
       else
       {
@@ -669,6 +675,8 @@ void C_SyvDcWidget::m_StartConfigProper(void)
             }
             else
             {
+               //Flashloader type "none" is supported by the device structure, but not the UI
+               tgl_assert(e_Flashloader == C_OSCNodeProperties::eFL_STW);
                this->mc_StwFlashloaderDeviceConfigurations.push_back(rc_Config);
             }
          }
@@ -875,7 +883,7 @@ void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const C_SyvDcDeviceConfiguation & o
 
       if (this->mpc_DcSequences->GetNodeIndex(c_ServerId, u32_NodeIndex) == true)
       {
-         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(u32_NodeIndex);
+         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
 
          if (pc_Node != NULL)
          {
@@ -1131,9 +1139,7 @@ void C_SyvDcWidget::m_ShowConfigInfoOfInterface(const C_OSCNodeComInterfaceSetti
    the same time could work sometimes depending on node timing. But it could also fail.
    A manual reset should always work.
 
-   \param[in]  oq_FinishReset     Flag if manual reset is necessary (always when the bitrate was changed)
-   \param[in]  oq_StartReadBack   Flag if m_StartReadBack shall be started automatically after reset
-   \param[in]  oq_Silent          Flag if reporting will disabled
+   \param[in]  oq_SameBitrate     Flag if the bitrate was not changed
 
    \return
    C_NO_ERR    Reset finished
@@ -1144,120 +1150,166 @@ void C_SyvDcWidget::m_ShowConfigInfoOfInterface(const C_OSCNodeComInterfaceSetti
    \created     06.12.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
-void C_SyvDcWidget::m_ResetNetwork(const bool oq_FinishReset, const bool oq_StartReadBack, const bool oq_Silent)
+void C_SyvDcWidget::m_ResetFlashloader(const bool oq_SameBitrate)
 {
    if (this->mpc_DcSequences != NULL)
    {
-      C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eWARNING);
-      bool q_Wait;
-
       sint32 s32_Return;
-      QString c_Text = "<table width=\"100%\"><tr><td width=\"40%\">";
+      sint32 s32_ThreadResult;
+      bool q_Manual = false;
+      uint32 u32_NewBitrate;
+      std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> c_OsyNodes;
+      std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> c_StwNodes;
+      C_OgeWiCustomMessage c_ConfirmationBox(this, C_OgeWiCustomMessage::E_Type::eWARNING);
 
-      if ((this->mc_OpenSydeDeviceConfigurations.size() > 0) &&
-          (this->mc_StwFlashloaderDeviceConfigurations.size() > 0))
+      if ((this->mc_StwFlashloaderDeviceConfigurations.size() > 0) &&
+          (oq_SameBitrate == false))
       {
-         if (oq_FinishReset == false)
-         {
-            // Mixed system. A reset of STW and openSYDE flashloader with changed bitrates is not reliable
-            c_MessageBox.SetHeading(C_GtGetText::h_GetText("Devices reset"));
-            c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText(
-                                                   "Reset every node manually and press \"Continue\".")));
-            c_MessageBox.SetDetails(C_GtGetText::h_GetText(
-                                       "Your system uses both Flashloader types (STW Flashloader and openSYDE Flashloader.)"
-                                       "\nand the bitrate of the CAN bus was changed."
-                                       "\nIn this case the reset cannot be performed automatically."));
+         // System with STW flashloader devices.
+         // A reset of STW flashloader with changed bitrates is not reliable to get them back in flashloader
+         q_Manual = true;
+         c_ConfirmationBox.SetHeading(C_GtGetText::h_GetText("Devices reset"));
+         c_ConfirmationBox.SetDetails(C_GtGetText::h_GetText(
+                                         "Your system uses at least one node with the STW Flashloader "
+                                         "\nand the bitrate of the CAN bus was changed."
+                                         "\nIn this case the reset cannot be performed automatically."));
 
-            c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
-            c_MessageBox.Execute();
-
-            c_Text += QString(C_GtGetText::h_GetText("User action: manual reset"));
-            q_Wait = false;
-
-            s32_Return = C_NO_ERR;
-         }
-         else
-         {
-            s32_Return = this->mpc_DcSequences->ResetCanStwFlashloaderDevices();
-
-            if (s32_Return == C_NO_ERR)
-            {
-               s32_Return = this->mpc_DcSequences->ResetCanOpenSydeDevices();
-            }
-
-            c_Text += QString(C_GtGetText::h_GetText("Performing automatic reset"));
-
-            q_Wait = true;
-         }
+         c_ConfirmationBox.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
       }
-      else if (this->mc_StwFlashloaderDeviceConfigurations.size() > 0)
+
+      if (q_Manual == false)
       {
-         // Only STW flashloader
-         s32_Return = this->mpc_DcSequences->ResetCanStwFlashloaderDevices();
+         if (this->mc_OpenSydeDeviceConfigurations.size() > 0)
+         {
+            // In case of openSYDE devices, send the request programming service to get the devices direct in
+            // the flashloader again
+            bool q_NotAccepted;
+            this->mpc_DcSequences->SendOsyBroadcastRequestProgramming(q_NotAccepted);
 
-         c_Text += QString(C_GtGetText::h_GetText("Performing automatic reset"));
+            if (q_NotAccepted == true)
+            {
+               osc_write_log_warning("Send openSYDE request programming flag",
+                                     "At least one node send a not accepted response.");
+            }
+         }
 
-         q_Wait = true;
+         // No manual interaction necessary
+         this->m_ResetNetwork(true);
+      }
+
+      s32_Return = this->m_GetRelevantConfigInfo(c_OsyNodes, c_StwNodes, u32_NewBitrate);
+
+      if ((s32_Return == C_NO_ERR) &&
+          (oq_SameBitrate == false))
+      {
+         //for manual resetting ask user to turn devices off before reinitializing and sending on the new bitrate
+         // otherwise we'd have inconsistent bitrates on the CAN bus possibly resulting in bus errors
+         if (q_Manual == true)
+         {
+            c_ConfirmationBox.SetDescription(QString(C_GtGetText::h_GetText(
+                                                        "Switch off all nodes manually and press \"Continue\".")));
+            c_ConfirmationBox.Execute();
+         }
+
+         // Set the new bitrate for the new active configuration if the bitrate was changed
+         s32_Return = this->mpc_DcSequences->InitCanAndSetCanBitrate(u32_NewBitrate);
+      }
+
+      if (s32_Return == C_NO_ERR)
+      {
+         // Start sending the message for getting into flashloader for at least 500ms
+         // In case of a manual reset, this sequence must be executed till the next dialog will be closed by user
+         s32_Return = this->mpc_DcSequences->ScanCanSendFlashloaderRequest(500U, q_Manual);
       }
       else
       {
-         // Only openSYDE flashloader
+         osc_write_log_error("Reset to flashloader",
+                             "Preparation for reset failed: " + C_SCLString::IntToStr(s32_Return));
+      }
+
+      if (s32_Return == C_NO_ERR)
+      {
+         if (q_Manual == true)
+         {
+            c_ConfirmationBox.SetDescription(QString(C_GtGetText::h_GetText(
+                                                        "Switch on all nodes manually and press \"Continue\".")));
+            c_ConfirmationBox.Execute();
+
+            // User has finished the reset, stop the sequence
+            this->mpc_DcSequences->StopScanCanSendFlashloaderRequest();
+         }
+
+         // Wait till thread is finished
+         while (this->mpc_DcSequences->GetResults(s32_ThreadResult) == C_BUSY)
+         {
+            //In case it takes longer do process events to handle cursor and proper show of message box
+            QApplication::processEvents(QEventLoop::AllEvents, 50);
+         }
+
+         // Start next sequence
+         m_HandleDeviceVerificationStart();
+
+         // Start the read back of the devices
          if (this->me_BusType == C_OSCSystemBus::eCAN)
          {
-            s32_Return = this->mpc_DcSequences->ResetCanOpenSydeDevices();
+            this->me_Step = eREADBACKCAN;
+            s32_Return = this->mpc_DcSequences->ReadBackCan(c_OsyNodes, c_StwNodes);
          }
          else
          {
-            s32_Return = this->mpc_DcSequences->ResetEthOpenSydeDevices();
+            this->me_Step = eREADBACKETH;
+            s32_Return = this->mpc_DcSequences->ReadBackEth(c_OsyNodes);
          }
 
-         c_Text += QString(C_GtGetText::h_GetText("Performing automatic reset"));
-
-         q_Wait = true;
-      }
-
-      c_Text += "</td>";
-      c_Text += "<td width=\"20%\">";
-      c_Text += QString(C_GtGetText::h_GetText("DONE"));
-      c_Text += "</td></tr></table>";
-      if (q_Wait == true)
-      {
-         // TODO: Waiting for reset
-         stw_tgl::TGL_Sleep(1000);
-      }
-      if (oq_Silent == true)
-      {
-         this->m_UpdateReportText(c_Text);
-      }
-
-      // Start next sequence
-      if ((s32_Return == C_NO_ERR) &&
-          (oq_StartReadBack == true))
-      {
          this->mc_Timer.start();
-         this->m_StartReadBack();
+
+         if (s32_Return != C_NO_ERR)
+         {
+            // Error occurred
+            this->mc_Timer.stop();
+            osc_write_log_error("Reset to flashloader",
+                                "Reset to flashloader failed: " + C_SCLString::IntToStr(s32_Return));
+         }
+      }
+      else
+      {
+         osc_write_log_error("Reset to flashloader",
+                             "Start of sending flashloader requests failed: " + C_SCLString::IntToStr(s32_Return));
       }
    }
 }
 
 //-----------------------------------------------------------------------------
 /*!
-   \brief   Starts the read back sequence
+   \brief   Sets the necessary bitrate which was configured in the previous step
 
-   A successful network reset after configuration is necessary
+   \param[out]    orc_OpenSydeIds     IDs of openSYDE devices for configuration
+   \param[out]    orc_StwIds          IDs of STW flashloader devices for configuration
+   \param[out]    oru32_Bitrate       Bitrate for current configuration
+
+   \return
+   C_NO_ERR    Bitrate returned
+   C_RANGE     Configuration invalid
+   C_BUSY      previously started sequence still going on
+   C_COM       Error on reading bitrate
+   C_CONFIG    No dispatcher installed
 
    \created     07.12.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
-void C_SyvDcWidget::m_StartReadBack(void)
+sint32 C_SyvDcWidget::m_GetRelevantConfigInfo(std::vector<C_OSCProtocolDriverOsyNode> & orc_OpenSydeIds,
+                                              std::vector<C_OSCProtocolDriverOsyNode> & orc_StwIds,
+                                              uint32 & oru32_Bitrate)
 {
    uint32 u32_Counter;
-   sint32 s32_Result = C_NO_ERR;
-   uint32 u32_NewBitrate = 0U;
-
-   std::vector<C_OSCProtocolDriverOsyNode> c_OsyNodes;
+   sint32 s32_Return = C_NO_ERR;
    C_OSCProtocolDriverOsyNode c_Id;
 
+   oru32_Bitrate = 0U;
+   orc_OpenSydeIds.clear();
+   orc_StwIds.clear();
+
+   // Check all CAN openSYDE devices
    for (u32_Counter = 0U; u32_Counter < this->mc_OpenSydeDeviceConfigurations.size(); ++u32_Counter)
    {
       const C_SyvDcDeviceConfiguation & rc_Config = this->mc_OpenSydeDeviceConfigurations[u32_Counter];
@@ -1268,43 +1320,41 @@ void C_SyvDcWidget::m_StartReadBack(void)
          // The first entries must be the used communication interface
          c_Id.u8_NodeIdentifier = rc_Config.c_NodeIds[0];
          c_Id.u8_BusIdentifier = rc_Config.c_BusIds[0];
-         c_OsyNodes.push_back(c_Id);
+         orc_OpenSydeIds.push_back(c_Id);
 
          if (this->me_BusType == C_OSCSystemBus::eCAN)
          {
             // Not necessary when using Ethernet
             if (rc_Config.c_CanBitrates.size() > 0)
             {
-               if (u32_NewBitrate == 0U)
+               if (oru32_Bitrate == 0U)
                {
-                  u32_NewBitrate = rc_Config.c_CanBitrates[0] / 1000U;
+                  oru32_Bitrate = rc_Config.c_CanBitrates[0] / 1000U;
                }
             }
             else
             {
-               s32_Result = C_RANGE;
+               s32_Return = C_RANGE;
             }
          }
       }
       else
       {
-         s32_Result = C_RANGE;
+         s32_Return = C_RANGE;
       }
 
-      if (s32_Result != C_NO_ERR)
+      if (s32_Return != C_NO_ERR)
       {
          break;
       }
    }
 
    if ((this->mpc_DcSequences != NULL) &&
-       (s32_Result == C_NO_ERR))
+       (s32_Return == C_NO_ERR))
    {
-      m_HandleDeviceVerificationStart();
+      // Check all STW flashloader devices
       if (this->me_BusType == C_OSCSystemBus::eCAN)
       {
-         std::vector<C_OSCProtocolDriverOsyNode> c_StwNodes;
-
          for (u32_Counter = 0U; u32_Counter < this->mc_StwFlashloaderDeviceConfigurations.size(); ++u32_Counter)
          {
             const C_SyvDcDeviceConfiguation & rc_Config = this->mc_StwFlashloaderDeviceConfigurations[u32_Counter];
@@ -1316,44 +1366,72 @@ void C_SyvDcWidget::m_StartReadBack(void)
                // The first entries must be the used communication interface
                c_Id.u8_NodeIdentifier = rc_Config.c_NodeIds[0];
                c_Id.u8_BusIdentifier = rc_Config.c_BusIds[0];
-               c_StwNodes.push_back(c_Id);
+               orc_StwIds.push_back(c_Id);
 
-               if (u32_NewBitrate == 0U)
+               if (oru32_Bitrate == 0U)
                {
-                  u32_NewBitrate = rc_Config.c_CanBitrates[0] / 1000U;
+                  oru32_Bitrate = rc_Config.c_CanBitrates[0] / 1000U;
                }
             }
             else
             {
-               s32_Result = C_RANGE;
+               s32_Return = C_RANGE;
                break;
             }
          }
+      }
+   }
 
-         if (s32_Result == C_NO_ERR)
+   return s32_Return;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Resets the devices to application
+
+   Resets the network dependent of the flashloader types
+
+   Procedure depends on used protocol(s):
+
+   * openSYDE Ethernet: broadcast NetReset
+   * openSYDE CAN: broadcast ECUReset
+   * STW Flashloader: netreset
+
+   \created     06.12.2018  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_SyvDcWidget::m_ResetNetwork(const bool oq_ToFlashloader)
+{
+   if (this->mpc_DcSequences != NULL)
+   {
+      QString c_Text = "<table width=\"100%\"><tr><td width=\"40%\">";
+
+      if (this->me_BusType == C_OSCSystemBus::eCAN)
+      {
+         if (this->mc_OpenSydeDeviceConfigurations.size() > 0)
          {
-            this->me_Step = eREADBACKCAN;
-            s32_Result = this->mpc_DcSequences->ReadBackCan(u32_NewBitrate, c_OsyNodes, c_StwNodes);
+            // CAN openSYDE flashloader
+            this->mpc_DcSequences->ResetCanOpenSydeDevices(oq_ToFlashloader);
          }
-         else
+
+         if (this->mc_StwFlashloaderDeviceConfigurations.size() > 0)
          {
-            // TODO: Error handling
+            // STW flashloader
+            this->mpc_DcSequences->ResetCanStwFlashloaderDevices();
          }
       }
       else
       {
-         this->me_Step = eREADBACKETH;
-         s32_Result = this->mpc_DcSequences->ReadBackEth(c_OsyNodes);
+         // Ethernet openSYDE flashloader
+         this->mpc_DcSequences->ResetEthOpenSydeDevices(oq_ToFlashloader);
       }
-   }
-   else
-   {
-      // TODO: Error handling
-   }
 
-   if (s32_Result != C_NO_ERR)
-   {
-      this->mc_Timer.stop();
+      c_Text += QString(C_GtGetText::h_GetText("Performing automatic reset"));
+
+      c_Text += "</td>";
+      c_Text += "<td width=\"20%\">";
+      c_Text += QString(C_GtGetText::h_GetText("DONE"));
+      c_Text += "</td></tr></table>";
    }
 }
 
@@ -1419,7 +1497,7 @@ void C_SyvDcWidget::m_ShowReadInfo(const sint32 os32_ActualResult)
             // Get topology node name and device type
             if (this->mpc_DcSequences->GetNodeIndex(c_ServerId, u32_NodeIndex) == true)
             {
-               const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(u32_NodeIndex);
+               const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
 
                if (pc_Node != NULL)
                {
@@ -2106,7 +2184,7 @@ void C_SyvDcWidget::m_Timer(void)
                   {
                      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
                      c_Message.SetHeading(C_GtGetText::h_GetText("Device configuration"));
-                     c_Message.SetDescription(C_GtGetText::h_GetText("Could not continue with step: reading information"
+                     c_Message.SetDescription(C_GtGetText::h_GetText("Could not continue with step: Reading information"
                                                                      " from STW Flashloader devices"));
                      m_CleanUpScan();
                      c_Message.Execute();
@@ -2122,7 +2200,7 @@ void C_SyvDcWidget::m_Timer(void)
                   {
                      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
                      c_Message.SetHeading(C_GtGetText::h_GetText("Device configuration"));
-                     c_Message.SetDescription(C_GtGetText::h_GetText("Could not continue with step: reading information"
+                     c_Message.SetDescription(C_GtGetText::h_GetText("Could not continue with step: Reading information"
                                                                      " from openSYDE devices."));
                      m_CleanUpScan();
                      c_Message.Execute();
@@ -2140,7 +2218,7 @@ void C_SyvDcWidget::m_Timer(void)
             {
                C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
                c_Message.SetHeading(C_GtGetText::h_GetText("Device configuration"));
-               c_Message.SetDescription(C_GtGetText::h_GetText("Could not get all devices into Flashloader."));
+               c_Message.SetDescription(C_GtGetText::h_GetText("Could not transfer all devices into Flashloader mode."));
                m_CleanUpScan();
                c_Message.Execute();
             }
@@ -2171,7 +2249,7 @@ void C_SyvDcWidget::m_Timer(void)
                   {
                      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
                      c_Message.SetHeading(C_GtGetText::h_GetText("Device configuration"));
-                     c_Message.SetDescription(C_GtGetText::h_GetText("Could not continue with step: reading information"
+                     c_Message.SetDescription(C_GtGetText::h_GetText("Could not continue with step: Reading information"
                                                                      " from openSYDE Devices"));
                      m_CleanUpScan();
                      c_Message.Execute();
@@ -2260,7 +2338,7 @@ void C_SyvDcWidget::m_Timer(void)
                   QApplication::processEvents();
                   this->m_ShowConfigResult();
                   // Finish the process. No waiting for reset necessary.
-                  this->m_ResetNetwork(this->mq_SameBitrates, true);
+                  this->m_ResetFlashloader(this->mq_SameBitrates);
                }
             }
             else
@@ -2282,7 +2360,7 @@ void C_SyvDcWidget::m_Timer(void)
                QApplication::processEvents();
                this->m_ShowConfigResult();
                // Finish the process. No waiting for reset necessary.
-               this->m_ResetNetwork(this->mq_SameBitrates, true);
+               this->m_ResetFlashloader(this->mq_SameBitrates);
             }
             else
             {
@@ -2315,7 +2393,7 @@ void C_SyvDcWidget::m_Timer(void)
             this->mq_DisconnectNecessary = false;
 
             // Start the applications
-            this->m_ResetNetwork(true, false);
+            this->m_ResetNetwork(false);
 
             //Notify user last?
             c_Text = "<br/><br/><br/>" + mhc_REPORT_HIGHLIGHT_TAG_START;
@@ -2520,18 +2598,23 @@ void C_SyvDcWidget::m_DoCompleteDisconnect(void)
                   {
                      if (pc_Bus->e_Type == C_OSCSystemBus::eCAN)
                      {
-                        if (pc_Node->pc_DeviceDefinition->q_FlashloaderOpenSydeCan == true)
+                        if (pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_OPEN_SYDE)
                         {
                            q_Osy = true;
                         }
-                        if (pc_Node->pc_DeviceDefinition->q_FlashloaderStwCan == true)
+                        else if (pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_STW)
                         {
                            q_Stw = true;
+                        }
+                        else
+                        {
+                           // do nothing
                         }
                      }
                      else
                      {
-                        if (pc_Node->pc_DeviceDefinition->q_FlashloaderOpenSydeEthernet == true)
+                        if ((pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_OPEN_SYDE) &&
+                            (pc_Node->pc_DeviceDefinition->q_FlashloaderOpenSydeEthernet == true))
                         {
                            q_Osy = true;
                         }
@@ -2552,7 +2635,7 @@ void C_SyvDcWidget::m_DoCompleteDisconnect(void)
 
             if (q_Osy == true)
             {
-               while (this->mpc_DcSequences->ResetCanOpenSydeDevices() == C_BUSY)
+               while (this->mpc_DcSequences->ResetCanOpenSydeDevices(false) == C_BUSY)
                {
                   //In case it takes longer do process events to handle cursor and proper show of message box
                   QApplication::processEvents(QEventLoop::AllEvents, 50);
@@ -2636,6 +2719,6 @@ void C_SyvDcWidget::m_InformUserAboutAbortedClose(void) const
 
    c_Message.SetHeading(C_GtGetText::h_GetText("Device configuration"));
    c_Message.SetDescription(C_GtGetText::h_GetText(
-                               "While communication is running abort can lead to inconsistent system state"));
+                               "While the communication is running, an abort can lead to an inconsistent status of the system."));
    c_Message.Execute();
 }

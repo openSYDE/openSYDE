@@ -26,8 +26,8 @@
 
 #include "constants.h"
 #include "C_Uti.h"
-#include "C_SdUtil.h"
 #include "C_OSCUtils.h"
+#include "C_OgeWiUtil.h"
 #include "C_UsHandler.h"
 #include "C_GtGetText.h"
 #include "C_SyvDaItUtil.h"
@@ -224,13 +224,11 @@ void C_SyvDaItPaImageRecordWidget::m_OnBrowse(void)
 {
    QString c_Folder = m_GetValidPath(this->mpc_Ui->pc_LineEditPath->text());
 
-   const QString c_Path = C_SdUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText("Choose location to save the "
-                                                                                   "parameter set image file"),
-                                                      c_Folder,
-                                                      C_GtGetText::h_GetText("openSYDE parameter set image (*") +
-                                                      mhc_FILE_EXTENSION + ")",
-                                                      "",
-                                                      QFileDialog::DontConfirmOverwrite); // overwrite is handled later
+   const QString c_Path =
+      C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText("Select Location for Parameter Set Image File"),
+                                     c_Folder, C_GtGetText::h_GetText(
+                                        "openSYDE parameter set image (*") + mhc_FILE_EXTENSION + ")",
+                                     "", QFileDialog::DontConfirmOverwrite); // overwrite is handled later
 
    if (c_Path.compare("") != 0)
    {
@@ -321,7 +319,8 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
                   C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
 
                   c_MessageBox.SetHeading(C_GtGetText::h_GetText("Parameter Set Image File save"));
-                  c_MessageBox.SetDescription(C_GtGetText::h_GetText("Do you want to overwrite the existing file?"));
+                  c_MessageBox.SetDescription(C_GtGetText::h_GetText(
+                                                 "Do you really want to overwrite the existing file?"));
                   c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Overwrite"));
                   c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Back"));
                   e_ReturnMessageBox = c_MessageBox.Execute();
@@ -383,7 +382,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
             C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR);
             c_MessageBox.SetHeading(C_GtGetText::h_GetText("Parameter Set Image File"));
             c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText(
-                                                   "The specified file has the wrong extension, please use: \"%1\".")).arg(
+                                                   "The specified file has the wrong extension, use: \"%1\".")).arg(
                                            C_SyvDaItPaImageRecordWidget::mhc_FILE_EXTENSION));
             c_MessageBox.SetDetails(QString("Invalid extension: \"%1\"").arg("." + c_Info.completeSuffix()));
             c_MessageBox.Execute();
@@ -403,7 +402,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
       C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR);
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Parameter Set Image File"));
       c_MessageBox.SetDescription(C_GtGetText::h_GetText(
-                                     "The specified file path is empty, please specify a target file."));
+                                     "The specified file does not exist in the path. Make the specified file available."));
       c_MessageBox.Execute();
    }
 }
@@ -538,10 +537,10 @@ void C_SyvDaItPaImageRecordWidget::m_ReadElementsOfNode(void)
                                                                                mc_STYLE_GUIDE_COLOR_13);
                         this->mpc_Ui->pc_LabelHeadingSelectFile->setText(C_GtGetText::h_GetText("Confirm"));
                         this->mpc_Ui->pc_LabelStepDescription->setText(
-                           C_GtGetText::h_GetText(
-                              "Parameter lists are read from system. Check if all required parameter lists are listed below. "
-                              "If yes check \"All required parameters lists are included\" "
-                              "and click on \"Validate File\"."));
+                           C_GtGetText::h_GetText("Parameter lists are read from system. Check if all required "
+                                                  "parameter lists are listed below. If yes, check "
+                                                  "\"All required parameter lists are included\" "
+                                                  "and click \"Validate File\"."));
                         this->mpc_Ui->pc_PbConfirm->setText(QString(C_GtGetText::h_GetText("Validate File")));
                         this->mpc_Ui->pc_CbConfirm->setVisible(true);
                         this->mpc_Ui->pc_CbConfirm->setEnabled(true);
@@ -609,7 +608,7 @@ sint32 C_SyvDaItPaImageRecordWidget::m_CreateParameterSetFile(void)
          c_ErrorText = "File already exists.";
          break;
       case C_RD_WR:
-         c_ErrorText = "Could not write to file (e.g. missing write permissions or missing folder).";
+         c_ErrorText = "Could not write to file (e.g. missing write permissions or missing directory).";
          break;
       default:
          c_ErrorText = "Creating file failed with unknown reason.";
@@ -850,7 +849,7 @@ void C_SyvDaItPaImageRecordWidget::m_WriteCrcOfNodeToFile(void)
          break;
       case C_RD_WR:
          c_ErrorText = "Specified file does not exist or "
-                       "specified file is present but structure is invalid (e.g. invalid XML file).";
+                       "specified file is present but its structure is invalid (e.g. invalid XML file).";
          break;
       case C_RANGE:
          c_ErrorText = "Path does not match the path of the preceding function calls.";
@@ -1064,21 +1063,21 @@ void C_SyvDaItPaImageRecordWidget::m_ReportErrorNvmSafeReadParameterValues(const
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_RANGE:
       c_Description += "Datapool list IDs invalid";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_CHECKSUM:
       c_Description += "CRC over the values of a parameter list read from the ECU does not match those values";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_CONFIG:
       c_Description += "No valid diagnostic protocol is set";
@@ -1086,21 +1085,21 @@ void C_SyvDaItPaImageRecordWidget::m_ReportErrorNvmSafeReadParameterValues(const
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_NOACT:
       c_Description += "Server communication protocol service could not be requested";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_TIMEOUT:
       c_Description += "Server communication protocol service has timed out";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    case C_WARN:
       c_Description += "Server communication protocol service error response was received";
@@ -1130,14 +1129,14 @@ void C_SyvDaItPaImageRecordWidget::m_ReportErrorNvmSafeReadParameterValues(const
       C_OSCLoggingHandler::h_Flush();
       c_Details += QString(C_GtGetText::h_GetText("\nSee log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                      mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                     "file://" + c_Log);
+                                                                                                     c_Log);
       break;
    case C_COM:
       c_Description += "Communication driver reported error";
       C_OSCLoggingHandler::h_Flush();
       c_Details = QString(C_GtGetText::h_GetText("See log file for details:")) + C_Uti::h_GetLink(c_Log,
                                                                                                   mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                                                                  "file://" + c_Log);
+                                                                                                  c_Log);
       break;
    default:
       //Should not happen

@@ -74,7 +74,7 @@ void C_PopErrorHandling::mh_ProjectLoadErr(const sint32 & ors32_Err, const QStri
       {
       case C_RD_WR:
          c_Message.SetDetails(C_GtGetText::h_GetText("There are problems accessing the file system.\n"
-                                                     "For example there may be no read access to the file."));
+                                                     "For example, there may be no read access to the file."));
          c_Message.Execute();
          break;
       case C_RANGE:
@@ -83,7 +83,7 @@ void C_PopErrorHandling::mh_ProjectLoadErr(const sint32 & ors32_Err, const QStri
          break;
       case C_NOACT:
          c_Message.SetDetails(C_GtGetText::h_GetText("A project file is present but its structure is invalid.\n"
-                                                     "For example this could be caused by an invalid XML file."));
+                                                     "For example this can be caused by an invalid XML file."));
          c_Message.Execute();
          break;
       case C_CONFIG:
@@ -95,7 +95,7 @@ void C_PopErrorHandling::mh_ProjectLoadErr(const sint32 & ors32_Err, const QStri
          C_OSCLoggingHandler::h_Flush();
          c_Message.SetDetails(QString("%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
                               arg(C_GtGetText::h_GetText(
-                                     "The device definition for the project was not found. For more details see ")).
+                                     "The device definition for the project was not found. For more information see ")).
                               arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
                               arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
                               arg(C_GtGetText::h_GetText("log file")));

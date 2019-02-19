@@ -367,61 +367,16 @@ p, li { white-space: pre-wrap; }
               <property name="spacing">
                <number>0</number>
               </property>
-              <property name="bottomMargin">
-               <number>0</number>
-              </property>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_19" stretch="0,0">
-                <property name="spacing">
-                 <number>6</number>
-                </property>
-                <property name="topMargin">
-                 <number>9</number>
-                </property>
-                <item>
-                 <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelDiagServer">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>31</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>31</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Diagnostic Server</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_24">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>25</width>
-                    <height>1</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_23" stretch="0,0">
                 <property name="spacing">
                  <number>6</number>
                 </property>
                 <property name="topMargin">
-                 <number>9</number>
+                 <number>8</number>
                 </property>
                 <item>
-                 <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelFlashloader">
+                 <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelProtocol">
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
@@ -435,7 +390,7 @@ p, li { white-space: pre-wrap; }
                    </size>
                   </property>
                   <property name="text">
-                   <string>Flashloader</string>
+                   <string>Protocol Support</string>
                   </property>
                  </widget>
                 </item>
@@ -460,7 +415,7 @@ p, li { white-space: pre-wrap; }
                  <number>6</number>
                 </property>
                 <property name="topMargin">
-                 <number>9</number>
+                 <number>8</number>
                 </property>
                 <item>
                  <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelProgramming">
@@ -506,104 +461,13 @@ p, li { white-space: pre-wrap; }
               <property name="sizeConstraint">
                <enum>QLayout::SetMinimumSize</enum>
               </property>
-              <property name="bottomMargin">
-               <number>0</number>
+              <property name="topMargin">
+               <number>6</number>
               </property>
-              <item>
-               <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_ApplicationGroup">
-                <property name="title">
-                 <string/>
-                </property>
-                <layout class="QVBoxLayout" name="verticalLayout_25">
-                 <property name="spacing">
-                  <number>6</number>
-                 </property>
-                 <property name="leftMargin">
-                  <number>0</number>
-                 </property>
-                 <property name="topMargin">
-                  <number>0</number>
-                 </property>
-                 <property name="rightMargin">
-                  <number>0</number>
-                 </property>
-                 <property name="bottomMargin">
-                  <number>0</number>
-                 </property>
-                 <item>
-                  <spacer name="verticalSpacer_3">
-                   <property name="orientation">
-                    <enum>Qt::Vertical</enum>
-                   </property>
-                   <property name="sizeType">
-                    <enum>QSizePolicy::Fixed</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>20</width>
-                     <height>6</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="0,0">
-                   <item>
-                    <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxDiagServer">
-                     <property name="enabled">
-                      <bool>false</bool>
-                     </property>
-                     <property name="minimumSize">
-                      <size>
-                       <width>160</width>
-                       <height>30</height>
-                      </size>
-                     </property>
-                     <property name="maximumSize">
-                      <size>
-                       <width>160</width>
-                       <height>30</height>
-                      </size>
-                     </property>
-                     <item>
-                      <property name="text">
-                       <string>openSYDE</string>
-                      </property>
-                     </item>
-                     <item>
-                      <property name="text">
-                       <string>KEFEX</string>
-                      </property>
-                     </item>
-                     <item>
-                      <property name="text">
-                       <string>none</string>
-                      </property>
-                     </item>
-                    </widget>
-                   </item>
-                   <item>
-                    <spacer name="horizontalSpacer">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>40</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                  </layout>
-                 </item>
-                </layout>
-               </widget>
-              </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_22" stretch="0,0,0,0">
                 <item>
-                 <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxFlashloader">
+                 <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxProtocol">
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
@@ -626,7 +490,7 @@ p, li { white-space: pre-wrap; }
                   </item>
                   <item>
                    <property name="text">
-                    <string>STW</string>
+                    <string>KEFEX</string>
                    </property>
                   </item>
                   <item>
@@ -772,7 +636,7 @@ p, li { white-space: pre-wrap; }
             <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
-              <height>10</height>
+              <height>20</height>
              </size>
             </property>
            </spacer>
@@ -1536,7 +1400,6 @@ p, li { white-space: pre-wrap; }
  <tabstops>
   <tabstop>pc_LineEditNodeName</tabstop>
   <tabstop>pc_TextEditComment</tabstop>
-  <tabstop>pc_ComboBoxDiagServer</tabstop>
  </tabstops>
  <resources/>
  <connections/>

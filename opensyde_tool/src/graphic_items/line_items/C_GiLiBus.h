@@ -47,8 +47,9 @@ class C_GiLiBus :
 
 public:
    C_GiLiBus(const stw_types::sint32 & ors32_Index, const stw_types::uint64 & oru64_ID,
-             C_GiTextElementBus * const opc_TextElementName, const std::vector<QPointF> * const opc_Points = NULL,
-             const bool & orq_MiddleLine = false, QGraphicsItem * const opc_Parent = NULL);
+             C_GiTextElementBus * const opc_TextElementName, const bool oq_DoErrorCheck,
+             const std::vector<QPointF> * const opc_Points = NULL, const bool & orq_MiddleLine = false,
+             QGraphicsItem * const opc_Parent = NULL);
    virtual ~C_GiLiBus();
 
    virtual stw_types::sintn type() const override;
@@ -65,7 +66,7 @@ public:
 
    virtual void SetDisabledLook(const bool oq_Disabled) override;
    void ApplyStyle(const QColor & orc_LineColor, const stw_types::sintn osn_Width);
-   void CheckBusForChanges(void);
+   virtual void CheckBusForChanges(void);
    virtual void SetResizing(const bool & orq_ResizeActive) override;
    C_GiTextElementBus * GetTextElementBus(void);
 
@@ -75,6 +76,8 @@ protected:
    virtual void mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event) override;
    //lint -restore
+
+   C_GiTextElementBus * mpc_TextElementName;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -91,8 +94,6 @@ private:
    void m_BusWasMoved(const stw_types::sint32 & ors32_LineIndex, const QPointF & orc_PositionDifference);
    void m_UpdateTextElementName(void);
    void m_UnregisterTextElement(void);
-
-   C_GiTextElementBus * mpc_TextElementName;
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

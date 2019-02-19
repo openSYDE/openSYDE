@@ -43,7 +43,7 @@ public:
    void LoadUserSettings(void) const;
    void SaveUserSettings(void) const;
    void UpdateNames(void) const;
-   void UpdateDeco(void) const;
+   void UpdateDeco(const bool oq_CheckOnlyThisView, const stw_types::uint32 ou32_ViewIndex) const;
    stw_types::sint32 GetMaximumRequiredHeight(void) const;
    void SetActive(const stw_types::uint32 ou32_ViewIndex, const stw_types::sint32 os32_SubMode) const;
    C_NagViewItem * GetItemAt(const stw_types::sintn osn_Index) const;

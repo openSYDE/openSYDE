@@ -54,9 +54,6 @@ C_OSCNodeComInterfaceSettings::C_OSCNodeComInterfaceSettings(void) :
    q_IsUpdateEnabled(false),
    q_IsRoutingEnabled(false),
    q_IsDiagnosisEnabled(false),
-   q_IsComProtocolL2Enabled(false),
-   q_IsComProtocolCANOpenSafetyEnabled(false),
-   q_IsComProtocolECeSEnabled(false),
    q_IsBusConnected(false),
    u32_BusIndex(0)
 {
@@ -109,12 +106,6 @@ void C_OSCNodeComInterfaceSettings::CalcHash(uint32 & oru32_HashValue) const
    stw_scl::C_SCLChecksums::CalcCRC32(&this->q_IsUpdateEnabled, sizeof(this->q_IsUpdateEnabled), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->q_IsRoutingEnabled, sizeof(this->q_IsRoutingEnabled), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->q_IsDiagnosisEnabled, sizeof(this->q_IsDiagnosisEnabled), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_IsComProtocolL2Enabled, sizeof(this->q_IsComProtocolL2Enabled),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_IsComProtocolCANOpenSafetyEnabled,
-                                      sizeof(this->q_IsComProtocolCANOpenSafetyEnabled), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_IsComProtocolECeSEnabled, sizeof(this->q_IsComProtocolECeSEnabled),
-                                      oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->q_IsBusConnected, sizeof(this->q_IsBusConnected), oru32_HashValue);
    stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_BusIndex, sizeof(this->u32_BusIndex), oru32_HashValue);
 }

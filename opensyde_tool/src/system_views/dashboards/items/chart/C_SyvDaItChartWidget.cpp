@@ -235,7 +235,7 @@ void C_SyvDaItChartWidget::SetData(const C_PuiSvDbChart & orc_Data)
             c_InvalidNamePlaceholder = rc_Config.c_ElementId.GetInvalidNamePlaceholder();
             e_InvalidDataPoolTypePlaceholder = rc_Config.c_ElementId.GetInvalidTypePlaceholder();
             c_ToolTipErrorTextHeading = C_GtGetText::h_GetText("Configuration warning");
-            c_ToolTipErrorText = C_GtGetText::h_GetText("Data element was deleted in system definition");
+            c_ToolTipErrorText = C_GtGetText::h_GetText("Data element was deleted in SYSTEM DEFINITION");
          }
          else
          {

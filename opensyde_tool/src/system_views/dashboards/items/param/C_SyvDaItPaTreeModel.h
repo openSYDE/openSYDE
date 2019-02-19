@@ -49,6 +49,7 @@ public:
    };
 
    C_SyvDaItPaTreeModel(QObject * const opc_Parent = NULL);
+   ~C_SyvDaItPaTreeModel(void);
 
    bool IsEmpty(void) const;
    void ReloadSetValues(void);
@@ -62,6 +63,9 @@ public:
    bool CheckRange(void) const;
    bool CheckAllListsRead(void) const;
    void PrepareChangedValues(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ListIds) const;
+   void RemoveValuesChangedFlag(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ListIds)
+   const;
+
    QModelIndexList GetAllAvailableIndixesForOneColumn(void) const;
    QModelIndex GetIndexForItem(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id,
                                const stw_types::uint32 & oru32_ValidLayers) const;
@@ -109,7 +113,8 @@ public:
    std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> GetListIdsForId(
       const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id, const stw_types::uint32 ou32_ValidLayers)
    const;
-   std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> GetElementIdsForId(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id, const stw_types::uint32 ou32_ValidLayers)
+   std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> GetElementIdsForId(
+      const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id, const stw_types::uint32 ou32_ValidLayers)
    const;
 
 private:

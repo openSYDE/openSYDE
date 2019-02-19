@@ -503,9 +503,12 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingConsecutiveFrame(const T_STW
       }
       else
       {
+         C_SCLString c_Tmp;
          //incorrect sequence: abort
          mc_RxService.e_Status = C_ServiceState::eIDLE;
-         m_LogWarningWithHeader("Consecutive frame with incorrect sequence number received.", TGL_UTIL_FUNC_ID);
+         c_Tmp.PrintFormatted("Consecutive frame with incorrect sequence number received. Expected: %i, Received: %i",
+                              mc_RxService.u8_SequenceNumber, orc_CanMessage.au8_Data[0] & 0x0FU);
+         m_LogWarningWithHeader(c_Tmp.c_str(), TGL_UTIL_FUNC_ID);
          s32_Return = C_RANGE;
       }
    }
@@ -726,6 +729,7 @@ void C_OSCProtocolDriverOsyTpCan::m_ComposeSingleFrame(const C_OSCProtocolDriver
    \return
    C_NO_ERR   cycle finished
    C_CONFIG   no dispatcher installed
+   C_COM      communication driver reported error
 
    \created     24.02.2017  STW/A.Stangl
 */
@@ -761,6 +765,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::Cycle(void)
                   {
                      m_LogWarningWithHeader("Could not send single frame CAN message.", TGL_UTIL_FUNC_ID);
                      s32_Return = C_COM; //terminate loop
+                     s32_ReturnFunc = C_COM;
                   }
                }
                else if (mc_TxService.c_ServiceData.q_CanTransferWithoutFlowControl == true)

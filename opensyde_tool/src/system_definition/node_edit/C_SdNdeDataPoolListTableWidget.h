@@ -46,9 +46,8 @@ class C_SdNdeDataPoolListTableWidget :
    Q_OBJECT
 
 public:
-   explicit C_SdNdeDataPoolListTableWidget(QWidget * const opc_Parent = NULL,
-                                           const QTreeWidgetItem * const opc_TreeWidgetItem = NULL, stw_opensyde_gui_logic::C_SdNdeUnoDataPoolManager * const opc_UndoStack =
-                                              NULL);
+   explicit C_SdNdeDataPoolListTableWidget(QWidget * const opc_Parent = NULL, QTreeWidget * const opc_TreeWidget = NULL, stw_opensyde_gui_logic::C_SdNdeUnoDataPoolManager * const opc_UndoStack =
+                                              NULL, const bool oq_PopUp=true);
    ~C_SdNdeDataPoolListTableWidget(void);
    void InitStaticNames(void) const;
    void SetTreeWidgetAndUndoManager(QTreeWidget * const opc_TreeWidget,
@@ -91,6 +90,7 @@ private:
    stw_types::uint32 mu32_NodeIndex;
    stw_types::uint32 mu32_DataPoolIndex;
    stw_types::uint32 mu32_ListIndex;
+   bool mq_PopUp;
 
    void m_OnErrorChangePossible(void);
    void m_OnSizeChangePossible(void);

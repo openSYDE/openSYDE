@@ -594,7 +594,7 @@ void C_SyvUpSummaryWidget::m_UpdateEstimatedWaitTime(void)
          if (u64_WaitingTimeMin == 0ULL)
          {
             this->mc_EstimatedTime = QString(C_GtGetText::h_GetText(
-                                                "Estimated waiting time less than one min."));
+                                                "Estimated waiting time less than one minute."));
          }
          else
          {

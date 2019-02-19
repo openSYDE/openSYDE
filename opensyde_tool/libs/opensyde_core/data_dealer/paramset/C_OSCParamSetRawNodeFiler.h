@@ -28,7 +28,7 @@ namespace stw_opensyde_core
 /* -- Global Constants ----------------------------------------------------- */
 
 /* -- Types ---------------------------------------------------------------- */
-
+///Filer for C_OSCParamSetRawNode
 class C_OSCParamSetRawNodeFiler :
    public C_OSCParamSetFilerBase
 {

@@ -20,6 +20,7 @@
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
+#include "C_PuiSdHandler.h"
 #include "C_SdBueUnoManager.h"
 #include "C_SdBueUnoBusProtNodeConnectAndCreateCommand.h"
 #include "C_SdBueUnoBusProtNodeConnectCommand.h"
@@ -201,14 +202,15 @@ void C_SdBueUnoManager::DoAddMessage(const C_OSCCanMessageIdentificationIndices 
    \param[in]     orc_OwnerIsTxFlag           Owner has message as TX flags
    \param[in,out] opc_MessageSyncManager      Message sync manager to perform actions on
    \param[in,out] opc_MessageTreeWidget       Message tree widget to perform actions on
+   \param[out]    orc_NewIds                  New pasted message IDs
 
    \created     24.04.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_SdBueUnoManager::DoPasteMessages(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                         const std::vector<C_OSCCanMessage> & orc_Messages,
-                                        const std::vector<std::vector<C_OSCNodeDataPoolListElement> > & orc_OSCSignalCommons, const std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UISignalCommons, const std::vector<std::vector<C_PuiSdNodeCanSignal> > & orc_UISignals, const std::vector<std::vector<QString> > & orc_OwnerNodeName, const std::vector<std::vector<uint32> > & orc_OwnerNodeInterfaceIndex, const std::vector<std::vector<bool> > & orc_OwnerIsTxFlag, C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
-                                        QTreeWidget * const opc_MessageTreeWidget)
+                                        const std::vector<std::vector<C_OSCNodeDataPoolListElement> > & orc_OSCSignalCommons, const std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UISignalCommons, const std::vector<std::vector<C_PuiSdNodeCanSignal> > & orc_UISignals, const std::vector<std::vector<QString> > & orc_OwnerNodeName, const std::vector<std::vector<uint32> > & orc_OwnerNodeInterfaceIndex, const std::vector<std::vector<bool> > & orc_OwnerIsTxFlag, C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager, QTreeWidget * const opc_MessageTreeWidget,
+                                        std::vector<C_OSCCanMessageIdentificationIndices> & orc_NewIds)
 {
    //Check if consistent size
    if ((((orc_Messages.size() == orc_OSCSignalCommons.size()) &&
@@ -216,10 +218,20 @@ void C_SdBueUnoManager::DoPasteMessages(const C_OSCCanMessageIdentificationIndic
    {
       if (orc_Messages.size() > 0)
       {
+         std::vector<const C_SdBueUnoMessageAddCommand *> c_AddCommands;
          C_OSCCanMessageIdentificationIndices c_CurrentMessageId = orc_MessageId;
          QUndoCommand * const pc_PasteCommand = new QUndoCommand("Paste Messages");
+
+         //Reserve
+         orc_NewIds.reserve(orc_Messages.size());
+         c_AddCommands.reserve(orc_Messages.size());
+
+         //Create add command for each new message (for paste multiple can be added at once)
          for (uint32 u32_ItMessage = 0; u32_ItMessage < orc_Messages.size(); ++u32_ItMessage)
          {
+            std::vector<QString> c_OwnerNodeName;
+            std::vector<uint32>  c_OwnerNodeInterfaceIndex;
+            std::vector<bool>  c_OwnerIsTxFlag;
             C_OSCCanMessage c_Tmp = orc_Messages[u32_ItMessage];
             //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
             C_SdBueMessageSelectorTreeWidget * const pc_MessageTreeWidget =
@@ -228,29 +240,43 @@ void C_SdBueUnoManager::DoPasteMessages(const C_OSCCanMessageIdentificationIndic
                                                                                                 opc_MessageSyncManager,
                                                                                                 pc_MessageTreeWidget,
                                                                                                 pc_PasteCommand);
+            //Check last owners storage valid
             if (((u32_ItMessage < orc_OwnerNodeName.size()) && (u32_ItMessage < orc_OwnerNodeInterfaceIndex.size())) &&
                 (u32_ItMessage < orc_OwnerIsTxFlag.size()))
             {
-               pc_AddCommand->SetInitialData(c_Tmp, orc_OSCSignalCommons[u32_ItMessage],
-                                             orc_UISignalCommons[u32_ItMessage], orc_UISignals[u32_ItMessage],
-                                             orc_OwnerNodeName[u32_ItMessage],
-                                             orc_OwnerNodeInterfaceIndex[u32_ItMessage],
-                                             orc_OwnerIsTxFlag[u32_ItMessage]);
+               C_SdBueUnoManager::mh_HandleLastOwnersValidation(orc_MessageId, orc_OwnerNodeName[u32_ItMessage],
+                                                                orc_OwnerNodeInterfaceIndex[u32_ItMessage],
+                                                                orc_OwnerIsTxFlag[u32_ItMessage], c_OwnerNodeName,
+                                                                c_OwnerNodeInterfaceIndex,
+                                                                c_OwnerIsTxFlag);
             }
-            else
-            {
-               std::vector<QString> c_EmptyOwnerNodeName;
-               std::vector<uint32>  c_EmptyOwnerNodeInterfaceIndex;
-               std::vector<bool>  c_EmptyOwnerIsTxFlag;
-               pc_AddCommand->SetInitialData(c_Tmp, orc_OSCSignalCommons[u32_ItMessage],
-                                             orc_UISignalCommons[u32_ItMessage], orc_UISignals[u32_ItMessage],
-                                             c_EmptyOwnerNodeName, c_EmptyOwnerNodeInterfaceIndex,
-                                             c_EmptyOwnerIsTxFlag);
-            }
+            //If vector are empty default behavior is used instead
+            pc_AddCommand->SetInitialData(c_Tmp, orc_OSCSignalCommons[u32_ItMessage],
+                                          orc_UISignalCommons[u32_ItMessage],
+                                          orc_UISignals[u32_ItMessage],
+                                          c_OwnerNodeName, c_OwnerNodeInterfaceIndex,
+                                          c_OwnerIsTxFlag);
+
+            c_AddCommands.push_back(pc_AddCommand);
+
+            //The message index increment might be highly inaccurate but it should never be used anyways
             ++c_CurrentMessageId.u32_MessageIndex;
+
             //lint -e429 Qt command stack will take care of it
          }
+
+         //Execute add
          this->DoPush(pc_PasteCommand);
+
+         //AFTER add step -> at this point the message IDs and especially the message index should be accurate
+         for (uint32 u32_ItMessage = 0; u32_ItMessage < c_AddCommands.size(); ++u32_ItMessage)
+         {
+            const C_SdBueUnoMessageAddCommand * const pc_AddCommand = c_AddCommands[u32_ItMessage];
+            if (pc_AddCommand != NULL)
+            {
+               orc_NewIds.push_back(pc_AddCommand->GetLastMessageId());
+            }
+         }
       }
    }
 }
@@ -497,5 +523,112 @@ void C_SdBueUnoManager::mh_PatchMessageId(const C_PuiSdNodeCanMessageSyncManager
    if (opc_MessageSyncManager != NULL)
    {
       orc_Message.u32_CanId = opc_MessageSyncManager->GetNextValidMessageId(orc_Message.q_IsExtended);
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Convert last known owners as restored from copy operation to current connected nodes (as possible)
+
+   \param[in]  orc_MessageId                   New message id from current bus to use as fallback
+   \param[in]  orc_LastOwnerNodeName           Original owners node names
+   \param[in]  orc_LastOwnerNodeInterfaceIndex Original owners interface indices
+   \param[in]  orc_LastOwnerIsTxFlag           Original owners TX flags
+   \param[out] orc_NewOwnerNodeName            New/valid owners node names (empty if no matches found)
+   \param[out] orc_NewOwnerNodeInterfaceIndex  New/valid owners interface indices (empty if no matches found)
+   \param[out] orc_NewOwnerIsTxFlag            New/valid owners TX flags (empty if no matches found)
+
+   \created     18.02.2019  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_SdBueUnoManager::mh_HandleLastOwnersValidation(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
+                                                      const std::vector<QString> & orc_LastOwnerNodeName,
+                                                      const std::vector<uint32> & orc_LastOwnerNodeInterfaceIndex,
+                                                      const std::vector<bool> & orc_LastOwnerIsTxFlag,
+                                                      std::vector<QString> & orc_NewOwnerNodeName,
+                                                      std::vector<uint32> & orc_NewOwnerNodeInterfaceIndex,
+                                                      std::vector<bool> & orc_NewOwnerIsTxFlag)
+{
+   //Confirm connected to bus state part 1 (container)
+   const C_OSCCanMessageContainer * const pc_Container =
+      C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(orc_MessageId.u32_NodeIndex,
+                                                                      orc_MessageId.e_ComProtocol,
+                                                                      orc_MessageId.u32_InterfaceIndex);
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+      orc_MessageId.u32_NodeIndex);
+
+   if ((pc_Node != NULL) &&
+       ((pc_Container != NULL) && (pc_Container->q_IsComProtocolUsedByInterface == true)))
+   {
+      if (orc_MessageId.u32_InterfaceIndex < pc_Node->c_Properties.c_ComInterfaces.size())
+      {
+         const C_OSCNodeComInterfaceSettings & rc_Interface =
+            pc_Node->c_Properties.c_ComInterfaces[orc_MessageId.u32_InterfaceIndex];
+         //Confirm connected to bus state part 2 (interface)
+         if (rc_Interface.q_IsBusConnected == true)
+         {
+            std::vector<uint32> c_NodeIndexes;
+            std::vector<uint32> c_InterfaceIndexes;
+            C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(
+               rc_Interface.u32_BusIndex, c_NodeIndexes, c_InterfaceIndexes);
+            //Check if operation was successful
+            if (c_NodeIndexes.size() == c_InterfaceIndexes.size())
+            {
+               //Confirm last owners still valid
+               for (uint32 u32_ItLastOwner = 0UL; u32_ItLastOwner < orc_LastOwnerNodeName.size();
+                    ++u32_ItLastOwner)
+               {
+                  const QString & rc_CurName = orc_LastOwnerNodeName[u32_ItLastOwner];
+                  //Iterate over all connected nodes
+                  for (uint32 u32_ItConnectedNode = 0UL;
+                       u32_ItConnectedNode < c_NodeIndexes.size();
+                       ++u32_ItConnectedNode)
+                  {
+                     const C_OSCNode * const pc_ConnectedNode =
+                        C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_NodeIndexes[u32_ItConnectedNode]);
+                     if (pc_ConnectedNode != NULL)
+                     {
+                        if (rc_CurName.compare(pc_ConnectedNode->c_Properties.c_Name.c_str()) == 0)
+                        {
+                           bool q_ExactMatch = false;
+                           //Match!
+                           //1. simple check: check if connected bus matches expected bus
+                           if (orc_LastOwnerNodeInterfaceIndex[u32_ItLastOwner] <
+                               pc_ConnectedNode->c_Properties.c_ComInterfaces.size())
+                           {
+                              const C_OSCNodeComInterfaceSettings & rc_LastInterface =
+                                 pc_Node->c_Properties.c_ComInterfaces[orc_LastOwnerNodeInterfaceIndex[u32_ItLastOwner]];
+                              if ((rc_LastInterface.q_IsBusConnected == true) &&
+                                  (rc_LastInterface.u32_BusIndex == rc_Interface.u32_BusIndex))
+                              {
+                                 //Exact match use same info
+                                 orc_NewOwnerNodeName.push_back(orc_LastOwnerNodeName[u32_ItLastOwner]);
+                                 orc_NewOwnerNodeInterfaceIndex.push_back(orc_LastOwnerNodeInterfaceIndex[
+                                                                             u32_ItLastOwner]);
+                                 orc_NewOwnerIsTxFlag.push_back(orc_LastOwnerIsTxFlag[u32_ItLastOwner]);
+                                 //Signal stop
+                                 q_ExactMatch = true;
+                              }
+                           }
+                           //Only continue if change necessary -> adapt last owner!
+                           if (q_ExactMatch == false)
+                           {
+                              //node name seems to match so no change necessary
+                              orc_NewOwnerNodeName.push_back(orc_LastOwnerNodeName[u32_ItLastOwner]);
+                              //The direction should not be a problem
+                              orc_NewOwnerIsTxFlag.push_back(orc_LastOwnerIsTxFlag[u32_ItLastOwner]);
+                              //The interface has to be changed to the only connected one
+                              orc_NewOwnerNodeInterfaceIndex.push_back(c_InterfaceIndexes[u32_ItConnectedNode]);
+                           }
+                           //Always stop if matching node name was found
+                           // (avoid match with same node and different interface!)
+                           break;
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
    }
 }

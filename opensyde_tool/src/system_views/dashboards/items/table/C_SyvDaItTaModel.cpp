@@ -923,7 +923,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                      c_Retval = pc_DataElementId->GetInvalidNamePlaceholder();
                      break;
                   case C_SyvDaItTaModel::eICON:
-                     c_Retval = C_GtGetText::h_GetText("Data element was deleted in system definition");
+                     c_Retval = C_GtGetText::h_GetText("Data element was deleted in SYSTEM DEFINITION");
                      break;
                   default:
                      break;

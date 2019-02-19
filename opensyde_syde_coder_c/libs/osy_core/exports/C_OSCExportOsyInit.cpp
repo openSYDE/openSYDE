@@ -103,6 +103,7 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
    C_SCLStringList c_Lines;
    sint32 s32_Return = C_NO_ERR;
    uint8 u8_DataPoolsKnownInThisApplication = 0U;
+   uint8 u8_CommDefinitionsKnownInThisApplication = 0U;
    uint8 u8_NumCanChannels = 0U;
    uint8 u8_NumEthChannels = 0U;
    uint32 u32_BufferSize;
@@ -141,29 +142,33 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
          C_SCLString c_HeaderName;
          C_OSCExportDataPool::h_GetFileName(rc_DataPool, c_HeaderName);
          c_Lines.Add("#include \"" + c_HeaderName + ".h\"");
+         u8_DataPoolsKnownInThisApplication++;
       }
    }
    //includes for comm stack configuration
    //these are not needed by this module at all; they are only provided for application convenience
-   c_Lines.Add("//Header files exporting comm stack configuration and status:");
-   for (uint32 u32_ItProtocol = 0U; u32_ItProtocol < orc_Node.c_ComProtocols.size(); u32_ItProtocol++)
+   if (orc_Node.c_ComProtocols.size() > 0)
    {
-      const C_OSCCanProtocol & rc_Protocol = orc_Node.c_ComProtocols[u32_ItProtocol];
-      //logic: C_OSCCanProtocol refers to a data pool; if that data pool is owned by the
-      // C_OSCNodeApplication then create it
-      if (orc_Node.c_DataPools[rc_Protocol.u32_DataPoolIndex].s32_RelatedDataBlockIndex == ou16_ApplicationIndex)
+      c_Lines.Add("//Header files exporting comm stack configuration and status:");
+      for (uint32 u32_ItProtocol = 0U; u32_ItProtocol < orc_Node.c_ComProtocols.size(); u32_ItProtocol++)
       {
-         for (uint32 u32_ItInterface = 0U; u32_ItInterface < rc_Protocol.c_ComMessages.size();
-              u32_ItInterface++)
+         const C_OSCCanProtocol & rc_Protocol = orc_Node.c_ComProtocols[u32_ItProtocol];
+         //logic: C_OSCCanProtocol refers to a data pool; if that data pool is owned by the
+         // C_OSCNodeApplication then create it
+         if (orc_Node.c_DataPools[rc_Protocol.u32_DataPoolIndex].s32_RelatedDataBlockIndex == ou16_ApplicationIndex)
          {
-            //at least one message defined ?
-            const C_OSCCanMessageContainer & rc_ComMessageContainer = rc_Protocol.c_ComMessages[u32_ItInterface];
-            if ((rc_ComMessageContainer.c_TxMessages.size() > 0) || (rc_ComMessageContainer.c_RxMessages.size() > 0))
+            for (uint32 u32_ItInterface = 0U; u32_ItInterface < rc_Protocol.c_ComMessages.size();
+                 u32_ItInterface++)
             {
-               C_SCLString c_HeaderName;
-               C_OSCExportCommunicationStack::h_GetFileName(static_cast<uint8>(u32_ItInterface),
-                                                            rc_Protocol.e_Type, c_HeaderName);
-               c_Lines.Add("#include \"" + c_HeaderName + ".h\"");
+               //at least one message defined ?
+               if (rc_Protocol.c_ComMessages[u32_ItInterface].ContainsAtLeastOneMessage() == true)
+               {
+                  const C_SCLString c_HeaderName =
+                     C_OSCExportCommunicationStack::h_GetFileName(static_cast<uint8>(u32_ItInterface),
+                                                                  rc_Protocol.e_Type);
+                  c_Lines.Add("#include \"" + c_HeaderName + ".h\"");
+                  u8_CommDefinitionsKnownInThisApplication++;
+               }
             }
          }
       }
@@ -242,19 +247,13 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
       c_Lines.Add("");
    }
 
-   //how many data pools does this application know ?
-   for (uint8 u8_DataPool = 0U; u8_DataPool < orc_Node.c_DataPools.size(); u8_DataPool++)
-   {
-      const C_OSCNodeDataPool & rc_DataPool = orc_Node.c_DataPools[u8_DataPool];
-      //add data pool if application runs DPD or application owns this data pool
-      if ((oq_RunsDpd == true) || (rc_DataPool.s32_RelatedDataBlockIndex == ou16_ApplicationIndex))
-      {
-         u8_DataPoolsKnownInThisApplication++;
-      }
-   }
-
    c_Lines.Add("#define OSY_INIT_DPH_NUM_DATA_POOLS                 " +
                C_SCLString::IntToStr(u8_DataPoolsKnownInThisApplication) + "U");
+   c_Lines.Add("");
+   //add the next constant even if there are no COMM protocols; just placing the define does not create an external
+   // dependency
+   c_Lines.Add("#define OSY_INIT_COM_NUM_PROTOCOL_CONFIGURATIONS    " +
+               C_SCLString::IntToStr(u8_CommDefinitionsKnownInThisApplication) + "U");
    c_Lines.Add("");
    c_Lines.Add(
       "/* -- Types --------------------------------------------------------------------------------------------------------- */");
@@ -271,6 +270,16 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
    c_Lines.Add("extern const T_osy_dpa_data_pool * const * osy_dph_get_init_config(void);");
    c_Lines.Add("extern uint8 osy_dph_get_num_data_pools(void);");
    c_Lines.Add("");
+
+   //prototypes for COMM utility functions; only place if there are COMM protocols to prevent external dependencies
+   // (on type definitions)
+   if (u8_CommDefinitionsKnownInThisApplication > 0U)
+   {
+      c_Lines.Add("extern const T_osy_com_protocol_configuration * const * osy_com_get_protocol_configs(void);");
+      c_Lines.Add("extern uint8 osy_com_get_num_protocol_configs(void);");
+      c_Lines.Add("");
+   }
+
    c_Lines.Add(
       "/* -- Implementation ------------------------------------------------------------------------------------------------ */");
    c_Lines.Add("");
@@ -373,7 +382,8 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
                {
                   c_Lines.Add("   OSY_DPD_CAN_CHANNEL(ht_CanInitConfiguration" +
                               C_SCLString::IntToStr(u8_NumCanChannels) +
-                              ", OSY_INIT_DPD_BUS_NUMBER_CAN_CHANNEL_" + C_SCLString::IntToStr(u8_NumCanChannels) + ",");
+                              ", OSY_INIT_DPD_BUS_NUMBER_CAN_CHANNEL_" + C_SCLString::IntToStr(u8_NumCanChannels) +
+                              ",");
                   c_Lines.Add(
                      "                       OSY_INIT_DPD_NUMBER_OF_PARALLEL_CONNECTIONS, OSY_INIT_DPD_NUMBER_OF_PARALLEL_CONNECTIONS,");
                   c_Lines.Add("                       OSY_INIT_DPD_BUF_SIZE_INSTANCE,");
@@ -540,6 +550,73 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
       c_Lines.Add("{");
       c_Lines.Add("   return OSY_INIT_DPH_NUM_DATA_POOLS;");
       c_Lines.Add("}");
+
+      if (u8_CommDefinitionsKnownInThisApplication > 0)
+      {
+         c_Lines.Add("");
+         c_Lines.Add(
+            "//----------------------------------------------------------------------------------------------------------------------");
+         c_Lines.Add("/*! \\brief   Set up and provide a list of openSYDE COMM protocol configurations");
+         c_Lines.Add("");
+         c_Lines.Add("   Sets up a table with pointers to all defined COMM protocol configurations");
+         c_Lines.Add("");
+         c_Lines.Add("   \\return");
+         c_Lines.Add("   pointer to table of configurations (statically available)");
+         c_Lines.Add("*/");
+         c_Lines.Add(
+            "//----------------------------------------------------------------------------------------------------------------------");
+         c_Lines.Add("const T_osy_com_protocol_configuration * const * osy_com_get_protocol_configs(void)");
+         c_Lines.Add("{");
+         c_Lines.Add("   static const T_osy_com_protocol_configuration * const");
+         c_Lines.Add("      hapt_CommConfigurations[OSY_INIT_COM_NUM_PROTOCOL_CONFIGURATIONS] =");
+         c_Lines.Add("   {");
+
+         for (uint32 u32_Protocol = 0U; u32_Protocol < orc_Node.c_ComProtocols.size(); u32_Protocol++)
+         {
+            const C_OSCCanProtocol & rc_Protocol = orc_Node.c_ComProtocols[u32_Protocol];
+            //logic: C_OSCCanProtocol refers to a data pool; if that data pool is owned by the
+            // C_OSCNodeApplication then this node knows about the protocol
+            if (orc_Node.c_DataPools[rc_Protocol.u32_DataPoolIndex].s32_RelatedDataBlockIndex == ou16_ApplicationIndex)
+            {
+               for (uint8 u8_Interface = 0U; u8_Interface < rc_Protocol.c_ComMessages.size(); u8_Interface++)
+               {
+                  //at least one message defined ?
+                  if (rc_Protocol.c_ComMessages[u8_Interface].ContainsAtLeastOneMessage() == true)
+                  {
+                     //finally we have a winner ...
+                     const C_SCLString c_Text = "      &" + C_OSCExportCommunicationStack::h_GetConfigurationName(
+                        u8_Interface, rc_Protocol.e_Type) + ",";
+
+                     c_Lines.Add(c_Text);
+                  }
+               }
+            }
+         }
+         //remove final ",":
+         c_Lines.Strings[static_cast<sint32>(c_Lines.GetCount()) - 1].Delete(
+            c_Lines.Strings[static_cast<sint32>(c_Lines.GetCount()) - 1].Length(), 1U);
+         c_Lines.Add("   };");
+         c_Lines.Add("");
+         c_Lines.Add("   return &hapt_CommConfigurations[0];");
+         c_Lines.Add("}");
+         c_Lines.Add("");
+         c_Lines.Add(
+            "//----------------------------------------------------------------------------------------------------------------------");
+         c_Lines.Add("/*! \\brief   Get number of defined openSYDE COMM protocol configurations");
+         c_Lines.Add("");
+         c_Lines.Add(
+            "   The returned value matches the number of elements in the table returned by osy_com_get_protocol_configs.");
+         c_Lines.Add("");
+         c_Lines.Add("   \\return");
+         c_Lines.Add("   number of openSYDE data pools");
+         c_Lines.Add("*/");
+         c_Lines.Add(
+            "//----------------------------------------------------------------------------------------------------------------------");
+         c_Lines.Add("uint8 osy_com_get_num_protocol_configs(void)");
+         c_Lines.Add("{");
+         c_Lines.Add("   return OSY_INIT_COM_NUM_PROTOCOL_CONFIGURATIONS;");
+         c_Lines.Add("}");
+      }
 
       try
       {

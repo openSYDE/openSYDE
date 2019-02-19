@@ -370,7 +370,7 @@ sint32 C_OSCProtocolDriverOsy::m_Cycle(const bool oq_CheckForSpecificServiceId, 
    C_NO_ERR   non event-driven service matching the definition received and placed in orc_Service
    C_WARN     error response
    C_TIMEOUT  expected response not received within timeout
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     15.03.2017  STW/A.Stangl
 */
@@ -551,7 +551,7 @@ sint32 C_OSCProtocolDriverOsy::m_PollForSpecificServiceResponse(const uint8 ou8_
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong session ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     15.03.2017  STW/A.Stangl
 */
@@ -622,7 +622,7 @@ sint32 C_OSCProtocolDriverOsy::OsyDiagnosticSessionControl(const uint8 ou8_Sessi
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     12.05.2017  STW/A.Stangl
 */
@@ -705,7 +705,7 @@ sint32 C_OSCProtocolDriverOsy::m_ReadDataByIdentifier(const uint16 ou16_Identifi
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     18.05.2017  STW/U.Roesch
 */
@@ -777,7 +777,7 @@ sint32 C_OSCProtocolDriverOsy::m_WriteDataByIdentifier(const uint16 ou16_Identif
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     15.03.2017  STW/A.Stangl
 */
@@ -822,7 +822,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadEcuSerialNumber(uint8 (&orau8_SerialNumber
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     11.05.2017  STW/A.Stangl
 */
@@ -870,7 +870,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadHardwareNumber(uint32 & oru32_HardwareNumb
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     11.05.2017  STW/A.Stangl
 */
@@ -922,7 +922,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadHardwareVersionNumber(C_SCLString & orc_Ha
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     11.05.2017  STW/A.Stangl
 */
@@ -972,7 +972,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDeviceName(C_SCLString & orc_DeviceName, s
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     11.05.2017  STW/A.Stangl
 */
@@ -1022,7 +1022,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadApplicationName(C_SCLString & orc_Applicat
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     11.05.2017  STW/A.Stangl
 */
@@ -1080,7 +1080,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadApplicationVersion(C_SCLString & orc_Appli
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID, or: number of modules is not 1)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     18.05.2017  STW/U.Roesch
 */
@@ -1128,12 +1128,12 @@ sint32 C_OSCProtocolDriverOsy::OsyReadBootSoftwareIdentification(uint8 (&orau8_V
    \return
    C_NO_ERR   request sent, positive response received
    C_TIMEOUT  expected response not received within timeout
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
    C_NOACT    could not put request in TX queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     11.05.2017  STW/A.Stangl
 */
@@ -1179,7 +1179,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadActiveDiagnosticSession(uint8 & oru8_Sessi
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     18.05.2017  STW/U.Roesch
 */
@@ -1237,7 +1237,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadApplicationSoftwareFingerprint(uint8 (&ora
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     18.05.2017  STW/U.Roesch
 */
@@ -1293,7 +1293,7 @@ sint32 C_OSCProtocolDriverOsy::OsyWriteApplicationSoftwareFingerprint(const uint
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     11.05.2017  STW/A.Stangl
 */
@@ -1340,7 +1340,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadMaxNumOfEventDrivenTransmissions(uint16 & 
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     18.05.2017  STW/U.Roesch
 */
@@ -1387,7 +1387,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadProtocolVersion(uint8 (&orau8_Version)[3],
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     18.05.2017  STW/U.Roesch
 */
@@ -1431,7 +1431,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadFlashloaderProtocolVersion(uint8 (&orau8_V
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     18.05.2017  STW/U.Roesch
 */
@@ -1481,7 +1481,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadFlashCount(uint32 & oru32_FlashCount, uint
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     11.05.2017  STW/A.Stangl
 */
@@ -1596,7 +1596,7 @@ void C_OSCProtocolDriverOsy::m_UnpackDataPoolIdentifier(const uint8 (&orau8_Pack
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     11.05.2017  STW/A.Stangl
 */
@@ -1699,7 +1699,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolData(const uint8 ou8_DataPoolIndex
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     18.05.2017  STW/A.Stangl
 */
@@ -1801,7 +1801,7 @@ sint32 C_OSCProtocolDriverOsy::OsyWriteDataPoolData(const uint8 ou8_DataPoolInde
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_RANGE    Transmission rail invalid
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     24.07.2017  STW/B.Bayer
 */
@@ -1870,7 +1870,7 @@ sint32 C_OSCProtocolDriverOsy::OsyWriteDataPoolEventDataRate(const uint8 ou8_Tra
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data pool index)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     14.07.2017  STW/A.Stangl
 */
@@ -1980,7 +1980,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolDataCyclic(const uint8 ou8_DataPoo
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data pool index)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     20.07.2017  STW/B.Bayer
 */
@@ -2094,7 +2094,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolDataChangeDriven(const uint8 ou8_D
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data pool index)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     26.07.2017  STW/B.Bayer
 */
@@ -2156,7 +2156,7 @@ sint32 C_OSCProtocolDriverOsy::OsyStopDataPoolEvents(uint8 * const opu8_NrCode)
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data pool index)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     17.07.2017  STW/M.Echtler
 */
@@ -2266,7 +2266,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolMetaData(const uint8 ou8_DataPoolI
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data pool index)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     17.07.2017  STW/M.Echtler
 */
@@ -2407,7 +2407,7 @@ sint32 C_OSCProtocolDriverOsy::OsySetRouteDiagnosisCommunication(const uint8 ou8
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     26.07.2017  STW/B.Bayer
 */
@@ -2460,7 +2460,7 @@ sint32 C_OSCProtocolDriverOsy::OsyStopRouteDiagnosisCommunication(uint8 * const 
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_RANGE    - output channel type is not Ethernet. Only Ethernet is supported.
               - a bus ID is out of range
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     13.06.2018  STW/B.Bayer
 */
@@ -2540,7 +2540,7 @@ sint32 C_OSCProtocolDriverOsy::OsySetRouteIp2IpCommunication(const uint8 ou8_Out
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     13.06.2018  STW/B.Bayer
 */
@@ -2599,7 +2599,7 @@ sint32 C_OSCProtocolDriverOsy::OsyCheckRouteIp2IpCommunication(uint8 & oru8_Stat
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     03.07.2017  STW/A.Stangl
 */
@@ -2685,7 +2685,7 @@ sint32 C_OSCProtocolDriverOsy::OsySendCanMessage(const uint8 ou8_ChannelIndex,
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     27.07.2017  STW/B.Bayer
 */
@@ -2746,7 +2746,7 @@ sint32 C_OSCProtocolDriverOsy::OsySetTunnelCanMessages(const uint8 ou8_CanChanne
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     27.07.2017  STW/B.Bayer
 */
@@ -2988,7 +2988,7 @@ void C_OSCProtocolDriverOsy::m_OsyReadDataPoolDataEventErrorReceived(const uint8
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     16.05.2017  STW/U.Roesch
 */
@@ -3053,7 +3053,7 @@ sint32 C_OSCProtocolDriverOsy::OsyCheckFlashMemoryAvailable(const uint32 ou32_St
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     16.05.2017  STW/U.Roesch
 */
@@ -3147,7 +3147,7 @@ sint32 C_OSCProtocolDriverOsy::m_RoutineControl(const uint16 ou16_RoutineIdentif
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     16.05.2017  STW/U.Roesch
 */
@@ -3207,7 +3207,7 @@ sint32 C_OSCProtocolDriverOsy::OsySecurityAccessRequestSeed(const uint8 ou8_Secu
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     16.05.2017  STW/U.Roesch
 */
@@ -3267,7 +3267,7 @@ sint32 C_OSCProtocolDriverOsy::OsySecurityAccessSendKey(const uint8 ou8_Security
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     16.05.2017  STW/U.Roesch
 */
@@ -3666,7 +3666,7 @@ void C_OSCProtocolDriverOsy::mh_ConvertVariableToNecessaryBytes(const uint32 ou3
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: incorrect response length)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     16.05.2017  STW/U.Roesch
 */
@@ -3778,7 +3778,7 @@ sint32 C_OSCProtocolDriverOsy::OsyRequestDownload(const uint32 ou32_StartAddress
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response
                (here: incorrect response length, mode of operation, data format)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     23.02.2018  STW/A.Stangl
 */
@@ -3894,7 +3894,7 @@ sint32 C_OSCProtocolDriverOsy::OsyRequestFileTransfer(const C_SCLString & orc_Fi
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     17.05.2017  STW/U.Roesch
 */
@@ -3980,7 +3980,7 @@ sint32 C_OSCProtocolDriverOsy::OsyTransferData(const uint8 ou8_BlockSequenceCoun
    C_NOACT    could not put request in TX queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     17.05.2017  STW/U.Roesch
 */
@@ -4071,7 +4071,7 @@ sint32 C_OSCProtocolDriverOsy::OsyRequestTransferExitAddressBased(const bool oq_
    C_NOACT    could not put request in TX queue ...
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     20.07.2017  STW/B.Bayer
 */
@@ -4401,7 +4401,7 @@ sint32 C_OSCProtocolDriverOsy::OsyWriteMemoryByAddress(const uint32 ou32_MemoryA
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data pool or list index)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     17.07.2017  STW/M.Echtler
 */
@@ -4468,7 +4468,7 @@ sint32 C_OSCProtocolDriverOsy::OsyNotifyNvmDataChanges(const uint8 ou8_DataPoolI
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     19.05.2017  STW/U.Roesch
 */
@@ -4625,7 +4625,7 @@ sint32 C_OSCProtocolDriverOsy::OsyEcuReset(const uint8 ou8_ResetType)
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_RANGE    BusId or NodeId out of range
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     01.06.2017  STW/U.Roesch
 */
@@ -4693,7 +4693,7 @@ sint32 C_OSCProtocolDriverOsy::OsySetNodeIdForChannel(const uint8 ou8_ChannelTyp
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     01.06.2017  STW/U.Roesch
 */
@@ -4770,7 +4770,7 @@ sint32 C_OSCProtocolDriverOsy::OsySetBitrate(const uint8 ou8_ChannelType, const 
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     01.06.2017  STW/U.Roesch
 */
@@ -4891,7 +4891,7 @@ sint32 C_OSCProtocolDriverOsy::OsyReadFlashBlockData(const uint8 ou8_FlashBlock,
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     02.06.2017  STW/U.Roesch
 */
@@ -4934,7 +4934,7 @@ sint32 C_OSCProtocolDriverOsy::OsyRequestProgramming(uint8 * const opu8_NrCode)
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     17.07.2017  STW/M.Echtler
 */
@@ -4997,7 +4997,7 @@ sint32 C_OSCProtocolDriverOsy::OsyConfigureFlashloaderCommunicationChannel(const
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     17.07.2017  STW/M.Echtler
 */

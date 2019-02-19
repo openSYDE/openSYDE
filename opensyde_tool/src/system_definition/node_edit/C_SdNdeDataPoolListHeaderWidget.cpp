@@ -19,8 +19,9 @@
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
 
-#include <QApplication>
 #include <limits>
+
+#include <QApplication>
 #include <QPointer>
 #include "stwerrors.h"
 #include "constants.h"
@@ -79,14 +80,13 @@ const sintn C_SdNdeDataPoolListHeaderWidget::mhsn_GroupSize = 270;
 */
 //-----------------------------------------------------------------------------
 C_SdNdeDataPoolListHeaderWidget::C_SdNdeDataPoolListHeaderWidget(QWidget * const opc_Parent,
-                                                                 QTreeWidgetItem * const opc_ListWidgetItem,
+                                                                 QTreeWidget * const opc_ListWidget,
                                                                  C_SdNdeUnoDataPoolManager * const opc_UndoManager,
                                                                  C_SdNdeDataPoolListModelViewManager * const opc_ModelViewManager, const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
                                                                  const uint32 ou32_ListIndex) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDataPoolListHeaderWidget),
-   mpc_TreeWidgetItem(opc_ListWidgetItem),
-   mpc_TreeWidget(NULL),
+   mpc_TreeWidget(opc_ListWidget),
    mpc_UndoManager(opc_UndoManager),
    mpc_ModelViewManager(opc_ModelViewManager),
    mu32_NodeIndex(ou32_NodeIndex),
@@ -114,17 +114,12 @@ C_SdNdeDataPoolListHeaderWidget::C_SdNdeDataPoolListHeaderWidget(QWidget * const
                                                          "://images/system_definition/NodeEdit/lists/FullscreenDisabled.svg");
    RegisterExpandOrCollapse(false);
 
-   m_UpdateUi();
-
    //Icon
    this->mpc_Ui->pc_LabelListError->setPixmap(QIcon("://images/Error_iconV2.svg").pixmap(mc_ICON_SIZE_24));
 
    //Inital expand false
    //lint -e{1938}  static const is guaranteed preinitialized before main
    m_HandleWidgetResize(mhu32_HeaderHeight);
-
-   //Initial values
-   m_UpdateListNamePrefix();
 
    //Init labels
    InitStaticNames();
@@ -147,12 +142,6 @@ C_SdNdeDataPoolListHeaderWidget::C_SdNdeDataPoolListHeaderWidget(QWidget * const
    this->mc_DoubleClickTimer.setSingleShot(true);
    connect(&this->mc_DoubleClickTimer, &QTimer::timeout, this,
            &C_SdNdeDataPoolListHeaderWidget::m_OnDoubleClickTimeout);
-
-   //Set tree if possible
-   if (this->mpc_TreeWidgetItem != NULL)
-   {
-      this->mpc_TreeWidget = this->mpc_TreeWidgetItem->treeWidget();
-   }
 
    //OK button (exit fullscreen)
    this->mpc_Ui->pc_PushButtonOK->SetCustomIcons("://images/system_definition/NodeEdit/lists/FullscreenExit.svg",
@@ -277,16 +266,16 @@ void C_SdNdeDataPoolListHeaderWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LineEditName->setPlaceholderText(C_GtGetText::h_GetText("Add your List Name"));
    this->mpc_Ui->pc_TextEditComment->setPlaceholderText(C_GtGetText::h_GetText("Add your comment here ..."));
    this->mpc_Ui->pc_PushButtonFullScreen->SetToolTipInformation("Fullscreen",
-                                                                "Shows this list in fullscreen mode to improve your editing experience");
+                                                                "Shows this list in fullscreen mode to improve your editing experience.");
    this->mpc_Ui->pc_PushButtonOK->SetToolTipInformation(C_GtGetText::h_GetText("Exit Fullscreen"),
                                                         C_GtGetText::h_GetText(
-                                                           "Go back to the edit data pool overview screen"));
+                                                           "Go back to Datapools."));
    this->mpc_Ui->pc_LabelSize->SetToolTipInformation(C_GtGetText::h_GetText("Size"),
                                                      C_GtGetText::h_GetText(
-                                                        "Set the number of bytes which this list will reserve"));
+                                                        "Set the number of bytes which this list will reserve."));
    this->mpc_Ui->pc_LabelDataSetsInfo->SetToolTipInformation(C_GtGetText::h_GetText("Datasets"),
                                                              C_GtGetText::h_GetText(
-                                                                "Edit the datasets which can be used to have defined value sets for each variable contained in this list"));
+                                                                "Edit the Datasets which can be used to set defined value for each variable contained in this list."));
 }
 
 //-----------------------------------------------------------------------------
@@ -567,7 +556,7 @@ void C_SdNdeDataPoolListHeaderWidget::PrepareExpandedMode(void) const
 //-----------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::PopUp(void)
 {
-   QPointer<C_OgePopUpDialog> c_Dialog = new C_OgePopUpDialog(this, this);
+   QPointer<C_OgePopUpDialog> c_Dialog = new C_OgePopUpDialog(this, this, false);
 
    C_SdNdeDataPoolListPopUp * const pc_PopUp = new C_SdNdeDataPoolListPopUp(*c_Dialog,
                                                                             this->mu32_NodeIndex,
@@ -627,7 +616,7 @@ void C_SdNdeDataPoolListHeaderWidget::m_OnPushButtonExpandClicked(const bool oq_
                                                         "://images/IconArrowBottomHovered.svg",
                                                         "://images/IconArrowBottomClicked.svg",
                                                         "://images/IconArrowBottomDisabledBright.svg");
-      Q_EMIT this->SigExpand(this->mpc_TreeWidgetItem, true);
+      Q_EMIT this->SigExpand(this, true);
    }
    else
    {
@@ -635,7 +624,7 @@ void C_SdNdeDataPoolListHeaderWidget::m_OnPushButtonExpandClicked(const bool oq_
                                                         "://images/IconOpenListHovered.svg",
                                                         "://images/IconOpenListClicked.svg",
                                                         "://images/IconOpenListDisabledBright.svg");
-      Q_EMIT this->SigExpand(this->mpc_TreeWidgetItem, false);
+      Q_EMIT this->SigExpand(this, false);
    }
 }
 
@@ -652,13 +641,13 @@ void C_SdNdeDataPoolListHeaderWidget::m_HandleWidgetResize(const uint32 ou32_New
 {
    this->setMinimumHeight(static_cast<sintn>(ou32_NewHeight));
    this->setMaximumHeight(static_cast<sintn>(ou32_NewHeight));
-   if (this->mpc_TreeWidgetItem == NULL)
+   if (this->mpc_TreeWidget == NULL)
    {
       //Adapted for missing borders (no delegate notification necessary as this one has no delegate)
       this->setMinimumHeight(static_cast<sintn>(ou32_NewHeight - 2UL));
       this->setMaximumHeight(static_cast<sintn>(ou32_NewHeight - 2UL));
    }
-   Q_EMIT this->SigNewHeight(this->mpc_TreeWidgetItem);
+   Q_EMIT this->SigNewHeight(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -1049,13 +1038,13 @@ void C_SdNdeDataPoolListHeaderWidget::m_UpdateErrorToolTip(void) const
             }
             if (q_OutOfDataPool == true)
             {
-               c_Content += C_GtGetText::h_GetText("Reserved list size over reserved NVM datapool size.\n");
+               c_Content += C_GtGetText::h_GetText("Reserved list size is bigger than the reserved NVM Datapool size.\n");
             }
             c_Content += "\n";
          }
          if (q_DataSetError == true)
          {
-            c_Content += C_GtGetText::h_GetText("Invalid datasets:\n");
+            c_Content += C_GtGetText::h_GetText("Invalid Datasets:\n");
             for (uint32 u32_ItDataSet = 0;
                  (u32_ItDataSet < c_InvalidDataSetIndices.size()) &&
                  (u32_ItDataSet < mu32_TOOL_TIP_MAXIMUM_ITEMS);

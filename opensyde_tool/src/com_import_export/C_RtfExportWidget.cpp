@@ -28,11 +28,11 @@
 #include <QDateTime>
 //#include <cstdio> // do not need to include because of indirect include,
 // otherwise PCLint warning 451 repeatly included
-#include "C_SdUtil.h"
 #include "TGLUtils.h"
 #include "stwerrors.h"
 #include "constants.h"
 #include "C_OSCUtils.h"
+#include "C_OgeWiUtil.h"
 #include "C_GtGetText.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_RtfExportWidget.h"
@@ -100,7 +100,7 @@ C_RtfExportWidget::C_RtfExportWidget(stw_opensyde_gui_elements::C_OgePopUpDialog
    this->mrc_ParentDialog.SetWidget(this);
 
    // set main title
-   this->mrc_ParentDialog.SetTitle(QString(C_GtGetText::h_GetText("System Definition")));
+   this->mrc_ParentDialog.SetTitle(QString(C_GtGetText::h_GetText("SYSTEM DEFINITION")));
    this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Report"));
 
    // connects
@@ -162,12 +162,12 @@ void C_RtfExportWidget::InitStaticNames(void) const
 
    this->mpc_Ui->pc_LabelCompany->SetToolTipInformation(C_GtGetText::h_GetText("Company Name"),
                                                         C_GtGetText::h_GetText(
-                                                           "The name of the company the RTF file export is created for.\n"
+                                                           "The company name for that the RTF file export is created for.\n"
                                                            "(optional parameter)"));
 
    this->mpc_Ui->pc_LabelLogo->SetToolTipInformation(C_GtGetText::h_GetText("Company Logo"),
                                                      C_GtGetText::h_GetText(
-                                                        "Location of logo file of the company the RTF file export is created for.\n"
+                                                        "Location of the file containing the logo of the company for that the RTF file export is created for.\n"
                                                         "File format is JPG or PNG. \n"
                                                         "(optional parameter)"));
 }
@@ -783,9 +783,9 @@ void C_RtfExportWidget::m_RtfPathClicked(void)
    c_DefaultFilename += ".rtf";
 
    const QString c_FilterName = QString(C_GtGetText::h_GetText("RTF file (*.rtf)"));
-   const QString c_FullRtfFilePath = C_SdUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText(
-                                                                    "Save file for RTF Export"), c_Folder, c_FilterName, c_DefaultFilename,
-                                                                 QFileDialog::DontConfirmOverwrite);
+   const QString c_FullRtfFilePath = C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText(
+                                                                       "Save File for RTF Export"), c_Folder, c_FilterName, c_DefaultFilename,
+                                                                    QFileDialog::DontConfirmOverwrite);
 
    if (c_FullRtfFilePath != "")
    {
@@ -818,7 +818,7 @@ void C_RtfExportWidget::m_LogoPathClicked(void)
    const QString c_FilterName = QString(C_GtGetText::h_GetText("Image file (*.jpg *.png)"));
    const QString c_FullLogoFilePath = QFileDialog::getOpenFileName(
       this,
-      C_GtGetText::h_GetText("Choose Company Logo"),
+      C_GtGetText::h_GetText("Select Company Logo"),
       c_Folder,
       c_FilterName,
       NULL);
@@ -854,8 +854,8 @@ sint32 C_RtfExportWidget::m_CheckSettings(void) const
       C_OgeWiCustomMessage c_MessageBox(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eQUESTION);
       C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
 
-      c_MessageBox.SetHeading(C_GtGetText::h_GetText("RTF File save"));
-      c_MessageBox.SetDescription(C_GtGetText::h_GetText("Do you want to overwrite the existing file?"));
+      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Save RTF file"));
+      c_MessageBox.SetDescription(C_GtGetText::h_GetText("Do you really want to overwrite the existing file?"));
       c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Overwrite"));
       c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Back"));
       e_ReturnMessageBox = c_MessageBox.Execute();
@@ -868,7 +868,7 @@ sint32 C_RtfExportWidget::m_CheckSettings(void) const
          {
             // Error on deleting file
             C_OgeWiCustomMessage c_MessageBoxErrorRemove(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eERROR);
-            c_MessageBoxErrorRemove.SetHeading(C_GtGetText::h_GetText("RTF File save"));
+            c_MessageBoxErrorRemove.SetHeading(C_GtGetText::h_GetText("Save RTF file"));
             c_MessageBoxErrorRemove.SetDescription(C_GtGetText::h_GetText("File cannot be overwritten!"));
             c_MessageBoxErrorRemove.Execute();
          }

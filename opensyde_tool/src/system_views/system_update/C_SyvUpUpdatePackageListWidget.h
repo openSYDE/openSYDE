@@ -70,7 +70,8 @@ public:
 
    stw_types::sint32 GetUpdatePackage(
       std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
-      std::vector<stw_types::uint32> & orc_NodesOrder) const;
+      std::vector<stw_types::uint32> & orc_NodesOrder,
+      std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> * const opc_AllApplications = NULL) const;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -111,7 +112,7 @@ private:
    void m_RemoveAllNodeFiles(void);
 
    void m_AdaptFile(const QString & orc_Path);
-   QString m_GetDialogPath(void) const;
+   QString m_GetDialogPath(void);
 
    C_SyvUpUpdatePackageListDelegate mc_Delegate;
    stw_opensyde_gui_elements::C_OgeContextMenu * mpc_ContextMenu;

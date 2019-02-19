@@ -53,7 +53,8 @@ using namespace stw_opensyde_gui_logic;
 */
 //-----------------------------------------------------------------------------
 C_TblTreModel::C_TblTreModel(QObject * const opc_Parent) :
-   QAbstractItemModel(opc_Parent)
+   QAbstractItemModel(opc_Parent),
+   mpc_InvisibleRootItem(NULL)
 {
 }
 
@@ -90,13 +91,17 @@ QModelIndex C_TblTreModel::index(const sintn osn_Row, const sintn osn_Column, co
       }
       else
       {
-         //Top level
-         c_Retval =
-            this->createIndex(osn_Row, osn_Column,
-                              this->mc_InvisibleRootItem.c_Children.at(static_cast<uint32>(osn_Row)));
+         if (this->mpc_InvisibleRootItem != NULL)
+         {
+            //Top level
+            c_Retval =
+               this->createIndex(osn_Row, osn_Column,
+                                 this->mpc_InvisibleRootItem->c_Children.at(static_cast<uint32>(osn_Row)));
+         }
       }
    }
    return c_Retval;
+   //lint -e{1763} Just passing one child
 }
 
 //-----------------------------------------------------------------------------
@@ -162,8 +167,11 @@ sintn C_TblTreModel::rowCount(const QModelIndex & orc_Parent) const
    }
    else
    {
-      //Top level
-      sn_Retval = this->mc_InvisibleRootItem.c_Children.size();
+      if (this->mpc_InvisibleRootItem != NULL)
+      {
+         //Top level
+         sn_Retval = this->mpc_InvisibleRootItem->c_Children.size();
+      }
    }
 
    return sn_Retval;

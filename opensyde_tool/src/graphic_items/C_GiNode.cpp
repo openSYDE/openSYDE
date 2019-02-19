@@ -472,6 +472,33 @@ sintn C_GiNode::type() const
 
 //-----------------------------------------------------------------------------
 /*!
+   \brief   Check if node has at least one connection of this bus type
+
+   \param[in] oe_Type   Bus type
+
+   \return
+   true     Node has connection of this type
+   false    Node has not a connection of this type
+
+   \created     15.02.2019  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+bool C_GiNode::HasConnectionType(const C_OSCSystemBus::E_Type oe_Type) const
+{
+   bool q_Return = false;
+
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->ms32_Index);
+
+   if (pc_Node != NULL)
+   {
+      q_Return = C_SdUtil::h_HasConnectionType(*pc_Node, oe_Type);
+   }
+
+   return q_Return;
+}
+
+//-----------------------------------------------------------------------------
+/*!
    \brief   Check if there are any connections available for this bus type
 
    \param[in] ore_Type Bus type
@@ -562,20 +589,6 @@ sint32 C_GiNode::GetIndexOfConnector(const C_GiLiBusConnector * const opc_Connec
 void C_GiNode::GetOSCNodeConst(const C_OSCNode * & orpc_Node) const
 {
    orpc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(static_cast<uint32>(this->ms32_Index));
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data node
-
-   \param[out]   orc_Node   Node
-
-   \created     22.09.2016  STW/M.Echtler
-*/
-//-----------------------------------------------------------------------------
-void C_GiNode::SetOSCNode(const C_OSCNode & orc_Node) const
-{
-   C_PuiSdHandler::h_GetInstance()->SetOSCNode(static_cast<uint32>(this->ms32_Index), orc_Node);
 }
 
 //-----------------------------------------------------------------------------
@@ -889,12 +902,9 @@ void C_GiNode::CheckNodeForChanges(void)
    //check node (Datapools)
    if (this->mq_DrawWhiteFilter == false)
    {
-      bool q_ErrorDetected;
-
       this->mc_ErrorText = "";
 
-      C_SdUtil::h_GetErrorToolTipNode(static_cast<uint32>(this->ms32_Index), this->mc_ErrorText, q_ErrorDetected);
-      this->mpc_ConflictIcon->setVisible(q_ErrorDetected);
+      this->mpc_ConflictIcon->setVisible(this->m_UpdateError());
    }
    else
    {
@@ -973,6 +983,25 @@ void C_GiNode::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event)
    Q_EMIT this->SigHideToolTip();
 
    C_GiRectBaseGroup::hoverLeaveEvent(opc_Event);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief  Get current error state and update error tooltip accordingly
+
+   \return
+   True  Error detected
+   False No error detected
+
+   \created     15.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+bool C_GiNode::m_UpdateError(void)
+{
+   bool q_ErrorDetected;
+
+   C_SdUtil::h_GetErrorToolTipNode(static_cast<uint32>(this->ms32_Index), this->mc_ErrorText, q_ErrorDetected);
+   return q_ErrorDetected;
 }
 
 //-----------------------------------------------------------------------------
@@ -1157,26 +1186,21 @@ void C_GiNode::LoadData(void)
 //-----------------------------------------------------------------------------
 void C_GiNode::UpdateData(void)
 {
-   const C_PuiSdNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetUINode(ms32_Index);
+   C_PuiBsBox c_BoxData;
 
-   if (pc_Node != NULL)
+   stw_opensyde_gui_logic::C_PuiSdNodeConnection c_Conn;
+   std::vector<C_PuiSdNodeConnection> c_BusConnections;
+
+   this->UpdateBasicData(c_BoxData);
+
+   //Connections
+   for (sint32 s32_ItConn = 0; s32_ItConn < this->mc_Connections.size(); ++s32_ItConn)
    {
-      C_PuiSdNode c_Node = *pc_Node;
-      stw_opensyde_gui_logic::C_PuiSdNodeConnection c_Conn;
-      std::vector<C_PuiSdNodeConnection> c_BusConnections;
-
-      this->UpdateBasicData(c_Node);
-
-      //Connections
-      for (sint32 s32_ItConn = 0; s32_ItConn < this->mc_Connections.size(); ++s32_ItConn)
-      {
-         this->mc_Connections[s32_ItConn]->UpdateData(&c_Conn);
-         c_BusConnections.push_back(c_Conn);
-      }
-      c_Node.c_UIBusConnections.clear();
-      c_Node.c_UIBusConnections = c_BusConnections;
-      C_PuiSdHandler::h_GetInstance()->SetUINode(ms32_Index, c_Node);
+      this->mc_Connections[s32_ItConn]->UpdateData(&c_Conn);
+      c_BusConnections.push_back(c_Conn);
    }
+   C_PuiSdHandler::h_GetInstance()->SetUINodeBox(ms32_Index, c_BoxData);
+   C_PuiSdHandler::h_GetInstance()->SetUINodeConnections(ms32_Index, c_BusConnections);
 }
 
 //-----------------------------------------------------------------------------
@@ -1405,21 +1429,12 @@ void C_GiNode::SetNodeConnectionId(const C_GiLiBusConnector * const opc_Connecti
 {
    if (opc_Connection != NULL)
    {
-      const C_PuiSdNode * const pc_Node =
-         C_PuiSdHandler::h_GetInstance()->GetUINode(static_cast<uint32>(this->ms32_Index));
-      if (pc_Node != NULL)
+      sint32 s32_Index = GetIndexOfConnector(opc_Connection);
+      if (s32_Index >= 0)
       {
-         C_PuiSdNode c_Node = *pc_Node;
-         sint32 s32_Index = GetIndexOfConnector(opc_Connection);
-         if (s32_Index >= 0)
-         {
-            uint32 u32_Index = static_cast<uint32>(s32_Index);
-            if (u32_Index < c_Node.c_UIBusConnections.size())
-            {
-               c_Node.c_UIBusConnections[u32_Index].c_ConnectionID = orc_ConnId;
-               C_PuiSdHandler::h_GetInstance()->SetUINode(static_cast<uint32>(this->ms32_Index), c_Node);
-            }
-         }
+         uint32 u32_Index = static_cast<uint32>(s32_Index);
+         C_PuiSdHandler::h_GetInstance()->SetUINodeConnectionId(static_cast<uint32>(this->ms32_Index), u32_Index,
+                                                                orc_ConnId);
       }
    }
 }

@@ -79,6 +79,10 @@ C_SdTopologyToolbox::C_SdTopologyToolbox(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_LabelSearchNotFound->setVisible(false);
    this->mpc_Ui->pc_LabelSearchNotFound->setText(C_GtGetText::h_GetText("No results found"));
 
+   this->mpc_Ui->pc_ScrollAreaNodesWidget->SetBackgroundColor(-1);
+   this->mpc_Ui->pc_ScrollAreaBusesWidget->SetBackgroundColor(-1);
+   this->mpc_Ui->pc_ScrollAreaDrawingWidget->SetBackgroundColor(-1);
+
    InitStaticNames();
    m_FillToolboxStatic();
    m_FillToolboxDynamic();

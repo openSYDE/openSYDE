@@ -18,6 +18,8 @@
 #define C_SYVDAPEDATAELEMENTTREEMODEL_H
 
 /* -- Includes ------------------------------------------------------------- */
+#include <QMap>
+
 #include "C_TblTreModel.h"
 #include "C_PuiSvDbNodeDataPoolListElementId.h"
 #include "C_PuiSdNodeCanMessageSyncManager.h"
@@ -43,6 +45,7 @@ public:
    };
 
    explicit C_TblTreDataElementModel(QObject * const opc_Parent = NULL);
+   ~C_TblTreDataElementModel(void);
 
    void InitSD(const stw_types::uint32 ou32_NodeIndex, const stw_types::sint32 os32_SkipApplicationIndex,
                const std::vector<stw_types::uint32> & orc_UsedDataPoolIndicesIndex);
@@ -51,6 +54,7 @@ public:
    std::vector<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId> GetDataElements(
       const QModelIndex & orc_Index)
    const;
+   static void h_CleanUp(void);
 
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
    //lint -save -e1960
@@ -64,8 +68,22 @@ public:
    std::vector<stw_types::uint32> GetGenericRepresentationForIndex(const QModelIndex & orc_ItemIndex) const;
 
 private:
-   std::vector<C_PuiSdNodeCanMessageSyncManager> mc_MessageSyncManagers;
+   class C_TblTreDataElementModelState
+   {
+   public:
+      C_TblTreDataElementModelState(C_TblTreItem * const opc_Tree,
+                                    const std::vector<C_PuiSdNodeCanMessageSyncManager *> & orc_SyncManagers);
+      C_TblTreItem * pc_Tree;
+      std::vector<C_PuiSdNodeCanMessageSyncManager *> c_SyncManagers;
+
+      void CleanUp(void);
+   };
+
+   std::vector<C_PuiSdNodeCanMessageSyncManager *> mc_MessageSyncManagers;
    E_Mode me_Mode;
+   static QMap<std::vector<stw_types::uint32>, C_TblTreDataElementModelState> mhc_ViewSetupsNL;
+   static QMap<std::vector<stw_types::uint32>, C_TblTreDataElementModelState> mhc_ViewSetupsDE;
+   static QMap<std::vector<stw_types::uint32>, C_TblTreDataElementModelState> mhc_ViewSetupsBS;
    static const QString mhc_IconNode;
    static const QString mhc_IconDatapool;
    static const QString mhc_IconList;
@@ -80,6 +98,8 @@ private:
    static const QString mhc_AdditionalArrayInfo;
    static const QString mhc_Additional64BitInfo;
 
+   void m_ClearSyncManagers(void);
+   void m_CleanUpLastModel(void);
    static C_PuiSvDbNodeDataPoolListElementId mh_Translate(
       const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_Indices,
       const stw_types::uint32 ou32_SignalIndex);
@@ -87,6 +107,12 @@ private:
                         const bool oq_ShowArrayElements, const bool oq_Show64BitValues);
    void m_InitDatapoolElement(const stw_types::uint32 ou32_ViewIndex, const bool oq_ShowOnlyWriteElements,
                               const bool oq_ShowArrayElements, const bool oq_Show64BitValues);
+   void m_UpdateDatapoolElement(const bool oq_ShowOnlyWriteElements,
+                                const bool oq_ShowArrayElements, const bool oq_Show64BitValues);
+   static void mh_ConfigureDatapoolElement(const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
+                                           const bool oq_Show64BitValues,
+                                           const stw_opensyde_core::C_OSCNodeDataPoolListElement & orc_Element,
+                                           C_TblTreItem * const opc_ElementItem);
    void m_InitNvmList(const stw_types::uint32 ou32_ViewIndex);
    std::vector<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId> m_GetBusSignals(
       const QModelIndex & orc_Index)
@@ -98,6 +124,10 @@ private:
    std::vector<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId> m_GetNvmList(const QModelIndex & orc_Index)
    const;
 
+   static void mh_CleanUp(QMap<std::vector<stw_types::uint32>, C_TblTreDataElementModelState> & orc_Map);
+   static bool mh_Contains(const QMap<std::vector<stw_types::uint32>, C_TblTreDataElementModelState> & orc_Map,
+                           const C_TblTreItem * const opc_Item);
+   static std::vector<stw_types::uint32> mh_GetViewSdHash(const stw_types::uint32 ou32_ViewIndex);
    static bool mh_CheckNodeDiagnostic(const stw_types::uint32 ou32_ViewIndex, const stw_types::uint32 ou32_NodeIndex);
 };
 

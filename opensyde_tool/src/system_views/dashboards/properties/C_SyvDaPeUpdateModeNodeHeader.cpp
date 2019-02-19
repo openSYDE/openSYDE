@@ -67,15 +67,12 @@ C_SyvDaPeUpdateModeNodeHeader::C_SyvDaPeUpdateModeNodeHeader(const stw_types::ui
    mu32_ViewIndex(ou32_ViewIndex),
    mu32_NodeIndex(ou32_NodeIndex)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(this->mu32_NodeIndex);
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
 
    mpc_Ui->setupUi(this);
 
    //Init buttons
    RegisterExpandOrCollapse(false);
-
-   //Remove debug string
-   this->mpc_Ui->pc_GroupBoxCount->setTitle("");
 
    //Resize
    //lint -e{1938}  static const is guaranteed preinitialized before main
@@ -86,14 +83,14 @@ C_SyvDaPeUpdateModeNodeHeader::C_SyvDaPeUpdateModeNodeHeader(const stw_types::ui
    //init
    this->InitStaticNames();
 
-   //Icon
-   this->mpc_Ui->pc_LabelListError->SetSvg("://images/Error_iconV2.svg");
-
    //Add deactivated button state
    this->mpc_Ui->pc_PushButtonExpand->SetCustomIcons("://images/IconOpenList.svg",
                                                      "://images/IconOpenListHovered.svg",
                                                      "://images/IconOpenListClicked.svg",
                                                      "://images/IconOpenListDisabledBright.svg");
+
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelCount, "Valid", true);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelCountNumber, "Valid", true);
 
    tgl_assert(pc_Node != NULL);
    if (pc_Node != NULL)
@@ -133,9 +130,14 @@ C_SyvDaPeUpdateModeNodeHeader::~C_SyvDaPeUpdateModeNodeHeader(void)
 void C_SyvDaPeUpdateModeNodeHeader::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelCount->setText(C_GtGetText::h_GetText("Used Transmissions:"));
-   this->mpc_Ui->pc_GroupBoxCount->SetToolTipInformation(C_GtGetText::h_GetText("Used Transmissions"),
-                                                         C_GtGetText::h_GetText(
-                                                            "Number of cyclic transmissions which will be registered on the device on connect"));
+   this->mpc_Ui->pc_LabelCount->SetToolTipInformation(C_GtGetText::h_GetText("Used Transmissions"),
+                                                      C_GtGetText::h_GetText(
+                                                         "Number of used cyclic or event driven transmissions. "
+                                                         "\nThese transmissions will be registered on the server during dashboard connect."));
+   this->mpc_Ui->pc_LabelCountNumber->SetToolTipInformation(C_GtGetText::h_GetText("Used Transmissions"),
+                                                            C_GtGetText::h_GetText(
+                                                               "Number of used cyclic or event driven transmissions."
+                                                               "\nThese transmissions will be registered on the server during dashboard connect."));
 }
 
 //-----------------------------------------------------------------------------
@@ -151,13 +153,11 @@ void C_SyvDaPeUpdateModeNodeHeader::InitStaticNames(void) const
 void C_SyvDaPeUpdateModeNodeHeader::UpdateCount(const sint32 os32_Count) const
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
 
-   tgl_assert((pc_View != NULL) && (pc_Node != NULL));
-   if ((pc_View != NULL) && (pc_Node != NULL))
+   tgl_assert(pc_View != NULL);
+   if (pc_View != NULL)
    {
       uint32 u32_Cur;
-      const uint32 u32_Max = pc_Node->c_Properties.c_OpenSYDEServerSettings.u8_MaxParallelTransmissions;
       if (os32_Count >= 0)
       {
          u32_Cur = static_cast<uint32>(os32_Count);
@@ -167,25 +167,7 @@ void C_SyvDaPeUpdateModeNodeHeader::UpdateCount(const sint32 os32_Count) const
          u32_Cur = pc_View->CountCyclicTransmissions(this->mu32_NodeIndex);
       }
       //Translation: 1 = Current number of used transmissions, 2 = Allowed number of used transmissions
-      this->mpc_Ui->pc_LabelCountNumber->setText(QString(C_GtGetText::h_GetText("%1 of %2")).arg(u32_Cur).arg(u32_Max));
-      this->mpc_Ui->pc_UsageWidget->SetUsage(u32_Max, u32_Cur);
-      this->mpc_Ui->pc_UsageWidget->SetToolTipActive(false);
-      this->mpc_Ui->pc_UsageWidget->update();
-      if (u32_Cur <= u32_Max)
-      {
-         C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelCount, "Valid", true);
-         C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelCountNumber, "Valid", true);
-         this->mpc_Ui->pc_LabelListError->setVisible(false);
-         this->mpc_Ui->pc_LabelListError->SetToolTipInformation("", "");
-      }
-      else
-      {
-         const QString c_Content = C_GtGetText::h_GetText("Node has too many configured cyclic transmissions");
-         C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelCount, "Valid", false);
-         C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelCountNumber, "Valid", false);
-         this->mpc_Ui->pc_LabelListError->setVisible(true);
-         this->mpc_Ui->pc_LabelListError->SetToolTipInformation("", c_Content, C_NagToolTip::eERROR);
-      }
+      this->mpc_Ui->pc_LabelCountNumber->setText(QString(C_GtGetText::h_GetText("%1")).arg(u32_Cur));
    }
 }
 
@@ -252,7 +234,7 @@ void C_SyvDaPeUpdateModeNodeHeader::m_OnPushButtonExpandClicked(const bool oq_Ch
                                                         "://images/IconArrowBottomClicked.svg",
                                                         "://images/IconArrowBottomDisabledBright.svg");
 
-      Q_EMIT this->SigExpand(this->mpc_TreeWidgetItem, true);
+      Q_EMIT (this->SigExpand(this->mpc_TreeWidgetItem, true));
    }
    else
    {
@@ -261,6 +243,6 @@ void C_SyvDaPeUpdateModeNodeHeader::m_OnPushButtonExpandClicked(const bool oq_Ch
                                                         "://images/IconOpenListClicked.svg",
                                                         "://images/IconOpenListDisabledBright.svg");
 
-      Q_EMIT this->SigExpand(this->mpc_TreeWidgetItem, false);
+      Q_EMIT (this->SigExpand(this->mpc_TreeWidgetItem, false));
    }
 }

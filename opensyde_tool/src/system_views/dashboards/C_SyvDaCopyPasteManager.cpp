@@ -95,8 +95,6 @@ C_SyvDaCopyPasteManager::~C_SyvDaCopyPasteManager(void)
 /*!
    \brief   Get data snapshot
 
-   Warning: calling function has to delete the created object
-
    \return
    NULL No valid data snap shot found
    Else Valid data snapshot
@@ -106,105 +104,94 @@ C_SyvDaCopyPasteManager::~C_SyvDaCopyPasteManager(void)
 //-----------------------------------------------------------------------------
 const C_PuiBsElements * C_SyvDaCopyPasteManager::GetSnapshot(QWidget * const opc_Parent)
 {
-   C_PuiSvDashboard * pc_Retval = new C_PuiSvDashboard();
+   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
-   if (C_SyvClipBoardHelper::h_LoadDashboardFromClipboard(*pc_Retval,
-                                                          C_SyvDaCopyPasteManager::hc_ClipBoardBaseTagName) !=
-       C_NO_ERR)
+   if (pc_View != NULL)
    {
-      delete (pc_Retval);
-      pc_Retval = NULL;
-   }
-   else
-   {
-      const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-      if (pc_View != NULL)
+      bool q_InvalidElementsFound = false;
+      std::vector<const C_PuiSvDbWidgetBase *> c_AllWidgets;
+      //Check params validity
+      for (uint32 u32_ItParam = 0; u32_ItParam < this->mc_LastKnownData.GetParams().size();)
       {
-         bool q_InvalidElementsFound = false;
-         std::vector<const C_PuiSvDbWidgetBase *> c_AllWidgets;
-         //Check params validity
-         for (uint32 u32_ItParam = 0; u32_ItParam < pc_Retval->GetParams().size();)
+         bool q_Found = false;
+         const C_PuiSvDbParam & rc_ParamWidget = this->mc_LastKnownData.GetParams()[u32_ItParam];
+         for (uint32 u32_ItElement = 0; u32_ItElement < rc_ParamWidget.c_DataPoolElementsConfig.size();
+              ++u32_ItElement)
          {
-            bool q_Found = false;
-            const C_PuiSvDbParam & rc_ParamWidget = pc_Retval->GetParams()[u32_ItParam];
-            for (uint32 u32_ItElement = 0; u32_ItElement < rc_ParamWidget.c_DataPoolElementsConfig.size();
-                 ++u32_ItElement)
+            const C_PuiSvDbNodeDataElementConfig & rc_Config =
+               rc_ParamWidget.c_DataPoolElementsConfig[u32_ItElement];
+            if (rc_Config.c_ElementId.GetIsValid() == true)
             {
-               const C_PuiSvDbNodeDataElementConfig & rc_Config =
-                  rc_ParamWidget.c_DataPoolElementsConfig[u32_ItElement];
-               if (rc_Config.c_ElementId.GetIsValid() == true)
+               if (pc_View->CheckNvmParamListUsage(stw_opensyde_core::C_OSCNodeDataPoolListId(rc_Config.c_ElementId.
+                                                                                              u32_NodeIndex,
+                                                                                              rc_Config.c_ElementId.
+                                                                                              u32_DataPoolIndex,
+                                                                                              rc_Config.c_ElementId.
+                                                                                              u32_ListIndex)) ==
+                   true)
                {
-                  if (pc_View->CheckNvmParamListUsage(stw_opensyde_core::C_OSCNodeDataPoolListId(rc_Config.c_ElementId.
-                                                                                                 u32_NodeIndex,
-                                                                                                 rc_Config.c_ElementId.
-                                                                                                 u32_DataPoolIndex,
-                                                                                                 rc_Config.c_ElementId.
-                                                                                                 u32_ListIndex)) ==
-                      true)
-                  {
-                     q_Found = true;
-                  }
-               }
-            }
-            if (q_Found == true)
-            {
-               C_OgeWiCustomMessage c_Message(opc_Parent);
-               //No iterator step because new element at current position
-               pc_Retval->DeleteWidget(u32_ItParam, C_PuiSvDbDataElement::ePARAM);
-               c_Message.SetType(C_OgeWiCustomMessage::E_Type::eERROR);
-               c_Message.SetHeading(C_GtGetText::h_GetText("Widget paste"));
-               c_Message.SetDescription(C_GtGetText::h_GetText("Parametrization widget could not be pasted.\n"
-                                                               "Another parametrization widget in this view is already "
-                                                               "using at least one of the containing lists."));
-               c_Message.Execute();
-            }
-            else
-            {
-               //Important iterator step
-               ++u32_ItParam;
-            }
-         }
-         //Check ID validity
-         pc_Retval->GetAllWidgetItems(c_AllWidgets);
-         for (uint32 u32_ItWidget = 0; u32_ItWidget < c_AllWidgets.size(); ++u32_ItWidget)
-         {
-            const C_PuiSvDbWidgetBase * const pc_Widget = c_AllWidgets[u32_ItWidget];
-            if (pc_Widget != NULL)
-            {
-               for (uint32 u32_ItElement = 0; u32_ItElement < pc_Widget->c_DataPoolElementsConfig.size();
-                    ++u32_ItElement)
-               {
-                  const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Widget->c_DataPoolElementsConfig[u32_ItElement];
-                  if (rc_Config.c_ElementId.GetIsValid() == true)
-                  {
-                     if (C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(rc_Config.c_ElementId.u32_NodeIndex,
-                                                                                    rc_Config.c_ElementId.
-                                                                                    u32_DataPoolIndex,
-                                                                                    rc_Config.c_ElementId.u32_ListIndex,
-                                                                                    rc_Config.c_ElementId.
-                                                                                    u32_ElementIndex) == NULL)
-                     {
-                        q_InvalidElementsFound = true;
-                     }
-                  }
+                  q_Found = true;
                }
             }
          }
-         if (q_InvalidElementsFound == true)
+         if (q_Found == true)
          {
             C_OgeWiCustomMessage c_Message(opc_Parent);
-            //Do not accept paste
-            pc_Retval->Clear();
+            //No iterator step because new element at current position
+            this->mc_LastKnownData.DeleteWidget(u32_ItParam, C_PuiSvDbDataElement::ePARAM);
             c_Message.SetType(C_OgeWiCustomMessage::E_Type::eERROR);
             c_Message.SetHeading(C_GtGetText::h_GetText("Widget paste"));
-            c_Message.SetDescription(C_GtGetText::h_GetText("Widgets could not be pasted.\n"
-                                                            "An item index was found that does not mach any element in your system definition."));
+            c_Message.SetDescription(C_GtGetText::h_GetText("Parametrization widget could not be pasted.\n"
+                                                            "Another parametrization widget in this view is already "
+                                                            "using at least one of the containing lists."));
             c_Message.Execute();
          }
+         else
+         {
+            //Important iterator step
+            ++u32_ItParam;
+         }
+      }
+      //Check ID validity
+      this->mc_LastKnownData.GetAllWidgetItems(c_AllWidgets);
+      for (uint32 u32_ItWidget = 0; u32_ItWidget < c_AllWidgets.size(); ++u32_ItWidget)
+      {
+         const C_PuiSvDbWidgetBase * const pc_Widget = c_AllWidgets[u32_ItWidget];
+         if (pc_Widget != NULL)
+         {
+            for (uint32 u32_ItElement = 0; u32_ItElement < pc_Widget->c_DataPoolElementsConfig.size();
+                 ++u32_ItElement)
+            {
+               const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Widget->c_DataPoolElementsConfig[u32_ItElement];
+               if (rc_Config.c_ElementId.GetIsValid() == true)
+               {
+                  if (C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(rc_Config.c_ElementId.u32_NodeIndex,
+                                                                                 rc_Config.c_ElementId.
+                                                                                 u32_DataPoolIndex,
+                                                                                 rc_Config.c_ElementId.u32_ListIndex,
+                                                                                 rc_Config.c_ElementId.
+                                                                                 u32_ElementIndex) == NULL)
+                  {
+                     q_InvalidElementsFound = true;
+                  }
+               }
+            }
+         }
+      }
+      if (q_InvalidElementsFound == true)
+      {
+         C_OgeWiCustomMessage c_Message(opc_Parent);
+         //Do not accept paste
+         this->mc_LastKnownData.Clear();
+         c_Message.SetType(C_OgeWiCustomMessage::E_Type::eERROR);
+         c_Message.SetHeading(C_GtGetText::h_GetText("Widget paste"));
+         c_Message.SetDescription(C_GtGetText::h_GetText("Widgets could not be pasted.\n"
+                                                         "An item index was found that does not mach any element in your SYSTEM DEFINITION."));
+         c_Message.Execute();
       }
    }
 
-   return pc_Retval;
+   return &this->mc_LastKnownData;
 }
 
 //-----------------------------------------------------------------------------
@@ -468,11 +455,10 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
    \created     24.07.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-bool C_SyvDaCopyPasteManager::CheckValidContent(void) const
+bool C_SyvDaCopyPasteManager::CheckValidContentAndPrepareData(void)
 {
-   C_PuiSvDashboard c_Tmp;
-
-   return (C_SyvClipBoardHelper::h_LoadDashboardFromClipboard(c_Tmp,
+   this->mc_LastKnownData.Clear();
+   return (C_SyvClipBoardHelper::h_LoadDashboardFromClipboard(this->mc_LastKnownData,
                                                               C_SyvDaCopyPasteManager::hc_ClipBoardBaseTagName) ==
            C_NO_ERR);
 }

@@ -228,10 +228,14 @@ void C_SyvUpUpdateWidget::InitText(void) const
    // tooltips
    this->mpc_Ui->pc_PbUpdate->SetToolTipInformation(C_GtGetText::h_GetText("System Update"),
                                                     C_GtGetText::h_GetText(
-                                                       "Updates all devices with version deviations (comparing to Update Package content). If not connected to system yet, a connect is performed first."));
+                                                       "Updates all devices that have a different version compared to "
+                                                       "the version in the Update Package. If the system is not "
+                                                       "connected yet, then a connection to the system is "
+                                                       "established first."));
    this->mpc_Ui->pc_PbConnect->SetToolTipInformation(C_GtGetText::h_GetText("Connect to System (optional)"),
                                                      C_GtGetText::h_GetText(
-                                                        "Puts all devices into flashloader mode and gets current versions of each device."));
+                                                        "Puts all devices into flashloader mode and gets current "
+                                                        "versions of each device."));
    this->mpc_Ui->pc_PbDisconnnect->SetToolTipInformation(C_GtGetText::h_GetText("Disconnect from System"),
                                                          C_GtGetText::h_GetText(
                                                             "Puts all devices back into application mode."));
@@ -415,49 +419,53 @@ void C_SyvUpUpdateWidget::resizeEvent(QResizeEvent * const opc_Event)
 {
    if (this->mpc_ProgressLog != NULL)
    {
-      QPoint c_Point = this->mpc_ProgressLog->pos();
-      QSize c_Size = this->mpc_ProgressLog->size();
-      QWidget * pc_Widget = this->mpc_ProgressLogParent;
-
       Q_UNUSED(opc_Event)
 
-      if (pc_Widget == NULL)
+      // only resize if scene is active to avoid bad toolbox geometry in case of "open tool with *.syde double click"
+      if (this->mpc_Scene->isActive() == true)
       {
-         // if no parent exist use this widget
-         pc_Widget = this;
-      }
+         QPoint c_Point = this->mpc_ProgressLog->pos();
+         QSize c_Size = this->mpc_ProgressLog->size();
+         QWidget * pc_Widget = this->mpc_ProgressLogParent;
 
-      // would the toolbox be outside of the widget in x direction
-      if ((this->mpc_ProgressLog->x() + this->mpc_ProgressLog->width() + mhsn_WidgetBorder) > pc_Widget->width())
-      {
-         // is the toolbox to big?
-         if ((this->mpc_ProgressLog->width() + (2 * mhsn_WidgetBorder)) > pc_Widget->width())
+         if (pc_Widget == NULL)
          {
-            c_Size.setWidth(pc_Widget->width() - (2 * mhsn_WidgetBorder));
+            // if no parent exist use this widget
+            pc_Widget = this;
          }
-         else
-         {
-            // adapt position of toolbox
-            c_Point.setX((pc_Widget->width() - this->mpc_ProgressLog->width()) - mhsn_WidgetBorder);
-         }
-      }
 
-      // would the toolbox be outside of the widget in y direction
-      if ((this->mpc_ProgressLog->y() + this->mpc_ProgressLog->height() + mhsn_WidgetBorder) > pc_Widget->height())
-      {
-         // is the toolbox to big?
-         if ((this->mpc_ProgressLog->height() + (2 * mhsn_WidgetBorder)) > pc_Widget->height())
+         // would the toolbox be outside of the widget in x direction
+         if ((this->mpc_ProgressLog->x() + this->mpc_ProgressLog->width() + mhsn_WidgetBorder) > pc_Widget->width())
          {
-            c_Size.setHeight(pc_Widget->height() - (2 * mhsn_WidgetBorder));
+            // is the toolbox to big?
+            if ((this->mpc_ProgressLog->width() + (2 * mhsn_WidgetBorder)) > pc_Widget->width())
+            {
+               c_Size.setWidth(pc_Widget->width() - (2 * mhsn_WidgetBorder));
+            }
+            else
+            {
+               // adapt position of toolbox
+               c_Point.setX((pc_Widget->width() - this->mpc_ProgressLog->width()) - mhsn_WidgetBorder);
+            }
          }
-         else
-         {
-            // adapt position of toolbox
-            c_Point.setY((pc_Widget->height() - this->mpc_ProgressLog->height()) - mhsn_WidgetBorder);
-         }
-      }
 
-      this->mpc_ProgressLog->setGeometry(QRect(c_Point, c_Size));
+         // would the toolbox be outside of the widget in y direction
+         if ((this->mpc_ProgressLog->y() + this->mpc_ProgressLog->height() + mhsn_WidgetBorder) > pc_Widget->height())
+         {
+            // is the toolbox to big?
+            if ((this->mpc_ProgressLog->height() + (2 * mhsn_WidgetBorder)) > pc_Widget->height())
+            {
+               c_Size.setHeight(pc_Widget->height() - (2 * mhsn_WidgetBorder));
+            }
+            else
+            {
+               // adapt position of toolbox
+               c_Point.setY((pc_Widget->height() - this->mpc_ProgressLog->height()) - mhsn_WidgetBorder);
+            }
+         }
+
+         this->mpc_ProgressLog->setGeometry(QRect(c_Point, c_Size));
+      }
    }
 }
 
@@ -530,7 +538,7 @@ sint32 C_SyvUpUpdateWidget::m_InitSequence(void)
    case C_NO_ERR:
       break;
    case C_CONFIG:
-      c_Message = QString(C_GtGetText::h_GetText("Invalid System Definition/View configuration."));
+      c_Message = QString(C_GtGetText::h_GetText("Invalid SYSTEM DEFINITION/View configuration."));
       break;
    case C_RD_WR:
       c_Message =
@@ -548,7 +556,7 @@ sint32 C_SyvUpUpdateWidget::m_InitSequence(void)
       c_Message =
          QString(C_GtGetText::h_GetText(
                     "CAN initialization failed. Check your PC CAN interface configuration (System View setup - "
-                    "double click on PC)."));
+                    "double-click on PC)."));
       break;
    case C_CHECKSUM:
       c_Message = QString(C_GtGetText::h_GetText("Internal buffer overflow detected."));
@@ -1046,9 +1054,6 @@ void C_SyvUpUpdateWidget::m_Connect(void)
 
    if (s32_Return == C_NO_ERR)
    {
-      this->m_UpdateReportText(C_GtGetText::h_GetText("Activate Flashloader: Started"));
-      s32_Return = this->mpc_UpSequences->StartActivateFlashloader();
-
       //Buttons
       this->mpc_Ui->pc_PbConnect->setEnabled(false);
       this->mpc_Ui->pc_PbUpdate->setEnabled(false);
@@ -1074,32 +1079,160 @@ void C_SyvUpUpdateWidget::m_Connect(void)
          this->mpc_Scene->SetConnected(true, true);
          this->mpc_Scene->StartConnectionAnimation();
       }
+
       // And Update package
       this->mpc_Ui->pc_WidgetUpdatePackage->SetConnected();
       // When connected, no drag and drop is allowed on top level
       Q_EMIT this->SigBlockDragAndDrop(true);
 
+      // Prepare the update package
+      this->mc_NodesToFlash.clear();
+      this->mc_NodesOrder.clear();
+      this->mc_NodesWithAllApplications.clear();
+      this->mc_NodesWithAllApplicationsAndTempPath.clear();
+      // Get the update package with the update configuration
+      s32_Return = this->mpc_Ui->pc_WidgetUpdatePackage->GetUpdatePackage(this->mc_NodesToFlash,
+                                                                          this->mc_NodesOrder,
+                                                                          &this->mc_NodesWithAllApplications);
+
       if (s32_Return == C_NO_ERR)
       {
-         //Don't set step if timer still active
-         this->me_Step = C_SyvUpSequences::eACTIVATE_FLASHLOADER;
-         //Timer
-         this->mc_Timer.start();
+         QString c_ErrorPath;
+         const C_SCLString c_ExePath = C_Uti::h_GetExePath().toStdString().c_str();
+         C_SCLString c_TemporaryPath = c_ExePath + "/" + mhc_TempFolder.toStdString().c_str() + "/";
+
+         // Copy the application paths
+         // Saving both, the original and temporary, paths will help to map changed relevant applications
+         // between connect and update by discarding application information blocks
+         this->mc_NodesWithAllApplicationsAndTempPath = this->mc_NodesWithAllApplications;
+
+         // Copy all files to a temporary folder to have them "safe"
+         s32_Return = this->mpc_UpSequences->SyvUpCreateTemporaryFolder(c_TemporaryPath,
+                                                                        this->mc_NodesWithAllApplicationsAndTempPath,
+                                                                        c_ErrorPath);
+
+         // Adapt paths of mc_NodesToFlash to the temporary folder
+         this->m_ReplaceOriginalWithTempPaths();
+
+         if (s32_Return != C_NO_ERR)
+         {
+            C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
+            QString c_MessageText;
+            QString c_CompleteMessageText;
+            switch (s32_Return)
+            {
+            case C_CONFIG:
+               c_MessageText = "View is invalid or initialization was not finished";
+               break;
+            case C_OVERFLOW:
+               c_MessageText =
+                  "Size of orc_ApplicationsToWrite is not the same as the size of nodes in orc_Nodes;\n"
+                  "Size of orc_ActiveNodes is not the same as the size of nodes in orc_Nodes";
+               break;
+            case C_NOACT:
+               c_MessageText =
+                  "orc_ApplicationsToWrite has non-empty list of files for node that was not set as active in orc_ActiveNodes;\n"
+                  "size of files in orc_ApplicationsToWrite[node] is higher than the"
+                  "number of applications of the node in orc_Nodes (for an active and address based node)";
+               break;
+            case C_RANGE:
+               c_MessageText = "File referenced by orc_ApplicationsToWrite does not exist\n"
+                               "orc_TargetPath does not end in \"\\\" or \"/\"";
+               break;
+            case C_BUSY:
+               c_MessageText =
+                  "Could not erase pre-existing target path (note: can result in partially erased target path)";
+               break;
+            case C_RD_WR:
+               c_MessageText = "Could not copy file:\n" + c_ErrorPath;
+               break;
+            case C_TIMEOUT:
+               c_MessageText = "Could not create target directory:\n" + c_ErrorPath;
+               break;
+            default:
+               c_MessageText = QString("Unknown: %1").arg(C_Uti::h_StwError(s32_Return));
+               break;
+            }
+            c_CompleteMessageText = QString(C_GtGetText::h_GetText(
+                                               "Connect to system: error on creating temporary folder: %1")).arg(
+               c_MessageText);
+            this->m_UpdateReportText(c_CompleteMessageText);
+            c_Message.SetHeading(C_GtGetText::h_GetText("System Update"));
+            c_Message.SetDescription("Connect to system: error on creating temporary folder.");
+            c_Message.SetDetails(c_MessageText);
+            c_Message.Execute();
+         }
+         else
+         {
+            this->mpc_Ui->pc_WidgetUpdateSummary->InitUpdatePackage(this->mc_NodesToFlash, this->mc_NodesOrder,
+                                                                    m_GetIsFileBasedFlagForEach());
+         }
+      }
+      else if (s32_Return == C_NOACT)
+      {
+         //nothing to flash: this is not a connection problem
+         s32_Return = C_NO_ERR;
       }
       else
       {
-         //Thread access possible
-         this->m_UpdateReportText(QString(
-                                     C_GtGetText::h_GetText(
-                                        "Activate Flashloader: Can not start. Error on initialization: %1")).
+         this->m_UpdateReportText(QString(C_GtGetText::h_GetText(
+                                             "Activate Flashloader: Cannot start. Error on creation temporary files: %1")).
                                   arg(C_Uti::h_StwError(s32_Return)));
+      }
+
+      if (s32_Return == C_NO_ERR)
+      {
+         // Start the connect sequence
+         this->m_UpdateReportText(C_GtGetText::h_GetText("Activate Flashloader: Started"));
+         s32_Return = this->mpc_UpSequences->StartActivateFlashloader();
+
+         if (s32_Return == C_NO_ERR)
+         {
+            //Don't set step if timer still active
+            this->me_Step = C_SyvUpSequences::eACTIVATE_FLASHLOADER;
+            //Timer
+            this->mc_Timer.start();
+         }
+         else
+         {
+            //Thread access possible
+            this->m_UpdateReportText(QString(
+                                        C_GtGetText::h_GetText(
+                                           "Activate Flashloader: Cannot start. Error on initialization: %1")).
+                                     arg(C_Uti::h_StwError(s32_Return)));
+         }
+      }
+
+      if (s32_Return != C_NO_ERR)
+      {
+         // Handle failure
+         this->mq_StartUpdateAfterConnect = false;
+
+         this->mpc_Ui->pc_PbUpdate->setEnabled(true);
+         this->mpc_Ui->pc_PbConnect->setEnabled(true);
+
+         //Signal summary
+         this->mpc_Ui->pc_WidgetUpdateSummary->SetHeading("",
+                                                          C_GtGetText::h_GetText("System disconnected!"));
+         //Signal progress log
+         if (this->mpc_ProgressLogContent != NULL)
+         {
+            this->mpc_ProgressLogContent->AddSubHeading(C_GtGetText::h_GetText("Connecting to System failed!"));
+            this->mpc_ProgressLogContent->AddLogHyperlink();
+         }
+         //Signal scene
+         if (this->mpc_Scene != NULL)
+         {
+            // Stop the previous animation first
+            this->mpc_Scene->StopProgressAnimation(false, 0, true);
+         }
       }
    }
    else
    {
       this->m_UpdateReportText(QString(
                                   C_GtGetText::h_GetText(
-                                     "Activate Flashloader: Can not start. Error on initialization: %1")).
+                                     "Activate Flashloader: Cannot start. Error on initialization: %1")).
                                arg(C_Uti::h_StwError(s32_Return)));
    }
 
@@ -1123,7 +1256,7 @@ void C_SyvUpUpdateWidget::m_Update(void)
       c_Message.SetHeading(C_GtGetText::h_GetText("System Update"));
       c_Message.SetDescription(C_GtGetText::h_GetText(
                                   "Update process cannot be started. There are active nodes, which are not responding. \n"
-                                  "Please check nodes connection and reconnect."));
+                                  "Check the nodes connection and try again."));
       c_Message.Execute();
    }
    else
@@ -1156,6 +1289,9 @@ void C_SyvUpUpdateWidget::m_Update(void)
                s32_Return = this->mpc_Ui->pc_WidgetUpdatePackage->GetUpdatePackage(this->mc_NodesToFlash,
                                                                                    this->mc_NodesOrder);
 
+               // Adapt paths of mc_NodesToFlash to the temporary folder
+               this->m_ReplaceOriginalWithTempPaths();
+
                if (s32_Return == C_NOACT)
                {
                   // No applications to update
@@ -1165,9 +1301,8 @@ void C_SyvUpUpdateWidget::m_Update(void)
                                               "No System Update needed. All applications for the devices match the ones in the "
                                               "update package. To update anyway see details."));
                   c_Message.SetDetails(C_GtGetText::h_GetText(
-                                          "For updating a device nevertheless, there is an option to "
-                                          "trigger a discard of the application information in the "
-                                          "\"Device Status Information\" dialog (double click on node)."));
+                                          "For updating a device nevertheless, there is an option to trigger a \"Force Update\" "
+                                          "in the \"Device Status Information\" dialog (double click on node)."));
 
                   c_Message.Execute();
                }
@@ -1237,7 +1372,7 @@ void C_SyvUpUpdateWidget::m_Update(void)
 
                      this->m_UpdateReportText(QString(
                                                  C_GtGetText::h_GetText(
-                                                    "Update System: Can not start. Thread is still busy.")).
+                                                    "Update System: Cannot start. Thread is still busy.")).
                                               arg(C_Uti::h_StwError(s32_Return)));
                   }
                }
@@ -1247,7 +1382,7 @@ void C_SyvUpUpdateWidget::m_Update(void)
                m_HandleUpdateFailure();
 
                this->m_UpdateReportText(QString(C_GtGetText::h_GetText(
-                                                   "Update System: Can not start. Error on System View.")));
+                                                   "Update System: Cannot start. Error on System View.")));
             }
 
             QApplication::restoreOverrideCursor();
@@ -1336,7 +1471,7 @@ void C_SyvUpUpdateWidget::m_DisconnectAction(const bool oq_ClearLogAndResetScene
       }
       else
       {
-         this->m_UpdateReportText(QString(C_GtGetText::h_GetText("Disconnect: Can not start. Thread is still busy.")));
+         this->m_UpdateReportText(QString(C_GtGetText::h_GetText("Disconnect: Cannot start. Thread is still busy.")));
          this->m_CleanUpSequence();
       }
    }
@@ -1385,7 +1520,6 @@ void C_SyvUpUpdateWidget::m_Timer(void)
 
    if (s32_Result == C_NO_ERR)
    {
-      bool q_AlreadyDisplayedError = false;
       // In the event queue could be some emitted signals from thread left.
       // We need all information for showing the result
       QApplication::processEvents();
@@ -1412,7 +1546,7 @@ void C_SyvUpUpdateWidget::m_Timer(void)
             else
             {
                this->m_UpdateReportText(QString(C_GtGetText::h_GetText(
-                                                   "Read Device information: Can not start. Thread is still busy.")));
+                                                   "Read Device information: Cannot start. Thread is still busy.")));
             }
          }
          else
@@ -1449,104 +1583,24 @@ void C_SyvUpUpdateWidget::m_Timer(void)
                this->mpc_Scene->StopProgressAnimation(false, 0, true);
             }
 
-            // Prepare the update package
-            this->mc_NodesToFlash.clear();
-            this->mc_NodesOrder.clear();
-            // Get the update package with the update configuration
-            s32_Result = this->mpc_Ui->pc_WidgetUpdatePackage->GetUpdatePackage(this->mc_NodesToFlash,
-                                                                                this->mc_NodesOrder);
-            if (s32_Result == C_NO_ERR)
+            //Signal progress log
+            if (this->mpc_ProgressLogContent != NULL)
             {
-               QString c_ErrorPath;
-               const C_SCLString c_ExePath = C_Uti::h_GetExePath().toStdString().c_str();
-               C_SCLString c_TemporaryPath = c_ExePath + "/" + mhc_TempFolder.toStdString().c_str() + "/";
-
-               // Copy all relevant files to a temporary folder to have them "safe"
-               s32_Result = this->mpc_UpSequences->SyvUpCreateTemporaryFolder(c_TemporaryPath, this->mc_NodesToFlash,
-                                                                              c_ErrorPath);
-
-               if (s32_Result != C_NO_ERR)
-               {
-                  C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
-                  QString c_MessageText;
-                  QString c_CompleteMessageText;
-                  switch (s32_Result)
-                  {
-                  case C_CONFIG:
-                     c_MessageText = "View is invalid or initialization was not finished";
-                     break;
-                  case C_OVERFLOW:
-                     c_MessageText =
-                        "Size of orc_ApplicationsToWrite is not the same as the size of nodes in orc_Nodes;\n"
-                        "Size of orc_ActiveNodes is not the same as the size of nodes in orc_Nodes";
-                     break;
-                  case C_NOACT:
-                     c_MessageText =
-                        "orc_ApplicationsToWrite has non-empty list of files for node that was not set as active in orc_ActiveNodes;\n"
-                        "size of files in orc_ApplicationsToWrite[node] is higher than the"
-                        "number of applications of the node in orc_Nodes (for an active and address based node)";
-                     break;
-                  case C_RANGE:
-                     c_MessageText = "File referenced by orc_ApplicationsToWrite does not exist\n"
-                                     "orc_TargetPath does not end in \"\\\" or \"/\"";
-                     break;
-                  case C_BUSY:
-                     c_MessageText =
-                        "Could not erase pre-existing target path (note: can result in partially erased target path)";
-                     break;
-                  case C_RD_WR:
-                     c_MessageText = "Could not copy file:\n" + c_ErrorPath;
-                     break;
-                  case C_TIMEOUT:
-                     c_MessageText = "Could not create target directory:\n" + c_ErrorPath;
-                     break;
-                  default:
-                     c_MessageText = QString("Unknown: %1").arg(C_Uti::h_StwError(s32_Result));
-                     break;
-                  }
-                  c_CompleteMessageText = QString(C_GtGetText::h_GetText(
-                                                     "Connect to system: error on creating temporary folder: %1")).arg(
-                     c_MessageText);
-                  this->m_UpdateReportText(c_CompleteMessageText);
-                  c_Message.SetHeading(C_GtGetText::h_GetText("System Update"));
-                  c_Message.SetDescription("Connect to system: error on creating temporary folder.");
-                  c_Message.SetDetails(c_MessageText);
-                  c_Message.Execute();
-                  q_AlreadyDisplayedError = true;
-               }
-               else
-               {
-                  this->mpc_Ui->pc_WidgetUpdateSummary->InitUpdatePackage(this->mc_NodesToFlash, this->mc_NodesOrder,
-                                                                          m_GetIsFileBasedFlagForEach());
-               }
-            }
-            else if (s32_Result == C_NOACT)
-            {
-               //nothing to flash: this is not a connection problem
-               s32_Result = C_NO_ERR;
+               this->mpc_ProgressLogContent->AddSubHeading(C_GtGetText::h_GetText("Connected to System!"));
             }
 
-            if (s32_Result == C_NO_ERR)
+            if (this->mq_StartUpdateAfterConnect == true)
             {
-               //Signal progress log
-               if (this->mpc_ProgressLogContent != NULL)
-               {
-                  this->mpc_ProgressLogContent->AddSubHeading(C_GtGetText::h_GetText("Connected to System!"));
-               }
+               // In the event queue could be some emitted signals from thread left.
+               // We need all information for showing the result before starting the update
+               QApplication::processEvents();
 
-               if (this->mq_StartUpdateAfterConnect == true)
-               {
-                  // In the event queue could be some emitted signals from thread left.
-                  // We need all information for showing the result before starting the update
-                  QApplication::processEvents();
-
-                  this->mq_ClearProgressLog = false;
-                  this->m_Update();
-               }
-               else
-               {
-                  this->mpc_Ui->pc_PbDisconnnect->setEnabled(true);
-               }
+               this->mq_ClearProgressLog = false;
+               this->m_Update();
+            }
+            else
+            {
+               this->mpc_Ui->pc_PbDisconnnect->setEnabled(true);
             }
          }
 
@@ -1557,12 +1611,12 @@ void C_SyvUpUpdateWidget::m_Timer(void)
             this->mpc_Ui->pc_PbUpdate->setEnabled(true);
             this->mpc_Ui->pc_PbDisconnnect->setEnabled(true);
             m_HandleConnectionFailure();
-            if ((this->mq_StartUpdateAfterConnect == true) && (q_AlreadyDisplayedError == false))
+            if (this->mq_StartUpdateAfterConnect == true)
             {
                C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
                c_Message.SetHeading(C_GtGetText::h_GetText("System Update"));
                c_Message.SetDescription(C_GtGetText::h_GetText("There are active nodes, which are not responding. \n"
-                                                               "Please check nodes connection and reconnect."));
+                                                               "Check the node's connection and try again.."));
                c_Message.Execute();
             }
          }
@@ -1951,6 +2005,55 @@ void C_SyvUpUpdateWidget::m_AddProgressLogConnectEntry(const uint32 ou32_NodeInd
 
 //-----------------------------------------------------------------------------
 /*!
+   \brief   Adapt paths of mc_NodesToFlash to the temporary folder
+
+   In case of an update of mc_NodesToFlash, the paths must be adapted again to the temporary path with the
+   copied files.
+   This function will adapt the paths by using the saved paths in mc_NodesWithAllApplications and
+   mc_NodesWithAllApplicationsAndTempPath.
+
+   \created     11.12.2018  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_SyvUpUpdateWidget::m_ReplaceOriginalWithTempPaths(void)
+{
+   uint32 u32_NodeCounter;
+
+   // All vector must have the size of the count of nodes in the system
+   tgl_assert(this->mc_NodesToFlash.size() == this->mc_NodesWithAllApplications.size());
+   tgl_assert(this->mc_NodesToFlash.size() == this->mc_NodesWithAllApplicationsAndTempPath.size());
+
+   for (u32_NodeCounter = 0U; u32_NodeCounter < this->mc_NodesToFlash.size(); ++u32_NodeCounter)
+   {
+      uint32 u32_ApplToFlashCounter;
+
+      for (u32_ApplToFlashCounter = 0U;
+           u32_ApplToFlashCounter < this->mc_NodesToFlash[u32_NodeCounter].c_FilesToFlash.size();
+           ++u32_ApplToFlashCounter)
+      {
+         uint32 u32_AllApplCounter;
+
+         for (u32_AllApplCounter = 0U;
+              u32_AllApplCounter < this->mc_NodesWithAllApplications[u32_NodeCounter].c_FilesToFlash.size();
+              ++u32_AllApplCounter)
+         {
+            // mc_NodesWithAllApplications has a 1:1 mapping to mc_NodesWithAllApplicationsAndTempPath
+            // Searching of the correct temp path in mc_NodesWithAllApplicationsAndTempPath for mc_NodesToFlash
+            if (this->mc_NodesToFlash[u32_NodeCounter].c_FilesToFlash[u32_ApplToFlashCounter] ==
+                this->mc_NodesWithAllApplications[u32_NodeCounter].c_FilesToFlash[u32_AllApplCounter])
+            {
+               // Same path, replace the original by the temporary path
+               this->mc_NodesToFlash[u32_NodeCounter].c_FilesToFlash[u32_ApplToFlashCounter] =
+                  this->mc_NodesWithAllApplicationsAndTempPath[u32_NodeCounter].c_FilesToFlash[u32_AllApplCounter];
+               break;
+            }
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
    \brief   Handle trigger for application information discard
 
    \param[in] ou32_NodeIndex Node index
@@ -1967,6 +2070,9 @@ void C_SyvUpUpdateWidget::m_DiscardInfo(const uint32 ou32_NodeIndex)
    this->mc_NodesOrder.clear();
    // Get the update package with the update configuration
    this->mpc_Ui->pc_WidgetUpdatePackage->GetUpdatePackage(this->mc_NodesToFlash, this->mc_NodesOrder);
+   // Adapt paths of mc_NodesToFlash to the temporary folder
+   this->m_ReplaceOriginalWithTempPaths();
+
    //Update summary widget with new info
    this->mpc_Ui->pc_WidgetUpdateSummary->InitUpdatePackage(this->mc_NodesToFlash, this->mc_NodesOrder,
                                                            m_GetIsFileBasedFlagForEach());

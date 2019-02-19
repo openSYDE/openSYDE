@@ -19,6 +19,7 @@
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
 
+#define MINIZ_NO_ZLIB_COMPATIBLE_NAMES //prevent namespace pollution
 #include "miniz.h"
 #include "stwtypes.h"
 #include "stwerrors.h"
@@ -66,8 +67,8 @@ sint32 C_OSCZipData::h_Zip(uint8 * const opu8_Destination, uint32 & oru32_Destin
 {
    sint32 s32_Return;
 
-   s32_Return = compress(opu8_Destination, &oru32_DestinationLength, opu8_Source, ou32_SourceLength);
-   if (s32_Return == Z_OK)
+   s32_Return = mz_compress(opu8_Destination, &oru32_DestinationLength, opu8_Source, ou32_SourceLength);
+   if (s32_Return == MZ_OK)
    {
       return C_NO_ERR;
    }
@@ -101,8 +102,8 @@ sint32 C_OSCZipData::h_Unzip(uint8 * const opu8_Destination, uint32 & oru32_Dest
 {
    sint32 s32_Return;
 
-   s32_Return = uncompress(opu8_Destination, &oru32_DestinationLength, opu8_Source, ou32_SourceLength);
-   if (s32_Return == Z_OK)
+   s32_Return = mz_uncompress(opu8_Destination, &oru32_DestinationLength, opu8_Source, ou32_SourceLength);
+   if (s32_Return == MZ_OK)
    {
       return C_NO_ERR;
    }
@@ -125,5 +126,5 @@ sint32 C_OSCZipData::h_Unzip(uint8 * const opu8_Destination, uint32 & oru32_Dest
 //-----------------------------------------------------------------------------
 uint32 C_OSCZipData::h_GetRequiredBufSizeForZipping(const uint32 ou32_SourceLength)
 {
-   return compressBound(ou32_SourceLength);
+   return mz_compressBound(ou32_SourceLength);
 }

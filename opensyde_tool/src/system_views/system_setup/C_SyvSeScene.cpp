@@ -799,4 +799,6 @@ void C_SyvSeScene::m_OnConnectionChanged(void)
    static_cast<void>(m_HandlePcReconnectIfNecessary(c_Dummy));
 
    Q_EMIT this->SigChanged();
+   //Trigger error check!
+   Q_EMIT this->SigErrorCheck();
 }

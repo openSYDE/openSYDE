@@ -21,6 +21,7 @@
 
 #include <winsock.h> //Windows WinSock
 #include <winsock2.h>
+#include <cstring>
 #include <iphlpapi.h> //Windows IP helper utilities
 #include "stwtypes.h"
 #include "stwerrors.h"
@@ -70,6 +71,21 @@ C_TGLCriticalSection C_OSCIpDispatcherWinSock::mhc_LockBuffer;
 /* -- Module Global Function Prototypes ------------------------------------ */
 
 /* -- Implementation ------------------------------------------------------- */
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Constructor
+
+   Initialize elements
+
+   \created     07.01.2019  STW/A.Stangl
+*/
+//-----------------------------------------------------------------------------
+C_OSCIpDispatcherWinSock::C_TcpConnection::C_TcpConnection(void)
+{
+   un_Socket = m_WsInvalidSocket();
+   (void)std::memset(&au8_IpAddress[0], 0U, 4U);
+}
 
 //-----------------------------------------------------------------------------
 /*!
@@ -159,7 +175,7 @@ C_OSCIpDispatcherWinSock::C_OSCIpDispatcherWinSock(void) :
 /*!
    \brief   Clean up class
 
-   Release allocated ressources
+   Release allocated resources
 
    \created     26.04.2017  STW/A.Stangl
 */
@@ -169,16 +185,16 @@ C_OSCIpDispatcherWinSock::~C_OSCIpDispatcherWinSock(void)
    //make sure to release resources in case the user forgot to
    for (uint16 u16_Index = 0U; u16_Index < this->mc_SocketsTcp.size(); u16_Index++)
    {
-      this->CloseTcp(u16_Index);
+      (void)this->CloseTcp(u16_Index);
    }
-   this->CloseUdp();
+   (void)this->CloseUdp();
 
    (void)WSACleanup(); //spec: one call of cleanup per call of startup; final call performs actual cleanup
 }
 
 //-----------------------------------------------------------------------------
 /*!
-   \brief   Init TCP communication
+   \brief   Initialize TCP communication
 
    Jobs to perform:
    - create one non-blocking TCP client socket
@@ -614,6 +630,11 @@ sint32 C_OSCIpDispatcherWinSock::IsTcpConnected(const uint32 ou32_Handle)
       osc_write_log_error("openSYDE IP-TP", "ReConnectTcp called with invalid handle.");
       s32_Return = C_RANGE;
    }
+   else if (this->mc_SocketsTcp[ou32_Handle].un_Socket == m_WsInvalidSocket())
+   {
+      // Socket not opened yet
+      s32_Return = C_NOACT;
+   }
    else
    {
       charn cn_Byte;
@@ -626,11 +647,16 @@ sint32 C_OSCIpDispatcherWinSock::IsTcpConnected(const uint32 ou32_Handle)
       {
          s32_Return = C_NO_ERR;
       }
+      else if (sn_BytesRead == 0)
+      {
+         // Connection closed by remote peer
+         s32_Return = C_NOACT;
+      }
       else
       {
          const sintn sn_SocketError = WSAGetLastError();
 
-         // Resource temporarily unavailable. It means that no bytes culd be read, because of an empty queue.
+         // Resource temporarily unavailable. It means that no bytes could be read, because of an empty queue.
          // But the connection is already established.
          if (sn_SocketError == WSAEWOULDBLOCK)
          {
@@ -710,7 +736,8 @@ sint32 C_OSCIpDispatcherWinSock::CloseTcp(const uint32 ou32_Handle)
 {
    sint32 s32_Return;
 
-   if (ou32_Handle >= this->mc_SocketsTcp.size())
+   if ((ou32_Handle >= this->mc_SocketsTcp.size()) ||
+       (this->mc_SocketsTcp[ou32_Handle].un_Socket == m_WsInvalidSocket()))
    {
       osc_write_log_error("openSYDE IP-TP", "CloseTcp called with invalid handle.");
       s32_Return = C_RANGE;
@@ -754,8 +781,14 @@ sint32 C_OSCIpDispatcherWinSock::CloseUdp(void)
 {
    for (uint32 u32_Interface = 0U; u32_Interface < mc_SocketsUdpClient.size(); u32_Interface++)
    {
-      (void)closesocket(mc_SocketsUdpClient[u32_Interface]);
-      (void)closesocket(mc_SocketsUdpServer[u32_Interface]);
+      if (mc_SocketsUdpClient[u32_Interface] != m_WsInvalidSocket())
+      {
+         (void)closesocket(mc_SocketsUdpClient[u32_Interface]);
+      }
+      if (mc_SocketsUdpServer[u32_Interface] != m_WsInvalidSocket())
+      {
+         (void)closesocket(mc_SocketsUdpServer[u32_Interface]);
+      }
    }
    mc_SocketsUdpClient.resize(0);
    mc_SocketsUdpServer.resize(0);
@@ -806,20 +839,30 @@ sint32 C_OSCIpDispatcherWinSock::SendTcp(const uint32 ou32_Handle, const std::ve
                                          reinterpret_cast<const charn *>(&orc_Data[0]), orc_Data.size(), 0);
          if (sn_BytesSent != static_cast<sintn>(orc_Data.size()))
          {
-            const sintn sn_Error = WSAGetLastError();
-
-            osc_write_log_error("openSYDE IP-TP",
-                                "SendTcp: Could not send TCP service. Data lost. Error: " +
-                                C_SCLString::IntToStr(sn_Error) +
-                                " IP-Address: " + mh_IpToText(this->mc_SocketsTcp[ou32_Handle].au8_IpAddress));
-            if ((sn_Error == WSAECONNABORTED) || (sn_Error == WSAECONNRESET))
+            if (sn_BytesSent == SOCKET_ERROR)
             {
-               //we got kicked out; we'll remember that ...
-               osc_write_log_warning("openSYDE IP-TP", "SendTcp: Connection aborted or reset ... IP-Address: " +
-                                     mh_IpToText(this->mc_SocketsTcp[ou32_Handle].au8_IpAddress));
-               (void)closesocket(this->mc_SocketsTcp[ou32_Handle].un_Socket);
-               this->mc_SocketsTcp[ou32_Handle].un_Socket = m_WsInvalidSocket();
-               m_OnTcpConnectionDropped(ou32_Handle);
+               const sintn sn_Error = WSAGetLastError();
+
+               osc_write_log_error("openSYDE IP-TP",
+                                   "SendTcp: Could not send TCP service. Data lost. Error: " +
+                                   C_SCLString::IntToStr(sn_Error) +
+                                   " IP-Address: " + mh_IpToText(this->mc_SocketsTcp[ou32_Handle].au8_IpAddress));
+               if ((sn_Error == WSAECONNABORTED) || (sn_Error == WSAECONNRESET))
+               {
+                  //we got kicked out; we'll remember that ...
+                  osc_write_log_warning("openSYDE IP-TP", "SendTcp: Connection aborted or reset ... IP-Address: " +
+                                        mh_IpToText(this->mc_SocketsTcp[ou32_Handle].au8_IpAddress));
+                  (void)closesocket(this->mc_SocketsTcp[ou32_Handle].un_Socket);
+                  this->mc_SocketsTcp[ou32_Handle].un_Socket = m_WsInvalidSocket();
+                  m_OnTcpConnectionDropped(ou32_Handle);
+               }
+            }
+            else
+            {
+               osc_write_log_error("openSYDE IP-TP",
+                                   "SendTcp: Could not send all data: tried: " +
+                                   C_SCLString::IntToStr(static_cast<sintn>(orc_Data.size())) +
+                                   "sent: " + C_SCLString::IntToStr(sn_BytesSent));
             }
             s32_Return = C_RD_WR;
          }
@@ -1099,19 +1142,29 @@ sint32 C_OSCIpDispatcherWinSock::SendUdp(const std::vector<uint8> & orc_Data)
    {
       for (uint32 u32_Interface = 0U; u32_Interface < mc_SocketsUdpClient.size(); u32_Interface++)
       {
-         sockaddr_in t_TargetAddress;
-         t_TargetAddress.sin_family = AF_INET;
-         t_TargetAddress.sin_port = htons(mhu16_UDP_TCP_PORT);      //target port [REQ DoIp-011]
-         t_TargetAddress.sin_addr.s_addr = htonl(INADDR_BROADCAST); //lint !e1960 //constant defined by API; no problem
-         //lint -e{740,926,929}  Side-effect of the POSIX-style API. Match is guaranteed by the API.
-         const sintn sn_Return = sendto(mc_SocketsUdpClient[u32_Interface],
-                                        reinterpret_cast<const charn *>(&orc_Data[0]),
-                                        orc_Data.size(), 0, reinterpret_cast<const sockaddr *>(&t_TargetAddress),
-                                        sizeof(t_TargetAddress));
-         if (sn_Return != static_cast<sintn>(orc_Data.size()))
+         if (mc_SocketsUdpClient[u32_Interface] != m_WsInvalidSocket())
          {
-            osc_write_log_error("openSYDE IP-TP", "SendUdp sendto error: " + C_SCLString::IntToStr(WSAGetLastError()));
-            s32_Return = C_RD_WR;
+            sockaddr_in t_TargetAddress;
+            t_TargetAddress.sin_family = AF_INET;
+            t_TargetAddress.sin_port = htons(mhu16_UDP_TCP_PORT);      //target port [REQ DoIp-011]
+            t_TargetAddress.sin_addr.s_addr = htonl(INADDR_BROADCAST); //lint !e1960 //constant defined by API; no
+                                                                       // problem
+            //lint -e{740,926,929}  Side-effect of the POSIX-style API. Match is guaranteed by the API.
+            const sintn sn_Return = sendto(mc_SocketsUdpClient[u32_Interface],
+                                           reinterpret_cast<const charn *>(&orc_Data[0]),
+                                           orc_Data.size(), 0, reinterpret_cast<const sockaddr *>(&t_TargetAddress),
+                                           sizeof(t_TargetAddress));
+            if (sn_Return != static_cast<sintn>(orc_Data.size()))
+            {
+               osc_write_log_error("openSYDE IP-TP",
+                                   "SendUdp sendto error: " + C_SCLString::IntToStr(WSAGetLastError()));
+               s32_Return = C_RD_WR;
+            }
+         }
+         else
+         {
+            // Write error to log, then ignore the error and continue
+            osc_write_log_error("openSYDE IP-TP", "SendUdp called with invalid socket.");
          }
       }
    }
@@ -1154,61 +1207,69 @@ sint32 C_OSCIpDispatcherWinSock::ReadUdp(std::vector<uint8> & orc_Data, uint8 (&
    {
       for (uint32 u32_Interface = 0U; u32_Interface < mc_SocketsUdpServer.size(); u32_Interface++)
       {
-         //do we have a package in RX buffer ?
-         uint32 u32_SizeInBuffer;
-         sintn sn_Return = ioctlsocket(mc_SocketsUdpServer[u32_Interface], m_WsFionRead(), &u32_SizeInBuffer);
-         if ((sn_Return != SOCKET_ERROR) && (u32_SizeInBuffer >= 1U))
+         if (mc_SocketsUdpClient[u32_Interface] != m_WsInvalidSocket())
          {
-            sockaddr_in t_Sender;
-            sintn sn_AddressSize = sizeof(t_Sender);
-            //enough bytes: read
-            orc_Data.resize(u32_SizeInBuffer);
-
-            //lint -e{926,929} Side-effect of the "char"-based API. No problems as long as we are on Windows.
-            //lint -e{740}     Side-effect of the POSIX-style API. Match is guaranteed by the API.
-            sn_Return = recvfrom(mc_SocketsUdpServer[u32_Interface], reinterpret_cast<charn *>(&orc_Data[0]),
-                                 orc_Data.size(), 0, reinterpret_cast<sockaddr *>(&t_Sender),
-                                 &sn_AddressSize);
-
-            //there might be more than one package in the buffer; recvfrom only reads one
-            //so we check whether we have more than zero bytes:
-            if (sn_Return > 0)
+            //do we have a package in RX buffer ?
+            uint32 u32_SizeInBuffer;
+            sintn sn_Return = ioctlsocket(mc_SocketsUdpServer[u32_Interface], m_WsFionRead(), &u32_SizeInBuffer);
+            if ((sn_Return != SOCKET_ERROR) && (u32_SizeInBuffer >= 1U))
             {
-               //extract sender address
-               orau8_Ip[0] = t_Sender.sin_addr.S_un.S_un_b.s_b1;
-               orau8_Ip[1] = t_Sender.sin_addr.S_un.S_un_b.s_b2;
-               orau8_Ip[2] = t_Sender.sin_addr.S_un.S_un_b.s_b3;
-               orau8_Ip[3] = t_Sender.sin_addr.S_un.S_un_b.s_b4;
+               sockaddr_in t_Sender;
+               sintn sn_AddressSize = sizeof(t_Sender);
+               //enough bytes: read
+               orc_Data.resize(u32_SizeInBuffer);
 
-               if (sn_Return != static_cast<sintn>(orc_Data.size()))
-               {
-                  orc_Data.resize(sn_Return); //we only need the data we really received
-               }
+               //lint -e{926,929} Side-effect of the "char"-based API. No problems as long as we are on Windows.
+               //lint -e{740}     Side-effect of the POSIX-style API. Match is guaranteed by the API.
+               sn_Return = recvfrom(mc_SocketsUdpServer[u32_Interface], reinterpret_cast<charn *>(&orc_Data[0]),
+                                    orc_Data.size(), 0, reinterpret_cast<sockaddr *>(&t_Sender),
+                                    &sn_AddressSize);
 
-               //filter out local reception of broadcasts we sent ourselves
-               //strategy to identify those:
-               //Responses from real nodes are sent from Port 13400
-               //Our broadcasts are sent with dynamically assigned Port != 13400
-               //Also: we should not just accept anything that is thrown upon us ...
-               if (t_Sender.sin_port == htons(13400))
+               //there might be more than one package in the buffer; recvfrom only reads one
+               //so we check whether we have more than zero bytes:
+               if (sn_Return > 0)
                {
-                  s32_Return = C_NO_ERR;
+                  //extract sender address
+                  orau8_Ip[0] = t_Sender.sin_addr.S_un.S_un_b.s_b1;
+                  orau8_Ip[1] = t_Sender.sin_addr.S_un.S_un_b.s_b2;
+                  orau8_Ip[2] = t_Sender.sin_addr.S_un.S_un_b.s_b3;
+                  orau8_Ip[3] = t_Sender.sin_addr.S_un.S_un_b.s_b4;
+
+                  if (sn_Return != static_cast<sintn>(orc_Data.size()))
+                  {
+                     orc_Data.resize(sn_Return); //we only need the data we really received
+                  }
+
+                  //filter out local reception of broadcasts we sent ourselves
+                  //strategy to identify those:
+                  //Responses from real nodes are sent from Port 13400
+                  //Our broadcasts are sent with dynamically assigned Port != 13400
+                  //Also: we should not just accept anything that is thrown upon us ...
+                  if (t_Sender.sin_port == htons(13400))
+                  {
+                     s32_Return = C_NO_ERR;
+                  }
+                  else
+                  {
+                     s32_Return = C_NOACT;
+                  }
+                  break; //we have a package ...
                }
                else
                {
-                  s32_Return = C_NOACT;
+                  //comm error: no data read even though it was reported by ioctl
+                  osc_write_log_error("openSYDE IP-TP",
+                                      "ReadUdp unexpected error: data reported as available but reading failed. Reported size: " +
+                                      C_SCLString::IntToStr(
+                                         orc_Data.size()) + " Read size: " + C_SCLString::IntToStr(sn_Return));
+                  s32_Return = C_RD_WR;
                }
-               break; //we have a package ...
             }
-            else
-            {
-               //comm error: no data read even though it was reported by ioctl
-               osc_write_log_error("openSYDE IP-TP",
-                                   "ReadUdp unexpected error: data reported as available but reading failed. Reported size: " +
-                                   C_SCLString::IntToStr(
-                                      orc_Data.size()) + " Read size: " + C_SCLString::IntToStr(sn_Return));
-               s32_Return = C_RD_WR;
-            }
+         }
+         else
+         {
+            // Write error to log, then ignore the error and continue
+            osc_write_log_error("openSYDE IP-TP", "ReadUdp called with invalid socket.");
          }
       }
    }

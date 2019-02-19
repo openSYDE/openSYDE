@@ -54,6 +54,7 @@ public:
    ///possible types of diagnostic protocols
    enum E_DiagnosticServerProtocol
    {
+      eDS_NONE,     ///< No diagnostic server available
       eDS_KEFEX,    ///< Diagnostic server protocol type KEFEX
       eDS_OPEN_SYDE ///< Diagnostic server protocol type openSYDE
    };
@@ -61,6 +62,7 @@ public:
    ///possible types of flashloader protocols
    enum E_FlashLoaderProtocol
    {
+      eFL_NONE,     ///< No Flash loader available
       eFL_STW,      ///< Flash loader protocol type STW Flashloader
       eFL_OPEN_SYDE ///< Flash loader protocol type openSYDE
    };

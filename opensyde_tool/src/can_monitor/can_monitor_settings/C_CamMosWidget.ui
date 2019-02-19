@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>C_CamMosWidget</class>
+ <widget class="QWidget" name="C_CamMosWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>350</width>
+    <height>347</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>C_CamMosWidget</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,1">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="stw_opensyde_gui_elements::C_CamOgeWiSectionHeader" name="pc_WiTitle" native="true"/>
+   </item>
+   <item>
+    <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WiCollapsed" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>35</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>35</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <property name="spacing">
+       <number>1</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>1</number>
+      </property>
+      <item>
+       <widget class="stw_opensyde_gui_elements::C_CamOgePubSettingsAdd" name="pc_PbDatabase">
+        <property name="minimumSize">
+         <size>
+          <width>35</width>
+          <height>29</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>35</width>
+          <height>29</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="stw_opensyde_gui_elements::C_CamOgePubSettingsAdd" name="pc_PbFilter">
+        <property name="minimumSize">
+         <size>
+          <width>35</width>
+          <height>29</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>35</width>
+          <height>29</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="stw_opensyde_gui_elements::C_CamOgePubSettingsAdd" name="pc_PbLogging">
+        <property name="minimumSize">
+         <size>
+          <width>35</width>
+          <height>29</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>35</width>
+          <height>29</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="stw_opensyde_gui_elements::C_CamOgePubSettingsAdd" name="pc_PbDllConfig">
+        <property name="minimumSize">
+         <size>
+          <width>35</width>
+          <height>29</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>35</width>
+          <height>29</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WiExpanded" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="spacing">
+       <number>1</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="stw_opensyde_gui::C_CamMosDatabaseWidget" name="pc_WiDatabase" native="true"/>
+      </item>
+      <item>
+       <widget class="stw_opensyde_gui::C_CamMosFilterWidget" name="pc_WiFilter" native="true"/>
+      </item>
+      <item>
+       <widget class="stw_opensyde_gui::C_CamMosLoggingWidget" name="pc_WiLogging" native="true"/>
+      </item>
+      <item>
+       <widget class="stw_opensyde_gui::C_CamMosDllWidget" name="pc_WiDllConfig" native="true"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_CamOgeWiSectionHeader</class>
+   <extends>QWidget</extends>
+   <header>C_CamOgeWiSectionHeader.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui::C_CamMosDatabaseWidget</class>
+   <extends>QWidget</extends>
+   <header>C_CamMosDatabaseWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui::C_CamMosFilterWidget</class>
+   <extends>QWidget</extends>
+   <header>C_CamMosFilterWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui::C_CamMosLoggingWidget</class>
+   <extends>QWidget</extends>
+   <header>C_CamMosLoggingWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui::C_CamMosDllWidget</class>
+   <extends>QWidget</extends>
+   <header>C_CamMosDllWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_CamOgePubSettingsAdd</class>
+   <extends>QPushButton</extends>
+   <header>C_CamOgePubSettingsAdd.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeWiOnlyBackground</class>
+   <extends>QWidget</extends>
+   <header>C_OgeWiOnlyBackground.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

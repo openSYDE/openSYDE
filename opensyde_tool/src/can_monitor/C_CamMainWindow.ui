@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>C_CamMainWindow</class>
+ <widget class="QMainWindow" name="C_CamMainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1034</width>
+    <height>714</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>C_CamMainWindow</string>
+  </property>
+  <widget class="QWidget" name="pc_CentralWidget">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="stw_opensyde_gui_elements::C_OgeSaMain" name="scrollArea">
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="scrollAreaWidgetContents_4">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>1032</width>
+         <height>712</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="stw_opensyde_gui::C_CamTitleBarWidget" name="pc_TitleBarWidget" native="true"/>
+        </item>
+        <item>
+         <widget class="QWidget" name="pc_ShowWidget" native="true">
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="stw_opensyde_gui_elements::C_CamOgeSpi" name="pc_SplitterSettings">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="childrenCollapsible">
+              <bool>false</bool>
+             </property>
+             <widget class="QWidget" name="pc_TraceAndGenWidget" native="true">
+              <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="stw_opensyde_gui_elements::C_CamOgeSpi" name="pc_SplitterMessageGen">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="childrenCollapsible">
+                  <bool>false</bool>
+                 </property>
+                 <widget class="stw_opensyde_gui::C_CamMetWidget" name="pc_TraceWidget" native="true"/>
+                 <widget class="stw_opensyde_gui::C_CamGenWidget" name="pc_GeneratorWidget" native="true"/>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+             <widget class="stw_opensyde_gui::C_CamMosWidget" name="pc_SettingsWidget" native="true"/>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+       <zorder>pc_ShowWidget</zorder>
+       <zorder>pc_TitleBarWidget</zorder>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>stw_opensyde_gui::C_CamTitleBarWidget</class>
+   <extends>QWidget</extends>
+   <header>C_CamTitleBarWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui::C_CamMosWidget</class>
+   <extends>QWidget</extends>
+   <header>C_CamMosWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui::C_CamMetWidget</class>
+   <extends>QWidget</extends>
+   <header>C_CamMetWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui::C_CamGenWidget</class>
+   <extends>QWidget</extends>
+   <header>C_CamGenWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_CamOgeSpi</class>
+   <extends>QSplitter</extends>
+   <header>C_CamOgeSpi.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeSaMain</class>
+   <extends>QScrollArea</extends>
+   <header>C_OgeSaMain.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

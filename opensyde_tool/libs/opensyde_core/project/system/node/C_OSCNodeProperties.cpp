@@ -75,8 +75,8 @@ void C_OSCNodeProperties::Initialize(void)
 {
    c_Name = "Default Node name";
    c_Comment = "";
-   e_DiagnosticServer = eDS_OPEN_SYDE;
-   e_FlashLoader = eFL_OPEN_SYDE;
+   e_DiagnosticServer = eDS_NONE;
+   e_FlashLoader = eFL_NONE;
    c_ComInterfaces.resize(0);
    c_OpenSYDEServerSettings.Initialize();
    c_STWFlashloaderSettings.Initialize();

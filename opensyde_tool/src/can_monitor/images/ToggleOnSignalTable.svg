@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 22.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 42 20" style="enable-background:new 0 0 42 20;" xml:space="preserve">
+<style type="text/css">
+	.st0{display:none;}
+	.st1{display:inline;opacity:0.2;fill:#FF0000;}
+	.st2{display:inline;fill:#474763;}
+	.st3{fill:#CECED9;}
+	.st4{fill:#5757AA;}
+	.st5{fill:#9B9BAA;}
+	.st6{fill:#5EA343;}
+	.st7{fill:#7F7FBB;}
+	.st8{opacity:0.2;fill:none;}
+	.st9{fill:#E63A3F;}
+	.st10{fill:#FFFFFF;}
+	.st11{fill:#FAFAFA;}
+	.st12{fill:none;stroke:#5757AA;stroke-width:2;stroke-linecap:round;stroke-miterlimit:10;}
+	.st13{fill:#CBEBC1;}
+	.st14{fill:#38396D;}
+	.st15{fill:#82828F;}
+	.st16{fill:#EDEDF2;}
+	.st17{fill:url(#SVGID_1_);}
+	.st18{fill:url(#SVGID_2_);}
+	.st19{fill:url(#SVGID_3_);}
+	.st20{fill:url(#SVGID_4_);}
+	.st21{fill:none;stroke:#5757AA;stroke-width:1.8947;stroke-miterlimit:10;}
+	.st22{fill:#CCCCCC;stroke:#CECED9;stroke-miterlimit:10;}
+	.st23{fill:none;stroke:#CECED9;stroke-width:1.6733;stroke-linecap:round;stroke-miterlimit:10;}
+	.st24{fill:#E1E1E5;}
+	.st25{fill:#39396D;}
+	.st26{fill:url(#SVGID_5_);}
+	.st27{fill:#2B2B5B;}
+	.st28{fill:url(#SVGID_6_);}
+	.st29{fill:url(#SVGID_7_);}
+	.st30{fill:#201F43;}
+	.st31{fill:none;stroke:#FFFFFF;stroke-width:3;stroke-miterlimit:10;}
+	.st32{opacity:0.6;fill:#FFFFFF;}
+	.st33{opacity:0.4;fill:#FFFFFF;}
+	.st34{opacity:0.8;fill:#FFFFFF;}
+	.st35{opacity:0.3;fill:#FFFFFF;}
+	.st36{opacity:0.7;fill:#FFFFFF;}
+	.st37{opacity:0.9;fill:#FFFFFF;}
+	.st38{opacity:0.5;fill:#FFFFFF;}
+	.st39{opacity:0.6;fill:#5757AA;}
+	.st40{opacity:0.4;fill:#5757AA;}
+	.st41{opacity:0.8;fill:#5757AA;}
+	.st42{opacity:0.3;fill:#5757AA;}
+	.st43{opacity:0.7;fill:#5757AA;}
+	.st44{opacity:0.9;fill:#5757AA;}
+	.st45{opacity:0.5;fill:#5757AA;}
+	.st46{opacity:0.6;}
+	.st47{opacity:0.4;}
+	.st48{opacity:0.8;}
+	.st49{opacity:0.3;}
+	.st50{opacity:0.7;}
+	.st51{opacity:0.9;}
+	.st52{opacity:0.5;}
+	.st53{fill:#7EB569;}
+	.st54{fill:url(#SVGID_8_);}
+	.st55{fill:url(#SVGID_9_);}
+	.st56{display:inline;}
+	.st57{fill:#DB8D2E;}
+	.st58{fill:#FF00FF;}
+</style>
+<g id="background" class="st0">
+</g>
+<g id="Icons">
+	<g>
+		<g>
+			<path class="st53" d="M10,18.5c-4.7,0-8.5-3.8-8.5-8.5c0-4.7,3.8-8.5,8.5-8.5H32c4.7,0,8.5,3.8,8.5,8.5c0,4.7-3.8,8.5-8.5,8.5H10
+				z"/>
+			<g>
+				<path class="st15" d="M32,2c4.4,0,8,3.6,8,8V10c0,4.4-3.6,8-8,8H10c-4.4,0-8-3.6-8-8V10c0-4.4,3.6-8,8-8H32 M32,1H10
+					c-5,0-9,4-9,9V10c0,5,4,9,9,9H32c5,0,9-4,9-9V10C41,5,37,1,32,1L32,1z"/>
+			</g>
+		</g>
+		<g>
+			<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="32" y1="1.3262" x2="32" y2="18.6738">
+				<stop  offset="0" style="stop-color:#EDEDF2"/>
+				<stop  offset="0.5227" style="stop-color:#DFDFE7"/>
+				<stop  offset="1" style="stop-color:#CECED9"/>
+			</linearGradient>
+			<circle class="st17" cx="32" cy="10" r="8.7"/>
+			<g>
+				<path class="st15" d="M32,1.7c4.6,0,8.3,3.7,8.3,8.3s-3.7,8.3-8.3,8.3s-8.3-3.7-8.3-8.3S27.4,1.7,32,1.7 M32,1c-5,0-9,4-9,9
+					s4,9,9,9s9-4,9-9S37,1,32,1L32,1z"/>
+			</g>
+		</g>
+		<g>
+			<path class="st10" d="M13.7,13.2h-0.8v-7h0.8V13.2z"/>
+		</g>
+	</g>
+</g>
+<g id="Linien" class="st0">
+	<g class="st56">
+		<g>
+			<path class="st57" d="M102-8v33H-12V-8H102 M103-9H-13v35h116V-9L103-9z"/>
+		</g>
+	</g>
+</g>
+</svg>

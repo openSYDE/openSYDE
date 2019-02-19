@@ -56,6 +56,10 @@ C_SyvDaDashboardToolbox::C_SyvDaDashboardToolbox(QWidget * const opc_Parent) :
 {
    mpc_Ui->setupUi(this);
 
+   this->mpc_Ui->pc_ScrollAreaWidgetsWidget->SetBackgroundColor(-1);
+   this->mpc_Ui->pc_ScrollAreaFunctionBlocksWidget->SetBackgroundColor(-1);
+   this->mpc_Ui->pc_ScrollAreaDrawingWidget->SetBackgroundColor(-1);
+
    InitStaticNames();
    m_FillToolboxStatic();
 

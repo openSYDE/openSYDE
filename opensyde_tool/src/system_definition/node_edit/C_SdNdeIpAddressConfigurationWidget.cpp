@@ -258,7 +258,6 @@ void C_SdNdeIpAddressConfigurationWidget::m_LoadData(void) const
 //-----------------------------------------------------------------------------
 void C_SdNdeIpAddressConfigurationWidget::m_OkClicked(void)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
    QString c_HelpString;
    QStringList c_Parts;
 
@@ -271,54 +270,52 @@ void C_SdNdeIpAddressConfigurationWidget::m_OkClicked(void)
    if (this->mq_VerifyInput() == true)
    {
       //write current settings to data
-      if (pc_Node != NULL)
+      std::vector<sint32> c_Ip;
+      std::vector<sint32> c_NetMask;
+      std::vector<sint32> c_DefaultGateway;
+
+      //write ip address
+      c_HelpString = this->mpc_Ui->pc_LineEditIpAddress->text();
+      c_Parts = c_HelpString.split(".", QString::SkipEmptyParts);
+      tgl_assert(c_Parts.size() == 4);
+      if (c_Parts.size() == 4)
       {
-         //copy current node
-         C_OSCNode c_NewNode = *pc_Node;
-         C_OSCNodeComInterfaceSettings & rc_CurInterface = c_NewNode.c_Properties.c_ComInterfaces[this->mu32_ComIf];
-
-         //write ip address
-         c_HelpString = this->mpc_Ui->pc_LineEditIpAddress->text();
-         c_Parts = c_HelpString.split(".", QString::SkipEmptyParts);
-         tgl_assert(c_Parts.size() == 4);
-         if (c_Parts.size() == 4)
-         {
-            rc_CurInterface.c_Ip.au8_IpAddress[0] = static_cast<uint8>(c_Parts[0].toInt());
-            rc_CurInterface.c_Ip.au8_IpAddress[1] = static_cast<uint8>(c_Parts[1].toInt());
-            rc_CurInterface.c_Ip.au8_IpAddress[2] = static_cast<uint8>(c_Parts[2].toInt());
-            rc_CurInterface.c_Ip.au8_IpAddress[3] = static_cast<uint8>(c_Parts[3].toInt());
-         }
-
-         //write sub net mask
-         c_HelpString = this->mpc_Ui->pc_LineEditSubNetMask->text();
-         c_Parts = c_HelpString.split(".", QString::SkipEmptyParts);
-         tgl_assert(c_Parts.size() == 4);
-         if (c_Parts.size() == 4)
-         {
-            rc_CurInterface.c_Ip.au8_NetMask[0] = static_cast<uint8>(c_Parts[0].toInt());
-            rc_CurInterface.c_Ip.au8_NetMask[1] = static_cast<uint8>(c_Parts[1].toInt());
-            rc_CurInterface.c_Ip.au8_NetMask[2] = static_cast<uint8>(c_Parts[2].toInt());
-            rc_CurInterface.c_Ip.au8_NetMask[3] = static_cast<uint8>(c_Parts[3].toInt());
-         }
-
-         //write default gateway
-         c_HelpString = this->mpc_Ui->pc_LineEditDefaultGateway->text();
-         c_Parts = c_HelpString.split(".", QString::SkipEmptyParts);
-         tgl_assert(c_Parts.size() == 4);
-         if (c_Parts.size() == 4)
-         {
-            rc_CurInterface.c_Ip.au8_DefaultGateway[0] = static_cast<uint8>(c_Parts[0].toInt());
-            rc_CurInterface.c_Ip.au8_DefaultGateway[1] = static_cast<uint8>(c_Parts[1].toInt());
-            rc_CurInterface.c_Ip.au8_DefaultGateway[2] = static_cast<uint8>(c_Parts[2].toInt());
-            rc_CurInterface.c_Ip.au8_DefaultGateway[3] = static_cast<uint8>(c_Parts[3].toInt());
-         }
-
-         //save new node
-         C_PuiSdHandler::h_GetInstance()->SetOSCNode(this->mu32_NodeIndex, c_NewNode);
-
-         //close dialog after data write
-         this->mrc_ParentDialog.accept();
+         c_Ip.push_back(c_Parts[0].toInt());
+         c_Ip.push_back(c_Parts[1].toInt());
+         c_Ip.push_back(c_Parts[2].toInt());
+         c_Ip.push_back(c_Parts[3].toInt());
       }
+
+      //write sub net mask
+      c_HelpString = this->mpc_Ui->pc_LineEditSubNetMask->text();
+      c_Parts = c_HelpString.split(".", QString::SkipEmptyParts);
+      tgl_assert(c_Parts.size() == 4);
+      if (c_Parts.size() == 4)
+      {
+         c_NetMask.push_back(c_Parts[0].toInt());
+         c_NetMask.push_back(c_Parts[1].toInt());
+         c_NetMask.push_back(c_Parts[2].toInt());
+         c_NetMask.push_back(c_Parts[3].toInt());
+      }
+
+      //write default gateway
+      c_HelpString = this->mpc_Ui->pc_LineEditDefaultGateway->text();
+      c_Parts = c_HelpString.split(".", QString::SkipEmptyParts);
+      tgl_assert(c_Parts.size() == 4);
+      if (c_Parts.size() == 4)
+      {
+         c_DefaultGateway.push_back(c_Parts[0].toInt());
+         c_DefaultGateway.push_back(c_Parts[1].toInt());
+         c_DefaultGateway.push_back(c_Parts[2].toInt());
+         c_DefaultGateway.push_back(c_Parts[3].toInt());
+      }
+
+      //save new node
+      C_PuiSdHandler::h_GetInstance()->SetOSCNodeEthernetConfiguration(this->mu32_NodeIndex, this->mu32_ComIf, c_Ip,
+                                                                       c_NetMask, c_DefaultGateway);
+
+      //close dialog after data write
+      this->mrc_ParentDialog.accept();
    }
    else
    {

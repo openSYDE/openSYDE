@@ -19,6 +19,8 @@
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
 
+#include <map>
+
 #include "stwerrors.h"
 #include "C_OSCUtils.h"
 #include "C_OSCNodeDataPool.h"
@@ -372,29 +374,84 @@ void C_OSCNodeDataPool::CheckErrorList(const uint32 & oru_ListIndex, bool * cons
       //Check elements
       if (opq_ElementsInvalid != NULL)
       {
-         bool q_NameConflict;
+         std::map<stw_scl::C_SCLString, uint32> c_PreviousNames;
+         static std::map<uint32, bool> hc_PreviousResults;
          bool q_NameInvalid;
          bool q_MinOverMax;
          bool q_DataSetInvalid;
          *opq_ElementsInvalid = false;
          for (uint32 u32_ItElement = 0;
               (u32_ItElement < rc_CheckedList.c_Elements.size()) &&
-              ((*opq_ElementsInvalid == false) || (opc_InvalidElementIndices != NULL));
-              ++u32_ItElement)
+              ((*opq_ElementsInvalid == false) || (opc_InvalidElementIndices != NULL)); ++u32_ItElement)
          {
-            q_NameConflict = false;
-            q_NameInvalid = false;
-            q_MinOverMax = false;
-            q_DataSetInvalid = false;
-            rc_CheckedList.CheckErrorElement(u32_ItElement, &q_NameConflict, &q_NameInvalid, &q_MinOverMax,
-                                             &q_DataSetInvalid, NULL);
-            if ((((q_NameConflict == true) || (q_NameInvalid == true)) || (q_MinOverMax == true)) ||
-                (q_DataSetInvalid == true))
+            //Overarching checks
+            const C_OSCNodeDataPoolListElement & rc_Element = rc_CheckedList.c_Elements[u32_ItElement];
+            const std::map<stw_scl::C_SCLString,
+                           uint32>::const_iterator c_ItElement = c_PreviousNames.find(rc_Element.c_Name.LowerCase());
+            if (c_ItElement != c_PreviousNames.end())
             {
                *opq_ElementsInvalid = true;
                if (opc_InvalidElementIndices != NULL)
                {
+                  bool q_Added = false;
+                  //Only add element once!
+                  for (uint32 u32_It = 0UL; u32_It < opc_InvalidElementIndices->size(); ++u32_It)
+                  {
+                     if ((*opc_InvalidElementIndices)[u32_It] == c_ItElement->second)
+                     {
+                        q_Added = true;
+                        break;
+                     }
+                  }
+                  //Add conflicting other item
+                  if (q_Added == false)
+                  {
+                     opc_InvalidElementIndices->push_back(c_ItElement->second);
+                  }
+                  //Add itself
                   opc_InvalidElementIndices->push_back(u32_ItElement);
+               }
+            }
+            else
+            {
+               //Get Hash for all relevant data
+               const uint32 u32_Hash = m_GetElementHash(oru_ListIndex, u32_ItElement);
+               //Check if check was already performed in the past
+               const std::map<uint32, bool>::const_iterator c_ItErr = hc_PreviousResults.find(u32_Hash);
+               //Append new name
+               c_PreviousNames[rc_Element.c_Name.LowerCase()] = u32_ItElement;
+               //Element specific checks
+               if (c_ItErr == hc_PreviousResults.end())
+               {
+                  q_NameInvalid = false;
+                  q_MinOverMax = false;
+                  q_DataSetInvalid = false;
+                  rc_CheckedList.CheckErrorElement(u32_ItElement, NULL, &q_NameInvalid, &q_MinOverMax,
+                                                   &q_DataSetInvalid, NULL);
+                  if (((q_NameInvalid == true) || (q_MinOverMax == true)) || (q_DataSetInvalid == true))
+                  {
+                     *opq_ElementsInvalid = true;
+                     if (opc_InvalidElementIndices != NULL)
+                     {
+                        opc_InvalidElementIndices->push_back(u32_ItElement);
+                     }
+                     //Append for possible reusing this result
+                     hc_PreviousResults[u32_Hash] = true;
+                  }
+                  else
+                  {
+                     //Append for possible reusing this result
+                     hc_PreviousResults[u32_Hash] = false;
+                  }
+               }
+               else
+               {
+                  //Do not reset error
+                  *opq_ElementsInvalid = (*opq_ElementsInvalid) || c_ItErr->second;
+                  if ((opc_InvalidElementIndices != NULL) && (c_ItErr->second))
+                  {
+                     opc_InvalidElementIndices->push_back(u32_ItElement);
+                  }
                }
             }
          }
@@ -423,4 +480,33 @@ void C_OSCNodeDataPool::CheckErrorList(const uint32 & oru_ListIndex, bool * cons
          *opq_ElementsInvalid = false;
       }
    }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get hash for element
+
+   \param[in] ou32_ListIndex    List index
+   \param[in] ou32_ElementIndex Element index
+
+   \return
+   Hash for element
+
+   \created     20.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+uint32 C_OSCNodeDataPool::m_GetElementHash(const uint32 ou32_ListIndex, const uint32 ou32_ElementIndex) const
+{
+   uint32 u32_Retval = 0xFFFFFFFFUL;
+
+   if (ou32_ListIndex < this->c_Lists.size())
+   {
+      const C_OSCNodeDataPoolList & rc_List = this->c_Lists[ou32_ListIndex];
+      if (ou32_ElementIndex < rc_List.c_Elements.size())
+      {
+         const C_OSCNodeDataPoolListElement & rc_Element = rc_List.c_Elements[ou32_ElementIndex];
+         rc_Element.CalcHash(u32_Retval);
+      }
+   }
+   return u32_Retval;
 }

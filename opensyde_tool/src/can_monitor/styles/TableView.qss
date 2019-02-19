@@ -1,0 +1,118 @@
+/* --------------------------------------------------------------------- */
+stw_opensyde_gui--C_CamGenTableView,
+stw_opensyde_gui--C_CamGenSigTableView,
+stw_opensyde_gui--C_CamMosFilterTableView
+{
+border-style: solid;
+border-width: 0px;
+border-bottom-width: 1px;
+}
+
+stw_opensyde_gui--C_CamGenTableView::item,
+stw_opensyde_gui--C_CamGenSigTableView::item,
+stw_opensyde_gui--C_CamMosFilterTableView::item
+{
+border-style: solid;
+border-top-width: 0px;
+border-bottom-width: 0px;
+border-left-width: 1px;
+border-right-width: 1px;
+}
+
+stw_opensyde_gui--C_CamGenTableView QHeaderView::section,
+stw_opensyde_gui--C_CamGenSigTableView QHeaderView::section
+{
+margin-top: 1px;
+margin-bottom: 1px;
+padding-bottom: 4px;
+padding-top: 2px;
+padding-left: 4px;
+border-style: solid;
+border-width: 0px;
+border-right-width: 1px;
+}
+
+stw_opensyde_gui--C_CamGenTableView QHeaderView,
+stw_opensyde_gui--C_CamGenSigTableView QHeaderView
+{
+border-style: solid;
+border-width: 0px;
+border-bottom-width: 1px;
+}
+
+stw_opensyde_gui--C_CamMosFilterTableView QHeaderView
+{
+border-style: none;
+}
+
+
+
+stw_opensyde_gui--C_CamGenTableView,
+stw_opensyde_gui--C_CamGenSigTableView,
+stw_opensyde_gui--C_CamMosFilterTableView
+{
+outline: none;
+}
+
+stw_opensyde_gui--C_CamGenTableView::indicator,
+stw_opensyde_gui--C_CamMosFilterTableView::indicator
+{
+border-style: solid;
+border-width: 1px;
+height:16px;
+width:16px;
+}
+
+stw_opensyde_gui--C_CamGenSigTableView::indicator
+{
+border-style: none;
+border-width: 0px;
+height: 23px;
+width: 51px;
+padding-bottom: 1px;
+}
+
+/* Grid */
+stw_opensyde_gui--C_CamGenSigTableView::item {
+margin: 1px;
+}
+
+stw_opensyde_gui--C_CamGenTableView::indicator:checked:enabled,
+stw_opensyde_gui--C_CamMosFilterTableView::indicator:checked
+{
+image: url(://images/IconCheckboxEnabledOn18x18.svg);
+}
+
+stw_opensyde_gui--C_CamGenTableView::indicator:checked:disabled
+{
+image: url(://images/IconCheckboxDisabledOn18x18.svg);
+}
+
+stw_opensyde_gui--C_CamGenTableView::indicator:!checked:disabled
+{
+image: url(://images/CheckBoxDisabledNotChecked.svg);
+}
+
+stw_opensyde_gui--C_CamGenSigTableView::indicator
+{
+image: url(://images/ToggleOffSignalTable.svg);
+}
+
+stw_opensyde_gui--C_CamGenSigTableView::indicator:checked
+{
+image:url(://images/ToggleOnSignalTable.svg);
+}
+
+/* -- Sort indicator -- */
+stw_opensyde_gui--C_CamGenTableView QHeaderView::down-arrow {
+width: 21px;
+height: 21px;
+image: url(://images/IconMoveDown.svg) 0 0 0 0 stretch stretch;
+}
+
+stw_opensyde_gui--C_CamGenTableView QHeaderView::up-arrow {
+width: 21px;
+height: 21px;
+image: url(://images/IconMoveUp.svg) 0 0 0 0 stretch stretch;
+}
+

@@ -37,7 +37,7 @@ public:
    void PrepareCopyFromSceneToManager(const stw_types::uint32 ou32_ViewIndex,
                                       const stw_types::uint32 ou32_DashboardIndex);
    virtual void CopyFromSceneToManager(const QList<QGraphicsItem *> & orc_SelectedItems) override;
-   virtual bool CheckValidContent(void) const override;
+   virtual bool CheckValidContentAndPrepareData(void) override;
 
    static const QString hc_ClipBoardBaseTagName;
 
@@ -47,6 +47,7 @@ protected:
 private:
    stw_types::uint32 mu32_ViewIndex;
    stw_types::uint32 mu32_DashboardIndex;
+   C_PuiSvDashboard mc_LastKnownData;
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

@@ -50,6 +50,8 @@ public:
    bool CheckRange(void) const;
    bool CheckAllListsRead(void) const;
    void PrepareChangedValues(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ListIds) const;
+   void RemoveValuesChangedFlag(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ListIds)
+   const;
    void SetDark(const bool oq_Value);
    void SetEditMode(const bool oq_EditMode);
    void SetConnected(const bool oq_Connected);

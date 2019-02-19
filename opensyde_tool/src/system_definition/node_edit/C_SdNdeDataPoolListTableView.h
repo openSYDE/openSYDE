@@ -66,6 +66,7 @@ public:
                              const stw_opensyde_gui_logic::C_SdNdeDataPoolUtil::E_ElementDataChangeType & ore_DataChangeType, const stw_types::uint32 & oru32_ArrayIndex, const stw_types::sint32 & ors32_DataSetIndex);
    void SetModelViewManager(stw_opensyde_gui_logic::C_SdNdeDataPoolListModelViewManager * const opc_Value);
    void SelectDataElement(const stw_types::sint32 os32_DataElementIndex);
+   void SelectRange(const stw_types::uint32 ou32_FirstRow, const stw_types::uint32 ou32_LastRow) const;
    bool IsSelected(void) const;
    void UpdateSelectionForNewDataSetColumn(const stw_types::sint32 os32_DataSetColumn);
    void Reset(void);
@@ -89,8 +90,6 @@ protected:
    //lint -save -e1960
    virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
    virtual void dropEvent(QDropEvent * const opc_Event) override;
-   virtual void mouseMoveEvent(QMouseEvent * const opc_Event) override;
-   virtual void leaveEvent(QEvent * const opc_Event) override;
    virtual void selectionChanged(const QItemSelection & orc_Selected, const QItemSelection & orc_Deselected) override;
    virtual void startDrag(const Qt::DropActions oc_SupportedActions) override;
    //lint -restore

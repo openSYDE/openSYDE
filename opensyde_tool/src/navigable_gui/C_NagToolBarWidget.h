@@ -107,6 +107,8 @@ private:
    void m_EnableBtn(const stw_types::uint32 ou32_Index, const bool oq_Enable) const;
    void m_ShowBackgroundOfBtn(const stw_types::uint32 ou32_Index, const bool oq_Enable) const;
    void m_SetIconForBtn(const stw_types::uint32 ou32_Index, const QIcon & orc_Icon) const;
+   void m_SetToolTipForBtn(const stw_types::uint32 ou32_Index, const QString & orc_ToolTipHeading,
+                           const QString & orc_ToolTipContent) const;
 
    void m_ShowSearchTree(void);
    void m_RepositionSearchTree(void);

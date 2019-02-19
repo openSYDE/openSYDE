@@ -48,7 +48,6 @@ private:
 
    void m_Change(QVariant & orc_PreviousData, const QVariant & orc_NewData);
    static void mh_ConvertListTypeToGeneric(const stw_opensyde_core::C_OSCNodeDataPoolList & orc_OSCElement,
-                                           const C_PuiSdNodeDataPoolList & orc_UIElement,
                                            const C_SdNdeDataPoolUtil::E_ListDataChangeType & ore_Type,
                                            QVariant & orc_Generic);
 };

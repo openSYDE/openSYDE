@@ -75,47 +75,7 @@ C_SdSearchTreeWidget::C_SdSearchTreeWidget(QWidget * const opc_Parent) :
 
    this->setItemDelegate(new C_OgeTreeWidgetToolBarSearchItemDelegate(this));
 
-   this->mpc_TreeItemRootNodes = new QTreeWidgetItem();
-   this->mpc_TreeItemRootNodes->setText(0, C_GtGetText::h_GetText("Nodes"));
-   this->mpc_TreeItemRootNodes->setFlags(Qt::ItemIsEnabled); // item is not selectable
-   this->addTopLevelItem(this->mpc_TreeItemRootNodes);
-   this->mpc_TreeItemRootNodes->setHidden(true);
-
-   this->mpc_TreeItemRootBusses = new QTreeWidgetItem();
-   this->mpc_TreeItemRootBusses->setText(0, C_GtGetText::h_GetText("Buses"));
-   this->mpc_TreeItemRootBusses->setFlags(Qt::ItemIsEnabled); // item is not selectable
-   this->addTopLevelItem(this->mpc_TreeItemRootBusses);
-   this->mpc_TreeItemRootBusses->setHidden(true);
-
-   this->mpc_TreeItemRootDataPools = new QTreeWidgetItem();
-   this->mpc_TreeItemRootDataPools->setText(0, C_GtGetText::h_GetText("Datapools"));
-   this->mpc_TreeItemRootDataPools->setFlags(Qt::ItemIsEnabled); // item is not selectable
-   this->addTopLevelItem(this->mpc_TreeItemRootDataPools);
-   this->mpc_TreeItemRootDataPools->setHidden(true);
-
-   this->mpc_TreeItemRootLists = new QTreeWidgetItem();
-   this->mpc_TreeItemRootLists->setText(0, C_GtGetText::h_GetText("Lists"));
-   this->mpc_TreeItemRootLists->setFlags(Qt::ItemIsEnabled); // item is not selectable
-   this->addTopLevelItem(this->mpc_TreeItemRootLists);
-   this->mpc_TreeItemRootLists->setHidden(true);
-
-   this->mpc_TreeItemRootMessages = new QTreeWidgetItem();
-   this->mpc_TreeItemRootMessages->setText(0, C_GtGetText::h_GetText("Messages"));
-   this->mpc_TreeItemRootMessages->setFlags(Qt::ItemIsEnabled); // item is not selectable
-   this->addTopLevelItem(this->mpc_TreeItemRootMessages);
-   this->mpc_TreeItemRootMessages->setHidden(true);
-
-   this->mpc_TreeItemRootDataElements = new QTreeWidgetItem();
-   this->mpc_TreeItemRootDataElements->setText(0, C_GtGetText::h_GetText("Data elements"));
-   this->mpc_TreeItemRootDataElements->setFlags(Qt::ItemIsEnabled); // item is not selectable
-   this->addTopLevelItem(this->mpc_TreeItemRootDataElements);
-   this->mpc_TreeItemRootDataElements->setHidden(true);
-
-   this->mpc_TreeItemRootApplications = new QTreeWidgetItem();
-   this->mpc_TreeItemRootApplications->setText(0, C_GtGetText::h_GetText("Data Blocks"));
-   this->mpc_TreeItemRootApplications->setFlags(Qt::ItemIsEnabled); // item is not selectable
-   this->addTopLevelItem(this->mpc_TreeItemRootApplications);
-   this->mpc_TreeItemRootApplications->setHidden(true);
+   m_SetupStartingState();
 
    // prepare the icons
    c_Pixmap.load("://images/system_definition/IconNode.svg");
@@ -237,26 +197,9 @@ bool C_SdSearchTreeWidget::Search(const QString & orc_SearchString)
 //-----------------------------------------------------------------------------
 void C_SdSearchTreeWidget::ClearResult(void)
 {
-   this->mpc_TreeItemRootNodes->setHidden(true);
-   this->m_DeleteChildren(this->mpc_TreeItemRootNodes);
+   this->clear();
 
-   this->mpc_TreeItemRootBusses->setHidden(true);
-   this->m_DeleteChildren(this->mpc_TreeItemRootBusses);
-
-   this->mpc_TreeItemRootDataPools->setHidden(true);
-   this->m_DeleteChildren(this->mpc_TreeItemRootDataPools);
-
-   this->mpc_TreeItemRootLists->setHidden(true);
-   this->m_DeleteChildren(this->mpc_TreeItemRootLists);
-
-   this->mpc_TreeItemRootMessages->setHidden(true);
-   this->m_DeleteChildren(this->mpc_TreeItemRootMessages);
-
-   this->mpc_TreeItemRootDataElements->setHidden(true);
-   this->m_DeleteChildren(this->mpc_TreeItemRootDataElements);
-
-   this->mpc_TreeItemRootApplications->setHidden(true);
-   this->m_DeleteChildren(this->mpc_TreeItemRootApplications);
+   m_SetupStartingState();
 
    this->mu32_NodesFound = 0U;
    this->mu32_BussesFound = 0U;
@@ -972,4 +915,56 @@ void C_SdSearchTreeWidget::m_AddApplicationResult(const QString & orc_Applicatio
    mpc_TreeItemRootApplications->addChild(pc_Item);
    mpc_TreeItemRootApplications->setHidden(false);
    //lint -e{429}  no memory leak because of the parent of pc_Item and the Qt memory management
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Setup/restore starting state
+
+   \created     21.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_SdSearchTreeWidget::m_SetupStartingState(void)
+{
+   this->mpc_TreeItemRootNodes = new QTreeWidgetItem();
+   this->mpc_TreeItemRootNodes->setText(0, C_GtGetText::h_GetText("Nodes"));
+   this->mpc_TreeItemRootNodes->setFlags(Qt::ItemIsEnabled); // item is not selectable
+   this->addTopLevelItem(this->mpc_TreeItemRootNodes);
+   this->mpc_TreeItemRootNodes->setHidden(true);
+
+   this->mpc_TreeItemRootBusses = new QTreeWidgetItem();
+   this->mpc_TreeItemRootBusses->setText(0, C_GtGetText::h_GetText("Buses"));
+   this->mpc_TreeItemRootBusses->setFlags(Qt::ItemIsEnabled); // item is not selectable
+   this->addTopLevelItem(this->mpc_TreeItemRootBusses);
+   this->mpc_TreeItemRootBusses->setHidden(true);
+
+   this->mpc_TreeItemRootDataPools = new QTreeWidgetItem();
+   this->mpc_TreeItemRootDataPools->setText(0, C_GtGetText::h_GetText("Datapools"));
+   this->mpc_TreeItemRootDataPools->setFlags(Qt::ItemIsEnabled); // item is not selectable
+   this->addTopLevelItem(this->mpc_TreeItemRootDataPools);
+   this->mpc_TreeItemRootDataPools->setHidden(true);
+
+   this->mpc_TreeItemRootLists = new QTreeWidgetItem();
+   this->mpc_TreeItemRootLists->setText(0, C_GtGetText::h_GetText("Lists"));
+   this->mpc_TreeItemRootLists->setFlags(Qt::ItemIsEnabled); // item is not selectable
+   this->addTopLevelItem(this->mpc_TreeItemRootLists);
+   this->mpc_TreeItemRootLists->setHidden(true);
+
+   this->mpc_TreeItemRootMessages = new QTreeWidgetItem();
+   this->mpc_TreeItemRootMessages->setText(0, C_GtGetText::h_GetText("Messages"));
+   this->mpc_TreeItemRootMessages->setFlags(Qt::ItemIsEnabled); // item is not selectable
+   this->addTopLevelItem(this->mpc_TreeItemRootMessages);
+   this->mpc_TreeItemRootMessages->setHidden(true);
+
+   this->mpc_TreeItemRootDataElements = new QTreeWidgetItem();
+   this->mpc_TreeItemRootDataElements->setText(0, C_GtGetText::h_GetText("Data elements"));
+   this->mpc_TreeItemRootDataElements->setFlags(Qt::ItemIsEnabled); // item is not selectable
+   this->addTopLevelItem(this->mpc_TreeItemRootDataElements);
+   this->mpc_TreeItemRootDataElements->setHidden(true);
+
+   this->mpc_TreeItemRootApplications = new QTreeWidgetItem();
+   this->mpc_TreeItemRootApplications->setText(0, C_GtGetText::h_GetText("Data Blocks"));
+   this->mpc_TreeItemRootApplications->setFlags(Qt::ItemIsEnabled); // item is not selectable
+   this->addTopLevelItem(this->mpc_TreeItemRootApplications);
+   this->mpc_TreeItemRootApplications->setHidden(true);
 }

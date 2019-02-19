@@ -143,6 +143,7 @@ protected:
    stw_types::float64 mf64_WriteValue;
    QMap<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId, QString> mc_CommmunicationErrors;
    QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId, stw_types::uint8> mc_InvalidDlcSignals;
+   bool mq_InitialStyleCall;
 
 private:
    C_GiWiProxyBase * mpc_ProxyWidget;

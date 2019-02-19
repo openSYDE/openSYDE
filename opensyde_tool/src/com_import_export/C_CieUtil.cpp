@@ -110,7 +110,7 @@ sint32 C_CieUtil::h_ImportFile(const uint32 ou32_NodeIndex, const uint32 ou32_Da
    }
 
    c_FullFilePath = QFileDialog::getOpenFileName(opc_Parent,
-                                                 C_GtGetText::h_GetText("Select file for openSYDE import"),
+                                                 C_GtGetText::h_GetText("Select File for openSYDE Import"),
                                                  c_Folder,
                                                  c_FilterName,
                                                  NULL);
@@ -153,7 +153,7 @@ sint32 C_CieUtil::h_ImportFile(const uint32 ou32_NodeIndex, const uint32 ou32_Da
                }
                C_OgeWiCustomMessage c_ImportWarnings(opc_Parent, C_OgeWiCustomMessage::E_Type::eWARNING);
                c_ImportWarnings.SetHeading(C_GtGetText::h_GetText("DBC file import"));
-               c_ImportWarnings.SetDescription(C_GtGetText::h_GetText("There occurred warning(s) on DBC file import."));
+               c_ImportWarnings.SetDescription(C_GtGetText::h_GetText("Warnings occurred during DBC file import."));
                c_ImportWarnings.SetDetails(c_Warnings);
                c_ImportWarnings.Execute();
             }
@@ -221,10 +221,10 @@ sint32 C_CieUtil::h_ImportFile(const uint32 ou32_NodeIndex, const uint32 ou32_Da
             QString c_ErrorMsg =  c_ErrorMessage.c_str();
             C_OgeWiCustomMessage c_MessageResult(opc_Parent, C_OgeWiCustomMessage::E_Type::eERROR);
             c_MessageResult.SetHeading(C_GtGetText::h_GetText("DBC file import"));
-            c_MessageResult.SetDescription(C_GtGetText::h_GetText("Error on importing DBC file!"));
+            c_MessageResult.SetDescription(C_GtGetText::h_GetText("DBC file import error occurred."));
             c_MessageResult.SetDetails(C_GtGetText::h_GetText("Error code: \n") +
                                        QString::number(s32_ImportReturn) +
-                                       C_GtGetText::h_GetText("\nError Message(s):\n") +
+                                       C_GtGetText::h_GetText("\nError message(s):\n") +
                                        c_ErrorMsg);
             c_MessageResult.Execute();
          }
@@ -299,12 +299,12 @@ sint32 C_CieUtil::h_ImportFile(const uint32 ou32_NodeIndex, const uint32 ou32_Da
                   switch (s32_ImportResult)
                   {
                   case C_RANGE:
-                     c_Message.SetDescription(C_GtGetText::h_GetText("Invalid Parameter."));
+                     c_Message.SetDescription(C_GtGetText::h_GetText("Invalid parameter."));
                      c_Message.SetDetails(QString(c_ParsingError.c_str()));
                      break;
                   case C_NOACT:
                      c_Message.SetDescription(QString(C_GtGetText::h_GetText(
-                                                         "EDS file import failure.\nNode ID %1 is invalid.")).arg(
+                                                         "EDS file import failed.\nNode ID %1 is invalid.")).arg(
                                                  rc_CurInterface.u8_NodeID));
                      c_Message.SetDetails(C_GtGetText::h_GetText("CANopen standard only supports node IDs in the range "
                                                                  "of 1 to 127.\nThe node ID can be changed in node "
@@ -315,7 +315,7 @@ sint32 C_CieUtil::h_ImportFile(const uint32 ou32_NodeIndex, const uint32 ou32_Da
                      //Update log file
                      C_OSCLoggingHandler::h_Flush();
                      c_Message.SetDetails(QString("%1<a href=\"file:%2\"><span style=\"color: %3;\">%4</span></a>.").
-                                          arg(C_GtGetText::h_GetText("For more details see ")).
+                                          arg(C_GtGetText::h_GetText("For more information see ")).
                                           arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
                                           arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
                                           arg(C_GtGetText::h_GetText("log file")));
@@ -380,7 +380,7 @@ sint32 C_CieUtil::h_ExportFile(const stw_opensyde_gui_logic::C_CieConverter::C_C
    // give user default filename
    QString c_DefaultFilename = QString(orc_CommDef.c_Bus.c_Name.c_str()) + ".dbc";
    // prepare file dialog
-   QFileDialog c_FileDialog(opc_Parent, C_GtGetText::h_GetText("Save file for openSYDE DBC export"));
+   QFileDialog c_FileDialog(opc_Parent, C_GtGetText::h_GetText("Select File for openSYDE DBC Export"));
    c_FileDialog.setFileMode(QFileDialog::AnyFile);
    c_FileDialog.setAcceptMode(QFileDialog::AcceptSave);
    c_FileDialog.setDirectory(c_Folder);

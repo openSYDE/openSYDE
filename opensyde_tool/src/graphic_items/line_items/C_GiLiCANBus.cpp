@@ -55,6 +55,7 @@ const QString mc_NAME_BUS = "BUS CAN";
    \param[in]     ors32_Index          Index of data element in system definition
    \param[in]     oru64_ID             Unique ID
    \param[in]     opc_TextElementName  Pointer to text element for showing bus name
+   \param[in]     oq_DoErrorCheck      Optional flag to trigger error check directly in constructor
    \param[in]     opc_Points           Points for line
    \param[in,out] opc_Parent           Optional pointer to parent
 
@@ -62,9 +63,9 @@ const QString mc_NAME_BUS = "BUS CAN";
 */
 //-----------------------------------------------------------------------------
 C_GiLiCANBus::C_GiLiCANBus(const stw_types::sint32 & ors32_Index, const uint64 & oru64_ID,
-                           C_GiTextElementBus * const opc_TextElementName,
+                           C_GiTextElementBus * const opc_TextElementName, const bool oq_DoErrorCheck,
                            const std::vector<QPointF> * const opc_Points, QGraphicsItem * const opc_Parent) :
-   C_GiLiBus(ors32_Index, oru64_ID, opc_TextElementName, opc_Points, false, opc_Parent)
+   C_GiLiBus(ors32_Index, oru64_ID, opc_TextElementName, oq_DoErrorCheck, opc_Points, false, opc_Parent)
 {
 }
 

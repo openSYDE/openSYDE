@@ -147,7 +147,7 @@ void C_SyvUpUpdatePackageWidget::InitText(void) const
    this->mpc_Ui->pc_PushButtonCreatePackage->SetToolTipInformation(C_GtGetText::h_GetText(
                                                                       "Create Service Update Package"),
                                                                    C_GtGetText::h_GetText(
-                                                                      "All required files are packed together (System Definition, flashware, ... )"));
+                                                                      "All required files are packed together (SYSTEM DEFINITION, flashware, ... )"));
 }
 
 //-----------------------------------------------------------------------------
@@ -330,6 +330,7 @@ void C_SyvUpUpdatePackageWidget::SetNodeProgress(const uint32 ou32_NodeIndex, co
 
    \param[out]    orc_ApplicationsToWrite Vector with node update configuration
    \param[out]    orc_NodesOrder          Vector with node update order (index is update position, value is node index)
+   \param[out]    opc_AllApplications     Optional vector with all node applications
 
    \return
    C_NO_ERR    Update package with all information created
@@ -342,9 +343,11 @@ void C_SyvUpUpdatePackageWidget::SetNodeProgress(const uint32 ou32_NodeIndex, co
 //-----------------------------------------------------------------------------
 sint32 C_SyvUpUpdatePackageWidget::GetUpdatePackage(
    std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
-   std::vector<uint32> & orc_NodesOrder) const
+   std::vector<uint32> & orc_NodesOrder,
+   std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> * const opc_AllApplications) const
 {
-   return this->mpc_Ui->pc_ListWidget->GetUpdatePackage(orc_ApplicationsToWrite, orc_NodesOrder);
+   return this->mpc_Ui->pc_ListWidget->GetUpdatePackage(orc_ApplicationsToWrite, orc_NodesOrder,
+                                                        opc_AllApplications);
 }
 
 //-----------------------------------------------------------------------------
@@ -554,7 +557,7 @@ void C_SyvUpUpdatePackageWidget::m_SetUpdatePackageStatusOk(void) const
 void C_SyvUpUpdatePackageWidget::m_SetUpdatePackageStatusLocked(void) const
 {
    const QString c_Content = C_GtGetText::h_GetText(
-      "Update Package cannot be configured while system connected state. Click on disconnect to unlock the Update Package.");
+      "Update Package cannot be configured while the System connected state. Click on disconnect to unlock the Update Package.");
 
    this->mpc_Ui->pc_LabelStateIcon->setPixmap(QIcon(":images/system_views/IconLocked.svg").pixmap(mc_ICON_SIZE_24));
    this->mpc_Ui->pc_LabelStateIcon->SetToolTipInformation("", c_Content, C_NagToolTip::eDEFAULT);
@@ -572,7 +575,7 @@ void C_SyvUpUpdatePackageWidget::m_SetUpdatePackageStatusLocked(void) const
 void C_SyvUpUpdatePackageWidget::m_SetUpdatePackageStatusWarning(const std::vector<QString> & orc_InvalidNodeNames)
 const
 {
-   QString c_Content = C_GtGetText::h_GetText("Update Package contains missing Files.\n"
+   QString c_Content = C_GtGetText::h_GetText("Update Package contains missing files.\n"
                                               "Check following Update Package sections:");
 
    for (uint32 u32_ItNode = 0; u32_ItNode < orc_InvalidNodeNames.size(); ++u32_ItNode)

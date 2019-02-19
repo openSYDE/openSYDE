@@ -43,6 +43,9 @@ public:
    stw_types::uint32 GetAssignmentCount(void) const;
    std::vector<stw_opensyde_gui_logic::C_SyvDcDeviceConfiguation> GetConfigs(void) const;
 
+   void StartDrag(const QString & orc_DeviceName, const bool oq_DeviceNameValid) const;
+   void StopDrag(void) const;
+
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 

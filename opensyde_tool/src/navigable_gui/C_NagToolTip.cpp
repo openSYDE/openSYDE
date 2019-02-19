@@ -79,8 +79,8 @@ C_NagToolTip::C_NagToolTip(const QString & orc_Heading, const QString & orc_Cont
       pc_Shadow = new QGraphicsDropShadowEffect(this->mpc_Ui->mpc_GroupBox);
       pc_Shadow->setBlurRadius(10.0);
       pc_Shadow->setOffset(3.0);
-      c_Color = mc_STYLE_GUIDE_COLOR_34;
-      c_Color.setAlpha(128);
+      c_Color = mc_STYLE_GUIDE_COLOR_31;
+      c_Color.setAlpha(100);
       pc_Shadow->setColor(c_Color);
       this->mpc_Ui->mpc_GroupBox->setGraphicsEffect(pc_Shadow);
       //lint -e{429}  no memory leak because of the parent of pc_Shadow and the Qt memory management

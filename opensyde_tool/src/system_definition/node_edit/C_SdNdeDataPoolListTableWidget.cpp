@@ -55,20 +55,23 @@ using namespace stw_errors;
    \param[in,out] opc_Parent         Optional pointer to parent
    \param[in,out] opc_TreeWidgetItem Tree widget item
    \param[in,out] opc_UndoStack      Undo stack
+   \param[in]     oq_PopUp           optional flag for "in pop up" state
 
    \created     24.01.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 C_SdNdeDataPoolListTableWidget::C_SdNdeDataPoolListTableWidget(QWidget * const opc_Parent,
-                                                               const QTreeWidgetItem * const opc_TreeWidgetItem,
-                                                               C_SdNdeUnoDataPoolManager * const opc_UndoStack) :
+                                                               QTreeWidget * const opc_TreeWidget,
+                                                               C_SdNdeUnoDataPoolManager * const opc_UndoStack,
+                                                               const bool oq_PopUp) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDataPoolListTableWidget),
-   mpc_TreeWidget(NULL),
+   mpc_TreeWidget(opc_TreeWidget),
    mpc_UndoStack(opc_UndoStack),
    mu32_NodeIndex(0),
    mu32_DataPoolIndex(0),
-   mu32_ListIndex(0)
+   mu32_ListIndex(0),
+   mq_PopUp(oq_PopUp)
 
 {
    mpc_Ui->setupUi(this);
@@ -77,11 +80,6 @@ C_SdNdeDataPoolListTableWidget::C_SdNdeDataPoolListTableWidget(QWidget * const o
 
    m_SetCRCVisibility(false);
    this->mpc_Ui->pc_TableView->SetUndoStack(opc_UndoStack);
-
-   if (opc_TreeWidgetItem != NULL)
-   {
-      this->mpc_TreeWidget = opc_TreeWidgetItem->treeWidget();
-   }
 
    //Connects
    connect(this->mpc_Ui->pc_TableView, &C_SdNdeDataPoolListTableView::SigErrorChangePossible, this,
@@ -532,7 +530,7 @@ void C_SdNdeDataPoolListTableWidget::m_SetCRCVisibility(const bool & orq_Visible
 //-----------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableWidget::m_AdjustToItems(const bool & orq_Initial)
 {
-   if (this->mpc_TreeWidget != NULL)
+   if ((this->mpc_TreeWidget != NULL) && (this->mq_PopUp == false))
    {
       //Configure
       const sint32 s32_Height = C_SdNdeDataPoolUtil::h_GetTableSize(this->mu32_NodeIndex, this->mu32_DataPoolIndex,

@@ -39,14 +39,8 @@ namespace stw_opensyde_gui_logic
 class C_PuiSdUtil
 {
 public:
-   static stw_scl::C_SCLString h_GetUniqueName(const std::vector<const stw_scl::C_SCLString *> & orc_ExistingStrings,
-                                               const stw_scl::C_SCLString & orc_ProposedName);
-   static QString h_GetUniqueName(const std::vector<const QString *> & orc_ExistingStrings,
-                                  const QString & orc_ProposedName);
    static bool h_CheckNameAvailable(const std::vector<const QString *> & orc_ExistingStrings,
                                     const QString & orc_Proposal, const stw_types::uint32 * const opu32_SkipIndex);
-   static void h_GetNumberAtStringEnd(const stw_scl::C_SCLString & orc_ProposedName,
-                                      stw_scl::C_SCLString & orc_CutString, stw_types::sint32 & ors32_Number);
    static QString h_ConvertBusTypeToStringUppercase(const stw_opensyde_core::C_OSCSystemBus::E_Type & ore_Type);
    static QString h_ConvertProtocolTypeToString(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Type);
    static QString h_ConvertProtocolTypeToDatapoolNameString(const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Type);

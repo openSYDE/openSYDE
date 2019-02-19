@@ -21,6 +21,8 @@
 
 #include <cmath>
 
+#include <QMap>
+
 #include "C_OSCUtils.h"
 #include "C_GiBiLineBounding.h"
 
@@ -95,32 +97,62 @@ C_GiBiLineBounding::C_GiBiLineBounding(const QLineF & orc_Line, const float64 & 
    \created     12.10.2016  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-QPainterPath C_GiBiLineBounding::GetShape()
+QPainterPath C_GiBiLineBounding::GetShape(void)
 {
+   QString c_Identity;
    QPainterPath c_Retval;
-   sint32 s32_FirstPointInSecondSegment;
+   static QMap<QString, QPainterPath> hc_PreviousResults;
 
-   this->mc_Bounding.clear();
+   QMap<QString, QPainterPath>::const_iterator c_It;
 
-   c_Retval.setFillRule(Qt::WindingFill);
+   //Construct values to identify
+   for (uint32 u32_ItP = 0UL; u32_ItP < static_cast<uint32>(this->mc_Points.size()); ++u32_ItP)
+   {
+      const QPointF & rc_P = this->mc_Points[u32_ItP];
+      c_Identity += QString::number(rc_P.x());
+      c_Identity += ",";
+      c_Identity += QString::number(rc_P.y());
+      c_Identity += ",";
+   }
+   c_Identity += QString::number(this->mf64_Width);
+   c_Identity += ",";
+   c_Identity += QString::number(this->mf64_InteractionPointWidth);
 
-   for (sint32 s32_It = 0; s32_It < static_cast<sint32>(this->mc_Points.size() - 1); ++s32_It)
+   //Check if already done
+   c_It = hc_PreviousResults.find(c_Identity);
+   if (c_It == hc_PreviousResults.end())
    {
-      this->AppendLineBoundingPointsTop(s32_It, s32_It + 1);
+      sint32 s32_FirstPointInSecondSegment;
+
+      this->mc_Bounding.clear();
+
+      c_Retval.setFillRule(Qt::WindingFill);
+
+      for (sint32 s32_It = 0; s32_It < static_cast<sint32>(this->mc_Points.size() - 1); ++s32_It)
+      {
+         this->AppendLineBoundingPointsTop(s32_It, s32_It + 1);
+      }
+      m_ConsolidateLine(0, static_cast<sint32>(this->mc_Bounding.size() - 1));
+      s32_FirstPointInSecondSegment = this->mc_Bounding.size();
+      for (sint32 s32_It = static_cast<sint32>(this->mc_Points.size() - 1); s32_It > 0; --s32_It)
+      {
+         this->AppendLineBoundingPointsTop(s32_It, s32_It - 1);
+      }
+      m_ConsolidateLine(s32_FirstPointInSecondSegment, static_cast<sint32>(this->mc_Bounding.size() - 1));
+      //Finish
+      if (this->mc_Bounding.size() > 0)
+      {
+         this->mc_Bounding.append(this->mc_Bounding.at(0));
+      }
+      c_Retval.addPolygon(this->mc_Bounding);
+
+      //store last result
+      hc_PreviousResults.insert(c_Identity, c_Retval);
    }
-   m_ConsolidateLine(0, static_cast<sint32>(this->mc_Bounding.size() - 1));
-   s32_FirstPointInSecondSegment = this->mc_Bounding.size();
-   for (sint32 s32_It = static_cast<sint32>(this->mc_Points.size() - 1); s32_It > 0; --s32_It)
+   else
    {
-      this->AppendLineBoundingPointsTop(s32_It, s32_It - 1);
+      c_Retval = c_It.value();
    }
-   m_ConsolidateLine(s32_FirstPointInSecondSegment, static_cast<sint32>(this->mc_Bounding.size() - 1));
-   //Finish
-   if (this->mc_Bounding.size() > 0)
-   {
-      this->mc_Bounding.append(this->mc_Bounding.at(0));
-   }
-   c_Retval.addPolygon(this->mc_Bounding);
    //Start
    return c_Retval;
 }

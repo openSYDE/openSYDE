@@ -42,11 +42,11 @@ using namespace stw_opensyde_gui_elements;
 */
 //-----------------------------------------------------------------------------
 C_OgeToolTipBase::C_OgeToolTipBase() :
-   mpc_ToolTip(NULL),
    mc_ToolTipHeading(""),
    mc_ToolTipContent(""),
    me_ToolTipType(stw_opensyde_gui::C_NagToolTip::eDEFAULT),
-   mq_ToolTipActive(false)
+   mq_ToolTipActive(false),
+   mpc_ToolTip(NULL)
 {
 }
 
@@ -86,15 +86,6 @@ void C_OgeToolTipBase::SetToolTipInformation(const QString & orc_Heading, const 
    if ((this->mc_ToolTipContent != "") || (this->mc_ToolTipHeading != ""))
    {
       this->mq_ToolTipActive = true;
-
-      this->m_CreateToolTip();
-
-      if (this->mpc_ToolTip->isVisible() == true)
-      {
-         this->mpc_ToolTip->SetHeading(orc_Heading);
-         this->mpc_ToolTip->SetContent(orc_Content);
-         this->mpc_ToolTip->SetType(oe_Type);
-      }
    }
    else
    {
@@ -104,21 +95,6 @@ void C_OgeToolTipBase::SetToolTipInformation(const QString & orc_Heading, const 
       {
          this->mpc_ToolTip->hide();
       }
-   }
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Creates an instance for mpc_ToolTip if not already exist
-
-   \created     17.08.2018  STW/B.Bayer
-*/
-//-----------------------------------------------------------------------------
-void C_OgeToolTipBase::m_CreateToolTip(void)
-{
-   if (mpc_ToolTip == NULL)
-   {
-      mpc_ToolTip = new stw_opensyde_gui::C_NagToolTip();
    }
 }
 
@@ -134,5 +110,36 @@ void C_OgeToolTipBase::m_HideToolTip(void)
    if (this->mpc_ToolTip != NULL)
    {
       this->mpc_ToolTip->hide();
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get the current tooltip
+
+   \return
+   Current tooltip
+
+   \created     19.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+stw_opensyde_gui::C_NagToolTip * C_OgeToolTipBase::m_GetToolTip(void)
+{
+   m_CreateToolTip();
+   return this->mpc_ToolTip;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Creates an instance for mpc_ToolTip if not already exist
+
+   \created     17.08.2018  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_OgeToolTipBase::m_CreateToolTip(void)
+{
+   if (mpc_ToolTip == NULL)
+   {
+      mpc_ToolTip = new stw_opensyde_gui::C_NagToolTip();
    }
 }

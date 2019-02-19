@@ -382,6 +382,10 @@ sint32 C_CAN_Dispatcher::DispatchIncoming(void)
 
    while (s32_Return == C_NO_ERR)
    {
+      // Need to lock the read of the message too, because of the order of pushing the messages in the queue
+      // by at least two threads is not guaranteed if only the push is locked.
+      // An older message could be pushed into the queue after a newer message.
+      mc_CriticalSection.Acquire();
       s32_Return = m_CAN_Read_Msg(t_Msg);
       if (s32_Return == C_NO_ERR)
       {
@@ -390,12 +394,11 @@ sint32 C_CAN_Dispatcher::DispatchIncoming(void)
          {
             if (mc_InstalledClients[s32_Loop].c_RXFilter.DoesMessagePass(t_Msg) == true)
             {
-               mc_CriticalSection.Acquire();
                (void)mc_InstalledClients[s32_Loop].c_RXQueue.Push(t_Msg);
-               mc_CriticalSection.Release();
             }
          }
       }
+      mc_CriticalSection.Release();
    }
 
    return s32_NumMessages;

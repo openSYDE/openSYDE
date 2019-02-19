@@ -225,6 +225,8 @@ sint32 C_OSCComDriverProtocol::Init(const C_OSCSystemDefinition & orc_SystemDefi
 /*!
    \brief   Sends the tester present message to all active nodes
 
+   \param[in]     opc_SkipNodes     optional pointer to a container with nodes for not sending the tester present
+
    \return
    C_NO_ERR    All nodes set to session successfully
    C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
@@ -233,7 +235,7 @@ sint32 C_OSCComDriverProtocol::Init(const C_OSCSystemDefinition & orc_SystemDefi
    \created     03.08.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::SendTesterPresent(void)
+sint32 C_OSCComDriverProtocol::SendTesterPresent(const std::set<uint32> * const opc_SkipNodes)
 {
    sint32 s32_Return = C_CONFIG;
 
@@ -243,17 +245,22 @@ sint32 C_OSCComDriverProtocol::SendTesterPresent(void)
 
       for (u32_Counter = 0U; u32_Counter < this->mc_OsyProtocols.size(); ++u32_Counter)
       {
-         C_OSCProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[u32_Counter];
-         if (pc_ProtocolOsy != NULL)
+         // Check the optional set for skipping nodes
+         if ((opc_SkipNodes == NULL) ||
+             (opc_SkipNodes->find(u32_Counter) == opc_SkipNodes->end()))
          {
-            // Send tester present message without expecting a response
-            s32_Return = pc_ProtocolOsy->OsyTesterPresent(1U);
-
-            if (s32_Return != C_NO_ERR)
+            C_OSCProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[u32_Counter];
+            if (pc_ProtocolOsy != NULL)
             {
-               // No response expected. All errors caused by client. We can break here.
-               s32_Return = C_COM;
-               break;
+               // Send tester present message without expecting a response
+               s32_Return = pc_ProtocolOsy->OsyTesterPresent(1U);
+
+               if (s32_Return != C_NO_ERR)
+               {
+                  // No response expected. All errors caused by client. We can break here.
+                  s32_Return = C_COM;
+                  break;
+               }
             }
          }
       }
@@ -285,7 +292,7 @@ sint32 C_OSCComDriverProtocol::SendTesterPresent(void)
    C_WARN     error response
    C_RD_WR    malformed protocol response
    C_RANGE    node index out of range
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     27.02.2018  STW/B.Bayer
 */
@@ -1026,26 +1033,27 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSessionId(const uint32 ou32_ActiveNode, 
 /*!
    \brief   Sets a node into a session
 
-   \param[in]     ou8_SessionId         session ID to switch to
-   \param[in]     oq_CheckForSession    checks the current session id on the server. only if it is different, the
-                                        new session id will be set
-   \param[out]    orc_DefectNodeIndices List of active node indices which encountered an error
+   \param[in]        ou8_SessionId         session ID to switch to
+   \param[in]        oq_CheckForSession    checks the current session id on the server. only if it is different, the
+                                           new session id will be set
+   \param[in,out]    orc_DefectNodeIndices List of active node indices which encountered an error
+
+   Nodes with previous errors registered in orc_DefectNodeIndices will be skipped
 
    \return
    C_NO_ERR    All nodes set to session successfully
    C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
    C_COM       Error of service
    C_TIMEOUT   Expected response not received within timeout
+               or at least one node was registered in orc_DefectNodeIndices
 
    \created     07.08.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::m_SetNodesSessionId(const uint8 ou8_SessionId, const bool oq_CheckForSession,
-                                                   std::vector<uint32> & orc_DefectNodeIndices) const
+                                                   std::set<uint32> & orc_DefectNodeIndices) const
 {
    sint32 s32_Retval = C_NO_ERR;
-
-   orc_DefectNodeIndices.clear();
 
    if (this->mq_Initialized == true)
    {
@@ -1053,20 +1061,30 @@ sint32 C_OSCComDriverProtocol::m_SetNodesSessionId(const uint8 ou8_SessionId, co
 
       for (u32_Counter = 0U; u32_Counter < this->mc_OsyProtocols.size(); ++u32_Counter)
       {
-         const sint32 s32_Return = this->m_SetNodeSessionId(u32_Counter, ou8_SessionId, oq_CheckForSession, NULL);
-
-         if ((s32_Return != C_NO_ERR) && (s32_Return != C_NOACT))
+         // Search the input values for a previous problem with the node
+         // Further communication is only necessary if the node was ok in the first place
+         if (orc_DefectNodeIndices.find(u32_Counter) == orc_DefectNodeIndices.end())
          {
-            // Do not change the C_TIMEOUT error
-            if ((s32_Return != C_TIMEOUT) && (s32_Return != C_WARN))
+            const sint32 s32_Return = this->m_SetNodeSessionId(u32_Counter, ou8_SessionId, oq_CheckForSession, NULL);
+
+            if ((s32_Return != C_NO_ERR) && (s32_Return != C_NOACT))
             {
-               s32_Retval = C_COM;
+               // Do not change the C_TIMEOUT error
+               if ((s32_Return != C_TIMEOUT) && (s32_Return != C_WARN))
+               {
+                  s32_Retval = C_COM;
+               }
+               else
+               {
+                  s32_Retval = s32_Return;
+               }
+               orc_DefectNodeIndices.insert(u32_Counter);
             }
-            else
-            {
-               s32_Retval = s32_Return;
-            }
-            orc_DefectNodeIndices.push_back(u32_Counter);
+         }
+         else
+         {
+            // It was a previous error. Only in case of a previous timeout it would be continued to here
+            s32_Retval = C_TIMEOUT;
          }
       }
    }
@@ -1534,7 +1552,7 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
    C_WARN     error response
    C_RD_WR    malformed protocol response
    C_RANGE    node index out of range
-   C_COM      expected response not received because of communication error
+   C_COM      communication driver reported error
 
    \created     27.02.2018  STW/B.Bayer
 */
@@ -1995,7 +2013,7 @@ void C_OSCComDriverProtocol::m_StopRoutingOfActiveNodes(void)
    \return
    C_NO_ERR    Routing for point deactivated
    C_NOACT     Routing for point deactivated and no further stopping necessary for this node
-   C_COM       expected response not received because of communication error
+   C_COM       communication driver reported error
 
    \created     11.07.2018  STW/B.Bayer
 */

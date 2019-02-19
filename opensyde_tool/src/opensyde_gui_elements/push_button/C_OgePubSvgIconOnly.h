@@ -37,7 +37,8 @@ public:
 
    void SetSvg(const QString & orc_PathEnabled, const QString & orc_PathDisabled = "",
                const QString & orc_PathHovered = "", const QString & orc_PathCheckedEnabled = "",
-               const QString & orc_PathCheckedDisabled = "", const QString & orc_PathCheckedHovered = "");
+               const QString & orc_PathCheckedDisabled = "", const QString & orc_PathCheckedHovered = "",
+               const QString & orc_PathPressed = "", const QString & orc_PathCheckedPressed = "");
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
@@ -47,12 +48,15 @@ protected:
    //lint -restore
 
    bool mq_Hovered;
+   bool mq_Pressed;
    QSvgRenderer * mpc_SvgRendererEnabled;
    QSvgRenderer * mpc_SvgRendererDisabeld;
    QSvgRenderer * mpc_SvgRendererHovered;
+   QSvgRenderer * mpc_SvgRendererPressed;
    QSvgRenderer * mpc_SvgRendererCheckedEnabled;
    QSvgRenderer * mpc_SvgRendererCheckedDisabeld;
    QSvgRenderer * mpc_SvgRendererCheckedHovered;
+   QSvgRenderer * mpc_SvgRendererCheckedPressed;
 
 private:
    //Avoid call

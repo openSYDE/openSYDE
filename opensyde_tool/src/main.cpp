@@ -66,23 +66,26 @@ sintn main(sintn osn_Argc, charn * opacn_Argv[])
 
    QApplication c_Appl(osn_Argc, opacn_Argv);
    {
-      const QString c_FilePath = stw_opensyde_gui_logic::C_Uti::h_GetCompleteLogFileLocation();
+      const QString c_FilePath = stw_opensyde_gui_logic::C_Uti::h_GetCompleteLogFileLocation(".syde_log");
       //Set up logging (FIRST)
       stw_opensyde_core::C_OSCLoggingHandler::h_SetWriteToConsoleActive(false);
       stw_opensyde_core::C_OSCLoggingHandler::h_SetWriteToFileActive(true);
       stw_opensyde_core::C_OSCLoggingHandler::h_SetCompleteLogFileLocation(c_FilePath.toStdString().c_str());
-      osc_write_log_info("Startup", "Starting openSYDE");
+
+      osc_write_log_info("Startup", ("Starting openSYDE Version: " +
+                                     stw_opensyde_gui_logic::C_Uti::h_ConvertVersionToSTWStyle(
+                                        APPLICATION_VERSION)).toStdString().c_str());
    }
    {
       //Set stylesheet (SECOND)
       c_Appl.setStyleSheet(stw_opensyde_gui_logic::C_UtiStyleSheets::h_GetStylesheet());
    }
    {
-      const QString c_TranslationLoacation = stw_opensyde_gui_logic::C_Uti::h_GetExePath() + "/Translations";
+      const QString c_TranslationLocation = stw_opensyde_gui_logic::C_Uti::h_GetExePath() + "/Translations";
       //Set language (THIRD)
       //stw_opensyde_core::C_OSCGetText::h_SetLanguage("en_US");
       stw_opensyde_gui_logic::C_PopErrorHandling::mh_GetTextInitializeErr(
-         stw_opensyde_gui_logic::C_GtGetText::h_Initialize(c_TranslationLoacation.toStdString().c_str(), "en_US"));
+         stw_opensyde_gui_logic::C_GtGetText::h_Initialize(c_TranslationLocation.toStdString().c_str(), "en_US"));
    }
    {
       //Application (FOURTH)

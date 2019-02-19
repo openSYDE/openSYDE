@@ -23,7 +23,6 @@
 
 #include "C_Uti.h"
 #include "TGLUtils.h"
-#include "C_SdUtil.h"
 #include "stwerrors.h"
 #include "C_OSCUtils.h"
 #include "C_GtGetText.h"
@@ -156,7 +155,7 @@ C_SyvDaItPaWidgetNew::~C_SyvDaItPaWidgetNew()
 void C_SyvDaItPaWidgetNew::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_PushButtonAdd->setText(C_GtGetText::h_GetText("Add List"));
-   this->mpc_Ui->pc_LabelTreeEmpty->setText(C_GtGetText::h_GetText("You may add any NVM Lists via the '+' button"));
+   this->mpc_Ui->pc_LabelTreeEmpty->setText(C_GtGetText::h_GetText("Add any NVM Lists via the '+' button"));
 }
 
 //-----------------------------------------------------------------------------
@@ -381,18 +380,18 @@ bool C_SyvDaItPaWidgetNew::HandleManualOperationFinished(const sint32 os32_Resul
                                                      "Requested memory range specified by address and size invalid");
                   break;
                case 0x22:
-                  c_Details = C_GtGetText::h_GetText("Reading failed");
+                  c_Details = C_GtGetText::h_GetText("Reading failed.");
                   break;
                case 0x33:
-                  c_Details = C_GtGetText::h_GetText("Required security level was not unlocked");
+                  c_Details = C_GtGetText::h_GetText("Required security level was not unlocked.");
                   break;
                case 0x14:
                   c_Details = C_GtGetText::h_GetText(
-                     "The total length of the response message exceeds the available buffer size");
+                     "The total length of the response message exceeds the available buffer size.");
                   break;
                case 0x7F:
                   c_Details = C_GtGetText::h_GetText(
-                     "The requested service is not available in the session currently active");
+                     "The requested service is not available in the currently active session.");
                   break;
                default:
                   c_Details =
@@ -1149,6 +1148,11 @@ void C_SyvDaItPaWidgetNew::m_WriteElements(const std::vector<C_OSCNodeDataPoolLi
                }
                //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
             }
+
+            // Reset all previous set NVM changed flags in all cases
+            // If a flag would not be reseted in case of an error or a cancel,
+            // writing to an other datapool would cause writing in both datapools
+            this->mpc_Ui->pc_TreeView->RemoveValuesChangedFlag(c_InterestingChangedElements);
          }
          else
          {
@@ -1157,7 +1161,7 @@ void C_SyvDaItPaWidgetNew::m_WriteElements(const std::vector<C_OSCNodeDataPoolLi
             c_MessageResult.SetHeading(C_GtGetText::h_GetText("System Parametrization"));
             c_MessageResult.SetDescription(C_GtGetText::h_GetText(
                                               "At least one of the selected lists contains invalid set"
-                                              " values. Please enter valid set values and retry."));
+                                              " values. Enter valid set values and retry."));
             c_MessageResult.Execute();
          }
       }
@@ -1337,7 +1341,8 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OSCNodeDataPoolLis
    for (u32_ListCounter = 0U; u32_ListCounter < orc_ListIds.size(); ++u32_ListCounter)
    {
       const C_OSCNodeDataPoolListElementId & rc_CurElementId = orc_ListIds[u32_ListCounter];
-      const C_OSCNode * const pc_SdNode = C_PuiSdHandler::h_GetInstance()->GetOSCNode(rc_CurElementId.u32_NodeIndex);
+      const C_OSCNode * const pc_SdNode =
+         C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(rc_CurElementId.u32_NodeIndex);
       if ((pc_SdNode != NULL) &&
           (rc_CurElementId.u32_DataPoolIndex < pc_SdNode->c_DataPools.size()) &&
           (rc_CurElementId.u32_ListIndex < pc_SdNode->c_DataPools[rc_CurElementId.u32_DataPoolIndex].c_Lists.size()))
@@ -1497,12 +1502,12 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OSCNodeDataPoolLis
                   c_Folder += QString("/%1%2").arg(c_File, mhc_FILE_EXTENSION_PARAMSET);
                }
 
-               c_FileName = C_SdUtil::h_GetSaveFileName(pc_ParamWidget->GetPopUpParent(),
-                                                        C_GtGetText::h_GetText("Save Parameter Set File"),
-                                                        c_Folder,
-                                                        QString(C_GtGetText::h_GetText(
-                                                                   "openSYDE Parameter Set File")) +
-                                                        " (*" + mhc_FILE_EXTENSION_PARAMSET + ")", "");
+               c_FileName = C_OgeWiUtil::h_GetSaveFileName(pc_ParamWidget->GetPopUpParent(),
+                                                           C_GtGetText::h_GetText("Save Parameter Set File"),
+                                                           c_Folder,
+                                                           QString(C_GtGetText::h_GetText(
+                                                                      "openSYDE Parameter Set File")) +
+                                                           " (*" + mhc_FILE_EXTENSION_PARAMSET + ")", "");
 
                if (c_FileName.compare("") != 0)
                {

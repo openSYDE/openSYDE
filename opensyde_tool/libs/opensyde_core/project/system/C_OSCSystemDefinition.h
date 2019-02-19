@@ -85,6 +85,12 @@ public:
    static C_OSCDeviceManager hc_Devices; ///< container of device types known in the system
    std::vector<C_OSCNode> c_Nodes;       ///< all nodes that are part of this system definition
    std::vector<C_OSCSystemBus> c_Buses;  ///< all buses that are part of this system definition
+
+private:
+   stw_types::uint32 m_GetDataPoolHash(const stw_types::uint32 ou32_NodeIndex,
+                                       const stw_types::uint32 ou32_DataPoolIndex) const;
+   stw_types::uint32 m_GetRelatedProtocolHash(const stw_types::uint32 ou32_NodeIndex,
+                                              const stw_types::uint32 ou32_DataPoolIndex) const;
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

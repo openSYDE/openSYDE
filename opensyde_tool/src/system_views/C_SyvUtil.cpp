@@ -72,13 +72,15 @@ bool C_SyvUtil::h_CheckViewSetupError(const uint32 ou32_ViewIndex, QString & orc
    bool q_UpdateDisabledButDataBlocks;
    bool q_SysDefInvalid;
    bool q_NoActiveNodes;
+   QString c_RoutingErrorText;
    sint32 s32_Return;
 
    s32_Return = C_PuiSvHandler::h_GetInstance()->CheckViewError(ou32_ViewIndex,
                                                                 &q_NameInvalid,
                                                                 &q_PcNotConnected,
                                                                 &q_RoutingInvalid, &q_UpdateDisabledButDataBlocks,
-                                                                &q_SysDefInvalid, &q_NoActiveNodes, NULL);
+                                                                &q_SysDefInvalid, &q_NoActiveNodes,
+                                                                &c_RoutingErrorText);
 
    if ((q_UpdateDisabledButDataBlocks == true) ||
        ((((((q_NameInvalid == true) || (q_PcNotConnected == true)) || ((q_RoutingInvalid == true)) ||
@@ -87,7 +89,7 @@ bool C_SyvUtil::h_CheckViewSetupError(const uint32 ou32_ViewIndex, QString & orc
    {
       if (s32_Return == C_RANGE)
       {
-         orc_ErrorLabelText = C_GtGetText::h_GetText("Invalid View: view is invalid.");
+         orc_ErrorLabelText = C_GtGetText::h_GetText("Invalid View: View is invalid.");
       }
       else if (q_NoActiveNodes == true)
       {
@@ -119,16 +121,7 @@ bool C_SyvUtil::h_CheckViewSetupError(const uint32 ou32_ViewIndex, QString & orc
       }
       else if (q_RoutingInvalid == true)
       {
-         bool q_RoutingError;
-         QString c_ErrorText;
-         if (C_PuiSvHandler::h_GetInstance()->CheckRouting(ou32_ViewIndex, q_RoutingError,
-                                                           c_ErrorText) == C_NO_ERR)
-         {
-            if (q_RoutingError == true)
-            {
-               orc_ErrorLabelText = QString(C_GtGetText::h_GetText("Invalid View: %1")).arg(c_ErrorText);
-            }
-         }
+         orc_ErrorLabelText = QString(C_GtGetText::h_GetText("Invalid View: %1")).arg(c_RoutingErrorText);
       }
       else if (q_SysDefInvalid == true)
       {

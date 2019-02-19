@@ -26,6 +26,8 @@
 namespace stw_opensyde_gui
 {
 /* -- Global Constants ----------------------------------------------------- */
+//Timing output
+const bool mq_TIMING_OUTPUT = false;
 //Modes and Submodes
 const stw_types::sint32 ms32_MODE_NONE = -1;
 const stw_types::sint32 ms32_MODE_SYSDEF = 0;
@@ -87,6 +89,7 @@ const QColor mc_STYLE_GUIDE_COLOR_24 = QColor(230, 58, 63, 255);
 const QColor mc_STYLE_GUIDE_COLOR_25 = QColor(195, 186, 221, 255);
 const QColor mc_STYLE_GUIDE_COLOR_26 = QColor(2, 155, 136, 255);
 const QColor mc_STYLE_GUIDE_COLOR_26_40P = QColor(154, 215, 207, 255);
+const QColor mc_STYLE_GUIDE_COLOR_27 = QColor(127, 127, 187, 255);
 const QColor mc_STYLE_GUIDE_COLOR_31 = QColor(20, 20, 20, 255);
 const QColor mc_STYLE_GUIDE_COLOR_32 = QColor(30, 30, 33, 255);
 const QColor mc_STYLE_GUIDE_COLOR_33 = QColor(47, 48, 54, 255);
@@ -177,16 +180,61 @@ const QSize mc_ICON_SIZE_24 = QSize(24, 24);
 const QSize mc_ICON_SIZE_20 = QSize(20, 20);
 
 //User roles
+//----------
+//Generic string for additional information (type: QString)
 const stw_types::sintn msn_USER_ROLE_ADDITIONAL_INFORMATION = static_cast<stw_types::sintn>(Qt::UserRole) + 10;
+//Tooltip (standard interface)
+//Type: QString
 const stw_types::sintn msn_USER_ROLE_TOOL_TIP_HEADING = static_cast<stw_types::sintn>(Qt::UserRole) + 20;
+//Type: QString
 const stw_types::sintn msn_USER_ROLE_TOOL_TIP_CONTENT = static_cast<stw_types::sintn>(Qt::UserRole) + 21;
+//Type: bool
 const stw_types::sintn msn_USER_ROLE_TOOL_TIP_TYPE = static_cast<stw_types::sintn>(Qt::UserRole) + 22;
+//Pixmap for dark/bright switch (type: QPixmap)
 const stw_types::sintn msn_USER_ROLE_PIXMAP_DARK_MODE = static_cast<stw_types::sintn>(Qt::UserRole) + 30;
 const stw_types::sintn msn_USER_ROLE_PIXMAP_BRIGHT_MODE = static_cast<stw_types::sintn>(Qt::UserRole) + 31;
+//Used for custom icon painting (type: QIcon)
 const stw_types::sintn msn_USER_ROLE_ICON = static_cast<stw_types::sintn>(Qt::UserRole) + 32;
-const stw_types::sintn msn_USER_ROLE_MAXIMUM_VALUE = static_cast<stw_types::sintn>(Qt::UserRole) + 40;
+//Generic flag for a conditional value (type: bool)
 const stw_types::sintn msn_USER_ROLE_CONDITIONAL_VALUE = static_cast<stw_types::sintn>(Qt::UserRole) + 50;
+//Flag to use for error reporting/error styling (type: bool, default: false)
 const stw_types::sintn msn_USER_ROLE_ERROR = static_cast<stw_types::sintn>(Qt::UserRole) + 60;
+//Generic table interface: Specify interaction element (type: E_USER_ROLE_INTERACTION_ELEMENT_VALUE (converted to int),
+// default: eURIEL_NONE)
+const stw_types::sintn msn_USER_ROLE_INTERACTION_ELEMENT_TYPE = static_cast<stw_types::sintn>(Qt::UserRole) + 70;
+enum E_UserRoleInteractionElementValue
+{
+   eURIEL_NONE = 0,        //Qt default if any or in our case: override by manual implementation
+   eURIEL_LINE_EDIT,       //input: any string (also integer as string), output: same type, supports: min & max handling
+   eURIEL_COMBO_BOX,       //input: integer, output: integer, supports: combo box values list
+   eURIEL_GENERIC_SPIN_BOX //input: integer or floating point, output: same type, only works with min & max handling
+};
+
+//Generic table interface: Minimum value to use if flag set (type: any number)
+const stw_types::sintn msn_USER_ROLE_INTERACTION_MINIMUM_VALUE = static_cast<stw_types::sintn>(Qt::UserRole) + 71;
+//Generic table interface: Maximum value to use if flag set (type: any number)
+const stw_types::sintn msn_USER_ROLE_INTERACTION_MAXIMUM_VALUE = static_cast<stw_types::sintn>(Qt::UserRole) + 72;
+//Generic table interface: Flag to see if item has link interaction handling (type: bool, default: false)
+const stw_types::sintn msn_USER_ROLE_INTERACTION_IS_LINK = static_cast<stw_types::sintn>(Qt::UserRole) + 73;
+//Generic table interface: Flag to see if cell requires a minimum value while interacting (type: bool, default: false)
+const stw_types::sintn msn_USER_ROLE_INTERACTION_USE_MIN_VALUE = static_cast<stw_types::sintn>(Qt::UserRole) + 74;
+//Generic table interface: Flag to see if cell requires a maximum value while interacting (type: bool, default: false)
+const stw_types::sintn msn_USER_ROLE_INTERACTION_USE_MAX_VALUE = static_cast<stw_types::sintn>(Qt::UserRole) + 75;
+//Generic table interface: Values for combo box (type: QStringList, default: none)
+const stw_types::sintn msn_USER_ROLE_INTERACTION_COMBO_BOX_VALUES_LIST = static_cast<stw_types::sintn>(Qt::UserRole) +
+                                                                         76;
+//Generic table interface: Parameters for spin box (type: QStringList, default: none)
+//Expected 4 elements:
+//0: Min of type C_OSCNodeDataPoolContent encoded as string -> TBD
+//1: Max of type C_OSCNodeDataPoolContent encoded as string
+//2: Factor (float64) encoded as string
+//3: Offset (float64) encoded as string
+const stw_types::sintn msn_USER_ROLE_INTERACTION_GENERIC_SPIN_BOX_PARAMETERS_LIST =
+   static_cast<stw_types::sintn>(Qt::UserRole) + 77;
+
+// Paths
+const QString mc_DLL_PATH_PEAK = "STW_dlls\\stwpeak2\\stwpeak2.dll";
+const QString mc_DLL_PATH_VECTOR = "STW_dlls\\stwvec32\\stwvec32.dll";
 
 /* -- Types ---------------------------------------------------------------- */
 

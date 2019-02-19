@@ -51,6 +51,8 @@ using namespace stw_opensyde_core;
    \param[out]  orc_ActiveNodes         Flags for all available nodes in the system
    \param[out]  opc_CanDispatcher       Pointer to concrete CAN dispatcher
    \param[out]  opc_IpDispatcher        Pointer to concrete IP dispatcher
+   \param[in]   oq_InitCan              Optional flag to initialize the CAN bus. Default is true.
+                                        DLL will be opened although.
 
    \return
    C_NO_ERR    Parameter filled
@@ -65,25 +67,25 @@ using namespace stw_opensyde_core;
 sint32 C_SyvComDriverUtil::h_GetOSCComDriverParamFromView(const uint32 ou32_ViewIndex, uint32 & oru32_ActiveBusIndex,
                                                           std::vector<uint8> & orc_ActiveNodes,
                                                           stw_can::C_CAN ** const oppc_CanDispatcher,
-                                                          C_OSCIpDispatcherWinSock ** const oppc_IpDispatcher)
+                                                          C_OSCIpDispatcherWinSock ** const oppc_IpDispatcher,
+                                                          const bool oq_InitCan)
 {
    bool q_NameInvalid;
    bool q_PCNotConnected;
    bool q_RoutingInvalid;
    bool q_UpdateDisabledButDataBlocks;
    bool q_SysDefInvalid;
-   bool q_RailsInvalid;
    bool q_NoNodesActive;
 
    sint32 s32_Retval = C_PuiSvHandler::h_GetInstance()->CheckViewError(ou32_ViewIndex, &q_NameInvalid,
                                                                        &q_PCNotConnected, &q_RoutingInvalid,
                                                                        &q_UpdateDisabledButDataBlocks,
                                                                        &q_SysDefInvalid, &q_NoNodesActive,
-                                                                       &q_RailsInvalid);
+                                                                       NULL);
 
    if ((((((((s32_Retval == C_NO_ERR) && (q_NameInvalid == false)) && (q_PCNotConnected == false)) &&
-           (q_RoutingInvalid == false)) && (q_SysDefInvalid == false)) && (q_NoNodesActive == false)) &&
-        (q_RailsInvalid == false)) && (q_UpdateDisabledButDataBlocks == false))
+           (q_RoutingInvalid == false)) && (q_SysDefInvalid == false)) && (q_NoNodesActive == false))) &&
+       (q_UpdateDisabledButDataBlocks == false))
    {
       const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
 
@@ -114,7 +116,8 @@ sint32 C_SyvComDriverUtil::h_GetOSCComDriverParamFromView(const uint32 ou32_View
                   *oppc_CanDispatcher = new stw_can::C_CAN();
 
                   s32_Retval = (*oppc_CanDispatcher)->DLL_Open(c_FilePath.toStdString().c_str());
-                  if (s32_Retval == C_NO_ERR)
+                  if ((s32_Retval == C_NO_ERR) &&
+                      (oq_InitCan == true))
                   {
                      s32_Retval = (*oppc_CanDispatcher)->CAN_Init(static_cast<sint32>(pc_Bus->u64_BitRate / 1000ULL));
                   }

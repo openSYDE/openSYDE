@@ -134,25 +134,6 @@
         </spacer>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabelListError">
-         <property name="minimumSize">
-          <size>
-           <width>24</width>
-           <height>24</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>24</width>
-           <height>24</height>
-          </size>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item>
         <spacer name="horizontalSpacer_3">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -301,25 +282,19 @@
           </spacer>
          </item>
          <item>
-          <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxCount">
+          <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="groupBox">
            <property name="minimumSize">
             <size>
-             <width>260</width>
+             <width>150</width>
              <height>0</height>
             </size>
            </property>
-           <property name="maximumSize">
-            <size>
-             <width>260</width>
-             <height>16777215</height>
-            </size>
-           </property>
            <property name="title">
-            <string>Group box</string>
+            <string/>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="0,0,1">
             <property name="spacing">
-             <number>0</number>
+             <number>6</number>
             </property>
             <property name="leftMargin">
              <number>0</number>
@@ -334,131 +309,37 @@
              <number>0</number>
             </property>
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0">
-              <property name="spacing">
-               <number>0</number>
+             <widget class="stw_opensyde_gui_elements::C_OgeLabComListHeader" name="pc_LabelCount">
+              <property name="text">
+               <string>Count</string>
               </property>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
-                <property name="spacing">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="groupBox">
-                  <property name="minimumSize">
-                   <size>
-                    <width>150</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="title">
-                   <string/>
-                  </property>
-                  <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="0,0,1">
-                   <property name="spacing">
-                    <number>6</number>
-                   </property>
-                   <property name="leftMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="topMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="rightMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="bottomMargin">
-                    <number>0</number>
-                   </property>
-                   <item>
-                    <widget class="stw_opensyde_gui_elements::C_OgeLabComListHeader" name="pc_LabelCount">
-                     <property name="text">
-                      <string>Count</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="stw_opensyde_gui_elements::C_OgeLabComListHeader" name="pc_LabelCountNumber">
-                     <property name="text">
-                      <string>1</string>
-                     </property>
-                     <property name="alignment">
-                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <spacer name="horizontalSpacer_13">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>1</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                  </layout>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxUsage">
-                <property name="title">
-                 <string/>
-                </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="1,0">
-                 <property name="spacing">
-                  <number>0</number>
-                 </property>
-                 <property name="leftMargin">
-                  <number>0</number>
-                 </property>
-                 <property name="topMargin">
-                  <number>0</number>
-                 </property>
-                 <property name="rightMargin">
-                  <number>0</number>
-                 </property>
-                 <property name="bottomMargin">
-                  <number>0</number>
-                 </property>
-                 <item>
-                  <widget class="stw_opensyde_gui::C_SdNdeDataPoolListHeaderUsageWidget" name="pc_UsageWidget" native="true">
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>5</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>5</height>
-                    </size>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <spacer name="horizontalSpacer_19">
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>55</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-             </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="stw_opensyde_gui_elements::C_OgeLabComListHeader" name="pc_LabelCountNumber">
+              <property name="text">
+               <string>1</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_13">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>96</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
             </item>
            </layout>
           </widget>
@@ -512,20 +393,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubIconOnly</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubIconOnly.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
    <extends>QGroupBox</extends>
    <header>C_OgeGbxTransparent.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabSvgOnly.h</header>
+   <class>stw_opensyde_gui_elements::C_OgePubIconOnly</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubIconOnly.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabListHeaderHeading</class>
@@ -536,12 +412,6 @@
    <class>stw_opensyde_gui_elements::C_OgeLabComListHeader</class>
    <extends>QLabel</extends>
    <header>C_OgeLabComListHeader.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeDataPoolListHeaderUsageWidget</class>
-   <extends>QWidget</extends>
-   <header>C_SdNdeDataPoolListHeaderUsageWidget.h</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

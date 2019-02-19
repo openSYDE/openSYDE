@@ -14,6 +14,7 @@
 */
 //-----------------------------------------------------------------------------
 #include <QFileInfo>
+#include <QDir>
 
 #include <cmath>
 
@@ -31,6 +32,7 @@
 #include "TGLUtils.h"
 #include "C_OgeWiCustomMessage.h"
 #include "C_Uti.h"
+#include "C_ImpUtil.h"
 
 /* -- Used Namespaces ------------------------------------------------------ */
 using namespace stw_types;
@@ -267,7 +269,9 @@ void C_SyvUpUpdatePackageListNodeAppWidget::SetAppNumber(const stw_types::uint32
 
 //-----------------------------------------------------------------------------
 /*!
-   \brief   Sets application path
+   \brief   Sets application path.
+
+   Can be relative to openSYDE project. In case of a data block project the data block project path must be included.
 
    \param[in]     orc_Path         Application path
    \param[in]     oq_DefaultPath   Flag if default or specific view path is used
@@ -277,7 +281,17 @@ void C_SyvUpUpdatePackageListNodeAppWidget::SetAppNumber(const stw_types::uint32
 //-----------------------------------------------------------------------------
 void C_SyvUpUpdatePackageListNodeAppWidget::SetAppFile(const QString & orc_File, const bool oq_DefaultFile)
 {
-   this->mc_FilePath = orc_File;
+   const QFileInfo c_FileInfo(orc_File);
+
+   if ((orc_File.isEmpty() == false) && (c_FileInfo.isDir() == false))
+   {
+      this->mc_FilePath = orc_File;
+   }
+   else
+   {
+      this->mc_FilePath = C_GtGetText::h_GetText("<Add File>");
+   }
+
    this->mq_DefaultFilePath = oq_DefaultFile;
 
    this->m_UpdateAbsolutePath();
@@ -582,46 +596,6 @@ bool C_SyvUpUpdatePackageListNodeAppWidget::IsAppIdentical(const QString & orc_A
 
 //-----------------------------------------------------------------------------
 /*!
-   \brief   short description of function
-
-   long description of function within several lines
-
-   \param[in]     ou8_Aa         input parameter description
-   \param[out]    opu32_Bb       output parameter description
-   \param[in,out] opu16_Cc       input/output parameter description
-
-   \return
-   possible return value(s) and description
-
-   \created     23.07.2018  STW/B.Bayer
-*/
-//-----------------------------------------------------------------------------
-bool C_SyvUpUpdatePackageListNodeAppWidget::h_GetAbsolutePath(const QString & orc_InputPath, QString & orc_OutputPath)
-{
-   QFileInfo c_FileInfo;
-   bool q_FileExists;
-
-   orc_OutputPath = orc_InputPath;
-   c_FileInfo.setFile(orc_OutputPath);
-   q_FileExists = (c_FileInfo.exists() && c_FileInfo.isFile());
-   if (q_FileExists == false)
-   {
-      // Check the path if the path was shortened
-      orc_OutputPath = C_PuiProject::h_GetInstance()->GetFolderPath() + orc_OutputPath;
-      c_FileInfo.setFile(orc_OutputPath);
-      q_FileExists = c_FileInfo.exists() && c_FileInfo.isFile();
-
-      if (q_FileExists == false)
-      {
-         orc_OutputPath = orc_InputPath;
-      }
-   }
-
-   return q_FileExists;
-}
-
-//-----------------------------------------------------------------------------
-/*!
    \brief   Overwritten show event slot
 
    Here: Adapt the path text
@@ -677,12 +651,16 @@ bool C_SyvUpUpdatePackageListNodeAppWidget::event(QEvent * const opc_Event)
 }
 
 //-----------------------------------------------------------------------------
-bool C_SyvUpUpdatePackageListNodeAppWidget::m_UpdateAbsolutePath(void)
+void C_SyvUpUpdatePackageListNodeAppWidget::m_UpdateAbsolutePath(void)
 {
-   const bool q_FileExists = C_SyvUpUpdatePackageListNodeAppWidget::h_GetAbsolutePath(this->mc_FilePath,
-                                                                                      this->mc_AbsoluteFilePath);
-
-   return q_FileExists;
+   if (this->mc_FilePath == "<Add File>")
+   {
+      this->mc_AbsoluteFilePath = this->mc_FilePath;
+   }
+   else
+   {
+      this->mc_AbsoluteFilePath = C_ImpUtil::h_GetAbsolutePathFromProject(this->mc_FilePath);
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -699,7 +677,8 @@ void C_SyvUpUpdatePackageListNodeAppWidget::m_UpdateTitle(void)
 //-----------------------------------------------------------------------------
 bool C_SyvUpUpdatePackageListNodeAppWidget::m_LoadApplicationInformation(void)
 {
-   bool q_FileExists = this->m_UpdateAbsolutePath();
+   QFileInfo c_FileInfo(this->mc_AbsoluteFilePath);
+   bool q_FileExists = c_FileInfo.exists() && c_FileInfo.isFile();
 
    // Default text
    this->mc_ProjectName = C_GtGetText::h_GetText("NA");
@@ -711,10 +690,7 @@ bool C_SyvUpUpdatePackageListNodeAppWidget::m_LoadApplicationInformation(void)
    if (q_FileExists == true)
    {
       bool q_Reset = false;
-      QFileInfo c_FileInfo;
       float64 f64_SizeFloat;
-
-      c_FileInfo.setFile(this->mc_AbsoluteFilePath);
 
       // File size in kB
       f64_SizeFloat = std::ceil(static_cast<float64>(c_FileInfo.size()) / 1024.0);
@@ -729,8 +705,9 @@ bool C_SyvUpUpdatePackageListNodeAppWidget::m_LoadApplicationInformation(void)
          if (pc_HexFile->LoadFromFile(this->mc_AbsoluteFilePath.toStdString().c_str()) == stw_hex_file::NO_ERR)
          {
             stw_diag_lib::C_XFLECUInformation c_FileApplicationInfo;
+            const sint32 s32_Result = pc_HexFile->ScanApplicationInformationBlockFromHexFile(c_FileApplicationInfo);
 
-            if (pc_HexFile->ScanApplicationInformationBlockFromHexFile(c_FileApplicationInfo) == C_NO_ERR)
+            if (s32_Result == C_NO_ERR)
             {
                // openSYDE nodes must use HEX files with matching devices
                // STW flashloader must not match. A warning in C_SyvUpUpdatePackageListNodeWidget will be shown when
@@ -761,7 +738,7 @@ bool C_SyvUpUpdatePackageListNodeAppWidget::m_LoadApplicationInformation(void)
                {
                   C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
                   c_Message.SetHeading(C_GtGetText::h_GetText("Update Package configuration"));
-                  c_Message.SetDescription(C_GtGetText::h_GetText("Device Type of selected HEX file does not "
+                  c_Message.SetDescription(C_GtGetText::h_GetText("Device type of selected HEX file does not "
                                                                   "match the node type."));
                   c_Message.SetDetails(QString(C_GtGetText::h_GetText("Device type of %1 does not match node type %2."))
                                        .arg(c_FileApplicationInfo.acn_DeviceID, this->mc_DeviceName));
@@ -771,7 +748,20 @@ bool C_SyvUpUpdatePackageListNodeAppWidget::m_LoadApplicationInformation(void)
             }
             else
             {
-               this->mpc_Ui->pc_LabelVersion->setText(C_GtGetText::h_GetText("?"));
+               // HEX file must have one valid application information block
+               C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
+               c_Message.SetHeading(C_GtGetText::h_GetText("Update Package configuration"));
+               if (s32_Result == C_OVERFLOW)
+               {
+                  c_Message.SetDescription(C_GtGetText::h_GetText(
+                                              "HEX file has multiple application information blocks!"));
+               }
+               else
+               {
+                  c_Message.SetDescription(C_GtGetText::h_GetText("HEX file has no application information block!"));
+               }
+               c_Message.Execute();
+               q_Reset = true;
             }
          }
          else
@@ -914,8 +904,18 @@ void C_SyvUpUpdatePackageListNodeAppWidget::m_UpdateToolTip(void)
       c_Content += this->mc_Date + " " + this->mc_Time;
    }
 
-   c_Content += C_GtGetText::h_GetText("\nFile path: ");
-   c_Content += this->mc_AbsoluteFilePath;
+   if (this->mc_FilePath == this->mc_AbsoluteFilePath)
+   {
+      c_Content += C_GtGetText::h_GetText("\nFile path: ");
+      c_Content += this->mc_AbsoluteFilePath;
+   }
+   else
+   {
+      c_Content += C_GtGetText::h_GetText("\nFile path: ");
+      c_Content += this->mc_FilePath;
+      c_Content += C_GtGetText::h_GetText("\nFile path absolute: ");
+      c_Content += this->mc_AbsoluteFilePath;
+   }
 
    c_Content += C_GtGetText::h_GetText("\nFile size: ");
    c_Content += QString::number(this->mu32_FileSize);
@@ -932,7 +932,7 @@ void C_SyvUpUpdatePackageListNodeAppWidget::m_UpateFilePathLabel(void) const
    {
       const sintn sn_Width = this->width() - mhsn_PathOffset;
       const QString c_AdaptedString =
-         C_Uti::h_MinimizePath(this->mc_AbsoluteFilePath,
+         C_Uti::h_MinimizePath(this->mc_FilePath,
                                this->mpc_Ui->pc_LabelPath->font(), static_cast<uint32>(sn_Width), 0U);
       this->mpc_Ui->pc_LabelPath->setText(c_AdaptedString);
    }

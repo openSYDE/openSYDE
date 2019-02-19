@@ -1,0 +1,73 @@
+/* --------------------------------------------------------------------- */
+QPushButton
+{
+/* suppress dotted rectangle: */
+outline: none;
+}
+
+/* --------------------------------------------------------------------- */
+stw_opensyde_gui_elements--C_CamOgePubSettingsAdd,
+stw_opensyde_gui_elements--C_OgePubConfigure
+{
+border-style: none;
+}
+
+/* --------------------------------------------------------------------- */
+stw_opensyde_gui_elements--C_CamOgePubSettingsAdd
+{
+padding: 1px;
+padding-left: 5px;
+padding-right: 5px;
+text-align: center;
+}
+
+/* --------------------------------------------------------------------- */
+stw_opensyde_gui_elements--C_OgePubProjAction
+{
+border-style: solid;
+border-radius: 0px;
+border-width: 1px;
+}
+
+/* --------------------------------------------------------------------- */
+stw_opensyde_gui_elements--C_OgePubCancel,
+stw_opensyde_gui_elements--C_OgePubDialog
+{
+border-style: solid;
+border-radius: 2px;
+border-width: 1px;
+text-align: center;
+min-height: 30px;
+max-height: 30px;
+}
+
+stw_opensyde_gui_elements--C_OgePubCancel:focus,
+stw_opensyde_gui_elements--C_OgePubDialog:focus
+{
+text-decoration: underline;
+}
+
+/* --------------------------------------------------------------------- */
+stw_opensyde_gui_elements--C_CamOgePubDarkBrowse
+{
+border-style: solid;
+border-width: 1px;
+border-left-width: 0px;
+}
+
+/* --------------------------------------------------------------------- */
+stw_opensyde_gui_elements--C_CamOgePubProjOp,
+stw_opensyde_gui_elements--C_CamOgePubAbout
+{
+border-style: solid;
+border-width: 1px;
+height: 28px;
+padding-left: 10px;
+padding-right: 10px;
+}
+
+stw_opensyde_gui_elements--C_CamOgePubProjOp
+{
+padding-left: 50px;
+}
+/* --------------------------------------------------------------------- */

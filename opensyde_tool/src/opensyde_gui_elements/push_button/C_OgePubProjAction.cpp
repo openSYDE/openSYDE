@@ -59,6 +59,7 @@ using namespace stw_opensyde_gui;
 C_OgePubProjAction::C_OgePubProjAction(QWidget * const opc_Parent) :
    C_OgePubToolTipBase(opc_Parent)
 {
+   this->msn_IconPaddingLeft = 26;
    this->setIconSize(mc_ICON_SIZE_24);
 }
 
@@ -84,7 +85,8 @@ void C_OgePubProjAction::paintEvent(QPaintEvent * const opc_Event)
       QPixmap c_PixmapEnabled;
       c_PixmapEnabled = this->mc_IconEnabled.pixmap(this->iconSize());
       //Calculate icon top left based on fixed center
-      c_Painter.drawPixmap(26 - (this->iconSize().width() / 2), 21 - (this->iconSize().height() / 2), c_PixmapEnabled);
+      c_Painter.drawPixmap(this->msn_IconPaddingLeft - (this->iconSize().width() / 2),
+                           21 - (this->iconSize().height() / 2), c_PixmapEnabled);
    }
    else
    {
@@ -92,7 +94,8 @@ void C_OgePubProjAction::paintEvent(QPaintEvent * const opc_Event)
       QPixmap c_PixmapDisabled;
       c_PixmapDisabled = this->mc_IconDisabled.pixmap(this->iconSize());
       //Calculate icon top left based on fixed center
-      c_Painter.drawPixmap(26 - (this->iconSize().width() / 2), 21 - (this->iconSize().height() / 2), c_PixmapDisabled);
+      c_Painter.drawPixmap(this->msn_IconPaddingLeft - (this->iconSize().width() / 2),
+                           21 - (this->iconSize().height() / 2), c_PixmapDisabled);
    }
 }
 
@@ -110,4 +113,19 @@ void C_OgePubProjAction::SetCustomIcon(QString oc_IconPathEnabled, QString oc_Ic
 {
    mc_IconEnabled.addPixmap(QPixmap(oc_IconPathEnabled));
    mc_IconDisabled.addPixmap(QPixmap(oc_IconPathDisabled));
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Setting the Icon padding left value
+
+   \param[in]     osn_Value      Padding value
+
+
+   \created     30.01.2019  STW/S.Singer
+*/
+//-----------------------------------------------------------------------------
+void C_OgePubProjAction::SetIconPaddingLeft(const stw_types::sintn osn_Value)
+{
+   this->msn_IconPaddingLeft = osn_Value;
 }

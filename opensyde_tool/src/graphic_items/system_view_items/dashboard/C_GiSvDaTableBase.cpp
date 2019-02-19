@@ -807,7 +807,7 @@ void C_GiSvDaTableBase::m_AddNewDataElement(void)
             }
          }
          //Signal for error change
-         Q_EMIT this->SigDataElementsChanged();
+         Q_EMIT (this->SigDataElementsChanged());
          //Cursor
          QApplication::restoreOverrideCursor();
       }
@@ -854,7 +854,7 @@ void C_GiSvDaTableBase::m_RemoveDataElement(void)
       }
 
       //Signal for error change
-      Q_EMIT this->SigDataElementsChanged();
+      Q_EMIT (this->SigDataElementsChanged());
    }
 }
 

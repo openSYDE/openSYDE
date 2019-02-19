@@ -124,7 +124,7 @@ void C_SdBueBusEditPropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelName->SetToolTipInformation(C_GtGetText::h_GetText("Name"),
                                                      C_GtGetText::h_GetText(
                                                         "Symbolic bus name. Unique within Network Topology.\n"
-                                                        "\nFollowing C naming conventions are required:"
+                                                        "\nC naming conventions must be followed:"
                                                         "\n - must not be empty"
                                                         "\n - only alphanumeric characters + \"_\""
                                                         "\n - should not be longer than 31 characters"));
@@ -261,8 +261,8 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
             const QString c_Heading = C_GtGetText::h_GetText(
                "Selected bitrate not supported by following connected nodes:");
             std::vector<QString> c_InvalidNodesForBitRate;
-            C_PuiSdHandler::h_GetInstance()->CheckBusConflict(this->mu32_BusIndex, NULL, NULL, NULL,
-                                                              &c_InvalidNodesForBitRate, NULL);
+            C_PuiSdHandler::h_GetInstance()->CheckBusConflictDetailed(this->mu32_BusIndex, NULL, NULL, NULL,
+                                                                      &c_InvalidNodesForBitRate, NULL);
             for (uint32 u32_ItNode = 0UL; (u32_ItNode < c_InvalidNodesForBitRate.size()) &&
                  (u32_ItNode < mu32_TOOL_TIP_MAXIMUM_ITEMS); ++u32_ItNode)
             {
@@ -446,7 +446,8 @@ void C_SdBueBusEditPropertiesWidget::m_CheckBusId(void) const
    bool q_IdIsValid;
 
    //check
-   tgl_assert(C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().CheckErrorBus(this->mu32_BusIndex, NULL,
+   tgl_assert(C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().CheckErrorBus(this->mu32_BusIndex,
+                                                                                           NULL,
                                                                                            NULL, &q_IdIsValid,
                                                                                            NULL) == C_NO_ERR);
    //Result signals error

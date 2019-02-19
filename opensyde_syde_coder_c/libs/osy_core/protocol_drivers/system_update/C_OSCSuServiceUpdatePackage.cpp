@@ -392,16 +392,14 @@ sint32 C_OSCSuServiceUpdatePackage::h_UnpackPackage(const C_SCLString & orc_Pack
    mhc_WarningMessages.Clear(); // clear old warning messages
    mhc_ErrorMessage = "";       // clear old error message
 
-   // add trailing path delimiter in case there is none
-   // we have to check for win and linux paths because of possible inconsistent paths given by user
-   if ((c_TargetUnzipPath.LastPos("\\") != c_TargetUnzipPath.Length()) &&
-       (c_TargetUnzipPath.LastPos("/") != c_TargetUnzipPath.Length()))
+   if (orc_TargetUnzipPath != "")
    {
+      // add trailing path delimiter in case there is none
       c_TargetUnzipPath = TGL_FileIncludeTrailingDelimiter(orc_TargetUnzipPath);
    }
    else
    {
-      c_TargetUnzipPath = orc_TargetUnzipPath;
+      c_TargetUnzipPath = "";
    }
 
    // as a precaution of inconsistent data, clear the input container

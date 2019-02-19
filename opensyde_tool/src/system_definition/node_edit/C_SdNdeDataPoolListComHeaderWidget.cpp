@@ -417,11 +417,12 @@ void C_SdNdeDataPoolListComHeaderWidget::m_UpdateBusLink(void)
                                                                           "Edit COMM interface description on bus level"));
                   this->mpc_Ui->pc_PushButtonEdit->SetToolTipInformation(C_GtGetText::h_GetText("Edit"),
                                                                          C_GtGetText::h_GetText(
-                                                                            "Edit disabled from the node side due to "
-                                                                            "the interface is already used on a bus.\n"
-                                                                            "Click on \"Used on\" link  to navigate to "
-                                                                            "the bus. COMM interface description can "
-                                                                            "be edited on bus level."));
+                                                                            "The option \"Edit\" is disabled for the "
+                                                                            "node due to the reason that the interface "
+                                                                            "is already used on a bus.\n"
+                                                                            "Click \"Used on\" to navigate to the bus. "
+                                                                            "COMM interface description can be edited "
+                                                                            "on bus level."));
                }
                else
                {

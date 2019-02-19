@@ -24,7 +24,8 @@
 
 #include "C_SebTopologyBaseScene.h"
 #include "C_GiNode.h"
-#include "C_GiLiBus.h"
+#include "C_GiLiCANBus.h"
+#include "C_GiLiEthernetBus.h"
 #include "C_GiLiBusConnector.h"
 #include "C_GiArrowCursorButton.h"
 #include "C_GiLiTemporaryLine.h"
@@ -102,6 +103,7 @@ Q_SIGNALS:
                       const stw_types::uint32 ou32_Flag);
    void SigNodeDeleted(const stw_types::uint32 ou32_Index);
    void SigBusDeleted(const stw_types::uint32 ou32_Index);
+   void SigErrorChange(void);
 
 protected:
    virtual C_SebBaseContextMenuManager * m_GetContextMenuManager(void) override;
@@ -135,6 +137,18 @@ protected:
    virtual C_GiNode * m_CreateNode(const stw_types::sint32 & ors32_Index, const stw_types::uint64 & oru64_ID,
                                    const stw_types::float64 & orf64_Width, const stw_types::float64 & orf64_Height,
                                    QGraphicsItem * const opc_Parent) override;
+   virtual C_GiLiCANBus * m_CreateCANBus(const stw_types::sint32 & ors32_Index, const stw_types::uint64 & oru64_ID,
+                                         C_GiTextElementBus * const opc_TextElementName,
+                                         const std::vector<QPointF> * const opc_Points,
+                                         QGraphicsItem * const opc_Parent) override;
+   virtual C_GiLiEthernetBus * m_CreateEthernetBus(const stw_types::sint32 & ors32_Index,
+                                                   const stw_types::uint64 & oru64_ID,
+                                                   C_GiTextElementBus * const opc_TextElementName,
+                                                   const std::vector<QPointF> * const opc_Points,
+                                                   QGraphicsItem * const opc_Parent) override;
+   virtual C_GiTextElementBus * m_CreateBusTextElement(const stw_types::sint32 & ors32_Index,
+                                                       const stw_types::uint64 & oru64_ID,
+                                                       QGraphicsItem * const opc_Parent) override;
 
    virtual void m_AddNodeToScene(C_GiNode * const opc_NodeGraphicsItem) override;
    virtual void m_AddBusConnectorToScene(C_GiLiBusConnector * const opc_BusConnectorGraphicsItem) override;

@@ -30,7 +30,7 @@ namespace stw_opensyde_gui_logic
 class C_UtiClipBoardHelper
 {
 protected:
-   C_UtiClipBoardHelper();
+   C_UtiClipBoardHelper(void);
 
    static QString mh_GetClipBoard(void);
    static void mh_SetClipBoard(const QString & orc_Text);

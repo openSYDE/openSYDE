@@ -20,6 +20,11 @@
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
 
+#include <iostream>
+
+#include <QElapsedTimer>
+#include <QProcess>
+
 #include "TGLUtils.h"
 #include "C_OgeWiUtil.h"
 #include "C_PuiSvHandler.h"
@@ -35,6 +40,9 @@
 #include "C_PuiSdHandler.h"
 #include "C_PuiSvHandler.h"
 #include "C_PuiSvData.h"
+#include "C_Uti.h"
+#include "C_OSCLoggingHandler.h"
+#include "C_OgeWiCustomMessage.h"
 
 /* -- Used Namespaces ------------------------------------------------------ */
 
@@ -86,6 +94,9 @@ C_NagNaviBarWidget::C_NagNaviBarWidget(QWidget * const opc_Parent) :
    //Layout splitter
    this->mpc_Ui->pc_Splitter->setCollapsible(0, false);
    this->mpc_Ui->pc_Splitter->setCollapsible(1, false);
+   // if there is more space stretch bottom widget (i.e. index 1)
+   this->mpc_Ui->pc_Splitter->setStretchFactor(0, 0);
+   this->mpc_Ui->pc_Splitter->setStretchFactor(1, 1);
 
    c_ImgLogo.load(":images/STW_Logo.png");
    c_ImgLogo = c_ImgLogo.scaled((c_ImgLogo.width() / 12), (c_ImgLogo.height() / 12),
@@ -132,14 +143,19 @@ C_NagNaviBarWidget::C_NagNaviBarWidget(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_WidgetTabSc->SetIconSvg("://images/IconSystemCommissioning.svg");
    this->mpc_Ui->pc_PushButtonAddSysView->SetCustomIcon("://images/main_page_and_navi_bar/Icon_new_project.svg",
                                                         "://images/main_page_and_navi_bar/Icon_new_project.svg");
+   this->mpc_Ui->pc_PushButtonCanMonitor->SetCustomIcon(":/images/CanMonitorIcon_Navibar.png",
+                                                        ":/images/CanMonitorIcon_Navibar.png");
 
-   //Customize button
+   //Customize buttons
    this->mpc_Ui->pc_PushButtonAddSysView->setIconSize(QSize(16, 16));
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_PushButtonAddSysView, "Border", true);
+   this->mpc_Ui->pc_PushButtonCanMonitor->setIconSize(QSize(18, 18));
+   this->mpc_Ui->pc_PushButtonCanMonitor->SetIconPaddingLeft(22); //special padding
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_PushButtonCanMonitor, "CanMonitorButton", true);
 
    //Handle scroll area styling issues
-   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_ScrollArea, "C_OgeScNaviBar", true);
-   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_ScrollAreaWidgetContents, "C_OgeScNaviBar", true);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_ScrollArea, "C_OgeSaNaviBar", true);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_ScrollAreaWidgetContents, "C_OgeSaNaviBar", true);
 
    // connect the buttons signals
    connect(this->mpc_Ui->pc_BtnMain, &QPushButton::clicked, this, &C_NagNaviBarWidget::m_StartViewClicked);
@@ -166,15 +182,15 @@ C_NagNaviBarWidget::C_NagNaviBarWidget(QWidget * const opc_Parent) :
            &C_NagNaviBarWidget::m_SysViewDeleteClicked);
    connect(this->mpc_Ui->pc_ListViewViews, &C_NagViewList::SigSizeChange, this,
            &C_NagNaviBarWidget::m_SysViewSizeChanged);
-   //Reload when splitter shown as the stored sizes might only be valid in this case (queue signal to ensure show event was properly finished)
-   connect(this->mpc_Ui->pc_Splitter, &C_OgeSpiHorizontalNavigation::SigShow, this,
-           &C_NagNaviBarWidget::LoadUserSettings, Qt::QueuedConnection);
 
    //connect to nodes/bus change signals
    connect(C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigNodesChanged, this,
            &C_NagNaviBarWidget::m_NodesChanged);
    connect(C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigBussesChanged,
            this, &C_NagNaviBarWidget::m_BussesChanged);
+
+   connect(this->mpc_Ui->pc_PushButtonCanMonitor, &C_OgePubProjAction::clicked, this,
+           &C_NagNaviBarWidget::m_OpenCanMonitor);
 
    this->SetMode(ms32_MODE_NONE);
    this->InitText();
@@ -233,57 +249,40 @@ void C_NagNaviBarWidget::UpdateNames(void) const
    \created     30.07.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-void C_NagNaviBarWidget::UpdateViewIcons(void) const
+void C_NagNaviBarWidget::UpdateViewIcons(const uint32 ou32_ViewIndex) const
 {
-   if (this->ms32_ActiveMode == ms32_MODE_SYSVIEW)
-   {
-      this->mpc_Ui->pc_ListViewViews->UpdateDeco();
-   }
-   else if (this->ms32_ActiveMode == ms32_MODE_SYSDEF)
-   {
-      switch (this->ms32_ActiveSubMode)
-      {
-      case ms32_SUBMODE_SYSDEF_NODEEDIT:
-         m_UpdateNodeErrors();
-         //Node com data pool changes can affect connected busses (eg com data pool delete)
-         m_UpdateBusErrors();
-         break;
-      case ms32_SUBMODE_SYSDEF_BUSEDIT:
-         m_UpdateBusErrors();
-         break;
-      case ms32_SUBMODE_SYSDEF_TOPOLOGY:
-         //Update all errors
-         m_UpdateNodeErrors();
-         m_UpdateBusErrors();
-         break;
-      default:
-         //No error handling necessary
-         break;
-      }
-   }
-   else
-   {
-      //No error handling necessary
-   }
+   m_UpdateViewIcons(true, ou32_ViewIndex);
 }
 
 //-----------------------------------------------------------------------------
 /*!
-   \brief   Handle all view icons update
+   \brief   Handle all views icon update
+
+   \created     22.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_NagNaviBarWidget::UpdateAllViewsIcons(void) const
+{
+   m_UpdateViewIcons(false, 0UL);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Handle all screens icons update
 
    \param[in] oq_CheckAll Flag if all icons should be checked
 
    \created     20.08.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-void C_NagNaviBarWidget::UpdateAllViewIcons(const bool oq_CheckAll) const
+void C_NagNaviBarWidget::UpdateAllScreenIcons(const bool oq_CheckAll) const
 {
    if (oq_CheckAll == true)
    {
       m_UpdateNodeErrors();
       m_UpdateBusErrors();
    }
-   this->mpc_Ui->pc_ListViewViews->UpdateDeco();
+   this->mpc_Ui->pc_ListViewViews->UpdateDeco(false, 0UL);
 }
 
 //-----------------------------------------------------------------------------
@@ -326,6 +325,7 @@ void C_NagNaviBarWidget::SetMode(const sint32 os32_Mode, const sint32 os32_SubMo
    this->mpc_Ui->pc_ListViewViews->setVisible(false);
    this->mpc_Ui->pc_GroupBoxSD->setVisible(false);
    this->mpc_Ui->pc_GroupBoxAddViewButtonSection->setVisible(false);
+   this->mpc_Ui->pc_GroupBoxOpenCanMonitorOutside->setVisible(false);
 
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_PushButtonTopology, "Active", false);
 
@@ -364,6 +364,7 @@ void C_NagNaviBarWidget::SetMode(const sint32 os32_Mode, const sint32 os32_SubMo
    case ms32_MODE_SYSVIEW:
       this->mpc_Ui->pc_ListViewViews->setVisible(true);
       this->mpc_Ui->pc_GroupBoxAddViewButtonSection->setVisible(true);
+      this->mpc_Ui->pc_GroupBoxOpenCanMonitorOutside->setVisible(true);
       //Highlight active view
       this->mpc_Ui->pc_ListViewViews->SetActive(ou32_Index, os32_SubMode);
 
@@ -397,99 +398,6 @@ void C_NagNaviBarWidget::MarkModeForDataChanged(const bool oq_Changed, const boo
    Q_UNUSED(os32_Mode)
    Q_UNUSED(os32_SubMode)
    Q_UNUSED(ou32_Index)
-   //// system definition
-   //if (os32_Mode == ms32_MODE_SYSDEF)
-   //{
-   //   if (oq_All == false)
-   //   {
-   //      C_OgeTreeViewItemNaviBar * pc_Item = NULL;
-
-   //      // get the correct item
-   //      switch (os32_SubMode)
-   //      {
-   //      case ms32_SUBMODE_SYSDEF_TOPOLOGY:
-   //         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   //         pc_Item = dynamic_cast<C_OgeTreeViewItemNaviBar *>(this->mpc_TreeItemTopology);
-   //         break;
-   //      case ms32_SUBMODE_SYSDEF_NODEEDIT:
-   //         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   //         pc_Item = dynamic_cast<C_OgeTreeViewItemNaviBar *>(this->mpc_TreeItemNodes->child(ou32_Index));
-   //         if (oq_Changed == true)
-   //         {
-   //            this->mc_SetChangedNodes.insert(ou32_Index);
-   //         }
-   //         else
-   //         {
-   //            this->mc_SetChangedNodes.erase(ou32_Index);
-   //         }
-   //         break;
-   //      case ms32_SUBMODE_SYSDEF_BUSEDIT:
-   //         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   //         pc_Item = dynamic_cast<C_OgeTreeViewItemNaviBar *>(this->mpc_TreeItemBusses->child(ou32_Index));
-   //         if (oq_Changed == true)
-   //         {
-   //            this->mc_SetChangedBusses.insert(ou32_Index);
-   //         }
-   //         else
-   //         {
-   //            this->mc_SetChangedBusses.erase(ou32_Index);
-   //         }
-   //         break;
-   //      default:
-   //         break;
-   //      }
-
-   //      // set the change mark
-   //      if (pc_Item != NULL)
-   //      {
-   //         pc_Item->SetChangeMark(oq_Changed);
-   //      }
-   //   }
-   //   else
-   //   {
-   //      // no changes anymore, all items of system definition was saved
-   //      // deactivate the change mark on all items of system definition
-   //      C_OgeTreeViewItemNaviBar * pc_Item;
-   //      sint32 s32_Counter;
-
-   //      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   //      pc_Item = dynamic_cast<C_OgeTreeViewItemNaviBar *>(this->mpc_TreeItemTopology);
-   //      if (pc_Item != NULL)
-   //      {
-   //         pc_Item->SetChangeMark(oq_Changed);
-   //      }
-
-   //      // all nodes
-   //      for (s32_Counter = 0U; s32_Counter < this->mpc_TreeItemNodes->childCount(); ++s32_Counter)
-   //      {
-   //         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   //         pc_Item = dynamic_cast<C_OgeTreeViewItemNaviBar *>(this->mpc_TreeItemNodes->child(s32_Counter));
-   //         if (pc_Item != NULL)
-   //         {
-   //            pc_Item->SetChangeMark(oq_Changed);
-   //         }
-   //      }
-   //      if (oq_Changed == false)
-   //      {
-   //         this->mc_SetChangedNodes.clear();
-   //      }
-
-   //      // all busses
-   //      for (s32_Counter = 0U; s32_Counter < this->mpc_TreeItemBusses->childCount(); ++s32_Counter)
-   //      {
-   //         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   //         pc_Item = dynamic_cast<C_OgeTreeViewItemNaviBar *>(this->mpc_TreeItemBusses->child(s32_Counter));
-   //         if (pc_Item != NULL)
-   //         {
-   //            pc_Item->SetChangeMark(oq_Changed);
-   //         }
-   //      }
-   //      if (oq_Changed == false)
-   //      {
-   //         this->mc_SetChangedBusses.clear();
-   //      }
-   //   }
-   //}
 }
 
 //-----------------------------------------------------------------------------
@@ -507,10 +415,15 @@ void C_NagNaviBarWidget::InitText(void) const
    this->mpc_Ui->pc_BtnMain->setText(C_GtGetText::h_GetText("MAIN"));
 
    this->mpc_Ui->pc_PushButtonAddSysView->setText(C_GtGetText::h_GetText("Add View"));
+   this->mpc_Ui->pc_PushButtonCanMonitor->setText(C_GtGetText::h_GetText("openSYDE CAN Monitor"));
 
    //SetText
    this->mpc_Ui->pc_WidgetTabSd->SetText(C_GtGetText::h_GetText("SYSTEM\nDEFINITION"));
    this->mpc_Ui->pc_WidgetTabSc->SetText(C_GtGetText::h_GetText("SYSTEM\nCOMMISSIONING"));
+
+   this->mpc_Ui->pc_PushButtonCanMonitor->SetToolTipInformation(C_GtGetText::h_GetText("openSYDE CAN Monitor"),
+                                                                C_GtGetText::h_GetText(
+                                                                   "Open new instance of openSYDE CAN Monitor."));
 }
 
 //-----------------------------------------------------------------------------
@@ -725,8 +638,51 @@ void C_NagNaviBarWidget::m_BussesChanged(void) const
 //-----------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_AddViewClicked(void)
 {
+   QElapsedTimer c_Timer;
+
+   if (mq_TIMING_OUTPUT)
+   {
+      c_Timer.start();
+   }
+
    Q_EMIT this->SigAddViewClicked();
    m_SysViewSizeChanged();
+   if (mq_TIMING_OUTPUT)
+   {
+      std::cout << "Add view: " << c_Timer.elapsed() << " ms" << &std::endl;
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Handle open CAN monitor click
+
+   \created     10.01.2019  STW/S.Singer
+*/
+//-----------------------------------------------------------------------------
+void C_NagNaviBarWidget::m_OpenCanMonitor(void)
+{
+   QString c_ExecutablePath = C_Uti::h_GetExePath() + "/CAN_Monitor/openSYDE_CAN_Monitor.exe";
+   // Adapted working directory is necessary for the stwpeak2.ini
+   bool q_Temp = QProcess::startDetached(c_ExecutablePath, QStringList(),
+                                         C_Uti::h_GetExePath() + "/CAN_Monitor");
+   QString c_ErrorMsg = QString(
+      "Could not start openSYDE CAN Monitor. Reason: Most likely due to insufficient permissions or the executable"
+      " \"%1\" is missing.").arg(c_ExecutablePath);
+
+   if (q_Temp == false)
+   {
+      osc_write_log_error("Open openSYDE CAN Monitor Tool", c_ErrorMsg.toStdString().c_str());
+
+      C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eERROR,
+                                        C_GtGetText::h_GetText(
+                                           "Could not start openSYDE CAN Monitor. Reason: Most likely due to insufficient permissions or the executable is missing."));
+      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Open openSYDE CAN Monitor"));
+      c_MessageBox.SetDetails(QString(C_GtGetText::h_GetText(
+                                         "Executable path: \n%1")).arg(c_ExecutablePath));
+
+      c_MessageBox.Execute();
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -776,7 +732,7 @@ void C_NagNaviBarWidget::m_SysViewSizeChanged(void) const
 {
    if (this->mpc_Ui->pc_ListViewViews->isVisible() == true)
    {
-      const sint32 s32_OtherItemSizes = 394;
+      const sint32 s32_OtherItemSizes = 444;
       const sint32 s32_MinSize = 52;
       //Check if there is any available space to work with
       if (this->height() > (s32_OtherItemSizes + s32_MinSize))
@@ -945,6 +901,50 @@ void C_NagNaviBarWidget::m_SelectView(const uint32 ou32_ViewIndex, const sint32 
    //After change of mode we will restore user settings so we have to store the current configuration
    this->SaveUserSettings();
    Q_EMIT this->SigChangeMode(ms32_MODE_SYSVIEW, os32_SubMode, ou32_ViewIndex, orc_Name, orc_SubSubItemName);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   update all view icons (depends on current state)
+
+   \param[in] oq_CheckOnlyThisView Flag to reduce view error check to one item (only used in view state)
+   \param[in] ou32_ViewIndex       Index to specify which view changed (only used if oq_CheckOnlyThisView set)
+
+   \created     22.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_NagNaviBarWidget::m_UpdateViewIcons(const bool oq_CheckOnlyThisView, const uint32 ou32_ViewIndex) const
+{
+   if (this->ms32_ActiveMode == ms32_MODE_SYSVIEW)
+   {
+      this->mpc_Ui->pc_ListViewViews->UpdateDeco(oq_CheckOnlyThisView, ou32_ViewIndex);
+   }
+   else if (this->ms32_ActiveMode == ms32_MODE_SYSDEF)
+   {
+      switch (this->ms32_ActiveSubMode)
+      {
+      case ms32_SUBMODE_SYSDEF_NODEEDIT:
+         m_UpdateNodeErrors();
+         //Node com data pool changes can affect connected busses (eg com data pool delete)
+         m_UpdateBusErrors();
+         break;
+      case ms32_SUBMODE_SYSDEF_BUSEDIT:
+         m_UpdateBusErrors();
+         break;
+      case ms32_SUBMODE_SYSDEF_TOPOLOGY:
+         //Update all errors
+         m_UpdateNodeErrors();
+         m_UpdateBusErrors();
+         break;
+      default:
+         //No error handling necessary
+         break;
+      }
+   }
+   else
+   {
+      //No error handling necessary
+   }
 }
 
 //-----------------------------------------------------------------------------

@@ -42,6 +42,12 @@ public:
    //lint -restore
 
    static const stw_types::float64 mhf64_FACTOR_MIN;
+
+protected:
+   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
+   //lint -save -e1960
+   virtual StepEnabled stepEnabled(void) const override;
+   //lint -restore
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

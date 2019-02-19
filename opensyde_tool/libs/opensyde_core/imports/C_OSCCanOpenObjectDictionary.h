@@ -29,6 +29,8 @@ namespace stw_opensyde_core
 /* -- Global Constants ----------------------------------------------------- */
 
 /* -- Types ---------------------------------------------------------------- */
+
+///container for on object dictionary entry
 class C_OSCCanOpenObject
 {
 private:
@@ -96,6 +98,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
+///container for a CANopen object dictionary
 class C_OSCCanOpenObjectDictionary
 {
 private:

@@ -22,6 +22,7 @@
 #include <QWidget>
 #include <QVariant>
 #include <QKeyEvent>
+#include <QFileDialog>
 
 #include "stwtypes.h"
 
@@ -53,6 +54,10 @@ public:
                                                      const stw_types::float32 of32_HeightScaling = 1.0F);
    static QWidget * h_GetWidgetUnderNextPopUp(QWidget * const opc_Input);
    static bool h_CheckGlobalKey(const QKeyEvent * const opc_Event);
+   static QString h_GetSaveFileName(QWidget * const opc_Parent, const QString & orc_Heading,
+                                    const QString & orc_StartingFolder, const QString & orc_Filter,
+                                    const QString & orc_DefaultFileName,
+                                    const QFileDialog::Options oc_Option = QFileDialog::Options());
 
 private:
    C_OgeWiUtil(void);

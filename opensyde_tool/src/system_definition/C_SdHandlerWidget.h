@@ -91,6 +91,10 @@ private:
    static const stw_types::uint32 mhu32_USER_INPUT_FUNC_GENERATE_CODE;
    static const stw_types::uint32 mhu32_USER_INPUT_FUNC_EXPORT;
    static const stw_types::uint32 mhu32_USER_INPUT_FUNC_RTF_EXPORT;
+
+   const QString mc_TOOLTIP_GENERAT_CODE_HEADING;
+   const QString mc_TOOLTIP_GENERAT_CODE_CONTENT_SYSDEF;
+   const QString mc_TOOLTIP_GENERAT_CODE_CONTENT_NODE;
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

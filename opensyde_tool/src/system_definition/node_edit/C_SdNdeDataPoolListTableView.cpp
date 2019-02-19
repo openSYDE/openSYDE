@@ -103,9 +103,9 @@ C_SdNdeDataPoolListTableView::C_SdNdeDataPoolListTableView(QWidget * const opc_P
    this->setSelectionBehavior(QAbstractItemView::SelectionBehavior::SelectRows);
    this->setSelectionMode(QAbstractItemView::SelectionMode::ExtendedSelection);
    this->setAlternatingRowColors(true);
-   this->setDragDropMode(QAbstractItemView::DragDropMode::DragDrop);
+   this->setDragDropMode(QAbstractItemView::NoDragDrop);
    this->setDefaultDropAction(Qt::DropAction::MoveAction);
-   this->setDragEnabled(true);
+   this->setDragEnabled(false);
    this->setLineWidth(0);
    this->setFrameShadow(QAbstractItemView::Shadow::Plain);
    this->setFrameShape(QAbstractItemView::Shape::NoFrame);
@@ -727,54 +727,6 @@ void C_SdNdeDataPoolListTableView::dropEvent(QDropEvent * const opc_Event)
 
 //-----------------------------------------------------------------------------
 /*!
-   \brief   Overwritten mouse move event slot
-
-   Here: Track mouse hover
-
-   \param[in,out] opc_Event Event identification and information
-
-   \created     14.02.2017  STW/M.Echtler
-*/
-//-----------------------------------------------------------------------------
-void C_SdNdeDataPoolListTableView::mouseMoveEvent(QMouseEvent * const opc_Event)
-{
-   sint32 s32_HoveredRow = -1;
-   const QModelIndex c_HoveredIndex = this->indexAt(opc_Event->pos());
-
-   QTableView::mouseMoveEvent(opc_Event);
-
-   if (c_HoveredIndex.isValid())
-   {
-      s32_HoveredRow = c_HoveredIndex.row();
-   }
-   if (this->mc_Delegate.SetHoveredRow(s32_HoveredRow) == true)
-   {
-      this->update();
-   }
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse leave event slot
-
-   Here: Handle hover effect change
-
-   \param[in,out] opc_Event Event identification and information
-
-   \created     18.05.2017  STW/M.Echtler
-*/
-//-----------------------------------------------------------------------------
-void C_SdNdeDataPoolListTableView::leaveEvent(QEvent * const opc_Event)
-{
-   QTableView::leaveEvent(opc_Event);
-   if (this->mc_Delegate.SetHoveredRow(-1) == true)
-   {
-      this->update();
-   }
-}
-
-//-----------------------------------------------------------------------------
-/*!
    \brief   Overwritten selection changed event slot
 
    Here: Register selection change
@@ -836,7 +788,6 @@ void C_SdNdeDataPoolListTableView::startDrag(const Qt::DropActions oc_SupportedA
 void C_SdNdeDataPoolListTableView::SetModelViewManager(C_SdNdeDataPoolListModelViewManager * const opc_Value)
 {
    this->mpc_ModelViewManager = opc_Value;
-   m_UpdateModelView();
 }
 
 //-----------------------------------------------------------------------------
@@ -853,6 +804,25 @@ void C_SdNdeDataPoolListTableView::SelectDataElement(const sint32 os32_DataEleme
    this->clearSelection();
    this->selectRow(os32_DataElementIndex);
    this->setFocus();
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Select data elements in a specific range
+
+   \param[in] ou32_FirstRow First row to select
+   \param[in] ou32_LastRow  Last row to select
+
+   \created     22.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_SdNdeDataPoolListTableView::SelectRange(const uint32 ou32_FirstRow, const uint32 ou32_LastRow) const
+{
+   const QModelIndex c_TopLeft = this->model()->index(ou32_FirstRow, 0);
+   const QModelIndex c_BottomRight = this->model()->index(ou32_LastRow, this->model()->columnCount() - 1);
+   const QItemSelection c_Selection(c_TopLeft, c_BottomRight);
+
+   this->selectionModel()->select(c_Selection, QItemSelectionModel::Select);
 }
 
 //-----------------------------------------------------------------------------

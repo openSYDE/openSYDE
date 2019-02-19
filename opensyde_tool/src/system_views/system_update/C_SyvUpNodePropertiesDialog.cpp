@@ -132,11 +132,11 @@ void C_SyvUpNodePropertiesDialog::InitStaticNames(void) const
    this->mpc_Ui->pc_TabWidget->setTabText(1, C_GtGetText::h_GetText("Flashloader Information"));
    this->mpc_Ui->pc_LabelDetails->setText(C_GtGetText::h_GetText("Details"));
    this->mpc_Ui->pc_LabelHeadingFlash->setText(C_GtGetText::h_GetText("Details"));
-   this->mpc_Ui->pc_PushButtonDiscard->setText(C_GtGetText::h_GetText("Discard device application info"));
+   this->mpc_Ui->pc_PushButtonDiscard->setText(C_GtGetText::h_GetText("Force Update"));
    this->mpc_Ui->pc_PushButtonDiscard->SetToolTipInformation(C_GtGetText::h_GetText(
-                                                                "Discard device application info"),
+                                                                "Force Update"),
                                                              C_GtGetText::h_GetText(
-                                                                "Option to allow flashing of already up to date nodes"),
+                                                                "Option to force flashing of already up to date nodes"),
                                                              C_NagToolTip::eDEFAULT);
 }
 
@@ -606,11 +606,10 @@ void C_SyvUpNodePropertiesDialog::m_OnDiscard(void)
    C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
 
    C_OgeWiCustomMessage::E_Outputs e_Output;
-   c_Message.SetHeading(C_GtGetText::h_GetText("Discarding application information"));
+   c_Message.SetHeading(C_GtGetText::h_GetText("Force Update"));
    c_Message.SetDescription(C_GtGetText::h_GetText(
-                               "Do you really want to discard all read application information, so that all "
-                               "applications will be flashed to this device again?\nUse-case: Force openSYDE "
-                               "to update this device."));
+                               "Do you really want to discard all read application information, "
+                               "to force flashing of this device?"));
    e_Output = c_Message.Execute();
    switch (e_Output)
    {

@@ -11,8 +11,6 @@
         <file>styles/CheckBox.qss</file>
         <file>styles/RadioButton.qss</file>
         <file>images/CheckBoxActiveWithoutBackground.svg</file>
-        <file>images/RadioButtonActive.png</file>
-        <file>images/RadioButtonInactive.png</file>
         <file>styles/PushButton.qss</file>
         <file>images/BtnWidgetMax.png</file>
         <file>images/BtnWidgetMin.png</file>
@@ -27,14 +25,12 @@
         <file>styles/TabWidget.qss</file>
         <file>styles/Slider.qss</file>
         <file>styles/Table.qss</file>
-        <file>styles/ToolTip.qss</file>
         <file>styles/GroupBox.qss</file>
         <file>styles/ListWidget.qss</file>
         <file>styles/PlainTextEdit.qss</file>
         <file>styles/Color.qss</file>
         <file>styles/Font.qss</file>
         <file>styles/Widget.qss</file>
-        <file>styles/Html.qss</file>
         <file>styles/TextEdit.qss</file>
         <file>images/graphic_items/TransparentBtnBackground.png</file>
         <file>images/graphic_items/LineStyleDash.png</file>
@@ -58,7 +54,6 @@
         <file>images/graphic_items/LineArrowHeadType4Selected.png</file>
         <file>images/graphic_items/LineArrowHeadType5Selected.png</file>
         <file>styles/TreeWidget.qss</file>
-        <file>styles/Splitter.qss</file>
         <file>images/IconArrowLeftActive.png</file>
         <file>images/IconArrowRightActive.png</file>
         <file>images/IconDataPoolSelCloseView.png</file>
@@ -74,7 +69,6 @@
         <file>images/IconArrowSmallClose.png</file>
         <file>images/IconArrowSmallOpen.png</file>
         <file>images/SpinBoxUpArrowDisabled.png</file>
-        <file>images/RadioButtonActiveAlternative.png</file>
         <file>images/BtnWidgetHor.png</file>
         <file>images/tools_icons/CodeBlocks.png</file>
         <file>images/tools_icons/EnterpriseArchitect.png</file>
@@ -198,7 +192,6 @@
         <file>images/STW_Logo_Dark.png</file>
         <file>images/system_views/Update.PNG</file>
         <file>images/openSYDE_logo.ico</file>
-        <file>styles/Misc.qss</file>
         <file>images/system_views/Device.svg</file>
         <file>styles/ProgressBar.qss</file>
         <file>styles/Charts.qss</file>
@@ -488,5 +481,11 @@
         <file>images/IconImportFileDisabled.svg</file>
         <file>images/system_definition/IconOpenExternalTool.svg</file>
         <file>images/system_definition/IconGenerateCodeSettings.svg</file>
+        <file>images/IconArrowUpMessageBox.svg</file>
+        <file>images/IconArrowBottomMessageBox.svg</file>
+        <file>images/CanMonitorIcon_Navibar.png</file>
+        <file>images/RadioButtonActive.svg</file>
+        <file>images/system_definition/NodeEdit/lists/IconSortDown.svg</file>
+        <file>images/system_definition/NodeEdit/lists/IconSortUp.svg</file>
     </qresource>
 </RCC>

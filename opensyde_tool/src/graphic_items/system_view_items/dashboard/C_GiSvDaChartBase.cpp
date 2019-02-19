@@ -607,6 +607,8 @@ void C_GiSvDaChartBase::m_AddNewDataElement(void)
       QApplication::restoreOverrideCursor();
    }
 
+   //Force update
+   this->mq_InitialStyleCall = true;
    // Update the whole styling, because of new added gui elements
    this->SetDisplayStyle(this->me_Style, this->mq_DarkMode);
 

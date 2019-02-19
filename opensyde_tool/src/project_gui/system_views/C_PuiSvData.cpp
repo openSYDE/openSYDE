@@ -30,7 +30,6 @@
 #include "CSCLChecksums.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_PuiSdHandler.h"
-#include "C_Uti.h"
 #include "C_PuiProject.h"
 
 /* -- Used Namespaces ------------------------------------------------------ */
@@ -976,7 +975,7 @@ void C_PuiSvData::OnSyncNodeAdded(const uint32 ou32_Index)
    {
       uint32 u32_NodeUpdateCounter;
       uint32 u32_Position = 0U;
-      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(ou32_Index);
+      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_Index);
 
       tgl_assert(pc_Node != NULL);
       if (pc_Node != NULL)
@@ -1802,6 +1801,20 @@ void C_PuiSvData::SetPCConnected(const bool oq_Connected, const uint32 ou32_BusI
 
 //-----------------------------------------------------------------------------
 /*!
+   \brief   Set type of the CAN DLL
+
+   \param[in]     oe_DllType   CAN DLL type
+
+   \created     07.02.2019  STW/G.Landsgesell
+*/
+//-----------------------------------------------------------------------------
+void C_PuiSvData::SetPCCANDllType(const C_PuiSvPc::E_CANDllType oe_DllType)
+{
+   this->mc_PcData.SetCANDllType(oe_DllType);
+}
+
+//-----------------------------------------------------------------------------
+/*!
    \brief   Set path for the CAN DLL
 
    \param[in]     orc_DllPath   Path for the CAN DLL
@@ -1809,9 +1822,9 @@ void C_PuiSvData::SetPCConnected(const bool oq_Connected, const uint32 ou32_BusI
    \created     05.07.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
-void C_PuiSvData::SetPCCANDll(const QString & orc_DllPath)
+void C_PuiSvData::SetPCCANDllPath(const QString & orc_DllPath)
 {
-   this->mc_PcData.SetCANDll(orc_DllPath);
+   this->mc_PcData.SetCustomCANDllPath(orc_DllPath);
 }
 
 //-----------------------------------------------------------------------------
@@ -1890,7 +1903,7 @@ sint32 C_PuiSvData::InsertDashboard(const uint32 ou32_Index, const C_PuiSvDashbo
 
       if (oq_AutoAdapt == true)
       {
-         c_Copy.SetName(C_PuiSdUtil::h_GetUniqueName(this->m_GetExistingDashboardNames(), c_Copy.GetName()));
+         c_Copy.SetName(C_Uti::h_GetUniqueNameQ(this->m_GetExistingDashboardNamesMap(), c_Copy.GetName()));
          c_Copy.SetComment(c_Copy.GetComment());
       }
       this->mc_Dashboards.insert(this->mc_Dashboards.begin() + ou32_Index, c_Copy);
@@ -2712,12 +2725,9 @@ void C_PuiSvData::InitFromSystemDefintion(void)
             for (uint32 u32_ItAppl = 0; u32_ItAppl < pc_Node->c_Applications.size(); ++u32_ItAppl)
             {
                const C_OSCNodeApplication & rc_Application = pc_Node->c_Applications[u32_ItAppl];
-               // get directory of .syde file
-               const QFileInfo c_FileInfo(C_PuiProject::h_GetInstance()->GetPath());
-               const QString c_SydePath = C_Uti::h_GetAbsoluteProjectPath(c_FileInfo.dir().path(),
-                                                                          rc_Application.c_ProjectPath.c_str());
 
-               c_ApplPaths.push_back(C_Uti::h_ConcatPathIfNecessary(c_SydePath, rc_Application.c_ResultPath.c_str()));
+               c_ApplPaths.push_back(C_Uti::h_ConcatPathIfNecessary(rc_Application.c_ProjectPath.c_str(),
+                                                                    rc_Application.c_ResultPath.c_str()));
             }
             c_Info.SetApplicationPaths(c_ApplPaths);
 
@@ -2778,7 +2788,7 @@ bool C_PuiSvData::CheckDashboardName(const QString & orc_Proposal, const uint32 
 //-----------------------------------------------------------------------------
 QString C_PuiSvData::GetUniqueDashboardName(const QString & orc_Proposal) const
 {
-   return C_PuiSdUtil::h_GetUniqueName(this->m_GetExistingDashboardNames(), orc_Proposal);
+   return C_Uti::h_GetUniqueNameQ(this->m_GetExistingDashboardNamesMap(), orc_Proposal);
 }
 
 //-----------------------------------------------------------------------------
@@ -3007,6 +3017,27 @@ std::vector<const QString *> C_PuiSvData::m_GetExistingDashboardNames(void) cons
    {
       const C_PuiSvDashboard & rc_Data = this->mc_Dashboards[u32_ItDashboard];
       c_Retval.push_back(&rc_Data.GetName());
+   }
+   return c_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get pointers to all currently registered dashboard names
+
+   \return
+   Vector of pointers to all currently registered dashboard names
+
+   \created     06.07.2017  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+std::map<stw_scl::C_SCLString, bool> C_PuiSvData::m_GetExistingDashboardNamesMap(void) const
+{
+   std::map<stw_scl::C_SCLString, bool> c_Retval;
+   for (uint32 u32_ItDashboard = 0; u32_ItDashboard < this->mc_Dashboards.size(); ++u32_ItDashboard)
+   {
+      const C_PuiSvDashboard & rc_Data = this->mc_Dashboards[u32_ItDashboard];
+      c_Retval[rc_Data.GetName().toStdString().c_str()] = true;
    }
    return c_Retval;
 }

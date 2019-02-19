@@ -79,6 +79,8 @@ Q_SIGNALS:
    void SigEnableUserInputFunc(const stw_types::uint32 ou32_FuncNumber, const bool oq_Enable);
    void SigShowBackgroundOfUserInputFunc(const stw_types::uint32 ou32_FuncNumber, const bool oq_Enable);
    void SigSetIconForUserInputFunc(const stw_types::uint32 ou32_FuncNumber, const QIcon & orc_Icon);
+   void SigSetToolTipForUserInputFunc(const stw_types::uint32 ou32_FuncNumber, const QString & orc_ToolTipHeading,
+                                      const QString & orc_ToolTipContent);
    void SigChangeMode(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode,
                       const stw_types::uint32 ou32_Index, const QString & orc_Name, const QString & orc_SubSubItemName,
                       const stw_types::uint32 ou32_Flag);

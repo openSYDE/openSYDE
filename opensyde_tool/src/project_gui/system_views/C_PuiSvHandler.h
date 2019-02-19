@@ -52,7 +52,8 @@ public:
    stw_types::sint32 SetViewPCConnection(const stw_types::uint32 ou32_Index, const C_PuiBsLineBase & orc_Line);
    stw_types::sint32 SetViewPCConnected(const stw_types::uint32 ou32_Index, const bool oq_Connected,
                                         const stw_types::uint32 ou32_BusIndex);
-   stw_types::sint32 SetViewPCCANDll(const stw_types::uint32 ou32_Index, const QString & orc_DllPath);
+   stw_types::sint32 SetViewPCCANDll(const stw_types::uint32 ou32_Index, const C_PuiSvPc::E_CANDllType oe_Type,
+                                     const QString & orc_DllPath);
    stw_types::sint32 SetDashboardName(const stw_types::uint32 ou32_ViewIndex,
                                       const stw_types::uint32 ou32_DashboardIndex, const QString & orc_Name);
    stw_types::sint32 SetDashboardComment(const stw_types::uint32 ou32_ViewIndex,
@@ -174,11 +175,13 @@ public:
                                                      const stw_types::uint32 ou32_DashboardIndex);
 
    //Error
+   void UpdateSystemDefintionErrors(void);
+   bool GetErrorNode(const stw_types::uint32 ou32_Index) const;
+   bool GetErrorBus(const stw_types::uint32 ou32_Index) const;
    stw_types::sint32 CheckViewError(const stw_types::uint32 ou32_Index, bool * const opq_NameInvalid,
                                     bool * const opq_PCNotConnected, bool * const opq_RoutingInvalid,
                                     bool * const opq_UpdateDisabledButDataBlocks, bool * const opq_SysDefInvalid,
-                                    bool * const opq_NoNodesActive,
-                                    bool * const opq_TooManyNodesPerRailConfigured) const;
+                                    bool * const opq_NoNodesActive, QString * const opc_RoutingErrorDetails);
    void CheckUpdateEnabledForDataBlocks(const stw_types::uint32 ou32_ViewIndex, bool & orq_UpdateDisabledButDataBlocks,
                                         QString & orc_ErrorMessage) const;
    stw_types::sint32 CheckRouting(const stw_types::uint32 ou32_ViewIndex, bool & orq_RoutingError,
@@ -194,6 +197,7 @@ public:
                                                              const stw_types::uint32 ou32_DashboardIndex,
                                                              const stw_types::uint32 ou32_ParamWidgetIndex,
                                                              const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_NewId, const stw_opensyde_core::C_OSCNodeDataPoolContent * const opc_Content);
+   stw_types::uint32 GetViewHash(const stw_types::uint32 ou32_ViewIndex) const;
 
    static C_PuiSvHandler * h_GetInstance(void);
    static void h_Destroy(void);
@@ -275,11 +279,32 @@ private:
    //Other
    stw_types::uint32 m_CalcHashSystemViews(void) const;
    void m_FixInvalidRailConfig(void);
-   std::vector<const QString *> m_GetExistingViewNames(void) const;
+   std::map<stw_scl::C_SCLString, bool> m_GetExistingViewNames(void) const;
 
    static C_PuiSvHandler * mhpc_Singleton;
-   std::vector<C_PuiSvData> mc_Views; ///< System view data elements
+   std::vector<bool> mc_SdNodeErrors;
+   std::vector<bool> mc_SdBusErrors;
+   std::vector<C_PuiSvData> mc_Views;
    stw_types::uint32 mu32_CalculatedHashSystemViews;
+   stw_types::uint32 mu32_PreviousSystemDefintionHash;
+
+   class C_PuiSvViewErrorDetails
+   {
+   public:
+      bool q_NameInvalid;
+      bool q_PCNotConnected;
+      bool q_RoutingInvalid;
+      bool q_UpdateDisabledButDataBlocks;
+      bool q_SysDefInvalid;
+      bool q_NoNodesActive;
+      QString c_RoutingErrorDetails;
+
+      void GetResults(bool * const opq_NameInvalid, bool * const opq_PCNotConnected, bool * const opq_RoutingInvalid,
+                      bool * const opq_UpdateDisabledButDataBlocks, bool * const opq_SysDefInvalid,
+                      bool * const opq_NoNodesActive, QString * const opc_RoutingErrorDetails) const;
+   };
+
+   QMap<stw_types::uint32, C_PuiSvViewErrorDetails> mc_PreviousErrorCheckResults;
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

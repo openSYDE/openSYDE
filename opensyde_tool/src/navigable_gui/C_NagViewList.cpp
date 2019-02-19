@@ -102,6 +102,8 @@ void C_NagViewList::Init(void)
          //Add item widget
          pc_ViewWidget = new C_NagViewItem(this);
          this->setIndexWidget(c_Index, pc_ViewWidget);
+         // scroll to new item
+         this->scrollTo(c_Index);
 
          connect(pc_ViewWidget, &C_NagViewItem::SigStartDrag, this, &C_NagViewList::m_OnStartDrag);
          connect(pc_ViewWidget, &C_NagViewItem::SigSetName, this, &C_NagViewList::m_OnSetName);
@@ -176,17 +178,31 @@ void C_NagViewList::UpdateNames(void) const
 /*!
    \brief   Trigger update of decoration role
 
+   \param[in] oq_CheckOnlyThisView Flag to reduce view error check to one item
+   \param[in] ou32_ViewIndex       Index to specify which view changed (only used if oq_CheckOnlyThisView set)
+
    \created     30.07.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-void C_NagViewList::UpdateDeco(void) const
+void C_NagViewList::UpdateDeco(const bool oq_CheckOnlyThisView, const uint32 ou32_ViewIndex) const
 {
-   for (sintn sn_ItView = 0UL; sn_ItView < this->mc_Model.rowCount(); ++sn_ItView)
+   if (oq_CheckOnlyThisView == true)
    {
-      C_NagViewItem * const pc_View = this->GetItemAt(sn_ItView);
+      C_NagViewItem * const pc_View = this->GetItemAt(static_cast<sintn>(ou32_ViewIndex));
       if (pc_View != NULL)
       {
          pc_View->UpdateDeco();
+      }
+   }
+   else
+   {
+      for (sintn sn_ItView = 0UL; sn_ItView < this->mc_Model.rowCount(); ++sn_ItView)
+      {
+         C_NagViewItem * const pc_View = this->GetItemAt(sn_ItView);
+         if (pc_View != NULL)
+         {
+            pc_View->UpdateDeco();
+         }
       }
    }
 }
@@ -545,6 +561,11 @@ void C_NagViewList::m_OnDuplicate(const C_NagViewItem * const opc_Sender)
       {
          Q_EMIT this->SigDuplicate(static_cast<uint32>(sn_It));
          Q_EMIT this->SigSizeChange();
+         // scroll to new item
+         if (this->mc_Model.index(sn_It + 1).isValid() == true)
+         {
+            this->scrollTo(this->mc_Model.index(sn_It + 1));
+         }
       }
    }
 }

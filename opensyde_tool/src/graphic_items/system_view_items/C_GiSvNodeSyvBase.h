@@ -31,7 +31,7 @@ class C_GiSvNodeSyvBase :
    public C_GiNode
 {
 public:
-   //lint -e{1938} TODO
+   //lint -e{1938}  static const is guaranteed preinitialized before main
    C_GiSvNodeSyvBase(const stw_types::uint32 ou32_ViewIndex, const stw_types::sint32 & ors32_NodeIndex,
                      const stw_types::uint64 & oru64_ID, const stw_types::float64 & orf64_Width = mhf64_MinWidthNode,
                      const stw_types::float64 & orf64_Height = mhf64_MinHeightNode,
@@ -44,6 +44,8 @@ public:
 protected:
    stw_types::uint32 mu32_ViewIndex;
    bool mq_ViewConnected;
+
+   virtual bool m_UpdateError(void) override;
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

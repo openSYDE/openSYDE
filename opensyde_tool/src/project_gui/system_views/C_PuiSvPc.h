@@ -33,6 +33,13 @@ class C_PuiSvPc :
    public C_PuiBsBox
 {
 public:
+   enum E_CANDllType
+   {
+      ePEAK = 0,
+      eVECTOR = 1,
+      eOTHER = 2
+   };
+
    C_PuiSvPc(void);
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
@@ -43,9 +50,12 @@ public:
    void SetConnectionData(const C_PuiBsLineBase & orc_Value);
    void SetConnected(const bool oq_Connected, const stw_types::uint32 ou32_BusIndex,
                      const bool & orq_ForceSimpleSet = false);
+   E_CANDllType GetCANDllType(void) const;
    QString GetCANDll(void) const;
+   QString GetCustomCANDllPath(void) const;
    QString GetCANDllAbsolute(void) const;
-   void SetCANDll(const QString & orc_DllPath);
+   void SetCANDllType(const E_CANDllType oe_Type);
+   void SetCustomCANDllPath(const QString & orc_Path);
 
    //Specific setter
    void SetBox(const C_PuiBsBox & orc_Box);
@@ -60,7 +70,8 @@ private:
    stw_types::uint32 mu32_BusIndex; ///< Target bus index this PC connects to
    ///< Only valid if bus flag q_IsBusConnected is true
    C_PuiBsLineBase mc_ConnectionData; ///< Relevant connection UI data
-   QString mc_CANDllPath;             ///< Path to the CAN DLL
+   E_CANDllType me_CANDllType;        ///< Type of CAN DLL
+   QString mc_CustomCANDllPath;       ///< Path to the custom CAN DLL
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

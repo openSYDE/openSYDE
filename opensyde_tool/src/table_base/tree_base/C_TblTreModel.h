@@ -18,7 +18,6 @@
 #define C_TBLTREMODEL_H
 
 /* -- Includes ------------------------------------------------------------- */
-#include <QElapsedTimer>
 #include <QAbstractItemModel>
 #include "C_TblTreItem.h"
 
@@ -55,8 +54,7 @@ public:
    //lint -restore
 
 protected:
-   QElapsedTimer mc_Measure;
-   C_TblTreItem mc_InvisibleRootItem;
+   C_TblTreItem * mpc_InvisibleRootItem;
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

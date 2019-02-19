@@ -19,8 +19,11 @@
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
 
+#include <QElapsedTimer>
+
 #include "stwtypes.h"
 #include "stwerrors.h"
+#include "constants.h"
 #include "C_PuiSdHandler.h"
 #include "C_SdUtil.h"
 #include "C_SdNdeDataPoolListTableView.h"
@@ -82,50 +85,30 @@ C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::C_SdNdeUnoLeDataPoolListEle
 //-----------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::Add(void)
 {
+   QElapsedTimer c_Timer;
+
+   if (mq_TIMING_OUTPUT)
+   {
+      c_Timer.start();
+   }
+
+   //Sort
    m_SortAscending();
    if (this->mpc_DataPoolListModelViewManager != NULL)
    {
-      C_SdNdeDataPoolListTableView * const pc_View = this->mpc_DataPoolListModelViewManager->GetElementView(
-         this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
       C_SdNdeDataPoolListTableModel * const pc_Model = this->mpc_DataPoolListModelViewManager->GetElementModel(
          this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
       if (pc_Model != NULL)
       {
-         const bool q_Continous = this->m_CheckContinuous();
-         //Clear selection
-         if (pc_View != NULL)
-         {
-            pc_View->clearSelection();
-         }
-         if (q_Continous == false)
-         {
-            for (uint32 u32_Index = 0; u32_Index < this->mc_Indices.size(); ++u32_Index)
-            {
-               std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> c_OSCContent;
-               std::vector<C_PuiSdNodeDataPoolListElement> c_UIContent;
-               c_OSCContent.push_back(this->mc_OSCContent[u32_Index]);
-               c_UIContent.push_back(this->mc_UIContent[u32_Index]);
-               pc_Model->DoInsertRows(c_OSCContent, c_UIContent, this->mc_Indices[u32_Index]);
-               //Select new row
-               if (pc_View != NULL)
-               {
-                  pc_View->selectRow(this->mc_Indices[u32_Index]);
-               }
-            }
-         }
-         else
-         {
-            pc_Model->DoInsertRows(this->mc_OSCContent, this->mc_UIContent, this->mc_Indices[0]);
-            //Select new rows
-            if (pc_View != NULL)
-            {
-               for (uint32 u32_Index = 0; u32_Index < this->mc_Indices.size(); ++u32_Index)
-               {
-                  pc_View->selectRow(this->mc_Indices[u32_Index]);
-               }
-            }
-         }
+         std::vector<std::vector<uint32> > c_Continous;
+         //Insert
+         c_Continous = pc_Model->DoInsertRows(this->mc_OSCContent, this->mc_UIContent, this->mc_Indices);
+         m_ReSelect(c_Continous, true);
       }
+   }
+   if (mq_TIMING_OUTPUT)
+   {
+      std::cout << "rows inserted " << c_Timer.elapsed() << " ms" << &std::endl;
    }
 }
 
@@ -138,6 +121,13 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::Add(void)
 //-----------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::Delete(void)
 {
+   QElapsedTimer c_Timer;
+
+   if (mq_TIMING_OUTPUT)
+   {
+      c_Timer.start();
+   }
+
    this->mc_OSCContent.resize(this->mc_Indices.size());
    this->mc_UIContent.resize(this->mc_Indices.size());
    m_SortAscending();
@@ -149,49 +139,26 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::Delete(void)
          this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
       if (pc_Model != NULL)
       {
-         const bool q_Continous = this->m_CheckContinuous();
          //Clear selection
          if (pc_View != NULL)
          {
             pc_View->clearSelection();
          }
+         //Store last
          for (uint32 u32_Index = this->mc_Indices.size(); u32_Index > 0UL; --u32_Index)
          {
-            tgl_assert(C_PuiSdHandler::h_GetInstance()->GetDataPoolListElement(this->mu32_NodeIndex,
-                                                                               this->mu32_DataPoolIndex,
-                                                                               this->mu32_DataPoolListIndex,
-                                                                               this->mc_Indices[static_cast<std::vector
-                                                                                                            <
-                                                                                                               stw_types
-                                                                                                               ::uint32>
-                                                                                                            ::
-                                                                                                            size_type >
-                                                                                                (u32_Index - 1UL)],
-                                                                               this->mc_OSCContent[static_cast<std::
-                                                                                                               vector<
-                                                                                                                  stw_opensyde_core
-                                                                                                                  ::
-                                                                                                                  C_OSCNodeDataPoolListElement>
-                                                                                                               ::
-                                                                                                               size_type >
-                                                                                                   (u32_Index - 1UL)],
-                                                                               this->mc_UIContent[static_cast<std::
-                                                                                                              vector<
-                                                                                                                 C_PuiSdNodeDataPoolListElement>
-                                                                                                              ::
-                                                                                                              size_type >
-                                                                                                  (u32_Index - 1UL)]) ==
+            tgl_assert(C_PuiSdHandler::h_GetInstance()->GetDataPoolListElement(
+                          this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex,
+                          this->mc_Indices[static_cast<std::vector<stw_types::uint32>::size_type >(u32_Index - 1UL)],
+                          this->mc_OSCContent[static_cast<std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement>::
+                                                          size_type >(u32_Index - 1UL)],
+                          this->mc_UIContent[static_cast<std::vector<C_PuiSdNodeDataPoolListElement>::size_type >(
+                                                u32_Index - 1UL)]) ==
                        C_NO_ERR);
-            if (q_Continous == false)
-            {
-               pc_Model->removeRow(this->mc_Indices[static_cast<std::vector< stw_types::uint32>::size_type >
-                                                    (u32_Index - 1UL)]);
-            }
          }
-         if (q_Continous == true)
-         {
-            pc_Model->removeRows(this->mc_Indices[0], this->mc_Indices.size());
-         }
+         //Remove action
+         pc_Model->DoRemoveRows(this->mc_Indices);
+
          //Select one over highest deleted index
          if (pc_View != NULL)
          {
@@ -214,6 +181,10 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::Delete(void)
             }
          }
       }
+   }
+   if (mq_TIMING_OUTPUT)
+   {
+      std::cout << "rows deleted " << c_Timer.elapsed() << " ms" << &std::endl;
    }
 }
 
@@ -260,6 +231,56 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::SetInitialData(
          rc_OSCData.c_DataSetValues.resize(u32_DataSetSize);
          //Assign type to new data sets
          rc_OSCData.SetType(rc_OSCData.GetType());
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Select the specified item ranges
+
+   \param[in] orc_Items       Items to select (sorted ascending!)
+   \param[in] oq_ScrollToLast Optional flag to scroll to the last element
+
+   \created     07.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_ReSelect(
+   const std::vector<std::vector<uint32> > & orc_Items, const bool oq_ScrollToLast)
+{
+   C_SdNdeDataPoolListTableView * const pc_View = this->mpc_DataPoolListModelViewManager->GetElementView(
+      this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
+
+   if (pc_View != NULL)
+   {
+      pc_View->clearSelection();
+      //New selection
+      for (uint32 u32_ItSection = 0UL; u32_ItSection < orc_Items.size(); ++u32_ItSection)
+      {
+         const std::vector<uint32> & rc_Section = orc_Items[u32_ItSection];
+         if (rc_Section.size() > 0UL)
+         {
+            pc_View->SelectRange(rc_Section[0UL], rc_Section[static_cast<std::vector<stw_types::uint32>::
+                                                                         size_type>(static_cast<uint32>(rc_Section
+                                                                                                        .size())
+                                                                                    -
+                                                                                    1UL)]);
+            //scroll to last
+            if ((oq_ScrollToLast) && (u32_ItSection == (orc_Items.size() - 1UL)))
+            {
+               C_SdNdeDataPoolListTableModel * const pc_Model =
+                  this->mpc_DataPoolListModelViewManager->GetElementModel(
+                     this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
+               if (pc_Model != NULL)
+               {
+                  pc_View->scrollTo(pc_Model->index(rc_Section[static_cast<std::vector<stw_types::uint32>::
+                                                                           size_type>(static_cast<uint32>(rc_Section
+                                                                                                          .size())
+                                                                                      -
+                                                                                      1UL)], 0));
+               }
+            }
+         }
       }
    }
 }

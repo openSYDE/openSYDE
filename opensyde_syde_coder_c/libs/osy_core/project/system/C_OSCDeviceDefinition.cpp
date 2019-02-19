@@ -62,6 +62,7 @@ C_OSCDeviceDefinition::C_OSCDeviceDefinition(void)
 void C_OSCDeviceDefinition::Clear(void)
 {
    c_DeviceName = "";
+   c_DeviceNameAlias = "";
    c_DeviceDescription = "";
    c_ImagePath = "";
    c_FilePath = "";

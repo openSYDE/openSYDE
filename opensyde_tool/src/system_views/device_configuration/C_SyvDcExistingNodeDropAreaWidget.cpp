@@ -51,7 +51,8 @@ using namespace stw_opensyde_gui_logic;
 //-----------------------------------------------------------------------------
 C_SyvDcExistingNodeDropAreaWidget::C_SyvDcExistingNodeDropAreaWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
-   mpc_Ui(new Ui::C_SyvDcExistingNodeDropAreaWidget)
+   mpc_Ui(new Ui::C_SyvDcExistingNodeDropAreaWidget),
+   mq_Assigned(false)
 {
    const QPixmap c_Device = QPixmap("://images/system_views/DeviceSmall.svg").scaled(QSize(16, 16),
                                                                                      Qt::KeepAspectRatio,
@@ -105,7 +106,7 @@ void C_SyvDcExistingNodeDropAreaWidget::InitStaticNames(void) const
 
 //-----------------------------------------------------------------------------
 /*!
-   \brief   Init content
+   \brief   Set content and assignment state
 
    \param[in] oq_ValidSerialNumber Flag if serial number valid
    \param[in] orc_PureSerialNumber Serial number (only used if valid)
@@ -128,6 +129,8 @@ void C_SyvDcExistingNodeDropAreaWidget::SetContent(const bool oq_ValidSerialNumb
       this->mpc_Ui->pc_GroupBoxEmpty->setVisible(true);
       this->mpc_Ui->pc_GroupBoxValid->setVisible(false);
    }
+
+   this->mq_Assigned = oq_ValidSerialNumber;
 }
 
 //-----------------------------------------------------------------------------
@@ -143,7 +146,7 @@ void C_SyvDcExistingNodeDropAreaWidget::SetContent(const bool oq_ValidSerialNumb
 //-----------------------------------------------------------------------------
 bool C_SyvDcExistingNodeDropAreaWidget::IsAssigned(void) const
 {
-   return this->mpc_Ui->pc_GroupBoxValid->isVisible();
+   return this->mq_Assigned;
 }
 
 //-----------------------------------------------------------------------------

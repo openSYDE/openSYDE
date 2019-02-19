@@ -57,11 +57,13 @@ using namespace stw_opensyde_gui_logic;
 
    \param[in,out] opc_Parent            Optional pointer to parent
    \param[in]     opc_EffectTargetChild Optional pointer to child widget of dialog to apply shadow effect to
+   \param[in]     oq_AddShadow          Optional flag to add shadow effect (warning: costs performance on redraw)
 
    \created     20.07.2016  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-C_OgePopUpDialog::C_OgePopUpDialog(QWidget * const opc_Parent, QWidget * const opc_EffectTargetChild) :
+C_OgePopUpDialog::C_OgePopUpDialog(QWidget * const opc_Parent, QWidget * const opc_EffectTargetChild,
+                                   const bool oq_AddShadow) :
    QDialog(opc_Parent),
    mpc_Ui(new Ui::C_OgePopUpDialog),
    mq_Pressed(false),
@@ -84,6 +86,7 @@ C_OgePopUpDialog::C_OgePopUpDialog(QWidget * const opc_Parent, QWidget * const o
    //transparency
    setAttribute(Qt::WA_TranslucentBackground);
    //shadow
+   if (oq_AddShadow)
    {
       QColor c_Color;
       QGraphicsDropShadowEffect * pc_Shadow = new QGraphicsDropShadowEffect(this->mpc_Ui->pc_GroupBoxPopUp);
@@ -157,7 +160,8 @@ void C_OgePopUpDialog::SetWidget(QWidget * const opc_Widget)
       stw_types::sintn sn_Index;
 
       //save class name for help call
-      //lint -e{10,48,64,734,746,1013,1055,1960} Will be defined via moc compiler, PC lint unable to handle this construct
+      //lint -e{10,48,64,734,746,1013,1055,1960} Will be defined via moc compiler, PC lint unable to handle this
+      // construct
       this->mc_WidgetClassName = opc_Widget->metaObject()->className();
 
       opc_Widget->setParent(this);

@@ -65,7 +65,8 @@ C_NagViewItem::C_NagViewItem(QWidget * const opc_Parent) :
    mpc_Ui(new Ui::C_NagViewItem),
    mq_Active(false),
    mq_IgnoreActiveOnExpand(false),
-   mu32_ViewIndex(0UL)
+   mu32_ViewIndex(0UL),
+   mq_ButtonPressed(false)
 {
    this->mpc_Ui->setupUi(this);
 
@@ -135,6 +136,18 @@ C_NagViewItem::C_NagViewItem(QWidget * const opc_Parent) :
            &C_NagViewItem::m_OnUpdateClicked);
    connect(this->mpc_Ui->pc_WidgetDashboard, &stw_opensyde_gui_elements::C_OgePubNavigationHover::clicked, this,
            &C_NagViewItem::m_OnDashboardClicked);
+   connect(this->mpc_Ui->pc_PushButtonCopy, &stw_opensyde_gui_elements::C_OgePubSvgIconOnly::pressed, this,
+           &C_NagViewItem::m_ButtonPressed);
+   connect(this->mpc_Ui->pc_PushButtonDelete, &stw_opensyde_gui_elements::C_OgePubSvgIconOnly::pressed, this,
+           &C_NagViewItem::m_ButtonPressed);
+   connect(this->mpc_Ui->pc_PushButtonEdit, &stw_opensyde_gui_elements::C_OgePubSvgIconOnly::pressed, this,
+           &C_NagViewItem::m_ButtonPressed);
+   connect(this->mpc_Ui->pc_PushButtonCopy, &stw_opensyde_gui_elements::C_OgePubSvgIconOnly::released, this,
+           &C_NagViewItem::m_ButtonReleased);
+   connect(this->mpc_Ui->pc_PushButtonDelete, &stw_opensyde_gui_elements::C_OgePubSvgIconOnly::released, this,
+           &C_NagViewItem::m_ButtonReleased);
+   connect(this->mpc_Ui->pc_PushButtonEdit, &stw_opensyde_gui_elements::C_OgePubSvgIconOnly::released, this,
+           &C_NagViewItem::m_ButtonReleased);
 }
 
 //-----------------------------------------------------------------------------
@@ -431,8 +444,11 @@ bool C_NagViewItem::event(QEvent * const opc_Event)
 {
    bool q_Retval = QWidget::event(opc_Event);
 
-   if (opc_Event->type() == QEvent::Leave)
+   if ((opc_Event->type() == QEvent::Leave) &&
+       (this->mq_ButtonPressed == false))
    {
+      // Set only invisible when no button of this item is pressed. See function C_NagViewItem::m_ButtonPressed for
+      // a detailed description
       this->SetHovered(false);
    }
    else if (opc_Event->type() == QEvent::Enter)
@@ -524,7 +540,7 @@ void C_NagViewItem::m_OnNameEditFinished(void)
          c_ImportWarnings(this, stw_opensyde_gui_elements::C_OgeWiCustomMessage::eERROR);
       c_ImportWarnings.SetHeading(C_GtGetText::h_GetText("View rename"));
       c_ImportWarnings.SetDescription(
-         QString(C_GtGetText::h_GetText("The view name \"%1\" is already used. Please choose another name.")).
+         QString(C_GtGetText::h_GetText("A view with the name \"%1\" already exists. Choose another name.")).
          arg(this->mpc_Ui->pc_LineEditHeading->text()));
       c_ImportWarnings.Execute();
    }
@@ -705,4 +721,34 @@ void C_NagViewItem::m_OnDashboardClicked(void)
 
    C_SyvUtil::h_GetViewDisplayName(this->mu32_ViewIndex, ms32_SUBMODE_SYSVIEW_DASHBOARD, c_SubMode, c_SubSubMode);
    Q_EMIT this->SigSelect(this, ms32_SUBMODE_SYSVIEW_DASHBOARD, c_SubMode, c_SubSubMode);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Slot for pressed signal of any button
+
+   We need to know when a button of the item was pressed, but is not released already. The signal clicked will be
+   send normally when pressed and released is sent.
+   In case of an active tool tip of the button and clicking the button, the leave event C_NagViewItem will be
+   caused before the released signal of the button and the group of the buttons will be set invisible for a short time.
+   This prevents the sending of the clicked signal of the button.
+
+   \created     28.01.2019  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_NagViewItem::m_ButtonPressed(void)
+{
+   this->mq_ButtonPressed = true;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Slot for released signal of any button
+
+   \created     28.01.2019  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_NagViewItem::m_ButtonReleased(void)
+{
+   this->mq_ButtonPressed = false;
 }

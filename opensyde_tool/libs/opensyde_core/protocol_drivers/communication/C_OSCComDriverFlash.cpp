@@ -145,6 +145,8 @@ sint32 C_OSCComDriverFlash::Init(const C_OSCSystemDefinition & orc_SystemDefinit
 /*!
    \brief   Sets the new CAN bitrate
 
+   An old connection will be closed.
+
    \param[in] ou32_Bitrate      Bitrate in kBit/s
 
    \return
@@ -162,6 +164,7 @@ sint32 C_OSCComDriverFlash::InitCanAndSetCanBitrate(const uint32 ou32_Bitrate)
 
    if (pc_CanDispatcher != NULL)
    {
+      pc_CanDispatcher->CAN_Exit();
       s32_Return = pc_CanDispatcher->CAN_Init(static_cast<sint32>(ou32_Bitrate));
 
       if (s32_Return != C_NO_ERR)
@@ -1760,6 +1763,7 @@ sint32 C_OSCComDriverFlash::SendStwGetDeviceId(const C_OSCProtocolDriverOsyNode 
    C_OSCFlashProtocolStwFlashloader c_StwProtocol(mpr_XflReportProgress, mpv_XflReportProgressInstance);
    C_OSCFlashProtocolStwFlashloader * pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
    uint16 u16_ProtocolVersion;
+   bool q_LongId;
 
    if (pc_ExistingProtocol == NULL)
    {
@@ -1768,13 +1772,14 @@ sint32 C_OSCComDriverFlash::SendStwGetDeviceId(const C_OSCProtocolDriverOsyNode 
       pc_ExistingProtocol = &c_StwProtocol;
    }
 
-   orc_DeviceName = "";
+   //check for supported version of service depending on the protocol version:
    s32_Return = pc_ExistingProtocol->GetImplementationInformationProtocolVersion(u16_ProtocolVersion);
-   if (s32_Return == C_NO_ERR)
-   {
-      const bool q_LongId = u16_ProtocolVersion >= mhu16_STW_FLASHLOADER_PROTOCOL_VERSION_3_00;
-      s32_Return = pc_ExistingProtocol->GetDeviceID(q_LongId, orc_DeviceName);
-   }
+
+   //no response or error response: we have to assume we have a version <= V3.00r0
+   q_LongId = ((s32_Return == C_NO_ERR) && (u16_ProtocolVersion >= mhu16_STW_FLASHLOADER_PROTOCOL_VERSION_3_00));
+   orc_DeviceName = "";
+   s32_Return = pc_ExistingProtocol->GetDeviceID(q_LongId, orc_DeviceName);
+
    return s32_Return;
 }
 

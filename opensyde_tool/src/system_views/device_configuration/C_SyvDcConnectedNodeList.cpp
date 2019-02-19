@@ -38,6 +38,7 @@ using namespace stw_opensyde_gui_logic;
 /* -- Module Global Constants ---------------------------------------------- */
 const QString C_SyvDcConnectedNodeList::mhc_MimeData = "stw_opensyde_connected_node";
 const QString C_SyvDcConnectedNodeList::mhc_MimeDataDevice = "stw_opensyde_connected_node_device";
+const QString C_SyvDcConnectedNodeList::mhc_MimeDataDeviceValid = "stw_opensyde_connected_node_device_valid";
 
 /* -- Types ---------------------------------------------------------------- */
 
@@ -174,17 +175,22 @@ void C_SyvDcConnectedNodeList::startDrag(const Qt::DropActions oc_Actions)
       //Manual drag
       QDrag * const pc_Drag = new QDrag(this);
 
+      Q_EMIT (this->SigStartDrag(pc_Widget->GetDeviceName(), pc_Widget->GetDeviceNameValid()));
+
       // create the screenshot
       pc_Widget->render(&c_Screenshot, QPoint(), QRegion(c_Rect));
-
-      // resize the screenshot
-      c_Screenshot = c_Screenshot.scaledToWidth(200, Qt::FastTransformation);
 
       pc_Drag->setPixmap(c_Screenshot);
 
       c_Items.push_back(pc_Item);
       pc_Drag->setMimeData(this->mimeData(c_Items));
       pc_Drag->exec(oc_Actions, this->defaultDropAction());
+
+      // pc_Drag->exec will start its own event loop. It will return when the mouse button is released.
+      // No Qt event or signal will detect this on drop exit on one common position
+      // That is the only solution to handle a drag exit always.
+      Q_EMIT (this->SigStopDrag());
+
       //lint -e{429}  no memory leak because of the parent of pc_Drag and the Qt memory management
    }
 }
@@ -217,6 +223,8 @@ QMimeData * C_SyvDcConnectedNodeList::mimeData(const QList<QListWidgetItem *> oc
                                pc_Widget->GetSerialNumberString().toStdString().c_str());
             pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MimeDataDevice,
                                pc_Widget->GetDeviceName().toStdString().c_str());
+            pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MimeDataDeviceValid,
+                               QString::number(pc_Widget->GetDeviceNameValid()).toStdString().c_str());
          }
       }
    }

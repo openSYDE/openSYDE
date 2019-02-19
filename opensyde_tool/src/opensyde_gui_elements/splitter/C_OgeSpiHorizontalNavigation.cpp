@@ -59,23 +59,6 @@ C_OgeSpiHorizontalNavigation::C_OgeSpiHorizontalNavigation(QWidget * const opc_P
 
 //-----------------------------------------------------------------------------
 /*!
-   \brief   Overwritten show event slot
-
-   Here: Signal show
-
-   \param[in,out] opc_Event Event identification and information
-
-   \created     08.11.2018  STW/M.Echtler
-*/
-//-----------------------------------------------------------------------------
-void C_OgeSpiHorizontalNavigation::showEvent(QShowEvent * const opc_Event)
-{
-   C_OgeSpiBase::showEvent(opc_Event);
-   Q_EMIT this->SigShow();
-}
-
-//-----------------------------------------------------------------------------
-/*!
    \brief   Create splitter handle
 
    \created     07.08.2018  STW/M.Echtler

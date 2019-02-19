@@ -61,6 +61,7 @@ protected:
 private:
    Ui::C_SyvDcExistingNodeDropAreaWidget * mpc_Ui;
    QString mc_PureSerialNumber;
+   bool mq_Assigned;
 
    void m_OnDisconnectRequest(void);
 

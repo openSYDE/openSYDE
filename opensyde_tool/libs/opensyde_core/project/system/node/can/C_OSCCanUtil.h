@@ -43,6 +43,10 @@ public:
    static void h_GetSignalValue(const stw_types::uint8(&orau8_CanDb)[8],
                                 const stw_opensyde_core::C_OSCCanSignal & orc_Signal,
                                 C_OSCNodeDataPoolContent & orc_Value);
+
+   static void h_SetSignalValue(stw_types::uint8(&orau8_CanDb)[8],
+                                const stw_opensyde_core::C_OSCCanSignal & orc_Signal,
+                                const C_OSCNodeDataPoolContent &orc_Value);
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

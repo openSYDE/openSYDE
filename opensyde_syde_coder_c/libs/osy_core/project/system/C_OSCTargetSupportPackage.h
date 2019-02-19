@@ -30,6 +30,7 @@ class C_OSCTSPApplication
 {
 public:
    C_OSCTSPApplication(void);
+   bool q_IsProgrammable;                    ///< true: generate code for this app, false: only handle binary
    stw_types::uint8 u8_ProcessId;            ///< process ID of application
    stw_scl::C_SCLString c_Name;              ///< name of application
    stw_scl::C_SCLString c_Comment;           ///< comment about application

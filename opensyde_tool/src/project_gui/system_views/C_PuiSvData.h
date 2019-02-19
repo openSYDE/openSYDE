@@ -173,7 +173,8 @@ public:
    void SetPCBox(const C_PuiBsBox & orc_Box);
    void SetPCConnection(const C_PuiBsLineBase & orc_Line);
    void SetPCConnected(const bool oq_Connected, const stw_types::uint32 ou32_BusIndex);
-   void SetPCCANDll(const QString & orc_DllPath);
+   void SetPCCANDllType(const C_PuiSvPc::E_CANDllType oe_DllType);
+   void SetPCCANDllPath(const QString & orc_DllPath);
 
    //Add
    stw_types::sint32 AddReadRailItem(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id,
@@ -259,6 +260,7 @@ private:
    bool mq_DarkModeActive;
 
    std::vector<const QString *> m_GetExistingDashboardNames(void) const;
+   std::map<stw_scl::C_SCLString, bool> m_GetExistingDashboardNamesMap(void) const;
    void m_CheckAllReadRails(void);
 };
 

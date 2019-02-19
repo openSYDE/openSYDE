@@ -74,12 +74,12 @@ public:
    void RemoveConnector(const C_GiLiBusConnector * const opc_BusConnectorGraphicsItem);
    virtual void DeleteData(void);
    void DisconnectBus(const QString & orc_BusName);
+   bool HasConnectionType(const stw_opensyde_core::C_OSCSystemBus::E_Type oe_Type) const;
    bool CheckConnectionAvailable(const stw_opensyde_core::C_OSCSystemBus::E_Type & ore_Type) const;
    bool CheckInterfaceAvailable(const stw_opensyde_core::C_OSCSystemBus::E_Type & ore_Type,
                                 const stw_types::uint8 & oru8_Interface);
    stw_types::sint32 GetIndexOfConnector(const C_GiLiBusConnector * const opc_Connection) const;
    void GetOSCNodeConst(const stw_opensyde_core::C_OSCNode * (&orpc_Node)) const;
-   void SetOSCNode(const stw_opensyde_core::C_OSCNode & orc_Node) const;
    virtual void RestoreDefaultCursor(void);
    virtual void SetTemporaryCursor(const QCursor & orc_TemporaryCursor);
    virtual void GenerateHint(void) override;
@@ -106,6 +106,7 @@ protected:
    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event) override;
    //lint -restore
 
+   virtual bool m_UpdateError(void);
    virtual void m_ResizeUpdateItems(const stw_types::float64 of64_DiffWidth,
                                     const stw_types::float64 of64_DiffHeight) override;
 
@@ -125,6 +126,7 @@ protected:
    static const stw_types::uint32 mhu32_ScaleCategory6;
 
    bool mq_ErrorIconHovered;
+   QString mc_ErrorText;
 
 private:
    //Avoid call
@@ -138,7 +140,6 @@ private:
    C_GiRectPixmap * mpc_ConflictIcon;
    bool mq_Valid;
    bool mq_DrawWhiteFilter;
-   QString mc_ErrorText;
    stw_types::sint32 ms32_IconSize;
 
    void m_InitPorts(void);

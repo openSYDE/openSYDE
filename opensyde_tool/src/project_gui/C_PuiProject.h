@@ -40,6 +40,7 @@ public:
    static QString h_GetDefaultPath(void);
    QString GetPath(void) const;
    QString GetFolderPath(void) const;
+   QString GetName(void) const;
    bool GetSwitchUseCaseFlag(void) const;
    static C_PuiProject * h_GetInstance(void);
    static void h_Destroy(void);

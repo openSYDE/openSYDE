@@ -474,7 +474,7 @@ QString C_SyvUpSequences::GetStepName(const E_ProgressStep oe_Step) const
       c_Text = C_GtGetText::h_GetText("Activate Flashloader: Start routing");
       break;
    case eACTIVATE_FLASHLOADER_ROUTING_ERROR:
-      c_Text = C_GtGetText::h_GetText("Activate Flashloader: Error on starting routing");
+      c_Text = C_GtGetText::h_GetText("Activate Flashloader: Error on start routing");
       break;
    case eACTIVATE_FLASHLOADER_FINISHED:
       c_Text = C_GtGetText::h_GetText("Activate Flashloader: Finished");
@@ -580,7 +580,7 @@ QString C_SyvUpSequences::GetStepName(const E_ProgressStep oe_Step) const
       c_Text = C_GtGetText::h_GetText("Update System: Node check memory file error");
       break;
    case eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_NOT_OK:
-      c_Text = C_GtGetText::h_GetText("Update System: Node check memory not ok");
+      c_Text = C_GtGetText::h_GetText("Update System: Node check memory not OK");
       break;
    case eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_START:
       c_Text = C_GtGetText::h_GetText("Update System: Node fingerprint start");

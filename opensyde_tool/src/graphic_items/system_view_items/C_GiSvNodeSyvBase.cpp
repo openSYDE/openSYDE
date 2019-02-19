@@ -20,6 +20,7 @@
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
+#include "C_GtGetText.h"
 #include "C_PuiSvHandler.h"
 #include "C_GiSvNodeSyvBase.h"
 
@@ -110,4 +111,30 @@ void C_GiSvNodeSyvBase::LoadData(void)
          }
       }
    }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief  Get current error state and update error tooltip accordingly
+
+   \return
+   True  Error detected
+   False No error detected
+
+   \created     15.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+bool C_GiSvNodeSyvBase::m_UpdateError(void)
+{
+   bool q_Retval = C_PuiSvHandler::h_GetInstance()->GetErrorNode(static_cast<uint32>(this->ms32_Index));
+
+   if (q_Retval == true)
+   {
+      this->mc_ErrorText = C_GtGetText::h_GetText("For further details switch to SYSTEM DEFINITION");
+   }
+   else
+   {
+      this->mc_ErrorText = "";
+   }
+   return q_Retval;
 }

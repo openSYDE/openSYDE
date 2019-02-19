@@ -55,6 +55,7 @@ sint32 C_OsyHexFile::GetSignatureBlockAddress(uint32 & oru32_Address)
 
    oru32_Address = this->mu32_MinAdr;
 
+   //lint -e{926}
    s32_Return = this->FindPattern(oru32_Address, 10, reinterpret_cast<const uint8 *>(";zwm2KgUZ!"));
    if (s32_Return == -1)
    {
@@ -112,14 +113,16 @@ sint32 C_OsyHexFile::ScanDeviceIdFromHexFile(C_SCLString & orc_DeviceID)
          }
       }
    }
-   if (c_DeviceID != "")
+   if (s32_Return == C_NO_ERR)
    {
-      orc_DeviceID = c_DeviceID;
-      s32_Return = C_NO_ERR;
-   }
-   else
-   {
-      s32_Return = C_NOACT;
+      if (c_DeviceID != "")
+      {
+         orc_DeviceID = c_DeviceID;
+      }
+      else
+      {
+         s32_Return = C_NOACT;
+      }
    }
    return s32_Return;
 }

@@ -18,8 +18,7 @@
 #define C_OGECBXTABLE_H
 
 /* -- Includes ------------------------------------------------------------- */
-
-#include <QComboBox>
+#include "C_OgeCbxResizingView.h"
 
 /* -- Namespace ------------------------------------------------------------ */
 namespace stw_opensyde_gui_elements
@@ -29,14 +28,13 @@ namespace stw_opensyde_gui_elements
 /* -- Types ---------------------------------------------------------------- */
 
 class C_OgeCbxTable :
-   public QComboBox
+   public C_OgeCbxResizingView
 {
    Q_OBJECT
 
 public:
    C_OgeCbxTable(QWidget * const opc_Parent = NULL);
    ~C_OgeCbxTable(void);
-   void ResizeViewToContents(void) const;
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions

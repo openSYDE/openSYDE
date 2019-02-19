@@ -38,7 +38,7 @@ class C_OgeSpxInt64 :
 public:
    C_OgeSpxInt64(QWidget * const opc_Parent = NULL, const bool & orq_IsUnsigned = false);
    bool GetIsUnsigned(void) const;
-   void SetValue(const QVariant & orc_Value);
+   void SetValue(const QVariant & orc_Value, const bool oq_AllowValueUpdate);
    void SetStepWidth(const stw_types::uint64 ou64_Step);
    void SetMinimum(const QVariant & orc_Minimum);
    void SetMaximum(const QVariant & orc_Maximum);

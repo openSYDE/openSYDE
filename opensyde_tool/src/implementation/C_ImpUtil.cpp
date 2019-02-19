@@ -23,7 +23,6 @@
 #include <tlhelp32.h>
 #include <QDir>
 #include <QProcess>
-#include <QFileDialog>
 #include <QTextStream>
 #include <QApplication>
 #include "C_ImpUtil.h"
@@ -162,7 +161,7 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
          c_Message.SetType(C_OgeWiCustomMessage::E_Type::eERROR);
          c_Message.SetHeading(C_GtGetText::h_GetText("Code generation"));
          c_Message.SetDescription(C_GtGetText::h_GetText(
-                                     "Cannot generate code. Please assign all Datapools and retry."));
+                                     "Cannot generate code. Assign all Datapools and retry."));
          c_Message.SetDetails(QString(C_GtGetText::h_GetText(
                                          "The following Datapools have no assigned application:\n%1")).arg(
                                  c_DataPoolErrorMessage));
@@ -198,10 +197,10 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
       {
          C_OgeWiCustomMessage c_Question(opc_Parent, C_OgeWiCustomMessage::E_Type::eQUESTION);
          c_Question.SetHeading("CONFIRM CODE GENERATION");
-         c_Question.SetDescription(C_GtGetText::h_GetText("There are System Definition errors. "
+         c_Question.SetDescription(C_GtGetText::h_GetText("There are SYSTEM DEFINITION errors. "
                                                           "Do you really want to generate code?"));
          c_Question.SetOKButtonText(C_GtGetText::h_GetText("Generate"));
-         c_Question.SetNOButtonText(C_GtGetText::h_GetText("Don't Generate"));
+         c_Question.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
          if (c_Question.Execute() == C_OgeWiCustomMessage::eYES)
          {
             q_Continue = true;
@@ -296,7 +295,7 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
          c_Message.SetType(C_OgeWiCustomMessage::E_Type::eERROR);
          c_Message.SetHeading(C_GtGetText::h_GetText("Code generation"));
          c_Message.SetDescription(C_GtGetText::h_GetText("Cannot generate code. "
-                                                         "Please set a code generator for every Data Block."));
+                                                         "Set a code generator for every Data Block."));
          c_Message.SetDetails(QString(C_GtGetText::h_GetText("<a/>The following Data Blocks "
                                                              "have no code generator:<br>%1")).arg(c_ErrorMessage));
          c_Message.Execute();
@@ -580,9 +579,9 @@ sint32 C_ImpUtil::h_OpenIDE(const QString & orc_IdeExeCall)
          {
             s32_Retval = C_CONFIG;
             osc_write_log_error("Open IDE",
-                                QString("Could not start IDE most likely due to insufficient permissions to invoke"
-                                        " this program or the executable \"%1\" is missing.").arg(
-                                   orc_IdeExeCall).toStdString().c_str());
+                                QString(
+                                   "Could not start IDE. Reason: Most likely due to insufficient permissions or the executable "
+                                   " \"%1\" is missing.").arg(orc_IdeExeCall).toStdString().c_str());
          }
       }
    }
@@ -650,7 +649,7 @@ QString C_ImpUtil::h_GetAbsoluteGeneratedDir(const C_OSCNodeApplication * const 
    {
       // concatenate paths
       c_GenerateDir.setPath(QDir::cleanPath(
-                               C_ImpUtil::h_GetAbsoluteProjectPath(opc_Application->c_ProjectPath.c_str()) +
+                               C_ImpUtil::h_GetAbsolutePathFromProject(opc_Application->c_ProjectPath.c_str()) +
                                QDir::separator() + c_GenerateDir.path()));
    }
 
@@ -678,7 +677,7 @@ bool C_ImpUtil::h_CheckProjForCodeGeneration(QWidget * const opc_Parent)
 {
    bool q_Return = true;
 
-   if (C_PopUtil::h_AskUserToContinue(opc_Parent) == true)
+   if (C_PopUtil::h_AskUserToContinue(opc_Parent, false) == true)
    {
       // if the project is empty do not continue
       if (C_PuiProject::h_GetInstance()->IsEmptyProject() == true)
@@ -687,8 +686,8 @@ bool C_ImpUtil::h_CheckProjForCodeGeneration(QWidget * const opc_Parent)
          c_Message.SetHeading(C_GtGetText::h_GetText("Code generation"));
          c_Message.SetDescription(C_GtGetText::h_GetText("Code cannot be generated without a valid project path."));
          c_Message.SetDetails(C_GtGetText::h_GetText(
-                                 "The location where code should get exported must be set and this is done by "
-                                 "saving the project."));
+                                 "The location where generated code get exported to. The path must be set. "
+                                 "Save the project to set the path."));
          c_Message.Execute();
          q_Return = false;
       }
@@ -704,25 +703,82 @@ bool C_ImpUtil::h_CheckProjForCodeGeneration(QWidget * const opc_Parent)
 
 //-----------------------------------------------------------------------------
 /*!
-   \brief   Wrapper for C_Uti::h_GetAbsolutePath using C_PuiProject.
+   \brief   Always get absolute path from path relative to openSYDE project.
 
-   \param[in]     orc_ProjectPath   Path that may be relative to .syde file
+   \param[in]     orc_Path    Absolute or relative path
 
    \return
-   absolute path to data block path
+   Absolute path
 
    \created     17.10.2018  STW/G.Landsgesell
 */
 //-----------------------------------------------------------------------------
-QString C_ImpUtil::h_GetAbsoluteProjectPath(const QString & orc_ProjectPath)
+QString C_ImpUtil::h_GetAbsolutePathFromProject(const QString & orc_Path)
 {
-   const QFileInfo c_FileInfo(C_PuiProject::h_GetInstance()->GetPath()); // includes "/Project.syde" -> use dir path
+   QString c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath(); // always absolute or empty
 
-   // note: h_GetInstance could return an relative path, which Qt engine than treats as relative to openSYDE.exe
+   if (c_Folder == "")
+   {
+      // default: relative to executable path
+      c_Folder = C_Uti::h_GetExePath();
+   }
 
-   return C_Uti::h_GetAbsoluteProjectPath(c_FileInfo.dir().path(), orc_ProjectPath);
+   return C_Uti::h_ConcatPathIfNecessary(c_Folder, orc_Path);
 }
 
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Handle paths after file save dialog.
+
+   Check if path could be made relative and ask user if she wants to save the path
+   relative or absolute.
+
+   Note: If one of the paths is empty this simply returns the given path.
+   If the reference path is a file path (ending on File.txt), behavior is undefined
+   (handling directory AND files AND existing AND non-existing did not work well).
+   If the reference path is not absolute, behavior is undefined
+   (Qt then defaults to calling path, which is often but not always the path of the executable).
+
+   \param[in]     opc_Parent                 parent widget (for parent of message box)
+   \param[in]     orc_Path                   relative or absolute path of file or directory
+   \param[in]     orc_AbsoluteReferenceDir   absolute path of reference directory
+
+   \return
+   path the user wants to save
+
+   \created     08.02.2019  STW/G.Landsgesell
+*/
+//-----------------------------------------------------------------------------
+QString C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const QString & orc_Path,
+                                               const QString & orc_AbsoluteReferenceDir)
+{
+   QString c_Return = orc_Path;
+   QString c_PathRelative;
+   QString c_PathAbsolute;
+
+   if (C_Uti::h_IsPathRelativeToDir(orc_Path, orc_AbsoluteReferenceDir, c_PathAbsolute, c_PathRelative) == true)
+   {
+      // ask user
+      C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::eQUESTION);
+      c_Message.SetHeading(C_GtGetText::h_GetText("Relative Path"));
+      c_Message.SetDescription(C_GtGetText::h_GetText("Do you want to save the selected path relative or absolute?"));
+      c_Message.SetDetails(QString(C_GtGetText::h_GetText("Relative path: %1 \nAbsolute path: %2")).
+                           arg(c_PathRelative).arg(c_PathAbsolute));
+      c_Message.SetOKButtonText(C_GtGetText::h_GetText("Relative"));
+      c_Message.SetNOButtonText(C_GtGetText::h_GetText("Absolute"));
+
+      if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
+      {
+         c_Return = c_PathRelative;
+      }
+      else
+      {
+         c_Return = c_PathAbsolute;
+      }
+   }
+
+   return c_Return;
+}
 //-----------------------------------------------------------------------------
 /*!
    \brief   Get active window handle if already existing
@@ -870,12 +926,13 @@ sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QS
    // build file list file path from executable (file which contains information which files were generated)
    QFileInfo c_CodeGenFileInfo(orc_CodeGenerator);
 
-   if(c_CodeGenFileInfo.isRelative()) // relative code generator is relative to openSYDE.exe
+   if (c_CodeGenFileInfo.isRelative()) // relative code generator is relative to openSYDE.exe
    {
       c_CodeGenFileInfo.setFile(C_Uti::h_GetExePath() + "/" + orc_CodeGenerator);
    }
 
-   c_FileListFile.setFileName(c_CodeGenFileInfo.absolutePath() + "/" + c_CodeGenFileInfo.completeBaseName() + "_file_list.txt");
+   c_FileListFile.setFileName(
+      c_CodeGenFileInfo.absolutePath() + "/" + c_CodeGenFileInfo.completeBaseName() + "_file_list.txt");
 
    // provide arguments
    c_Arguments.push_back("-s"); // system definition

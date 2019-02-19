@@ -115,6 +115,23 @@ public:
 
    void SetBroadcastTimeout(const stw_types::uint32 ou32_TimeoutMs);
 
+   //-----------------------------------------------------------------------------
+   /*!
+      \brief   Perform cyclic communication tasks
+
+      Perform cyclic communication tasks.
+      - send services from TX queue
+      - read incoming services and place in RX queue
+
+      Configuration problems will be reported via the function return value.
+      Ongoing communication problems will be written to the class's log text.
+
+      \return
+      C_NO_ERR   cycle finished
+      C_CONFIG   no dispatcher installed
+      C_COM      communication driver reported error
+   */
+   //-----------------------------------------------------------------------------
    virtual stw_types::sint32 Cycle(void) = 0;
    virtual stw_types::sint32 SetNodeIdentifiers(const C_OSCProtocolDriverOsyNode & orc_ClientIdentifier,
                                                 const C_OSCProtocolDriverOsyNode & orc_ServerIdentifier);

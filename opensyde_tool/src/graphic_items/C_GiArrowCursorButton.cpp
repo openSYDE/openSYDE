@@ -172,8 +172,8 @@ void C_GiArrowCursorButton::GenerateHint(void)
    //Tool tip
    this->SetDefaultToolTipHeading(C_GtGetText::h_GetText("Link Use"));
    this->SetDefaultToolTipContent(C_GtGetText::h_GetText(
-                                     "Connect existing elements easily. Click on link icon and while holding down the left mouse button,"
-                                     "\ndrag to either an existing node or bus element."));
+                                     "Connect existing elements: Click on the link icon and drag and drop it "
+                                     "\neither to an existing node or to a bus element."));
 }
 
 //-----------------------------------------------------------------------------

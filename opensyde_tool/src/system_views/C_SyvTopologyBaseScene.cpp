@@ -21,6 +21,9 @@
 
 #include "C_SyvTopologyBaseScene.h"
 #include "C_GiSvPc.h"
+#include "C_GiSvCANBus.h"
+#include "C_GiSvEthernetBus.h"
+#include "C_GiSvTextElementBus.h"
 #include "C_GiSvPcBusConnector.h"
 #include "gitypes.h"
 #include "TGLUtils.h"
@@ -94,6 +97,10 @@ void C_SyvTopologyBaseScene::Load(void)
 
    pc_PC->LoadData();
    m_AddRectBaseGroupToScene(pc_PC);
+
+   //Tool tip connect (no disconnect necessary because PC cannot be deleted)
+   connect(pc_PC, &C_GiSvPc::SigHideToolTip, this, &C_SyvTopologyBaseScene::m_HandleHideToolTip);
+
    m_AddAnyItemToScene(pc_PC);
    if (pc_View != NULL)
    {
@@ -147,7 +154,7 @@ void C_SyvTopologyBaseScene::Load(void)
       if (c_BusName != "")
       {
          c_MessageBox.SetDescription(C_GtGetText::h_GetText(
-                                        "Due to changes in System Definition the PC - bus connection has been changed.\n"
+                                        "Due to changes in SYSTEM DEFINITION the PC - connected bus has been changed.\n"
                                         "PC is connected to ") + c_BusName + C_GtGetText::h_GetText(" now."));
          c_MessageBox.Execute();
       }
@@ -273,6 +280,72 @@ stw_opensyde_gui_logic::C_SebBaseCopyPasteManager * C_SyvTopologyBaseScene::m_Ge
 const stw_opensyde_gui_logic::C_SebBaseCopyPasteManager * C_SyvTopologyBaseScene::m_GetCopyPasteManagerConst(void) const
 {
    return NULL;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get specific CAN bus
+
+   \param[in]     ors32_Index          Index of data element in system definition
+   \param[in]     oru64_ID             Unique ID
+   \param[in]     opc_TextElementName  Pointer to text element for showing bus name
+   \param[in]     opc_Points           Points for line
+   \param[in,out] opc_Parent           Optional pointer to parent
+
+   \return
+   Specific CAN bus
+
+   \created     15.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+C_GiLiCANBus * C_SyvTopologyBaseScene::m_CreateCANBus(const sint32 & ors32_Index, const uint64 & oru64_ID,
+                                                      C_GiTextElementBus * const opc_TextElementName,
+                                                      const std::vector<QPointF> * const opc_Points,
+                                                      QGraphicsItem * const opc_Parent)
+{
+   return new C_GiSvCANBus(this->mu32_ViewIndex, ors32_Index, oru64_ID, opc_TextElementName, opc_Points, opc_Parent);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get specific ethernet bus
+
+   \param[in]     ors32_Index          Index of data element in system definition
+   \param[in]     oru64_ID             Unique ID
+   \param[in]     opc_TextElementName  Pointer to text element for showing bus name
+   \param[in]     opc_Points           Points for line
+   \param[in,out] opc_Parent           Optional pointer to parent
+
+   \return
+   Specific ethernet bus
+
+   \created     15.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+C_GiLiEthernetBus * C_SyvTopologyBaseScene::m_CreateEthernetBus(const sint32 & ors32_Index, const uint64 & oru64_ID,
+                                                                C_GiTextElementBus * const opc_TextElementName,
+                                                                const std::vector<QPointF> * const opc_Points,
+                                                                QGraphicsItem * const opc_Parent)
+{
+   return new C_GiSvEthernetBus(this->mu32_ViewIndex, ors32_Index, oru64_ID, opc_TextElementName, opc_Points,
+                                opc_Parent);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get specific bus text element
+
+   \param[in]       ors32_Index          Index of data element in system definition
+   \param[in]       oru64_ID             Unique ID
+   \param[in,out]   opc_parent           Optional pointer to parent
+
+   \created     15.11.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+C_GiTextElementBus * C_SyvTopologyBaseScene::m_CreateBusTextElement(const sint32 & ors32_Index, const uint64 & oru64_ID,
+                                                                    QGraphicsItem * const opc_Parent)
+{
+   return new C_GiSvTextElementBus(ors32_Index, oru64_ID, opc_Parent);
 }
 
 //-----------------------------------------------------------------------------
@@ -512,6 +585,8 @@ C_GiLiBus * C_SyvTopologyBaseScene::m_CheckBusState(void) const
          {
             pc_Retval = pc_Item;
          }
+         //Update error
+         pc_Item->CheckBusForChanges();
       }
       else
       {

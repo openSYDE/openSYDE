@@ -19,9 +19,9 @@
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
 
-#include <iostream>
 #include <QMimeData>
 #include <QIcon>
+
 #include "C_SdNdeDataPoolContentUtil.h"
 #include "C_SdNdeDataPoolListTableModel.h"
 #include "stwerrors.h"
@@ -300,7 +300,7 @@ QVariant C_SdNdeDataPoolListTableModel::headerData(const sintn osn_Section, cons
          QString c_PhysicalValueInfo = C_GtGetText::h_GetText("The raw value of a data element is the value as it is transmitted in the network."
                                                               "\nThe physical value of a data element is the value of the physical quantity (e.g. speed, "
                                                               "\nrpm, temperature, etc.) that represents the data element."
-                                                              "\nFollowing conversion formula is used to transform the raw value "
+                                                              "\nThe following conversion formula is used to transform the raw value "
                                                               "\nto a physical value or in the reverse direction:"
                                                               "\n\n[Physical value] = ([Raw value] * [Factor]) + [Offset]");
          QString c_InfoText;
@@ -374,7 +374,7 @@ QVariant C_SdNdeDataPoolListTableModel::headerData(const sintn osn_Section, cons
                                               "is stored in non volatile memory (NVM)");
             break;
          case eEVENT_CALL:
-            c_Retval = C_GtGetText::h_GetText("Notify application via callback on data element change.");
+            c_Retval = C_GtGetText::h_GetText("Notify the application with a callback function when data elements are changed.");
             break;
          case eUNKNOWN:
          default:
@@ -522,21 +522,21 @@ QVariant C_SdNdeDataPoolListTableModel::data(const QModelIndex & orc_Index, cons
                   c_Retval = orc_Index.row() + 1;
                   break;
                case eNAME:
-                  C_SdNdeDataPoolUtil::h_ConvertToGeneric(*pc_OSCElement, *pc_UIElement,
-                                                          C_SdNdeDataPoolUtil::E_ElementDataChangeType::eELEMENT_NAME,
-                                                          c_Retval, 0, 0);
+                  C_SdNdeDataPoolUtil::h_ConvertToElementGeneric(*pc_OSCElement, *pc_UIElement,
+                                                                 C_SdNdeDataPoolUtil::E_ElementDataChangeType::eELEMENT_NAME,
+                                                                 c_Retval, 0, 0);
                   break;
                case eCOMMENT:
-                  C_SdNdeDataPoolUtil::h_ConvertToGeneric(*pc_OSCElement, *pc_UIElement,
-                                                          C_SdNdeDataPoolUtil::E_ElementDataChangeType::eELEMENT_COMMENT,
-                                                          c_Retval, 0, 0);
+                  C_SdNdeDataPoolUtil::h_ConvertToElementGeneric(*pc_OSCElement, *pc_UIElement,
+                                                                 C_SdNdeDataPoolUtil::E_ElementDataChangeType::eELEMENT_COMMENT,
+                                                                 c_Retval, 0, 0);
                   break;
                case eVALUE_TYPE:
                   if (osn_Role == static_cast<sintn>(Qt::ItemDataRole::EditRole))
                   {
-                     C_SdNdeDataPoolUtil::h_ConvertToGeneric(*pc_OSCElement, *pc_UIElement,
-                                                             C_SdNdeDataPoolUtil::E_ElementDataChangeType::eELEMENT_VALUE_TYPE,
-                                                             c_Retval, 0, 0);
+                     C_SdNdeDataPoolUtil::h_ConvertToElementGeneric(*pc_OSCElement, *pc_UIElement,
+                                                                    C_SdNdeDataPoolUtil::E_ElementDataChangeType::eELEMENT_VALUE_TYPE,
+                                                                    c_Retval, 0, 0);
                   }
                   else
                   {
@@ -554,9 +554,9 @@ QVariant C_SdNdeDataPoolListTableModel::data(const QModelIndex & orc_Index, cons
                case eARRAY_SIZE:
                   if (osn_Role == static_cast<sintn>(Qt::EditRole))
                   {
-                     C_SdNdeDataPoolUtil::h_ConvertToGeneric(*pc_OSCElement, *pc_UIElement,
-                                                             C_SdNdeDataPoolUtil::E_ElementDataChangeType::eELEMENT_ARRAY,
-                                                             c_Retval, 0, 0);
+                     C_SdNdeDataPoolUtil::h_ConvertToElementGeneric(*pc_OSCElement, *pc_UIElement,
+                                                                    C_SdNdeDataPoolUtil::E_ElementDataChangeType::eELEMENT_ARRAY,
+                                                                    c_Retval, 0, 0);
                   }
                   else
                   {
@@ -579,9 +579,11 @@ QVariant C_SdNdeDataPoolListTableModel::data(const QModelIndex & orc_Index, cons
                   {
                      if ((pc_OSCElement->GetArray() == false) || (pc_UIElement->q_AutoMinMaxActive == true))
                      {
-                        c_Retval = C_SdNdeDataPoolUtil::h_ScaledDataVariable(pc_OSCElement->c_MinValue,
-                                                                             pc_OSCElement->f64_Factor,
-                                                                             pc_OSCElement->f64_Offset, 0);
+                        c_Retval = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(
+                           pc_OSCElement->c_MinValue,
+                           pc_OSCElement->f64_Factor,
+                           pc_OSCElement->f64_Offset,
+                           0);
                      }
                      else
                      {
@@ -611,9 +613,11 @@ QVariant C_SdNdeDataPoolListTableModel::data(const QModelIndex & orc_Index, cons
                   {
                      if ((pc_OSCElement->GetArray() == false) || (pc_UIElement->q_AutoMinMaxActive == true))
                      {
-                        c_Retval = C_SdNdeDataPoolUtil::h_ScaledDataVariable(pc_OSCElement->c_MaxValue,
-                                                                             pc_OSCElement->f64_Factor,
-                                                                             pc_OSCElement->f64_Offset, 0);
+                        c_Retval = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(
+                           pc_OSCElement->c_MaxValue,
+                           pc_OSCElement->f64_Factor,
+                           pc_OSCElement->f64_Offset,
+                           0);
                      }
                      else
                      {
@@ -635,19 +639,19 @@ QVariant C_SdNdeDataPoolListTableModel::data(const QModelIndex & orc_Index, cons
                   }
                   break;
                case eFACTOR:
-                  C_SdNdeDataPoolUtil::h_ConvertToGeneric(*pc_OSCElement, *pc_UIElement,
-                                                          C_SdNdeDataPoolUtil::E_ElementDataChangeType::eELEMENT_FACTOR,
-                                                          c_Retval, 0, 0);
+                  C_SdNdeDataPoolUtil::h_ConvertToElementGeneric(*pc_OSCElement, *pc_UIElement,
+                                                                 C_SdNdeDataPoolUtil::E_ElementDataChangeType::eELEMENT_FACTOR,
+                                                                 c_Retval, 0, 0);
                   break;
                case eOFFSET:
-                  C_SdNdeDataPoolUtil::h_ConvertToGeneric(*pc_OSCElement, *pc_UIElement,
-                                                          C_SdNdeDataPoolUtil::E_ElementDataChangeType::eELEMENT_OFFSET,
-                                                          c_Retval, 0, 0);
+                  C_SdNdeDataPoolUtil::h_ConvertToElementGeneric(*pc_OSCElement, *pc_UIElement,
+                                                                 C_SdNdeDataPoolUtil::E_ElementDataChangeType::eELEMENT_OFFSET,
+                                                                 c_Retval, 0, 0);
                   break;
                case eUNIT:
-                  C_SdNdeDataPoolUtil::h_ConvertToGeneric(*pc_OSCElement, *pc_UIElement,
-                                                          C_SdNdeDataPoolUtil::E_ElementDataChangeType::eELEMENT_UNIT,
-                                                          c_Retval, 0, 0);
+                  C_SdNdeDataPoolUtil::h_ConvertToElementGeneric(*pc_OSCElement, *pc_UIElement,
+                                                                 C_SdNdeDataPoolUtil::E_ElementDataChangeType::eELEMENT_UNIT,
+                                                                 c_Retval, 0, 0);
                   if (c_Retval == "")
                   {
                      c_Retval = "-";
@@ -681,9 +685,11 @@ QVariant C_SdNdeDataPoolListTableModel::data(const QModelIndex & orc_Index, cons
                            if (u32_DataSet < pc_OSCElement->c_DataSetValues.size())
                            {
                               c_Retval =
-                                 C_SdNdeDataPoolUtil::h_ScaledDataVariable(pc_OSCElement->c_DataSetValues[u32_DataSet],
-                                                                           pc_OSCElement->f64_Factor,
-                                                                           pc_OSCElement->f64_Offset, 0);
+                                 C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(pc_OSCElement->c_DataSetValues[
+                                                                                                u32_DataSet],
+                                                                                             pc_OSCElement->f64_Factor,
+                                                                                             pc_OSCElement->f64_Offset,
+                                                                                             0);
                            }
                         }
                      }
@@ -717,9 +723,9 @@ QVariant C_SdNdeDataPoolListTableModel::data(const QModelIndex & orc_Index, cons
                case eACCESS:
                   if (osn_Role == static_cast<sintn>(Qt::EditRole))
                   {
-                     C_SdNdeDataPoolUtil::h_ConvertToGeneric(*pc_OSCElement, *pc_UIElement,
-                                                             C_SdNdeDataPoolUtil::E_ElementDataChangeType::eELEMENT_ACCESS,
-                                                             c_Retval, 0, 0);
+                     C_SdNdeDataPoolUtil::h_ConvertToElementGeneric(*pc_OSCElement, *pc_UIElement,
+                                                                    C_SdNdeDataPoolUtil::E_ElementDataChangeType::eELEMENT_ACCESS,
+                                                                    c_Retval, 0, 0);
                   }
                   else
                   {
@@ -919,9 +925,9 @@ QVariant C_SdNdeDataPoolListTableModel::data(const QModelIndex & orc_Index, cons
 
                   break;
                case eCOMMENT:
-                  C_SdNdeDataPoolUtil::h_ConvertToGeneric(*pc_OSCElement, *pc_UIElement,
-                                                          C_SdNdeDataPoolUtil::E_ElementDataChangeType::eELEMENT_COMMENT,
-                                                          c_Retval, 0, 0);
+                  C_SdNdeDataPoolUtil::h_ConvertToElementGeneric(*pc_OSCElement, *pc_UIElement,
+                                                                 C_SdNdeDataPoolUtil::E_ElementDataChangeType::eELEMENT_COMMENT,
+                                                                 c_Retval, 0, 0);
                   break;
                case eMIN:
                   if ((pc_OSCElement->GetArray() == false) || (pc_UIElement->q_AutoMinMaxActive == true) ||
@@ -1563,7 +1569,7 @@ Qt::ItemFlags C_SdNdeDataPoolListTableModel::flags(const QModelIndex & orc_Index
       bool q_Edit = true;
       const C_SdNdeDataPoolListTableModel::E_Columns e_Col = ColumnToEnum(orc_Index.column());
       //Each item
-      c_Retval =   Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsSelectable;
+      c_Retval =  Qt::ItemIsSelectable;
       //Add edit
       switch (e_Col)
       {
@@ -1679,64 +1685,52 @@ Qt::DropActions C_SdNdeDataPoolListTableModel::supportedDropActions(void) const
 
    \param[in] orc_OSCInsertedElements Inserted elements OSC content
    \param[in] orc_UIInsertedElements  Inserted elements UI content
-   \param[in] oru32_Row               Starting Row
+   \param[in] oru32_Row               Starting Row (Expected: Sorted ascending!)
+
+   \return
+   Continuous sections of new elements
 
    \created     10.02.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-void C_SdNdeDataPoolListTableModel::DoInsertRows(
+std::vector<std::vector<uint32> > C_SdNdeDataPoolListTableModel::DoInsertRows(
    const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCInsertedElements,
-   const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UIInsertedElements, const uint32 & oru32_Row)
+   const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UIInsertedElements, const std::vector<uint32> & orc_Rows)
 {
-   if (orc_OSCInsertedElements.size() == orc_UIInsertedElements.size())
+   std::vector<std::vector<uint32> > c_Retval;
+
+   if ((orc_OSCInsertedElements.size() == orc_UIInsertedElements.size()) &&
+       (orc_OSCInsertedElements.size() == orc_Rows.size()))
    {
-      this->mc_OSCInsertedElements = orc_OSCInsertedElements;
-      this->mc_UIInsertedElements = orc_UIInsertedElements;
-      this->insertRows(oru32_Row, orc_OSCInsertedElements.size());
+      uint32 u32_Counter = 0UL;
+      c_Retval = C_Uti::h_GetContiguousSectionsAscending(orc_Rows);
+      C_PuiSdHandler::h_GetInstance()->ReserveDataPoolListElements(this->mu32_NodeIndex,
+                                                                   this->mu32_DataPoolIndex,
+                                                                   this->mu32_ListIndex,
+                                                                   orc_OSCInsertedElements.size());
+      for (uint32 u32_ItSection = 0UL; u32_ItSection < c_Retval.size(); ++u32_ItSection)
+      {
+         const std::vector<uint32> & rc_Section = c_Retval[u32_ItSection];
+         if (rc_Section.size() > 0UL)
+         {
+            this->beginInsertRows(QModelIndex(), rc_Section[0UL],
+                                  rc_Section[static_cast<std::vector<uint32>::size_type>(rc_Section.size() - 1UL)]);
+            for (uint32 u32_ItItem = 0UL; u32_ItItem < rc_Section.size(); ++u32_ItItem)
+            {
+               C_PuiSdHandler::h_GetInstance()->InsertDataPoolListElement(this->mu32_NodeIndex,
+                                                                          this->mu32_DataPoolIndex,
+                                                                          this->mu32_ListIndex, rc_Section[u32_ItItem],
+                                                                          orc_OSCInsertedElements[u32_Counter],
+                                                                          orc_UIInsertedElements[u32_Counter]);
+               ++u32_Counter;
+            }
+            this->endInsertRows();
+         }
+      }
       this->mc_ErrorManager.OnErrorChange();
       Q_EMIT this->SigSizeChangePossible(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
    }
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Insert items into model
-
-   \param[in] osn_Row    Starting row
-   \param[in] osn_Count  Number of inserted items
-   \param[in] orc_Parent Parent
-
-   \return
-   true  success
-   false failure
-
-   \created     09.02.2017  STW/M.Echtler
-*/
-//-----------------------------------------------------------------------------
-bool C_SdNdeDataPoolListTableModel::insertRows(const sintn osn_Row, const sintn osn_Count,
-                                               const QModelIndex & orc_Parent)
-{
-   bool q_Retval = false;
-
-   if ((osn_Count > 0) && (osn_Row >= 0))
-   {
-      if ((this->mc_OSCInsertedElements.size() == static_cast<uint32>(osn_Count)) &&
-          (this->mc_UIInsertedElements.size() == static_cast<uint32>(osn_Count)))
-      {
-         beginInsertRows(orc_Parent, osn_Row, (osn_Row + osn_Count) - 1);
-         for (uint32 u32_Index = 0; u32_Index < static_cast<uint32>(osn_Count); ++u32_Index)
-         {
-            C_PuiSdHandler::h_GetInstance()->InsertDataPoolListElement(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
-                                                                       this->mu32_ListIndex,
-                                                                       static_cast<uint32>(osn_Row) + u32_Index,
-                                                                       this->mc_OSCInsertedElements[u32_Index],
-                                                                       this->mc_UIInsertedElements[u32_Index]);
-         }
-         endInsertRows();
-         q_Retval =  true;
-      }
-   }
-   return q_Retval;
+   return c_Retval;
 }
 
 //-----------------------------------------------------------------------------
@@ -1771,42 +1765,41 @@ bool C_SdNdeDataPoolListTableModel::insertColumns(const sintn osn_Col, const sin
 
 //-----------------------------------------------------------------------------
 /*!
-   \brief   Remove items from model
+   \brief   Handle delete items action
 
-   \param[in] osn_Row    Starting row
-   \param[in] osn_Count  Number of removed items
-   \param[in] orc_Parent Parent
+   \param[in] orc_Rows Row indices (Expected: unique, ascending)
 
-   \return
-   true  success
-   false failure
-
-   \created     09.02.2017  STW/M.Echtler
+   \created     06.12.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-bool C_SdNdeDataPoolListTableModel::removeRows(const sintn osn_Row, const sintn osn_Count,
-                                               const QModelIndex & orc_Parent)
+void C_SdNdeDataPoolListTableModel::DoRemoveRows(const std::vector<uint32> & orc_Rows)
 {
-   bool q_Retval = false;
+   const std::vector<std::vector<uint32> > c_ContiguousSections = C_Uti::h_GetContiguousSectionsAscending(orc_Rows);
 
-   if ((osn_Count > 0) && (osn_Row >= 0))
+   //Start deleting from back (easier to keep indices valid)
+   for (uint32 u32_ItSection = c_ContiguousSections.size(); u32_ItSection > 0UL; --u32_ItSection)
    {
-      beginRemoveRows(orc_Parent, osn_Row, (osn_Row + osn_Count) - 1);
-      for (uint32 u32_Index = static_cast<uint32>(osn_Row + osn_Count); u32_Index > static_cast<uint32>(osn_Row);
-           --u32_Index)
+      const std::vector<uint32> & rc_Section =
+         c_ContiguousSections[static_cast<std::vector<uint32>::size_type>(u32_ItSection - 1UL)];
+      if (rc_Section.size() > 0UL)
       {
-         tgl_assert(C_PuiSdHandler::h_GetInstance()->RemoveDataPoolListElement(this->mu32_NodeIndex,
-                                                                               this->mu32_DataPoolIndex,
-                                                                               this->mu32_ListIndex,
-                                                                               u32_Index - 1UL) == C_NO_ERR);
+         this->beginRemoveRows(QModelIndex(), rc_Section[0UL],
+                               rc_Section[static_cast<std::vector<uint32>::size_type>(rc_Section.size() - 1UL)]);
+         for (uint32 u32_ItItem = rc_Section.size(); u32_ItItem > 0UL; --u32_ItItem)
+         {
+            tgl_assert(C_PuiSdHandler::h_GetInstance()->RemoveDataPoolListElement(this->mu32_NodeIndex,
+                                                                                  this->mu32_DataPoolIndex,
+                                                                                  this->mu32_ListIndex,
+                                                                                  rc_Section[static_cast<std::vector<uint32>
+                                                                                                         ::size_type>(
+                                                                                                u32_ItItem - 1UL)]) ==
+                       C_NO_ERR);
+         }
+         this->endRemoveRows();
       }
-      endRemoveRows();
-      q_Retval = true;
-      this->mc_ErrorManager.OnErrorChange();
-      Q_EMIT this->SigSizeChangePossible(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
    }
-
-   return q_Retval;
+   this->mc_ErrorManager.OnErrorChange();
+   Q_EMIT this->SigSizeChangePossible(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
 }
 
 //-----------------------------------------------------------------------------
@@ -1842,41 +1835,63 @@ bool C_SdNdeDataPoolListTableModel::removeColumns(const sintn osn_Col, const sin
 
 //-----------------------------------------------------------------------------
 /*!
-   \brief   Move rows
+   \brief   Handle move selected items action
 
-   \param[in] orc_SourceParent      Source parent
-   \param[in] osn_SourceRow         Source row
-   \param[in] osn_Count             Count
-   \param[in] orc_DestinationParent Destination parent
-   \param[in] osn_DestinationChild  Destination child
+   Warning 1: only works if target indices have same contiguous property as selected indices
+   i.e. if you make the selected indices contiguous by resorting the target indices should also become contiguous
+   Warning 2: does no boundary check
 
-   \return
-   true  success
-   false failure
+   \param[in] orc_SelectedIndices Selected row indices (Expected: unique)
+   \param[in] orc_TargetIndices   Target row indices (Expected: unique)
+                                  Example value:
+                                   "move up" -> orc_SelectedIndices - 1
+                                   "move down" -> orc_TargetIndices + 1
 
-   \created     09.02.2017  STW/M.Echtler
+   \created     07.12.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-bool C_SdNdeDataPoolListTableModel::moveRows(const QModelIndex & orc_SourceParent, const sintn osn_SourceRow,
-                                             const sintn osn_Count, const QModelIndex & orc_DestinationParent,
-                                             const sintn osn_DestinationChild)
+void C_SdNdeDataPoolListTableModel::DoMoveRows(const std::vector<uint32> & orc_SelectedIndices,
+                                               const std::vector<uint32> & orc_TargetIndices)
 {
-   bool q_Retval = false;
-
-   if (osn_Count > 0)
+   if (orc_SelectedIndices.size() == orc_TargetIndices.size())
    {
-      beginMoveRows(orc_SourceParent, osn_SourceRow, osn_Count, orc_DestinationParent, osn_DestinationChild);
-      for (uint32 u32_It = 0; u32_It < static_cast<uint32>(osn_Count); ++u32_It)
+      std::vector<uint32> c_SelectedIndicesCopy = orc_SelectedIndices;
+      std::vector<uint32> c_TargetIndicesCopy = orc_TargetIndices;
+      std::vector<std::vector<uint32> > c_ContiguousSections;
+      uint32 u32_TargetAccessIndex = 0UL;
+
+      //Step 1 sort (so the next step can assume the contiguous selection has the same order!
+      C_Uti::h_SortIndicesAscendingAndSync(c_SelectedIndicesCopy, c_TargetIndicesCopy);
+
+      //Step 2: get contiguous selection
+      c_ContiguousSections = C_Uti::h_GetContiguousSectionsAscending(orc_SelectedIndices);
+
+      //Step 3: move
+      for (uint32 u32_ItSection = 0UL; u32_ItSection < c_ContiguousSections.size(); ++u32_ItSection)
       {
-         C_PuiSdHandler::h_GetInstance()->MoveDataPoolListElement(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
-                                                                  this->mu32_ListIndex,
-                                                                  static_cast<uint32>(osn_SourceRow) + u32_It,
-                                                                  static_cast<uint32>(osn_DestinationChild) + u32_It);
+         const std::vector<uint32> & rc_Section = c_ContiguousSections[u32_ItSection];
+         if (rc_Section.size() > 0UL)
+         {
+            uint32 u32_TargetIndex = c_TargetIndicesCopy[u32_TargetAccessIndex];
+            uint32 u32_TargetIndexParam = c_TargetIndicesCopy[u32_TargetAccessIndex];
+            //+1UL seems to fit the documentation of beginMoveRows of what we want to achieve here
+            if (u32_TargetIndex > rc_Section[0UL])
+            {
+               //Qt interface seems to insert the items before removing anything so the "new position" has to have an
+               // bigger offset
+               u32_TargetIndex += rc_Section.size();
+               //We insert after removing so this has to be considered
+               u32_TargetIndexParam = u32_TargetIndex - 1UL;
+            }
+            this->beginMoveRows(QModelIndex(), rc_Section[0UL],
+                                rc_Section[static_cast<std::vector<uint32>::size_type>(rc_Section.size() - 1UL)],
+                                QModelIndex(), u32_TargetIndex);
+            this->m_MoveItems(rc_Section, u32_TargetIndexParam);
+            this->endMoveRows();
+            u32_TargetAccessIndex += rc_Section.size();
+         }
       }
-      endMoveRows();
-      q_Retval = true;
    }
-   return q_Retval;
 }
 
 //-----------------------------------------------------------------------------
@@ -2457,4 +2472,64 @@ bool C_SdNdeDataPoolListTableModel::m_CheckLink(const QModelIndex & orc_Index) c
 void C_SdNdeDataPoolListTableModel::m_OnErrorChange(void)
 {
    Q_EMIT this->SigErrorChangePossible(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Move items to target index
+
+   \param[in] orc_ContiguousIndices Contiguous section of ascending indices
+   \param[in] ou32_TargetIndex      Target index
+
+   \created     07.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_SdNdeDataPoolListTableModel::m_MoveItems(const std::vector<uint32> & orc_ContiguousIndices,
+                                                const uint32 ou32_TargetIndex) const
+{
+   if (orc_ContiguousIndices.size() > 0UL)
+   {
+      std::vector<uint32> c_ContiguousIndicesCopy = orc_ContiguousIndices;
+      bool q_Forward;
+      if (c_ContiguousIndicesCopy[0UL] < ou32_TargetIndex)
+      {
+         q_Forward = true;
+      }
+      else
+      {
+         q_Forward = false;
+      }
+      for (uint32 u32_ItItem = 0UL; u32_ItItem < c_ContiguousIndicesCopy.size(); ++u32_ItItem)
+      {
+         if (q_Forward == true)
+         {
+            //There should always be a "new item" at the same position
+            this->m_MoveItem(orc_ContiguousIndices[0UL], ou32_TargetIndex);
+         }
+         else
+         {
+            //The item position should not change but the target will
+            this->m_MoveItem(orc_ContiguousIndices[u32_ItItem], ou32_TargetIndex + u32_ItItem);
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Move specific item
+
+   For implementation: First delete ou32_SourceIndex then insert ou32_TargetIndex
+   Warning: not expected to fail
+
+   \param[in] ou32_SourceIndex Source index
+   \param[in] ou32_TargetIndex Target index
+
+   \created     07.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_SdNdeDataPoolListTableModel::m_MoveItem(const uint32 ou32_SourceIndex, const uint32 ou32_TargetIndex) const
+{
+   C_PuiSdHandler::h_GetInstance()->MoveDataPoolListElement(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
+                                                            this->mu32_ListIndex, ou32_SourceIndex, ou32_TargetIndex);
 }

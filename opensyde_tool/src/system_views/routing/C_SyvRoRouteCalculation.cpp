@@ -45,6 +45,8 @@ using namespace stw_opensyde_core;
 /*!
    \brief   Default constructor
 
+   Use local only! (uses reference on nodes)
+
    \param[in]     ou32_ViewIndex       View index
    \param[in]     ou32_TargetNodeIndex Target node at the end of the routing
    \param[in]     oe_Mode              Decision for update or diagnostic routing

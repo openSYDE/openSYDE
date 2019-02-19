@@ -102,9 +102,7 @@ bool C_OgeTreeViewToolTipBase::event(QEvent * const opc_Event)
    if (opc_Event->type() == QEvent::ToolTip)
    {
       //show tooltip
-      this->m_CreateToolTip();
-
-      if (this->mpc_ToolTip->isVisible() == false)
+      if (this->m_GetToolTip()->isVisible() == false)
       {
          //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          QHelpEvent * const pc_HelpEvent = dynamic_cast<QHelpEvent * const>(opc_Event);
@@ -135,12 +133,12 @@ bool C_OgeTreeViewToolTipBase::event(QEvent * const opc_Event)
                      this->ms32_HoveredHorzHeader = s32_VisualIndex;
                      //Update text
                      this->setMouseTracking(true);
-                     this->mpc_ToolTip->SetHeading(c_Heading);
-                     this->mpc_ToolTip->SetContent(c_Content);
-                     this->mpc_ToolTip->SetType(e_Type);
-                     this->mpc_ToolTip->show();
+                     this->m_GetToolTip()->SetHeading(c_Heading);
+                     this->m_GetToolTip()->SetContent(c_Content);
+                     this->m_GetToolTip()->SetType(e_Type);
+                     this->m_GetToolTip()->show();
                      //Use global pos for move because that's the actual target position
-                     this->mpc_ToolTip->DoMove(pc_HelpEvent->globalPos());
+                     this->m_GetToolTip()->DoMove(pc_HelpEvent->globalPos());
                   }
                }
             }
@@ -165,12 +163,12 @@ bool C_OgeTreeViewToolTipBase::event(QEvent * const opc_Event)
                         this->ms32_HoveredNumberOfParents = mh_CountParents(c_Index);
                         //Update text
                         this->setMouseTracking(true);
-                        this->mpc_ToolTip->SetHeading(c_Heading);
-                        this->mpc_ToolTip->SetContent(c_Content);
-                        this->mpc_ToolTip->SetType(e_Type);
-                        this->mpc_ToolTip->show();
+                        this->m_GetToolTip()->SetHeading(c_Heading);
+                        this->m_GetToolTip()->SetContent(c_Content);
+                        this->m_GetToolTip()->SetType(e_Type);
+                        this->m_GetToolTip()->show();
                         //Use global pos for move because that's the actual target position
-                        this->mpc_ToolTip->DoMove(pc_HelpEvent->globalPos());
+                        this->m_GetToolTip()->DoMove(pc_HelpEvent->globalPos());
                      }
                   }
                }

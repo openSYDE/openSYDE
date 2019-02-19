@@ -42,6 +42,14 @@ public:
    void EnableSerialNumber(const QString & orc_SerialNumber) const;
    void DisableSerialNumber(const QString & orc_SerialNumber) const;
 
+   //The signals keyword is necessary for Qt signal slot functionality
+   //lint -save -e1736
+
+Q_SIGNALS:
+   //lint -restore
+   void SigStartDrag(const QString & orc_DeviceName, const bool oq_DeviceNameValid);
+   void SigStopDrag(void);
+
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
    //lint -save -e1960
@@ -53,6 +61,7 @@ private:
    std::vector<stw_opensyde_gui_logic::C_SyvDcDeviceInformation> mc_Data;
    static const QString mhc_MimeData;
    static const QString mhc_MimeDataDevice;
+   static const QString mhc_MimeDataDeviceValid;
 
    void m_Init(void);
    void m_AppendNode(const stw_opensyde_gui_logic::C_SyvDcDeviceInformation & orc_Info);

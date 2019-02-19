@@ -357,7 +357,8 @@ void C_SyvDaItPaTreeDelegate::paint(QPainter * const opc_Painter, const QStyleOp
    if (c_IconPaths.count() == 2)
    {
       const QSize c_IconSize(16, 16);
-      const QRect c_Rect(orc_Option.rect.topLeft() + QPoint(4,
+      // center icon
+      const QRect c_Rect(orc_Option.rect.topLeft() + QPoint((orc_Option.rect.width() - c_IconSize.width()) / 2,
                                                             (orc_Option.rect.height() - c_IconSize.height()) / 2),
                          c_IconSize);
       if (orc_Index.flags().testFlag(Qt::ItemIsEditable) == true)

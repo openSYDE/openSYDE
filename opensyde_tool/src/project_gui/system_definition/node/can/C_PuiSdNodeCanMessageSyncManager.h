@@ -18,8 +18,9 @@
 #define C_PUISDNODECANMESSAGESYNCMANAGER_H
 
 /* -- Includes ------------------------------------------------------------- */
-#include <QString>
 #include <vector>
+#include <QObject>
+#include <QString>
 #include "stwtypes.h"
 #include "C_OSCCanMessageIdentificationIndices.h"
 #include "C_OSCCanProtocol.h"
@@ -33,10 +34,13 @@ namespace stw_opensyde_gui_logic
 
 /* -- Types ---------------------------------------------------------------- */
 
-class C_PuiSdNodeCanMessageSyncManager
+class C_PuiSdNodeCanMessageSyncManager :
+   public QObject
 {
+   Q_OBJECT
+
 public:
-   C_PuiSdNodeCanMessageSyncManager(void);
+   C_PuiSdNodeCanMessageSyncManager(QObject * const opc_Parent = NULL);
 
    void Init(const stw_types::uint32 & oru32_BusIndex,
              const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComProtocol);

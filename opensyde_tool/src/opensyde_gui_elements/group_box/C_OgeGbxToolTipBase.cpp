@@ -78,9 +78,7 @@ bool C_OgeGbxToolTipBase::event(QEvent * const opc_Event)
       if (opc_Event->type() == QEvent::ToolTip)
       {
          //show tooltip
-         this->m_CreateToolTip();
-
-         if (this->mpc_ToolTip->isVisible() == false)
+         if (this->m_GetToolTip()->isVisible() == false)
          {
             //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
             QHelpEvent * const pc_HelpEvent = dynamic_cast<QHelpEvent * const>(opc_Event);
@@ -89,11 +87,11 @@ bool C_OgeGbxToolTipBase::event(QEvent * const opc_Event)
             {
                this->setMouseTracking(true);
 
-               this->mpc_ToolTip->SetHeading(this->mc_ToolTipHeading);
-               this->mpc_ToolTip->SetContent(this->mc_ToolTipContent);
-               this->mpc_ToolTip->SetType(this->me_ToolTipType);
-               this->mpc_ToolTip->show();
-               this->mpc_ToolTip->DoMove(pc_HelpEvent->globalPos());
+               this->m_GetToolTip()->SetHeading(this->mc_ToolTipHeading);
+               this->m_GetToolTip()->SetContent(this->mc_ToolTipContent);
+               this->m_GetToolTip()->SetType(this->me_ToolTipType);
+               this->m_GetToolTip()->show();
+               this->m_GetToolTip()->DoMove(pc_HelpEvent->globalPos());
             }
          }
          //Accept event because of Qt dynamic tooltip time based on the fact if there was a tooltip in this widget

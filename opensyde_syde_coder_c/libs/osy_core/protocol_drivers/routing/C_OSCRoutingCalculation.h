@@ -80,8 +80,10 @@ private:
    std::vector<stw_types::uint32> mc_CheckedBusses;
    bool mq_PcBus;
 
-   const std::vector<C_OSCNode> mc_AllNodes;
-   const std::vector<stw_types::uint8> mc_ActiveNodes;
+   //lint -e{1725} reference used for performance reasons
+   const std::vector<C_OSCNode> & mrc_AllNodes;
+   //lint -e{1725} reference used for performance reasons
+   const std::vector<stw_types::uint8> & mrc_ActiveNodes;
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

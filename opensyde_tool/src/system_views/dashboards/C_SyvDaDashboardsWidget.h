@@ -60,7 +60,7 @@ public:
    bool GetConnectActive(void) const;
    stw_types::sint32 SetConnectActive(const bool oq_Value);
 
-   void CheckError(void);
+   void CheckError(void) const;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -70,7 +70,6 @@ Q_SIGNALS:
    void SigChanged(void);
    void SigEditModeClosed(void);
    void SigSetPushButtonIcon(const QString & orc_IconPath);
-   void SigConfigError(const bool oq_Active);
    void SigBlockDragAndDrop(const bool oq_Block);
 
 protected:

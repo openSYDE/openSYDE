@@ -227,7 +227,7 @@ void C_SyvDaPeBase::InitStaticNames(void)
    this->mpc_Ui->pc_LabelOffset->setText(C_GtGetText::h_GetText("Offset"));
    this->mpc_Ui->pc_LabelUnit->setText(C_GtGetText::h_GetText("Unit"));
    this->mpc_Ui->pc_LabelNamespaceDescription->setText(C_GtGetText::h_GetText("Source"));
-   this->mpc_Ui->pc_CheckBoxDefaultScaling->setText(C_GtGetText::h_GetText("Use System Definition default values"));
+   this->mpc_Ui->pc_CheckBoxDefaultScaling->setText(C_GtGetText::h_GetText("Use the default values of SYSTEM DEFINITION"));
    this->mpc_Ui->pc_PushButtonUpdateModeConfigure->setText(C_GtGetText::h_GetText("Configure"));
    this->mpc_Ui->pc_ComboBoxTransmissionMode->addItem(C_GtGetText::h_GetText("On Trigger"));
    this->mpc_Ui->pc_ComboBoxTransmissionMode->addItem(C_GtGetText::h_GetText("On Change"));

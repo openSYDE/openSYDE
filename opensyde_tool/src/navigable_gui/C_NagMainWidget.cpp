@@ -188,7 +188,7 @@ void C_NagMainWidget::InitText(void) const
    this->mpc_Ui->pc_LabelCurProjTitle->setText(C_GtGetText::h_GetText("Current Project"));
    this->mpc_Ui->pc_LabRecentProjects->setText(C_GtGetText::h_GetText("Recent Projects"));
    this->mpc_Ui->pc_LabelNoRecentProj->setText(C_GtGetText::h_GetText(
-                                                  "No recent projects found, you may choose any via \"Open Project\"."));
+                                                  "No recent projects found, use \"Open Project\"."));
    this->mpc_Ui->pc_GroupBoxNoRecentProj->setTitle("");
 
    // tool tips
@@ -197,16 +197,16 @@ void C_NagMainWidget::InitText(void) const
    this->mpc_Ui->pc_BtnOpenProj->SetToolTipInformation(C_GtGetText::h_GetText("Open Project"),
                                                        C_GtGetText::h_GetText("Browse to open existing project."));
    this->mpc_Ui->pc_BtnSaveProjAs->SetToolTipInformation(C_GtGetText::h_GetText("Save Project as"),
-                                                         C_GtGetText::h_GetText("Choose name and location to save the "
-                                                                                "project at."));
+                                                         C_GtGetText::h_GetText(
+                                                            "Select name and location to save the project"));
    this->mpc_Ui->pc_BtnAbout->SetToolTipInformation(C_GtGetText::h_GetText("About"),
                                                     C_GtGetText::h_GetText("Show information about openSYDE tool."));
-   this->mpc_Ui->pc_BtnSysDef->SetToolTipInformation(C_GtGetText::h_GetText("System Definition"),
+   this->mpc_Ui->pc_BtnSysDef->SetToolTipInformation(C_GtGetText::h_GetText("SYSTEM DEFINITION"),
                                                      C_GtGetText::h_GetText("Define your Network "
                                                                             "Topology, Nodes properties, Datapools, "
                                                                             "Interface description, "
                                                                             "generate code and more."));
-   this->mpc_Ui->pc_BtnSysView->SetToolTipInformation(C_GtGetText::h_GetText("System Commissioning"),
+   this->mpc_Ui->pc_BtnSysView->SetToolTipInformation(C_GtGetText::h_GetText("SYSTEM COMMISSIONING"),
                                                       C_GtGetText::h_GetText("Manage your system views, "
                                                                              "update your system, analyze your system "
                                                                              "behavior in Dashboards and more."));
@@ -310,14 +310,10 @@ void C_NagMainWidget::m_InitGUIElements(void) const
 //-----------------------------------------------------------------------------
 void C_NagMainWidget::m_UpdateCurrProjInfo(void)
 {
-   const QString c_Path = C_PuiProject::h_GetInstance()->GetPath();
-   QFileInfo c_File;
+   const QString c_Name = C_PuiProject::h_GetInstance()->GetName();
 
-   c_File.setFile(c_Path);
-
-   if (c_Path.compare("") != 0)
+   if (c_Name.compare("") != 0)
    {
-      const QString c_Name = c_File.baseName();
       QFont c_Font = mc_STYLE_GUIDE_FONT_SEMIBOLD_24;
       c_Font.setPixelSize(c_Font.pointSize());
       QFontMetrics c_FontMetrics(c_Font);
@@ -341,14 +337,15 @@ void C_NagMainWidget::m_UpdateCurrProjInfo(void)
                                                                           this->mpc_Ui->pc_LabelCurProjName->
                                                                           maximumWidth()));
       this->mpc_Ui->pc_LabelCurProjName->SetToolTipInformation(c_Name, c_TooltipContent);
-      Q_EMIT this->SigNewApplicationName(QString("openSYDE - %1 (%2)").arg(c_Name).arg(c_File.absoluteFilePath()));
+      Q_EMIT (this->SigNewApplicationName(QString("openSYDE - %1 (%2)").
+                                          arg(c_Name).arg(C_PuiProject::h_GetInstance()->GetPath())));
    }
    else
    {
       this->mpc_Ui->pc_LabelCurProjName->setText(C_GtGetText::h_GetText("New project"));
       this->mpc_Ui->pc_LabelVersion->setText("0.01r0b0");
       this->mpc_Ui->pc_LabelCurProjName->SetToolTipInformation("New project", "This project is not yet saved.");
-      Q_EMIT this->SigNewApplicationName(QString("openSYDE - ") + QString(C_GtGetText::h_GetText("New project")));
+      Q_EMIT (this->SigNewApplicationName(QString("openSYDE - ") + QString(C_GtGetText::h_GetText("New project"))));
    }
 }
 
@@ -429,7 +426,11 @@ void C_NagMainWidget::m_SysViewClicked()
 void C_NagMainWidget::m_AboutClicked()
 {
    QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
-   new C_NagAboutDialog(*c_New);
+   new C_NagAboutDialog(*c_New, "openSYDE", ":/images/LogoOpensyde_XXL.png", 27);
+
+   //Resize
+   c_New->SetSize(QSize(650, 350));
+
    c_New->exec();
 
    if (c_New != NULL)

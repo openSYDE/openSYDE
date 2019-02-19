@@ -35,6 +35,7 @@
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
+using namespace stw_can;
 
 /* -- Module Global Constants ---------------------------------------------- */
 

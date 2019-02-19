@@ -26,7 +26,8 @@
 #include "C_GtGetText.h"
 #include "C_PuiSdHandler.h"
 #include "C_SdUtil.h"
-#include "C_SdNdeDataPoolUtil.h"
+#include "C_SdTooltipUtil.h"
+#include "C_SdNdeDataPoolContentUtil.h"
 
 /* -- Used Namespaces ------------------------------------------------------ */
 using namespace stw_types;
@@ -330,7 +331,7 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                   C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(c_MessageId, u32_SignalIndex);
                if (pc_OSCSignalCommon != NULL)
                {
-                  c_Retval = C_SdNdeDataPoolUtil::h_ConvertTypeToNameSimplified(pc_OSCSignalCommon->GetType());
+                  c_Retval = C_SdTooltipUtil::h_ConvertTypeToNameSimplified(pc_OSCSignalCommon->GetType());
                }
                break;
             case eINITIAL_VALUE:
@@ -340,9 +341,10 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                {
                   if (pc_OSCSignalCommon->c_DataSetValues.size() > 0)
                   {
-                     c_Retval = C_SdNdeDataPoolUtil::h_ScaledDataVariable(pc_OSCSignalCommon->c_DataSetValues[0],
-                                                                          pc_OSCSignalCommon->f64_Factor,
-                                                                          pc_OSCSignalCommon->f64_Offset, 0);
+                     c_Retval = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(
+                        pc_OSCSignalCommon->c_DataSetValues[0],
+                        pc_OSCSignalCommon->f64_Factor,
+                        pc_OSCSignalCommon->f64_Offset, 0);
                   }
                }
                break;
@@ -370,9 +372,10 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                   C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(c_MessageId, u32_SignalIndex);
                if (pc_OSCSignalCommon != NULL)
                {
-                  c_Retval = C_SdNdeDataPoolUtil::h_ScaledDataVariable(pc_OSCSignalCommon->c_MinValue,
-                                                                       pc_OSCSignalCommon->f64_Factor,
-                                                                       pc_OSCSignalCommon->f64_Offset, 0);
+                  c_Retval = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(pc_OSCSignalCommon->c_MinValue,
+                                                                                         pc_OSCSignalCommon->f64_Factor,
+                                                                                         pc_OSCSignalCommon->f64_Offset,
+                                                                                         0);
                }
                break;
             case eMAXIMUM_VALUE:
@@ -380,9 +383,10 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                   C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(c_MessageId, u32_SignalIndex);
                if (pc_OSCSignalCommon != NULL)
                {
-                  c_Retval = C_SdNdeDataPoolUtil::h_ScaledDataVariable(pc_OSCSignalCommon->c_MaxValue,
-                                                                       pc_OSCSignalCommon->f64_Factor,
-                                                                       pc_OSCSignalCommon->f64_Offset, 0);
+                  c_Retval = C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(pc_OSCSignalCommon->c_MaxValue,
+                                                                                         pc_OSCSignalCommon->f64_Factor,
+                                                                                         pc_OSCSignalCommon->f64_Offset,
+                                                                                         0);
                }
                break;
             case eUNIT:
@@ -456,10 +460,12 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                      bool q_ValueBelowMin;
                      bool q_ValueOverMax;
                      bool q_SignalValid;
-                     pc_Message->CheckErrorSignal(pc_List, u32_SignalIndex, &q_LayoutConflict, &q_BorderConflict,
-                                                  &q_NameConflict, &q_NameInvalid, &q_MinOverMax, &q_ValueBelowMin,
-                                                  &q_ValueOverMax, C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
-                                                     c_MessageId.e_ComProtocol));
+                     pc_Message->CheckErrorSignalDetailed(pc_List, u32_SignalIndex, &q_LayoutConflict,
+                                                          &q_BorderConflict,
+                                                          &q_NameConflict, &q_NameInvalid, &q_MinOverMax,
+                                                          &q_ValueBelowMin,
+                                                          &q_ValueOverMax, C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                                                             c_MessageId.e_ComProtocol));
                      q_SignalValid =
                         (((((((q_LayoutConflict == false) && (q_BorderConflict == false)) &&
                              (q_NameConflict == false)) &&

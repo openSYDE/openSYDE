@@ -50,11 +50,17 @@ public:
                         std::vector<stw_types::uint32> * const opc_InvalidTxMessages = NULL,
                         std::vector<stw_types::uint32> * const opc_InvalidRxMessages = NULL) const;
 
+   bool ContainsAtLeastOneMessage(void) const;
+
    std::vector<C_OSCCanMessage> c_TxMessages; ///< Transmitted message types
    std::vector<C_OSCCanMessage> c_RxMessages; ///< Received message types
    bool q_IsComProtocolUsedByInterface;       ///< Flag whether com protocol is used on the corresponding CAN
    ///< interface.
    ///< Default is false
+
+private:
+   std::vector<stw_types::uint32> m_GetHashes(const C_OSCNodeDataPoolList & orc_ListTx,
+                                              const C_OSCNodeDataPoolList & orc_ListRx) const;
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

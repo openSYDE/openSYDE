@@ -293,7 +293,7 @@ void C_GiNodeBoundary::m_DrawBackground(QPainter * const opc_Painter) const
 {
    //   static sintn sn_Counter = 0;
 
-   //   std::cout << sn_Counter << std::endl;
+   //   std::cout << sn_Counter << &std::endl;
    //   sn_Counter++;
    //   if (opc_Painter != NULL)
    //   {
@@ -362,7 +362,7 @@ void C_GiNodeBoundary::m_DrawBackground(QPainter * const opc_Painter) const
    //      if (this->mq_DrawBoder == false)
    //      {
    //         opc_Painter->setPen(Qt::NoPen);
-   //         std::cout << "Border off" << std::endl;
+   //         std::cout << "Border off" << &std::endl;
    //      }
    //      else
    //      {

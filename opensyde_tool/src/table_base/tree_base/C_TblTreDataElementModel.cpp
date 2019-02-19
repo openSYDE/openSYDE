@@ -19,10 +19,13 @@
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
 
+#include <QElapsedTimer>
+
 #include "TGLUtils.h"
 #include "constants.h"
 #include "stwerrors.h"
 #include "C_GtGetText.h"
+#include "CSCLChecksums.h"
 #include "C_PuiSvHandler.h"
 #include "C_PuiSdHandler.h"
 #include "C_SyvRoRouteCalculation.h"
@@ -57,6 +60,12 @@ const QString C_TblTreDataElementModel::mhc_Additional64BitInfo = " (Not support
 /* -- Global Variables ----------------------------------------------------- */
 
 /* -- Module Global Variables ---------------------------------------------- */
+QMap<std::vector<stw_types::uint32>,
+     C_TblTreDataElementModel::C_TblTreDataElementModelState> C_TblTreDataElementModel::mhc_ViewSetupsNL;
+QMap<std::vector<stw_types::uint32>,
+     C_TblTreDataElementModel::C_TblTreDataElementModelState> C_TblTreDataElementModel::mhc_ViewSetupsDE;
+QMap<std::vector<stw_types::uint32>,
+     C_TblTreDataElementModel::C_TblTreDataElementModelState> C_TblTreDataElementModel::mhc_ViewSetupsBS;
 
 /* -- Module Global Function Prototypes ------------------------------------ */
 
@@ -81,6 +90,20 @@ C_TblTreDataElementModel::C_TblTreDataElementModel(QObject * const opc_Parent) :
 
 //-----------------------------------------------------------------------------
 /*!
+   \brief   Default destructor
+
+   Clean up.
+
+   \created     06.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+C_TblTreDataElementModel::~C_TblTreDataElementModel(void)
+{
+   m_CleanUpLastModel();
+}
+
+//-----------------------------------------------------------------------------
+/*!
    \brief   Set the active node index
 
    \param[in] ou32_NodeIndex               Active node index
@@ -100,12 +123,8 @@ void C_TblTreDataElementModel::InitSD(const uint32 ou32_NodeIndex, const sint32 
    this->beginResetModel();
    this->me_Mode = C_TblTreDataElementModel::eDATAPOOLS;
    //Clear
-   for (std::vector<C_TblTreItem *>::const_iterator c_It = this->mc_InvisibleRootItem.c_Children.begin();
-        c_It != this->mc_InvisibleRootItem.c_Children.end(); ++c_It)
-   {
-      delete (*c_It);
-   }
-   this->mc_InvisibleRootItem.c_Children.clear();
+   m_CleanUpLastModel();
+   this->mpc_InvisibleRootItem = new C_TblTreItem();
    //Init
 
    //Static
@@ -140,6 +159,10 @@ void C_TblTreDataElementModel::InitSD(const uint32 ou32_NodeIndex, const sint32 
       pc_NodeItem->c_ToolTipHeading = pc_Node->c_Properties.c_Name.c_str();
       pc_NodeItem->c_ToolTipContent = pc_Node->c_Properties.c_Comment.c_str();
       //Data pools
+      pc_NodeItem->ReserveChildrenSpace(3UL);
+      pc_DiagItem->ReserveChildrenSpace(pc_Node->c_DataPools.size());
+      pc_NvmItem->ReserveChildrenSpace(pc_Node->c_DataPools.size());
+      pc_ComItem->ReserveChildrenSpace(pc_Node->c_DataPools.size());
       for (uint32 u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
       {
          const C_OSCNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
@@ -226,7 +249,7 @@ void C_TblTreDataElementModel::InitSD(const uint32 ou32_NodeIndex, const sint32 
    }
    if (q_NodeValid == true)
    {
-      this->mc_InvisibleRootItem.AddChild(pc_NodeItem);
+      this->mpc_InvisibleRootItem->AddChild(pc_NodeItem);
    }
    else
    {
@@ -252,32 +275,124 @@ void C_TblTreDataElementModel::InitSV(const uint32 ou32_ViewIndex, const E_Mode 
                                       const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
                                       const bool oq_Show64BitValues)
 {
+   QElapsedTimer c_Timer;
+
+   if (mq_TIMING_OUTPUT)
+   {
+      c_Timer.start();
+   }
+   QMap<std::vector<stw_types::uint32>, C_TblTreDataElementModelState>::const_iterator c_It;
+   const std::vector<uint32> c_Hashes = C_TblTreDataElementModel::mh_GetViewSdHash(ou32_ViewIndex);
+
    this->me_Mode = oe_Mode;
    this->beginResetModel();
    //Clear
-   for (std::vector<C_TblTreItem *>::const_iterator c_It = this->mc_InvisibleRootItem.c_Children.begin();
-        c_It != this->mc_InvisibleRootItem.c_Children.end(); ++c_It)
-   {
-      delete (*c_It);
-   }
-   this->mc_InvisibleRootItem.c_Children.clear();
+   m_CleanUpLastModel();
    //Init
    switch (this->me_Mode)
    {
    case eDATAPOOL_ELEMENT:
-      m_InitDatapoolElement(ou32_ViewIndex, oq_ShowOnlyWriteElements, oq_ShowArrayElements, oq_Show64BitValues);
+      c_It = C_TblTreDataElementModel::mhc_ViewSetupsDE.find(c_Hashes);
+      if (c_It != C_TblTreDataElementModel::mhc_ViewSetupsDE.end())
+      {
+         const C_TblTreDataElementModelState & rc_It = c_It.value();
+         this->mpc_InvisibleRootItem = rc_It.pc_Tree;
+         this->mc_MessageSyncManagers = rc_It.c_SyncManagers;
+         this->m_UpdateDatapoolElement(oq_ShowOnlyWriteElements, oq_ShowArrayElements,
+                                       oq_Show64BitValues);
+         if (mq_TIMING_OUTPUT)
+         {
+            std::cout << "Restored" << &std::endl;
+         }
+      }
+      else
+      {
+         this->mpc_InvisibleRootItem = new C_TblTreItem();
+         m_InitDatapoolElement(ou32_ViewIndex, oq_ShowOnlyWriteElements, oq_ShowArrayElements, oq_Show64BitValues);
+         //Clean up (old values probably not necessary in future);
+         mh_CleanUp(C_TblTreDataElementModel::mhc_ViewSetupsDE);
+         //Directly store the model (after filling it-> for sync managers)
+         C_TblTreDataElementModel::mhc_ViewSetupsDE.insert(c_Hashes,
+                                                           C_TblTreDataElementModel::C_TblTreDataElementModelState(
+                                                              this->mpc_InvisibleRootItem,
+                                                              this->mc_MessageSyncManagers));
+         if (mq_TIMING_OUTPUT)
+         {
+            std::cout << "New" << &std::endl;
+         }
+      }
       break;
    case eBUS_SIGNAL:
-      m_InitBusSignal(ou32_ViewIndex, oq_ShowOnlyWriteElements, oq_ShowArrayElements, oq_Show64BitValues);
+      c_It = C_TblTreDataElementModel::mhc_ViewSetupsBS.find(c_Hashes);
+      if (c_It != C_TblTreDataElementModel::mhc_ViewSetupsBS.end())
+      {
+         const C_TblTreDataElementModelState & rc_It = c_It.value();
+         this->mpc_InvisibleRootItem = rc_It.pc_Tree;
+         this->mc_MessageSyncManagers = rc_It.c_SyncManagers;
+         this->m_UpdateDatapoolElement(oq_ShowOnlyWriteElements, oq_ShowArrayElements,
+                                       oq_Show64BitValues);
+         if (mq_TIMING_OUTPUT)
+         {
+            std::cout << "Restored" << &std::endl;
+         }
+      }
+      else
+      {
+         this->mpc_InvisibleRootItem = new C_TblTreItem();
+         m_InitBusSignal(ou32_ViewIndex, oq_ShowOnlyWriteElements, oq_ShowArrayElements, oq_Show64BitValues);
+         //Clean up (old values probably not necessary in future);
+         mh_CleanUp(C_TblTreDataElementModel::mhc_ViewSetupsBS);
+         //Directly store the model (after filling it-> for sync managers)
+         C_TblTreDataElementModel::mhc_ViewSetupsBS.insert(c_Hashes,
+                                                           C_TblTreDataElementModel::C_TblTreDataElementModelState(
+                                                              this->mpc_InvisibleRootItem,
+                                                              this->mc_MessageSyncManagers));
+         if (mq_TIMING_OUTPUT)
+         {
+            std::cout << "New" << &std::endl;
+         }
+      }
       break;
    case eNVM_LIST:
-      m_InitNvmList(ou32_ViewIndex);
+      c_It = C_TblTreDataElementModel::mhc_ViewSetupsNL.find(c_Hashes);
+      if (c_It != C_TblTreDataElementModel::mhc_ViewSetupsNL.end())
+      {
+         const C_TblTreDataElementModelState & rc_It = c_It.value();
+         this->mpc_InvisibleRootItem = rc_It.pc_Tree;
+         this->mc_MessageSyncManagers = rc_It.c_SyncManagers;
+         this->m_UpdateDatapoolElement(oq_ShowOnlyWriteElements, oq_ShowArrayElements,
+                                       oq_Show64BitValues);
+         if (mq_TIMING_OUTPUT)
+         {
+            std::cout << "Restored" << &std::endl;
+         }
+      }
+      else
+      {
+         this->mpc_InvisibleRootItem = new C_TblTreItem();
+         m_InitNvmList(ou32_ViewIndex);
+         //Clean up (old values probably not necessary in future);
+         mh_CleanUp(C_TblTreDataElementModel::mhc_ViewSetupsNL);
+         //Directly store the model (after filling it-> for sync managers)
+         C_TblTreDataElementModel::mhc_ViewSetupsNL.insert(c_Hashes,
+                                                           C_TblTreDataElementModel::C_TblTreDataElementModelState(
+                                                              this->mpc_InvisibleRootItem,
+                                                              this->mc_MessageSyncManagers));
+         if (mq_TIMING_OUTPUT)
+         {
+            std::cout << "New" << &std::endl;
+         }
+      }
       break;
    default:
       //NO SV use case
       tgl_assert(false);
    }
    this->endResetModel();
+   if (mq_TIMING_OUTPUT)
+   {
+      std::cout << "Setup data element tree:" << c_Timer.elapsed() << " ms" << &std::endl;
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -315,6 +430,23 @@ const
       }
    }
    return c_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Preparation for final clean up
+
+   \created     06.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_TblTreDataElementModel::h_CleanUp(void)
+{
+   mh_CleanUp(C_TblTreDataElementModel::mhc_ViewSetupsBS);
+   C_TblTreDataElementModel::mhc_ViewSetupsBS.clear();
+   mh_CleanUp(C_TblTreDataElementModel::mhc_ViewSetupsDE);
+   C_TblTreDataElementModel::mhc_ViewSetupsDE.clear();
+   mh_CleanUp(C_TblTreDataElementModel::mhc_ViewSetupsNL);
+   C_TblTreDataElementModel::mhc_ViewSetupsNL.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -425,6 +557,83 @@ const
 
 //-----------------------------------------------------------------------------
 /*!
+   \brief   Default constructor
+
+   \param[in,out] opc_Tree         Tree layout to remember
+   \param[in]     orc_SyncManagers Sync managers to store
+
+   \created     06.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+C_TblTreDataElementModel::C_TblTreDataElementModelState::C_TblTreDataElementModelState(C_TblTreItem * const opc_Tree,
+                                                                                       const std::vector<C_PuiSdNodeCanMessageSyncManager *> & orc_SyncManagers)
+   :
+   pc_Tree(opc_Tree),
+   c_SyncManagers(orc_SyncManagers)
+{
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Preparation for final clean up
+
+   \created     06.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_TblTreDataElementModel::C_TblTreDataElementModelState::CleanUp(void)
+{
+   delete (this->pc_Tree);
+   this->pc_Tree = NULL;
+   for (uint32 u32_It = 0UL; u32_It < this->c_SyncManagers.size(); ++u32_It)
+   {
+      delete (this->c_SyncManagers[u32_It]);
+   }
+   this->c_SyncManagers.clear();
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Clean up all current sync managers
+
+   \created     05.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_TblTreDataElementModel::m_ClearSyncManagers(void)
+{
+   for (uint32 u32_It = 0UL; u32_It < this->mc_MessageSyncManagers.size(); ++u32_It)
+   {
+      delete (this->mc_MessageSyncManagers[u32_It]);
+   }
+   this->mc_MessageSyncManagers.clear();
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Clean up current model
+
+   Warning: pointer might be invalid after call of this function
+
+   \created     06.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_TblTreDataElementModel::m_CleanUpLastModel(void)
+{
+   //Check if current model is stored, only discard if not stored
+   if (mh_Contains(C_TblTreDataElementModel::mhc_ViewSetupsBS, this->mpc_InvisibleRootItem) == false)
+   {
+      if (mh_Contains(C_TblTreDataElementModel::mhc_ViewSetupsDE, this->mpc_InvisibleRootItem) == false)
+      {
+         if (mh_Contains(C_TblTreDataElementModel::mhc_ViewSetupsNL, this->mpc_InvisibleRootItem) == false)
+         {
+            delete (this->mpc_InvisibleRootItem);
+            m_ClearSyncManagers();
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
    \brief   Translate signal index to data pool index
 
    WARNING: Only works if message contains at least one signal
@@ -493,6 +702,8 @@ void C_TblTreDataElementModel::m_InitBusSignal(const uint32 ou32_ViewIndex, cons
       bool q_ProtocolValid;
       bool q_MessageValid;
 
+      //Expected to be already clean
+      this->mc_MessageSyncManagers.clear();
       this->mc_MessageSyncManagers.reserve(3U);
       //Init sync managers
       //Busses
@@ -523,9 +734,10 @@ void C_TblTreDataElementModel::m_InitBusSignal(const uint32 ou32_ViewIndex, cons
                break;
             }
             //Protocols
+            pc_BusItem->ReserveChildrenSpace(3UL);
             for (uint8 u8_ItProtocol = 0U; u8_ItProtocol < 3U; ++u8_ItProtocol)
             {
-               C_PuiSdNodeCanMessageSyncManager c_SyncManager;
+               C_PuiSdNodeCanMessageSyncManager * const pc_SyncManager = new C_PuiSdNodeCanMessageSyncManager();
                C_OSCCanProtocol::E_Type e_Type;
                std::vector<C_OSCCanMessageIdentificationIndices> c_UniqueMessages;
                C_TblTreItem * const pc_ProtocolItem = new C_TblTreItem();
@@ -554,13 +766,14 @@ void C_TblTreDataElementModel::m_InitBusSignal(const uint32 ou32_ViewIndex, cons
                   tgl_assert(true);
                   break;
                }
-               c_SyncManager.Init(pc_View->GetPcData().GetBusIndex(), e_Type);
-               c_UniqueMessages = c_SyncManager.GetUniqueMessages();
-               this->mc_MessageSyncManagers.push_back(c_SyncManager);
+               pc_SyncManager->Init(pc_View->GetPcData().GetBusIndex(), e_Type);
+               c_UniqueMessages = pc_SyncManager->GetUniqueMessages();
+               this->mc_MessageSyncManagers.push_back(pc_SyncManager);
                //Flag
                q_ProtocolValid = false;
 
                //Messages
+               pc_ProtocolItem->ReserveChildrenSpace(c_UniqueMessages.size());
                for (uint32 u32_ItMessage = 0U; u32_ItMessage < c_UniqueMessages.size(); ++u32_ItMessage)
                {
                   C_TblTreItem * const pc_MessageItem = new C_TblTreItem();
@@ -580,6 +793,7 @@ void C_TblTreDataElementModel::m_InitBusSignal(const uint32 ou32_ViewIndex, cons
                         C_SdUtil::h_GetToolTipContentMessage(c_UniqueMessages[u32_ItMessage]);
                      pc_MessageItem->c_Icon = QIcon(C_TblTreDataElementModel::mhc_IconMessage);
                      //Signals
+                     pc_MessageItem->ReserveChildrenSpace(pc_Message->c_Signals.size());
                      for (uint32 u32_ItSignal = 0; u32_ItSignal < pc_Message->c_Signals.size(); ++u32_ItSignal)
                      {
                         const C_OSCNodeDataPoolListElement * const pc_Element =
@@ -660,11 +874,12 @@ void C_TblTreDataElementModel::m_InitBusSignal(const uint32 ou32_ViewIndex, cons
                {
                   delete (pc_ProtocolItem);
                }
+               //lint -e{429} Deleted at a later point
             }
          }
          if (q_BusValid == true)
          {
-            this->mc_InvisibleRootItem.AddChild(pc_BusItem);
+            this->mpc_InvisibleRootItem->AddChild(pc_BusItem);
          }
          else
          {
@@ -703,6 +918,7 @@ void C_TblTreDataElementModel::m_InitDatapoolElement(const uint32 ou32_ViewIndex
       const uint32 u32_NodeSize = C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize();
 
       //Nodes
+      this->mpc_InvisibleRootItem->ReserveChildrenSpace(u32_NodeSize);
       tgl_assert(rc_NodeActiveFlags.size() == u32_NodeSize);
       for (uint32 u32_ItNode = 0; u32_ItNode < u32_NodeSize; ++u32_ItNode)
       {
@@ -743,6 +959,10 @@ void C_TblTreDataElementModel::m_InitDatapoolElement(const uint32 ou32_ViewIndex
                pc_NodeItem->c_ToolTipHeading = pc_Node->c_Properties.c_Name.c_str();
                pc_NodeItem->c_ToolTipContent = pc_Node->c_Properties.c_Comment.c_str();
                //Data pools
+               pc_NodeItem->ReserveChildrenSpace(3UL);
+               pc_DiagItem->ReserveChildrenSpace(pc_Node->c_DataPools.size());
+               pc_NvmItem->ReserveChildrenSpace(pc_Node->c_DataPools.size());
+               pc_ComItem->ReserveChildrenSpace(pc_Node->c_DataPools.size());
                for (uint32 u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
                {
                   const C_OSCNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
@@ -758,6 +978,7 @@ void C_TblTreDataElementModel::m_InitDatapoolElement(const uint32 ou32_ViewIndex
                   q_DataPoolValid = false;
                   //Data pool
                   //Lists
+                  pc_DataPoolItem->ReserveChildrenSpace(rc_DataPool.c_Lists.size());
                   for (uint32 u32_ItList = 0; u32_ItList < rc_DataPool.c_Lists.size(); ++u32_ItList)
                   {
                      const C_OSCNodeDataPoolList & rc_List = rc_DataPool.c_Lists[u32_ItList];
@@ -774,6 +995,7 @@ void C_TblTreDataElementModel::m_InitDatapoolElement(const uint32 ou32_ViewIndex
                      //Flag
                      q_ListValid = false;
                      //Elements
+                     pc_ListItem->ReserveChildrenSpace(rc_List.c_Elements.size());
                      for (uint32 u32_ItElement = 0; u32_ItElement < rc_List.c_Elements.size(); ++u32_ItElement)
                      {
                         const C_OSCNodeDataPoolListElement & rc_Element = rc_List.c_Elements[u32_ItElement];
@@ -783,7 +1005,6 @@ void C_TblTreDataElementModel::m_InitDatapoolElement(const uint32 ou32_ViewIndex
                                                                                  u32_ItElement);
                         //Init current node
                         pc_ElementItem->u32_Index = u32_ItElement;
-                        pc_ElementItem->c_Name = rc_Element.c_Name.c_str();
                         pc_ElementItem->c_ToolTipHeading = rc_Element.c_Name.c_str();
                         pc_ElementItem->c_ToolTipContent = C_SdUtil::h_GetToolTipContentDpListElement(
                            c_NodeDpListElement);
@@ -809,41 +1030,13 @@ void C_TblTreDataElementModel::m_InitDatapoolElement(const uint32 ou32_ViewIndex
                         default:
                            break;
                         }
-                        if ((rc_Element.GetArray() == false) || (oq_ShowArrayElements == true))
-                        {
-                           if ((((rc_Element.GetType() != C_OSCNodeDataPoolContent::eFLOAT64) &&
-                                 (rc_Element.GetType() != C_OSCNodeDataPoolContent::eUINT64)) &&
-                                (rc_Element.GetType() != C_OSCNodeDataPoolContent::eSINT64)) ||
-                               (oq_Show64BitValues == true))
-                           {
-                              if ((rc_Element.e_Access == C_OSCNodeDataPoolListElement::eACCESS_RW) ||
-                                  (oq_ShowOnlyWriteElements == false))
-                              {
-                                 //Valid no adaptation
-                              }
-                              else
-                              {
-                                 pc_ElementItem->q_Enabled = false;
-                                 pc_ElementItem->q_Selectable = false;
-                                 //Explanation
-                                 pc_ElementItem->c_Name += C_TblTreDataElementModel::mhc_AdditionalWriteOnlyInfo;
-                              }
-                           }
-                           else
-                           {
-                              pc_ElementItem->q_Enabled = false;
-                              pc_ElementItem->q_Selectable = false;
-                              //Explanation
-                              pc_ElementItem->c_Name += C_TblTreDataElementModel::mhc_Additional64BitInfo;
-                           }
-                        }
-                        else
-                        {
-                           pc_ElementItem->q_Enabled = false;
-                           pc_ElementItem->q_Selectable = false;
-                           //Explanation
-                           pc_ElementItem->c_Name += C_TblTreDataElementModel::mhc_AdditionalArrayInfo;
-                        }
+
+                        // Adapt the element item
+                        C_TblTreDataElementModel::mh_ConfigureDatapoolElement(oq_ShowOnlyWriteElements,
+                                                                              oq_ShowArrayElements,
+                                                                              oq_Show64BitValues,
+                                                                              rc_Element, pc_ElementItem);
+
                         //Add
                         pc_ListItem->AddChild(pc_ElementItem);
                      }
@@ -906,7 +1099,7 @@ void C_TblTreDataElementModel::m_InitDatapoolElement(const uint32 ou32_ViewIndex
             }
             if (q_NodeValid == true)
             {
-               this->mc_InvisibleRootItem.AddChild(pc_NodeItem);
+               this->mpc_InvisibleRootItem->AddChild(pc_NodeItem);
             }
             else
             {
@@ -915,6 +1108,174 @@ void C_TblTreDataElementModel::m_InitDatapoolElement(const uint32 ou32_ViewIndex
          }
       }
    }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapts the properties of already existing tree structure for data pool elements
+
+   \param[in] oq_ShowOnlyWriteElements Optional flag to show only writable elements
+   \param[in] oq_ShowArrayElements     Optional flag to hide all array elements (if false)
+   \param[in] oq_Show64BitValues       Optional flag to hide all 64 bit elements (if false)
+
+   \created     15.02.2019  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_TblTreDataElementModel::m_UpdateDatapoolElement(const bool oq_ShowOnlyWriteElements,
+                                                       const bool oq_ShowArrayElements, const bool oq_Show64BitValues)
+{
+   if (this->mpc_InvisibleRootItem != NULL)
+   {
+      uint32 u32_NodeCounter;
+
+      // Node layer
+      for (u32_NodeCounter = 0U; u32_NodeCounter < this->mpc_InvisibleRootItem->c_Children.size(); ++u32_NodeCounter)
+      {
+         C_TblTreItem * const pc_NodeItem = this->mpc_InvisibleRootItem->c_Children[u32_NodeCounter];
+         const C_OSCNode * pc_OscNode = NULL;
+
+         if (pc_NodeItem != NULL)
+         {
+            pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(pc_NodeItem->u32_Index);
+         }
+
+         if ((pc_OscNode != NULL) &&
+             (pc_NodeItem != NULL))
+         {
+            uint32 u32_DpTypeCounter;
+
+            // Datapool type layer
+            for (u32_DpTypeCounter = 0U; u32_DpTypeCounter < pc_NodeItem->c_Children.size(); ++u32_DpTypeCounter)
+            {
+               C_TblTreItem * const pc_DpTypeItem = pc_NodeItem->c_Children[u32_DpTypeCounter];
+
+               if (pc_DpTypeItem != NULL)
+               {
+                  uint32 u32_DatapoolCounter;
+
+                  // Datapool layer
+                  for (u32_DatapoolCounter = 0U; u32_DatapoolCounter < pc_DpTypeItem->c_Children.size();
+                       ++u32_DatapoolCounter)
+                  {
+                     C_TblTreItem * const pc_DatapoolItem = pc_DpTypeItem->c_Children[u32_DatapoolCounter];
+
+                     if (pc_DatapoolItem != NULL)
+                     {
+                        uint32 u32_ListCounter;
+
+                        // List Layer
+                        for (u32_ListCounter = 0U; u32_ListCounter < pc_DatapoolItem->c_Children.size();
+                             ++u32_ListCounter)
+                        {
+                           C_TblTreItem * const pc_ListItem = pc_DatapoolItem->c_Children[u32_ListCounter];
+
+                           if (pc_ListItem != NULL)
+                           {
+                              uint32 u32_ElementCounter;
+
+                              // Element layer
+                              for (u32_ElementCounter = 0U; u32_ElementCounter < pc_ListItem->c_Children.size();
+                                   ++u32_ElementCounter)
+                              {
+                                 C_TblTreItem * const pc_ElementItem = pc_ListItem->c_Children[u32_ElementCounter];
+
+                                 // Check if the element index is valid
+                                 if ((pc_ElementItem != NULL) &&
+                                     (pc_DatapoolItem->u32_Index < pc_OscNode->c_DataPools.size()) &&
+                                     (pc_ListItem->u32_Index <
+                                      pc_OscNode->c_DataPools[pc_DatapoolItem->u32_Index].c_Lists.size()) &&
+                                     (pc_ElementItem->u32_Index <
+                                      pc_OscNode->c_DataPools[pc_DatapoolItem->u32_Index].
+                                      c_Lists[pc_ListItem->u32_Index].c_Elements.size()))
+                                 {
+                                    const C_OSCNodeDataPoolListElement & rc_Element =
+                                       pc_OscNode->c_DataPools[pc_DatapoolItem->u32_Index].
+                                       c_Lists[pc_ListItem->u32_Index].c_Elements[pc_ElementItem->u32_Index];
+
+                                    // Adapt the element item
+                                    C_TblTreDataElementModel::mh_ConfigureDatapoolElement(oq_ShowOnlyWriteElements,
+                                                                                          oq_ShowArrayElements,
+                                                                                          oq_Show64BitValues,
+                                                                                          rc_Element, pc_ElementItem);
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Adapts the properties of the tree item
+
+   Sets the enabled and selectable flag dependent of the paramters oq_ShowOnlyWriteElements, oq_ShowArrayElements and
+   oq_Show64BitValues
+
+   \param[in]     oq_ShowOnlyWriteElements Optional flag to show only writable elements
+   \param[in]     oq_ShowArrayElements     Optional flag to hide all array elements (if false)
+   \param[in]     oq_Show64BitValues       Optional flag to hide all 64 bit elements (if false)
+   \param[in]     orc_Element              Datapool element of tree item
+   \param[in]     opc_ElementItem          Tree item for datapool element
+
+   \created     15.02.2019  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_TblTreDataElementModel::mh_ConfigureDatapoolElement(const bool oq_ShowOnlyWriteElements,
+                                                           const bool oq_ShowArrayElements,
+                                                           const bool oq_Show64BitValues,
+                                                           const C_OSCNodeDataPoolListElement & orc_Element,
+                                                           C_TblTreItem * const opc_ElementItem)
+{
+   if (opc_ElementItem != NULL)
+   {
+      // Set the name always here, in case of an earlier update, the name was adapted with the explanation
+      opc_ElementItem->c_Name = orc_Element.c_Name.c_str();
+
+      if ((orc_Element.GetArray() == false) || (oq_ShowArrayElements == true))
+      {
+         if ((((orc_Element.GetType() != C_OSCNodeDataPoolContent::eFLOAT64) &&
+               (orc_Element.GetType() != C_OSCNodeDataPoolContent::eUINT64)) &&
+              (orc_Element.GetType() != C_OSCNodeDataPoolContent::eSINT64)) ||
+             (oq_Show64BitValues == true))
+         {
+            if ((orc_Element.e_Access == C_OSCNodeDataPoolListElement::eACCESS_RW) ||
+                (oq_ShowOnlyWriteElements == false))
+            {
+               //Valid
+               opc_ElementItem->q_Enabled = true;
+               opc_ElementItem->q_Selectable = true;
+            }
+            else
+            {
+               opc_ElementItem->q_Enabled = false;
+               opc_ElementItem->q_Selectable = false;
+               //Explanation
+               opc_ElementItem->c_Name += C_TblTreDataElementModel::mhc_AdditionalWriteOnlyInfo;
+            }
+         }
+         else
+         {
+            opc_ElementItem->q_Enabled = false;
+            opc_ElementItem->q_Selectable = false;
+            //Explanation
+            opc_ElementItem->c_Name += C_TblTreDataElementModel::mhc_Additional64BitInfo;
+         }
+      }
+      else
+      {
+         opc_ElementItem->q_Enabled = false;
+         opc_ElementItem->q_Selectable = false;
+         //Explanation
+         opc_ElementItem->c_Name += C_TblTreDataElementModel::mhc_AdditionalArrayInfo;
+      }
+   }
+   //lint -e{429}  no memory leak because of no ownership of the element opc_ElementItem here
 }
 
 //-----------------------------------------------------------------------------
@@ -941,6 +1302,7 @@ void C_TblTreDataElementModel::m_InitNvmList(const uint32 ou32_ViewIndex)
       const uint32 u32_NodeSize = C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize();
 
       //Nodes
+      this->mpc_InvisibleRootItem->ReserveChildrenSpace(u32_NodeSize);
       tgl_assert(rc_NodeActiveFlags.size() == u32_NodeSize);
       for (uint32 u32_ItNode = 0; u32_ItNode < u32_NodeSize; ++u32_ItNode)
       {
@@ -981,6 +1343,10 @@ void C_TblTreDataElementModel::m_InitNvmList(const uint32 ou32_ViewIndex)
                pc_NodeItem->c_ToolTipHeading = pc_Node->c_Properties.c_Name.c_str();
                pc_NodeItem->c_ToolTipContent = pc_Node->c_Properties.c_Comment.c_str();
                //Data pools
+               pc_NodeItem->ReserveChildrenSpace(3UL);
+               pc_DiagItem->ReserveChildrenSpace(pc_Node->c_DataPools.size());
+               pc_NvmItem->ReserveChildrenSpace(pc_Node->c_DataPools.size());
+               pc_ComItem->ReserveChildrenSpace(pc_Node->c_DataPools.size());
                for (uint32 u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
                {
                   const C_OSCNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
@@ -996,6 +1362,7 @@ void C_TblTreDataElementModel::m_InitNvmList(const uint32 ou32_ViewIndex)
                   q_DataPoolValid = false;
                   //Data pool
                   //Lists
+                  pc_DataPoolItem->ReserveChildrenSpace(rc_DataPool.c_Lists.size());
                   for (uint32 u32_ItList = 0; u32_ItList < rc_DataPool.c_Lists.size(); ++u32_ItList)
                   {
                      const C_OSCNodeDataPoolList & rc_List = rc_DataPool.c_Lists[u32_ItList];
@@ -1094,7 +1461,7 @@ void C_TblTreDataElementModel::m_InitNvmList(const uint32 ou32_ViewIndex)
             }
             if (q_NodeValid == true)
             {
-               this->mc_InvisibleRootItem.AddChild(pc_NodeItem);
+               this->mpc_InvisibleRootItem->AddChild(pc_NodeItem);
             }
             else
             {
@@ -1154,14 +1521,17 @@ const
                   const uint32 u32_MessageVectorIndex = pc_SecondParent->u32_Index;
                   if (u32_MessageVectorIndex < this->mc_MessageSyncManagers.size())
                   {
-                     const C_PuiSdNodeCanMessageSyncManager & rc_MessageSyncManager =
+                     const C_PuiSdNodeCanMessageSyncManager * const pc_MessageSyncManager =
                         this->mc_MessageSyncManagers[u32_MessageVectorIndex];
-                     const std::vector<C_OSCCanMessageIdentificationIndices> c_Messages =
-                        rc_MessageSyncManager.GetUniqueMessages();
-                     if (pc_FirstParent->u32_Index < c_Messages.size())
+                     if (pc_MessageSyncManager != NULL)
                      {
-                        c_Retval.push_back(mh_Translate(c_Messages[pc_FirstParent->u32_Index],
-                                                        pc_TreeItem->u32_Index));
+                        const std::vector<C_OSCCanMessageIdentificationIndices> c_Messages =
+                           pc_MessageSyncManager->GetUniqueMessages();
+                        if (pc_FirstParent->u32_Index < c_Messages.size())
+                        {
+                           c_Retval.push_back(mh_Translate(c_Messages[pc_FirstParent->u32_Index],
+                                                           pc_TreeItem->u32_Index));
+                        }
                      }
                   }
                }
@@ -1446,6 +1816,100 @@ const
          //TODO ?
       }
    }
+   return c_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Clean up map
+
+   \param[in] orc_Map Map to clean up
+
+   \created     06.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+void C_TblTreDataElementModel::mh_CleanUp(QMap<std::vector<uint32>, C_TblTreDataElementModelState> & orc_Map)
+{
+   for (QMap<std::vector<uint32>, C_TblTreDataElementModelState>::iterator c_It = orc_Map.begin();
+        c_It != orc_Map.end(); ++c_It)
+   {
+      c_It.value().CleanUp();
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Check if item in map
+
+   \param[in] orc_Map  Map to look in
+   \param[in] opc_Item Item to look for
+
+   \return
+   True  Found
+   False Not found
+
+   \created     06.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+bool C_TblTreDataElementModel::mh_Contains(const QMap<std::vector<uint32>, C_TblTreDataElementModelState> & orc_Map,
+                                           const C_TblTreItem * const opc_Item)
+{
+   bool q_Retval = false;
+
+   for (QMap<std::vector<uint32>, C_TblTreDataElementModelState>::const_iterator c_It = orc_Map.begin();
+        c_It != orc_Map.end(); ++c_It)
+   {
+      if (c_It.value().pc_Tree == opc_Item)
+      {
+         q_Retval = true;
+         break;
+      }
+   }
+   return q_Retval;
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Get view and system definition hash in combination
+
+   \param[in] ou32_ViewIndex View index
+
+   \return
+   View and system definition hash in combination
+
+   \created     06.12.2018  STW/M.Echtler
+*/
+//-----------------------------------------------------------------------------
+std::vector<uint32> C_TblTreDataElementModel::mh_GetViewSdHash(const uint32 ou32_ViewIndex)
+{
+   std::vector<uint32> c_Retval;
+   uint32 u32_Hash;
+   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
+   if (pc_View != NULL)
+   {
+      bool q_Data;
+      uint32 u32_Data;
+      const std::vector<uint8> & rc_NodeActiveFlags = pc_View->GetNodeActiveFlags();
+      u32_Hash = 0xFFFFFFFFUL;
+      //Active flags
+      for (uint32 u32_ItNode = 0; u32_ItNode < rc_NodeActiveFlags.size(); ++u32_ItNode)
+      {
+         q_Data = static_cast<bool>(rc_NodeActiveFlags[u32_ItNode]);
+         stw_scl::C_SCLChecksums::CalcCRC32(&q_Data, sizeof(q_Data), u32_Hash);
+      }
+      //Relevant PC data
+      q_Data = pc_View->GetPcData().GetConnected();
+      u32_Data = pc_View->GetPcData().GetBusIndex();
+      stw_scl::C_SCLChecksums::CalcCRC32(&q_Data, sizeof(q_Data), u32_Hash);
+      stw_scl::C_SCLChecksums::CalcCRC32(&u32_Data, sizeof(u32_Data), u32_Hash);
+   }
+   else
+   {
+      u32_Hash = 0UL;
+   }
+   c_Retval.push_back(u32_Hash);
+   u32_Hash = C_PuiSdHandler::h_GetInstance()->CalcHashSystemDefinition();
+   c_Retval.push_back(u32_Hash);
    return c_Retval;
 }
 

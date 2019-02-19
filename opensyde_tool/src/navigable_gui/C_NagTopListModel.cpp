@@ -234,7 +234,7 @@ QVariant C_NagTopListModel::data(const QModelIndex & orc_Index, const sintn osn_
             }
             else
             {
-               c_Retval = C_GtGetText::h_GetText("Bus has invalid content");
+               c_Retval = C_GtGetText::h_GetText("Invalid Bus Content");
             }
          }
       }

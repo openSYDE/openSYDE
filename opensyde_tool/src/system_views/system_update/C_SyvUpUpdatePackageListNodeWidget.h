@@ -87,7 +87,8 @@ public:
    stw_types::uint32 GetNodeIndex(void) const;
    bool IsFileBased(void) const;
 
-   stw_types::sint32 GetUpdatePackage(stw_opensyde_core::C_OSCSuSequences::C_DoFlash & orc_ApplicationsToWrite);
+   stw_types::sint32 GetUpdatePackage(stw_opensyde_core::C_OSCSuSequences::C_DoFlash & orc_ApplicationsToWrite,
+                                      stw_opensyde_core::C_OSCSuSequences::C_DoFlash * const opc_AllApplications);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

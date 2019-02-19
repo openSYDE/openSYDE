@@ -96,30 +96,26 @@ public:
    //lint -restore
 
    // Add data:
-   void DoInsertRows(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_OSCInsertedElements,
-                     const std::vector<stw_opensyde_gui_logic::C_PuiSdNodeDataPoolListElement> & orc_UIInsertedElements,
-                     const stw_types::uint32 & oru32_Row);
+   std::vector<std::vector<stw_types::uint32> > DoInsertRows(
+      const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_OSCInsertedElements,
+      const std::vector<stw_opensyde_gui_logic::C_PuiSdNodeDataPoolListElement> & orc_UIInsertedElements,
+      const std::vector<stw_types::uint32> & orc_Rows);
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
    //lint -save -e1960
-   //lint -e{1735} Suppression, because default parameters are identical
-   virtual bool insertRows(const stw_types::sintn osn_Row, const stw_types::sintn osn_Count,
-                           const QModelIndex & orc_Parent = QModelIndex()) override;
    //lint -e{1735} Suppression, because default parameters are identical
    virtual bool insertColumns(const stw_types::sintn osn_Col, const stw_types::sintn osn_Count,
                               const QModelIndex & orc_Parent = QModelIndex()) override;
 
    // Remove data:
-   //lint -e{1735} Suppression, because default parameters are identical
-   virtual bool removeRows(const stw_types::sintn osn_Row, const stw_types::sintn osn_Count,
-                           const QModelIndex & orc_Parent = QModelIndex()) override;
+   void DoRemoveRows(const std::vector<stw_types::uint32> & orc_Rows);
    //lint -e{1735} Suppression, because default parameters are identical
    virtual bool removeColumns(const stw_types::sintn osn_Col, const stw_types::sintn osn_Count,
                               const QModelIndex & orc_Parent = QModelIndex()) override;
 
-   // Move data
-   virtual bool moveRows(const QModelIndex & orc_SourceParent, const stw_types::sintn osn_SourceRow,
-                         const stw_types::sintn osn_Count, const QModelIndex & orc_DestinationParent,
-                         const stw_types::sintn osn_DestinationChild) override;
+   //Move data:
+   void DoMoveRows(const std::vector<stw_types::uint32> & orc_SelectedIndices,
+                   const std::vector<stw_types::uint32> & orc_TargetIndices);
+
    //lint -restore
 
    E_Columns ColumnToEnum(const stw_types::sint32 & ors32_Column,
@@ -164,12 +160,13 @@ private:
    stw_types::uint32 mu32_NodeIndex;
    stw_types::uint32 mu32_DataPoolIndex;
    stw_types::uint32 mu32_ListIndex;
-   std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> mc_OSCInsertedElements;
-   std::vector<stw_opensyde_gui_logic::C_PuiSdNodeDataPoolListElement> mc_UIInsertedElements;
    C_SdNdeDataPoolListTableErrorManager mc_ErrorManager;
 
    bool m_CheckLink(const QModelIndex & orc_Index) const;
    void m_OnErrorChange(void);
+   void m_MoveItems(const std::vector<stw_types::uint32> & orc_ContiguousIndices,
+                    const stw_types::uint32 ou32_TargetIndex) const;
+   void m_MoveItem(const stw_types::uint32 ou32_SourceIndex, const stw_types::uint32 ou32_TargetIndex) const;
 };
 
 /* -- Extern Global Variables ---------------------------------------------- */

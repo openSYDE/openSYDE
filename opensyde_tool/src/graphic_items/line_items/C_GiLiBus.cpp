@@ -52,6 +52,7 @@ using namespace stw_types;
    \param[in]     ors32_Index          Index of data element in system definition
    \param[in]     oru64_ID             Unique ID
    \param[in]     opc_TextElementName  Pointer to text element for showing bus name
+   \param[in]     oq_DoErrorCheck      Optional flag to trigger error check directly in constructor
    \param[in]     opc_Points           Points for line
    \param[in]     orq_MiddleLine       Indicator if line(s) should have a different colored central line
    \param[in,out] opc_Parent           Optional pointer to parent
@@ -60,8 +61,9 @@ using namespace stw_types;
 */
 //-----------------------------------------------------------------------------
 C_GiLiBus::C_GiLiBus(const stw_types::sint32 & ors32_Index, const uint64 & oru64_ID,
-                     C_GiTextElementBus * const opc_TextElementName, const std::vector<QPointF> * const opc_Points,
-                     const bool & orq_MiddleLine, QGraphicsItem * const opc_Parent) :
+                     C_GiTextElementBus * const opc_TextElementName, const bool oq_DoErrorCheck,
+                     const std::vector<QPointF> * const opc_Points, const bool & orq_MiddleLine,
+                     QGraphicsItem * const opc_Parent) :
    C_GiLiLineGroup(opc_Points, orq_MiddleLine, opc_Parent),
    C_PuiSdDataElement(ors32_Index, C_PuiSdDataElement::eBUS),
    C_GiUnique(oru64_ID),
@@ -107,7 +109,11 @@ C_GiLiBus::C_GiLiBus(const stw_types::sint32 & ors32_Index, const uint64 & oru64
       connect(this->mpc_TextElementName, &C_GiTextElementBus::destroyed, this, &C_GiLiBus::m_UnregisterTextElement);
    }
 
-   this->CheckBusForChanges();
+   //System definition specific check
+   if (oq_DoErrorCheck == true)
+   {
+      C_GiLiBus::CheckBusForChanges();
+   }
 
    connect(this, &C_GiLiBus::SigSubItemMoves, this, &C_GiLiBus::m_BusWasMoved);
 }
@@ -284,7 +290,7 @@ void C_GiLiBus::GenerateHint(void)
       }
    }
 
-   c_ToolTip.append(C_GtGetText::h_GetText("\n\nConnected Nodes:"));
+   c_ToolTip.append(C_GtGetText::h_GetText("\n\nConnected nodes:"));
 
    for (uint32 u32_ItNode = 0; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize(); ++u32_ItNode)
    {

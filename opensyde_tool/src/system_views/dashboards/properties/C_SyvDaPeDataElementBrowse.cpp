@@ -69,6 +69,8 @@ C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Pa
    mpc_ContextMenu(NULL),
    mrc_ParentDialog(orc_Parent)
 {
+   bool q_TreeFilled = false;
+
    mpc_Ui->setupUi(this);
 
    if (oq_MultiSelect == true)
@@ -80,12 +82,7 @@ C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Pa
       this->mpc_Ui->pc_TreeView->setSelectionMode(QAbstractItemView::SingleSelection);
    }
 
-   this->mpc_Ui->pc_TreeView->InitSV(ou32_ViewIndex, oq_ShowOnlyWriteElements, oq_ShowArrayElements, oq_Show64BitValues,
-                                     oq_ShowNVMLists);
-
    this->mpc_Ui->pc_GroupBoxSearchNoElementsFound->setVisible(false);
-   //After tree was filled
-   m_UpdateSelection(0);
 
    //Deactivate debug string
    this->mpc_Ui->pc_GroupBoxSearchNoElementsFound->setTitle("");
@@ -97,6 +94,11 @@ C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Pa
 
    //Init (BEFORE combo box access!)
    InitStaticNames();
+
+   // Save the flags for m_SwitchType slot for combo box
+   this->mq_ShowOnlyWriteElements = oq_ShowOnlyWriteElements;
+   this->mq_ShowArrayElements = oq_ShowArrayElements;
+   this->mq_Show64BitValues = oq_Show64BitValues;
 
    // set title
    if (oq_ShowNVMLists == true)
@@ -118,9 +120,19 @@ C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Pa
          //lint -e{1938}  no write access in constructor, initialization is done outside constructor
          this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeDataElementBrowse::mhs32_LastSelectedComboBoxIndex);
          //lint -e{1938}  no write access in constructor, initialization is done outside constructor
-         m_SwitchType(C_SyvDaPeDataElementBrowse::mhs32_LastSelectedComboBoxIndex);
+         this->m_SwitchType(C_SyvDaPeDataElementBrowse::mhs32_LastSelectedComboBoxIndex);
+         q_TreeFilled = true;
       }
    }
+   //Avoid filling/resetting the tree if already set up (and user settings/ last known state takes priority)
+   if (q_TreeFilled == false)
+   {
+      this->mpc_Ui->pc_TreeView->InitSV(ou32_ViewIndex, oq_ShowOnlyWriteElements, oq_ShowArrayElements,
+                                        oq_Show64BitValues,
+                                        oq_ShowNVMLists);
+   }
+   //After tree was filled
+   m_UpdateSelection(0);
    this->mrc_ParentDialog.SetSubTitle(QString(C_GtGetText::h_GetText("Selection")));
 
    //Deactivate combo box for write widgets
@@ -352,7 +364,7 @@ void C_SyvDaPeDataElementBrowse::m_OnSearch(const QString & orc_Text) const
 /*!
    \brief   Switch displayed type
 
-   \param[in] osn_Index Type index
+   \param[in] osn_Index                Type index
 
    \created     07.09.2017  STW/M.Echtler
 */
@@ -362,10 +374,11 @@ void C_SyvDaPeDataElementBrowse::m_SwitchType(const sintn osn_Index) const
    switch (osn_Index)
    {
    case C_SyvDaPeDataElementBrowse::mhsn_INDEX_DATAPOOL_ELEMENT:
-      this->mpc_Ui->pc_TreeView->SwitchMode(C_TblTreDataElementModel::eDATAPOOL_ELEMENT);
+      this->mpc_Ui->pc_TreeView->SwitchMode(C_TblTreDataElementModel::eDATAPOOL_ELEMENT, this->mq_ShowOnlyWriteElements,
+                                            this->mq_ShowArrayElements, this->mq_Show64BitValues);
       break;
    case C_SyvDaPeDataElementBrowse::mhsn_INDEX_BUS_SIGNAL:
-      this->mpc_Ui->pc_TreeView->SwitchMode(C_TblTreDataElementModel::eBUS_SIGNAL);
+      this->mpc_Ui->pc_TreeView->SwitchMode(C_TblTreDataElementModel::eBUS_SIGNAL, false, false, true);
       break;
    default:
       //Unknown

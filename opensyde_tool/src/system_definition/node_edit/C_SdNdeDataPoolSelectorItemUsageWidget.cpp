@@ -29,7 +29,6 @@
 #include "C_SdNdeDataPoolSelectorItemUsageWidget.h"
 
 #include "C_Uti.h"
-#include "C_GtGetText.h"
 
 /* -- Used Namespaces ------------------------------------------------------ */
 using namespace stw_types;

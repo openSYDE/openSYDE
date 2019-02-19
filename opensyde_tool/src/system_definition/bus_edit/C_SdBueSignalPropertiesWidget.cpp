@@ -29,8 +29,8 @@
 #include "C_GtGetText.h"
 #include "C_OgeWiUtil.h"
 #include "C_PuiSdHandler.h"
+#include "C_SdTooltipUtil.h"
 #include "C_OgeSpxInt64Table.h"
-#include "C_SdNdeDataPoolUtil.h"
 #include "C_SdNdeDataPoolContentUtil.h"
 #include "C_SdBueSignalPropertiesWidget.h"
 #include "ui_C_SdBueSignalPropertiesWidget.h"
@@ -170,14 +170,14 @@ void C_SdBueSignalPropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_TextEditComment->setPlaceholderText(C_GtGetText::h_GetText("Add your comment here ..."));
 
    //Combo boxes
-   this->mpc_Ui->pc_ComboBoxType->addItem(C_SdNdeDataPoolUtil::h_ConvertTypeToNameSimplified(C_OSCNodeDataPoolContent::
-                                                                                             eUINT8));
-   this->mpc_Ui->pc_ComboBoxType->addItem(C_SdNdeDataPoolUtil::h_ConvertTypeToNameSimplified(C_OSCNodeDataPoolContent::
-                                                                                             eSINT8));
-   this->mpc_Ui->pc_ComboBoxType->addItem(C_SdNdeDataPoolUtil::h_ConvertTypeToNameSimplified(C_OSCNodeDataPoolContent::
-                                                                                             eFLOAT32));
-   this->mpc_Ui->pc_ComboBoxType->addItem(C_SdNdeDataPoolUtil::h_ConvertTypeToNameSimplified(C_OSCNodeDataPoolContent::
-                                                                                             eFLOAT64));
+   this->mpc_Ui->pc_ComboBoxType->addItem(C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OSCNodeDataPoolContent::
+                                                                                         eUINT8));
+   this->mpc_Ui->pc_ComboBoxType->addItem(C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OSCNodeDataPoolContent::
+                                                                                         eSINT8));
+   this->mpc_Ui->pc_ComboBoxType->addItem(C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OSCNodeDataPoolContent::
+                                                                                         eFLOAT32));
+   this->mpc_Ui->pc_ComboBoxType->addItem(C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OSCNodeDataPoolContent::
+                                                                                         eFLOAT64));
 
    this->mpc_Ui->pc_ComboBoxByteOrder->addItem(C_SdUtil::h_ConvertByteOrderToName(C_OSCCanSignal::eBYTE_ORDER_INTEL));
    this->mpc_Ui->pc_ComboBoxByteOrder->addItem(C_SdUtil::h_ConvertByteOrderToName(C_OSCCanSignal::eBYTE_ORDER_MOTOROLA));
@@ -190,13 +190,13 @@ void C_SdBueSignalPropertiesWidget::InitStaticNames(void) const
    c_PhysicalValueInfo = C_GtGetText::h_GetText("The raw value of a signal is the value as it is transmitted in the network."
                                                 "\nThe physical value of a signal is the value of the physical quantity (e.g. speed, "
                                                 "\nrpm, temperature, etc.) that represents the signal."
-                                                "\nFollowing conversion formula is used to transform the raw value "
+                                                "\nThe following conversion formula is used to transform the raw value "
                                                 "\nto a physical value or in the reverse direction:"
                                                 "\n\n[Physical value] = ([Raw value] * [Factor]) + [Offset]");
 
    //name
    c_InfoText =  C_GtGetText::h_GetText("Symbolic signal name. Unique within a message."
-                                        "\nFollowing C naming conventions are required:"
+                                        "\nC naming conventions must be followed:"
                                         "\n - must not be empty"
                                         "\n - only alphanumeric characters + \"_\""
                                         "\n - should not be longer than 31 characters");
@@ -787,7 +787,8 @@ sint32 C_SdBueSignalPropertiesWidget::m_LoadGeneric(C_OgeWiSpinBoxGroup * const 
          }
       }
       opc_Widget->Init(c_Min, c_Max, of64_Factor, of64_Offset);
-      opc_Widget->SetValue(C_SdNdeDataPoolUtil::h_ScaledDataVariable(orc_Content, of64_Factor, of64_Offset, 0UL));
+      opc_Widget->SetValue(C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(orc_Content, of64_Factor,
+                                                                                       of64_Offset, 0UL));
    }
    else
    {
@@ -1161,7 +1162,7 @@ sint32 C_SdBueSignalPropertiesWidget::m_SaveGeneric(const C_OgeWiSpinBoxGroup * 
 
    if (opc_Widget != NULL)
    {
-      s32_Retval = C_SdNdeDataPoolUtil::h_SetUnscaledDataVariable(
+      s32_Retval = C_SdNdeDataPoolContentUtil::h_SetDataVariableFromGenericWithScaling(
          opc_Widget->GetValue(), orc_Content, of64_Factor, of64_Offset, 0UL);
    }
    else
@@ -1316,10 +1317,10 @@ void C_SdBueSignalPropertiesWidget::m_CheckSignalName(const bool & orq_SignalErr
       bool q_NameInvalid = false;
       bool q_NameConflict = false;
 
-      pc_Message->CheckErrorSignal(pc_List, this->mu32_SignalIndex, NULL, NULL, &q_NameConflict, &q_NameInvalid, NULL,
-                                   NULL, NULL,
-                                   C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(this->mc_MessageId.
-                                                                                          e_ComProtocol));
+      pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, NULL, NULL, &q_NameConflict, &q_NameInvalid,
+                                           NULL, NULL, NULL,
+                                           C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(this->mc_MessageId.
+                                                                                                  e_ComProtocol));
 
       q_Combined = (q_NameInvalid == false) && (q_NameConflict == false);
       //set invalid text property
@@ -1372,10 +1373,9 @@ void C_SdBueSignalPropertiesWidget::m_CheckMessagePosition(const bool & orq_Sign
       bool q_LayoutConflict = false;
       bool q_BorderConflict = false;
 
-      pc_Message->CheckErrorSignal(pc_List, this->mu32_SignalIndex, &q_LayoutConflict, &q_BorderConflict, NULL, NULL,
-                                   NULL, NULL, NULL,
-                                   C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(this->mc_MessageId.
-                                                                                          e_ComProtocol));
+      pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, &q_LayoutConflict, &q_BorderConflict, NULL,
+                                           NULL, NULL, NULL, NULL, C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                                              this->mc_MessageId.e_ComProtocol));
       q_PositionValid = (q_LayoutConflict == false) && (q_BorderConflict == false);
       //set invalid text property
       C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_SpinBoxStartBit, "Valid", q_PositionValid);
@@ -1424,10 +1424,10 @@ void C_SdBueSignalPropertiesWidget::m_CheckMinMaxAndInitValue(const bool & orq_S
       bool q_ValueOverMax = false;
       bool q_MinMaxValid;
 
-      pc_Message->CheckErrorSignal(pc_List, this->mu32_SignalIndex, NULL, NULL, NULL, NULL,
-                                   &q_MinOverMax, &q_ValueBelowMin, &q_ValueOverMax,
-                                   C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
-                                      this->mc_MessageId.e_ComProtocol));
+      pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, NULL, NULL, NULL, NULL,
+                                           &q_MinOverMax, &q_ValueBelowMin, &q_ValueOverMax,
+                                           C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                                              this->mc_MessageId.e_ComProtocol));
       q_InitValid = (q_ValueBelowMin == false) && (q_ValueOverMax == false);
       q_MinMaxValid = (q_MinOverMax == false);
       //set invalid text property

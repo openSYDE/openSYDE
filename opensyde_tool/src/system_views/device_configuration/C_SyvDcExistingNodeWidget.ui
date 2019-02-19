@@ -69,6 +69,12 @@
    </item>
    <item>
     <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxSerialNumber">
+     <property name="minimumSize">
+      <size>
+       <width>190</width>
+       <height>0</height>
+      </size>
+     </property>
      <property name="title">
       <string>GroupBox</string>
      </property>
@@ -86,7 +92,14 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="stw_opensyde_gui::C_SyvDcExistingNodeDropAreaWidget" name="pc_WidgetSerialNumber" native="true"/>
+       <widget class="stw_opensyde_gui::C_SyvDcExistingNodeDropAreaWidget" name="pc_WidgetSerialNumber" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>37</height>
+         </size>
+        </property>
+       </widget>
       </item>
       <item>
        <spacer name="verticalSpacer">
