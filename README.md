@@ -31,4 +31,4 @@ o	Connect openSYDE to your tools and processes solution
 o	Import / Export standard file formats (DBC, EDS, DCF, ASC, BLF, …)
 
 Safety ready
-o	Realize applications that need to address funcational safety requirements. All safety related openSYDE components are certified by TÜV.
+o	Realize applications that need to address functional safety requirements. All safety related openSYDE components are certified by TÜV.
