@@ -24,8 +24,8 @@ Open Source
   - openSYDE GUI – GPL V3
     - is based on the openSYDE Core Library.
   -	openSYDE Core – Dual
-  -	GPL V3
-  -	STW Licence
+    -	GPL V3
+    -	STW Licence
 
 Open Interface
 -	open (human readable) file format
