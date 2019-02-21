@@ -10,25 +10,27 @@ In addition openSYDE provides the development- and service-teams with a user fri
 Main strong points:
 
 Focus on System
-o One development environment for the complete system (single point of source)
-o Realization of functionality shared between multiple devices
-o Fast realization – consistent workflow for all STW products
+
+- One development environment for the complete system (single point of source)
+- Realization of functionality shared between multiple devices
+- Fast realization – consistent workflow for all STW products
 
 Open Source
-o	Add your own features
-o	Basic logic implemented in free to use ANSI C++ openSYDE Core Library
-o	Integrate openSYDE functionality into your existing Service Tool or Linux HMI
-o	Licence model:
-  o	openSYDE GUI – GPL V3
-    o	is based on the openSYDE Core Library.
-  o	openSYDE Core – Dual
-o	GPL V3
-o	STW Licence
+
+-	Add your own features
+-	Basic logic implemented in free to use ANSI C++ openSYDE Core Library
+-	Integrate openSYDE functionality into your existing Service Tool or Linux HMI
+- Licence model:
+  - openSYDE GUI – GPL V3
+    - is based on the openSYDE Core Library.
+  -	openSYDE Core – Dual
+-	GPL V3
+-	STW Licence
 
 Open Interface
-o	open (human readable) file format
-o	Connect openSYDE to your tools and processes solution
-o	Import / Export standard file formats (DBC, EDS, DCF, ASC, BLF, …)
+-	open (human readable) file format
+-	Connect openSYDE to your tools and processes solution
+-	Import / Export standard file formats (DBC, EDS, DCF, ASC, BLF, …)
 
 Safety ready
-o	Realize applications that need to address functional safety requirements. All safety related openSYDE components are certified by TÜV.
+-	Realize applications that need to address functional safety requirements. All safety related openSYDE components are certified by TÜV.
