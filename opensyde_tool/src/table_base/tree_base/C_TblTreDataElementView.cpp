@@ -57,9 +57,6 @@ QMap<C_TblTreDataElementModel::E_Mode,
 C_TblTreDataElementView::C_TblTreDataElementView(QWidget * const opc_Parent) :
    C_OgeTreeViewToolTipBase(opc_Parent),
    mq_UseInternalExpandedItems(true),
-   mq_ShowOnlyWriteElements(false),
-   mq_ShowArrayElements(false),
-   mq_Show64BitValues(false),
    mu32_ViewIndex(0),
    me_Mode(C_TblTreDataElementModel::eDATAPOOL_ELEMENT)
 {
@@ -117,9 +114,6 @@ void C_TblTreDataElementView::InitSD(const uint32 ou32_NodeIndex, const sint32 o
    this->me_Mode = C_TblTreDataElementModel::eDATAPOOLS;
    this->mc_Model.InitSD(ou32_NodeIndex, os32_SkipApplicationIndex, orc_UsedDataPoolIndicesIndex);
    //Some defaults
-   this->mq_ShowOnlyWriteElements = false;
-   this->mq_ShowArrayElements = false;
-   this->mq_Show64BitValues = false;
    this->mu32_ViewIndex = 0UL;
 }
 
@@ -140,9 +134,6 @@ void C_TblTreDataElementView::InitSV(const stw_types::uint32 ou32_ViewIndex, con
                                      const bool oq_ShowArrayElements, const bool oq_Show64BitValues,
                                      const bool oq_ShowNVMLists)
 {
-   this->mq_ShowOnlyWriteElements = oq_ShowOnlyWriteElements;
-   this->mq_ShowArrayElements = oq_ShowArrayElements;
-   this->mq_Show64BitValues = oq_Show64BitValues;
    this->mu32_ViewIndex = ou32_ViewIndex;
    if (oq_ShowNVMLists == true)
    {
@@ -171,6 +162,20 @@ void C_TblTreDataElementView::InitSV(const stw_types::uint32 ou32_ViewIndex, con
 void C_TblTreDataElementView::Search(const QString & orc_Text)
 {
    this->mc_SortModel.SetFilter(orc_Text);
+}
+
+//-----------------------------------------------------------------------------
+/*!
+   \brief   Setting of view index without initialization
+
+   \param[in] ou32_ViewIndex           View index
+
+   \created     08.03.2019  STW/B.Bayer
+*/
+//-----------------------------------------------------------------------------
+void C_TblTreDataElementView::SetViewIndex(const uint32 ou32_ViewIndex)
+{
+   this->mu32_ViewIndex = ou32_ViewIndex;
 }
 
 //-----------------------------------------------------------------------------

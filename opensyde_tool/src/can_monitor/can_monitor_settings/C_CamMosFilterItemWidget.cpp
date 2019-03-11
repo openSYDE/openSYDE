@@ -233,7 +233,8 @@ void C_CamMosFilterItemWidget::m_OnEdit()
    if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
    {
       // check if there are any changes
-      const C_CamProFilterData c_FilterDataNew = pc_Dialog->GetFilterData();
+      C_CamProFilterData c_FilterDataNew = pc_Dialog->GetFilterData();
+      c_FilterDataNew.q_Enabled = this->mc_Filter.q_Enabled; // enabled flag of whole filter is not set in dialog
       uint32 u32_HashValueOld = 0xFFFFFFFFUL;
       uint32 u32_HashValueNew = 0xFFFFFFFFUL;
       this->mc_Filter.CalcHash(u32_HashValueOld);
@@ -241,7 +242,7 @@ void C_CamMosFilterItemWidget::m_OnEdit()
 
       if (u32_HashValueNew != u32_HashValueOld)
       {
-         // note: we also started the dialog with data from mc_Filter, so unedited properties do not change
+         // note: we also started the dialog with data from mc_Filter, so unedited properties did not change
 
          // inform filter widget (that than handles data handling)
          Q_EMIT (this->SigUpdateFilter(this, this->mc_Filter, c_FilterDataNew));
@@ -285,6 +286,9 @@ void C_CamMosFilterItemWidget::m_OnChxToggle(const bool & orq_Checked)
 {
    // inform list about check box toggle
    Q_EMIT (this->SigEnableFilter(this, orq_Checked));
+
+   // update filter data
+   this->mc_Filter.q_Enabled = orq_Checked;
 }
 
 //-----------------------------------------------------------------------------

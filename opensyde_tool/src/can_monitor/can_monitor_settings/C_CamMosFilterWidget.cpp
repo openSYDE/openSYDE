@@ -183,7 +183,8 @@ void C_CamMosFilterWidget::m_InitUi(void)
    this->mpc_Ui->pc_BtnAdd->setIcon(c_Icon);
    this->mpc_Ui->pc_BtnAdd->setText(C_GtGetText::h_GetText("Add Filter"));
    this->mpc_Ui->pc_BtnAdd->SetToolTipInformation(C_GtGetText::h_GetText("Add New Filter"),
-                                                  C_GtGetText::h_GetText("Add new receive filter and configure filter items."));
+                                                  C_GtGetText::h_GetText(
+                                                     "Add new receive filter and configure filter items."));
 
    // initialize label
    this->mpc_Ui->pc_LabNoFilter->SetForegroundColor(0);
@@ -344,6 +345,7 @@ void C_CamMosFilterWidget::m_OnAddClicked()
    {
       QList<C_CamProFilterItemData> c_TempItems;
       c_FilterData = pc_Dialog->GetFilterData();
+      // c_FilterData.q_Enabled is not set from dialog but we want the default anyway
 
       // add in data handling
       C_CamProHandler::h_GetInstance()->AddFilter(c_FilterData);
@@ -549,18 +551,24 @@ void C_CamMosFilterWidget::m_UpdateFilterConfiguration(const C_CamMosFilterItemW
    {
       C_CamProHandler::h_GetInstance()->SetFilter(s32_Index, orc_FilterNew);
 
-      // enable filter items if filter widget is enabled
-      if (C_CamProHandler::h_GetInstance()->GetFilterWidgetEnabled() == true)
+      // disable or enable filter items if filter widget is enabled
+      if ((C_CamProHandler::h_GetInstance()->GetFilterWidgetEnabled() == true))
       {
-         // remove old active filter items
-         c_FilterItems = orc_FilterOld.c_FilterItems;
-         this->m_GetActiveFilterItems(c_FilterItems);
-         Q_EMIT (this->SigRemoveFilterItems(c_FilterItems));
+         // remove old active filter items if filter was enabled
+         if (orc_FilterOld.q_Enabled == true)
+         {
+            c_FilterItems = orc_FilterOld.c_FilterItems;
+            this->m_GetActiveFilterItems(c_FilterItems);
+            Q_EMIT (this->SigRemoveFilterItems(c_FilterItems));
+         }
 
-         // add new active filter items
-         c_FilterItems = orc_FilterNew.c_FilterItems;
-         this->m_GetActiveFilterItems(c_FilterItems);
-         Q_EMIT (this->SigAddFilterItems(c_FilterItems));
+         // add new active filter items if filter is enabled
+         if (orc_FilterNew.q_Enabled == true)
+         {
+            c_FilterItems = orc_FilterNew.c_FilterItems;
+            this->m_GetActiveFilterItems(c_FilterItems);
+            Q_EMIT (this->SigAddFilterItems(c_FilterItems));
+         }
       }
    }
 }

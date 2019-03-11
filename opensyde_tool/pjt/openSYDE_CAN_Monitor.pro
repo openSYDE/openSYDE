@@ -19,7 +19,7 @@ TEMPLATE = app
 
 DESTDIR = ../result/tool/CAN_Monitor
 
-VERSION = 1.00.0
+VERSION = 1.00.1
 
 DEFINES += APPLICATION_VERSION=\\\"$$VERSION\\\"
 

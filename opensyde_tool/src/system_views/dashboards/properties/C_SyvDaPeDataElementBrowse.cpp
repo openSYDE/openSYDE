@@ -119,6 +119,8 @@ C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Pa
          //Init combo box (restore)
          //lint -e{1938}  no write access in constructor, initialization is done outside constructor
          this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeDataElementBrowse::mhs32_LastSelectedComboBoxIndex);
+         // InitSV will not be called when calling m_SwitchType and the view index will not be updated
+         this->mpc_Ui->pc_TreeView->SetViewIndex(ou32_ViewIndex);
          //lint -e{1938}  no write access in constructor, initialization is done outside constructor
          this->m_SwitchType(C_SyvDaPeDataElementBrowse::mhs32_LastSelectedComboBoxIndex);
          q_TreeFilled = true;

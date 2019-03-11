@@ -618,15 +618,19 @@ void C_TblTreDataElementModel::m_ClearSyncManagers(void)
 //-----------------------------------------------------------------------------
 void C_TblTreDataElementModel::m_CleanUpLastModel(void)
 {
-   //Check if current model is stored, only discard if not stored
-   if (mh_Contains(C_TblTreDataElementModel::mhc_ViewSetupsBS, this->mpc_InvisibleRootItem) == false)
+   if (this->mpc_InvisibleRootItem != NULL)
    {
-      if (mh_Contains(C_TblTreDataElementModel::mhc_ViewSetupsDE, this->mpc_InvisibleRootItem) == false)
+      //Check if current model is stored, only discard if not stored
+      if (mh_Contains(C_TblTreDataElementModel::mhc_ViewSetupsBS, this->mpc_InvisibleRootItem) == false)
       {
-         if (mh_Contains(C_TblTreDataElementModel::mhc_ViewSetupsNL, this->mpc_InvisibleRootItem) == false)
+         if (mh_Contains(C_TblTreDataElementModel::mhc_ViewSetupsDE, this->mpc_InvisibleRootItem) == false)
          {
-            delete (this->mpc_InvisibleRootItem);
-            m_ClearSyncManagers();
+            if (mh_Contains(C_TblTreDataElementModel::mhc_ViewSetupsNL, this->mpc_InvisibleRootItem) == false)
+            {
+               delete (this->mpc_InvisibleRootItem);
+               this->mpc_InvisibleRootItem = NULL;
+               m_ClearSyncManagers();
+            }
          }
       }
    }

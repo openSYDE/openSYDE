@@ -140,6 +140,8 @@ C_CamMosFilterPopup::~C_CamMosFilterPopup(void)
 /*!
    \brief   Get filter data.
 
+   Attention: enabled flag must be set separately!
+
    \return
    filter data
 
@@ -153,6 +155,8 @@ C_CamProFilterData C_CamMosFilterPopup::GetFilterData(void) const
    c_Retval.c_Name = this->mpc_Ui->pc_LineEditName->text();
    c_Retval.c_Comment = this->mpc_Ui->pc_TedComment->toPlainText();
    c_Retval.c_FilterItems = this->mpc_TableModel->GetFilterItemsData();
+   // c_Retval.q_Enabled can not be edited in this dialog
+
    return c_Retval;
 }
 

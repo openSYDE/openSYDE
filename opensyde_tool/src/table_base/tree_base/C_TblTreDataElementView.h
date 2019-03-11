@@ -45,6 +45,7 @@ public:
    void InitSV(const stw_types::uint32 ou32_ViewIndex, const bool oq_ShowOnlyWriteElements,
                const bool oq_ShowArrayElements, const bool oq_Show64BitValues, const bool oq_ShowNVMLists);
    void Search(const QString & orc_Text);
+   void SetViewIndex(const stw_types::uint32 ou32_ViewIndex);
    void SwitchMode(const stw_opensyde_gui_logic::C_TblTreDataElementModel::E_Mode & ore_Mode,
                    const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements, const bool oq_Show64BitValues);
 
@@ -72,9 +73,6 @@ private:
    stw_opensyde_gui_logic::C_TblTreDataElementModel mc_Model;
    stw_opensyde_gui_logic::C_TblTreDataElementSortFilter mc_SortModel;
    bool mq_UseInternalExpandedItems;
-   bool mq_ShowOnlyWriteElements;
-   bool mq_ShowArrayElements;
-   bool mq_Show64BitValues;
    stw_types::uint32 mu32_ViewIndex;
    stw_opensyde_gui_logic::C_TblTreDataElementModel::E_Mode me_Mode;
    static QMap<stw_opensyde_gui_logic::C_TblTreDataElementModel::E_Mode,

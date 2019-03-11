@@ -375,9 +375,23 @@ std::vector<sint32> C_CamMetTreeModel::AddRows(const std::list<C_CamMetTreeLogge
             }
 
             // Check if the CAN message data bytes changed
-            c_DataBytesTimeStampCopy.resize(rc_Message.c_CanMsg.u8_DLC);
+            c_DataBytesTimeStampCopy.resize(8);
+
+            //if old DLC < than new DLC
+            if (rc_Message.c_CanMsg.u8_DLC < c_ItData->c_CanMsg.u8_DLC)
+            {
+               //reset the gap between old and new dlc
+               for (u8_DbCounter = rc_Message.c_CanMsg.u8_DLC; u8_DbCounter < c_ItData->c_CanMsg.u8_DLC; ++u8_DbCounter)
+               {
+                  // Set the current timestamp for the changed byte
+                  c_DataBytesTimeStampCopy[u8_DbCounter] = u32_MsgTimeStamp;
+               }
+            }
+
+            //reset the gap between old and new dlc
             for (u8_DbCounter = 0; u8_DbCounter < rc_Message.c_CanMsg.u8_DLC; ++u8_DbCounter)
             {
+               //replace timestamp when databyte has changed
                if (rc_Message.c_CanMsg.au8_Data[u8_DbCounter] != c_ItData->c_CanMsg.au8_Data[u8_DbCounter])
                {
                   // Set the current timestamp for the changed byte

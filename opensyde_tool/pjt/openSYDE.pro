@@ -15,7 +15,7 @@ TEMPLATE = app
 
 DESTDIR = ../result/tool
 
-VERSION = 1.03.0
+VERSION = 1.03.1
 
 DEFINES += APPLICATION_VERSION=\\\"$$VERSION\\\"
 

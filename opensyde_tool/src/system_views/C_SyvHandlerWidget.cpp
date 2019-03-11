@@ -29,6 +29,7 @@
 #include "C_HeHandler.h"
 #include "C_PuiProject.h"
 #include "C_PopErrorHandling.h"
+#include "C_TblTreDataElementModel.h"
 
 #include "constants.h"
 
@@ -354,6 +355,12 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
          this->mpc_Ui->pc_VerticalLayout->removeWidget(this->mpc_DashboardsWidget);
          delete this->mpc_DashboardsWidget;
          this->mpc_DashboardsWidget = NULL;
+
+         // Clear the model of the element selector dialog. The model must refreshed in case of an other
+		 // or changed view
+		 // Do not clean it up in destructor of dashboard widget. The order of children destructor and this clean up
+		 // can cause problems.
+         C_TblTreDataElementModel::h_CleanUp();
       }
 
       // create the new widget

@@ -1552,21 +1552,35 @@ bool File::readValueDescriptionSignal(Network & network, std::string & line)
    //                 At the moment the most appropriate way seems to replace the implementation by using simple
    //                 string operations.
    //                 Hint: the statusCallback is not used. If it is used you must take care of it.
+   // 2019-02-22 STW: Adapted our replacement and added some defensive checks for std::string::erase in combination
+   //                 with finding a specific character. No ";" in a VAL_ line led to crashes. This issue occured on
+   //                 files with line breaks between different values. Parsing such files will still not work correctly,
+   //                 because at the moment only the first line is considered.
+
    const char * pcn_Trim = " \t\r\n\v\f";
    std::string c_SearchLine = line;
    bool q_Return = false;
+   size_t un_Pos;
 
-   c_SearchLine.erase(0, c_SearchLine.find_first_not_of(pcn_Trim));
+   un_Pos = c_SearchLine.find_first_not_of(pcn_Trim);
+
+   if (un_Pos < c_SearchLine.size())
+   {
+      c_SearchLine.erase(un_Pos);
+   }
 
    if (c_SearchLine.substr(0, 4) == "VAL_")
    {
       unsigned int un_MessageId;
       std::string c_SignalName;
-      size_t un_Pos;
 
       q_Return = true;
       // Trim right and remove line ending of value description
-      c_SearchLine.erase(c_SearchLine.find_first_of(';'));
+      un_Pos = c_SearchLine.find_first_of(';');
+      if (un_Pos < c_SearchLine.size())
+      {
+         c_SearchLine.erase(un_Pos);
+      }
       c_SearchLine.erase(c_SearchLine.find_last_not_of(pcn_Trim) + 1);
 
       // Remove the VAL_
