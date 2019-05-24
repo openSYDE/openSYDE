@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Export data pool settings of a openSYDE node.
 
    Create a .c and .h file providing entire data pool configuration.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     23.08.2017  STW/U.Roesch
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -29,68 +22,58 @@
 #include "C_OSCUtils.h"
 #include "C_OSCLoggingHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_scl;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Constructor
 
    Initialize all elements with default values
-
-   \created     23.08.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCExportDataPool::C_OSCExportDataPool(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     23.08.2017  STW/U.Roesch
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCExportDataPool::~C_OSCExportDataPool(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Return filename (without extension)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Return filename (without extension)
 
    The caller must provide a valid data pool.
 
    \param[in]  orc_DataPool            data pool configuration
    \param[out] orc_FileName            assembled filename
-
-   \created     17.10.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportDataPool::h_GetFileName(const C_OSCNodeDataPool & orc_DataPool, C_SCLString & orc_FileName)
 {
    mh_CreateFileName(orc_DataPool.c_Name, orc_FileName);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create source files
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create source files
 
    The caller must provide a valid path and data pool.
 
@@ -104,10 +87,8 @@ void C_OSCExportDataPool::h_GetFileName(const C_OSCNodeDataPool & orc_DataPool, 
    \return
    C_NO_ERR Operation success
    C_RD_WR  Operation failure: cannot store files
-
-   \created     23.08.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportDataPool::h_CreateSourceCode(const C_SCLString & orc_Path, const C_OSCNodeDataPool & orc_DataPool,
                                                const uint8 ou8_DataPoolIndex, const bool oq_IsRemote,
                                                const uint8 ou8_DataPoolIndexRemote, const uint8 ou8_ProcessId)
@@ -132,9 +113,8 @@ sint32 C_OSCExportDataPool::h_CreateSourceCode(const C_SCLString & orc_Path, con
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create header file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create header file
 
    \param[in] orc_Path                 storage path for created file
    \param[in] orc_DataPool             data pool configuration
@@ -145,10 +125,8 @@ sint32 C_OSCExportDataPool::h_CreateSourceCode(const C_SCLString & orc_Path, con
    \return
    C_NO_ERR Operation success
    C_RD_WR  Operation failure: cannot store file
-
-   \created     24.08.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportDataPool::mh_CreateHeaderFile(const C_SCLString & orc_Path, const C_OSCNodeDataPool & orc_DataPool,
                                                 const uint8 ou8_DataPoolIndex, const C_SCLString & orc_ProjectId,
                                                 const bool oq_IsRemote)
@@ -172,9 +150,7 @@ sint32 C_OSCExportDataPool::mh_CreateHeaderFile(const C_SCLString & orc_Path, co
    mh_AddGlobalVariables(c_Data, orc_DataPool, mhq_IS_HEADER_FILE, oq_IsRemote);
 
    // add function prototypes
-   c_Data.Append(
-      "/* -- Function Prototypes ------------------------------------------------------------------------------------------- */");
-   c_Data.Append("");
+   mh_AddFunctionPrototypes(c_Data, orc_DataPool, orc_ProjectId);
 
    // add implementation
    mh_AddImplementation(c_Data, mhq_IS_HEADER_FILE);
@@ -185,9 +161,8 @@ sint32 C_OSCExportDataPool::mh_CreateHeaderFile(const C_SCLString & orc_Path, co
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create implementation file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create implementation file
 
    \param[in] orc_Path                 storage path for created file
    \param[in] orc_DataPool             data pool configuration
@@ -200,10 +175,8 @@ sint32 C_OSCExportDataPool::mh_CreateHeaderFile(const C_SCLString & orc_Path, co
    \return
    C_NO_ERR Operation success
    C_RD_WR  Operation failure: cannot store file
-
-   \created     24.08.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportDataPool::mh_CreateImplementationFile(const C_SCLString & orc_Path,
                                                         const C_OSCNodeDataPool & orc_DataPool,
                                                         const uint8 ou8_DataPoolIndex,
@@ -241,17 +214,14 @@ sint32 C_OSCExportDataPool::mh_CreateImplementationFile(const C_SCLString & orc_
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add file header
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add file header
 
    \param[out] orc_Data                 converted data to string list
    \param[in]  orc_DataPool             data pool configuration
    \param[in]  oq_FileType              .c or .h file selected
-
-   \created     24.08.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportDataPool::mh_AddHeader(C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
                                        const bool oq_FileType)
 {
@@ -282,17 +252,14 @@ void C_OSCExportDataPool::mh_AddHeader(C_SCLStringList & orc_Data, const C_OSCNo
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add includes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add includes
 
    \param[out] orc_Data                 converted data to string list
    \param[in]  orc_DataPool             data pool configuration
    \param[in]  oq_FileType              .c or .h file selected
-
-   \created     24.08.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportDataPool::mh_AddIncludes(C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
                                          const bool oq_FileType)
 {
@@ -319,9 +286,8 @@ void C_OSCExportDataPool::mh_AddIncludes(C_SCLStringList & orc_Data, const C_OSC
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add defines
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add defines
 
    \param[out] orc_Data                 converted data to string list
    \param[in]  orc_DataPool             data pool configuration
@@ -329,10 +295,8 @@ void C_OSCExportDataPool::mh_AddIncludes(C_SCLStringList & orc_Data, const C_OSC
    \param[in]  orc_ProjectId            project id for consistency check
    \param[in]  oq_FileType              .c or .h file selected
    \param[in]  oq_IsRemote              true: create for remote data pool
-
-   \created     24.08.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportDataPool::mh_AddDefines(C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
                                         const uint8 ou8_DataPoolIndex, const C_SCLString & orc_ProjectId,
                                         const bool oq_FileType, const bool oq_IsRemote)
@@ -415,18 +379,15 @@ void C_OSCExportDataPool::mh_AddDefines(C_SCLStringList & orc_Data, const C_OSCN
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add types
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add types
 
    \param[out] orc_Data                 converted data to string list
    \param[in]  orc_DataPool             data pool configuration
    \param[in]  oq_FileType              .c or .h file selected
    \param[in]  oq_IsRemote              true: create for remote data pool
-
-   \created     28.08.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportDataPool::mh_AddTypes(C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
                                       const bool oq_FileType, const bool oq_IsRemote)
 {
@@ -492,18 +453,15 @@ void C_OSCExportDataPool::mh_AddTypes(C_SCLStringList & orc_Data, const C_OSCNod
    orc_Data.Append("");
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add global variables
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add global variables
 
    \param[out] orc_Data                 converted data to string list
    \param[in]  orc_DataPool             data pool configuration
    \param[in]  oq_FileType              .c or .h file selected
    \param[in]  oq_IsRemote              true: create for remote data pool
-
-   \created     28.08.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportDataPool::mh_AddGlobalVariables(C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
                                                 const bool oq_FileType, const bool oq_IsRemote)
 {
@@ -558,9 +516,29 @@ void C_OSCExportDataPool::mh_AddGlobalVariables(C_SCLStringList & orc_Data, cons
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add module global variables and function prototypes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief      Add function prototypes.
+
+   \param[out] orc_Data                 converted data to string list
+   \param[in]  orc_DataPool             data pool configuration
+   \param[in]  orc_ProjectId            project id for consistency check
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCExportDataPool::mh_AddFunctionPrototypes(C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
+                                                   const C_SCLString & orc_ProjectId)
+{
+   const C_SCLString c_DataPoolName = orc_DataPool.c_Name.UpperCase();
+   const C_SCLString c_MagicName = c_DataPoolName + "_PROJECT_ID_" + orc_ProjectId;
+
+   orc_Data.Append(
+      "/* -- Function Prototypes ------------------------------------------------------------------------------------------- */");
+   orc_Data.Append("///unique ID to ensure consistency between .h and .c files");
+   orc_Data.Append("extern void " + c_MagicName.LowerCase() + "(void);");
+   orc_Data.Append("");
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add module global variables and function prototypes
 
    Implementation file only.
 
@@ -569,10 +547,8 @@ void C_OSCExportDataPool::mh_AddGlobalVariables(C_SCLStringList & orc_Data, cons
    \param[in]  ou8_ProcessId            ID of process owning this data pool
    \param[in]  ou8_DataPoolIndexRemote  index of data pool within remote process (only used for remote data pools)
    \param[in]  oq_IsRemote              true: create for remote data pool
-
-   \created     29.08.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
                                              const uint8 ou8_ProcessId, const uint8 ou8_DataPoolIndexRemote,
                                              const bool oq_IsRemote)
@@ -904,16 +880,13 @@ void C_OSCExportDataPool::mh_AddModuleGlobal(C_SCLStringList & orc_Data, const C
    orc_Data.Append("");
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add implementation
 
    \param[out] orc_Data                 converted data to string list
    \param[in]  oq_FileType              .c or .h file selected
-
-   \created     28.08.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportDataPool::mh_AddImplementation(C_SCLStringList & orc_Data, const bool oq_FileType)
 {
    orc_Data.Append(
@@ -932,9 +905,8 @@ void C_OSCExportDataPool::mh_AddImplementation(C_SCLStringList & orc_Data, const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Store assembled data in file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Store assembled data in file
 
    \param[in] orc_Data                 converted data to string list
    \param[in] orc_Path                 storage path for created file
@@ -944,10 +916,8 @@ void C_OSCExportDataPool::mh_AddImplementation(C_SCLStringList & orc_Data, const
    \return
    C_NO_ERR Operation success
    C_RD_WR  Operation failure: cannot store file
-
-   \created     24.08.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportDataPool::mh_SaveToFile(C_SCLStringList & orc_Data, const C_SCLString & orc_Path,
                                           const C_SCLString & orc_DataPoolName, const bool oq_FileType)
 {
@@ -985,16 +955,13 @@ sint32 C_OSCExportDataPool::mh_SaveToFile(C_SCLStringList & orc_Data, const C_SC
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create filename
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create filename
 
    \param[in]  orc_DataPoolName         name of data pool
    \param[out] orc_FileName             assembled filename
-
-   \created     17.10.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportDataPool::mh_CreateFileName(const C_SCLString & orc_DataPoolName, C_SCLString & orc_FileName)
 {
    // assemble filename
@@ -1002,18 +969,15 @@ void C_OSCExportDataPool::mh_CreateFileName(const C_SCLString & orc_DataPoolName
    orc_FileName = orc_DataPoolName.LowerCase() + "_data_pool";
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get type string according to data type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get type string according to data type
 
    \param[in] oe_Type            data type (uint8, sint8, ...)
 
    \return
    data type as string
-
-   \created     30.08.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCExportDataPool::mh_GetType(const C_OSCNodeDataPoolContent::E_Type oe_Type)
 {
    C_SCLString c_Type;
@@ -1057,19 +1021,16 @@ C_SCLString C_OSCExportDataPool::mh_GetType(const C_OSCNodeDataPoolContent::E_Ty
    return c_Type;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get type prefix according to data type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get type prefix according to data type
 
    \param[in] oe_Type                 data type (uint8, sint8, ...)
    \param[in] oq_IsArray              data type is an array
 
    \return
    data type as variable prefix string
-
-   \created     28.08.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCExportDataPool::mh_GetTypePrefix(const C_OSCNodeDataPoolContent::E_Type oe_Type, const bool oq_IsArray)
 {
    C_SCLString c_Prefix;
@@ -1122,9 +1083,8 @@ C_SCLString C_OSCExportDataPool::mh_GetTypePrefix(const C_OSCNodeDataPoolContent
    return c_Prefix;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get value string from list element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get value string from list element
 
    \param[in] orc_Value                value to be converted
    \param[in] oe_Type                  type of element
@@ -1132,10 +1092,8 @@ C_SCLString C_OSCExportDataPool::mh_GetTypePrefix(const C_OSCNodeDataPoolContent
 
    \return
    element with unsigned indicator as string
-
-   \created     29.08.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCExportDataPool::mh_GetElementValueString(const C_OSCNodeDataPoolContent & orc_Value,
                                                           const C_OSCNodeDataPoolContent::E_Type oe_Type,
                                                           const bool oq_IsArray)
@@ -1276,9 +1234,8 @@ C_SCLString C_OSCExportDataPool::mh_GetElementValueString(const C_OSCNodeDataPoo
    return c_String;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get element size according to data type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get element size according to data type
 
    \param[in] oe_Type                 data type (uint8, sint8, ...)
    \param[in] ou32_ArraySize          size of array (if ou8_DataType means an array)
@@ -1286,10 +1243,8 @@ C_SCLString C_OSCExportDataPool::mh_GetElementValueString(const C_OSCNodeDataPoo
 
    \return
    element size as string
-
-   \created     30.08.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCExportDataPool::mh_GetElementSize(const C_OSCNodeDataPoolContent::E_Type oe_Type,
                                                    const uint32 ou32_ArraySize, const bool oq_IsArray)
 {

@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       STW standard error code collection
 
    A collection of error codes uses as standardized return values from functions.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     xx.07.2016  STW/STW
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef STWERRORSH
 #define STWERRORSH
 

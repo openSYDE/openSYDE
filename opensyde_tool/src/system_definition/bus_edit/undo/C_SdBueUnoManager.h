@@ -1,34 +1,28 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Message and signal undo command stack (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.04.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SDBUEUNOMANAGER_H
 #define C_SDBUEUNOMANAGER_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QTreeWidget>
 #include "C_UtiUndoStack.h"
 #include "C_OSCCanMessageIdentificationIndices.h"
 #include "C_PuiSdNodeCanMessageSyncManager.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SdBueUnoManager :
    public C_UtiUndoStack
@@ -95,7 +89,7 @@ private:
       std::vector<stw_types::uint32> & orc_NewOwnerNodeInterfaceIndex, std::vector<bool> & orc_NewOwnerIsTxFlag);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

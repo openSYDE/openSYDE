@@ -1,32 +1,26 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Label for error frame label (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.06.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OGELABFRAMEERROR_H
 #define C_OGELABFRAMEERROR_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QFontMetrics>
 #include "C_OgeLabToolTipBase.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_elements
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OgeLabFrameError :
    public C_OgeLabToolTipBase
@@ -36,7 +30,7 @@ class C_OgeLabFrameError :
 public:
    C_OgeLabFrameError(QWidget * const opc_Parent = NULL);
 
-   void SetCompleteText(const QString & orc_Text);
+   void SetCompleteText(const QString & orc_Text, const QString & orc_Tooltip);
    virtual QSize sizeHint(void) const override;
    virtual QSize minimumSizeHint(void) const override;
 
@@ -51,7 +45,7 @@ private:
    static QFontMetrics mh_GetFontMetrics(void);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       short description (implementation)
 
    detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.10.2018  STW/G.Landsgesell
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -38,12 +31,9 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Constructor
+/*! \brief   Constructor
 
    Initialize all class elements with default values
-
-   \created     02.10.2018  STW/G.Landsgesell
 */
 //-----------------------------------------------------------------------------
 C_OSCTSPApplication::C_OSCTSPApplication(void) :
@@ -61,19 +51,16 @@ C_OSCTSPApplication::C_OSCTSPApplication(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Constructor
+/*! \brief   Constructor
 
    Initialize all class elements with default values
-
-   \created     01.10.2018  STW/G.Landsgesell
 */
 //-----------------------------------------------------------------------------
 C_OSCTargetSupportPackage::C_OSCTargetSupportPackage(void) :
    c_DeviceName(""),
    c_Comment(""),
    u8_ApplicationIndex(0U),
-   u8_MaxParallelTransmissions(16U),
+   u8_MaxParallelTransmissions(64U),
    u16_MaxMessageBufferTx(585U),
    u16_MaxRoutingMessageBufferRx(585U),
    c_TemplatePath("")
@@ -82,12 +69,9 @@ C_OSCTargetSupportPackage::C_OSCTargetSupportPackage(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Clear elements
+/*! \brief   Clear elements
 
    Sets all strings to "" and other values to default.
-
-   \created     01.10.2018  STW/G.Landsgesell
 */
 //-----------------------------------------------------------------------------
 void C_OSCTargetSupportPackage::Clear(void)
@@ -97,7 +81,7 @@ void C_OSCTargetSupportPackage::Clear(void)
    c_TemplatePath = "";
 
    u8_ApplicationIndex = 0U;
-   u8_MaxParallelTransmissions = 16U;
+   u8_MaxParallelTransmissions = 64U;
    u16_MaxMessageBufferTx = 585U;
    u16_MaxRoutingMessageBufferRx = 585U;
 

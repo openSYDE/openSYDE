@@ -1,31 +1,25 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Delegate for message generator signals table (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     14.01.2019  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_CAMGENSIGTABLEDELEGATE_H
 #define C_CAMGENSIGTABLEDELEGATE_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_TblDelegate.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_CamGenSigTableDelegate :
    public C_TblDelegate
@@ -53,7 +47,7 @@ private:
    void m_AfterSetEditorData(QLineEdit * const opc_Widget) const;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

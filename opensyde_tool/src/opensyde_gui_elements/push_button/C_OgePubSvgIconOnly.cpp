@@ -1,54 +1,44 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       SVG icon only push button (implementation)
 
    SVG icon only push button
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     10.07.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QEvent>
 #include <QPainter>
 #include "C_OgePubSvgIconOnly.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     10.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgePubSvgIconOnly::C_OgePubSvgIconOnly(QWidget * const opc_Parent) :
    C_OgePubToolTipBase(opc_Parent),
    mq_Hovered(false),
@@ -65,13 +55,10 @@ C_OgePubSvgIconOnly::C_OgePubSvgIconOnly(QWidget * const opc_Parent) :
    this->setAttribute(Qt::WA_Hover, true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     10.07.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgePubSvgIconOnly::~C_OgePubSvgIconOnly(void)
 {
    delete (mpc_SvgRendererEnabled);
@@ -84,9 +71,8 @@ C_OgePubSvgIconOnly::~C_OgePubSvgIconOnly(void)
    delete (mpc_SvgRendererCheckedPressed);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set new SVG path
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new SVG path
 
    \param[in] orc_PathEnabled         New SVG path for enabled state
    \param[in] orc_PathDisabled        New SVG path for disabled state
@@ -96,10 +82,8 @@ C_OgePubSvgIconOnly::~C_OgePubSvgIconOnly(void)
    \param[in] orc_PathCheckedHovered  New SVG path for hovered and checked state
    \param[in] orc_PathPressed         New SVG path for pressed state
    \param[in] orc_PathCheckedPressed  New SVG path for pressed and checked state
-
-   \created     10.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgePubSvgIconOnly::SetSvg(const QString & orc_PathEnabled, const QString & orc_PathDisabled,
                                  const QString & orc_PathHovered, const QString & orc_PathCheckedEnabled,
                                  const QString & orc_PathCheckedDisabled, const QString & orc_PathCheckedHovered,
@@ -174,17 +158,14 @@ void C_OgePubSvgIconOnly::SetSvg(const QString & orc_PathEnabled, const QString 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Override paint event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Override paint event
 
    Draws the element
 
    \param[in,out] opc_Event  Pointer to paint event
-
-   \created     10.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgePubSvgIconOnly::paintEvent(QPaintEvent * const opc_Event)
 {
    Q_UNUSED(opc_Event)
@@ -236,9 +217,8 @@ void C_OgePubSvgIconOnly::paintEvent(QPaintEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten default event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten default event slot
 
    Here: Handle hover
 
@@ -247,10 +227,8 @@ void C_OgePubSvgIconOnly::paintEvent(QPaintEvent * const opc_Event)
    \return
    True  Event was recognized and processed
    False Event ignored
-
-   \created     27.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OgePubSvgIconOnly::event(QEvent * const opc_Event)
 {
    bool q_Retval = C_OgePubToolTipBase::event(opc_Event);

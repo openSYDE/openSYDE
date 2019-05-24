@@ -1,32 +1,26 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Storage container for all CAN message types (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.04.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCCANMESSAGECONTAINER_H
 #define C_OSCCANMESSAGECONTAINER_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 #include "C_OSCCanMessage.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCCanMessageContainer
 {
@@ -50,14 +44,20 @@ public:
                         std::vector<stw_types::uint32> * const opc_InvalidTxMessages = NULL,
                         std::vector<stw_types::uint32> * const opc_InvalidRxMessages = NULL) const;
 
+   bool ContainsAtLeastOneMessage(void) const;
+
    std::vector<C_OSCCanMessage> c_TxMessages; ///< Transmitted message types
    std::vector<C_OSCCanMessage> c_RxMessages; ///< Received message types
    bool q_IsComProtocolUsedByInterface;       ///< Flag whether com protocol is used on the corresponding CAN
    ///< interface.
    ///< Default is false
+
+private:
+   std::vector<stw_types::uint32> m_GetHashes(const C_OSCNodeDataPoolList & orc_ListTx,
+                                              const C_OSCNodeDataPoolList & orc_ListRx) const;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

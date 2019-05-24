@@ -1,34 +1,28 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Data class for communication interface settings (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.12.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCNODECOMINTERFACESETTINGS_H
 #define C_OSCNODECOMINTERFACESETTINGS_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include "stwtypes.h"
 #include "CSCLString.h"
 #include "C_OSCSystemBus.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCNodeComInterfaceSettings
 {
@@ -49,7 +43,7 @@ public:
    void CalcHash(stw_types::uint32 & oru32_HashValue) const;
 
    C_OSCSystemBus::E_Type e_InterfaceType; ///< e.g. CAN, ethernet
-   stw_types::uint8 u8_InterfaceNumber;    ///< 0 = first bus
+   stw_types::uint8 u8_InterfaceNumber;    ///< 0 = first interface for this type
    stw_types::uint8 u8_NodeID;             ///< Node ID on bus
 
    C_IpAddress c_Ip; ///< only used with interface type ethernet
@@ -59,14 +53,14 @@ public:
    bool q_IsDiagnosisEnabled;      ///< Flag for diagnosis enabled using this bus
    bool q_IsBusConnected;          ///< Flag if there is a valid bus connected to this interface
    stw_types::uint32 u32_BusIndex; ///< Target bus index this interface connects to
-   ///< (index in system definition)
-   ///< Only valid if bus flag q_IsBusConnected is true
+                                   ///< (index in system definition)
+                                   ///< Only valid if bus flag q_IsBusConnected is true
 
    void AddConnection(const stw_types::uint32 & oru32_BusIndex);
    void RemoveConnection(void);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

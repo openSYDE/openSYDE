@@ -1,34 +1,29 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       short description (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.02.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_GIINFO_H
 #define C_GIINFO_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QObject>
+#include <QMovie>
 #include <QSvgRenderer>
 #include <QGraphicsRectItem>
 #include "stwtypes.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_GiInfo :
    public QObject,
@@ -42,10 +37,12 @@ public:
 
    void SetTextFont(const QFont & orc_Value);
    void SetText(const QString & orc_Value);
+   void SetGif(const QString & orc_Value);
    void SetSvg(const QString & orc_Value);
    void SetBackgroundColor(const QColor & orc_Value);
    void SetTextColor(const QColor & orc_Value, const stw_types::sint32 os32_Alignment);
    void SetIconSize(const stw_types::sint32 os32_IconSize);
+   void UpdateTransform(const QTransform & orc_Transform);
 
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
    //lint -save -e1960
@@ -61,11 +58,14 @@ private:
    QFont mc_TextFont;
    stw_types::sint32 ms32_TextAlignment;
    QSvgRenderer * mpc_SvgRenderer;
+   QMovie * mpc_Movie;
+   QTransform mc_Transform;
 
    void m_Update(void);
+   void m_RestartGif(void);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

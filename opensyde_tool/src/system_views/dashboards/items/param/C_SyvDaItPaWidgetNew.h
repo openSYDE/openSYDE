@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget base for parameterization widget. (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.08.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVDAITPAWIDGETNEW_H
 #define C_SYVDAITPAWIDGETNEW_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 #include "stwtypes.h"
 
@@ -25,7 +19,7 @@
 #include "C_OSCParamSetInterpretedNode.h"
 #include "C_PuiSvDbParam.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace Ui
 {
@@ -34,9 +28,9 @@ class C_SyvDaItPaWidgetNew;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_SyvDaItPaWidgetNew :
    public QWidget
 {
@@ -86,6 +80,7 @@ public:
 Q_SIGNALS:
    //lint -restore
    void SigImport(void);
+   void SigNvmReadList(const stw_opensyde_core::C_OSCNodeDataPoolListId & orc_Id);
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
@@ -158,7 +153,7 @@ private:
    static const QString mhc_FILE_EXTENSION_PARAMSETIMAGE;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

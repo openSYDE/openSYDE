@@ -495,7 +495,7 @@ p, li { white-space: pre-wrap; }
                   </item>
                   <item>
                    <property name="text">
-                    <string>none</string>
+                    <string>None</string>
                    </property>
                   </item>
                  </widget>

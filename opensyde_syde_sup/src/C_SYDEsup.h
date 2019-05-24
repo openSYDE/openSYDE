@@ -1,38 +1,32 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Base class with functionality of console application system updater SYDEsup (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.08.2018  STW/G.Landsgesell
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYDESUP_H
 #define C_SYDESUP_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 #include "CSCLString.h"
 #include "CCAN.h"
 #include "C_SUPSuSequences.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SYDEsup
 {
 public:
-   C_SYDEsup();
+   C_SYDEsup(void);
    enum E_Result
    {
       // for detailed description see C_SYDEsup::m_PrintStringFromError
@@ -44,6 +38,7 @@ public:
       eERR_PACKAGE_UNZIP               = 23,
       eERR_PACKAGE_CORE_C_NOACT        = 24,
       eERR_PACKAGE_NOT_FOUND           = 25,
+      eERR_PACKAGE_WRONG_EXTENSION     = 26,
 
       eERR_DLL_NOT_FOUND               = 30,
 
@@ -73,6 +68,8 @@ public:
       eERR_UPDATE_C_NOACT              = 63,
       eERR_UPDATE_C_COM                = 64,
       eERR_UPDATE_SYSDEF               = 65,
+      eERR_UPDATE_CHECKSUM             = 66,
+      eERR_UPDATE_NO_NVM               = 67,
 
       eOK                              = 0,
       eERR_UNKNOWN                     = 100
@@ -94,12 +91,12 @@ private:
 
    void m_PrintInformation(const stw_scl::C_SCLString & orc_Version) const;
    stw_scl::C_SCLString m_GetLogFileLocation(void) const;
-   void m_InitOptionalParameters(void);
+   C_SYDEsup::E_Result m_InitOptionalParameters(void);
    void m_PrintStringFromError(const C_SYDEsup::E_Result & ore_Result) const;
    void m_Conclude(stw_can::C_CAN & orc_CanDispatcher, C_SUPSuSequences & orc_Sequence, const bool & orq_CanLoaded,
                    const bool & orq_ResetSystem) const;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 
 #endif

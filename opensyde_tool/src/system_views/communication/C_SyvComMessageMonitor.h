@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Class for preparing CAN message data for showing on GUI (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     03.09.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVCOMMESSAGEMONITOR_H
 #define C_SYVCOMMESSAGEMONITOR_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>
 #include <QList>
 #include <QVector>
@@ -34,12 +28,12 @@
 #include "C_OSCSystemBus.h"
 #include "C_CieConverter.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SyvComMessageMonitor :
    public stw_opensyde_core::C_OSCComMessageLogger
@@ -163,7 +157,7 @@ private:
    std::map<stw_scl::C_SCLString, C_CieConverter::C_CIECommDefinition> mc_DbcFiles;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

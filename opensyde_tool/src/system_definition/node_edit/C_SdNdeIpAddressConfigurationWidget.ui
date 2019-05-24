@@ -139,7 +139,7 @@
            <number>20</number>
           </property>
           <item row="0" column="1">
-           <widget class="stw_opensyde_gui_elements::C_OgeLeProperties" name="pc_LineEditIpAddress">
+           <widget class="stw_opensyde_gui_elements::C_OgeLeIpAddress" name="pc_LineEditIpAddress">
             <property name="minimumSize">
              <size>
               <width>150</width>
@@ -182,7 +182,7 @@
            </spacer>
           </item>
           <item row="1" column="1">
-           <widget class="stw_opensyde_gui_elements::C_OgeLeFilePath" name="pc_LineEditSubNetMask">
+           <widget class="stw_opensyde_gui_elements::C_OgeLeIpAddress" name="pc_LineEditSubNetMask">
             <property name="minimumSize">
              <size>
               <width>150</width>
@@ -198,7 +198,7 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="stw_opensyde_gui_elements::C_OgeLeFilePath" name="pc_LineEditDefaultGateway">
+           <widget class="stw_opensyde_gui_elements::C_OgeLeIpAddress" name="pc_LineEditDefaultGateway">
             <property name="minimumSize">
              <size>
               <width>150</width>
@@ -216,7 +216,7 @@
           <item row="2" column="0">
            <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelDefaultGateway">
             <property name="text">
-             <string>SubNetMask</string>
+             <string>GateWay</string>
             </property>
            </widget>
           </item>
@@ -391,14 +391,9 @@
    <header>C_OgeLabHeadingGroupBold.h</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLeProperties</class>
+   <class>stw_opensyde_gui_elements::C_OgeLeIpAddress</class>
    <extends>QLineEdit</extends>
-   <header>C_OgeLeProperties.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLeFilePath</class>
-   <extends>QLineEdit</extends>
-   <header>C_OgeLeFilePath.h</header>
+   <header>C_OgeLeIpAddress.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

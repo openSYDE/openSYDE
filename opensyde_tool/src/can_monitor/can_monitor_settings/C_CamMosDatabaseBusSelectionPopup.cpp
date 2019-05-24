@@ -1,22 +1,16 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
-   \brief       Widget for bus selection in for database type openSYDE system definition. (implementation)
+   \brief       Widget for bus selection for database type openSYDE system definition. (implementation)
 
-   Widget for bus selection in for database type openSYDE system definition.
+   In openSYDE system definition there might be several buses defined. Show information about all buses and
+   let the user select one.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.12.2018  STW/G.Landsgesell
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QComboBox>
@@ -30,36 +24,35 @@
 #include "C_Uti.h"
 #include "C_CamUti.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
-   \param[in,out] orc_Parent Reference to parent
-
-   \created     19.12.2018  STW/G.Landsgesell
+   \param[in,out]    orc_Parent        Reference to parent
+   \param[in]        orc_Busses        Possible buses found in openSYDE system definition
+   \param[in]        orc_Database      Database for which the bus needs to get selected
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosDatabaseBusSelectionPopup::C_CamMosDatabaseBusSelectionPopup(
    const std::vector<stw_opensyde_core::C_OSCSystemBus> & orc_Busses,
    const stw_opensyde_gui_logic::C_CamProDatabaseData & orc_Database,
@@ -116,44 +109,35 @@ C_CamMosDatabaseBusSelectionPopup::C_CamMosDatabaseBusSelectionPopup(
            this, &C_CamMosDatabaseBusSelectionPopup::m_CancelClicked);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     19.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosDatabaseBusSelectionPopup::~C_CamMosDatabaseBusSelectionPopup(void)
 {
    delete this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get index of selected bus.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get index of selected bus.
 
    \return
    selected bus index
-
-   \created     20.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_CamMosDatabaseBusSelectionPopup::GetSelectedBus() const
 {
    return this->m_ComboboxIndexToBusIndex(this->mpc_Ui->pc_CbxBus->currentIndex());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     19.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseBusSelectionPopup::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
@@ -179,13 +163,10 @@ void C_CamMosDatabaseBusSelectionPopup::keyPressEvent(QKeyEvent * const opc_KeyE
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     19.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseBusSelectionPopup::m_InitStaticNames(void) const
 {
    this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("openSYDE Database Import"));
@@ -206,13 +187,10 @@ void C_CamMosDatabaseBusSelectionPopup::m_InitStaticNames(void) const
    this->mpc_Ui->pc_PushButtonCancel->setText(C_GtGetText::h_GetText("Cancel"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize colors, fonts, ...
-
-   \created     20.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize colors, fonts, ...
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseBusSelectionPopup::m_InitStaticGUIElements() const
 {
    // label "Select Bus"
@@ -266,15 +244,12 @@ void C_CamMosDatabaseBusSelectionPopup::m_InitStaticGUIElements() const
    this->mpc_Ui->pc_LabelCommentValue->SetFontPixel(12);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize GUI from bus data.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize GUI from bus data.
 
    \param[in]   orc_Bus    Bus data
-
-   \created     20.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseBusSelectionPopup::m_InitComboBox(void) const
 {
    // clean up
@@ -295,50 +270,42 @@ void C_CamMosDatabaseBusSelectionPopup::m_InitComboBox(void) const
            this, &C_CamMosDatabaseBusSelectionPopup::m_OnComboBoxChanged);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of combo box index changed.
-
-   \created     20.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of combo box index changed.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseBusSelectionPopup::m_OnComboBoxChanged(const sint32 os32_Index) const
 {
    const sint32 s32_BusIndex = this->m_ComboboxIndexToBusIndex(os32_Index);
 
    if ((s32_BusIndex >= 0) && (s32_BusIndex < static_cast<sint32>(this->mc_Busses.size())))
    {
-      C_OSCSystemBus c_Bus = this->mc_Busses[s32_BusIndex];
-      this->mpc_Ui->pc_LabelBusIDValue->setText(QString::number(c_Bus.u8_BusID));
-      this->mpc_Ui->pc_LabelBitrateValue->setText(QString::number(c_Bus.u64_BitRate / 1000) + " kBit/s");
-      this->mpc_Ui->pc_LabelCommentValue->setText(c_Bus.c_Comment.c_str());
+      const C_OSCSystemBus & rc_Bus = this->mc_Busses[s32_BusIndex];
+      this->mpc_Ui->pc_LabelBusIDValue->setText(QString::number(rc_Bus.u8_BusID));
+      this->mpc_Ui->pc_LabelBitrateValue->setText(QString::number(rc_Bus.u64_BitRate / 1000) + " kBit/s");
+      this->mpc_Ui->pc_LabelCommentValue->setText(rc_Bus.c_Comment.c_str());
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of cancel button click.
-
-   \created     20.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of cancel button click.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseBusSelectionPopup::m_CancelClicked()
 {
    this->mrc_ParentDialog.reject();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Ok button click
-
-   \created     19.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Ok button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseBusSelectionPopup::m_OkClicked(void)
 {
    QStringList c_Messages;
 
-   C_CamProHandler::h_GetInstance()->GetAllMessagesFromDatabase(C_CamUti::h_GetAbsPathFromProj(this->mc_Database.c_Name),
+   C_CamProHandler::h_GetInstance()->GetAllMessagesFromDatabase(C_CamUti::h_GetAbsPathFromProj(
+                                                                   this->mc_Database.c_Name),
                                                                 &c_Messages, NULL);
    if ((c_Messages.size() > 0) && (this->mpc_Ui->pc_CbxBus->currentIndex() != this->mc_Database.s32_BusIndex))
    {
@@ -377,9 +344,8 @@ void C_CamMosDatabaseBusSelectionPopup::m_OkClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get bus index from combo box index.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get bus index from combo box index.
 
    Combo box only shows CAN buses; but for bus index we must also consider Ethernet buses.
 
@@ -387,10 +353,8 @@ void C_CamMosDatabaseBusSelectionPopup::m_OkClicked(void)
 
    \return
    bus index (-1 if something went wrong)
-
-   \created     20.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamMosDatabaseBusSelectionPopup::m_ComboboxIndexToBusIndex(const sint32 os32_ComboboxIndex) const
 {
    sint32 s32_Return = -1;
@@ -413,9 +377,8 @@ sint32 C_CamMosDatabaseBusSelectionPopup::m_ComboboxIndexToBusIndex(const sint32
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get combo box index from bus index.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get combo box index from bus index.
 
    Combo box only shows CAN buses; but for bus index we must also consider Ethernet buses.
    Assumes that bus of given index is of type CAN!
@@ -424,10 +387,8 @@ sint32 C_CamMosDatabaseBusSelectionPopup::m_ComboboxIndexToBusIndex(const sint32
 
    \return
    Combo box index (-1 if something went wrong)
-
-   \created     20.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamMosDatabaseBusSelectionPopup::m_BusIndexToComboboxIndex(const sint32 os32_BusIndex) const
 {
    sint32 s32_Return = -1;

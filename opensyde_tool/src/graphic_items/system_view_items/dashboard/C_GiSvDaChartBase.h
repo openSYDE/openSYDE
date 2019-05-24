@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Class for system view dashboard chart item (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.08.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_GISVDACHARTBASE_H
 #define C_GISVDACHARTBASE_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 
 #include <QAction>
@@ -28,12 +22,12 @@
 
 #include "C_PuiSvDbNodeDataPoolListElementId.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_GiSvDaChartBase :
    public C_GiSvDaRectBaseGroup
@@ -59,6 +53,7 @@ public:
                                    const stw_types::sintn osn_Value) override;
    virtual void ConnectionActiveChanged(const bool oq_Active) override;
    virtual bool CallProperties(void) override;
+   virtual void SetDrawingActive(const bool oq_Active) override;
 
    virtual void ConfigureContextMenu(C_SyvDaContextMenuManager * const opc_ContextMenuManager,
                                      const bool oq_Active) override;
@@ -89,7 +84,7 @@ private:
    C_GiSvDaChartBase & operator =(const C_GiSvDaChartBase &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

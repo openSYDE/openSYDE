@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       short description (implementation)
 
    detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     03.08.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "constants.h"
@@ -26,30 +19,29 @@
 #include "C_OgeLabToolboxHeadingGroupBold.h"
 #include "C_SdUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const stw_types::sintn C_SebToolboxUtil::hsn_LabelSize = 35;
 const stw_types::sintn C_SebToolboxUtil::hsn_HeadingSpacerSizeTop = 47;
 const stw_types::sintn C_SebToolboxUtil::hsn_HeadingSpacerSizeBottom = 6;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create new C_SdTopologyListWidget with heading
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create new C_SdTopologyListWidget with heading
 
    \param[in]     orc_Name        Heading for list
    \param[in,out] opc_Layout      Layout to add list to
@@ -58,10 +50,8 @@ const stw_types::sintn C_SebToolboxUtil::hsn_HeadingSpacerSizeBottom = 6;
 
    \return
    Pointer to created C_SdTopologyListWidget
-
-   \created     03.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdTopologyListWidget * C_SebToolboxUtil::h_AddNewList(const QString & orc_Name, QVBoxLayout * const opc_Layout,
                                                         QVector<C_SdTopologyListWidget *> & orc_ListWidgets,
                                                         QWidget * const opc_Parent)
@@ -99,18 +89,15 @@ C_SdTopologyListWidget * C_SebToolboxUtil::h_AddNewList(const QString & orc_Name
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new section heading
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new section heading
 
    \param[in]     orc_Name           Heading name
    \param[in,out] opc_Layout         Layout to add heading to
    \param[in,out] opc_Parent         Parent widget
    \param[in]     oq_AddSpacerBefore Optional flag to add spacer on top
-
-   \created     08.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebToolboxUtil::h_AddNewHeading(const QString & orc_Name, QVBoxLayout * const opc_Layout,
                                        QWidget * const opc_Parent, const bool oq_AddSpacerBefore)
 {
@@ -145,15 +132,12 @@ void C_SebToolboxUtil::h_AddNewHeading(const QString & orc_Name, QVBoxLayout * c
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add free elements to specified list widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add free elements to specified list widget
 
    \param[in,out] opc_ListWidget List widget to add free elements to
-
-   \created     03.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebToolboxUtil::h_InitFreeElements(QListWidget * const opc_ListWidget)
 {
    if (opc_ListWidget != NULL)
@@ -173,9 +157,8 @@ void C_SebToolboxUtil::h_InitFreeElements(QListWidget * const opc_ListWidget)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add specified item to list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add specified item to list
 
    \param[in,out] opc_ListWidget     List
    \param[in]     orc_Text           Item text
@@ -183,10 +166,8 @@ void C_SebToolboxUtil::h_InitFreeElements(QListWidget * const opc_ListWidget)
    \param[in]     orc_IconPathDark   Item dark icon path
    \param[in]     orc_ToolTipContent Tool tip content text
    \param[in]     orc_ToolTipHeading Tool tip heading text
-
-   \created     04.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebToolboxUtil::h_AddElementToList(QListWidget * const opc_ListWidget, const QString & orc_Text,
                                           const QString & orc_IconPath, const QString & orc_IconPathDark,
                                           const QString & orc_ToolTipContent, const QString & orc_ToolTipHeading)
@@ -214,16 +195,13 @@ void C_SebToolboxUtil::h_AddElementToList(QListWidget * const opc_ListWidget, co
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Append final spacer to layout
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Append final spacer to layout
 
    \param[in,out] opc_Layout     Layout to append spacer to
    \param[in,out] opc_ListWidget Last list widget
-
-   \created     04.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebToolboxUtil::h_AddFinalSpacer(QVBoxLayout * const opc_Layout, QListWidget * const opc_ListWidget)
 {
    if ((opc_Layout != NULL) && (opc_ListWidget != NULL))
@@ -249,13 +227,10 @@ void C_SebToolboxUtil::h_AddFinalSpacer(QVBoxLayout * const opc_Layout, QListWid
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     03.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebToolboxUtil::C_SebToolboxUtil(void)
 {
 }

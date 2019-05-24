@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Progress bar part of dashboard progress bar item (implementation)
 
    Progress bar part of dashboard progress bar item
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.08.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
@@ -24,35 +17,32 @@
 #include "constants.h"
 #include "C_OgeDashboardProgressBar.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     21.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeDashboardProgressBar::C_OgeDashboardProgressBar(QWidget * const opc_Parent) :
    QProgressBar(opc_Parent),
    me_Style(C_PuiSvDbWidgetBase::eOPENSYDE),
@@ -60,16 +50,13 @@ C_OgeDashboardProgressBar::C_OgeDashboardProgressBar(QWidget * const opc_Parent)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply style
 
    \param[in] oe_Style    New style type
    \param[in] oq_DarkMode Flag if dark mode is active
-
-   \created     21.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeDashboardProgressBar::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode)
 {
    this->me_Style = oe_Style;
@@ -133,17 +120,14 @@ void C_OgeDashboardProgressBar::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Sty
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    Here: manual markers
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     21.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeDashboardProgressBar::paintEvent(QPaintEvent * const opc_Event)
 {
    if ((this->me_Style == C_PuiSvDbWidgetBase::eOPENSYDE) || (this->me_Style == C_PuiSvDbWidgetBase::eFLAT))
@@ -356,15 +340,12 @@ void C_OgeDashboardProgressBar::paintEvent(QPaintEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten show event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten show event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     dd.01.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeDashboardProgressBar::resizeEvent(QResizeEvent * const opc_Event)
 {
    QProgressBar::resizeEvent(opc_Event);

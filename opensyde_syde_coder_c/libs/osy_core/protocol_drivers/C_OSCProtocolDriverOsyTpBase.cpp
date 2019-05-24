@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       openSYDE protocol transport-protocol abstract class implementation
 
    For details cf. documentation in .h file.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.02.2016  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -44,12 +37,9 @@ using namespace stw_scl;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   constructor
+/*! \brief   constructor
 
    Initialize with default values
-
-   \created     17.03.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_OSCProtocolDriverOsyNode::C_OSCProtocolDriverOsyNode(void) :
@@ -59,15 +49,12 @@ C_OSCProtocolDriverOsyNode::C_OSCProtocolDriverOsyNode(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   constructor
+/*! \brief   constructor
 
    Initialize with specified values
 
    \param[in] ou8_BusIdentifier    bus ID init value
    \param[in] ou8_NodeIdentifier   node ID init value
-
-   \created     17.03.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_OSCProtocolDriverOsyNode::C_OSCProtocolDriverOsyNode(const uint8 ou8_BusIdentifier, const uint8 ou8_NodeIdentifier) :
@@ -77,16 +64,13 @@ C_OSCProtocolDriverOsyNode::C_OSCProtocolDriverOsyNode(const uint8 ou8_BusIdenti
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check if current equal to orc_Cmp
+/*! \brief   Check if current equal to orc_Cmp
 
    \param[in] orc_Cmp Compared instance
 
    \return
    Current equal to orc_Cmp
    Else false
-
-   \created     27.11.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 bool C_OSCProtocolDriverOsyNode::operator ==(const C_OSCProtocolDriverOsyNode & orc_Cmp) const
@@ -103,16 +87,13 @@ bool C_OSCProtocolDriverOsyNode::operator ==(const C_OSCProtocolDriverOsyNode & 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check if current is not equal to orc_Cmp
+/*! \brief   Check if current is not equal to orc_Cmp
 
    \param[in] orc_Cmp Compared instance
 
    \return
    Current not equal to orc_Cmp
    Else false
-
-   \created     25.05.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 bool C_OSCProtocolDriverOsyNode::operator !=(const C_OSCProtocolDriverOsyNode & orc_Cmp) const
@@ -129,16 +110,13 @@ bool C_OSCProtocolDriverOsyNode::operator !=(const C_OSCProtocolDriverOsyNode & 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Less operator.
+/*! \brief    Less operator.
 
    \param[in] orc_Cmp Compared instance
 
    \return
    true     Current smaller than orc_Cmp
    false    Else
-
-   \created     12.12.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 bool C_OSCProtocolDriverOsyNode::operator <(const C_OSCProtocolDriverOsyNode & orc_Cmp) const
@@ -163,8 +141,7 @@ bool C_OSCProtocolDriverOsyNode::operator <(const C_OSCProtocolDriverOsyNode & o
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   add new service to TX queue
+/*! \brief   add new service to TX queue
 
    Add specified service to TX queue for outgoing requests.
    During the operation the queue will be locked by a critical section.
@@ -176,8 +153,6 @@ bool C_OSCProtocolDriverOsyNode::operator <(const C_OSCProtocolDriverOsyNode & o
    C_RANGE     service size out of range (maximum: 4095 bytes)
    C_OVERFLOW  TX queue is already full
    C_NOACT     could not add to queue (out of memory; should not happen in real life)
-
-   \created     17.03.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpBase::m_AddToTxQueue(const C_OSCProtocolDriverOsyService & orc_Service)
@@ -212,8 +187,7 @@ sint32 C_OSCProtocolDriverOsyTpBase::m_AddToTxQueue(const C_OSCProtocolDriverOsy
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   add new service to RX queue
+/*! \brief   add new service to RX queue
 
    Add specified service to RX queue for incoming responses.
    During the operation the queue will be locked by a critical section.
@@ -225,8 +199,6 @@ sint32 C_OSCProtocolDriverOsyTpBase::m_AddToTxQueue(const C_OSCProtocolDriverOsy
    C_RANGE     service size out of range
    C_OVERFLOW  RX queue is already full
    C_NOACT     could not add to queue (out of memory; should not happen in real life)
-
-   \created     17.03.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpBase::m_AddToRxQueue(const C_OSCProtocolDriverOsyService & orc_Service)
@@ -261,8 +233,7 @@ sint32 C_OSCProtocolDriverOsyTpBase::m_AddToRxQueue(const C_OSCProtocolDriverOsy
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   get "oldest" entry from TX queue
+/*! \brief   get "oldest" entry from TX queue
 
    Get service from TX queue for outgoing requests.
    During the operation the queue will be locked by a critical section.
@@ -272,8 +243,6 @@ sint32 C_OSCProtocolDriverOsyTpBase::m_AddToRxQueue(const C_OSCProtocolDriverOsy
    \return
    C_NO_ERR    service read; data in orc_Service
    C_NOACT     queue is empty
-
-   \created     17.03.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpBase::m_GetFromTxQueue(C_OSCProtocolDriverOsyService & orc_Service)
@@ -295,8 +264,7 @@ sint32 C_OSCProtocolDriverOsyTpBase::m_GetFromTxQueue(C_OSCProtocolDriverOsyServ
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   get "oldest" entry from RX queue
+/*! \brief   get "oldest" entry from RX queue
 
    Get service from RX queue for incoming responses.
    During the operation the queue will be locked by a critical section.
@@ -306,8 +274,6 @@ sint32 C_OSCProtocolDriverOsyTpBase::m_GetFromTxQueue(C_OSCProtocolDriverOsyServ
    \return
    C_NO_ERR    service read; data in orc_Service
    C_NOACT     queue is empty
-
-   \created     17.03.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpBase::m_GetFromRxQueue(C_OSCProtocolDriverOsyService & orc_Service)
@@ -329,13 +295,10 @@ sint32 C_OSCProtocolDriverOsyTpBase::m_GetFromRxQueue(C_OSCProtocolDriverOsyServ
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Clear RX and TX service queues
+/*! \brief   Clear RX and TX service queues
 
    Remove all elements from TX and TX service queues
    During the operation each of the queues will be locked by a critical section.
-
-   \created     20.03.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_OSCProtocolDriverOsyTpBase::ClearServiceQueues(void)
@@ -349,14 +312,11 @@ void C_OSCProtocolDriverOsyTpBase::ClearServiceQueues(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Set timeout for waiting for broadcast responses
+/*! \brief   Set timeout for waiting for broadcast responses
 
    Set time period to wait when collecting responses to broadcast requests.
 
    \param[in]    ou32_TimeoutMs   number of ms to wait for responses
-
-   \created     17.05.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_OSCProtocolDriverOsyTpBase::SetBroadcastTimeout(const uint32 ou32_TimeoutMs)
@@ -365,14 +325,11 @@ void C_OSCProtocolDriverOsyTpBase::SetBroadcastTimeout(const uint32 ou32_Timeout
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   constructor
+/*! \brief   constructor
 
    Initialize class fields
 
    \param[in]  ou16_MaxServiceQueueSize  maximum number of service queue entries for TX and RX queue
-
-   \created     17.03.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_OSCProtocolDriverOsyTpBase::C_OSCProtocolDriverOsyTpBase(const uint16 ou16_MaxServiceQueueSize) :
@@ -382,12 +339,9 @@ C_OSCProtocolDriverOsyTpBase::C_OSCProtocolDriverOsyTpBase(const uint16 ou16_Max
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   destructor
+/*! \brief   destructor
 
    Clean up
-
-   \created     17.03.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_OSCProtocolDriverOsyTpBase::~C_OSCProtocolDriverOsyTpBase(void)
@@ -395,8 +349,7 @@ C_OSCProtocolDriverOsyTpBase::~C_OSCProtocolDriverOsyTpBase(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Checks the connection of the TCP socket
+/*! \brief   Checks the connection of the TCP socket
 
    \return
    C_NO_ERR   is connected
@@ -409,8 +362,7 @@ sint32 C_OSCProtocolDriverOsyTpBase::IsConnected(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   re-connect to device
+/*! \brief   re-connect to device
 
    Re-connect to device.
    e.g. after it was reset.
@@ -419,8 +371,6 @@ sint32 C_OSCProtocolDriverOsyTpBase::IsConnected(void)
    \return
    C_NO_ERR    re-connection established (or not required)
    C_BUSY      re-connection failed
-
-   \created     05.01.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpBase::ReConnect(void)
@@ -429,14 +379,11 @@ sint32 C_OSCProtocolDriverOsyTpBase::ReConnect(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Disconnect from server
+/*! \brief   Disconnect from server
 
    \return
    C_NO_ERR    disconnect established (or not required)
    C_NOACT     disconnect failed
-
-   \created     19.04.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpBase::Disconnect(void)
@@ -445,8 +392,7 @@ sint32 C_OSCProtocolDriverOsyTpBase::Disconnect(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Send service request
+/*! \brief   Send service request
 
    Add service request to TX queue for sending.
    Actual sending will not be performed here (use C_OSCProtocolDriverOsyTpBase::Cycle).
@@ -458,8 +404,6 @@ sint32 C_OSCProtocolDriverOsyTpBase::Disconnect(void)
    C_RANGE     service size out of range
    C_OVERFLOW  TX queue is already full
    C_NOACT     could not add to queue (out of memory; should not happen in real life)
-
-   \created     17.03.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpBase::SendRequest(const C_OSCProtocolDriverOsyService & orc_Request)
@@ -468,8 +412,7 @@ sint32 C_OSCProtocolDriverOsyTpBase::SendRequest(const C_OSCProtocolDriverOsySer
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Read service response from RX queue
+/*! \brief   Read service response from RX queue
 
    Get "oldest" incoming service request from RX queue.
    The function does not perform to actual reception from the CAN bus (use C_OSCProtocolDriverOsyTpBase::Cycle).
@@ -479,8 +422,6 @@ sint32 C_OSCProtocolDriverOsyTpBase::SendRequest(const C_OSCProtocolDriverOsySer
    \return
    C_NO_ERR    service read; date in orc_Service
    C_NOACT     queue is empty
-
-   \created     17.03.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpBase::ReadResponse(C_OSCProtocolDriverOsyService & orc_Response)
@@ -489,8 +430,7 @@ sint32 C_OSCProtocolDriverOsyTpBase::ReadResponse(C_OSCProtocolDriverOsyService 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Make server and client identifiers known to TP.
+/*! \brief   Make server and client identifiers known to TP.
 
    * remember IDs
 
@@ -505,8 +445,6 @@ sint32 C_OSCProtocolDriverOsyTpBase::ReadResponse(C_OSCProtocolDriverOsyService 
    \return
    C_NO_ERR   no problems
    C_RANGE    client and/or server identifier out of range
-
-   \created     24.02.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpBase::SetNodeIdentifiers(const C_OSCProtocolDriverOsyNode & orc_ClientIdentifier,

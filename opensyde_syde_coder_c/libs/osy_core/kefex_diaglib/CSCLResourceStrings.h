@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       resource string handling class
@@ -13,15 +13,9 @@
 
    Loading string tables from file is not implemented yet but can easily be added.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-200x
-   license     use only under terms of contract / confidential
-
-   created     22.07.2009  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CSCLResourceStringsH
 #define CSCLResourceStringsH
 
@@ -85,9 +79,7 @@ public:
 
 /* -- Implementation ------------------------------------------------------ */
 
-
 }
 
 #endif
-
 

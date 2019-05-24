@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       List for all connected node entries (implementation)
 
    List for all connected node entries
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.12.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QDrag>
@@ -29,38 +22,35 @@
 #include "C_SyvDcConnectedNodeList.h"
 #include "C_SyvDcConnectedNodeWidget.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvDcConnectedNodeList::mhc_MimeData = "stw_opensyde_connected_node";
 const QString C_SyvDcConnectedNodeList::mhc_MimeDataDevice = "stw_opensyde_connected_node_device";
 const QString C_SyvDcConnectedNodeList::mhc_MimeDataDeviceValid = "stw_opensyde_connected_node_device_valid";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     06.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDcConnectedNodeList::C_SyvDcConnectedNodeList(QWidget * const opc_Parent) :
    QListWidget(opc_Parent)
 {
@@ -88,30 +78,24 @@ C_SyvDcConnectedNodeList::C_SyvDcConnectedNodeList(QWidget * const opc_Parent) :
            &C_SyvDcConnectedNodeList::m_ScrollBarRangeChangedVer);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set data
 
    \param[in] orc_Infos Data
-
-   \created     08.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcConnectedNodeList::SetData(const std::vector<C_SyvDcDeviceInformation> & orc_Infos)
 {
    this->mc_Data = orc_Infos;
    m_Init();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Enable serial number
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Enable serial number
 
    \param[in] orc_SerialNumber Serial number
-
-   \created     12.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcConnectedNodeList::EnableSerialNumber(const QString & orc_SerialNumber) const
 {
    for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
@@ -126,15 +110,12 @@ void C_SyvDcConnectedNodeList::EnableSerialNumber(const QString & orc_SerialNumb
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Disable serial number
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Disable serial number
 
    \param[in] orc_SerialNumber Serial number
-
-   \created     12.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcConnectedNodeList::DisableSerialNumber(const QString & orc_SerialNumber) const
 {
    for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
@@ -149,17 +130,14 @@ void C_SyvDcConnectedNodeList::DisableSerialNumber(const QString & orc_SerialNum
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten start drag event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten start drag event slot
 
    Here: Start manual drag
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     11.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcConnectedNodeList::startDrag(const Qt::DropActions oc_Actions)
 {
    QListWidgetItem * const pc_Item = this->currentItem();
@@ -195,17 +173,14 @@ void C_SyvDcConnectedNodeList::startDrag(const Qt::DropActions oc_Actions)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mime data request event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mime data request event slot
 
    Here: Add additional information
 
    \param[in] oc_Items Affected items
-
-   \created     11.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QMimeData * C_SyvDcConnectedNodeList::mimeData(const QList<QListWidgetItem *> oc_Items) const
 {
    QMimeData * const pc_Retval = QListWidget::mimeData(oc_Items);
@@ -231,13 +206,10 @@ QMimeData * C_SyvDcConnectedNodeList::mimeData(const QList<QListWidgetItem *> oc
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init step
-
-   \created     08.12.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init step
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcConnectedNodeList::m_Init(void)
 {
    //Init/Reinit UI
@@ -249,15 +221,12 @@ void C_SyvDcConnectedNodeList::m_Init(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Append node to list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Append node to list
 
    \param[in] ou32_NodeIndex Node index
-
-   \created     08.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcConnectedNodeList::m_AppendNode(const C_SyvDcDeviceInformation & orc_Info)
 {
    C_SyvDcConnectedNodeWidget * pc_Widget;
@@ -272,7 +241,7 @@ void C_SyvDcConnectedNodeList::m_AppendNode(const C_SyvDcDeviceInformation & orc
    C_OgeWiUtil::h_ApplyStylesheetProperty(pc_Widget, "First", this->count() == 1);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcConnectedNodeList::m_ScrollBarRangeChangedVer(const sintn osn_Min, const sintn osn_Max) const
 {
    // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar

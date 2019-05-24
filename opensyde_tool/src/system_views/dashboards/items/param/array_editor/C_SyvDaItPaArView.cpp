@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data pool list array edit view (implementation)
 
    Data pool list array edit view
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.11.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QScrollBar>
@@ -27,34 +20,31 @@
 #include "C_SdNdeSingleHeaderView.h"
 #include "TGLUtils.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     06.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaArView::C_SyvDaItPaArView(QWidget * const opc_Parent) :
    C_TblViewScroll(opc_Parent),
    mc_Model(),
@@ -112,31 +102,25 @@ C_SyvDaItPaArView::C_SyvDaItPaArView(QWidget * const opc_Parent) :
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaArView::~C_SyvDaItPaArView(void)
 {
    mpc_LabelCorner = NULL;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Specify associated list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Specify associated list
 
    \param[in] oru32_ElementIndex Element index
    \param[in] opc_DataWidget     Data widget
    \param[in] oq_ECUValues       Optional flag if the shown values are ECU values
-
-   \created     07.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaArView::SetElement(const uint32 ou32_ElementIndex,
                                    stw_opensyde_gui_logic::C_PuiSvDbDataElementHandler * const opc_DataWidget,
                                    const bool oq_ECUValues)
@@ -144,28 +128,22 @@ void C_SyvDaItPaArView::SetElement(const uint32 ou32_ElementIndex,
    this->mc_Model.SetElement(ou32_ElementIndex, opc_DataWidget, oq_ECUValues);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Forward signal
-
-   \created     27.02.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Forward signal
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaArView::OnErrorChangePossible(void)
 {
    Q_EMIT this->SigErrorChangePossible();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get selected indices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get selected indices
 
    \return
    Selected indices
-
-   \created     27.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint32> C_SyvDaItPaArView::m_GetSelectedIndices(void) const
 {
    const QModelIndexList c_SelectedItems = this->selectedIndexes();
@@ -183,13 +161,10 @@ std::vector<uint32> C_SyvDaItPaArView::m_GetSelectedIndices(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update corner button size
-
-   \created     20.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update corner button size
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaArView::m_UpdateCornerButton(void)
 {
    tgl_assert(this->mpc_LabelCorner != NULL);

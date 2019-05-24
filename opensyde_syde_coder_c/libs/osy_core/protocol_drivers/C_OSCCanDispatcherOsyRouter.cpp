@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       CAN dispatcher for routing of legacy protocols (implementation)
 
@@ -11,15 +10,9 @@
    Thus the requests and responses send and received by the protocol driver will not be sent
    directly on CAN but be communicated to the openSYDE server node using the routing services.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.08.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -50,14 +43,11 @@ using namespace stw_can;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+/*! \brief   Default constructor
 
    \param[in]  orc_OsyProtocol   openSYDE protocol instance to use for communication for the "last mile"
 
    Initialize instance
-
-   \created     01.08.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_OSCCanDispatcherOsyRouter::C_OSCCanDispatcherOsyRouter(C_OSCProtocolDriverOsy & orc_OsyProtocol) :
@@ -71,15 +61,12 @@ C_OSCCanDispatcherOsyRouter::C_OSCCanDispatcherOsyRouter(C_OSCProtocolDriverOsy 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+/*! \brief   Default constructor
 
    Initialize instance
 
    \param[in]  orc_OsyProtocol  openSYDE protocol driver to communicate over
    \param[in]  ou8_CommChannel  communication driver channel
-
-   \created     01.08.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_OSCCanDispatcherOsyRouter::C_OSCCanDispatcherOsyRouter(C_OSCProtocolDriverOsy & orc_OsyProtocol,
@@ -94,8 +81,7 @@ C_OSCCanDispatcherOsyRouter::C_OSCCanDispatcherOsyRouter(C_OSCProtocolDriverOsy 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the routing configuration
+/*! \brief   Sets the routing configuration
 
    The functions sets the parameter for routing configuration, but does not activate it!
    Call CAN_Init to activate the routing.
@@ -107,8 +93,6 @@ C_OSCCanDispatcherOsyRouter::C_OSCCanDispatcherOsyRouter(C_OSCProtocolDriverOsy 
    \param[in]     ou32_FilterMask         Mask that is applied to both the received CAN frame identifiers an the
                                           FilterId before comparison.
                                           Bits 29, 30 and 31 are reserved (shall be set to zero)
-
-   \created     01.08.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCCanDispatcherOsyRouter::SetFilterParameters(const uint8 ou8_RoutingChannel, const uint32 ou32_FilterId,
@@ -120,8 +104,7 @@ void C_OSCCanDispatcherOsyRouter::SetFilterParameters(const uint8 ou8_RoutingCha
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Initialization of CAN legacy routing
+/*! \brief   Initialization of CAN legacy routing
 
    Parameters shall be set with SetFilterParameters first before calling this function.
 
@@ -133,8 +116,6 @@ void C_OSCCanDispatcherOsyRouter::SetFilterParameters(const uint8 ou8_RoutingCha
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
    C_COM      communication driver reported error
-
-   \created     01.08.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCCanDispatcherOsyRouter::CAN_Init(void)
@@ -144,8 +125,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Init(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Function has no functionality
+/*! \brief   Function has no functionality
 
    Not bitrate can be set by this dispatcher. Use CAN_Init without parameter for initialization of the
    CAN legacy routing.
@@ -154,8 +134,6 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Init(void)
 
    \return
    C_NOACT
-
-   \created     01.08.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCCanDispatcherOsyRouter::CAN_Init(const sint32 os32_BitrateKBitS)
@@ -165,8 +143,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Init(const sint32 os32_BitrateKBitS)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Stop of CAN legacy routing
+/*! \brief   Stop of CAN legacy routing
 
    \return
    C_NO_ERR   request sent, positive response received
@@ -176,8 +153,6 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Init(const sint32 os32_BitrateKBitS)
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
    C_COM      communication driver reported error
-
-   \created     01.08.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCCanDispatcherOsyRouter::CAN_Exit(void)
@@ -186,15 +161,12 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Exit(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   short description of function
+/*! \brief   short description of function
 
    long description of function within several lines
 
    \return
    possible return value(s) and description
-
-   \created     01.08.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCCanDispatcherOsyRouter::CAN_Reset(void)
@@ -212,8 +184,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Reset(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Sending a CAN message with legacy routing
+/*! \brief   Sending a CAN message with legacy routing
 
    \param[in]  orc_Message     CAN message to send
 
@@ -226,8 +197,6 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Reset(void)
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     01.08.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCCanDispatcherOsyRouter::CAN_Send_Msg(const stw_can::T_STWCAN_Msg_TX & orc_Message)
@@ -236,8 +205,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Send_Msg(const stw_can::T_STWCAN_Msg_TX 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check timestamp basis of driver
+/*! \brief   Check timestamp basis of driver
 
    Return system time in micro seconds as the driver sees it.
    Can be used by an application to have a time basis for putting the timestamps of received messages into a
@@ -247,8 +215,6 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Send_Msg(const stw_can::T_STWCAN_Msg_TX 
 
    \return
    C_NO_ERR   information read
-
-   \created     01.08.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCCanDispatcherOsyRouter::CAN_Get_System_Time(uint64 & oru64_SystemTimeUs) const
@@ -259,8 +225,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Get_System_Time(uint64 & oru64_SystemTim
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Read the first received message from the list
+/*! \brief   Read the first received message from the list
 
    Functions shall read and return one asynchronous received tunneled CAN message.
 
@@ -269,8 +234,6 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Get_System_Time(uint64 & oru64_SystemTim
    \return
    C_NO_ERR   message read
    C_WARN     no message read
-
-   \created     01.08.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCCanDispatcherOsyRouter::m_CAN_Read_Msg(stw_can::T_STWCAN_Msg_RX & orc_Message)
@@ -296,14 +259,11 @@ sint32 C_OSCCanDispatcherOsyRouter::m_CAN_Read_Msg(stw_can::T_STWCAN_Msg_RX & or
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   In C_OSCProtocolDriverOsy registered function for receiving asynchronous messages
+/*! \brief   In C_OSCProtocolDriverOsy registered function for receiving asynchronous messages
 
    \param[in]     opv_Instance     Pointer to the instance of C_OSCCanDispatcherOsyRouter
    \param[in]     ou8_Channel      Channel the message was received on
    \param[in]     orc_CanMessage   Async received CAN message
-
-   \created     01.08.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCCanDispatcherOsyRouter::mh_OsyTunnelCanMessageReceived(void * const opv_Instance, const uint8 ou8_Channel,
@@ -321,13 +281,10 @@ void C_OSCCanDispatcherOsyRouter::mh_OsyTunnelCanMessageReceived(void * const op
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   In C_OSCProtocolDriverOsy registered function for receiving asynchronous messages
+/*! \brief   In C_OSCProtocolDriverOsy registered function for receiving asynchronous messages
 
    \param[in]     ou8_Channel      Channel the message was received on
    \param[in]     orc_CanMessage   Async received CAN message
-
-   \created     01.08.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCCanDispatcherOsyRouter::m_OsyTunnelCanMessageReceived(const uint8 ou8_Channel,

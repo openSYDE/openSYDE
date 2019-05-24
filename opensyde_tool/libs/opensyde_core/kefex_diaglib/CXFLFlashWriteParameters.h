@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       header for class C_XFLFlashWriteParameters
 
    Parameter class for C_XFLFlashWrite::Execute.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     14.01.2010  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2010 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CXFLFLASHWRITEPARAMETERSH
 #define CXFLFLASHWRITEPARAMETERSH
 
@@ -23,7 +17,7 @@
 #include "DiagLib_config.h"
 #include "CXFLActions.h"
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 namespace stw_diag_lib
 {
@@ -103,7 +97,7 @@ enum E_XFLDevTypeCheckMatchIDFailReaction
    eXFL_DEV_TYPE_CHECK_MATCHID_FAIL_REACTION_ASK    = 2    ///< ask user whether to continue  -> ok if he/she selects "yes"
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Parameters for perfoming flash write procedure
 class C_XFLFlashWriteParameters
 {
@@ -115,7 +109,6 @@ public:
    stw_scl::C_SCLString c_HexFile;   ///< full path the hex file
 
    C_XFLWakeupParameters c_WakeupConfig; ///< parameters defining how to address the target node
-
 
    E_XFLEraseMode     e_EraseMode;          ///< determines the erase mode
    stw_scl::C_SCLString c_UserDefinedSectors; ///< comma separated (e.g. "10,11,4"), only used if e_EraseMode =
@@ -157,9 +150,9 @@ public:
    stw_types::sint32 SaveToIni(stw_scl::C_SCLIniFile & orc_IniFile, const stw_scl::C_SCLString & orc_Section) const;
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #endif

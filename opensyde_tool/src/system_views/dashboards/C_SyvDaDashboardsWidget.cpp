@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for system view dashboards
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_SyvDaDashboardsWidget.h"
@@ -23,6 +17,7 @@
 #include "stwerrors.h"
 #include "constants.h"
 #include "TGLUtils.h"
+#include "TGLTime.h"
 #include "C_SyvUtil.h"
 #include "C_OgeWiUtil.h"
 #include "C_GtGetText.h"
@@ -32,10 +27,9 @@
 #include "C_UsHandler.h"
 #include "C_SyvDaDashboardToolbox.h"
 #include "C_SyvDaPeUpdateModeConfiguration.h"
-#include "TGLTime.h"
 #include "C_OgeWiCustomMessage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -44,50 +38,57 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvDaDashboardsWidget::mhc_DarkModeEnabledIconPath = "://images/system_views/Darkmode_Enable.svg";
 const QString C_SyvDaDashboardsWidget::mhc_DarkModeDisabledIconPath = "://images/system_views/Darkmode_Disable.svg";
 const sintn C_SyvDaDashboardsWidget::mhsn_WidgetBorder = 25;
 const sintn C_SyvDaDashboardsWidget::mhsn_ToolboxInitPosY = 150;
 stw_types::uint32 C_SyvDaDashboardsWidget::mhu32_DisconnectTime = 0UL;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in]     ou32_ViewIndex    View index
    \param[in]     opc_ToolboxParent Optional pointer to toolbox parent
    \param[in,out] opc_Parent        Optional pointer to parent
-
-   \created     20.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaDashboardsWidget::C_SyvDaDashboardsWidget(const uint32 ou32_ViewIndex, QWidget * const opc_ToolboxParent,
                                                  QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvDaDashboardsWidget),
    mpc_ComDriver(NULL),
+   mpc_ConnectionThread(new C_SyvComDriverDiagConnect(this)),
    mpc_Toolbox(NULL),
    mpc_ToolboxParent(opc_ToolboxParent),
    mu32_ViewIndex(ou32_ViewIndex),
    mq_EditModeActive(false),
-   mq_ConnectActive(false)
+   mq_ConnectActive(false),
+   me_ConnectState(eCS_DISCONNECTED)
 {
    mpc_Ui->setupUi(this);
 
    this->InitText();
+
+   //Style error label
+   this->mpc_Ui->pc_ErrorLabelTitle->SetForegroundColor(24);
+   this->mpc_Ui->pc_ErrorLabelTitle->SetFontPixel(14, false, true);
+   this->mpc_Ui->pc_ErrorLabelIcon->SetSvg("://images/Error_iconV2.svg");
+
+   //Remove debug label
+   this->mpc_Ui->pc_GroupBoxButtons->setTitle("");
 
    //Init view index
    this->mpc_Ui->pc_TabWidget->SetViewIndex(this->mu32_ViewIndex);
@@ -100,9 +101,9 @@ C_SyvDaDashboardsWidget::C_SyvDaDashboardsWidget(const uint32 ou32_ViewIndex, QW
    connect(&this->mc_Timer, &QTimer::timeout, this, &C_SyvDaDashboardsWidget::m_UpdateShowValues);
 
    // Connect buttons
-   connect(this->mpc_Ui->pc_PbConfirm, &stw_opensyde_gui_elements::C_OgePubTextWithBorderEdit::clicked,
+   connect(this->mpc_Ui->pc_PbConfirm, &stw_opensyde_gui_elements::C_OgePubSystemCommissioningEdit::clicked,
            this, &C_SyvDaDashboardsWidget::m_ConfirmClicked);
-   connect(this->mpc_Ui->pc_PbCancel, &stw_opensyde_gui_elements::C_OgePubTextWithBorderEdit::clicked,
+   connect(this->mpc_Ui->pc_PbCancel, &stw_opensyde_gui_elements::C_OgePubSystemCommissioningEdit::clicked,
            this, &C_SyvDaDashboardsWidget::m_CancelClicked);
 
    connect(this->mpc_Ui->pc_TabWidget, &C_SyvDaDashboardSelectorTabWidget::SigConfirmClicked,
@@ -111,25 +112,29 @@ C_SyvDaDashboardsWidget::C_SyvDaDashboardsWidget(const uint32 ou32_ViewIndex, QW
            this, &C_SyvDaDashboardsWidget::m_CancelClicked);
    connect(this->mpc_Ui->pc_TabWidget, &C_SyvDaDashboardSelectorTabWidget::SigChanged,
            this, &C_SyvDaDashboardsWidget::SigChanged);
+   connect(this->mpc_Ui->pc_TabWidget, &C_SyvDaDashboardSelectorTabWidget::SigNumberDashboardsChanged,
+           this, &C_SyvDaDashboardsWidget::SigNumberDashboardsChanged);
    connect(this->mpc_Ui->pc_TabWidget, &C_SyvDaDashboardSelectorTabWidget::SigErrorChange,
            this, &C_SyvDaDashboardsWidget::CheckError);
    connect(this->mpc_Ui->pc_TabWidget, &C_SyvDaDashboardSelectorTabWidget::SigDataPoolWrite,
            this, &C_SyvDaDashboardsWidget::m_DataPoolWrite);
    connect(this->mpc_Ui->pc_TabWidget, &C_SyvDaDashboardSelectorTabWidget::SigDataPoolRead,
            this, &C_SyvDaDashboardsWidget::m_DataPoolRead);
+   connect(this->mpc_Ui->pc_TabWidget, &C_SyvDaDashboardSelectorTabWidget::SigNvmReadList,
+           this, &C_SyvDaDashboardsWidget::m_NvmReadList);
+
+   connect(this->mpc_ConnectionThread, &C_SyvComDriverDiagConnect::finished, this,
+           &C_SyvDaDashboardsWidget::m_ConnectStepFinished);
 
    this->SetEditMode(false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     20.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaDashboardsWidget::~C_SyvDaDashboardsWidget(void)
 {
    this->m_CloseOsyDriver();
@@ -145,26 +150,19 @@ C_SyvDaDashboardsWidget::~C_SyvDaDashboardsWidget(void)
    // memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initializes all visible strings on the widget
-
-   \created     30.06.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initializes all visible strings on the widget
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::InitText(void) const
 {
-   this->mpc_Ui->pc_PbConfirm->setText(C_GtGetText::h_GetText("Confirm"));
    this->mpc_Ui->pc_PbCancel->setText(C_GtGetText::h_GetText("Cancel"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle initial dark mode
-
-   \created     02.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle initial dark mode
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::LoadDarkMode(void)
 {
    const C_PuiSvData * pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
@@ -173,37 +171,31 @@ void C_SyvDaDashboardsWidget::LoadDarkMode(void)
    {
       if (pc_View->GetDarkModeActive() == true)
       {
-         Q_EMIT this->SigSetPushButtonIcon(C_SyvDaDashboardsWidget::mhc_DarkModeEnabledIconPath);
+         Q_EMIT this->SigSetDarkModePushButtonIcon(C_SyvDaDashboardsWidget::mhc_DarkModeEnabledIconPath);
          m_ApplyDarkMode(true);
       }
       else
       {
-         Q_EMIT this->SigSetPushButtonIcon(C_SyvDaDashboardsWidget::mhc_DarkModeDisabledIconPath);
+         Q_EMIT this->SigSetDarkModePushButtonIcon(C_SyvDaDashboardsWidget::mhc_DarkModeDisabledIconPath);
          m_ApplyDarkMode(false);
       }
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save data
-
-   \created     30.06.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::Save(void) const
 {
    m_CleanUpToolBox();
    this->mpc_Ui->pc_TabWidget->Save();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle dashboards settings request
-
-   \created     27.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle dashboards settings request
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::OpenSettings(void)
 {
    QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
@@ -229,13 +221,10 @@ void C_SyvDaDashboardsWidget::OpenSettings(void)
    //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle dark mode toggle
-
-   \created     02.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle dark mode toggle
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::ToggleDarkMode(void)
 {
    const C_PuiSvData * pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
@@ -254,26 +243,28 @@ void C_SyvDaDashboardsWidget::ToggleDarkMode(void)
    this->LoadDarkMode();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the edit mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the edit mode
 
    \param[in]     oq_Active      Flag for edit mode
-
-   \created     30.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::SetEditMode(const bool oq_Active)
 {
    this->mq_EditModeActive = oq_Active;
 
    this->mpc_Ui->pc_BackgroundWidget->SetEditBackground(oq_Active);
-   this->mpc_Ui->pc_GroupBoxButtons->setVisible(oq_Active);
 
    this->mpc_Ui->pc_TabWidget->SetEditMode(oq_Active);
 
    if (oq_Active == true)
    {
+      //Handle button
+      this->mpc_Ui->pc_PbConfirm->SetSvg("://images/system_views/IconConfirm.svg");
+      this->mpc_Ui->pc_PbConfirm->setIconSize(QSize(22, 22));
+      this->mpc_Ui->pc_PbConfirm->SetMargins(12, 20);
+      this->mpc_Ui->pc_PbConfirm->setText(C_GtGetText::h_GetText("Confirm"));
+
       //Initially create toolbox
       if (this->mpc_Toolbox == NULL)
       {
@@ -286,11 +277,16 @@ void C_SyvDaDashboardsWidget::SetEditMode(const bool oq_Active)
       }
 
       // create copy of dashboard in case of clicking cancel
-
-      this->mpc_Ui->pc_BackgroundWidget->layout()->setContentsMargins(8, 0, 8, 8);
    }
    else
    {
+      //Handle button
+      this->mpc_Ui->pc_PbConfirm->SetSvg("://images/main_page_and_navi_bar/IconEdit.svg",
+                                         "://images/IconEditDisabledBright.svg");
+      this->mpc_Ui->pc_PbConfirm->setIconSize(QSize(24, 24));
+      this->mpc_Ui->pc_PbConfirm->SetMargins(16, 25);
+      this->mpc_Ui->pc_PbConfirm->setText(C_GtGetText::h_GetText("Edit"));
+
       //Hide toolbox
       if (this->mpc_Toolbox != NULL)
       {
@@ -299,56 +295,43 @@ void C_SyvDaDashboardsWidget::SetEditMode(const bool oq_Active)
 
       //Also should remember the toolbox settings
       this->Save();
-      this->mpc_Ui->pc_BackgroundWidget->layout()->setContentsMargins(0, 0, 0, 8);
-      Q_EMIT this->SigEditModeClosed();
    }
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_GroupBox, "Edit", oq_Active);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the state of the edit mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the state of the edit mode
 
    \return
    true     edit mode is active
    false    edit mode is not active
-
-   \created     30.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaDashboardsWidget::GetEditMode(void) const
 {
    return this->mq_EditModeActive;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get connected flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get connected flag
 
    \return
    Current connected flag
-
-   \created     26.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaDashboardsWidget::GetConnectActive(void) const
 {
    return mq_ConnectActive;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set connected flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set connected flag
 
    \param[in] orc_Value New connected flag
-
-   \created     26.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
-sint32 C_SyvDaDashboardsWidget::SetConnectActive(const bool oq_Value)
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardsWidget::SetConnectActive(const bool oq_Value)
 {
-   sint32 s32_Retval = C_NO_ERR;
-
    this->mq_ConnectActive = oq_Value;
 
    QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -356,190 +339,8 @@ sint32 C_SyvDaDashboardsWidget::SetConnectActive(const bool oq_Value)
    if ((this->mq_ConnectActive == true) &&
        (this->mpc_ComDriver == NULL))
    {
-      QString c_Message;
-      QString c_MessageDetails = "";
-
-      // Is a new connect already possible
-      while ((C_SyvDaDashboardsWidget::mhu32_DisconnectTime + 5100U) > TGL_GetTickCount())
-      {
-         // Wait till it is possible
-      }
-
-      mpc_ComDriver = new C_SyvComDriverDiag(this->mu32_ViewIndex);
-      connect(mpc_ComDriver, &C_SyvComDriverDiag::SigPollingFinished, this,
-              &C_SyvDaDashboardsWidget::m_HandleManualOperationFinished);
-
-      s32_Retval = this->m_InitOsyDriver(c_Message);
-
-      if (s32_Retval == C_NO_ERR)
-      {
-         s32_Retval = this->m_InitNodes(c_Message, c_MessageDetails);
-      }
-
-      if ((s32_Retval == C_NO_ERR) ||
-          (s32_Retval == C_NOACT))
-      {
-         // Register all widgets
-         this->mpc_Ui->pc_TabWidget->RegisterWidgets(*this->mpc_ComDriver);
-      }
-
-      if (s32_Retval == C_NO_ERR)
-      {
-         QString c_ErrorDetails;
-         std::vector<C_OSCNodeDataPoolListElementId> c_FailedIdRegisters;
-         std::vector<QString> c_FailedIdErrorDetails;
-         std::map<stw_types::uint32, stw_types::uint32> c_FailedNodesElementNumber;
-         std::map<stw_types::uint32, stw_types::uint32> c_NodesElementNumber;
-
-         // Start the asyn communication
-         s32_Retval = this->mpc_ComDriver->SetUpCyclicTransmissions(c_ErrorDetails, c_FailedIdRegisters,
-                                                                    c_FailedIdErrorDetails,
-                                                                    c_FailedNodesElementNumber,
-                                                                    c_NodesElementNumber);
-
-         switch (s32_Retval)
-         {
-         case C_NO_ERR:
-            if (c_FailedIdRegisters.size() > 0)
-            {
-               uintn un_Counter;
-               uintn un_CurrentNode = 0xFFFFFFFFU;
-
-               //Signal all widgets about c_FailedIdRegisters
-               // ToDo: No visualization on the dashboard
-               //this->mpc_Ui->pc_TabWidget->SetErrorForFailedCyclicElementIdRegistrations(c_FailedIdRegisters,
-               //                                                                          c_FailedIdErrorDetails);
-
-               // Show all error information
-               c_Message =
-                  QString(C_GtGetText::h_GetText("Not all cyclic transmission could be registered. (%1 failed)")).
-                  arg(
-                     c_FailedIdRegisters.size());
-
-               for (un_Counter = 0; un_Counter < c_FailedIdRegisters.size(); ++un_Counter)
-               {
-                  const C_OSCNodeDataPoolListElementId & rc_Id = c_FailedIdRegisters[un_Counter];
-                  C_OSCNodeDataPool::E_Type e_Type;
-                  C_PuiSdHandler::h_GetInstance()->GetDataPoolType(rc_Id.u32_NodeIndex, rc_Id.u32_DataPoolIndex,
-                                                                   e_Type);
-
-                  if (un_CurrentNode != rc_Id.u32_NodeIndex)
-                  {
-                     const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
-                        rc_Id.u32_NodeIndex);
-
-                     if (c_MessageDetails != "")
-                     {
-                        c_MessageDetails += "\n\n";
-                     }
-
-                     if (pc_Node != NULL)
-                     {
-                        const std::map<stw_types::uint32,
-                                       stw_types::uint32>::const_iterator c_ItFailedNodesElementNumber =
-                           c_FailedNodesElementNumber.find(rc_Id.u32_NodeIndex);
-
-                        // This information as title for all errors of this node
-                        c_MessageDetails += "Node " + QString(pc_Node->c_Properties.c_Name.c_str()) + ":\n";
-
-                        if (c_ItFailedNodesElementNumber != c_FailedNodesElementNumber.end())
-                        {
-                           c_MessageDetails += QString("The node %1 can handle maximum %2 transmissions. ").
-                                               arg(pc_Node->c_Properties.c_Name.c_str()).arg(c_FailedNodesElementNumber[
-                                                                                                rc_Id.u32_NodeIndex] -
-                                                                                             1U);
-                           c_MessageDetails += QString("Tried to register %1 transmissions.\n"
-                                                       "To fix this adjust 'Max number of cyclic/event driven "
-                                                       "transmissions' in 'Code Generation Settings' of"
-                                                       " the node properties.\n\n").
-                                               arg(c_NodesElementNumber[rc_Id.u32_NodeIndex]);
-                        }
-                     }
-                     c_MessageDetails += "Error details:\n";
-
-                     un_CurrentNode = rc_Id.u32_NodeIndex;
-                  }
-
-                  c_MessageDetails += "The initiating of the transmission of the element ";
-                  if (e_Type != C_OSCNodeDataPool::eCOM)
-                  {
-                     c_MessageDetails += C_PuiSdHandler::h_GetInstance()->GetNamespace(rc_Id);
-                  }
-                  else
-                  {
-                     c_MessageDetails += C_PuiSdHandler::h_GetInstance()->GetSignalNamespace(rc_Id);
-                  }
-
-                  c_MessageDetails += " failed: " + c_FailedIdErrorDetails[un_Counter] + "\n";
-               }
-
-               s32_Retval = C_RD_WR;
-            }
-
-            break;
-         case C_CONFIG:
-            c_Message =
-               QString(C_GtGetText::h_GetText("System connection failed. Configuration error.")); //Many possibilities
-                                                                                                  // for
-                                                                                                  // this error
-            break;
-         case C_COM:
-            c_Message =
-               QString(C_GtGetText::h_GetText("Communication error. (%1)")).arg(c_ErrorDetails);
-            break;
-         default:
-            c_Message = QString(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Retval));
-            break;
-         }
-      }
-
-      if ((s32_Retval == C_NO_ERR) ||
-          (s32_Retval == C_NOACT))
-      {
-         s32_Retval = this->mpc_ComDriver->StartCycling();
-         switch (s32_Retval)
-         {
-         case C_NO_ERR:
-            break;
-         case C_CONFIG:
-            c_Message =
-               QString(C_GtGetText::h_GetText("System connect failed. Configuration error.")); //Many possibilities for
-                                                                                               // this error
-            break;
-         default:
-            c_Message = QString(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Retval));
-            break;
-         }
-      }
-
-      if (s32_Retval == C_NO_ERR)
-      {
-         // When connected, no drag and drop is allowed on top level
-         Q_EMIT (this->SigBlockDragAndDrop(true));
-         // Inform all widgets about the connection
-         this->mpc_Ui->pc_TabWidget->ConnectionActiveChanged(true);
-         // Start updating the dashboard widgets
-         this->mc_Timer.start();
-      }
-      else
-      {
-         C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR);
-
-         this->m_CloseOsyDriver();
-         // Save the time of 'disconnect'
-         C_SyvDaDashboardsWidget::mhu32_DisconnectTime = TGL_GetTickCount();
-
-         //Restore cursor before error message
-         QApplication::restoreOverrideCursor();
-
-         // Show the message box only when all communication relevant functions closing in m_CloseOsyDriver are finished
-         c_MessageBox.SetHeading(C_GtGetText::h_GetText("Dashboard connect"));
-         c_MessageBox.SetDescription(c_Message);
-         c_MessageBox.SetDetails(c_MessageDetails);
-         c_MessageBox.SetCustomMinHeight(450);
-         c_MessageBox.SetCustomMinWidth(850);
-         c_MessageBox.Execute();
-      }
+      this->mpc_ConnectionThread->SetWaitingStepParameters(C_SyvDaDashboardsWidget::mhu32_DisconnectTime);
+      this->mpc_ConnectionThread->start();
    }
    else
    {
@@ -556,43 +357,99 @@ sint32 C_SyvDaDashboardsWidget::SetConnectActive(const bool oq_Value)
    }
 
    QApplication::restoreOverrideCursor();
-   return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Perform error check
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function to prepare closing the widget
 
-   \created     27.09.2017  STW/M.Echtler
+   \return
+   true     Can be closed.
+   false    Cannot be closed.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvDaDashboardsWidget::PrepareToClose(void) const
+{
+   bool q_Return = this->me_ConnectState != eCS_CONNECTING;
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Perform error check
+*/
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::CheckError(void) const
 {
    QString c_ErrorText;
-   const bool q_ViewSetupError = C_SyvUtil::h_CheckViewSetupError(this->mu32_ViewIndex, c_ErrorText);
+   QString c_ErrorTextHeading;
+   QString c_ErrorTextTooltip;
+   const bool q_ViewSetupError =
+      C_SyvUtil::h_CheckViewSetupError(this->mu32_ViewIndex, c_ErrorTextHeading, c_ErrorText, c_ErrorTextTooltip);
 
    if (q_ViewSetupError == true)
    {
-      this->mpc_Ui->pc_ErrorLabel->SetCompleteText(c_ErrorText);
-      this->mpc_Ui->pc_ErrorFrame->setVisible(true);
+      this->mpc_Ui->pc_ErrorLabelIcon->SetToolTipInformation("", c_ErrorTextTooltip, C_NagToolTip::eERROR);
+      this->mpc_Ui->pc_ErrorLabelTitle->setText(c_ErrorTextHeading);
+      this->mpc_Ui->pc_ErrorLabelTitle->SetToolTipInformation("", c_ErrorTextTooltip, C_NagToolTip::eERROR);
+      this->mpc_Ui->pc_ErrorLabel->SetCompleteText(c_ErrorText, c_ErrorTextTooltip);
+      this->mpc_Ui->pc_GroupBoxErrorContent->setVisible(true);
    }
    else
    {
-      this->mpc_Ui->pc_ErrorFrame->setVisible(false);
+      this->mpc_Ui->pc_GroupBoxErrorContent->setVisible(false);
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten hide event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle push button connect press
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardsWidget::OnPushButtonConnectPress(void)
+{
+   switch (this->me_ConnectState)
+   {
+   case eCS_DISCONNECTED:
+      //Connecting
+      this->me_ConnectState = eCS_CONNECTING;
+      Q_EMIT this->SigSetConnectPushButtonIcon("://images/system_views/IconConnecting.svg", true);
+      //Leave edit mode
+      if (this->GetEditMode() == true)
+      {
+         this->SetEditMode(false);
+      }
+      //Deactivate edit & config
+      this->mpc_Ui->pc_PbConfirm->setEnabled(false);
+      Q_EMIT this->SigSetConfigurationAvailable(false);
+      //While connecting display updated tool bar
+      QApplication::processEvents();
+      this->SetConnectActive(true);
+      break;
+   case eCS_CONNECTED:
+      //Disconnecting
+      this->me_ConnectState = eCS_DISCONNECTING;
+      Q_EMIT this->SigSetConnectPushButtonIcon("://images/system_views/IconDisconnecting.svg", true);
+      this->SetConnectActive(false);
+      this->me_ConnectState = eCS_DISCONNECTED;
+      Q_EMIT this->SigSetConnectPushButtonIcon("://images/system_views/IconDisconnected.svg", false);
+      //Reactivate edit & config
+      this->mpc_Ui->pc_PbConfirm->setEnabled(true);
+      Q_EMIT this->SigSetConfigurationAvailable(true);
+      break;
+   case eCS_CONNECTING:
+   case eCS_DISCONNECTING:
+      //No action can be started
+      break;
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten hide event slot
 
    Here: hide and delete toolbox
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     03.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::hideEvent(QHideEvent * const opc_Event)
 {
    QWidget::hideEvent(opc_Event);
@@ -602,17 +459,14 @@ void C_SyvDaDashboardsWidget::hideEvent(QHideEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten resize event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten resize event
 
    Move the toolbox.
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     25.01.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::resizeEvent(QResizeEvent * const opc_Event)
 {
    if (this->mpc_Toolbox != NULL)
@@ -663,13 +517,13 @@ void C_SyvDaDashboardsWidget::resizeEvent(QResizeEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::m_ConfirmClicked(void)
 {
-   this->SetEditMode(false);
+   this->SetEditMode(!this->GetEditMode());
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::m_CancelClicked(void)
 {
    // restore the saved dashboard
@@ -678,15 +532,12 @@ void C_SyvDaDashboardsWidget::m_CancelClicked(void)
    this->SetEditMode(false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply dark mode setting
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply dark mode setting
 
    \param[in] oq_Active Dark mode value
-
-   \created     02.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::m_ApplyDarkMode(const bool oq_Active)
 {
    this->mpc_Ui->pc_TabWidget->ApplyDarkMode(oq_Active);
@@ -701,13 +552,10 @@ void C_SyvDaDashboardsWidget::m_ApplyDarkMode(const bool oq_Active)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init toolbox widget
-
-   \created     03.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init toolbox widget
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::m_InitToolBox(void)
 {
    QString c_ViewName = "";
@@ -782,13 +630,10 @@ void C_SyvDaDashboardsWidget::m_InitToolBox(void)
    this->mpc_Toolbox->hide();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up toolbox
-
-   \created     03.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clean up toolbox
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::m_CleanUpToolBox(void) const
 {
    if (this->mpc_Toolbox != NULL)
@@ -807,13 +652,13 @@ void C_SyvDaDashboardsWidget::m_CleanUpToolBox(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::m_UpdateShowValues(void) const
 {
    this->mpc_Ui->pc_TabWidget->UpdateShowValues();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDaDashboardsWidget::m_InitOsyDriver(QString & orc_Message)
 {
    sint32 s32_Retval;
@@ -824,7 +669,14 @@ sint32 C_SyvDaDashboardsWidget::m_InitOsyDriver(QString & orc_Message)
    bool q_SysDefInvalid;
    bool q_NoNodesActive;
 
-   s32_Retval = this->mpc_ComDriver->InitDiag();
+   if (this->mpc_ComDriver != NULL)
+   {
+      s32_Retval = this->mpc_ComDriver->InitDiag();
+   }
+   else
+   {
+      s32_Retval = C_CONFIG;
+   }
 
    switch (s32_Retval)
    {
@@ -833,7 +685,10 @@ sint32 C_SyvDaDashboardsWidget::m_InitOsyDriver(QString & orc_Message)
       // Starting logging starts the CAN signal interpretation too
       // TODO: Bitrate is not necessary for initialization here and the bus load calculation is not used here.
       //       If this is necessary, this bitrate must be adapted for the real value and not this dummy
-      this->mpc_ComDriver->StartLogging(0U);
+      if (this->mpc_ComDriver != NULL)
+      {
+         this->mpc_ComDriver->StartLogging(0U);
+      }
       break;
    case C_CONFIG:
       orc_Message =
@@ -896,74 +751,7 @@ sint32 C_SyvDaDashboardsWidget::m_InitOsyDriver(QString & orc_Message)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-sint32 C_SyvDaDashboardsWidget::m_InitNodes(QString & orc_Message, QString & orc_MessageDetails)
-{
-   sint32 s32_Retval;
-   QString c_ErrorDetails;
-
-   s32_Retval = this->mpc_ComDriver->SetDiagnosticMode(c_ErrorDetails);
-
-   switch (s32_Retval)
-   {
-   case C_NO_ERR:
-      break;
-   case C_CONFIG:
-      orc_Message = QString(C_GtGetText::h_GetText("Initialization was not finished."));
-      break;
-   case C_NOACT:
-      orc_Message = QString(C_GtGetText::h_GetText("System View is invalid. Action cannot be performed."));
-      break;
-   case C_TIMEOUT:
-      orc_Message = QString(C_GtGetText::h_GetText("At least one node is not responding!"));
-      orc_MessageDetails = QString(C_GtGetText::h_GetText("Affected node(s):\n%1")).arg(c_ErrorDetails);
-      break;
-   case C_BUSY:
-      orc_Message = QString(C_GtGetText::h_GetText("Connecting to at least one node failed!"));
-      orc_MessageDetails = QString(C_GtGetText::h_GetText("Affected node(s):\n"
-                                                          "%1\n"
-                                                          "\n"
-                                                          "Possible scenarios:\n"
-                                                          "- Wrong configured IP address\n"
-                                                          "- Gateway address of node is not configured properly"))
-                           .arg(c_ErrorDetails);
-      break;
-   case C_CHECKSUM:
-      orc_Message =
-         QString(C_GtGetText::h_GetText(
-                    "The CRC over at least one Datapool does not match. Are the applications on all nodes "
-                    "up to date?"));
-      orc_MessageDetails = QString(C_GtGetText::h_GetText("Affected node(s) and Datapool(s):\n%1")).arg(c_ErrorDetails);
-      break;
-   case C_COM:
-      orc_Message = QString(C_GtGetText::h_GetText("Service error response detected."));
-      orc_MessageDetails = QString(C_GtGetText::h_GetText("Affected node(s):\n"
-                                                          "%1\n"
-                                                          "\n"
-                                                          "Possible scenario:\n"
-                                                          "If these nodes are in Flashloader (Try restarting those nodes to fix this error)"))
-                           .arg(c_ErrorDetails);
-      break;
-   case C_RD_WR:
-      orc_Message = QString(C_GtGetText::h_GetText("Unexpected protocol response detected."));
-      orc_MessageDetails = QString(C_GtGetText::h_GetText("Possible scenario:\n"
-                                                          "If there are multiple nodes with the same node ID connected to the same bus"));
-      break;
-   case C_WARN:
-      orc_Message = QString(C_GtGetText::h_GetText("Protocol error response detected."));
-      orc_MessageDetails = QString(C_GtGetText::h_GetText("Possible scenario:\n"
-                                                          "- Node can currently not enter diagnostic session\n"
-                                                          "- A Data Pool defined in the openSYDE tool is not available on the Node"));
-      break;
-   default:
-      orc_Message = QString(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Retval));
-      break;
-   }
-
-   return s32_Retval;
-}
-
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::m_CloseOsyDriver(void)
 {
    if (this->mpc_ComDriver != NULL)
@@ -981,7 +769,7 @@ void C_SyvDaDashboardsWidget::m_CloseOsyDriver(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::m_DataPoolWrite(const uint32 ou32_NodeIndex, const uint8 ou8_DataPoolIndex,
                                               const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex)
 {
@@ -990,7 +778,7 @@ void C_SyvDaDashboardsWidget::m_DataPoolWrite(const uint32 ou32_NodeIndex, const
       const sint32 s32_Return = this->mpc_ComDriver->PollDataPoolWrite(ou32_NodeIndex, ou8_DataPoolIndex,
                                                                        ou16_ListIndex, ou16_ElementIndex);
       //Error handling
-      if (s32_Return != C_NO_ERR)
+      if (s32_Return == C_BUSY)
       {
          const C_OSCNodeDataPoolListElementId c_Id(ou32_NodeIndex, static_cast<uint32>(ou8_DataPoolIndex),
                                                    static_cast<uint32>(ou16_ListIndex),
@@ -1000,7 +788,7 @@ void C_SyvDaDashboardsWidget::m_DataPoolWrite(const uint32 ou32_NodeIndex, const
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::m_DataPoolRead(const C_OSCNodeDataPoolListElementId & orc_Index)
 {
    if (this->mpc_ComDriver != NULL)
@@ -1010,7 +798,7 @@ void C_SyvDaDashboardsWidget::m_DataPoolRead(const C_OSCNodeDataPoolListElementI
                                                static_cast<uint16>(orc_Index.u32_ListIndex),
                                                static_cast<uint16>(orc_Index.u32_ElementIndex));
       //Error handling
-      if (s32_Return != C_NO_ERR)
+      if (s32_Return == C_BUSY)
       {
          const C_OSCNodeDataPoolListElementId c_Id(orc_Index);
          this->mc_MissedReadOperations.insert(c_Id);
@@ -1018,49 +806,229 @@ void C_SyvDaDashboardsWidget::m_DataPoolRead(const C_OSCNodeDataPoolListElementI
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle manual user operation finished event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Attempt to start read NVM list operation
+
+   \param[in] orc_Index List index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardsWidget::m_NvmReadList(const C_OSCNodeDataPoolListId & orc_Index)
+{
+   if (this->mpc_ComDriver != NULL)
+   {
+      const sint32 s32_Return =
+         this->mpc_ComDriver->PollNvmReadList(orc_Index.u32_NodeIndex, static_cast<uint8>(orc_Index.u32_DataPoolIndex),
+                                              static_cast<uint16>(orc_Index.u32_ListIndex));
+      //Error handling
+      if (s32_Return == C_BUSY)
+      {
+         this->mc_MissedReadNvmOperations.insert(orc_Index);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle manual user operation finished event
 
    \param[in] os32_Result Operation result
    \param[in] ou8_NRC     Negative response code, if any
-
-   \created     09.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::m_HandleManualOperationFinished(const sint32 os32_Result, const uint8 ou8_NRC)
 {
    this->mpc_Ui->pc_TabWidget->HandleManualOperationFinished(os32_Result, ou8_NRC);
    if (this->mpc_ComDriver != NULL)
    {
-      if (this->mc_MissedReadOperations.size() > 0)
+      if (this->mc_MissedReadNvmOperations.size() > 0)
       {
-         const C_OSCNodeDataPoolListElementId c_Id = *this->mc_MissedReadOperations.begin();
+         const C_OSCNodeDataPoolListId c_Id = *this->mc_MissedReadNvmOperations.begin();
          const sint32 s32_Return =
-            this->mpc_ComDriver->PollDataPoolRead(c_Id.u32_NodeIndex, static_cast<uint8>(c_Id.u32_DataPoolIndex),
-                                                  static_cast<uint16>(c_Id.u32_ListIndex),
-                                                  static_cast<uint16>(c_Id.u32_ElementIndex));
+            this->mpc_ComDriver->PollNvmReadList(c_Id.u32_NodeIndex, static_cast<uint8>(c_Id.u32_DataPoolIndex),
+                                                 static_cast<uint16>(c_Id.u32_ListIndex));
          //Error handling
-         if (s32_Return == C_NO_ERR)
+         if (s32_Return != C_BUSY)
          {
-            this->mc_MissedReadOperations.erase(this->mc_MissedReadOperations.begin());
+            this->mc_MissedReadNvmOperations.erase(this->mc_MissedReadNvmOperations.begin());
          }
       }
       else
       {
-         if (this->mc_MissedWriteOperations.size() > 0)
+         if (this->mc_MissedReadOperations.size() > 0)
          {
-            const C_OSCNodeDataPoolListElementId c_Id = *this->mc_MissedWriteOperations.begin();
+            const C_OSCNodeDataPoolListElementId c_Id = *this->mc_MissedReadOperations.begin();
             const sint32 s32_Return =
-               this->mpc_ComDriver->PollDataPoolWrite(c_Id.u32_NodeIndex, static_cast<uint8>(c_Id.u32_DataPoolIndex),
-                                                      static_cast<uint16>(c_Id.u32_ListIndex),
-                                                      static_cast<uint16>(c_Id.u32_ElementIndex));
+               this->mpc_ComDriver->PollDataPoolRead(c_Id.u32_NodeIndex, static_cast<uint8>(c_Id.u32_DataPoolIndex),
+                                                     static_cast<uint16>(c_Id.u32_ListIndex),
+                                                     static_cast<uint16>(c_Id.u32_ElementIndex));
             //Error handling
-            if (s32_Return == C_NO_ERR)
+            if (s32_Return != C_BUSY)
             {
-               this->mc_MissedWriteOperations.erase(this->mc_MissedWriteOperations.begin());
+               this->mc_MissedReadOperations.erase(this->mc_MissedReadOperations.begin());
+            }
+         }
+         else
+         {
+            if (this->mc_MissedWriteOperations.size() > 0)
+            {
+               const C_OSCNodeDataPoolListElementId c_Id = *this->mc_MissedWriteOperations.begin();
+               const sint32 s32_Return =
+                  this->mpc_ComDriver->PollDataPoolWrite(c_Id.u32_NodeIndex, static_cast<uint8>(c_Id.u32_DataPoolIndex),
+                                                         static_cast<uint16>(c_Id.u32_ListIndex),
+                                                         static_cast<uint16>(c_Id.u32_ElementIndex));
+               //Error handling
+               if (s32_Return != C_BUSY)
+               {
+                  this->mc_MissedWriteOperations.erase(this->mc_MissedWriteOperations.begin());
+               }
             }
          }
       }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle signal of any connect step finished
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardsWidget::m_ConnectStepFinished(void)
+{
+   if (this->mpc_ConnectionThread->GetStep() == C_SyvComDriverDiagConnect::eCDCS_WAITING_FINISHED)
+   {
+      sint32 s32_Retval;
+      QString c_Message;
+
+      mpc_ComDriver = new C_SyvComDriverDiag(this->mu32_ViewIndex);
+      connect(mpc_ComDriver, &C_SyvComDriverDiag::SigPollingFinished, this,
+              &C_SyvDaDashboardsWidget::m_HandleManualOperationFinished);
+
+      s32_Retval = this->m_InitOsyDriver(c_Message);
+
+      if (s32_Retval == C_NO_ERR)
+      {
+         //Continue with set diagnostic mode
+         this->mpc_ConnectionThread->SetSetDiagnosticModeParameters(this->mpc_ComDriver);
+         this->mpc_ConnectionThread->start();
+      }
+      else
+      {
+         //Default error handling
+         this->m_HandleConnectionResult(s32_Retval, c_Message, "");
+      }
+   }
+   else if ((this->mpc_ConnectionThread->GetStep() == C_SyvComDriverDiagConnect::eCDCS_SET_DIAGNOSTIC_MODE_FINISHED) &&
+            (this->mpc_ComDriver != NULL))
+   {
+      sint32 s32_Retval;
+      QString c_Message;
+      QString c_MessageDetails;
+      //Get result of set diagnostic mode
+      this->mpc_ConnectionThread->GetLastOperationResult(s32_Retval, c_Message, c_MessageDetails);
+
+      if ((s32_Retval == C_NO_ERR) ||
+          (s32_Retval == C_NOACT))
+      {
+         // Register all widgets
+         this->mpc_Ui->pc_TabWidget->RegisterWidgets(*this->mpc_ComDriver);
+      }
+
+      if (s32_Retval == C_NO_ERR)
+      {
+         //Continue with set up cyclic transmission parameters
+         this->mpc_ConnectionThread->SetSetUpCyclicTransmissionsParameters(this->mpc_ComDriver);
+         this->mpc_ConnectionThread->start();
+      }
+      else
+      {
+         //Default error handling
+         this->m_HandleConnectionResult(s32_Retval, c_Message, c_MessageDetails);
+      }
+   }
+   else if ((this->mpc_ConnectionThread->GetStep() ==
+             C_SyvComDriverDiagConnect::eCDCS_SET_UP_CYCLIC_TRANSMISSIONS_FINISHED) &&
+            (this->mpc_ComDriver != NULL))
+   {
+      sint32 s32_Retval;
+      QString c_Message;
+      QString c_MessageDetails;
+      //Get result of set up cyclic transmissions
+      this->mpc_ConnectionThread->GetLastOperationResult(s32_Retval, c_Message, c_MessageDetails);
+
+      if ((s32_Retval == C_NO_ERR) ||
+          (s32_Retval == C_NOACT))
+      {
+         s32_Retval = this->mpc_ComDriver->StartCycling();
+         switch (s32_Retval)
+         {
+         case C_NO_ERR:
+            break;
+         case C_CONFIG:
+            c_Message =
+               QString(C_GtGetText::h_GetText("System connect failed. Configuration error.")); //Many possibilities for
+                                                                                               // this error
+            break;
+         default:
+            c_Message = QString(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Retval));
+            break;
+         }
+      }
+      this->m_HandleConnectionResult(s32_Retval, c_Message, c_MessageDetails);
+   }
+   else
+   {
+      //Step unknown
+      tgl_assert(false);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle connection attempt result value
+
+   \param[in] os32_Result        Connection attempt result value
+   \param[in] orc_Message        Error message (if any)
+   \param[in] orc_MessageDetails Error message details (if any)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardsWidget::m_HandleConnectionResult(const sint32 os32_Result, const QString & orc_Message,
+                                                       const QString & orc_MessageDetails)
+{
+   if (os32_Result == C_NO_ERR)
+   {
+      //Success
+      // When connected, no drag and drop is allowed on top level
+      Q_EMIT (this->SigBlockDragAndDrop(true));
+      // Inform all widgets about the connection
+      this->mpc_Ui->pc_TabWidget->ConnectionActiveChanged(true);
+      // Start updating the dashboard widgets
+      this->mc_Timer.start();
+      //Update UI
+      this->me_ConnectState = eCS_CONNECTED;
+      Q_EMIT this->SigSetConnectPushButtonIcon("://images/system_views/IconConnected.svg", false);
+   }
+   else
+   {
+      //Failure
+      C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR);
+
+      this->m_CloseOsyDriver();
+      // Save the time of 'disconnect'
+      C_SyvDaDashboardsWidget::mhu32_DisconnectTime = TGL_GetTickCount();
+
+      //Reactivate edit & config
+      this->mpc_Ui->pc_PbConfirm->setEnabled(true);
+      Q_EMIT this->SigSetConfigurationAvailable(true);
+      Q_EMIT this->SigSetConnectPushButtonIcon("://images/system_views/IconDisconnected.svg", false);
+
+      //Restore cursor before error message
+      QApplication::restoreOverrideCursor();
+
+      // Show the message box only when all communication relevant functions closing in m_CloseOsyDriver are finished
+      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Dashboard connect"));
+      c_MessageBox.SetDescription(orc_Message);
+      c_MessageBox.SetDetails(orc_MessageDetails);
+      c_MessageBox.SetCustomMinHeight(450);
+      c_MessageBox.SetCustomMinWidth(850);
+      c_MessageBox.Execute();
+      //Reset internal state AFTER user confirmation to block any screen switches until this point
+      this->me_ConnectState = eCS_DISCONNECTED;
    }
 }

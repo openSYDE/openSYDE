@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for showing an usage bar on datapool list header (implementation)
 
    The widget draws two bars for used and free space in the complete area.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     29.05.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
@@ -31,33 +24,30 @@
 #include "C_Uti.h"
 #include "C_GtGetText.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent           Optional pointer to parent
-
-   \created     23.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListHeaderUsageWidget::C_SdNdeDataPoolListHeaderUsageWidget(QWidget * const opc_Parent) :
    C_OgeWiProgressBar(opc_Parent),
    mq_ActivateToolTip(true),
@@ -75,32 +65,26 @@ C_SdNdeDataPoolListHeaderUsageWidget::C_SdNdeDataPoolListHeaderUsageWidget(QWidg
    this->SetToolTipWidgetName(QString(C_GtGetText::h_GetText("Datapool")));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     18.08.2017  STW/Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListHeaderUsageWidget::~C_SdNdeDataPoolListHeaderUsageWidget()
 {
    delete mpc_ToolTip;
    mpc_ToolTip = NULL;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the actual percentage of the usage
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the actual percentage of the usage
 
    \param[in] ou32_Size       Maximum size
    \param[in] ou32_Used       Absolute used space of the available space
 
    \return
    Calculated percentage
-
-   \created     23.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SdNdeDataPoolListHeaderUsageWidget::SetUsage(const uint32 ou32_Size, const uint32 ou32_Used)
 {
    uint32 u32_Percentage;
@@ -134,23 +118,19 @@ uint32 C_SdNdeDataPoolListHeaderUsageWidget::SetUsage(const uint32 ou32_Size, co
    return u32_Percentage;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set tool tip status
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set tool tip status
 
    \param[in] oq_Active Flag to set tool tip status
-
-   \created     19.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderUsageWidget::SetToolTipActive(const bool oq_Active)
 {
    this->mq_ActivateToolTip = oq_Active;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten default event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten default event slot
 
    Here: Handle tool tip
 
@@ -159,10 +139,8 @@ void C_SdNdeDataPoolListHeaderUsageWidget::SetToolTipActive(const bool oq_Active
    \return
    True  Event was recognized and processed
    False Event ignored
-
-   \created     27.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolListHeaderUsageWidget::event(QEvent * const opc_Event)
 {
    if ((opc_Event->type() == QEvent::ToolTip) && (this->mq_ActivateToolTip == true))
@@ -220,30 +198,24 @@ bool C_SdNdeDataPoolListHeaderUsageWidget::event(QEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set displayed tool tip widget name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set displayed tool tip widget name
 
    \param[in] orc_Value New tool tip widget name
-
-   \created     22.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderUsageWidget::SetToolTipWidgetName(const QString & orc_Value)
 {
    this->mc_ToolTipHeading = orc_Value + QString(C_GtGetText::h_GetText(" Usage"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set error tooltip override
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set error tooltip override
 
    \param[in] orc_Heading Heading
    \param[in] orc_Content Content
-
-   \created     20.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderUsageWidget::SetErrorToolTip(const QString & orc_Heading, const QString & orc_Content)
 {
    this->mc_ToolTipErrorHeading = orc_Heading;

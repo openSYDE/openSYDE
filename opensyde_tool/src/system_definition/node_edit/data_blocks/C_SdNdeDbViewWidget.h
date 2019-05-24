@@ -1,28 +1,22 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for showing all node applications of a specific node (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     30.01.2016 STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SDNDEDBVIEWWIDGET_H
 #define C_SDNDEDBVIEWWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 #include "stwtypes.h"
 #include "C_OSCNodeApplication.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
 {
 class C_SdNdeDbViewWidget;
@@ -30,9 +24,9 @@ class C_SdNdeDbViewWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SdNdeDbViewWidget :
    public QWidget
@@ -65,7 +59,6 @@ private:
    C_SdNdeDbViewWidget & operator =(const C_SdNdeDbViewWidget &);
 
    void m_OnDelete(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_ApplicationIndex);
-   void m_OnDuplicate(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_ApplicationIndex) const;
    void m_OnAppDisplay() const;
    void m_HandleNoDatablocksLabel() const;
    void m_AddFromTSP(void);
@@ -83,5 +76,5 @@ private:
 };
 }
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 #endif

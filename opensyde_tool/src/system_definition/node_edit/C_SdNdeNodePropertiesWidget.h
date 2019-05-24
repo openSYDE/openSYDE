@@ -1,26 +1,20 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Properties dialog for node properties (header)
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.01.2017  STW/S.Singer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SDNDENODEPROPERTIESWIDGET_H
 #define C_SDNDENODEPROPERTIESWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 
 #include "stwtypes.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
 {
 class C_SdNdeNodePropertiesWidget;
@@ -28,9 +22,9 @@ class C_SdNdeNodePropertiesWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_SdNdeNodePropertiesWidget :
    public QWidget
 {
@@ -74,7 +68,7 @@ Q_SIGNALS:
    void SigNameChanged(const QString & orc_Name, const QString & orc_SubItemName = "");
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

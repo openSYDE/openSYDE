@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Bus protocol for specific node base class for connect and disconnect commands (implementation)
 
    detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     03.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwerrors.h"
@@ -30,28 +23,27 @@
 #include "C_GtGetText.h"
 #include "C_PuiSdUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     ou32_NodeIndex      Node index
    \param[in]     ou32_InterfaceIndex Interface index
@@ -59,10 +51,8 @@ using namespace stw_opensyde_core;
    \param[in,out] opc_Widget          Widget to notify for changes
    \param[in]     orc_Text            Optional command text for informational display
    \param[in,out] opc_Parent          Optional pointer to parent
-
-   \created     03.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand(
    const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex, const C_OSCCanProtocol::E_Type oe_Protocol,
    QWidget * const opc_Widget, const QString & orc_Text, QUndoCommand * const opc_Parent) :
@@ -74,26 +64,20 @@ C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::C_SdBueUnoBusProtNodeConnectD
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Connect node & interface to protocol
-
-   \created     03.04.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Connect node & interface to protocol
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_DoConnectNodeToProt(void)
 {
    this->m_SetComProtocolUsedByInterfaceFlag(true);
    m_UpdateUi();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Connect node & interface to protocol and create data pool
-
-   \created     03.04.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Connect node & interface to protocol and create data pool
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_DoConnectNodeToProtAndAddDataPool(void)
 {
    if (this->m_AddDataPool() == C_NO_ERR)
@@ -103,26 +87,20 @@ void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_DoConnectNodeToProtAnd
    m_UpdateUi();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Disconnect node & interface from protocol
-
-   \created     03.04.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Disconnect node & interface from protocol
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_DoDisconnectNodeFromProt(void)
 {
    this->m_SetComProtocolUsedByInterfaceFlag(false);
    m_UpdateUi();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Disconnect node & interface from protocol and delete data pool
-
-   \created     21.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Disconnect node & interface from protocol and delete data pool
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_DoDisconnectNodeToProtAndDeleteDataPool(void)
 {
    this->m_SetComProtocolUsedByInterfaceFlag(false);
@@ -133,13 +111,10 @@ void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_DoDisconnectNodeToProt
    m_UpdateUi();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Connect node & interface to protocol and create data pool
-
-   \created     14.05.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Connect node & interface to protocol and create data pool
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_DoAddDataPool(void)
 {
    this->m_AddDataPool();
@@ -147,13 +122,10 @@ void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_DoAddDataPool(void)
    m_UpdateUi();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Disconnect node & interface from protocol and delete data pool
-
-   \created     14.05.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Disconnect node & interface from protocol and delete data pool
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_DoDeleteDataPool(void)
 {
    this->m_DeleteDataPool();
@@ -161,7 +133,7 @@ void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_DoDeleteDataPool(void)
    m_UpdateUi();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_SetComProtocolUsedByInterfaceFlag(const bool oq_Flag) const
 {
    C_PuiSdHandler::h_GetInstance()->SetCanProtocolMessageContainerConnected(this->mu32_NodeIndex,
@@ -169,7 +141,7 @@ void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_SetComProtocolUsedByIn
                                                                             this->mu32_InterfaceIndex, oq_Flag);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_AddDataPool(void) const
 {
    C_OSCNodeDataPool c_NewDatapool;
@@ -199,7 +171,7 @@ sint32 C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_AddDataPool(void) co
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_DeleteDataPool(void) const
 {
    const C_OSCNode * pc_Node;
@@ -233,13 +205,10 @@ void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_DeleteDataPool(void) c
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Notify ui
-
-   \created     21.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Notify ui
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_UpdateUi(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2

@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Common graphics scene with basic functionality (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QGraphicsSceneDragDropEvent>
@@ -38,13 +31,13 @@
 #include "C_GiCustomFunctions.h"
 #include "C_Uti.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const float64 mf64_SCENE_RECT_BORDER = 0.0; //SSI: no border needed so far
 const QString C_SebScene::mhc_BOUNDARY = "Boundary";
 const QString C_SebScene::mhc_TEXT_ELEMENT = "Text element";
@@ -52,25 +45,22 @@ const QString C_SebScene::mhc_LINE = "Line/Arrow";
 const QString C_SebScene::mhc_IMAGE = "Image";
 const float64 C_SebScene::mhf64_MovingRange = 10.0;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     20.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebScene::C_SebScene(QObject * const opc_Parent) :
    QGraphicsScene(opc_Parent),
    mq_BlockContextMenu(false),
@@ -100,71 +90,56 @@ C_SebScene::C_SebScene(QObject * const opc_Parent) :
    connect(this, &C_SebScene::selectionChanged, this, &C_SebScene::m_OnSelectionChange);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     10.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebScene::~C_SebScene()
 {
    //lint -e{1540}  no memory leak because of the parents of the items and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the drawing of the background active
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the drawing of the background active
 
    \param[in]  oq_Active   Flag for drawing the background
-
-   \created     20.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::SetDrawingBackground(const bool oq_Active)
 {
    this->mq_DrawCustomBackground = oq_Active;
    m_HandleBackground();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the minimum required scene rectangle size for all elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the minimum required scene rectangle size for all elements
 
    \return
    Minimum scene rectangle size
-
-   \created     23.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QRectF C_SebScene::GetMinimumSceneRect(void) const
 {
    return mc_MinimumSceneRect;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Activate blocking of the context menu for one call
-
-   \created     26.09.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Activate blocking of the context menu for one call
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::BlockContextMenu(void)
 {
    this->mq_BlockContextMenu = true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check scene if tool tip for current position is necessary
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check scene if tool tip for current position is necessary
 
    \param[in] orc_ScenePos Scene position to check for tool tip
-
-   \created     26.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::DisplayToolTip(const QPointF & orc_ScenePos)
 {
    //Check if item has tool tip
@@ -191,17 +166,14 @@ void C_SebScene::DisplayToolTip(const QPointF & orc_ScenePos)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check scene if tool tip for current position is necessary
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check scene if tool tip for current position is necessary
 
    Display tool tip for set object
 
    \param[in] orc_ScenePos Scene position to check for tool tip
-
-   \created     26.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::DisplaySpecificItemToolTip(const QPointF & orc_ScenePos)
 {
    if (this->mpc_CurrentHoverItem != NULL)
@@ -217,9 +189,8 @@ void C_SebScene::DisplaySpecificItemToolTip(const QPointF & orc_ScenePos)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checks if the cursor position is relevant for the proxy widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks if the cursor position is relevant for the proxy widget
 
    In base is no item relevant. Function returns always false.
    Derived classes must overwrite the function if needed.
@@ -229,10 +200,8 @@ void C_SebScene::DisplaySpecificItemToolTip(const QPointF & orc_ScenePos)
    \return
    true     Cursor is on a relevant position
    false    Cursor is not on a relevant position
-
-   \created     04.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SebScene::IsMousePosRelevantForProxyWidgetInteraction(const QPointF & orc_ScenePos)
 {
    Q_UNUSED(orc_ScenePos)
@@ -240,15 +209,12 @@ bool C_SebScene::IsMousePosRelevantForProxyWidgetInteraction(const QPointF & orc
    return false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal for update of current scaling
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal for update of current scaling
 
    \param[in] orc_Transform Current scaling
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::UpdateTransform(const QTransform & orc_Transform)
 {
    QList<QGraphicsItem *> c_Items = this->items();
@@ -271,32 +237,26 @@ void C_SebScene::UpdateTransform(const QTransform & orc_Transform)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set dark mode active
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set dark mode active
 
    \param[in] oq_Value Dark mode active
-
-   \created     02.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::SetDarkModeActive(const bool oq_Value)
 {
    this->mq_DarkModeActive = oq_Value;
    m_HandleBackground();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add bend point to line
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add bend point to line
 
    \param[in,out] opc_Item     Line item
    \param[in]     orc_ScenePos Scene position
    \param[in]     opc_Index    Optional specific index to add point add
-
-   \created     25.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SebScene::BendLine(QGraphicsItem * const opc_Item, const QPointF & orc_ScenePos,
                             const stw_types::sint32 * const opc_Index)
 {
@@ -312,17 +272,14 @@ sint32 C_SebScene::BendLine(QGraphicsItem * const opc_Item, const QPointF & orc_
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Remove bend point of line
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove bend point of line
 
    \param[in,out] opc_Item     Line item
    \param[in]     orc_ScenePos Scene position
    \param[in]     opc_Index    Optional specific index which point to remove
-
-   \created     25.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SebScene::RemoveBendLine(QGraphicsItem * const opc_Item, const QPointF & orc_ScenePos,
                                   const sint32 * const opc_Index) const
 {
@@ -337,19 +294,16 @@ sint32 C_SebScene::RemoveBendLine(QGraphicsItem * const opc_Item, const QPointF 
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get item identified by unique item ID
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get item identified by unique item ID
 
    \param[in] oru64_ID Unique item ID
 
    \return
    NULL: not found
    else: pointer to item
-
-   \created     21.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QGraphicsItem * C_SebScene::GetItemByID(const uint64 & oru64_ID) const
 {
    QGraphicsItem * pc_Retval = NULL;
@@ -378,7 +332,7 @@ QGraphicsItem * C_SebScene::GetItemByID(const uint64 & oru64_ID) const
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_InitSceneContextMenuManager(void)
 {
    // can not be initialized in the constructor because of usage of pure virtual functions
@@ -409,15 +363,12 @@ void C_SebScene::m_InitSceneContextMenuManager(void)
            this, &C_SebScene::m_SetupStyle);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press release event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press release event slot
 
    \param[in,out] opc_KeyEvent  Key event identification and information
-
-   \created     24.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOriginal = true;
@@ -641,17 +592,14 @@ void C_SebScene::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten focus out event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten focus out event slot
 
    Here: Remove selection of items
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     30.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::focusOutEvent(QFocusEvent * const opc_Event)
 {
    if (opc_Event->reason() != Qt::PopupFocusReason)
@@ -660,15 +608,12 @@ void C_SebScene::focusOutEvent(QFocusEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten drag move event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten drag move event
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     11.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::dragMoveEvent(QGraphicsSceneDragDropEvent * const opc_Event)
 {
    if (mq_ProxyWidgetInteractionActive == false)
@@ -708,15 +653,12 @@ void C_SebScene::dragMoveEvent(QGraphicsSceneDragDropEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten drop event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten drop event
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     10.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::dropEvent(QGraphicsSceneDragDropEvent * const opc_Event)
 {
    if (mq_ProxyWidgetInteractionActive == false)
@@ -732,15 +674,12 @@ void C_SebScene::dropEvent(QGraphicsSceneDragDropEvent * const opc_Event)
    QGraphicsScene::dropEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse move event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse move event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     25.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    if (mq_ProxyWidgetInteractionActive == false)
@@ -762,15 +701,12 @@ void C_SebScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse press event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     09.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    if (mq_ProxyWidgetInteractionActive == false)
@@ -857,15 +793,12 @@ void C_SebScene::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse release event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse release event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     25.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    QGraphicsScene::mouseReleaseEvent(opc_Event);
@@ -878,15 +811,12 @@ void C_SebScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten context menu event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten context menu event
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     02.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * const opc_Event)
 {
    if (this->mq_BlockContextMenu == false)
@@ -904,74 +834,59 @@ void C_SebScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * const opc_Eve
    this->mq_BlockContextMenu = false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new text element to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new text element to scene and connect signals
 
    \param[in,out] opc_Item  Text element
-
-   \created     04.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_AddTextElementToScene(C_GiBiTextElement * const opc_Item)
 {
    m_AddRectBaseGroupToScene(opc_Item);
    m_AddAnyItemToScene(opc_Item);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new line arrow to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new line arrow to scene and connect signals
 
    \param[in,out] opc_Item Line arrow item
-
-   \created     27.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_AddLineArrowToScene(C_GiBiArrow * const opc_Item)
 {
    m_AddLineGroupToScene(opc_Item);
    m_AddAnyItemToScene(opc_Item);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new boundary to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new boundary to scene and connect signals
 
    \param[in,out] opc_Item  Boundary item
-
-   \created     27.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_AddBoundaryToScene(C_GiBiBoundary * const opc_Item)
 {
    m_AddRectBaseGroupToScene(opc_Item);
    m_AddAnyItemToScene(opc_Item);
 }
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new image to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new image to scene and connect signals
 
    \param[in,out] opc_Item  Image group item
-
-   \created     08.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_AddImageGroupToScene(C_GiBiImageGroup * const opc_Item)
 {
    m_AddRectBaseGroupToScene(opc_Item);
    m_AddAnyItemToScene(opc_Item);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new rectangle based item to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new rectangle based item to scene and connect signals
 
    \param[in,out] opc_Item Rectangle based item
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_AddRectBaseGroupToScene(C_GiBiRectBaseGroup * const opc_Item)
 {
    //Move
@@ -980,15 +895,12 @@ void C_SebScene::m_AddRectBaseGroupToScene(C_GiBiRectBaseGroup * const opc_Item)
    connect(opc_Item, &C_GiBiRectBaseGroup::SigItemWasResized, this, &C_SebScene::m_HandleRevertableResizeRectangle);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new line based item to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new line based item to scene and connect signals
 
    \param[in,out] opc_Item  Line based item
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_AddLineGroupToScene(C_GiLiLineGroup * const opc_Item)
 {
    //Move
@@ -998,15 +910,12 @@ void C_SebScene::m_AddLineGroupToScene(C_GiLiLineGroup * const opc_Item)
    connect(opc_Item, &C_GiLiLineGroup::SigItemWasResized, this, &C_SebScene::m_HandleRevertableResizeLine);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add any item and do general actions
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add any item and do general actions
 
    \param[in,out] opc_Item Pointer to new item
-
-   \created     19.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_AddAnyItemToScene(QGraphicsItem * const opc_Item)
 {
    this->addItem(opc_Item);
@@ -1015,15 +924,12 @@ void C_SebScene::m_AddAnyItemToScene(QGraphicsItem * const opc_Item)
    Q_EMIT this->SigTriggerUpdateTransform();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set initial state of actions select and move
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set initial state of actions select and move
 
    \param[in,out] opc_Item Current item
-
-   \created     26.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_SetItemSelectionAndMoveAvailability(QGraphicsItem * const opc_Item) const
 {
    if (opc_Item != NULL)
@@ -1070,15 +976,12 @@ void C_SebScene::m_SetItemSelectionAndMoveAvailability(QGraphicsItem * const opc
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle after move action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle after move action
 
    \param[in] orc_PositionDifference Position difference of move
-
-   \created     21.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_HandleRevertableMove(const QPointF & orc_PositionDifference)
 {
    if (this->m_GetUndoManager() != NULL)
@@ -1094,16 +997,13 @@ void C_SebScene::m_HandleRevertableMove(const QPointF & orc_PositionDifference)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle after resize action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle after resize action
 
    \param[in] ors32_InteractionPointIndex Interaction point index
    \param[in] orc_PositionDifference      Position difference of resize
-
-   \created     21.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_HandleRevertableResizeLine(const sint32 & ors32_InteractionPointIndex,
                                               const QPointF & orc_PositionDifference)
 {
@@ -1114,16 +1014,13 @@ void C_SebScene::m_HandleRevertableResizeLine(const sint32 & ors32_InteractionPo
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle after sub line move action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle after sub line move action
 
    \param[in] ors32_SubLineIndex     Sub line index
    \param[in] orc_PositionDifference Position difference of resize
-
-   \created     25.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_HandleSubLineMove(const sint32 & ors32_SubLineIndex, const QPointF & orc_PositionDifference)
 {
    if (this->m_GetUndoManager() != NULL)
@@ -1132,18 +1029,15 @@ void C_SebScene::m_HandleSubLineMove(const sint32 & ors32_SubLineIndex, const QP
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register resize action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register resize action
 
    \param[in]     orc_OldPos  Old position
    \param[in]     orc_OldSize Old size
    \param[in]     orc_NewPos  New position
    \param[in]     orc_NewSize New size
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_HandleRevertableResizeRectangle(const QPointF & orc_OldPos, const QSizeF & orc_OldSize,
                                                    const QPointF & orc_NewPos, const QSizeF & orc_NewSize)
 {
@@ -1154,16 +1048,13 @@ void C_SebScene::m_HandleRevertableResizeRectangle(const QPointF & orc_OldPos, c
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Select new item only
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Select new item only
 
    \param[in, out] opc_Item          Item to be selected
    \param[in]      oq_ClearSelection Flag if the old selection have to be cleared
-
-   \created     25.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_UpdateSelection(QGraphicsItem * const opc_Item, const bool oq_ClearSelection)
 {
    if (oq_ClearSelection == true)
@@ -1174,13 +1065,10 @@ void C_SebScene::m_UpdateSelection(QGraphicsItem * const opc_Item, const bool oq
    opc_Item->setSelected(true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Select all items
-
-   \created     16.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Select all items
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_SelectAll(void) const
 {
    QList<QGraphicsItem *> c_ListItems = this->items();
@@ -1196,21 +1084,18 @@ void C_SebScene::m_SelectAll(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SebScene::m_IsRubberBandActive(void) const
 {
    return this->mq_RubberBandActive;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   React to text interaction mode change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   React to text interaction mode change
 
    \param[in] orq_On Flag if text interaction mode is currently active
-
-   \created     12.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_HandleProxyWidgetInteractionChange(const bool & orq_On)
 {
    this->mq_ProxyWidgetInteractionActive = orq_On;
@@ -1225,16 +1110,13 @@ void C_SebScene::m_HandleProxyWidgetInteractionChange(const bool & orq_On)
    Q_EMIT this->SigProxyWidgetInteractionActive(orq_On);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add image to scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add image to scene
 
    \param[in] orc_Path     Image path
    \param[in] orc_Position Image scene position
-
-   \created     03.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_AddImage(const QString & orc_Path, const QPointF & orc_Position)
 {
    Q_UNUSED(orc_Path)
@@ -1242,15 +1124,12 @@ void C_SebScene::m_AddImage(const QString & orc_Path, const QPointF & orc_Positi
    //Add image if necessary
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds a new image
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds a new image
 
    \param[in] orc_Pos        Position to place item at
-
-   \created     12.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_AddImageWithFileDialog(const QPointF & orc_Pos)
 {
    const QString c_Filter =
@@ -1270,16 +1149,13 @@ void C_SebScene::m_AddImageWithFileDialog(const QPointF & orc_Pos)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Map scene position to screen position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Map scene position to screen position
 
    \param[in]       orc_ScenePos    Scene position
    \param[in,out]   orc_GlobalPos   Screen position
-
-   \created     22.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_MapToGlobal(const QPointF & orc_ScenePos, QPoint & orc_GlobalPos) const
 {
    const QList<QGraphicsView *> c_Views = this->views();
@@ -1292,16 +1168,13 @@ void C_SebScene::m_MapToGlobal(const QPointF & orc_ScenePos, QPoint & orc_Global
    orc_GlobalPos = c_Views[0]->mapToGlobal(orc_GlobalPos);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Map screen position to scene position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Map screen position to scene position
 
    \param[in]       orc_GlobalPos   Screen position
    \param[in,out]   orc_ScenePos    Scene position
-
-   \created     22.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_MapFromGlobal(const QPoint & orc_GlobalPos, QPointF & orc_ScenePos) const
 {
    const QList<QGraphicsView *> c_Views = this->views();
@@ -1314,13 +1187,12 @@ void C_SebScene::m_MapFromGlobal(const QPoint & orc_GlobalPos, QPointF & orc_Sce
    orc_ScenePos = c_Views[0]->mapToScene(c_Tmp);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete selected items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete selected items
 
-   \created     16.09.2016  STW/M.Echtler
+   \param[in] oq_NoUserConfirm Optional flag to suppress user confirmation for any delete action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_Delete(const bool oq_NoUserConfirm)
 {
    QList<QGraphicsItem *> c_SelectedItems = this->selectedItems();
@@ -1377,15 +1249,12 @@ void C_SebScene::m_Delete(const bool oq_NoUserConfirm)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clear all items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clear all items
 
    Hint: leaves all items which are not included in the system definition
-
-   \created     16.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_Clear(void)
 {
    if (this->m_GetUndoManager() != NULL)
@@ -1394,15 +1263,12 @@ void C_SebScene::m_Clear(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete line based item of scene and disconnect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete line based item of scene and disconnect signals
 
    \param[in,out] opc_Item  Line based item
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_RemoveLineGroupOfScene(C_GiLiLineGroup * const opc_Item)
 {
    //Move
@@ -1412,15 +1278,12 @@ void C_SebScene::m_RemoveLineGroupOfScene(C_GiLiLineGroup * const opc_Item)
    disconnect(opc_Item, &C_GiLiLineGroup::SigItemWasResized, this, &C_SebScene::m_HandleRevertableResizeLine);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete rectangle based item of scene and disconnect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete rectangle based item of scene and disconnect signals
 
    \param[in,out] opc_Item Rectangle based item
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_RemoveRectBaseGroupOfScene(C_GiBiRectBaseGroup * const opc_Item)
 {
    //Move
@@ -1430,15 +1293,12 @@ void C_SebScene::m_RemoveRectBaseGroupOfScene(C_GiBiRectBaseGroup * const opc_It
               &C_SebScene::m_HandleRevertableResizeRectangle);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paste origin items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paste origin items
 
    \param[in] opc_Pos   Optional position where items shall be paste
-
-   \created     01.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_Paste(const QPointF * const opc_Pos)
 {
    if (this->m_IsPastePossible() == true)
@@ -1447,19 +1307,16 @@ void C_SebScene::m_Paste(const QPointF * const opc_Pos)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if paste is possible
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if paste is possible
 
    Warning: also has to check copy paste manager!
 
    \return
    True  Valid
    False Invalid
-
-   \created     11.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SebScene::m_IsPastePossible(void)
 {
    bool q_Retval = false;
@@ -1472,61 +1329,51 @@ bool C_SebScene::m_IsPastePossible(void)
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if undo currently possible
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if undo currently possible
 
    \return
    True  Undo possible
    False Undo impossible
-
-   \created     28.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SebScene::m_IsUndoAvailable(void) const
 {
    return true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Optional check for user confirmation on delete action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Optional check for user confirmation on delete action
+
+   \param[in] orc_SelectedItems Selected items
 
    \return
    true  Continue
    false Abort
-
-   \created     12.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SebScene::m_HandleDeleteUserConfirmation(const QList<QGraphicsItem *> & orc_SelectedItems) const
 {
    Q_UNUSED(orc_SelectedItems)
    return true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paste objects of clipboard
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paste objects of clipboard
 
    \param[in] opc_Pos Optional position to paste at (Otherwise current mouse cursor position is chosen)
-
-   \created     10.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_PasteOfClipBoard(const QPointF * const opc_Pos)
 {
    //Default no action
    Q_UNUSED(opc_Pos)
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update hints to reality
-
-   \created     26.10.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update hints to reality
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_UpdateHints(void) const
 {
    C_GiBiCustomToolTip * pc_CustomToolTip;
@@ -1554,13 +1401,10 @@ void C_SebScene::m_UpdateHints(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle tool tip hide event
-
-   \created     26.10.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle tool tip hide event
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_HandleHideToolTip(void)
 {
    mpc_CurrentHoverItem = NULL;
@@ -1568,16 +1412,13 @@ void C_SebScene::m_HandleHideToolTip(void)
    Q_EMIT this->SigHideToolTip();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start timer for possible tool tip
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start timer for possible tool tip
 
    \param[in] orc_ScenePos Scene position to start tool tip at
    \param[in] opc_Item     Item to display tooltip for
-
-   \created     26.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_StartTimerForToolTip(const QPointF & orc_ScenePos, const C_GiBiCustomToolTip * const opc_Item)
 {
    this->mc_ToolTipPos = orc_ScenePos;
@@ -1585,25 +1426,22 @@ void C_SebScene::m_StartTimerForToolTip(const QPointF & orc_ScenePos, const C_Gi
    this->mc_ToolTipTimer.start();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_StartTimerForToolTipDirect(void)
 {
    this->mc_ToolTipTimer.start();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Stop tool tip
-
-   \created     15.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Stop tool tip
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_StopToolTip(void)
 {
    this->m_HandleHideToolTip();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_BendLine(QGraphicsItem * const opc_Item, const QPointF & orc_ScenePos)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -1615,7 +1453,7 @@ void C_SebScene::m_BendLine(QGraphicsItem * const opc_Item, const QPointF & orc_
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_RemoveBendLine(QGraphicsItem * const opc_Item, const QPointF & orc_ScenePos)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -1627,19 +1465,16 @@ void C_SebScene::m_RemoveBendLine(QGraphicsItem * const opc_Item, const QPointF 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Call setup style dialog
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Call setup style dialog
 
    \param[in,out] opc_Item Item to change style for
 
    \return
    False Failure or abort by user
    True  Success and accept
-
-   \created     25.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SebScene::m_CallSetupStyle(QGraphicsItem * const opc_Item) const
 {
    bool q_Retval = false;
@@ -1673,9 +1508,42 @@ bool C_SebScene::m_CallSetupStyle(QGraphicsItem * const opc_Item) const
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get new unique ID
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Apply all changes for the guideline item to the other selected items
+
+   \param[in] orc_SelectedItems Selected items to apply changes to
+   \param[in] opc_GuidelineItem Guideline item to use as reference for style changes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SebScene::m_ApplySetupStyleMultiple(const QList<QGraphicsItem *> & orc_SelectedItems,
+                                           const QGraphicsItem * const opc_GuidelineItem) const
+{
+   if (opc_GuidelineItem != NULL)
+   {
+      for (QList<QGraphicsItem *>::const_iterator c_ItItem = orc_SelectedItems.begin();
+           c_ItItem != orc_SelectedItems.end(); ++c_ItItem)
+      {
+         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         C_GiBiRectBaseGroup * const pc_RectItem = dynamic_cast<C_GiBiRectBaseGroup *>(*c_ItItem);
+         if (pc_RectItem != NULL)
+         {
+            pc_RectItem->CopyStyle(opc_GuidelineItem);
+         }
+         else
+         {
+            //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+            C_GiLiLineGroup * const pc_LineItem = dynamic_cast<C_GiLiLineGroup *>(*c_ItItem);
+            if (pc_LineItem != NULL)
+            {
+               pc_LineItem->CopyStyle(opc_GuidelineItem);
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get new unique ID
 
    \param[in] opc_IDMap   Optional map for item to id
    \param[in] os32_Type   Item type, warning: only casted enum values accepted
@@ -1683,10 +1551,8 @@ bool C_SebScene::m_CallSetupStyle(QGraphicsItem * const opc_Item) const
 
    \return
    New unique ID
-
-   \created     18.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint64 C_SebScene::m_GetNewUniqueID(const QMap<C_PuiBsTemporaryDataID,
                                                uint64> * const opc_IDMap, const sint32 os32_Type,
                                     const uint32 & oru32_Index)
@@ -1711,7 +1577,7 @@ uint64 C_SebScene::m_GetNewUniqueID(const QMap<C_PuiBsTemporaryDataID,
    return u64_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QRectF C_SebScene::m_ItemsBoundRect(void) const
 {
    // the original function itemsBoundingRect calculates the size with graphic items in graphics proxy widgets
@@ -1743,16 +1609,13 @@ QRectF C_SebScene::m_ItemsBoundRect(void) const
    return c_Rect;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt scene rectangle
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt scene rectangle
 
    The scene rectangle will be adpated dependent of the existing items and
    a additional border area.
-
-   \created     26.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_AdaptSceneRect(void)
 {
    QRectF c_Rect = m_ItemsBoundRect();
@@ -1777,7 +1640,7 @@ void C_SebScene::m_AdaptSceneRect(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_MoveSelectedItems(const QPointF & orc_Delta)
 {
    const QList<QGraphicsItem *> & rc_SelectedItems = this->selectedItems();
@@ -1816,25 +1679,19 @@ void C_SebScene::m_MoveSelectedItems(const QPointF & orc_Delta)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paste origin items by key press
-
-   \created     06.09.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paste origin items by key press
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_PasteKey(void)
 {
    this->m_Paste(NULL);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paste origin items by context menu click
-
-   \created     06.09.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paste origin items by context menu click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_PasteClick()
 {
    QPointF c_CursorPos;
@@ -1845,16 +1702,13 @@ void C_SebScene::m_PasteClick()
    this->m_Paste(&c_CursorPos);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Align selected items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Align selected items
 
    \param[in] opc_GuidelineItem Item to use as guideline
    \param[in] ore_Alignment     Alignment type
-
-   \created     07.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_Align(const QGraphicsItem * const opc_GuidelineItem, const E_Alignment & ore_Alignment)
 {
    if (this->m_GetUndoManager() != NULL)
@@ -1863,7 +1717,7 @@ void C_SebScene::m_Align(const QGraphicsItem * const opc_GuidelineItem, const E_
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_BringToFront(void)
 {
    const QList<QGraphicsItem *> & rc_SelectedItems = this->selectedItems();
@@ -1893,7 +1747,7 @@ void C_SebScene::m_BringToFront(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_BringForward(void)
 {
    const QList<QGraphicsItem *> & rc_SelectedItems = this->selectedItems();
@@ -1905,7 +1759,7 @@ void C_SebScene::m_BringForward(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_SendBackward(void)
 {
    const QList<QGraphicsItem *> & rc_SelectedItems = this->selectedItems();
@@ -1917,7 +1771,7 @@ void C_SebScene::m_SendBackward(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_SendToBack(void)
 {
    const QList<QGraphicsItem *> & rc_SelectedItems = this->selectedItems();
@@ -1947,15 +1801,12 @@ void C_SebScene::m_SendToBack(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle setup style action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle setup style action
 
    \param[in,out] opc_Item Item to change style for
-
-   \created     25.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_SetupStyle(QGraphicsItem * const opc_Item)
 {
    C_SebUnoBaseManager * const pc_UndoManager = this->m_GetUndoManager();
@@ -1963,41 +1814,37 @@ void C_SebScene::m_SetupStyle(QGraphicsItem * const opc_Item)
    if (pc_UndoManager != NULL)
    {
       bool q_Apply;
-
-      QList<QGraphicsItem *> c_Items;
+      //Get and store selected items before changing to the dialog as this clears the selection
+      const QList<QGraphicsItem *> c_SelectedItems = this->selectedItems();
 
       //Undo
-      c_Items.push_back(opc_Item);
-      pc_UndoManager->SaveStyleInformation(c_Items, this->mq_DarkModeActive);
+      pc_UndoManager->SaveStyleInformation(c_SelectedItems, this->mq_DarkModeActive);
 
       q_Apply = m_CallSetupStyle(opc_Item);
+
       if (q_Apply == true)
       {
+         //Handle other selected items
+         this->m_ApplySetupStyleMultiple(c_SelectedItems, opc_Item);
          //Undo
          pc_UndoManager->RegisterStyleChange();
       }
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Now show tool tip
-
-   \created     26.10.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Now show tool tip
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_TriggerToolTip(void)
 {
    this->DisplaySpecificItemToolTip(mc_ToolTipPos);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle background state
-
-   \created     02.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle background state
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_HandleBackground(void)
 {
    if (this->mq_DrawCustomBackground == true)
@@ -2024,13 +1871,10 @@ void C_SebScene::m_HandleBackground(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle change of selection
-
-   \created     04.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle change of selection
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_OnSelectionChange(void)
 {
    // Register selection change in move because different items could be affected by move.
@@ -2041,28 +1885,22 @@ void C_SebScene::m_OnSelectionChange(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for delete action
-
-   \created     12.01.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for delete action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_DeleteSlot(void)
 {
    m_Delete();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get supported image types as filter
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get supported image types as filter
 
    \return
    Supported image types as filter
-
-   \created     21.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SebScene::mh_GetImageFileTypesFilter(void)
 {
    QString c_Retval = "";

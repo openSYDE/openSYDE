@@ -1,34 +1,28 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Tree view for data elements (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     07.09.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVDAPEDATAELEMENTTREEVIEW_H
 #define C_SYVDAPEDATAELEMENTTREEVIEW_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeTreeViewToolTipBase.h"
 #include "C_TblTreDataElementModel.h"
 #include "C_TblTreDataElementSortFilter.h"
 #include "C_PuiSvDbNodeDataPoolListElementId.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_TblTreDataElementView :
    public stw_opensyde_gui_elements::C_OgeTreeViewToolTipBase
@@ -84,7 +78,7 @@ private:
    QModelIndex m_ManualMapFromSource(const QModelIndex & orc_Index) const;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

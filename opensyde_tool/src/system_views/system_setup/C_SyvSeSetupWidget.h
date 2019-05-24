@@ -1,21 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for showing system view setup
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.06.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVSESETUPWIDGET_H
 #define C_SYVSESETUPWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <QWidget>
 
@@ -24,7 +18,7 @@
 #include "C_SyvSeScene.h"
 #include "C_PuiSvData.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace Ui
 {
@@ -33,9 +27,9 @@ class C_SyvSeSetupWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SyvSeSetupWidget :
    public QWidget
@@ -65,7 +59,6 @@ Q_SIGNALS:
    void SigChanged(void);
    void SigCheckViewError(const stw_types::uint32 ou32_ViewIndex) const;
    void SigEnableConfiguration(const bool oq_State) const;
-   void SigEditModeClosed(void);
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
@@ -81,9 +74,9 @@ private:
    void m_ViewChanged(void);
    void m_CheckViewForErrorGeneral(void) const;
    void m_CheckViewForError(const bool oq_SendError = true) const;
+   void m_OnViewConnectionChange(void);
 
-   void m_CheckAllClicked(void);
-   void m_CheckNoneClicked(void);
+   void m_SelectAllStateChanged(void);
    void m_ConfirmClicked(void);
    void m_CancelClicked(void);
 
@@ -94,6 +87,7 @@ private:
 
    const stw_types::uint32 mu32_ViewIndex;
    bool mq_EditModeActive;
+   bool mq_IgnoreSelectAllCheckboxChanges;
 };
 }
 

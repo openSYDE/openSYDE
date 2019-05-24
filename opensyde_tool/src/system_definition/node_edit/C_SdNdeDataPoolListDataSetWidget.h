@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Data set edit widget (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     15.03.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SDNDEDATAPOOLLISTDATASETWIDGET_H
 #define C_SDNDEDATAPOOLLISTDATASETWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <QWidget>
 #include <QUndoCommand>
@@ -26,7 +20,7 @@
 #include "C_SdNdeDataPoolListModelViewManager.h"
 #include "C_OgeContextMenu.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace Ui
 {
@@ -35,9 +29,9 @@ class C_SdNdeDataPoolListDataSetWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SdNdeDataPoolListDataSetWidget :
    public QWidget
@@ -92,7 +86,7 @@ private:
    C_SdNdeDataPoolListDataSetWidget & operator =(const C_SdNdeDataPoolListDataSetWidget &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

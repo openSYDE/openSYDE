@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       openSYDE protocol driver
 
    For details cf. documentation in .h file.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     12.05.2017  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <iostream>
@@ -30,93 +23,95 @@
 #include "TGLTime.h"
 #include "TGLUtils.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_scl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set up class
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set up class
 
    Initializes class elements
-
-   \created     12.05.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCProtocolDriverOsy::C_OSCProtocolDriverOsy(void) :
    mpr_OnOsyTunnelCanMessageReceived(NULL),
    mpv_OnAsyncTunnelCanMessageInstance(NULL),
    mpc_TransportProtocol(NULL),
    //lint -e{1938}  //constant is initialized as it's in the same translation unit
-   mu32_TimeoutPollingMs(hu32_DEFAULT_TIMEOUT)
+   mu32_TimeoutPollingMs(hu32_DEFAULT_TIMEOUT),
+   mu16_MaxServiceSize(C_OSCProtocolDriverOsyTpBase::hu16_OSY_MAXIMUM_SERVICE_SIZE)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Tear down class
-
-   \created     12.05.2017  STW/A.Stangl
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Tear down class
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCProtocolDriverOsy::~C_OSCProtocolDriverOsy(void)
 {
    mpc_TransportProtocol = NULL;
    mpv_OnAsyncTunnelCanMessageInstance = NULL;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set timeout for "polling" functions
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set timeout for "polling" functions
 
    Set timeout for "polling functions.
 
    \param[in]  ou32_TimeoutPollingMs   timeout in milliseconds
-
-   \created     12.05.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCProtocolDriverOsy::SetTimeoutPolling(const uint32 ou32_TimeoutPollingMs)
 {
    mu32_TimeoutPollingMs = ou32_TimeoutPollingMs;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Resets the timeout to the default value
-
-   \created     22.01.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Resets the timeout to the default value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCProtocolDriverOsy::ResetTimeoutPolling(void)
 {
    this->mu32_TimeoutPollingMs = hu32_DEFAULT_TIMEOUT;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialization of the async handling of tunneled CAN messages
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set maximum size of service
+
+   Set maximum size of service.
+   Currently only used for "WriteMemoryByAddress".
+   If this function is not called the default value of C_OSCProtocolDriverOsyTpBase::hu16_OSY_MAXIMUM_SERVICE_SIZE
+    will be used.
+
+   \param[in]  ou16_MaxServiceSize   Maximum service size to use (including header)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCProtocolDriverOsy::SetMaxServiceSize(const uint16 ou16_MaxServiceSize)
+{
+   mu16_MaxServiceSize = ou16_MaxServiceSize;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialization of the async handling of tunneled CAN messages
 
    \param[in]  opr_OsyTunnelCanMessageReceived     function to be called if an async Tunnel CAN message is received
    \param[in]  opv_Instance                        instance pointer to pass back when invoking read event callback
-
-   \created     01.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCProtocolDriverOsy::InitializeTunnelCanMessage(
    const C_OSCProtocolDriverOsy::PR_OsyTunnelCanMessageReceived opr_OsyTunnelCanMessageReceived,
    void * const opv_Instance)
@@ -125,16 +120,15 @@ void C_OSCProtocolDriverOsy::InitializeTunnelCanMessage(
    this->mpv_OnAsyncTunnelCanMessageInstance = opv_Instance;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checks the connection of the TCP socket
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks the connection of the TCP socket
 
    \return
    C_NO_ERR   is connected
    C_NOACT    is not connected
    C_CONFIG   no transport protocol installed
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::IsConnected(void)
 {
    sint32 s32_Return;
@@ -150,9 +144,8 @@ sint32 C_OSCProtocolDriverOsy::IsConnected(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   ReConnect to node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReConnect to node
 
    Re-connect to openSYDE node.
    Useful after losing a connection (e.g. after ECU reset)
@@ -161,10 +154,8 @@ sint32 C_OSCProtocolDriverOsy::IsConnected(void)
    C_NO_ERR   re-connected
    C_CONFIG   no transport protocol installed
    C_BUSY     re-connect failed
-
-   \created     05.01.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::ReConnect(void)
 {
    sint32 s32_Return;
@@ -180,9 +171,8 @@ sint32 C_OSCProtocolDriverOsy::ReConnect(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Disconnect to node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Disconnect to node
 
    Disconnect to openSYDE node.
 
@@ -190,10 +180,8 @@ sint32 C_OSCProtocolDriverOsy::ReConnect(void)
    C_NO_ERR   disconnected
    C_CONFIG   no transport protocol installed
    C_NOACT    disconnect failed
-
-   \created     19.04.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::Disconnect(void)
 {
    sint32 s32_Return;
@@ -209,19 +197,16 @@ sint32 C_OSCProtocolDriverOsy::Disconnect(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add log entry for common protocol problems
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add log entry for common protocol problems
 
    Add log entries for standard protocol error codes.
 
    \param[in]   orc_Service       Name of protocol service
    \param[in]   os32_ReturnCode   Protocol driver function return code (C_NO_ERR -> no log entry)
    \param[in]   ou8_NrCode        Negative response code (if os32_ReturnCode is C_WARN)
-
-   \created     23.05.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCProtocolDriverOsy::m_LogServiceError(const C_SCLString & orc_Service, const sint32 os32_ReturnCode,
                                                const uint8 ou8_NrCode) const
 {
@@ -235,9 +220,8 @@ void C_OSCProtocolDriverOsy::m_LogServiceError(const C_SCLString & orc_Service, 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Perform cyclic communication tasks
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Perform cyclic communication tasks
 
    Invoke transport protocol's "Cycle" function.
    Invoke virtual functions to report all incoming event driven responses.
@@ -260,10 +244,8 @@ void C_OSCProtocolDriverOsy::m_LogServiceError(const C_SCLString & orc_Service, 
    C_CONFIG   no transport protocol or transport protocol returns error
    C_NOACT    nothing received
    C_COM      communication error
-
-   \created     15.03.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::m_Cycle(const bool oq_CheckForSpecificServiceId, const uint8 ou8_ExpectedServiceId,
                                        C_OSCProtocolDriverOsyService * const opc_ReceivedService)
 {
@@ -343,9 +325,8 @@ sint32 C_OSCProtocolDriverOsy::m_Cycle(const bool oq_CheckForSpecificServiceId, 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Poll for one specific response service
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Poll for one specific response service
 
    Wait for a specific incoming response to a non event-driver service.
    Timeout can be configured with SetTimeoutPolling()
@@ -371,10 +352,8 @@ sint32 C_OSCProtocolDriverOsy::m_Cycle(const bool oq_CheckForSpecificServiceId, 
    C_WARN     error response
    C_TIMEOUT  expected response not received within timeout
    C_COM      communication driver reported error
-
-   \created     15.03.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::m_PollForSpecificServiceResponse(const uint8 ou8_ExpectedServiceId,
                                                                 const uint16 ou16_ExpectedSize,
                                                                 C_OSCProtocolDriverOsyService & orc_Service,
@@ -534,9 +513,8 @@ sint32 C_OSCProtocolDriverOsy::m_PollForSpecificServiceResponse(const uint8 ou8_
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   DiagnosticSessionControl service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   DiagnosticSessionControl service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -552,10 +530,8 @@ sint32 C_OSCProtocolDriverOsy::m_PollForSpecificServiceResponse(const uint8 ou8_
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong session ID)
    C_COM      communication driver reported error
-
-   \created     15.03.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyDiagnosticSessionControl(const uint8 ou8_SessionId, uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
@@ -601,9 +577,8 @@ sint32 C_OSCProtocolDriverOsy::OsyDiagnosticSessionControl(const uint8 ou8_Sessi
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   ReadDataByIdentifier utility wrapper
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadDataByIdentifier utility wrapper
 
    Send ReadDataByIdentifier request and wait for response.
    See class description for general handling of "polled" services.
@@ -623,10 +598,8 @@ sint32 C_OSCProtocolDriverOsy::OsyDiagnosticSessionControl(const uint8 ou8_Sessi
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     12.05.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::m_ReadDataByIdentifier(const uint16 ou16_Identifier,
                                                       const uint16 ou16_ExpectedPayloadSize,
                                                       const bool oq_ExactSizeExpected,
@@ -684,9 +657,8 @@ sint32 C_OSCProtocolDriverOsy::m_ReadDataByIdentifier(const uint16 ou16_Identifi
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   WriteDataByIdentifier utility wrapper
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   WriteDataByIdentifier utility wrapper
 
    Send WriteDataByIdentifier request and wait for response.
    See class description for general handling of "polled" services.
@@ -706,10 +678,8 @@ sint32 C_OSCProtocolDriverOsy::m_ReadDataByIdentifier(const uint16 ou16_Identifi
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     18.05.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::m_WriteDataByIdentifier(const uint16 ou16_Identifier, std::vector<uint8> & orc_WriteData,
                                                        uint8 & oru8_NrCode)
 {
@@ -760,9 +730,8 @@ sint32 C_OSCProtocolDriverOsy::m_WriteDataByIdentifier(const uint16 ou16_Identif
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   ReadEcuSerialNumber service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadEcuSerialNumber service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -778,10 +747,8 @@ sint32 C_OSCProtocolDriverOsy::m_WriteDataByIdentifier(const uint16 ou16_Identif
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     15.03.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyReadEcuSerialNumber(uint8 (&orau8_SerialNumber)[6], uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
@@ -805,9 +772,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadEcuSerialNumber(uint8 (&orau8_SerialNumber
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   ReadHardwareNumber service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadHardwareNumber service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -823,10 +789,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadEcuSerialNumber(uint8 (&orau8_SerialNumber
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     11.05.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyReadHardwareNumber(uint32 & oru32_HardwareNumber, uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
@@ -853,9 +817,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadHardwareNumber(uint32 & oru32_HardwareNumb
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   ReadHardwareVersionNumber service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadHardwareVersionNumber service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -871,10 +834,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadHardwareNumber(uint32 & oru32_HardwareNumb
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     11.05.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyReadHardwareVersionNumber(C_SCLString & orc_HardwareVersionNumber,
                                                             uint8 * const opu8_NrCode)
 
@@ -904,9 +865,99 @@ sint32 C_OSCProtocolDriverOsy::OsyReadHardwareVersionNumber(C_SCLString & orc_Ha
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   ReadDeviceName service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadListOfFeatures service implementation
+
+   Send request and wait for response.
+   See class description for general handling of "polled" services.
+
+   \param[out] orc_ListOfFeatures           read list of features
+   \param[out] opu8_NrCode                  if != NULL: negative response code in case of an error response
+
+   \return
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in TX queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCProtocolDriverOsy::OsyReadListOfFeatures(C_ListOfFeatures & orc_ListOfFeatures, uint8 * const opu8_NrCode)
+{
+   sint32 s32_Return;
+
+   std::vector<uint8> c_Data;
+   uint8 u8_NrErrorCode = 0U;
+
+   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_LIST_OF_FEATURES, 8U, true, c_Data, u8_NrErrorCode);
+   if (s32_Return == C_NO_ERR)
+   {
+      //extract bits:
+      orc_ListOfFeatures.q_FlashloaderCanWriteToNvm        = ((c_Data[7] & 0x01U) == 0x01U) ? true : false;
+      orc_ListOfFeatures.q_MaxNumberOfBlockLengthAvailable = ((c_Data[7] & 0x02U) == 0x02U) ? true : false;
+      orc_ListOfFeatures.q_EthernetToEthernetRoutingSupported = ((c_Data[7] & 0x04U) == 0x04U) ? true : false;
+      //we don't know anything about the meaning of the rest of the bits as we have no crystal ball
+   }
+   if (opu8_NrCode != NULL)
+   {
+      (*opu8_NrCode) = u8_NrErrorCode;
+   }
+
+   m_LogServiceError("ReadDataByIdentifier::ListOfFeatures", s32_Return, u8_NrErrorCode);
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   MaxNumberOfBlockLength service implementation
+
+   Send request and wait for response.
+   See class description for general handling of "polled" services.
+
+   Whether this service is available on the target can be checked with OsyReadListOfFeatures().
+
+   \param[out] oru16_MaxNumberOfBlockLength     read MaxNumberOfBlockLength
+   \param[out] opu8_NrCode                      if != NULL: negative response code in case of an error response
+
+   \return
+   C_NO_ERR   request sent, positive response received
+   C_TIMEOUT  expected response not received within timeout
+   C_NOACT    could not put request in TX queue ...
+   C_CONFIG   no transport protocol installed
+   C_WARN     error response (negative response code placed in *opu8_NrCode)
+   C_RD_WR    unexpected content in response (here: wrong data identifier ID)
+   C_COM      communication driver reported error
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCProtocolDriverOsy::OsyReadMaxNumberOfBlockLength(uint16 & oru16_MaxNumberOfBlockLength,
+                                                             uint8 * const opu8_NrCode)
+{
+   sint32 s32_Return;
+
+   std::vector<uint8> c_Data;
+   uint8 u8_NrErrorCode = 0U;
+
+   s32_Return = m_ReadDataByIdentifier(mhu16_OSY_DI_MAX_NUMBER_OF_BLOCK_LENGTH, 2U, true, c_Data, u8_NrErrorCode);
+   if (s32_Return == C_NO_ERR)
+   {
+      //extract information:
+      //lint -e{864} //false positive due to const/non-const misinterpretation
+      oru16_MaxNumberOfBlockLength = (static_cast<uint16>((static_cast<uint16>(c_Data[0])) << 8U)) + (c_Data[1]);
+   }
+   if (opu8_NrCode != NULL)
+   {
+      (*opu8_NrCode) = u8_NrErrorCode;
+   }
+
+   m_LogServiceError("ReadDataByIdentifier::ReadMaxNumberOfBlockLength", s32_Return, u8_NrErrorCode);
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadDeviceName service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -923,10 +974,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadHardwareVersionNumber(C_SCLString & orc_Ha
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     11.05.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyReadDeviceName(C_SCLString & orc_DeviceName, stw_types::uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
@@ -954,9 +1003,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDeviceName(C_SCLString & orc_DeviceName, s
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   ReadApplicationName service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadApplicationName service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -973,10 +1021,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDeviceName(C_SCLString & orc_DeviceName, s
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     11.05.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyReadApplicationName(C_SCLString & orc_ApplicationName, uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
@@ -1004,9 +1050,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadApplicationName(C_SCLString & orc_Applicat
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   ReadApplicationName service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadApplicationName service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -1023,10 +1068,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadApplicationName(C_SCLString & orc_Applicat
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     11.05.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyReadApplicationVersion(C_SCLString & orc_ApplicationVersion,
                                                          uint8 * const opu8_NrCode)
 {
@@ -1055,9 +1098,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadApplicationVersion(C_SCLString & orc_Appli
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   ReadBootSoftwareIdentification service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadBootSoftwareIdentification service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -1081,10 +1123,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadApplicationVersion(C_SCLString & orc_Appli
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID, or: number of modules is not 1)
    C_COM      communication driver reported error
-
-   \created     18.05.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyReadBootSoftwareIdentification(uint8 (&orau8_Version)[3], uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
@@ -1115,9 +1155,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadBootSoftwareIdentification(uint8 (&orau8_V
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   ReadActiveDiagnosticSession service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadActiveDiagnosticSession service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -1134,10 +1173,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadBootSoftwareIdentification(uint8 (&orau8_V
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     11.05.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyReadActiveDiagnosticSession(uint8 & oru8_SessionId, uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
@@ -1159,9 +1196,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadActiveDiagnosticSession(uint8 & oru8_Sessi
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   ReadApplicationSoftwareFingerprint service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadApplicationSoftwareFingerprint service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -1180,10 +1216,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadActiveDiagnosticSession(uint8 & oru8_Sessi
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     18.05.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyReadApplicationSoftwareFingerprint(uint8 (&orau8_Date)[3], uint8 (&orau8_Time)[3],
                                                                      C_SCLString & orc_Username,
                                                                      uint8 * const opu8_NrCode)
@@ -1217,9 +1251,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadApplicationSoftwareFingerprint(uint8 (&ora
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   WriteApplicationSoftwareFingerprint service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   WriteApplicationSoftwareFingerprint service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -1238,10 +1271,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadApplicationSoftwareFingerprint(uint8 (&ora
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     18.05.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyWriteApplicationSoftwareFingerprint(const uint8 (&orau8_Date)[3],
                                                                       const uint8 (&orau8_Time)[3],
                                                                       const C_SCLString & orc_UserName,
@@ -1276,9 +1307,8 @@ sint32 C_OSCProtocolDriverOsy::OsyWriteApplicationSoftwareFingerprint(const uint
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   ReadMaxNumOfEventDrivenTransmissions service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadMaxNumOfEventDrivenTransmissions service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -1294,10 +1324,8 @@ sint32 C_OSCProtocolDriverOsy::OsyWriteApplicationSoftwareFingerprint(const uint
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     11.05.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyReadMaxNumOfEventDrivenTransmissions(uint16 & oru16_MaxNum, uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
@@ -1320,9 +1348,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadMaxNumOfEventDrivenTransmissions(uint16 & 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   ReadProtocolVersion service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadProtocolVersion service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -1341,10 +1368,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadMaxNumOfEventDrivenTransmissions(uint16 & 
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     18.05.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyReadProtocolVersion(uint8 (&orau8_Version)[3], uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
@@ -1367,9 +1392,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadProtocolVersion(uint8 (&orau8_Version)[3],
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   ReadFlashloaderProtocolVersion service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadFlashloaderProtocolVersion service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -1388,10 +1412,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadProtocolVersion(uint8 (&orau8_Version)[3],
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     18.05.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyReadFlashloaderProtocolVersion(uint8 (&orau8_Version)[3], uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
@@ -1414,9 +1436,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadFlashloaderProtocolVersion(uint8 (&orau8_V
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   ReadFlashCount service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadFlashCount service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -1432,10 +1453,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadFlashloaderProtocolVersion(uint8 (&orau8_V
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     18.05.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyReadFlashCount(uint32 & oru32_FlashCount, uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
@@ -1461,9 +1480,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadFlashCount(uint32 & oru32_FlashCount, uint
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   ReadProtocolDriverImplementationVersion service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadProtocolDriverImplementationVersion service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -1482,10 +1500,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadFlashCount(uint32 & oru32_FlashCount, uint
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     11.05.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyReadProtocolDriverImplementationVersion(uint8 (&orau8_Version)[3],
                                                                           uint8 * const opu8_NrCode)
 {
@@ -1510,12 +1526,10 @@ sint32 C_OSCProtocolDriverOsy::OsyReadProtocolDriverImplementationVersion(uint8 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Compose 24bit data pool ID
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Compose 24bit data pool ID
 
    Pack data pool, list, element index into 24bit data pool ID.
-
 
    \param[in]  ou8_DataPoolIndex  index of data pool
    \param[in]  ou16_ListIndex     list index
@@ -1525,10 +1539,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadProtocolDriverImplementationVersion(uint8 
    \return
    C_NO_ERR   packed
    C_RANGE    one of the parameters is out of range
-
-   \created     11.05.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::m_PackDataPoolIdentifier(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                                         const uint16 ou16_ElementIndex, uint8(&orau8_PackedId)[3]) const
 {
@@ -1548,21 +1560,17 @@ sint32 C_OSCProtocolDriverOsy::m_PackDataPoolIdentifier(const uint8 ou8_DataPool
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Split 24bit data pool ID
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Split 24bit data pool ID
 
    Unpack data pool, list, element index from 24bit data pool ID.
-
 
    \param[in]  orau8_PackedId      packed ID to be placed into protocol service
    \param[out] oru8_DataPoolIndex  index of data pool
    \param[out] oru16_ListIndex     list index
    \param[out] oru16_ElementIndex  element index
-
-   \created     21.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCProtocolDriverOsy::m_UnpackDataPoolIdentifier(const uint8 (&orau8_PackedId)[3], uint8 & oru8_DataPoolIndex,
                                                         uint16 & oru16_ListIndex, uint16 & oru16_ElementIndex) const
 {
@@ -1575,9 +1583,8 @@ void C_OSCProtocolDriverOsy::m_UnpackDataPoolIdentifier(const uint8 (&orau8_Pack
    oru16_ElementIndex = static_cast<uint16>(u32_PackedId) & 0x7FFU;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   ReadDataPoolDataByIdentifier service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadDataPoolDataByIdentifier service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -1597,10 +1604,8 @@ void C_OSCProtocolDriverOsy::m_UnpackDataPoolIdentifier(const uint8 (&orau8_Pack
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     11.05.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolData(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                                    const uint16 ou16_ElementIndex, std::vector<uint8> & orc_ReadData,
                                                    uint8 * const opu8_NrCode)
@@ -1678,9 +1683,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolData(const uint8 ou8_DataPoolIndex
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   WriteDataPoolDataByIdentifier service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   WriteDataPoolDataByIdentifier service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -1700,10 +1704,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolData(const uint8 ou8_DataPoolIndex
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     18.05.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyWriteDataPoolData(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                                     const uint16 ou16_ElementIndex,
                                                     const std::vector<uint8> & orc_DataToWrite,
@@ -1782,9 +1784,8 @@ sint32 C_OSCProtocolDriverOsy::OsyWriteDataPoolData(const uint8 ou8_DataPoolInde
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   WriteDataPoolEventDataRate service request implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   WriteDataPoolEventDataRate service request implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -1802,10 +1803,8 @@ sint32 C_OSCProtocolDriverOsy::OsyWriteDataPoolData(const uint8 ou8_DataPoolInde
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_RANGE    Transmission rail invalid
    C_COM      communication driver reported error
-
-   \created     24.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyWriteDataPoolEventDataRate(const uint8 ou8_TransmissionRail,
                                                              const uint16 ou16_DataRate, uint8 * const opu8_NrCode)
 {
@@ -1850,9 +1849,8 @@ sint32 C_OSCProtocolDriverOsy::OsyWriteDataPoolEventDataRate(const uint8 ou8_Tra
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   ReadDataPoolDataCyclic service request implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadDataPoolDataCyclic service request implementation
 
    Send request and wait for initial response.
    Further Responses are handled asynchronously in Cycle()
@@ -1871,10 +1869,8 @@ sint32 C_OSCProtocolDriverOsy::OsyWriteDataPoolEventDataRate(const uint8 ou8_Tra
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data pool index)
    C_COM      communication driver reported error
-
-   \created     14.07.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolDataCyclic(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                                          const uint16 ou16_ElementIndex,
                                                          const uint8 ou8_TransmissionRail, uint8 * const opu8_NrCode)
@@ -1959,9 +1955,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolDataCyclic(const uint8 ou8_DataPoo
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   ReadDataPoolDataChangeDriver service request implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadDataPoolDataChangeDriver service request implementation
 
    Send request and wait for initial response.
    Further responses are handled asynchronously in Cycle()
@@ -1981,10 +1976,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolDataCyclic(const uint8 ou8_DataPoo
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data pool index)
    C_COM      communication driver reported error
-
-   \created     20.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolDataChangeDriven(const uint8 ou8_DataPoolIndex,
                                                                const uint16 ou16_ListIndex,
                                                                const uint16 ou16_ElementIndex,
@@ -2078,9 +2071,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolDataChangeDriven(const uint8 ou8_D
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Stop datapool event driven service request implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Stop datapool event driven service request implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -2095,10 +2087,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolDataChangeDriven(const uint8 ou8_D
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data pool index)
    C_COM      communication driver reported error
-
-   \created     26.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyStopDataPoolEvents(uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
@@ -2141,9 +2131,8 @@ sint32 C_OSCProtocolDriverOsy::OsyStopDataPoolEvents(uint8 * const opu8_NrCode)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Read data pool meta data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read data pool meta data
 
    \param[in]  ou8_DataPoolIndex  Data pool index
    \param[out] orc_MetaData       Meta data returned by service
@@ -2157,10 +2146,8 @@ sint32 C_OSCProtocolDriverOsy::OsyStopDataPoolEvents(uint8 * const opu8_NrCode)
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data pool index)
    C_COM      communication driver reported error
-
-   \created     17.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolMetaData(const uint8 ou8_DataPoolIndex, C_DataPoolMetaData & orc_MetaData,
                                                        uint8 * const opu8_NrCode)
 {
@@ -2250,9 +2237,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolMetaData(const uint8 ou8_DataPoolI
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Verify data pool consistency
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Verify data pool consistency
 
    \param[in]  ou8_DataPoolIndex     Data pool index
    \param[in]  ou32_DataPoolChecksum Data pool checksum
@@ -2267,10 +2253,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadDataPoolMetaData(const uint8 ou8_DataPoolI
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data pool index)
    C_COM      communication driver reported error
-
-   \created     17.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyVerifyDataPool(const uint8 ou8_DataPoolIndex, const uint32 ou32_DataPoolChecksum,
                                                  bool & orq_Match, uint8 * const opu8_NrCode)
 {
@@ -2313,9 +2297,8 @@ sint32 C_OSCProtocolDriverOsy::OsyVerifyDataPool(const uint8 ou8_DataPoolIndex, 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Route diagnosis communication activation service request implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Route diagnosis communication activation service request implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -2337,10 +2320,8 @@ sint32 C_OSCProtocolDriverOsy::OsyVerifyDataPool(const uint8 ou8_DataPoolIndex, 
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
    C_RANGE    - input channel type is CAN and output channel type is Ethernet. This combination is not supported.
               - a bus ID is out of range
-
-   \created     26.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsySetRouteDiagnosisCommunication(const uint8 ou8_InputChannelType,
                                                                  const uint8 ou8_InputChannelIndex,
                                                                  const uint8 ou8_OutputChannelType,
@@ -2391,9 +2372,8 @@ sint32 C_OSCProtocolDriverOsy::OsySetRouteDiagnosisCommunication(const uint8 ou8
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Route diagnosis communication deactivation service request implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Route diagnosis communication deactivation service request implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -2408,10 +2388,8 @@ sint32 C_OSCProtocolDriverOsy::OsySetRouteDiagnosisCommunication(const uint8 ou8
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
    C_COM      communication driver reported error
-
-   \created     26.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyStopRouteDiagnosisCommunication(uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
@@ -2432,9 +2410,8 @@ sint32 C_OSCProtocolDriverOsy::OsyStopRouteDiagnosisCommunication(uint8 * const 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Activates the IP to IP routing for a specific node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Activates the IP to IP routing for a specific node
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -2461,10 +2438,8 @@ sint32 C_OSCProtocolDriverOsy::OsyStopRouteDiagnosisCommunication(uint8 * const 
    C_RANGE    - output channel type is not Ethernet. Only Ethernet is supported.
               - a bus ID is out of range
    C_COM      communication driver reported error
-
-   \created     13.06.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsySetRouteIp2IpCommunication(const uint8 ou8_OutputChannelType,
                                                              const uint8 ou8_OutputChannelIndex,
                                                              const uint8 ou8_SourceBusId, const uint8 ou8_TargetBusId,
@@ -2516,9 +2491,8 @@ sint32 C_OSCProtocolDriverOsy::OsySetRouteIp2IpCommunication(const uint8 ou8_Out
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check status of IP to IP routing
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check status of IP to IP routing
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -2541,10 +2515,8 @@ sint32 C_OSCProtocolDriverOsy::OsySetRouteIp2IpCommunication(const uint8 ou8_Out
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     13.06.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyCheckRouteIp2IpCommunication(uint8 & oru8_Status, uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
@@ -2578,9 +2550,8 @@ sint32 C_OSCProtocolDriverOsy::OsyCheckRouteIp2IpCommunication(uint8 & oru8_Stat
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   StartRoutine: SendCanMessage service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   StartRoutine: SendCanMessage service implementation
 
    Send request to send CAN message on target channel.
    Wait for response (i.e. confirmation the message was sent) from server node.
@@ -2600,10 +2571,8 @@ sint32 C_OSCProtocolDriverOsy::OsyCheckRouteIp2IpCommunication(uint8 & oru8_Stat
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     03.07.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsySendCanMessage(const uint8 ou8_ChannelIndex,
                                                  const stw_can::T_STWCAN_Msg_TX & orc_CanMessage,
                                                  uint8 * const opu8_NrCode)
@@ -2662,9 +2631,8 @@ sint32 C_OSCProtocolDriverOsy::OsySendCanMessage(const uint8 ou8_ChannelIndex,
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Tunnel can messages activation service request implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Tunnel can messages activation service request implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -2686,10 +2654,8 @@ sint32 C_OSCProtocolDriverOsy::OsySendCanMessage(const uint8 ou8_ChannelIndex,
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
    C_COM      communication driver reported error
-
-   \created     27.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsySetTunnelCanMessages(const uint8 ou8_CanChannelIndex, const uint32 ou32_FilterId,
                                                        const uint32 ou32_FilterMask, uint8 * const opu8_NrCode)
 {
@@ -2730,9 +2696,8 @@ sint32 C_OSCProtocolDriverOsy::OsySetTunnelCanMessages(const uint8 ou8_CanChanne
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Tunnel can messages deactivation service request implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Tunnel can messages deactivation service request implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -2747,10 +2712,8 @@ sint32 C_OSCProtocolDriverOsy::OsySetTunnelCanMessages(const uint8 ou8_CanChanne
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
    C_COM      communication driver reported error
-
-   \created     27.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyStopTunnelCanMessages(uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
@@ -2774,9 +2737,8 @@ sint32 C_OSCProtocolDriverOsy::OsyStopTunnelCanMessages(uint8 * const opu8_NrCod
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Print logging text
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Print logging text
 
    Add information about this class and the current server-id configuration and call logger
     to perform the actual logging.
@@ -2784,10 +2746,8 @@ sint32 C_OSCProtocolDriverOsy::OsyStopTunnelCanMessages(uint8 * const opu8_NrCod
    \param[in]     orc_Activity        Current activity
    \param[in]     orc_Information     text to log
    \param[in]     opcn_Function       Function name
-
-   \created     17.03.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCProtocolDriverOsy::m_LogErrorWithHeader(const C_SCLString & orc_Activity,
                                                   const stw_scl::C_SCLString & orc_Information,
                                                   const charn * const opcn_Function) const
@@ -2797,9 +2757,8 @@ void C_OSCProtocolDriverOsy::m_LogErrorWithHeader(const C_SCLString & orc_Activi
       C_SCLString::IntToStr(mc_ServerId.u8_NodeIdentifier) + ": " + orc_Information, __FILE__, opcn_Function);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Make transport protocol to use known
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Make transport protocol to use known
 
    Install (or uninstall) transport protocol to use.
    The passed protocol will be remembered for further use and the client and server addresses will be
@@ -2810,10 +2769,8 @@ void C_OSCProtocolDriverOsy::m_LogErrorWithHeader(const C_SCLString & orc_Activi
    \return
    C_NO_ERR   no problems
    C_CONFIG   transport protocol was set, but could not set node identifiers in installed protocol
-
-   \created     15.03.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::SetTransportProtocol(C_OSCProtocolDriverOsyTpBase * const opc_TransportProtocol)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -2831,9 +2788,8 @@ sint32 C_OSCProtocolDriverOsy::SetTransportProtocol(C_OSCProtocolDriverOsyTpBase
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Make client and server identifiers known
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Make client and server identifiers known
 
    Set client and server node identifiers.
    If a transport protocol ist installed the new identifiers will be set there, too.
@@ -2844,10 +2800,8 @@ sint32 C_OSCProtocolDriverOsy::SetTransportProtocol(C_OSCProtocolDriverOsyTpBase
    \return
    C_NO_ERR   no problems
    C_CONFIG   IDs were set, but could not be propagated to the installed transport protocol
-
-   \created     15.03.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::SetNodeIdentifiers(const C_OSCProtocolDriverOsyNode & orc_ClientId,
                                                   const C_OSCProtocolDriverOsyNode & orc_ServerId)
 {
@@ -2869,9 +2823,34 @@ sint32 C_OSCProtocolDriverOsy::SetNodeIdentifiers(const C_OSCProtocolDriverOsyNo
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Perform cyclic communication tasks
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get used transport protocol
+
+   \return
+   Installed transport protocol (NULL -> none installed)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OSCProtocolDriverOsyTpBase * C_OSCProtocolDriverOsy::GetTransportProtocol(void)
+{
+   return mpc_TransportProtocol;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get configured client and server identifiers
+
+   \param[our] orc_ClientId    client ID (= our own ID)
+   \param[our] orc_ServerId    server ID (= ID of server we communicate with)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCProtocolDriverOsy::GetNodeIdentifiers(C_OSCProtocolDriverOsyNode & orc_ClientId,
+                                                C_OSCProtocolDriverOsyNode & orc_ServerId) const
+{
+   orc_ClientId = mc_ClientId;
+   orc_ServerId = mc_ServerId;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Perform cyclic communication tasks
 
    * Get exclusive access to reception handling
    * Invoke transport protocol's "Cycle" function
@@ -2885,10 +2864,8 @@ sint32 C_OSCProtocolDriverOsy::SetNodeIdentifiers(const C_OSCProtocolDriverOsyNo
    \return
    C_NO_ERR   finished cycle
    C_CONFIG   no transport protocol installed
-
-   \created     15.03.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::Cycle(void)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -2910,9 +2887,8 @@ sint32 C_OSCProtocolDriverOsy::Cycle(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle async reception of ReadDataPoolEventDriven response
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle async reception of ReadDataPoolEventDriven response
 
    Default implementation: just log ...
 
@@ -2920,10 +2896,8 @@ sint32 C_OSCProtocolDriverOsy::Cycle(void)
    \param[in] ou16_ListIndex       reported list index
    \param[in] ou16_ElementIndex    reported element index
    \param[in] orc_Value            reported value
-
-   \created     14.07.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCProtocolDriverOsy::m_OsyReadDataPoolDataEventReceived(const uint8 ou8_DataPoolIndex,
                                                                 const uint16 ou16_ListIndex,
                                                                 const uint16 ou16_ElementIndex,
@@ -2938,9 +2912,8 @@ void C_OSCProtocolDriverOsy::m_OsyReadDataPoolDataEventReceived(const uint8 ou8_
                         "). Ignoring.", TGL_UTIL_FUNC_ID);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle async reception of ReadDataPoolEventDriven negative response
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle async reception of ReadDataPoolEventDriven negative response
 
    Default implementation: just log ...
 
@@ -2948,10 +2921,8 @@ void C_OSCProtocolDriverOsy::m_OsyReadDataPoolDataEventReceived(const uint8 ou8_
    \param[in] ou16_ListIndex       reported list index
    \param[in] ou16_ElementIndex    reported element index
    \param[in] ou8_NrCode           reported negative response code
-
-   \created     21.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCProtocolDriverOsy::m_OsyReadDataPoolDataEventErrorReceived(const uint8 ou8_DataPoolIndex,
                                                                      const uint16 ou16_ListIndex,
                                                                      const uint16 ou16_ElementIndex,
@@ -2965,9 +2936,8 @@ void C_OSCProtocolDriverOsy::m_OsyReadDataPoolDataEventErrorReceived(const uint8
                         C_SCLString::IntToHex(ou8_NrCode, 2) + "). Ignoring.", TGL_UTIL_FUNC_ID);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   CheckFlashMemoryAvailable service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   CheckFlashMemoryAvailable service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -2989,10 +2959,8 @@ void C_OSCProtocolDriverOsy::m_OsyReadDataPoolDataEventErrorReceived(const uint8
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     16.05.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyCheckFlashMemoryAvailable(const uint32 ou32_StartAddress, const uint32 ou32_Size,
                                                             uint8 * const opu8_NrCode)
 {
@@ -3029,9 +2997,8 @@ sint32 C_OSCProtocolDriverOsy::OsyCheckFlashMemoryAvailable(const uint32 ou32_St
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   RoutineControl utility wrapper
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   RoutineControl utility wrapper
 
    Send RoutineControl request and wait for response.
    See class description for general handling of "polled" services.
@@ -3054,10 +3021,8 @@ sint32 C_OSCProtocolDriverOsy::OsyCheckFlashMemoryAvailable(const uint32 ou32_St
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     16.05.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::m_RoutineControl(const uint16 ou16_RoutineIdentifier, const uint8 ou8_SubFunction,
                                                 const std::vector<uint8> & orc_SendData,
                                                 const uint16 ou16_ExpectedPayloadSize, const bool oq_ExactSizeExpected,
@@ -3125,9 +3090,8 @@ sint32 C_OSCProtocolDriverOsy::m_RoutineControl(const uint16 ou16_RoutineIdentif
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Security access - Request Seed service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Security access - Request Seed service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -3148,10 +3112,8 @@ sint32 C_OSCProtocolDriverOsy::m_RoutineControl(const uint16 ou16_RoutineIdentif
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     16.05.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsySecurityAccessRequestSeed(const uint8 ou8_SecurityLevel, uint32 & oru32_Seed,
                                                             uint8 * const opu8_NrCode)
 {
@@ -3185,9 +3147,8 @@ sint32 C_OSCProtocolDriverOsy::OsySecurityAccessRequestSeed(const uint8 ou8_Secu
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Security access - Send Key service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Security access - Send Key service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -3208,10 +3169,8 @@ sint32 C_OSCProtocolDriverOsy::OsySecurityAccessRequestSeed(const uint8 ou8_Secu
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     16.05.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsySecurityAccessSendKey(const uint8 ou8_SecurityLevel, const uint32 ou32_Key,
                                                         uint8 * const opu8_NrCode)
 {
@@ -3243,9 +3202,8 @@ sint32 C_OSCProtocolDriverOsy::OsySecurityAccessSendKey(const uint8 ou8_Security
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Security access utility wrapper
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Security access utility wrapper
 
    Send RoutineControl request and wait for response.
    See class description for general handling of "polled" services.
@@ -3268,10 +3226,8 @@ sint32 C_OSCProtocolDriverOsy::OsySecurityAccessSendKey(const uint8 ou8_Security
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     16.05.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::m_SecurityAccess(const uint8 ou8_SubFunction, const std::vector<uint8> & orc_SendData,
                                                 const uint16 ou16_SendPayloadSize,
                                                 const uint16 ou16_ExpectedPayloadSize,
@@ -3341,9 +3297,8 @@ sint32 C_OSCProtocolDriverOsy::m_SecurityAccess(const uint8 ou8_SubFunction, con
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle incoming async response
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle incoming async response
 
    Called on reception of a supposedly async positive or negative response.
 
@@ -3362,10 +3317,8 @@ sint32 C_OSCProtocolDriverOsy::m_SecurityAccess(const uint8 ou8_SubFunction, con
    C_NO_ERR  something we could handle ...
    C_NOACT   this function was not interested
    C_RANGE   Received message is not complete
-
-   \created     14.07.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::m_HandleAsyncResponse(const C_OSCProtocolDriverOsyService & orc_ReceivedService)
 {
    sint32 s32_Return = C_NOACT;
@@ -3430,19 +3383,16 @@ sint32 C_OSCProtocolDriverOsy::m_HandleAsyncResponse(const C_OSCProtocolDriverOs
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle incoming async response of service OsyReadDataPoolDataEvent
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle incoming async response of service OsyReadDataPoolDataEvent
 
    \param[in]  orc_ReceivedService        received service suspected to be an async response
 
    \return
    C_NO_ERR     Async message received successfully
    C_RANGE      Received message is not complete
-
-   \created     21.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::m_HandleAsyncOsyReadDataPoolDataEvent(
    const C_OSCProtocolDriverOsyService & orc_ReceivedService)
 {
@@ -3482,9 +3432,8 @@ sint32 C_OSCProtocolDriverOsy::m_HandleAsyncOsyReadDataPoolDataEvent(
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle incoming async error response of service OsyReadDataPoolDataEvent
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle incoming async error response of service OsyReadDataPoolDataEvent
 
    Check the negative response only if the additional information with the datapool index is
    available.
@@ -3496,10 +3445,8 @@ sint32 C_OSCProtocolDriverOsy::m_HandleAsyncOsyReadDataPoolDataEvent(
    \return
    C_NO_ERR     Async message received successfully
    C_RANGE      Received message is not complete
-
-   \created     21.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::m_HandleAsyncOsyReadDataPoolDataErrorEvent(
    const C_OSCProtocolDriverOsyService & orc_ReceivedService)
 {
@@ -3535,9 +3482,8 @@ sint32 C_OSCProtocolDriverOsy::m_HandleAsyncOsyReadDataPoolDataErrorEvent(
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle incoming async response of service OsyTunnelCanMessagesEvent
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle incoming async response of service OsyTunnelCanMessagesEvent
 
    \param[in]  orc_ReceivedService        received service suspected to be an async response
 
@@ -3545,10 +3491,8 @@ sint32 C_OSCProtocolDriverOsy::m_HandleAsyncOsyReadDataPoolDataErrorEvent(
    C_NO_ERR     Async message received successfully
    C_RANGE      - Received message is not complete
                 - 11 Bit identifier is not valid
-
-   \created     27.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::m_HandleAsyncOsyTunnelCanMessagesEvent(
    const C_OSCProtocolDriverOsyService & orc_ReceivedService)
 {
@@ -3602,16 +3546,13 @@ sint32 C_OSCProtocolDriverOsy::m_HandleAsyncOsyTunnelCanMessagesEvent(
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert variable to necessary bytes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert variable to necessary bytes
 
    \param[in]  ou32_Variable Input variable
    \param[out] orc_Bytes     Necessary bytes
-
-   \created     17.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCProtocolDriverOsy::mh_ConvertVariableToNecessaryBytes(const uint32 ou32_Variable,
                                                                 std::vector<uint8> & orc_Bytes)
 {
@@ -3643,9 +3584,8 @@ void C_OSCProtocolDriverOsy::mh_ConvertVariableToNecessaryBytes(const uint32 ou3
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Request Download service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Request Download service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -3667,10 +3607,8 @@ void C_OSCProtocolDriverOsy::mh_ConvertVariableToNecessaryBytes(const uint32 ou3
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: incorrect response length)
    C_COM      communication driver reported error
-
-   \created     16.05.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyRequestDownload(const uint32 ou32_StartAddress, const uint32 ou32_Size,
                                                   uint32 & oru32_MaxBlockLength, uint8 * const opu8_NrCode)
 {
@@ -3752,9 +3690,8 @@ sint32 C_OSCProtocolDriverOsy::OsyRequestDownload(const uint32 ou32_StartAddress
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Request File Transfer service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Request File Transfer service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -3779,10 +3716,8 @@ sint32 C_OSCProtocolDriverOsy::OsyRequestDownload(const uint32 ou32_StartAddress
    C_RD_WR    unexpected content in response
                (here: incorrect response length, mode of operation, data format)
    C_COM      communication driver reported error
-
-   \created     23.02.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyRequestFileTransfer(const C_SCLString & orc_FilePath, const uint32 ou32_FileSize,
                                                       uint32 & oru32_MaxBlockLength, uint8 * const opu8_NrCode)
 {
@@ -3871,9 +3806,8 @@ sint32 C_OSCProtocolDriverOsy::OsyRequestFileTransfer(const C_SCLString & orc_Fi
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Transfer Data service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Transfer Data service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -3895,10 +3829,8 @@ sint32 C_OSCProtocolDriverOsy::OsyRequestFileTransfer(const C_SCLString & orc_Fi
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     17.05.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyTransferData(const uint8 ou8_BlockSequenceCounter, std::vector<uint8> & orc_Data,
                                                uint8 * const opu8_NrCode)
 {
@@ -3957,9 +3889,8 @@ sint32 C_OSCProtocolDriverOsy::OsyTransferData(const uint8 ou8_BlockSequenceCoun
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Request Transfer Exit service implementation based on address
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Request Transfer Exit service implementation based on address
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -3981,10 +3912,8 @@ sint32 C_OSCProtocolDriverOsy::OsyTransferData(const uint8 ou8_BlockSequenceCoun
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_COM      communication driver reported error
-
-   \created     17.05.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyRequestTransferExitAddressBased(const bool oq_SendSignatureBlockAddress,
                                                                   const uint32 ou32_SignatureBlockAddress,
                                                                   uint8 * const opu8_NrCode)
@@ -4052,9 +3981,8 @@ sint32 C_OSCProtocolDriverOsy::OsyRequestTransferExitAddressBased(const bool oq_
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Request Transfer Exit service implementation based on file system
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Request Transfer Exit service implementation based on file system
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -4072,10 +4000,8 @@ sint32 C_OSCProtocolDriverOsy::OsyRequestTransferExitAddressBased(const bool oq_
    C_CONFIG   no transport protocol installed
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_COM      communication driver reported error
-
-   \created     20.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyRequestTransferExitFileBased(const uint8 (&orau8_Signature)[8],
                                                                uint8 * const opu8_NrCode)
 {
@@ -4137,12 +4063,11 @@ sint32 C_OSCProtocolDriverOsy::OsyRequestTransferExitFileBased(const uint8 (&ora
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Read NVM memory by address
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read NVM memory by address
 
    As the openSYDE protocol can only handle transfers up to 4kB bigger packages are split up into multiple
-    services (each transferring (C_OSCProtocolDriverOsyTpBase::hu16_OSY_MAXIMUM_SERVICE_SIZE - 20) bytes).
+    services (each transferring (C_OSCProtocolDriverOsyTpBase::hu16_OSY_MAXIMUM_SERVICE_SIZE - 10) bytes).
 
    \param[in]     ou32_MemoryAddress NVM memory address to read (first read byte)
    \param[in,out] orc_DataRecord     in: size defines number of bytes to read
@@ -4157,10 +4082,8 @@ sint32 C_OSCProtocolDriverOsy::OsyRequestTransferExitFileBased(const uint8 (&ora
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RANGE    size of orc_DataRecord is zero
    C_COM      expected server response not received because of communication error
-
-   \created     17.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyReadMemoryByAddress(const uint32 ou32_MemoryAddress,
                                                       std::vector<uint8> & orc_DataRecord, uint8 * const opu8_NrCode)
 {
@@ -4173,8 +4096,12 @@ sint32 C_OSCProtocolDriverOsy::OsyReadMemoryByAddress(const uint32 ou32_MemoryAd
    }
    else
    {
-      //allow a few bytes for protocol overhead
-      const uint32 u32_BlockSize = (C_OSCProtocolDriverOsyTpBase::hu16_OSY_MAXIMUM_SERVICE_SIZE - 20U);
+      //worst case protocol overhead:
+      //1 byte service ID
+      //1 byte FormatIdentifier
+      //4 bytes address
+      //4 bytes size
+      const uint32 u32_BlockSize = (C_OSCProtocolDriverOsyTpBase::hu16_OSY_MAXIMUM_SERVICE_SIZE - 10U);
 
       //split up into smaller blocks:
       for (uint32 u32_ReadIndex = 0U; u32_ReadIndex < orc_DataRecord.size(); u32_ReadIndex += u32_BlockSize)
@@ -4253,16 +4180,18 @@ sint32 C_OSCProtocolDriverOsy::OsyReadMemoryByAddress(const uint32 ou32_MemoryAd
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Write NVM memory by address
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Write NVM memory by address
 
-   As the openSYDE protocol can only handle transfers up to 4kB bigger packages are split up into multiple
-    services (each transferring (C_OSCProtocolDriverOsyTpBase::hu16_OSY_MAXIMUM_SERVICE_SIZE - 20) bytes).
+   The maximum size of transfers the openSYDE protocol can handle in one package is 4kB.
+   This can be further limited by the server's capabilities.
+   A client can check for this limit using OsyReadMaxNumberOfBlockLength().
 
-   \param[in]  ou32_MemoryAddress NVM memory address to write to (first written byte)
-   \param[in]  orc_DataRecord     Data bytes to write
-   \param[out] opu8_NrCode        if != NULL: negative response code in case of an error response
+   This function uses "mu16_MaxServiceSize" to split the individual write services into suitable chunks.
+
+   \param[in]  ou32_MemoryAddress   NVM memory address to write to (first written byte)
+   \param[in]  orc_DataRecord       Data bytes to write
+   \param[out] opu8_NrCode          if != NULL: negative response code in case of an error response
 
    \return
    C_NO_ERR   request sent, positive response received
@@ -4273,10 +4202,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadMemoryByAddress(const uint32 ou32_MemoryAd
    C_RD_WR    unexpected content in response (here: unexpected length or address)
    C_RANGE    orc_DataRecord empty
    C_COM      expected server response not received because of communication error
-
-   \created     17.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyWriteMemoryByAddress(const uint32 ou32_MemoryAddress,
                                                        const std::vector<uint8> & orc_DataRecord,
                                                        uint8 * const opu8_NrCode)
@@ -4290,8 +4217,12 @@ sint32 C_OSCProtocolDriverOsy::OsyWriteMemoryByAddress(const uint32 ou32_MemoryA
    }
    else
    {
-      //allow a few bytes for protocol overhead
-      const uint32 u32_BlockSize = (C_OSCProtocolDriverOsyTpBase::hu16_OSY_MAXIMUM_SERVICE_SIZE - 20);
+      //worst case protocol overhead:
+      //1 byte service ID
+      //1 byte FormatIdentifier
+      //4 bytes address
+      //4 bytes size
+      const uint32 u32_BlockSize = static_cast<uint32>(mu16_MaxServiceSize) - 10U;
 
       //split up into smaller blocks:
       for (uint32 u32_WriteIndex = 0U; u32_WriteIndex < orc_DataRecord.size(); u32_WriteIndex += u32_BlockSize)
@@ -4384,9 +4315,8 @@ sint32 C_OSCProtocolDriverOsy::OsyWriteMemoryByAddress(const uint32 ou32_MemoryA
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Notify server of changes in NVM
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Notify server of changes in NVM
 
    \param[in]  ou8_DataPoolIndex           Data pool index
    \param[in]  ou8_ListIndex               List index
@@ -4402,10 +4332,8 @@ sint32 C_OSCProtocolDriverOsy::OsyWriteMemoryByAddress(const uint32 ou32_MemoryA
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data pool or list index)
    C_COM      communication driver reported error
-
-   \created     17.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyNotifyNvmDataChanges(const uint8 ou8_DataPoolIndex, const uint8 ou8_ListIndex,
                                                        bool & orq_ApplicationAcknowledge, uint8 * const opu8_NrCode)
 {
@@ -4445,9 +4373,8 @@ sint32 C_OSCProtocolDriverOsy::OsyNotifyNvmDataChanges(const uint8 ou8_DataPoolI
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Tester Present service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Tester Present service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -4455,7 +4382,6 @@ sint32 C_OSCProtocolDriverOsy::OsyNotifyNvmDataChanges(const uint8 ou8_DataPoolI
    Send the tester present service to indicate to the server that the client is still active.
    Sub-function byte is always zero.
    Usually the suppressPosRspMsgIndicationBit may be set to avoid flooding the bus with response messages.
-
 
    \param[in]  ou8_SuppressResponseMsg    0: server shall send a response message
                                           1: server shall send no response message
@@ -4469,10 +4395,8 @@ sint32 C_OSCProtocolDriverOsy::OsyNotifyNvmDataChanges(const uint8 ou8_DataPoolI
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     19.05.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyTesterPresent(const uint8 ou8_SuppressResponseMsg, uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
@@ -4541,9 +4465,8 @@ sint32 C_OSCProtocolDriverOsy::OsyTesterPresent(const uint8 ou8_SuppressResponse
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   ECU Reset service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ECU Reset service implementation
 
    Send request.
    See class description for general handling of "polled" services.
@@ -4562,10 +4485,8 @@ sint32 C_OSCProtocolDriverOsy::OsyTesterPresent(const uint8 ou8_SuppressResponse
    C_NO_ERR   request sent
    C_NOACT    could not put request in TX queue ...
    C_CONFIG   no transport protocol installed
-
-   \created     19.05.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyEcuReset(const uint8 ou8_ResetType)
 {
    sint32 s32_Return;
@@ -4600,9 +4521,8 @@ sint32 C_OSCProtocolDriverOsy::OsyEcuReset(const uint8 ou8_ResetType)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   SetNodeIdForChannel service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   SetNodeIdForChannel service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -4626,10 +4546,8 @@ sint32 C_OSCProtocolDriverOsy::OsyEcuReset(const uint8 ou8_ResetType)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_RANGE    BusId or NodeId out of range
    C_COM      communication driver reported error
-
-   \created     01.06.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsySetNodeIdForChannel(const uint8 ou8_ChannelType, const uint8 ou8_ChannelIndex,
                                                       const C_OSCProtocolDriverOsyNode & orc_NewNodeId,
                                                       uint8 * const opu8_NrCode)
@@ -4669,9 +4587,8 @@ sint32 C_OSCProtocolDriverOsy::OsySetNodeIdForChannel(const uint8 ou8_ChannelTyp
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   SetBitrate service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   SetBitrate service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -4694,10 +4611,8 @@ sint32 C_OSCProtocolDriverOsy::OsySetNodeIdForChannel(const uint8 ou8_ChannelTyp
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     01.06.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsySetBitrate(const uint8 ou8_ChannelType, const uint8 ou8_ChannelIndex,
                                              const uint32 ou32_Bitrate, uint8 * const opu8_NrCode)
 {
@@ -4731,9 +4646,8 @@ sint32 C_OSCProtocolDriverOsy::OsySetBitrate(const uint8 ou8_ChannelType, const 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   ReadFlashBlockData service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   ReadFlashBlockData service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -4771,10 +4685,8 @@ sint32 C_OSCProtocolDriverOsy::OsySetBitrate(const uint8 ou8_ChannelType, const 
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     01.06.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyReadFlashBlockData(const uint8 ou8_FlashBlock, C_FlashBlockInfo & orc_BlockInfo,
                                                      uint8 * const opu8_NrCode)
 {
@@ -4873,9 +4785,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadFlashBlockData(const uint8 ou8_FlashBlock,
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Request programming service implementation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Request programming service implementation
 
    Send request and wait for response.
    See class description for general handling of "polled" services.
@@ -4892,10 +4803,8 @@ sint32 C_OSCProtocolDriverOsy::OsyReadFlashBlockData(const uint8 ou8_FlashBlock,
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     02.06.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyRequestProgramming(uint8 * const opu8_NrCode)
 {
    sint32 s32_Return;
@@ -4918,9 +4827,8 @@ sint32 C_OSCProtocolDriverOsy::OsyRequestProgramming(uint8 * const opu8_NrCode)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   This service is for activating/deactivating a CAN/Ethernet channel for flashloader communication use
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   This service is for activating/deactivating a CAN/Ethernet channel for flashloader communication use
 
    \param[in]  ou8_ChannelType  selected channel type (0 equals CAN, 1 equals Ethernet)
    \param[in]  ou8_ChannelIndex selected channel index
@@ -4935,10 +4843,8 @@ sint32 C_OSCProtocolDriverOsy::OsyRequestProgramming(uint8 * const opu8_NrCode)
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
    C_COM      communication driver reported error
-
-   \created     17.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsyConfigureFlashloaderCommunicationChannel(const uint8 ou8_ChannelType,
                                                                            const uint8 ou8_ChannelIndex,
                                                                            const bool oq_Activated,
@@ -4979,9 +4885,8 @@ sint32 C_OSCProtocolDriverOsy::OsyConfigureFlashloaderCommunicationChannel(const
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set the ip address for the referenced channel to the given value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set the ip address for the referenced channel to the given value
 
    \param[in]  ou8_ChannelType       selected channel type (0 equals CAN, 1 equals Ethernet)
    \param[in]  ou8_ChannelIndex      selected channel index
@@ -4998,10 +4903,8 @@ sint32 C_OSCProtocolDriverOsy::OsyConfigureFlashloaderCommunicationChannel(const
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
    C_COM      communication driver reported error
-
-   \created     17.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsy::OsySetIpAddressForChannel(const uint8 ou8_ChannelType, const uint8 ou8_ChannelIndex,
                                                          const uint8 (&orau8_IpAddress)[4],
                                                          const uint8 (&orau8_NetMask)[4],
@@ -5051,40 +4954,31 @@ sint32 C_OSCProtocolDriverOsy::OsySetIpAddressForChannel(const uint8 ou8_Channel
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set up class
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set up class
 
    Initializes class elements
-
-   \created     01.06.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCProtocolDriverOsy::C_FlashBlockInfo::C_FlashBlockInfo(void)
 {
    this->ClearContent();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Tear down class
-
-  \created     01.06.2017  STW/U.Roesch
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Tear down class
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCProtocolDriverOsy::C_FlashBlockInfo::~C_FlashBlockInfo(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize members
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize members
 
    Set defined default values for class members
-
-   \created     11.08.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCProtocolDriverOsy::C_FlashBlockInfo::ClearContent(void)
 {
    u32_BlockStartAddress = 0U;
@@ -5097,15 +4991,12 @@ void C_OSCProtocolDriverOsy::C_FlashBlockInfo::ClearContent(void)
    c_AdditionalInformation = "";
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set up class
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set up class
 
    Initializes class elements
-
-   \created     18.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCProtocolDriverOsy::C_DataPoolMetaData::C_DataPoolMetaData(void) :
    c_Name("")
 {
@@ -5114,19 +5005,16 @@ C_OSCProtocolDriverOsy::C_DataPoolMetaData::C_DataPoolMetaData(void) :
    this->au8_Version[2] = 0;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility: create textual representation of openSYDE protocol service result
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility: create textual representation of openSYDE protocol service result
 
    \param[in]  os32_FunctionResult   error result as returned by openSYDE protocol driver service function
    \param[in]  ou8_NrCode            negative response code received
 
    \return
    string representation
-
-   \created     19.12.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(const sint32 os32_FunctionResult,
                                                                      const uint8 ou8_NrCode)
 {

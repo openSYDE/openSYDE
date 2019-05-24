@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for selecting nodes (implementation)
 
    detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.03.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <vector>
@@ -35,36 +28,33 @@
 #include "C_SdUtil.h"
 #include "C_CieUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_parent Optional pointer to parent
-
-   \created     24.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueNodeSelectorWidget::C_SdBueNodeSelectorWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueNodeSelectorWidget),
@@ -75,27 +65,21 @@ C_SdBueNodeSelectorWidget::C_SdBueNodeSelectorWidget(QWidget * const opc_Parent)
    this->InitStaticNames();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     29.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueNodeSelectorWidget::~C_SdBueNodeSelectorWidget()
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initializes all visible strings on the widget
-
-   \created     07.07.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initializes all visible strings on the widget
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_BueNodeSelectorTitleLabel->setText(C_GtGetText::h_GetText("Active Protocol Nodes"));
@@ -113,15 +97,12 @@ void C_SdBueNodeSelectorWidget::InitStaticNames(void) const
                                                                         " on this node."));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the bus id to load all connected nodes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the bus id to load all connected nodes
 
    \param[in]     ou32_BusIndex     Bus id
-
-   \created     31.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorWidget::SetBusId(const stw_types::uint32 ou32_BusIndex)
 {
    std::vector<uint32> c_NodeIndexes;
@@ -155,15 +136,12 @@ void C_SdBueNodeSelectorWidget::SetBusId(const stw_types::uint32 ou32_BusIndex)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the actual protocol to mark the protocol using nodes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the actual protocol to mark the protocol using nodes
 
    \param[in]     oe_Protocol     Protocol id
-
-   \created     03.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorWidget::SetProtocol(const C_OSCCanProtocol::E_Type oe_Protocol)
 {
    uint32 u32_NodeCounter;
@@ -227,19 +205,16 @@ void C_SdBueNodeSelectorWidget::SetProtocol(const C_OSCCanProtocol::E_Type oe_Pr
            this, &C_SdBueNodeSelectorWidget::m_NodeComImport);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates in case of changed the items
-
-   \created     09.05.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates in case of changed the items
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorWidget::Refresh(void)
 {
    this->mpc_Ui->pc_NodeSelectorListWidget->Refresh();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorWidget::m_NodeToggled(const uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
                                               const bool oq_Checked) const
 {
@@ -281,7 +256,7 @@ void C_SdBueNodeSelectorWidget::m_NodeToggled(const uint32 ou32_NodeIndex, const
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorWidget::m_NodeComImport(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex)
 {
    sint32 s32_Return = C_NO_ERR;

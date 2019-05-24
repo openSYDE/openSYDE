@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for system definition update
 
    detailed description
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     11.07.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -25,10 +18,9 @@
 #include "C_SdNdeDataPoolEditWidget.h"
 #include "ui_C_SdNdeDataPoolEditWidget.h"
 #include "C_HeHandler.h"
-#include "C_SdNdeDataPoolListHeaderWidget.h"
 #include "C_PuiSdHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
@@ -36,29 +28,26 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     11.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolEditWidget::C_SdNdeDataPoolEditWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDataPoolEditWidget),
@@ -109,29 +98,23 @@ C_SdNdeDataPoolEditWidget::C_SdNdeDataPoolEditWidget(QWidget * const opc_Parent)
            &C_SdNdeDataPoolEditWidget::SigSaveAs);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     11.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolEditWidget::~C_SdNdeDataPoolEditWidget()
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set new node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new node
 
    \param[in] oru32_NodeIndex Node index
-
-   \created     27.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolEditWidget::SetNode(const uint32 & oru32_NodeIndex)
 {
    //Reset visibility
@@ -141,29 +124,23 @@ void C_SdNdeDataPoolEditWidget::SetNode(const uint32 & oru32_NodeIndex)
    this->mpc_Ui->pc_WidgetDpView->SetNode(oru32_NodeIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger check of data pool interaction availability
-
-   \created     04.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger check of data pool interaction availability
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolEditWidget::CheckDataPoolInteraction(void) const
 {
    this->mpc_Ui->pc_WidgetDpView->CheckDataPoolInteraction();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function to open a concrete datapool, datapool list or dataelement
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function to open a concrete datapool, datapool list or dataelement
 
    \param[in] os32_DataPoolIndex      Datapool index
    \param[in] os32_ListIndex          Optional list index (if not used set to -1)
    \param[in] os32_DataElementIndex   Optional data element index (if not used set to -1)
-
-   \created     16.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolEditWidget::OpenDetail(const sint32 os32_DataPoolIndex, const sint32 os32_ListIndex,
                                            const sint32 os32_DataElementIndex) const
 {
@@ -182,27 +159,21 @@ void C_SdNdeDataPoolEditWidget::OpenDetail(const sint32 os32_DataPoolIndex, cons
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update communication lists
-
-   \created     12.01.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update communication lists
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolEditWidget::UpdateComLists(void) const
 {
    this->mpc_Ui->pc_ComListsWidget->Update();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Change of actual selected datapool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Change of actual selected datapool
 
    \param[in] ou32_DataPoolIndex Index of selected datapool
-
-   \created     22.02.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolEditWidget::m_DataPoolSelected(const uint32 ou32_DataPoolIndex) const
 {
    C_OSCNodeDataPool::E_Type e_Type;
@@ -224,42 +195,33 @@ void C_SdNdeDataPoolEditWidget::m_DataPoolSelected(const uint32 ou32_DataPoolInd
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle error change
-
-   \created     27.02.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle error change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolEditWidget::m_OnErrorChange(const bool & orq_Error) const
 {
    this->mpc_Ui->pc_WidgetDpView->SetActualDataPoolConflict(orq_Error);
-   Q_EMIT SigErrorChange();
+   Q_EMIT this->SigErrorChange();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle size change
-
-   \created     27.02.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle size change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolEditWidget::m_OnSizeChange(void) const
 {
    this->mpc_Ui->pc_WidgetDpView->UpdateActualDataPool();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Forward signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Forward signal
 
    \param[in] oru32_BusIndex Bus index
    \param[in] orc_BusName  Bus name
-
-   \created     23.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolEditWidget::m_OnSwitchToBus(const uint32 & oru32_BusIndex, const QString & orc_BusName)
 {
-   Q_EMIT this->SigSwitchToBus(oru32_BusIndex, orc_BusName);
+   Q_EMIT (this->SigSwitchToBus(oru32_BusIndex, orc_BusName));
 }

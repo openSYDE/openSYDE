@@ -1,7 +1,7 @@
 /* --------------------------------------------------------------------- */
 stw_opensyde_gui_elements--C_OgeFrame
 {
-border-width: 2px;
+border-width: 1px;
 border-style: solid;
 }
 

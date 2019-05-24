@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for system definition user
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     11.07.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QApplication>
@@ -43,7 +36,7 @@
 #include "C_RtfExportWidget.h"
 #include "C_PopUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_opensyde_core;
@@ -51,33 +44,30 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const uint32 C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_APPLY = 0U;
 const uint32 C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_GENERATE_CODE = 1U;
 const uint32 C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_EXPORT = 2U;
 const uint32 C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_RTF_EXPORT = 3U;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_parent Optional pointer to parent
-
-   \created     11.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdHandlerWidget::C_SdHandlerWidget(QWidget * const opc_Parent) :
    C_NagUseCaseWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdHandlerWidget),
@@ -157,15 +147,12 @@ C_SdHandlerWidget::C_SdHandlerWidget(QWidget * const opc_Parent) :
    this->mc_VecUserInputFuncNames.append(c_ButtonProperties);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     11.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdHandlerWidget::~C_SdHandlerWidget()
 {
    C_UsHandler::h_GetInstance()->SetProjLastSysDefTabIndex(this->msn_NodeEditTabIndex, this->msn_BusEditTabIndex);
@@ -174,13 +161,10 @@ C_SdHandlerWidget::~C_SdHandlerWidget()
    //lint -e{1579,1740}  no memory leak because of the parent all elements and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function to set the parent of the widget
-
-   \created     13.10.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function to set the parent of the widget
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdHandlerWidget::SetParentHook(QWidget * const opc_Parent)
 {
    if (this->mpc_Topology != NULL)
@@ -191,17 +175,14 @@ void C_SdHandlerWidget::SetParentHook(QWidget * const opc_Parent)
    C_NagUseCaseWidget::SetParentHook(opc_Parent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function for toolbar
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function for toolbar
 
    Saves the project.
 
    \param[in]  ou32_FuncNumber   Number of function
-
-   \created     12.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdHandlerWidget::UserInputFunc(const uint32 ou32_FuncNumber)
 {
    switch (ou32_FuncNumber)
@@ -210,12 +191,18 @@ void C_SdHandlerWidget::UserInputFunc(const uint32 ou32_FuncNumber)
       this->Save();
       break;
    case mhu32_USER_INPUT_FUNC_GENERATE_CODE:
+      //Trigger CRC update
+      if (this->mpc_Topology != NULL)
+      {
+         this->mpc_Topology->SaveToData();
+      }
       this->GenerateCode();
       break;
    case mhu32_USER_INPUT_FUNC_EXPORT:
       this->Export();
       break;
    case mhu32_USER_INPUT_FUNC_RTF_EXPORT:
+      //Trigger CRC update
       if (this->mpc_Topology != NULL)
       {
          this->mpc_Topology->SaveToData();
@@ -227,15 +214,12 @@ void C_SdHandlerWidget::UserInputFunc(const uint32 ou32_FuncNumber)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function to save data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function to save data
 
    Saves the system definition
-
-   \created     08.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdHandlerWidget::Save(void)
 {
    QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -253,37 +237,37 @@ void C_SdHandlerWidget::Save(void)
    {
       this->mpc_Topology->SaveToData();
    }
-   //Check if valid save
-   if (C_PuiProject::h_GetInstance()->IsEmptyProject() == true)
+   if (C_PopUtil::h_CheckCriticalNamingConflict(this, true) == false)
    {
-      // open project save
-      this->SaveAs();
-   }
-   else
-   {
-      //Save to file
-      C_PopErrorHandling::mh_ProjectSaveErr(C_PuiProject::h_GetInstance()->Save(), this);
+      //Check if valid save
+      if (C_PuiProject::h_GetInstance()->IsEmptyProject() == true)
+      {
+         // open project save
+         this->SaveAs();
+      }
+      else
+      {
+         //Save to file
+         C_PopErrorHandling::mh_ProjectSaveErr(C_PuiProject::h_GetInstance()->Save(), this);
 
-      Q_EMIT this->SigDataChanged(false, true, ms32_MODE_SYSDEF);
+         Q_EMIT this->SigDataChanged(false, true, ms32_MODE_SYSDEF);
 
-      this->mq_DataChanged = false;
+         this->mq_DataChanged = false;
+      }
    }
    QApplication::restoreOverrideCursor();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function to open a concrete datapool, datapool list or dataelement
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function to open a concrete datapool, datapool list or dataelement
 
    \param[in] os32_Index            First index
    \param[in] os32_SubIndex         Second index
    \param[in] os32_SubSubIndex      Third index
    \param[in] os32_SubSubSubIndex   Fourth index
    \param[in] os32_Flag             Optional flag for further information
-
-   \created     16.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdHandlerWidget::OpenDetail(const sint32 os32_Index, const sint32 os32_SubIndex, const sint32 os32_SubSubIndex,
                                    const sint32 os32_SubSubSubIndex, const sint32 os32_Flag)
 {
@@ -303,19 +287,16 @@ void C_SdHandlerWidget::OpenDetail(const sint32 os32_Index, const sint32 os32_Su
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function to prepare closing the widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function to prepare closing the widget
 
    Updating of the system definition without saving it into the files
 
    \return
    true     Preparation successful. Can be closed.
    false    Preparation not finished. Can not be closed.
-
-   \created     22.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdHandlerWidget::PrepareToClose(void)
 {
    // save all changes of the active edit widgets to the core
@@ -339,9 +320,8 @@ bool C_SdHandlerWidget::PrepareToClose(void)
    return true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the actual mode of the system definition handler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the actual mode of the system definition handler
 
    Do not call this function internally. Use the signal SigChangeMode to
    inform the entire application about the change.
@@ -349,10 +329,8 @@ bool C_SdHandlerWidget::PrepareToClose(void)
    \param[in]     os32_SubMode     Actual sub mode
    \param[in]     ou32_Index       Index for node or bus
    \param[in]     ou32_Flag        Flag for special functionality
-
-   \created     28.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_Index, const uint32 ou32_Flag)
 {
    const QIcon c_IconSave(":images/IconSave.svg");
@@ -439,6 +417,12 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
       Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_EXPORT, false));
       Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_RTF_EXPORT, false));
 
+      //Set indices as soon as possible (after clean up) to have additional checks directly compare with the current
+      // indices to avoid calling the system definition change more than once on rapid use-case change calls
+      // from this point onward the indices may only be used for the new use-case
+      this->ms32_SubMode = os32_SubMode;
+      this->mu32_Index = ou32_Index;
+
       if (os32_SubMode == ms32_SUBMODE_SYSDEF_TOPOLOGY)
       {
          if (this->mpc_Topology != NULL)
@@ -518,27 +502,21 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
       {
          // not good at all...
       }
-
-      this->ms32_SubMode = os32_SubMode;
-      this->mu32_Index = ou32_Index;
    }
 
    this->m_SetFlag(ou32_Flag);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle for global key press event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle for global key press event
 
    \param[in,out] opc_Event Event identification and information
 
    \return
    True  Handled
    False Not handled
-
-   \created     27.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdHandlerWidget::GlobalUserKeyPress(QKeyEvent * const opc_Event)
 {
    if ((opc_Event->key() == static_cast<sintn>(Qt::Key_S)) &&
@@ -564,7 +542,7 @@ bool C_SdHandlerWidget::GlobalUserKeyPress(QKeyEvent * const opc_Event)
    return false;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdHandlerWidget::m_DataChanged(void)
 {
    this->mq_DataChanged = true;
@@ -572,7 +550,7 @@ void C_SdHandlerWidget::m_DataChanged(void)
    Q_EMIT this->SigDataChanged(true, false, ms32_MODE_SYSDEF, this->ms32_SubMode, this->mu32_Index);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdHandlerWidget::m_NodeChanged(const uint32 ou32_Index)
 {
    this->mq_DataChanged = true;
@@ -580,7 +558,7 @@ void C_SdHandlerWidget::m_NodeChanged(const uint32 ou32_Index)
    Q_EMIT this->SigDataChanged(true, false, ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_NODEEDIT, ou32_Index);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdHandlerWidget::m_BusChanged(const uint32 ou32_Index)
 {
    this->mq_DataChanged = true;
@@ -588,23 +566,20 @@ void C_SdHandlerWidget::m_BusChanged(const uint32 ou32_Index)
    Q_EMIT this->SigDataChanged(true, false, ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_BUSEDIT, ou32_Index);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Switch to bus edit widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Switch to bus edit widget
 
    \param[in] ou32_Index   Bus index
    \param[in] orc_BusName  Bus name
-
-   \created     24.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdHandlerWidget::m_SwitchToBus(const uint32 ou32_Index, const QString & orc_BusName)
 {
    Q_EMIT this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_BUSEDIT, ou32_Index, orc_BusName, "",
                               mu32_FLAG_OPEN_SYSDEF_BUS_COMIFDESCR);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdHandlerWidget::m_SetFlag(const uint32 ou32_Flag) const
 {
    if (ou32_Flag != mu32_FLAG_DEFAULT)
@@ -624,27 +599,22 @@ void C_SdHandlerWidget::m_SetFlag(const uint32 ou32_Flag) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle error change
-
-   \created     31.07.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle error change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdHandlerWidget::m_ErrorChange(void)
 {
    Q_EMIT this->SigErrorChanged(this->mu32_Index);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle generate code action
-
-   \created     03.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle generate code action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdHandlerWidget::GenerateCode(void) const
 {
+   //Check for changes
    if (C_ImpUtil::h_CheckProjForCodeGeneration(this->parentWidget()) == true)
    {
       if (this->ms32_SubMode == ms32_SUBMODE_SYSDEF_TOPOLOGY)
@@ -667,13 +637,10 @@ void C_SdHandlerWidget::GenerateCode(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Call for (DBC file) export functionality.
-
-   \created     16.05.2018  STW/D.Pohl
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Call for (DBC file) export functionality.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdHandlerWidget::Export(void)
 {
    uint32 u32_NumOfInputNodes = 0;
@@ -811,13 +778,10 @@ void C_SdHandlerWidget::Export(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Call for (RTF file) documentation functionality.
-
-   \created     22.06.2018  STW/D.Pohl
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Call for (RTF file) documentation functionality.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdHandlerWidget::RtfExport(void)
 {
    // check for unsaved data and start the export dialog later (only saved items are exported to RTF file)
@@ -855,10 +819,7 @@ void C_SdHandlerWidget::RtfExport(void)
          if (c_RtfPath == "")
          {
             // get default file name with project path (if using the RTF dialog the first time)
-
-            QFileInfo c_FileTmp; // get project name by project file path
-            c_FileTmp.setFile(C_PuiProject::h_GetInstance()->GetPath());
-            QString c_DefaultFilename = c_FileTmp.baseName().toStdString().c_str();
+            QString c_DefaultFilename = C_PuiProject::h_GetInstance()->GetName();
             c_DefaultFilename += ".rtf";
 
             QString c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath(); // get project path
@@ -941,13 +902,10 @@ void C_SdHandlerWidget::RtfExport(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Call specific help pages
-
-   \created     30.10.2018  STW/S.Singer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Call specific help pages
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdHandlerWidget::CallHelp(void)
 {
    if (this->mpc_ActNodeEdit != NULL)

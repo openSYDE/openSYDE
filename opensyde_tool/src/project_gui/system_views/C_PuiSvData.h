@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       System view data element (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.06.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_PUISVDATA_H
 #define C_PUISVDATA_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 #include <QMap>
 #include <QString>
@@ -26,12 +20,12 @@
 #include "C_PuiSvNodeUpdate.h"
 #include "C_PuiSvReadDataConfiguration.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_PuiSvData
 {
@@ -56,6 +50,20 @@ public:
    const C_PuiSvNodeUpdate * GetNodeUpdateInformation(const stw_types::uint32 ou32_NodeIndex) const;
    stw_types::sint32 SetNodeUpdateInformation(const stw_types::uint32 ou32_NodeIndex,
                                               const C_PuiSvNodeUpdate & orc_NodeUpdateInformation);
+   stw_types::sint32 SetNodeUpdateInformationPath(const stw_types::uint32 ou32_NodeIndex,
+                                                  const stw_types::uint32 ou32_Index, const QString & orc_Value,
+                                                  const C_PuiSvNodeUpdate::E_GenericFileType oe_Type);
+   stw_types::sint32 SetNodeUpdateInformationParamInfo(const stw_types::uint32 ou32_NodeIndex,
+                                                       const stw_types::uint32 ou32_Index,
+                                                       const C_PuiSvNodeUpdateParamInfo & orc_Value);
+   stw_types::sint32 SetNodeUpdateInformationParamInfoContent(const stw_types::uint32 ou32_NodeIndex,
+                                                              const stw_types::uint32 ou32_Index,
+                                                              const QString & orc_FilePath,
+                                                              const stw_types::uint32 ou32_LastKnownCrc);
+   stw_types::sint32 AddNodeUpdateInformationPath(const stw_types::uint32 ou32_NodeIndex, const QString & orc_Value,
+                                                  const C_PuiSvNodeUpdate::E_GenericFileType oe_Type);
+   stw_types::sint32 AddNodeUpdateInformationParamInfo(const stw_types::uint32 ou32_NodeIndex,
+                                                       const C_PuiSvNodeUpdateParamInfo & orc_Value);
    const QString & GetName(void) const;
    void SetName(const QString & orc_Value);
    const std::vector<C_PuiSvDashboard> & GetDashboards(void) const;
@@ -213,6 +221,14 @@ public:
 
    //Delete
    stw_types::sint32 RemoveReadRailItem(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id);
+   stw_types::sint32 RemoveNodeUpdateInformationPath(const stw_types::uint32 ou32_NodeIndex,
+                                                     const stw_types::uint32 ou32_Index,
+                                                     const C_PuiSvNodeUpdate::E_GenericFileType oe_Type);
+   stw_types::sint32 RemoveNodeUpdateInformationParamInfo(const stw_types::uint32 ou32_NodeIndex,
+                                                          const stw_types::uint32 ou32_Index);
+   stw_types::sint32 ClearNodeUpdateInformationAsAppropriate(const stw_types::uint32 ou32_NodeIndex,
+                                                             const C_PuiSvNodeUpdate::E_GenericFileType oe_Type);
+   stw_types::sint32 ClearNodeUpdateInformationParamPaths(const stw_types::uint32 ou32_NodeIndex);
    stw_types::sint32 DeleteDashboard(const stw_types::uint32 ou32_DashboardIndex);
    stw_types::sint32 DeleteDashboardWidget(const stw_types::uint32 ou32_DashboardIndex,
                                            const stw_types::uint32 ou32_WidgetIndex,
@@ -240,16 +256,19 @@ public:
    stw_types::uint32 CountCyclicTransmissions(const stw_types::uint32 ou32_NodeIndex) const;
    bool CheckNvmParamListUsage(const stw_opensyde_core::C_OSCNodeDataPoolListId & orc_Id) const;
 
-private:
-   QString mc_Name;                                  ///< System view name
-   C_PuiSvPc mc_PcData;                              ///< Data for PC element
+protected:
+   //Protected access for tests
    std::vector<stw_types::uint8> mc_NodeActiveFlags; ///< Vector of usage flags.
    ///< Equal to system definition nodes count.
    ///< True: Node used in system view
    ///< False: Node not used in system view
-   std::vector<C_PuiSvNodeUpdate> mc_NodeUpdateInformation; ///< Vector of node update informations.
-   ///< Equal to system definition nodes count.
    std::vector<C_PuiSvDashboard> mc_Dashboards; ///< Dashboard data
+
+private:
+   QString mc_Name;                                         ///< System view name
+   C_PuiSvPc mc_PcData;                                     ///< Data for PC element
+   std::vector<C_PuiSvNodeUpdate> mc_NodeUpdateInformation; ///< Vector of node update information.
+   ///< Equal to system definition nodes count.
    stw_types::uint16 mu16_UpdateRateFast;
    stw_types::uint16 mu16_UpdateRateMedium;
    stw_types::uint16 mu16_UpdateRateSlow;
@@ -264,7 +283,7 @@ private:
    void m_CheckAllReadRails(void);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

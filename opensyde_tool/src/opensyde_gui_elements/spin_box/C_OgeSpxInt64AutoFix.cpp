@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Int 64 spin box with auto fix to nearest raw value (implementation)
 
    Int 64 spin box with auto fix to nearest raw value
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.11.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <cmath>
@@ -29,7 +22,7 @@
 #include "C_OgeSpxInt64AutoFix.h"
 #include "C_SdNdeDataPoolContentUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -37,29 +30,26 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     13.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeSpxInt64AutoFix::C_OgeSpxInt64AutoFix(QWidget * const opc_Parent) :
    C_OgeSpxInt64ToolTipBase(opc_Parent),
    C_OgeSpxAutoFixBase()
@@ -67,30 +57,24 @@ C_OgeSpxInt64AutoFix::C_OgeSpxInt64AutoFix(QWidget * const opc_Parent) :
    this->setCorrectionMode(QAbstractSpinBox::CorrectToNearestValue);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current line edit width
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current line edit width
 
    \return
    Current line edit width
-
-   \created     12.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_OgeSpxInt64AutoFix::GetLineEditWidth(void) const
 {
    return this->lineEdit()->width();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Fix string after user confirm
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Fix string after user confirm
 
    \param[in,out] orc_Input Current string
-
-   \created     13.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64AutoFix::fixup(QString & orc_Input) const
 {
    sintn sn_Pos = orc_Input.length();
@@ -166,9 +150,8 @@ void C_OgeSpxInt64AutoFix::fixup(QString & orc_Input) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Validate current input string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Validate current input string
 
    \param[in,out] orc_Input Input string
    \param[in,out] orc_Pos   Position
@@ -177,10 +160,8 @@ void C_OgeSpxInt64AutoFix::fixup(QString & orc_Input) const
    Invalid      Unusable
    Intermediate Might be valid on next user input
    Acceptable   Completely valid
-
-   \created     13.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QValidator::State C_OgeSpxInt64AutoFix::validate(QString & orc_Input, sintn & orc_Pos) const
 {
    QValidator::State e_Retval = C_OgeSpxInt64::validate(orc_Input, orc_Pos);
@@ -234,13 +215,10 @@ QValidator::State C_OgeSpxInt64AutoFix::validate(QString & orc_Input, sintn & or
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init static values
-
-   \created     14.11.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init static values
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64AutoFix::m_Init(void)
 {
    tgl_assert(this->mc_UnscaledMin.GetType() == this->mc_UnscaledMax.GetType());
@@ -326,9 +304,8 @@ void C_OgeSpxInt64AutoFix::m_Init(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get value from string if any
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get value from string if any
 
    \param[in]  orc_Value    Input string
    \param[out] orf64_Output Output value
@@ -336,10 +313,8 @@ void C_OgeSpxInt64AutoFix::m_Init(void)
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     14.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OgeSpxInt64AutoFix::mh_GetUValue(const QString & orc_Input, uint64 & oru64_Output)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -353,9 +328,8 @@ sint32 C_OgeSpxInt64AutoFix::mh_GetUValue(const QString & orc_Input, uint64 & or
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get value from string if any
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get value from string if any
 
    \param[in]  orc_Value    Input string
    \param[out] orf64_Output Output value
@@ -363,10 +337,8 @@ sint32 C_OgeSpxInt64AutoFix::mh_GetUValue(const QString & orc_Input, uint64 & or
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     14.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OgeSpxInt64AutoFix::mh_GetSValue(const QString & orc_Input, sint64 & ors64_Output)
 {
    sint32 s32_Retval = C_NO_ERR;

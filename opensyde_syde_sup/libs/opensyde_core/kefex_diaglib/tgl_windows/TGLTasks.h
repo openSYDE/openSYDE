@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       DiagLib Target Glue Layer: Task system related functionality.
 
    DiagLib Target Glue Layer module containing task system related functionality.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.07.2009  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef TGLTASKSH
 #define TGLTASKSH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <windows.h>
 #include "stwtypes.h"
 #include "SCLDynamicArray.h"
@@ -30,12 +24,12 @@
 #endif
 #endif
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_tgl
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 ///Implements a handler for critical sections
 class TGL_PACKAGE C_TGLCriticalSection
 {
@@ -56,7 +50,7 @@ public:
    void Release(void);
 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 typedef void (* PR_TGLTimer_Event)(void * opv_Instance);
 
@@ -100,7 +94,7 @@ public:
    stw_types::uint32 GetInterval(void) const;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

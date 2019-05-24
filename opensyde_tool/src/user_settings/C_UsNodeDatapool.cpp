@@ -1,174 +1,139 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Project node datapool user settings (implementation)
 
    Project node datapool user settings
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     23.01.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_UsNodeDatapool.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     23.01.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_UsNodeDatapool::C_UsNodeDatapool(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get system definition node datapool expanded list names
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get system definition node datapool expanded list names
 
    \return
    Current system definition node datapool expanded list names
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const std::vector<QString> & C_UsNodeDatapool::GetExpandedListNames(void) const
 {
    return this->mc_ExpandedListNames;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set system definition node datapool expanded list names
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set system definition node datapool expanded list names
 
    \param[in] orc_Value New system definition node datapool expanded list names
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsNodeDatapool::SetExpandedListNames(const std::vector<QString> & orc_Value)
 {
    this->mc_ExpandedListNames = orc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get system definition node datapool selected list names
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get system definition node datapool selected list names
 
    \return
    Current system definition node datapool selected list names
-
-   \created     24.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const std::vector<QString> & C_UsNodeDatapool::GetSelectedListNames() const
 {
    return this->mc_SelectedListNames;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set system definition node datapool selected list names
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set system definition node datapool selected list names
 
    \param[in] orc_Value New system definition node datapool selected list names
-
-   \created     24.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsNodeDatapool::SetSelectedListNames(const std::vector<QString> & orc_Value)
 {
    this->mc_SelectedListNames = orc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get system definition node datapool selected variable names
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get system definition node datapool selected variable names
 
    \return
    Current system definition node datapool selected variable names
-
-   \created     25.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const std::vector<QString> & C_UsNodeDatapool::GetSelectedVariableNames(void) const
 {
    return this->mc_SelectedVariableNames;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set system definition node datapool selected variable names
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set system definition node datapool selected variable names
 
    \param[in] orc_Value New system definition node datapool selected variable names
-
-   \created     25.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsNodeDatapool::SetSelectedVariableNames(const std::vector<QString> & orc_Value)
 {
    this->mc_SelectedVariableNames = orc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get interface settings keys internal structure
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get interface settings keys internal structure
 
    \return
    Interface settings keys internal structure
-
-   \created     02.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const QList<QString> C_UsNodeDatapool::GetInterfaceSettingsKeysInternal(void) const
 {
    return this->mc_InterfaceSettings.keys();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get list user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get list user settings
 
    \param[in] orc_ListName List name (identifier)
 
    \return
    List user settings
-
-   \created     02.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_UsCommunication C_UsNodeDatapool::GetCommList(const QString & orc_ListName) const
 {
    return this->mc_InterfaceSettings.value(orc_ListName, C_UsCommunication());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set list last selected message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set list last selected message
 
    \param[in] orc_ListName            List name (identifier)
    \param[in] oe_SelectedProtocol     Currently selected protocol
@@ -176,10 +141,8 @@ C_UsCommunication C_UsNodeDatapool::GetCommList(const QString & orc_ListName) co
    \param[in] orc_SelectedMessageName Selected message name if any
    \param[in] oq_SignalSelected       Flag if signal selected
    \param[in] orc_SelectedSignalName  Selected signal name if any
-
-   \created     02.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsNodeDatapool::SetListSelectedMessage(const QString & orc_ListName,
                                               const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_SelectedProtocol,
                                               const bool oq_MessageSelected, const QString & orc_SelectedMessageName,
@@ -202,48 +165,39 @@ void C_UsNodeDatapool::SetListSelectedMessage(const QString & orc_ListName,
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get list settings keys internal structure
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get list settings keys internal structure
 
    \return
    List settings keys internal structure
-
-   \created     16.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const QList<QString> C_UsNodeDatapool::GetListSettingsKeysInternal() const
 {
    return this->mc_ListSettings.keys();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get list user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get list user settings
 
    \param[in] orc_ListName List name (identifier)
 
    \return
    List user settings
-
-   \created     16.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_UsNodeDatapoolList C_UsNodeDatapool::GetOtherList(const QString & orc_ListName) const
 {
    return this->mc_ListSettings.value(orc_ListName, C_UsNodeDatapoolList());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set list column widths
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set list column widths
 
    \param[in] orc_ListName     Project system definition node datapool list name (identifier)
    \param[in] orc_ColumnWidths Last known column widths
-
-   \created     16.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsNodeDatapool::SetListColumnSizes(const QString & orc_ListName,
                                           const std::vector<stw_types::sint32> & orc_ColumnWidths)
 {

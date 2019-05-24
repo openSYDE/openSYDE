@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Base class for all system view dashboard items which are rectangle based (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.07.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_GISVDARECTBASEGROUP_H
 #define C_GISVDARECTBASEGROUP_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QTimer>
 
 #include "C_PuiSvDbWidgetBase.h"
@@ -30,12 +24,12 @@
 #include "C_GiSvgGraphicsItem.h"
 #include "C_GiBiCustomToolTip.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_GiSvDaRectBaseGroup :
    public C_GiBiRectBaseGroup,
@@ -81,6 +75,7 @@ public:
       const std::vector<QString> & orc_FailedIdErrorDetails);
    virtual void SetErrorForInvalidDlc(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_ElementId,
                                       const stw_types::uint8 ou8_DLC);
+   virtual void SetDrawingActive(const bool oq_Active);
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
    //lint -save -e1960
    //lint -e{1735} Suppression, because default parameters are identical
@@ -126,10 +121,10 @@ protected:
    virtual void hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_Event) override;
    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event) override;
    //lint -restore
-   virtual bool m_CheckInvalidElements(QString & orc_FirstInvalidElementName) const;
+   virtual bool m_CheckHasValidElements(QString & orc_FirstInvalidElementName) const;
    bool m_CheckManualReadRequired(void) const;
-   bool m_CheckAnyRequiredNodesInactive(void) const;
-   bool m_CheckAnyRequiredBusesNotConnected(void) const;
+   bool m_CheckHasAnyRequiredNodesActive(void) const;
+   bool m_CheckHasAnyRequiredBusesConnected(void) const;
    virtual void m_DataPoolElementsChanged(void) override;
    virtual bool m_AllowRefreshButton(void) const;
    virtual void m_UpdateErrorIcon(void);
@@ -159,6 +154,7 @@ private:
    static const stw_types::uint8 mhu8_StartGreyTimeoutPercentage;
    bool mq_ConnectionActive;
    bool mq_ShowButton;
+   bool mq_AbortTriggered;
    QString mc_RegistrationFailedIdErrorDetails;
    stw_types::uint32 mu32_NextManualActionIndex; ///< 0: Inactive
                                                  // Else: If current is finished this is the next index to try,
@@ -178,13 +174,14 @@ private:
    void m_InitConflictIcon(void);
    void m_InitButton(void);
    void m_ManualRead(void);
+   void m_HandleGenericButtonClick(void);
    void m_UpdateErrorIconToolTip(void);
    void m_ManualOperationStarted(void);
    void m_ManualOperationFinished(void);
    bool m_CheckNodeActive(const stw_types::uint32 ou32_NodeIndex) const;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

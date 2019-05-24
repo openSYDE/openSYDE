@@ -1,21 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Custom text element graphics item (header)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     11.08.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_GILILABEL_H
 #define C_GILILABEL_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>
 #include <QFont>
 #include <QSvgRenderer>
@@ -26,12 +20,12 @@
 #include "C_GiText.h"
 #include "C_PuiBsTextElement.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_GiBiTextElement :
    public C_GiBiRectBaseGroup
@@ -46,6 +40,7 @@ public:
 
    virtual stw_types::sintn type() const override;
    bool OpenStyleDialog(const bool oq_DarkMode);
+   virtual void CopyStyle(const QGraphicsItem * const opc_GuidelineItem);
 
    virtual void RestoreDefaultCursor(void) override;
    virtual void SetTemporaryCursor(const QCursor & orc_TemporaryCursor) override;
@@ -101,7 +96,7 @@ private:
    static const stw_types::float64 mhf64_MinHeightTextElement;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

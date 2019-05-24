@@ -1,21 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \file        ccan.h
+   \file
    \brief       Header for C_CAN class.
 
    Header to class implementing an high level interface to MPC5200 Linux SocketCAN communication driver.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 2012-2012
-   license     use only under terms of contract / confidential
-
-   created     2012-03-09  STW/T.Heilig
-   \endimplementation
-
-   \internal
+   \copyright   Copyright 2012 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CCANH
 #define CCANH
 

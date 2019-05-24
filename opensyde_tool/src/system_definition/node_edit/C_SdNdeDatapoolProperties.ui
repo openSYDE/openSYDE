@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>840</width>
-    <height>812</height>
+    <height>800</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -22,7 +22,7 @@
   <property name="minimumSize">
    <size>
     <width>840</width>
-    <height>812</height>
+    <height>800</height>
    </size>
   </property>
   <property name="palette">
@@ -1111,7 +1111,7 @@ p, li { white-space: pre-wrap; }
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_15" stretch="0,0,1">
                  <property name="bottomMargin">
-                  <number>9</number>
+                  <number>0</number>
                  </property>
                  <item>
                   <spacer name="horizontalSpacer">
@@ -1174,9 +1174,6 @@ p, li { white-space: pre-wrap; }
                </property>
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_13" stretch="0,0,1">
-                 <property name="bottomMargin">
-                  <number>9</number>
-                 </property>
                  <item>
                   <spacer name="horizontalSpacer_13">
                    <property name="orientation">
@@ -1214,6 +1211,171 @@ p, li { white-space: pre-wrap; }
                   </spacer>
                  </item>
                 </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxShareConfiguration">
+              <property name="title">
+               <string/>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_22" stretch="0,1,0">
+               <property name="spacing">
+                <number>6</number>
+               </property>
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelDatapoolShareConfiguration">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>TextLabe</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_18">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>476</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="stw_opensyde_gui_elements::C_OgePubConfigure" name="pc_BushButtonBreakRelation">
+                 <property name="minimumSize">
+                  <size>
+                   <width>160</width>
+                   <height>30</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>160</width>
+                   <height>30</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>BushButton</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxShareConfigurationList">
+              <property name="title">
+               <string/>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_23" stretch="0,0,1">
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>3</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <spacer name="horizontalSpacer_20">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QWidget" name="widget_2" native="true">
+                 <layout class="QVBoxLayout" name="verticalLayout_9" stretch="1">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="stw_opensyde_gui::C_SdNdeDataPoolSelectorAddListWidget" name="pc_ListWidgetSharedDatapoolInfo">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>350</width>
+                      <height>62</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>350</width>
+                      <height>62</height>
+                     </size>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_21">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>328</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
               </layout>
              </widget>
@@ -1462,6 +1624,16 @@ p, li { white-space: pre-wrap; }
    <class>stw_opensyde_gui_elements::C_OgeLabGroupSubItem</class>
    <extends>QLabel</extends>
    <header>C_OgeLabGroupSubItem.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui::C_SdNdeDataPoolSelectorAddListWidget</class>
+   <extends>QListWidget</extends>
+   <header>C_SdNdeDataPoolSelectorAddListWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubConfigure</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubConfigure.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

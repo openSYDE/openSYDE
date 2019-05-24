@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for bus messages (note: main module description should be in .cpp file)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.03.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QAction>
@@ -27,36 +20,33 @@
 #include "C_OgeWiUtil.h"
 #include "C_Uti.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_parent Optional pointer to parent
-
-   \created     27.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageSelectorWidget::C_SdBueMessageSelectorWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueMessageSelectorWidget),
@@ -116,103 +106,87 @@ C_SdBueMessageSelectorWidget::C_SdBueMessageSelectorWidget(QWidget * const opc_P
            this->mpc_Ui->pc_PbTreeWidgetRoot, &C_OgePubTreeWidgetRoot::click);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     27.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageSelectorWidget::~C_SdBueMessageSelectorWidget()
 {
    delete mpc_Ui;
    //lint -e{1740}  no memory leak because of the parent of mpc_ContextMenu and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set active node id
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set active node id
 
    \param[in] ou32_NodeIndex      Node index
    \param[in] ou32_InterfaceIndex Interface index
-
-   \created     24.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::SetNodeDataPool(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex) const
 {
    this->mpc_Ui->pc_MessageTreeWidget->SetNodeDataPool(ou32_NodeIndex, ou32_InterfaceIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set active bus id
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set active bus id
 
    \param[in] ou32_BusIndex Bus index
-
-   \created     24.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::SetBusId(const uint32 ou32_BusIndex) const
 {
    this->mpc_Ui->pc_MessageTreeWidget->SetBusId(ou32_BusIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set current com protocol
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set current com protocol
 
    \param[in] ore_Value Com protocol value
-
-   \created     24.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::SetProtocolType(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Value) const
 {
    this->mpc_Ui->pc_MessageTreeWidget->SetProtocolType(ore_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set undo manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set undo manager
 
    \param[in,out] opc_Value Undo manager
-
-   \created     21.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::SetUndoManager(stw_opensyde_gui_logic::C_SdBueUnoManager * const opc_Value) const
 {
    this->mpc_Ui->pc_MessageTreeWidget->SetUndoManager(opc_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set message sync manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set message sync manager
 
    \param[in,out] opc_Value Message sync manager
-
-   \created     21.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::SetMessageSyncManager(
    stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value) const
 {
    this->mpc_Ui->pc_MessageTreeWidget->SetMessageSyncManager(opc_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init from data
-
-   \created     21.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init from data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::InitFromData(void) const
 {
    this->mpc_Ui->pc_MessageTreeWidget->InitFromData();
+
+   //Text
+   this->mpc_Ui->pc_PbTreeWidgetRoot->setText(QString(C_GtGetText::h_GetText("Messages (%1)")).arg(this->mpc_Ui->
+                                                                                                   pc_MessageTreeWidget
+                                                                                                   ->topLevelItemCount()));
 
    //Handle visibility
    if (this->mpc_Ui->pc_MessageTreeWidget->topLevelItemCount() > 0)
@@ -227,13 +201,10 @@ void C_SdBueMessageSelectorWidget::InitFromData(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     12.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_PbAddMessage->setText(C_GtGetText::h_GetText("Add new Message"));
@@ -243,201 +214,159 @@ void C_SdBueMessageSelectorWidget::InitStaticNames(void) const
                                                                "Show overview of all messages / signals"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Any message id is invalid
-
-   \created     25.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Any message id is invalid
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::OnMessageIdChange(void) const
 {
    this->mpc_Ui->pc_MessageTreeWidget->OnMessageIdChange();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   The specified message data was changed
-
-   \created     25.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   The specified message data was changed
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::OnMessageNameChange(void) const
 {
    this->mpc_Ui->pc_MessageTreeWidget->OnMessageNameChange();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   The signal name has changed
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   The signal name has changed
 
    \param[in] orc_MessageId Message identification indices
-
-   \created     27.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::OnSignalNameChange(const C_OSCCanMessageIdentificationIndices & orc_MessageId) const
 {
    this->mpc_Ui->pc_MessageTreeWidget->OnSignalNameChange(orc_MessageId);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger global error check (icons only)
-
-   \created     28.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger global error check (icons only)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::RecheckErrorGlobal(void) const
 {
    this->mpc_Ui->pc_MessageTreeWidget->RecheckErrorGlobal();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger recheck of error values for tree
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger recheck of error values for tree
 
    \param[in] orc_MessageId Message identification indices
-
-   \created     28.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::RecheckError(const C_OSCCanMessageIdentificationIndices & orc_MessageId) const
 {
    this->mpc_Ui->pc_MessageTreeWidget->RecheckError(orc_MessageId);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set initial focus
-
-   \created     07.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set initial focus
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::SetInitialFocus(void) const
 {
    this->mpc_Ui->pc_PbTreeWidgetRoot->setFocus();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle selection change with all aspects
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle selection change with all aspects
 
    \param[in] orc_MessageId Message identification indices
-
-   \created     08.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::SelectMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId) const
 {
    this->mpc_Ui->pc_MessageTreeWidget->SelectMessage(orc_MessageId);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle selection change with all aspects
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle selection change with all aspects
 
    \param[in] orc_MessageId     Message identification indices
    \param[in] oru32_SignalIndex Signal index
-
-   \created     08.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::SelectSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                 const uint32 & oru32_SignalIndex) const
 {
    this->mpc_Ui->pc_MessageTreeWidget->SelectSignal(orc_MessageId, oru32_SignalIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new signal
 
    \param[in] orc_MessageId      Message identification indices
    \param[in] ou16_StartBit      Start bit for new signal
-
-   \created     06.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::AddSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                              const uint16 ou16_StartBit) const
 {
    this->mpc_Ui->pc_MessageTreeWidget->AddSignalWithStartBit(orc_MessageId, ou16_StartBit);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy specific signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy specific signal
 
    \param[in] orc_MessageId      Message identification indices
    \param[in] ou32_SignalIndex   Signal index
-
-   \created     06.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::CopySignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                               const uint32 ou32_SignalIndex) const
 {
    this->mpc_Ui->pc_MessageTreeWidget->CopySignal(orc_MessageId, ou32_SignalIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Cut specific signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Cut specific signal
 
    \param[in] orc_MessageId      Message identification indices
    \param[in] ou32_SignalIndex   Signal index
-
-   \created     06.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::CutSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                              const uint32 ou32_SignalIndex) const
 {
    this->mpc_Ui->pc_MessageTreeWidget->CutSignal(orc_MessageId, ou32_SignalIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paste copied signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paste copied signal
 
    \param[in] orc_MessageId      Message identification indices
    \param[in] ou16_StartBit      Start bit for new signal
-
-   \created     06.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::PasteSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                const uint16 ou16_StartBit) const
 {
    this->mpc_Ui->pc_MessageTreeWidget->PasteSignal(orc_MessageId, ou16_StartBit);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete specific signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete specific signal
 
    \param[in] orc_MessageId      Message identification indices
    \param[in] ou32_SignalIndex   Signal index
-
-   \created     06.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::DeleteSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                 const uint32 ou32_SignalIndex) const
 {
    this->mpc_Ui->pc_MessageTreeWidget->DeleteSignal(orc_MessageId, ou32_SignalIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press release event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press release event slot
 
    \param[in,out] opc_KeyEvent Key event identification and information
-
-   \created     24.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOriginal = true;
@@ -510,7 +439,7 @@ void C_SdBueMessageSelectorWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::m_AddMessageButtonClicked(void) const
 {
    if (this->mpc_Ui->pc_MessageTreeWidget->CheckIfAnyNodeConnected() == true)
@@ -526,7 +455,7 @@ void C_SdBueMessageSelectorWidget::m_AddMessageButtonClicked(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::m_MessagesButtonClicked(void)
 {
    this->mpc_Ui->pc_MessageTreeWidget->collapseAll();
@@ -542,7 +471,7 @@ void C_SdBueMessageSelectorWidget::m_MessagesButtonClicked(void)
    Q_EMIT this->SigMessagesSelected();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::m_MessagesSelectionChanged(void)
 {
    if (this->mq_MessagesActive == true)
@@ -559,43 +488,34 @@ void C_SdBueMessageSelectorWidget::m_MessagesSelectionChanged(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Select message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Select message
 
    \param[in] orc_MessageId Message identification indices
-
-   \created     21.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::m_SelectMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 {
    Q_EMIT this->SigMessageSelected(orc_MessageId);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Select signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Select signal
 
    \param[in] orc_MessageId     Message identification indices
    \param[in] oru32_SignalIndex Signal index
-
-   \created     21.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::m_SelectSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                   const uint32 & oru32_SignalIndex)
 {
    Q_EMIT this->SigSignalSelected(orc_MessageId, oru32_SignalIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init context menu entries
-
-   \created     25.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init context menu entries
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::m_SetupContextMenu(void)
 {
    this->mpc_ContextMenu = new C_OgeContextMenu(this);
@@ -654,15 +574,12 @@ void C_SdBueMessageSelectorWidget::m_SetupContextMenu(void)
            &C_SdBueMessageSelectorWidget::m_OnCustomContextMenuRequested);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show custom context menu
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show custom context menu
 
    \param[in] orc_Pos Local context menu position
-
-   \created     25.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 {
    //Check if valid pos
@@ -741,31 +658,30 @@ void C_SdBueMessageSelectorWidget::m_OnCustomContextMenuRequested(const QPoint &
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On change of signal count in message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On change of signal count in message
 
    \param[in] orc_MessageId Message identification indices
-
-   \created     26.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::m_OnSignalCountOfMessageChanged(
    const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 {
    Q_EMIT this->SigSignalCountOfMessageChanged(orc_MessageId);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On change of message count
-
-   \created     05.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On change of message count
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::m_OnMessageCountChanged(void)
 {
    Q_EMIT this->SigMessageCountChanged();
+
+   //Text
+   this->mpc_Ui->pc_PbTreeWidgetRoot->setText(QString(C_GtGetText::h_GetText("Messages (%1)")).arg(this->mpc_Ui->
+                                                                                                   pc_MessageTreeWidget
+                                                                                                   ->topLevelItemCount()));
 
    //Handle visibility
    if (this->mpc_Ui->pc_MessageTreeWidget->topLevelItemCount() > 0)

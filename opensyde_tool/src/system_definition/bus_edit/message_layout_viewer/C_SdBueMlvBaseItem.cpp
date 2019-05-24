@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Base class for the message layout viewer graphic items (implementation)
 
    detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     05.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
@@ -28,35 +21,32 @@
 #include "C_SdBueMlvBaseItem.h"
 #include "C_Uti.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]        orc_BackgroundColor  Background color
    \param[in]        orc_FontColor        Font color
    \param[in]        orc_Font             Font configuration
    \param[in]        orc_Text             Text
    \param[in,out]    opc_parent           Optional pointer to parent
-
-   \created     05.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvBaseItem::C_SdBueMlvBaseItem(const QColor & orc_BackgroundColor, const QColor & orc_FontColor,
                                        const QFont & orc_Font, const QString & orc_Text, const bool oq_DrawText,
                                        QGraphicsItem * const opc_Parent) :
@@ -77,56 +67,44 @@ C_SdBueMlvBaseItem::C_SdBueMlvBaseItem(const QColor & orc_BackgroundColor, const
    this->setFlag(ItemSendsGeometryChanges);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     05.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvBaseItem::~C_SdBueMlvBaseItem()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the shown text
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the shown text
 
    \param[in]     orc_Text      New text
-
-   \created     05.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvBaseItem::SetText(const QString & orc_Text)
 {
    this->mc_Text = orc_Text;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the size of the rectangle
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the size of the rectangle
 
    \param[in]     orc_Size      New size
-
-   \created     05.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvBaseItem::SetSize(const QSizeF & orc_Size)
 {
    this->mc_Size = orc_Size;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets new font for the text
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets new font for the text
 
    \param[in]     orc_Font       New font
-
-   \created     17.01.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvBaseItem::SetFont(const QFont & orc_Font)
 {
    this->mc_Font = orc_Font;
@@ -135,17 +113,14 @@ void C_SdBueMlvBaseItem::SetFont(const QFont & orc_Font)
    this->mc_Font.setPixelSize(this->mc_Font.pointSize());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    \param[in,out] opc_Painter Painter
    \param[in,out] opc_Option  Option
    \param[in,out] opc_Widget  Widget
-
-   \created     05.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvBaseItem::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                                QWidget * const opc_Widget)
 {
@@ -186,15 +161,12 @@ void C_SdBueMlvBaseItem::paint(QPainter * const opc_Painter, const QStyleOptionG
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns an estimate of the area painted by the item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns an estimate of the area painted by the item
 
    \return     Rectangle
-
-   \created     05.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QRectF C_SdBueMlvBaseItem::boundingRect() const
 {
    return QRectF(0.0, 0.0, this->mc_Size.width(), mc_Size.height());

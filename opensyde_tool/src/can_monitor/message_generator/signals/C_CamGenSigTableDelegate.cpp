@@ -1,52 +1,42 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Delegate for message generator signals table (implementation)
 
    Delegate for message generator signals table
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     14.01.2019  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_CamOgeCbxTable.h"
 #include "C_CamGenSigTableDelegate.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     14.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamGenSigTableDelegate::C_CamGenSigTableDelegate(QObject * const opc_Parent) :
    C_TblDelegate(opc_Parent)
 {
@@ -57,16 +47,13 @@ C_CamGenSigTableDelegate::C_CamGenSigTableDelegate(QObject * const opc_Parent) :
            Qt::QueuedConnection);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten set editor data event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten set editor data event slot
 
    \param[in,out] opc_Editor Editor widget
    \param[in]     orc_Index  Correlating index
-
-   \created     08.02.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex & orc_Index) const
 {
    C_TblEditLineEditBase * pc_LineEdit;
@@ -83,32 +70,26 @@ void C_CamGenSigTableDelegate::setEditorData(QWidget * const opc_Editor, const Q
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create generic combo box interaction element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create generic combo box interaction element
 
    \param[in,out] opc_Parent Optional pointer to parent
 
    \return
    Generic combo box interaction element
-
-   \created     30.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QComboBox * C_CamGenSigTableDelegate::m_CreateComboBox(QWidget * const opc_Parent) const
 {
    return new C_CamOgeCbxTable(opc_Parent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle delayed widget selection clear
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle delayed widget selection clear
 
    \param[in,out] opc_Widget Widget to clear the selection for
-
-   \created     08.02.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableDelegate::m_AfterSetEditorData(QLineEdit * const opc_Widget) const
 {
    //Set selection to line edit end

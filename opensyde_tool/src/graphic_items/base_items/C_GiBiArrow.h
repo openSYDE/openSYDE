@@ -1,35 +1,29 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Informational Line / Arrow for user (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.10.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_GILIARROW_H
 #define C_GILIARROW_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include "stwtypes.h"
 #include "C_GiLiLineGroup.h"
 #include "C_GiUnique.h"
 #include "C_PuiBsLineArrow.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_GiBiArrow :
    public C_GiLiLineGroup,
@@ -43,6 +37,7 @@ public:
    virtual void SetWidth(const stw_types::sint32 & ors32_Width);
    virtual stw_types::sintn type() const override;
    bool OpenStyleDialog(const bool oq_DarkMode);
+   virtual void CopyStyle(const QGraphicsItem * const opc_GuidelineItem);
    void ApplyStyle(const QColor & orc_LineColor, const stw_types::sintn osn_Width,
                    const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType oe_LineType,
                    const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType oe_StartArrow,
@@ -86,7 +81,7 @@ private:
    static const stw_types::float64 mhf64_ShapeOffsetFactor;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

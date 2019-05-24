@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       GUI communication driver for diagnostics (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.11.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVCOMDRIVERDIAG_H
 #define C_SYVCOMDRIVERDIAG_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QObject>
 #include <set>
 
@@ -32,12 +26,12 @@
 #include "C_OSCIpDispatcherWinSock.h"
 #include "C_OSCCanSignal.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SyvComDriverDiag :
    public QObject,
@@ -88,14 +82,16 @@ public:
    stw_types::sint32 GetPollResults(stw_types::sint32 & ors32_Result) const;
    stw_types::sint32 GetPollResultNRC(stw_types::uint8 & oru8_NRC) const;
 
-   void NvmSafeClearInternalContent(void) const;
+   stw_types::sint32 NvmSafeClearInternalContent(const stw_types::uint32 ou32_NodeIndex) const;
    stw_types::sint32 PollNvmSafeReadParameterValues(const stw_types::uint32 ou32_NodeIndex,
                                                     const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListId> & orc_ListIds);
-   stw_types::sint32 NvmSafeCreateCleanFileWithoutCRC(const QString & orc_Path) const;
-   stw_types::sint32 NvmSafeReadFileWithoutCRC(const QString & orc_Path) const;
+   stw_types::sint32 NvmSafeCreateCleanFileWithoutCRC(const stw_types::uint32 ou32_NodeIndex, const QString & orc_Path, const stw_opensyde_core::C_OSCParamSetInterpretedFileInfoData & orc_FileInfo =
+                                                         stw_opensyde_core::C_OSCParamSetInterpretedFileInfoData())
+   const;
+   stw_types::sint32 NvmSafeReadFileWithoutCRC(const stw_types::uint32 ou32_NodeIndex, const QString & orc_Path) const;
    stw_types::sint32 NvmSafeCheckParameterFileContents(const stw_types::uint32 ou32_NodeIndex, const QString & orc_Path,
                                                        std::vector<stw_opensyde_core::C_OSCNodeDataPoolListId> & orc_DataPoolLists);
-   stw_types::sint32 NvmSafeUpdateCRCForFile(const QString & orc_Path) const;
+   stw_types::sint32 NvmSafeUpdateCRCForFile(const stw_types::uint32 ou32_NodeIndex, const QString & orc_Path) const;
 
    const std::vector<C_SyvComDataDealer *> & GetAllDataDealer(void) const;
 
@@ -186,7 +182,7 @@ private:
    C_SyvComDriverDiag & operator =(const C_SyvComDriverDiag &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

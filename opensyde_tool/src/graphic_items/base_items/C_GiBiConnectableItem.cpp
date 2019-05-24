@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Interface for connectable item (implementation)
 
    Interface for connectable item
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.08.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <cmath>
@@ -24,50 +17,43 @@
 #include "C_OSCUtils.h"
 #include "C_GiBiConnectableItem.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_types;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     24.08.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiBiConnectableItem::C_GiBiConnectableItem()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Helper function to trigger changed graphic manually to avoid signals on every possible change
-
-   \created     19.10.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Helper function to trigger changed graphic manually to avoid signals on every possible change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiConnectableItem::TriggerSigChangedGraphic()
 {
-   Q_EMIT ChangedGraphic();
+   Q_EMIT this->ChangedGraphic();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculate distance to segment of line
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculate distance to segment of line
 
    Look at http://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
    Abstract:
@@ -83,10 +69,8 @@ void C_GiBiConnectableItem::TriggerSigChangedGraphic()
    \param[out] opf64_Distance         Optional pointer for distance as result
    \param[out] opc_Projection         Optional pointer for projected point on line
    \param[out] opf64_RestrictPosition Optional pointer for relative position of projected point on line
-
-   \created     24.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiConnectableItem::h_DistToLine(const QPointF & orc_LineStart, const QPointF & orc_LineEnd,
                                          const QPointF & orc_EvPoint, float64 * const opf64_Distance,
                                          QPointF * const opc_Projection, float64 * const opf64_RestrictPosition)
@@ -133,17 +117,14 @@ void C_GiBiConnectableItem::h_DistToLine(const QPointF & orc_LineStart, const QP
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculate distance point to point
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculate distance point to point
 
    \param[in]  orc_Point1     Start
    \param[in]  orc_Point2     End
    \param[out] orf64_Distance Distance as result
-
-   \created     24.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiConnectableItem::h_DistToPoint(const QPointF & orc_Point1, const QPointF & orc_Point2,
                                           stw_types::float64 & orf64_Distance)
 {

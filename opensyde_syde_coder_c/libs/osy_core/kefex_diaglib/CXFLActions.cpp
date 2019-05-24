@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Common flashloader actions
 
    Encapsulates some higher level action that are used by more complex procedures (e.g. downloadclass).
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     xx.xx.200x  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2002 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------ */
 #include "precomp_headers.h"  //pre-compiled headers
@@ -130,8 +123,7 @@ C_XFLDivertParameters & C_XFLDivertParameters::operator =(const C_XFLDivertParam
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Load divert stream parameter definition and values from INI file
+/*! \brief   Load divert stream parameter definition and values from INI file
 
    Will read the following parameters:
 
@@ -150,8 +142,6 @@ C_XFLDivertParameters & C_XFLDivertParameters::operator =(const C_XFLDivertParam
 
    \param[in]   orc_IniFile        opened INI file
    \param[in]   orc_Section        section in INI file
-
-   \created     xx.xx.20xx  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_XFLDivertParameters::LoadFromINI(C_SCLIniFile & orc_IniFile, const C_SCLString & orc_Section)
@@ -178,8 +168,7 @@ void C_XFLDivertParameters::LoadFromINI(C_SCLIniFile & orc_IniFile, const C_SCLS
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Save divert stream parameter definitions and values to INI file
+/*! \brief   Save divert stream parameter definitions and values to INI file
 
    Will write the following parameters:
 
@@ -202,9 +191,6 @@ void C_XFLDivertParameters::LoadFromINI(C_SCLIniFile & orc_IniFile, const C_SCLS
    \return
    C_NO_ERR   written  \n
    else       error
-
-
-   \created     xx.xx.20xx  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_XFLDivertParameters::SaveToINI(C_SCLIniFile & orc_IniFile, const C_SCLString & orc_Section)
@@ -240,14 +226,11 @@ sint32 C_XFLDivertParameters::SaveToINI(C_SCLIniFile & orc_IniFile, const C_SCLS
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Set parameters for diverting from/to CAN bus
+/*! \brief   Set parameters for diverting from/to CAN bus
 
    Parameters for CAN are defined in flashloader protocol specification
 
    \param[in]   ou8_NumPositions        number of possible target busses
-
-   \created     11.04.2012  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_XFLDivertParametersCAN::C_XFLDivertParametersCAN(const uint8 ou8_NumPositions) :
@@ -547,8 +530,7 @@ sint32 C_XFLActions::m_WakeupSNR(const C_XFLCompanyID & orc_CompanyID, const uin
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Bring server node into wakeup state.
+/*! \brief   Bring server node into wakeup state.
 
    This variation is to be used if:
    - the SNR and local ID of the server node are known
@@ -570,8 +552,6 @@ sint32 C_XFLActions::m_WakeupSNR(const C_XFLCompanyID & orc_CompanyID, const uin
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     22.03.2011  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_XFLActions::m_WakeupLocalIDAndSNR(const C_XFLCompanyID & orc_CompanyID, const uint8 (& orau8_SNR)[6])
@@ -612,8 +592,7 @@ sint32 C_XFLActions::m_WakeupLocalIDAndSNR(const C_XFLCompanyID & orc_CompanyID,
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   function for generic divert stream mechanism
+/*! \brief   function for generic divert stream mechanism
 
    Assumptions:
    - server node is already in wakeup state
@@ -637,8 +616,6 @@ sint32 C_XFLActions::m_WakeupLocalIDAndSNR(const C_XFLCompanyID & orc_CompanyID,
    C_COM              no response from server                    \n
    C_NOACT            error response from server                 \n
    C_RANGE            ou8_HopHandle is != 0 with protocol versions < V3.02r0
-
-   \created     xx.xx.20xx  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_XFLActions::DivertStreamOnOff(const bool oq_On, const C_XFLDivertParameters & orc_DivertParams,
@@ -748,8 +725,7 @@ sint32 C_XFLActions::DivertStreamOnOffBBB(const bool oq_OnOff, const uint8 ou8_T
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   read flash information
+/*! \brief   read flash information
 
    read all flash memory information from server
 
@@ -760,8 +736,6 @@ sint32 C_XFLActions::DivertStreamOnOffBBB(const bool oq_OnOff, const uint8 ou8_T
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     16.04.2008  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_XFLActions::ReadFlashInformation(C_XFLFlashInformation & orc_Information, C_SCLString & orc_ErrorText)
@@ -855,10 +829,7 @@ sint32 C_XFLActions::ReadFlashInformation(C_XFLFlashInformation & orc_Informatio
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the total number of sectors in this IC
-
-   \created     27.07.2015  STW/A.Stangl
+/*! \brief   Returns the total number of sectors in this IC
 
    \return
    total number of sectors in this IC
@@ -876,8 +847,7 @@ uint16 C_XFLFlashICInformation::GetNumberOfSectors(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   convert flash mapping table to a linear array with all the individual sectors
+/*! \brief   convert flash mapping table to a linear array with all the individual sectors
 
    The flash information structure contains all information in a compact format.
    This is good for storage but not for searching through a list of all sectors.
@@ -885,8 +855,6 @@ uint16 C_XFLFlashICInformation::GetNumberOfSectors(void) const
     structure and put it in a table.
 
    \param[out]  orc_Sectors           array of sectors
-
-   \created     16.04.2008  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_XFLFlashInformation::ConvertToFlashSectorTable(C_XFLFlashSectors & orc_Sectors) const
@@ -944,15 +912,12 @@ void C_XFLFlashInformation::ConvertToFlashSectorTable(C_XFLFlashSectors & orc_Se
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Returns true if specified address lies within sector range
+/*! \brief   Returns true if specified address lies within sector range
 
    \param[in]   ou32_Address    address to check
 
    \return
    true:      (ou32_Address >= u32_LowestAddress) && (ou32_Address <= u32_HighestAddress)
-
-   \created     27.07.2015  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool C_XFLFlashSector::IsAddressWithinSector(const uint32 ou32_Address) const
@@ -960,10 +925,8 @@ bool C_XFLFlashSector::IsAddressWithinSector(const uint32 ou32_Address) const
    return ((ou32_Address >= u32_LowestAddress) && (ou32_Address <= u32_HighestAddress));
 }
 
-
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the sector index the specified address resides in
+/*! \brief   Returns the sector index the specified address resides in
 
    \param[in]   ou32_Address    address to check
    \param[out]  oru16_Sector    sector the address resides in
@@ -971,8 +934,6 @@ bool C_XFLFlashSector::IsAddressWithinSector(const uint32 ou32_Address) const
    \return
    C_NO_ERR    no problems; oru16_Sector contains sector index
    else        could not find address within any sector
-
-   \created     27.07.2015  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_XFLFlashSectors::GetSectorOccupiedByAddress(const uint32 ou32_Address, uint16 & oru16_Sector) const
@@ -992,15 +953,12 @@ sint32 C_XFLFlashSectors::GetSectorOccupiedByAddress(const uint32 ou32_Address, 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the erase time for a specified linear sector
+/*! \brief   Returns the erase time for a specified linear sector
 
    \param[in]   ou16_Sector         Linear sector index (0 = first sector in IC 0)
 
    \return
    Erase time of specified sector in [ms] (0xFFFFFFFFU if sector is not valid)
-
-   \created     27.07.2015  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 uint32 C_XFLFlashInformation::GetEraseTimeByLinearSectorNumber(const uint16 ou16_Sector) const
@@ -1022,15 +980,12 @@ uint32 C_XFLFlashInformation::GetEraseTimeByLinearSectorNumber(const uint16 ou16
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the maximum write time for up to 255 bytes of data
+/*! \brief   Returns the maximum write time for up to 255 bytes of data
 
    Returns time taken for slowest IC
 
    \return
    Write to for up to 255 bytes for slowest IC in [ms] (0xFFFFFFFF if no ICs are defined)
-
-   \created     27.07.2015  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 uint32 C_XFLFlashInformation::GetWriteTimeOfSlowestIC(void) const
@@ -1057,8 +1012,7 @@ uint32 C_XFLFlashInformation::GetWriteTimeOfSlowestIC(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert company-ID string to byte-array to send to server
+/*! \brief   Convert company-ID string to byte-array to send to server
 
    cf. details in STWCOMPID::CID_string_to_bytes
 
@@ -1068,8 +1022,6 @@ uint32 C_XFLFlashInformation::GetWriteTimeOfSlowestIC(void) const
    \return
    C_NO_ERR   converted company-id      \n
    C_CONFIG   invalid company-id
-
-   \created     22.04.2008  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_XFLActions::CompIDStringToStruct(const C_SCLString & orc_String, C_XFLCompanyID & orc_Data)
@@ -1080,8 +1032,7 @@ sint32 C_XFLActions::CompIDStringToStruct(const C_SCLString & orc_String, C_XFLC
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert encoded company-ID structure to a displayable string
+/*! \brief   Convert encoded company-ID structure to a displayable string
 
    cf. details in stw_company_id::CID_bytes_to_string
 
@@ -1091,8 +1042,6 @@ sint32 C_XFLActions::CompIDStringToStruct(const C_SCLString & orc_String, C_XFLC
    \return
    C_NO_ERR   converted company-id        \n
    C_CONFIG   invalid length
-
-   \created     25.04.2008  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_XFLActions::CompIDStructToString(const C_XFLCompanyID & orc_Data, C_SCLString & orc_String)
@@ -1108,8 +1057,7 @@ sint32 C_XFLActions::CompIDStructToString(const C_XFLCompanyID & orc_Data, C_SCL
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert flash protocol driver error code to displayable error text
+/*! \brief   Convert flash protocol driver error code to displayable error text
 
    Converts the return value of a CXFLProtocol funciton and an server-side error code
     to a displayable string.
@@ -1120,8 +1068,6 @@ sint32 C_XFLActions::CompIDStructToString(const C_XFLCompanyID & orc_Data, C_SCL
 
    \return
    Displayable error text
-
-   \created     28.04.2008  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_XFLActions::XFLProtocolErrorToText(const sint32 os32_ReturnValue, const uint8 ou8_ErrorCode)
@@ -1210,10 +1156,7 @@ C_SCLString C_XFLActions::SNRBytesToString(const uint8 (& orau8_Data)[6], const 
 }
 
 //-----------------------------------------------------------------------------
-//06.04.10  AST: allow hex nibbles in the SNR (return C_WARN if there are !)
-//                -> maybe the target contains an invalid serial number for whatever reason
-//20.07.09  AST: removed error messageboxes here. This is the job of the application layer.
-//16.06.08  AST: fixed converting SNR with dots
+
 sint32 C_XFLActions::SNRStringToBytes(const C_SCLString & orc_Text, uint8 (& orau8_Data)[6])
 {
    uint8 u8_Index;
@@ -1261,8 +1204,7 @@ sint32 C_XFLActions::SNRStringToBytes(const C_SCLString & orc_Text, uint8 (& ora
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Search Nodes in network
+/*! \brief   Search Nodes in network
 
    \param[in]     orc_CompanyID       company-id to use to wake up nodes (2, 3, 5 characters)
    \param[in]     ou32_StartTime      time to send "FLASH" message in milli seconds
@@ -1275,8 +1217,6 @@ sint32 C_XFLActions::SNRStringToBytes(const C_SCLString & orc_Text, uint8 (& ora
    C_DEFAULT       aborted by user       \n
    C_OVERFLOW      too many nodes found  \n
    C_RANGE         invalid parameter(s)
-
-   \created     28.04.2008  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_XFLActions::SearchNodes(const C_SCLString & orc_CompanyID, const uint32 ou32_StartTime,
@@ -1394,7 +1334,6 @@ sint32 C_XFLActions::SearchNodes(const C_SCLString & orc_CompanyID, const uint32
                      au8_Found[s32_i] = u8_NumSNRsFound; //to be added to s32_IndexInTable later !
                   }
 
-
                   for (s32_j = s32_IndexInTable; s32_j < (s32_IndexInTable + u8_NumSNRsFound); s32_j++)
                   {
                      //convert bcd to serial number in STW format
@@ -1476,14 +1415,11 @@ sint32 C_XFLActions::SearchNodes(const C_SCLString & orc_CompanyID, const uint32
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   read finger print information if available
+/*! \brief   read finger print information if available
 
    Read available finger print information from server
 
    \param[in,out]   orc_Information      target configuration and possibly read data
-
-   \created     01.04.2010  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_XFLActions::m_ReadFingerPrintInformation(C_XFLInformationFromServer & orc_Information)
@@ -1565,15 +1501,12 @@ void C_XFLActions::m_ReadFingerPrintInformation(C_XFLInformationFromServer & orc
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   read device info information if available
+/*! \brief   read device info information if available
 
    Read available finger print information from server
 
    \param[in,out]   orc_Information      target configuration and possibly read data
                                           (u16_ProtocolVersion must already have been set !)
-
-   \created     01.04.2010  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_XFLActions::m_ReadDeviceInfo(C_XFLInformationFromServer & orc_Information)
@@ -1719,8 +1652,7 @@ C_XFLInformationFromServer::C_XFLInformationFromServer(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Read all available information from server
+/*! \brief   Read all available information from server
 
    Assumption: server node is already in wakeup state.
    On errors on individual read requests TRG_ReportStatus will be executed and the process will be
@@ -1736,8 +1668,6 @@ C_XFLInformationFromServer::C_XFLInformationFromServer(void) :
 
    \return
    C_NO_ERR     executed / check callback texts and valid flags in structure for details \n
-
-   \created     01.04.2010  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_XFLActions::ReadServerInformation(C_XFLInformationFromServer & orc_Info)
@@ -1993,8 +1923,7 @@ sint32 C_XFLActions::ReadServerInformation(C_XFLInformationFromServer & orc_Info
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Read block based flash checksum data from server
+/*! \brief   Read block based flash checksum data from server
 
    Assumption: server node is already in wakeup state.
    On errors on individual read requests TRG_ReportStatus will be executed with detailed error
@@ -2007,8 +1936,6 @@ sint32 C_XFLActions::ReadServerInformation(C_XFLInformationFromServer & orc_Info
    C_RANGE      invalid function parameter                             \n
    C_COM        no response from server                                \n
    C_NOACT      error response from server
-
-   \created     04.02.2016  STW/A.Stangl (refactored from existing code)
 */
 //-----------------------------------------------------------------------------
 sint32 C_XFLActions::ReadServerBlockChecksumInformation(C_XFLChecksumAreas & orc_ChecksumInformation)
@@ -2083,8 +2010,7 @@ sint32 C_XFLActions::ReadServerBlockChecksumInformation(C_XFLChecksumAreas & orc
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Read sector based flash checksum data from server
+/*! \brief   Read sector based flash checksum data from server
 
    Assumption: server node is already in wakeup state.
    On errors on individual read requests TRG_ReportStatus will be executed with detailed error
@@ -2098,8 +2024,6 @@ sint32 C_XFLActions::ReadServerBlockChecksumInformation(C_XFLChecksumAreas & orc
    C_RANGE      invalid function parameter                             \n
    C_COM        no response from server                                \n
    C_NOACT      error response from server
-
-   \created     07.04.2010  STW/A.Stangl (refactored from existing code)
 */
 //-----------------------------------------------------------------------------
 sint32 C_XFLActions::ReadServerSectorChecksumInformation(const uint16 ou16_SectorCount,
@@ -2156,8 +2080,7 @@ sint32 C_XFLActions::ReadServerSectorChecksumInformation(const uint16 ou16_Secto
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Perform node wakeup
+/*! \brief   Perform node wakeup
 
    Configurable wakeup procedure.
    Steps:
@@ -2174,8 +2097,6 @@ sint32 C_XFLActions::ReadServerSectorChecksumInformation(const uint16 ou16_Secto
    \return
    C_NO_ERR           no errors                                  \n
    else               wakeup failed
-
-   \created     09.06.2010  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_XFLActions::PerformWakeup(const C_XFLWakeupParameters & orc_Parameters, uint8 * const opu8_ActualLocalID)

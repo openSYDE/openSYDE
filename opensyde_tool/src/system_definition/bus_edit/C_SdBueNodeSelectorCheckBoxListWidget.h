@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Handling all node selector widgets in a kind of list (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     29.03.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SDBUENODESELECTORCHECKBOXLISTWIDGET_H
 #define C_SDBUENODESELECTORCHECKBOXLISTWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <QWidget>
 #include <QIcon>
@@ -28,7 +22,7 @@
 #include "C_SdBueNodeSelectorCheckBoxItemWidget.h"
 #include "C_OSCCanProtocol.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace Ui
 {
@@ -37,9 +31,9 @@ class C_SdBueNodeSelectorCheckBoxListWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SdBueNodeSelectorCheckBoxListWidget :
    public QWidget
@@ -79,7 +73,7 @@ private:
    Ui::C_SdBueNodeSelectorCheckBoxListWidget * mpc_Ui;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

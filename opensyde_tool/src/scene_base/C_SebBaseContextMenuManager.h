@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Context menu manager of base scene (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SEBBASECONTEXTMENUMANAGER_H
 #define C_SEBBASECONTEXTMENUMANAGER_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QObject>
 #include <QGraphicsItem>
 #include <QAction>
@@ -26,12 +20,12 @@
 #include "C_OgeContextMenu.h"
 #include "C_SebUtil.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SebBaseContextMenuManager :
    public QObject
@@ -102,6 +96,7 @@ protected:
 
    virtual void m_SetActionsInvisible(void);
    virtual bool m_ActivateSpecificActions(void) = 0;
+   virtual bool m_ItemTypeHasSetupStyle(const stw_types::sintn osn_ItemType);
 
    void m_ContextMenuClosed(void);
    void m_InsertBendLineActions(QAction * const opc_Action);
@@ -127,7 +122,7 @@ private:
    void m_AlignBottom(void);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

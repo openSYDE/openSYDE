@@ -1,32 +1,26 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Data class, containing information about the data pools in a parameter set file (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     17.10.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCPARAMSETDATAPOOLINFO_H
 #define C_OSCPARAMSETDATAPOOLINFO_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 #include "CSCLString.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 ///information about one data pool in a parameter set file
 class C_OSCParamSetDataPoolInfo
@@ -34,12 +28,14 @@ class C_OSCParamSetDataPoolInfo
 public:
    C_OSCParamSetDataPoolInfo(void);
 
-   stw_scl::C_SCLString c_Name;       ///< Data pool name
-   stw_types::uint32 u32_DataPoolCrc; ///< Data pool CRC
-   stw_types::uint8 au8_Version[3];   ///< User data pool version Major, minor, release
+   stw_scl::C_SCLString c_Name;           ///< Data pool name
+   stw_types::uint32 u32_DataPoolCrc;     ///< Data pool CRC
+   stw_types::uint32 u32_NvMStartAddress; ///< NvM start address of data pool
+   stw_types::uint32 u32_NvMSize;         ///< NvM size of data pool
+   stw_types::uint8 au8_Version[3];       ///< User data pool version Major, minor, release
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

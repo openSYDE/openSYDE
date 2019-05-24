@@ -50,7 +50,7 @@
     <number>0</number>
    </property>
    <property name="rightMargin">
-    <number>2</number>
+    <number>30</number>
    </property>
    <property name="bottomMargin">
     <number>0</number>
@@ -90,13 +90,13 @@
        <property name="minimumSize">
         <size>
          <width>350</width>
-         <height>36</height>
+         <height>30</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>350</width>
-         <height>36</height>
+         <height>30</height>
         </size>
        </property>
        <property name="title">
@@ -104,13 +104,13 @@
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0,0">
         <property name="leftMargin">
-         <number>0</number>
+         <number>5</number>
         </property>
         <property name="topMargin">
          <number>0</number>
         </property>
         <property name="rightMargin">
-         <number>0</number>
+         <number>5</number>
         </property>
         <property name="bottomMargin">
          <number>0</number>
@@ -243,7 +243,7 @@
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>4</width>
+         <width>10</width>
          <height>20</height>
         </size>
        </property>

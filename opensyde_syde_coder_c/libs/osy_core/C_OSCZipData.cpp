@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       openSYDE Core zip/unzip utilities
 
    see header in .h file for details.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.09.2016  STW/A.Stangl (refactored from pre-existing code)
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -43,8 +36,7 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Zip data in memory
+/*! \brief   Zip data in memory
 
    Compresses the specified data in memory.
 
@@ -58,8 +50,6 @@ using namespace stw_opensyde_core;
    \return
    C_NO_ERR   data compressed
    C_NOACT    error (e.g. destination buffer too small)
-
-   \created     01.09.2016  STW/A.Stangl (refactored from pre-existing code)
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCZipData::h_Zip(uint8 * const opu8_Destination, uint32 & oru32_DestinationLength,
@@ -76,8 +66,7 @@ sint32 C_OSCZipData::h_Zip(uint8 * const opu8_Destination, uint32 & oru32_Destin
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Unzip data in memory
+/*! \brief    Unzip data in memory
 
    Uncompresses the specified data in memory.
 
@@ -93,8 +82,6 @@ sint32 C_OSCZipData::h_Zip(uint8 * const opu8_Destination, uint32 & oru32_Destin
    \return
    C_NO_ERR   data uncompressed
    C_NOACT    error (e.g. destination buffer too small)
-
-   \created     01.09.2016  STW/A.Stangl (refactored from pre-existing code)
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCZipData::h_Unzip(uint8 * const opu8_Destination, uint32 & oru32_DestinationLength,
@@ -111,8 +98,7 @@ sint32 C_OSCZipData::h_Unzip(uint8 * const opu8_Destination, uint32 & oru32_Dest
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get required size for compressed data
+/*! \brief   Get required size for compressed data
 
    Returns maximum buffer size required for compressed data.
 
@@ -120,8 +106,6 @@ sint32 C_OSCZipData::h_Unzip(uint8 * const opu8_Destination, uint32 & oru32_Dest
 
    \return
    Maximum size required for compressed data.
-
-   \created     01.09.2016  STW/A.Stangl (refactored from pre-existing code)
 */
 //-----------------------------------------------------------------------------
 uint32 C_OSCZipData::h_GetRequiredBufSizeForZipping(const uint32 ou32_SourceLength)

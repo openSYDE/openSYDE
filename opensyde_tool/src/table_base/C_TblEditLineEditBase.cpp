@@ -1,114 +1,94 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Generic line edit for table edit (implementation)
 
    Generic line edit for table edit
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     30.11.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwerrors.h"
 #include "C_GtGetText.h"
 #include "C_TblEditLineEditBase.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     30.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_TblEditLineEditBase::C_TblEditLineEditBase(QWidget * const opc_Parent) :
    C_OgeLeToolTipBase(opc_Parent),
    me_Type(QVariant::Invalid)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize from value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize from value
 
    Warning: this also prepares the output value type
 
    \param[in] orc_DisplayValue Display value
    \param[in] orc_EditValue    Edit value
-
-   \created     29.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblEditLineEditBase::SetFromVariant(const QVariant & orc_DisplayValue, const QVariant & orc_EditValue)
 {
    this->me_Type = orc_EditValue.type();
    this->setText(orc_DisplayValue.toString());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set minimum value from variant
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set minimum value from variant
 
    \param[in] orc_Value Edit value
-
-   \created     29.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblEditLineEditBase::SetMinFromVariant(const QVariant & orc_Value)
 {
    this->mc_MinValue = orc_Value.toString();
    m_UpdateToolTip();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set maximum value from variant
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set maximum value from variant
 
    \param[in] orc_Value Edit value
-
-   \created     29.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblEditLineEditBase::SetMaxFromVariant(const QVariant & orc_Value)
 {
    this->mc_MaxValue = orc_Value.toString();
    m_UpdateToolTip();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get value as variant
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get value as variant
 
    Expected: same value type as input
 
@@ -118,10 +98,8 @@ void C_TblEditLineEditBase::SetMaxFromVariant(const QVariant & orc_Value)
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     29.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_TblEditLineEditBase::GetValueAsVariant(QVariant & orc_Value, QString & orc_ErrorDescription) const
 {
    const QString c_ErrorDescriptionInt = C_GtGetText::h_GetText(
@@ -216,13 +194,10 @@ sint32 C_TblEditLineEditBase::GetValueAsVariant(QVariant & orc_Value, QString & 
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update tooltip (for min max only!)
-
-   \created     29.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update tooltip (for min max only!)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblEditLineEditBase::m_UpdateToolTip(void)
 {
    if ((this->mc_MinValue.isEmpty() == false) || (this->mc_MaxValue.isEmpty() == false))
@@ -245,19 +220,16 @@ void C_TblEditLineEditBase::m_UpdateToolTip(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get string as float value (if possible)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get string as float value (if possible)
 
    \param[in]  orc_Value  Value to transform
    \param[out] orq_Worked Output for error reporting
 
    \return
    Value as float if it worked
-
-   \created     29.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 float64 C_TblEditLineEditBase::mh_GetStringAsFloat(const QString & orc_Value, bool & orq_Worked)
 {
    float64 f64_Retval = orc_Value.toDouble(&orq_Worked);

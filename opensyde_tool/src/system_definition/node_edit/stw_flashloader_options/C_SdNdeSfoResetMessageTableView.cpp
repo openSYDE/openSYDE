@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       short description (implementation)
 
    detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     07.12.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QScrollBar>
@@ -24,34 +17,31 @@
 #include "C_SdNdeSfoResetMessageTableView.h"
 #include "constants.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     07.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeSfoResetMessageTableView::C_SdNdeSfoResetMessageTableView(QWidget * const opc_Parent) :
    //Do not use common base class because of spacing issue at bottom
    QTableView(opc_Parent)
@@ -97,15 +87,12 @@ C_SdNdeSfoResetMessageTableView::C_SdNdeSfoResetMessageTableView(QWidget * const
            &C_SdNdeSfoResetMessageTableView::m_ScrollBarRangeChangedHor);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Specify associated node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Specify associated node
 
    \param[in] ou32_NodeIndex Node index
-
-   \created     07.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeSfoResetMessageTableView::SetNode(const stw_types::uint32 ou32_NodeIndex)
 {
    this->mc_Model.SetIndex(ou32_NodeIndex);
@@ -113,13 +100,10 @@ void C_SdNdeSfoResetMessageTableView::SetNode(const stw_types::uint32 ou32_NodeI
    m_InitColumns();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize columns size
-
-   \created     07.12.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize columns size
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeSfoResetMessageTableView::m_InitColumns(void)
 {
    //Table size
@@ -137,7 +121,7 @@ void C_SdNdeSfoResetMessageTableView::m_InitColumns(void)
    this->setColumnWidth(C_SdNdeSfoResetMessageTableModel::h_EnumToColumn(C_SdNdeSfoResetMessageTableModel::eBYTE8), 50);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeSfoResetMessageTableView::m_ScrollBarRangeChangedHor(const sintn osn_Min, const sintn osn_Max) const
 {
    // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar

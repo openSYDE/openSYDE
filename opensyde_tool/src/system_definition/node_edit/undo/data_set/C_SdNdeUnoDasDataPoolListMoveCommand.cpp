@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data pool list data set move undo command (implementation)
 
    Data pool list data set move undo command
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.01.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -25,25 +18,24 @@
 #include "C_SdNdeUnoUtil.h"
 #include "C_SdUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     oru32_NodeIndex            Node index
    \param[in]     oru32_DataPoolIndex        Node data pool index
@@ -54,10 +46,8 @@ using namespace stw_opensyde_gui_logic;
    \param[in]     orc_TargetCol              Target columns
    \param[in]     orq_AdaptIndices           Flag, if target columns should be adapted to source column deletion
    \param[in,out] opc_Parent                 Optional pointer to parent
-
-   \created     25.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoDasDataPoolListMoveCommand::C_SdNdeUnoDasDataPoolListMoveCommand(const uint32 & oru32_NodeIndex,
                                                                            const uint32 & oru32_DataPoolIndex,
                                                                            const uint32 & oru32_DataPoolListIndex,
@@ -78,13 +68,10 @@ C_SdNdeUnoDasDataPoolListMoveCommand::C_SdNdeUnoDasDataPoolListMoveCommand(const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Redo
-
-   \created     26.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Redo
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDasDataPoolListMoveCommand::redo(void)
 {
    //DELETE
@@ -97,13 +84,10 @@ void C_SdNdeUnoDasDataPoolListMoveCommand::redo(void)
    this->mq_Initial = false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Undo
-
-   \created     26.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Undo
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDasDataPoolListMoveCommand::undo(void)
 {
    C_SdNdeUnoDasDataPoolListBaseCommand::undo();

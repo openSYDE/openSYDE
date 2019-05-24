@@ -1,48 +1,40 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Custom text element graphics item in system definition (implementation)
 
    Custom text element graphics item in system definition
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.07.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
 #include "C_GiSdTextElement.h"
 #include "C_PuiSdHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -50,10 +42,8 @@ using namespace stw_opensyde_gui_logic;
    \param[in]     oru64_ID    Unique ID
    \param[in]     oq_Editable Flag for editing the content of the text element
    \param[in,out] opc_Parent  Optional pointer to parent
-
-   \created     20.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSdTextElement::C_GiSdTextElement(const sint32 & ors32_Index, const uint64 & oru64_ID, const bool oq_Editable,
                                      QGraphicsItem * const opc_Parent) :
    C_GiBiTextElement(oru64_ID, oq_Editable, opc_Parent),
@@ -61,19 +51,16 @@ C_GiSdTextElement::C_GiSdTextElement(const sint32 & ors32_Index, const uint64 & 
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in]     ors32_Index Index of data element in system definition
    \param[in]     oru64_ID    Unique ID
    \param[in,out] opc_Parent  Optional pointer to parent
-
-   \created     20.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSdTextElement::C_GiSdTextElement(const sint32 & ors32_Index, const uint64 & oru64_ID,
                                      QGraphicsItem * const opc_Parent) :
    C_GiBiTextElement(oru64_ID, opc_Parent),
@@ -81,31 +68,27 @@ C_GiSdTextElement::C_GiSdTextElement(const sint32 & ors32_Index, const uint64 & 
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function for initially loading internal data
-
-   \created     10.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function for initially loading internal data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSdTextElement::LoadData(void)
 {
    if (C_PuiSdHandler::h_GetInstance()->c_Elements.c_TextElements.size() > static_cast<uint32>(this->ms32_Index))
    {
-      C_PuiBsTextElement & rc_UITextElementData =
+      const C_PuiBsTextElement & rc_UITextElementData =
          C_PuiSdHandler::h_GetInstance()->c_Elements.c_TextElements[static_cast<uint32>(this->ms32_Index)];
 
       this->m_LoadTextElementData(&rc_UITextElementData, false);
+      //Object name for test
+      this->setObjectName(QString("Meta: %1").arg(rc_UITextElementData.c_UIText));
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot function for updating internal data
-
-   \created     02.11.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for updating internal data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSdTextElement::UpdateData(void)
 {
    if (C_PuiSdHandler::h_GetInstance()->c_Elements.c_TextElements.size() > static_cast<uint32>(this->ms32_Index))
@@ -116,13 +99,10 @@ void C_GiSdTextElement::UpdateData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete data in system definition
-
-   \created     14.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete data in system definition
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSdTextElement::DeleteData(void)
 {
    C_PuiSdHandler::h_GetInstance()->c_Elements.c_TextElements.erase(

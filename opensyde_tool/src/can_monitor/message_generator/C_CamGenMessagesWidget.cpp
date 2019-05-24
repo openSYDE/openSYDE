@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for all displaying and interacting with manually configured messages (implementation)
 
    Widget for all displaying and interacting with manually configured messages
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     26.11.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_GtGetText.h"
@@ -25,34 +18,31 @@
 #include "C_CamGenMessagesWidget.h"
 #include "ui_C_CamGenMessagesWidget.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     26.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamGenMessagesWidget::C_CamGenMessagesWidget(QWidget * const opc_Parent) :
    C_OgeWiOnlyBackground(opc_Parent),
    mpc_Ui(new Ui::C_CamGenMessagesWidget)
@@ -87,25 +77,19 @@ C_CamGenMessagesWidget::C_CamGenMessagesWidget(QWidget * const opc_Parent) :
            &C_CamGenMessagesWidget::SigRegisterCyclicMessage);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     26.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamGenMessagesWidget::~C_CamGenMessagesWidget()
 {
    delete this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     30.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelNoMessages->setText(C_GtGetText::h_GetText(
@@ -122,125 +106,98 @@ void C_CamGenMessagesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_PushButtonMoveDown->SetToolTipInformation(C_GtGetText::h_GetText("Move Down"), "");
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save all user settings
-
-   \created     12.12.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save all user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::SaveUserSettings(void) const
 {
    this->mpc_Ui->pc_TableView->SaveUserSettings();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle user settings
-
-   \created     04.02.2019  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::LoadUserSettings(void) const
 {
    this->mpc_Ui->pc_TableView->LoadUserSettings();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Remove all messages for the specified file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove all messages for the specified file
 
    \param[in] orc_File Database to remove all messages for
-
-   \created     05.02.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::RemoveMessagesForFile(const QString & orc_File) const
 {
    this->mpc_Ui->pc_TableView->RemoveMessagesForFile(orc_File);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal communication start
-
-   \created     14.12.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal communication start
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::SetCommunicationStarted(void) const
 {
    this->mpc_Ui->pc_TableView->SetCommunicationStarted();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal communication stop
-
-   \created     14.12.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal communication stop
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::SetCommunicationStopped(void) const
 {
    this->mpc_Ui->pc_TableView->SetCommunicationStopped();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if the key needs to be handled by this widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if the key needs to be handled by this widget
 
    \param[in] orc_Input Key input interpreted as text
 
    \return
    True  Handled by this widget
    False No handling
-
-   \created     15.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_CamGenMessagesWidget::CheckAndHandleKey(const QString & orc_Input) const
 {
    return this->mpc_Ui->pc_TableView->CheckAndHandleKey(orc_Input);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update message data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update message data
 
    \param[in] ou32_MessageIndex Message index
-
-   \created     14.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::UpdateMessageData(const stw_types::uint32 ou32_MessageIndex) const
 {
    this->mpc_Ui->pc_TableView->UpdateMessageData(ou32_MessageIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Request trigger of model function for update cyclic message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Request trigger of model function for update cyclic message
 
    Reason: have one central point for each check which has to be done when changing an existing message
 
    \param[in] ou32_MessageIndex Message index
    \param[in] oq_Active         Change of cyclic message state
-
-   \created     15.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::TriggerModelUpdateCyclicMessage(const stw_types::uint32 ou32_MessageIndex,
                                                              const bool oq_Active) const
 {
    this->mpc_Ui->pc_TableView->TriggerModelUpdateCyclicMessage(ou32_MessageIndex, oq_Active);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle buttons init state
-
-   \created     26.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle buttons init state
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::m_InitButtons(void) const
 {
    QString c_Icon;
@@ -288,13 +245,10 @@ void C_CamGenMessagesWidget::m_InitButtons(void) const
            &C_CamGenTableView::MoveMessageDown);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update dynamic heading
-
-   \created     30.01.2019  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update dynamic heading
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::m_UpdateHeading(void) const
 {
    this->mpc_Ui->pc_LabelHeading->setText(QString(C_GtGetText::h_GetText("Messages (%1)")).arg(C_CamProHandler::
@@ -302,15 +256,12 @@ void C_CamGenMessagesWidget::m_UpdateHeading(void) const
                                                                                                GetMessages().size()));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register item count change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register item count change
 
    \param[in] ou32_NewItemCount New item count
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::m_OnItemCountChanged(const stw_types::uint32 ou32_NewItemCount) const
 {
    m_UpdateHeading();

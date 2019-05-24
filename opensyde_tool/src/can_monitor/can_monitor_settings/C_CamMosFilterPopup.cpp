@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for create/edit filter dialog. (implementation)
 
    Widget for create/edit filter dialog.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     03.12.2018  STW/G.Landsgesell
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_CamMosFilterPopup.h"
@@ -30,7 +23,7 @@
 #include "C_CamDbHandler.h"
 #include "C_CamMosDatabaseSelectionPopup.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
@@ -38,30 +31,27 @@ using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in]     orc_FilterData    filter data (name, comment, ...)
-   \param[in,out] opc_Parent        Optional pointer to parent
-
-   \created     03.12.2018  STW/G.Landsgesell
+   \param[in,out] orc_Parent        Reference to parent
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosFilterPopup::C_CamMosFilterPopup(const stw_opensyde_gui_logic::C_CamProFilterData & orc_FilterData,
                                          stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
    QWidget(&orc_Parent),
@@ -123,31 +113,25 @@ C_CamMosFilterPopup::C_CamMosFilterPopup(const stw_opensyde_gui_logic::C_CamProF
    connect(this->mpc_Ui->pc_PubAddItem, &C_OgePubSvgIconOnly::clicked, this, &C_CamMosFilterPopup::m_OnAddFilterItem);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     03.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosFilterPopup::~C_CamMosFilterPopup(void)
 {
    delete this->mpc_Ui;
    delete this->mpc_TableModel;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get filter data.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get filter data.
 
    Attention: enabled flag must be set separately!
 
    \return
    filter data
-
-   \created     05.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamProFilterData C_CamMosFilterPopup::GetFilterData(void) const
 {
    C_CamProFilterData c_Retval;
@@ -160,17 +144,14 @@ C_CamProFilterData C_CamMosFilterPopup::GetFilterData(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     12.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
@@ -196,13 +177,10 @@ void C_CamMosFilterPopup::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     03.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_InitStaticNames(void)
 {
    this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("Filter"));
@@ -253,13 +231,10 @@ void C_CamMosFilterPopup::m_InitStaticNames(void)
    this->mpc_Ui->pc_LeCanIdStart->SetMinFromVariant("0x0");
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize colors, fonts, ...
-
-   \created     04.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize colors, fonts, ...
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_InitStaticGUIElements(void) const
 {
    // label "Name"
@@ -356,13 +331,10 @@ void C_CamMosFilterPopup::m_InitStaticGUIElements(void) const
                                                                         QHeaderView::Fixed);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize data from filter data.
-
-   \created     05.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize data from filter data.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_InitFromData(const stw_opensyde_gui_logic::C_CamProFilterData & orc_FilterData) const
 {
    const bool q_NoItems = orc_FilterData.c_FilterItems.isEmpty();
@@ -388,15 +360,12 @@ void C_CamMosFilterPopup::m_InitFromData(const stw_opensyde_gui_logic::C_CamProF
    this->m_UpdateTitleFilterItemCount();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update settings section (line edits, radio buttons, ...)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update settings section (line edits, radio buttons, ...)
 
    \param[in]     orc_FilterData    Filter item data the settings correspond to
-
-   \created     11.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_UpdateSettingsSection(const C_CamProFilterItemData & orc_FilterItemData) const
 {
    // type
@@ -436,15 +405,12 @@ void C_CamMosFilterPopup::m_UpdateSettingsSection(const C_CamProFilterItemData &
    this->mpc_Ui->pc_CheckBoxExtended->setChecked(static_cast<bool>(orc_FilterItemData.u8_ExtendedId));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show label "No filter item" or table and settings.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show label "No filter item" or table and settings.
 
    \param[in]     oq_NoFilter    true: show label "No filter item"; false: show settings
-
-   \created     18.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_ShowNoFilter(const bool oq_NoFilter) const
 {
    // these ifs are because order matters: first hide then show to avoid resizing
@@ -463,15 +429,12 @@ void C_CamMosFilterPopup::m_ShowNoFilter(const bool oq_NoFilter) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show type specific widgets.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show type specific widgets.
 
    \param[in]     os32_NewType     new index (corresponds to type)
-
-   \created     10.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_ShowTypeSpecificWidgets(const sint32 os32_NewType) const
 {
    if (os32_NewType == 1)
@@ -496,13 +459,10 @@ void C_CamMosFilterPopup::m_ShowTypeSpecificWidgets(const sint32 os32_NewType) c
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update both line edit texts with table data.
-
-   \created     12.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update both line edit texts with table data.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_UpdateLineEdits(const uint32 ou32_RowIndex) const
 {
    const QList<C_CamProFilterItemData> c_Data = this->mpc_TableModel->GetFilterItemsData();
@@ -520,37 +480,28 @@ void C_CamMosFilterPopup::m_UpdateLineEdits(const uint32 ou32_RowIndex) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Cancel button click
-
-   \created     03.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Cancel button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_OnCancel(void)
 {
    this->mrc_ParentDialog.reject();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Ok button click
-
-   \created     03.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Ok button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_OnOk(void)
 {
    this->mrc_ParentDialog.accept();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of add filter item button click
-
-   \created     04.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of add filter item button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_OnAddFilterItem(void)
 {
    std::vector<uint32> c_IndexVector;
@@ -569,13 +520,10 @@ void C_CamMosFilterPopup::m_OnAddFilterItem(void)
    this->m_UpdateTitleFilterItemCount();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of index/row click of table view.
-
-   \created     10.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of index/row click of table view.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_OnIndexClicked(const QModelIndex & orc_NewIndex)
 {
    sint32 s32_Row = orc_NewIndex.row();
@@ -607,15 +555,12 @@ void C_CamMosFilterPopup::m_OnIndexClicked(const QModelIndex & orc_NewIndex)
    this->m_ShowNoFilter(this->mpc_TableModel->rowCount() == 0);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for combo box type selection.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for combo box type selection.
 
    \param[in]     os32_NewType     new index (corresponds to type)
-
-   \created     05.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_OnTypeChanged(const sint32 os32_NewType)
 {
    const sint32 s32_CurrentRowIndex = this->m_GetCurrentSelectedRowIndex();
@@ -645,15 +590,12 @@ void C_CamMosFilterPopup::m_OnTypeChanged(const sint32 os32_NewType)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of radio button "Pass" toggle.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of radio button "Pass" toggle.
 
    \param[in]     oq_Checked     true: pass, false: stop
-
-   \created     11.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_OnRadioButtonToggle(const bool oq_Checked)
 {
    const sint32 s32_CurrentRowIndex = this->m_GetCurrentSelectedRowIndex();
@@ -669,13 +611,10 @@ void C_CamMosFilterPopup::m_OnRadioButtonToggle(const bool oq_Checked)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of line edit "From" editing finished signal.
-
-   \created     09.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of line edit "From" editing finished signal.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_OnStartIdEdited(void)
 {
    const sint32 s32_CurrentRowIndex = this->m_GetCurrentSelectedRowIndex();
@@ -723,13 +662,10 @@ void C_CamMosFilterPopup::m_OnStartIdEdited(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of line edit "To" editing finished signal.
-
-   \created     09.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of line edit "To" editing finished signal.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_OnEndIdEdited(void)
 {
    const sint32 s32_CurrentRowIndex = this->m_GetCurrentSelectedRowIndex();
@@ -777,15 +713,12 @@ void C_CamMosFilterPopup::m_OnEndIdEdited(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of check box "extended" toggle.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of check box "extended" toggle.
 
    \param[in]     oq_Checked     true: extended, false: standard
-
-   \created     12.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_OnExtendedToggled(const bool oq_Checked)
 {
    const sint32 s32_CurrentRowIndex = this->m_GetCurrentSelectedRowIndex();
@@ -809,13 +742,10 @@ void C_CamMosFilterPopup::m_OnExtendedToggled(const bool oq_Checked)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of add from database button click
-
-   \created     04.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of add from database button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_OnAddFromDatabase(void)
 {
    QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
@@ -884,16 +814,13 @@ void C_CamMosFilterPopup::m_OnAddFromDatabase(void)
    //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Return row index of currently selected row.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Return row index of currently selected row.
 
    \return
    row index (-1 if invalid selection)
-
-   \created     18.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamMosFilterPopup::m_GetCurrentSelectedRowIndex(void) const
 {
    sint32 s32_RetVal = -1;
@@ -912,26 +839,20 @@ sint32 C_CamMosFilterPopup::m_GetCurrentSelectedRowIndex(void) const
    return s32_RetVal;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update title: show number of databases
-
-   \created     25.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update title: show number of databases
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterPopup::m_UpdateTitleFilterItemCount(void) const
 {
    this->mpc_Ui->pc_LabelFilterItems->setText(
       QString(C_GtGetText::h_GetText("Filter Items (%1)")).arg(this->mpc_TableModel->rowCount()));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert int value to string.
-
-   \created     13.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert int value to string.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_CamMosFilterPopup::mh_GetValueAsHex(const uint32 u32_Value)
 {
    return "0x" + QString("%1").arg(u32_Value, 0, 16).toUpper();

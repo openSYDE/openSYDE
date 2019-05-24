@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data pool command stack (implementation)
 
    Data pool command stack
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.01.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -28,64 +21,55 @@
 #include "C_SdNdeUnoDataPoolListAddCommand.h"
 #include "C_SdNdeUnoDataPoolListDataChangeCommand.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     25.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoDataPoolManager::C_SdNdeUnoDataPoolManager(QObject * const opc_Parent) :
    C_UtiUndoStack(opc_Parent)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     25.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoDataPoolManager::~C_SdNdeUnoDataPoolManager(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register move command
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register move command
 
    \param[in]     oru32_NodeIndex             Node index
    \param[in]     oru32_DataPoolIndex         Node data pool index
    \param[in,out] opc_DataPoolListsTreeWidget Data pool lists tree widget to perform actions on
    \param[in]     oru32_StartIndices          Source row index
    \param[in]     oru32_TargetIndices         Target row index
-
-   \created     26.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolManager::DoMoveList(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
                                            C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget,
                                            const std::vector<uint32> & oru32_StartIndices,
@@ -104,18 +88,15 @@ void C_SdNdeUnoDataPoolManager::DoMoveList(const uint32 & oru32_NodeIndex, const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do delete
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do delete
 
    \param[in]     oru32_NodeIndex             Node index
    \param[in]     oru32_DataPoolIndex         Node data pool index
    \param[in,out] opc_DataPoolListsTreeWidget Data pool lists tree widget to perform actions on
    \param[in]     orc_Indices                 Node data pool list indices
-
-   \created     26.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolManager::DoDeleteList(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
                                              stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget,
                                              const std::vector<uint32> & orc_Indices)
@@ -142,18 +123,15 @@ void C_SdNdeUnoDataPoolManager::DoDeleteList(const uint32 & oru32_NodeIndex, con
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do paste
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do paste
 
    \param[in]     oru32_NodeIndex             Node index
    \param[in]     oru32_DataPoolIndex         Node data pool index
    \param[in,out] opc_DataPoolListsTreeWidget Data pool lists tree widget to perform actions on
    \param[in]     oru32_InsertListIndex        Node data pool list index to insert new elements at
-
-   \created     27.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolManager::DoPaste(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
                                         C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget,
                                         const uint32 & oru32_InsertListIndex)
@@ -174,18 +152,15 @@ void C_SdNdeUnoDataPoolManager::DoPaste(const uint32 & oru32_NodeIndex, const ui
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do add
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do add
 
    \param[in]     oru32_NodeIndex             Node index
    \param[in]     oru32_DataPoolIndex         Node data pool index
    \param[in,out] opc_DataPoolListsTreeWidget Data pool lists tree widget to perform actions on
    \param[in]     orc_Indices                 Node data pool list indices
-
-   \created     27.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolManager::DoAddList(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
                                           stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget,
                                           const std::vector<uint32> & orc_Indices)
@@ -201,9 +176,8 @@ void C_SdNdeUnoDataPoolManager::DoAddList(const uint32 & oru32_NodeIndex, const 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do data change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do data change
 
    \param[in]     oru32_NodeIndex                Node index
    \param[in]     oru32_DataPoolIndex            Node data pool index
@@ -211,10 +185,8 @@ void C_SdNdeUnoDataPoolManager::DoAddList(const uint32 & oru32_NodeIndex, const 
    \param[in]     oru32_DataPoolListElementIndex Node data pool list index
    \param[in]     orc_NewData                    New data
    \param[in]     ore_DataChangeType             Data change type
-
-   \created     13.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolManager::DoChangeListData(const uint32 & oru32_NodeIndex,     const uint32 & oru32_DataPoolIndex,
                                                  stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget, const uint32 & oru32_DataPoolListIndex, const QVariant & orc_NewData,
                                                  const C_SdNdeDataPoolUtil::E_ListDataChangeType & ore_DataChangeType)
@@ -230,7 +202,7 @@ void C_SdNdeUnoDataPoolManager::DoChangeListData(const uint32 & oru32_NodeIndex,
    this->DoPush(pc_DataChangeCommand);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolManager::m_CleanupAction(void)
 {
    Q_EMIT this->SigChanged();

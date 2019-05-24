@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       openSYDE: Sequences for system update.
@@ -8,15 +8,9 @@
 
    Provides functions to perform the flashing sequence.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     08.11.2017  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCSUSEQUENCESH
 #define C_OSCSUSEQUENCESH
 

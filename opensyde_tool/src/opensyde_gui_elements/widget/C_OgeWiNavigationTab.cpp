@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for navigation bar tab (implementation)
 
    Widget for navigation bar tab
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.07.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QGroupBox>
@@ -25,34 +18,31 @@
 #include "C_OgeWiNavigationTab.h"
 #include "ui_C_OgeWiNavigationTab.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     25.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeWiNavigationTab::C_OgeWiNavigationTab(QWidget * const opc_Parent) :
    QPushButton(opc_Parent),
    mpc_Ui(new Ui::C_OgeWiNavigationTab),
@@ -74,41 +64,32 @@ C_OgeWiNavigationTab::C_OgeWiNavigationTab(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_LabelIcon->setText("");
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     25.07.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeWiNavigationTab::~C_OgeWiNavigationTab(void)
 {
    delete this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set include left border flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set include left border flag
 
    \param[in] oq_Include Include left border flag
-
-   \created     25.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiNavigationTab::SetIncludeLeftBorder(const bool oq_Include)
 {
    C_OgeWiUtil::h_ApplyStylesheetProperty(this, "IncludeLeftBorder", oq_Include);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set new active state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new active state
 
    \param[in] oq_Active New active state
-
-   \created     25.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiNavigationTab::SetActive(const bool oq_Active)
 {
    QColor c_Color = mc_STYLE_GUIDE_COLOR_21;
@@ -124,46 +105,37 @@ void C_OgeWiNavigationTab::SetActive(const bool oq_Active)
                                                       c_Color.alpha()));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set new SVG icon
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new SVG icon
 
    \param[in] orc_IconSvg New icon
-
-   \created     25.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiNavigationTab::SetIconSvg(const QString & orc_IconSvg) const
 {
    this->mpc_Ui->pc_LabelIcon->SetSvg(orc_IconSvg);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set new text
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new text
 
    \param[in] orc_NewText New text
-
-   \created     25.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiNavigationTab::SetText(const QString & orc_NewText) const
 {
    this->mpc_Ui->pc_LabelText->setText(orc_NewText);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    Here: draw background
    (Not automatically drawn in any QWidget derivative)
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     25.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiNavigationTab::paintEvent(QPaintEvent * const opc_Event)
 {
    C_OgeWiUtil::h_DrawBackground(this);
@@ -171,17 +143,14 @@ void C_OgeWiNavigationTab::paintEvent(QPaintEvent * const opc_Event)
    QWidget::paintEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten event slot
 
    Here: Check for hover event
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     25.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OgeWiNavigationTab::event(QEvent * const opc_Event)
 {
    if ((opc_Event->type() == QEvent::HoverMove) && (this->mq_Active == false))

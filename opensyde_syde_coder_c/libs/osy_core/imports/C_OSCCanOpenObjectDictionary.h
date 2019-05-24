@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       CANopen EDS / DCF file handler
 
    see .cpp file for details
 
-   \implementation
-   project     CANopen library
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     09.04.2018  STW/A.Stangl (based on pre-existing implementation)
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCCANOPENEDSDCFH
 #define C_OSCCANOPENEDSDCFH
 

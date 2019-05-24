@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief      Wrapper class for tinyxml2
 
    cf. .h file header for details
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     07.09.2016  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h" //pre-compiled headers
 
 #include <fstream>
@@ -25,47 +18,41 @@
 #include "C_OSCXMLParser.h"
 #include "tinyxml2.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_scl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Constructor
 
    Open XML file.
    Will throw on error.
-
-   \created     07.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCXMLParserBase::C_OSCXMLParserBase(void)
 {
    mpc_CurrentNode = NULL;
    m_Init();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init of common xml structure
-
-   \created     21.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init of common xml structure
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCXMLParserBase::m_Init(void)
 {
    //empty file ?
@@ -77,53 +64,43 @@ void C_OSCXMLParserBase::m_Init(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Destructor
 
    Will try to save the XML file and will throw on error.
-
-   \created     07.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCXMLParserBase::~C_OSCXMLParserBase(void)
 {
    mpc_CurrentNode = NULL;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Constructor
 
    Set up empty document
 
    Open XML file.
    Will throw on error.
-
-   \created     07.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCXMLParser::C_OSCXMLParser(void) :
    C_OSCXMLParserBase()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Destructor
 
    Clean up ...
-
-   \created     07.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCXMLParser::~C_OSCXMLParser(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Open XML data from file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Open XML data from file
 
    Open XML file.
    If the file could not be opened the function will return an error and prepare an empty XML structure.
@@ -133,10 +110,8 @@ C_OSCXMLParser::~C_OSCXMLParser(void)
    \return
    C_NO_ERR   data was read from file
    C_NOACT    could not read data from file
-
-   \created     07.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCXMLParser::LoadFromFile(const C_SCLString & orc_FileName)
 {
    tinyxml2::XMLError e_Error;
@@ -153,9 +128,8 @@ sint32 C_OSCXMLParser::LoadFromFile(const C_SCLString & orc_FileName)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Write XML data to file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Write XML data to file
 
    A pre-existing file will be replaced.
 
@@ -164,10 +138,8 @@ sint32 C_OSCXMLParser::LoadFromFile(const C_SCLString & orc_FileName)
    \return
    C_NO_ERR   data was written to file
    C_NOACT    could not write data to file
-
-   \created     25.01.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCXMLParser::SaveToFile(const C_SCLString & orc_FileName)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -180,18 +152,15 @@ sint32 C_OSCXMLParser::SaveToFile(const C_SCLString & orc_FileName)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Select root node as active element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Select root node as active element
 
    Set the document's root node as active element.
 
    \return
    name of root element ("" on error)
-
-   \created     07.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCXMLParserBase::SelectRoot(void)
 {
    C_SCLString c_RootName;
@@ -204,9 +173,8 @@ C_SCLString C_OSCXMLParserBase::SelectRoot(void)
    return c_RootName;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Select next node as active element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Select next node as active element
 
    Select the next node on the same level as the current node as active element.
 
@@ -215,10 +183,8 @@ C_SCLString C_OSCXMLParserBase::SelectRoot(void)
 
    \return
    name of selected element ("" on error)
-
-   \created     07.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCXMLParserBase::SelectNodeNext(const C_SCLString & orc_Name)
 {
    C_SCLString c_Name;
@@ -248,9 +214,8 @@ C_SCLString C_OSCXMLParserBase::SelectNodeNext(const C_SCLString & orc_Name)
    return c_Name;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Select next node as active element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Select next node as active element
 
    Select the next node on the same level as the current node as active element.
 
@@ -259,10 +224,8 @@ C_SCLString C_OSCXMLParserBase::SelectNodeNext(const C_SCLString & orc_Name)
 
    \return
    name of selected element ("" on error)
-
-   \created     07.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCXMLParserBase::SelectNodeChild(const C_SCLString & orc_Name)
 {
    C_SCLString c_Name;
@@ -298,18 +261,15 @@ C_SCLString C_OSCXMLParserBase::SelectNodeChild(const C_SCLString & orc_Name)
    return c_Name;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Select parent of active node as active element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Select parent of active node as active element
 
    Select the parent node of the current node as active element.
 
    \return
    name of selected element ("" on error)
-
-   \created     07.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCXMLParserBase::SelectNodeParent(void)
 {
    C_SCLString c_Name;
@@ -325,9 +285,8 @@ C_SCLString C_OSCXMLParserBase::SelectNodeParent(void)
    return c_Name;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Get content of selected node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get content of selected node
 
    Return content of selected node as string.
    Example:
@@ -336,10 +295,8 @@ C_SCLString C_OSCXMLParserBase::SelectNodeParent(void)
 
    \return
    Content of selected element ("" on error)
-
-   \created     07.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCXMLParserBase::GetNodeContent(void) const
 {
    C_SCLString c_Content;
@@ -356,9 +313,8 @@ C_SCLString C_OSCXMLParserBase::GetNodeContent(void) const
    return c_Content;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Check whether specified attribute exists
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check whether specified attribute exists
 
    Check whether the specified attribute exists in the current element.
 
@@ -367,10 +323,8 @@ C_SCLString C_OSCXMLParserBase::GetNodeContent(void) const
    \return
    true   attribute exists
    false  attribute does not exists (or: no element selected)
-
-   \created     08.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCXMLParserBase::AttributeExists(const C_SCLString & orc_Name) const
 {
    bool q_Return = false;
@@ -386,9 +340,8 @@ bool C_OSCXMLParserBase::AttributeExists(const C_SCLString & orc_Name) const
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Get attribute value of selected node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get attribute value of selected node
 
    Return one attribute value of selected node as string.
 
@@ -396,10 +349,8 @@ bool C_OSCXMLParserBase::AttributeExists(const C_SCLString & orc_Name) const
 
    \return
    Content of selected attribute ("" on error)
-
-   \created     07.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCXMLParserBase::GetAttributeString(const C_SCLString & orc_Name) const
 {
    C_SCLString c_Value;
@@ -415,9 +366,8 @@ C_SCLString C_OSCXMLParserBase::GetAttributeString(const C_SCLString & orc_Name)
    return c_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Get attribute value of selected node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get attribute value of selected node
 
    Return one attribute value of selected node as sint32 value.
    Can handle "0x" notation to interpret hex values.
@@ -426,10 +376,8 @@ C_SCLString C_OSCXMLParserBase::GetAttributeString(const C_SCLString & orc_Name)
 
    \return
    value (zero on error)
-
-   \created     08.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCXMLParserBase::GetAttributeSint32(const C_SCLString & orc_Name) const
 {
    sintn sn_Value = 0;
@@ -450,9 +398,8 @@ sint32 C_OSCXMLParserBase::GetAttributeSint32(const C_SCLString & orc_Name) cons
    return sn_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Get attribute value of selected node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get attribute value of selected node
 
    Return one attribute value of selected node as uint32 value.
    Can handle "0x" notation to interpret hex values.
@@ -461,10 +408,8 @@ sint32 C_OSCXMLParserBase::GetAttributeSint32(const C_SCLString & orc_Name) cons
 
    \return
    value (zero on error)
-
-   \created     08.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_OSCXMLParserBase::GetAttributeUint32(const C_SCLString & orc_Name) const
 {
    uintn un_Value = 0;
@@ -485,9 +430,8 @@ uint32 C_OSCXMLParserBase::GetAttributeUint32(const C_SCLString & orc_Name) cons
    return un_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Get attribute value of selected node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get attribute value of selected node
 
    Return one attribute value of selected node as sint64 value.
    Can handle "0x" notation to interpret hex values.
@@ -496,10 +440,8 @@ uint32 C_OSCXMLParserBase::GetAttributeUint32(const C_SCLString & orc_Name) cons
 
    \return
    value (zero on error)
-
-   \created     08.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint64 C_OSCXMLParserBase::GetAttributeSint64(const C_SCLString & orc_Name) const
 {
    sint64 s64_Value = 0;
@@ -520,9 +462,8 @@ sint64 C_OSCXMLParserBase::GetAttributeSint64(const C_SCLString & orc_Name) cons
    return s64_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Get attribute value of selected node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get attribute value of selected node
 
    Return one attribute value of selected node as bool value.
 
@@ -531,10 +472,8 @@ sint64 C_OSCXMLParserBase::GetAttributeSint64(const C_SCLString & orc_Name) cons
    \return
    true   attribute value is "1"
    false  attribute value is "0" (also returned on error)
-
-   \created     08.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCXMLParserBase::GetAttributeBool(const C_SCLString & orc_Name) const
 {
    bool q_Value = false;
@@ -550,9 +489,8 @@ bool C_OSCXMLParserBase::GetAttributeBool(const C_SCLString & orc_Name) const
    return q_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Get attribute value of selected node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get attribute value of selected node
 
    Return one attribute value of selected node as float32 value.
 
@@ -560,10 +498,8 @@ bool C_OSCXMLParserBase::GetAttributeBool(const C_SCLString & orc_Name) const
 
    \return
    value (0.0F on error)
-
-   \created     08.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 float32 C_OSCXMLParserBase::GetAttributeFloat32(const C_SCLString & orc_Name) const
 {
    float32 f32_Value = 0.0F;
@@ -579,9 +515,8 @@ float32 C_OSCXMLParserBase::GetAttributeFloat32(const C_SCLString & orc_Name) co
    return f32_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Get attribute value of selected node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get attribute value of selected node
 
    Return one attribute value of selected node as float64 value.
 
@@ -589,10 +524,8 @@ float32 C_OSCXMLParserBase::GetAttributeFloat32(const C_SCLString & orc_Name) co
 
    \return
    value (0.0 on error)
-
-   \created     08.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 float64 C_OSCXMLParserBase::GetAttributeFloat64(const C_SCLString & orc_Name) const
 {
    float64 f64_Value = 0.0;
@@ -608,18 +541,15 @@ float64 C_OSCXMLParserBase::GetAttributeFloat64(const C_SCLString & orc_Name) co
    return f64_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Get all attribute values of selected node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get all attribute values of selected node
 
    Return all attribute values of selected node as vector of C_OSCXMLAttribute.
 
    \return
    Content of selected attributes (empty vector on error)
-
-   \created     07.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<C_OSCXMLAttribute> C_OSCXMLParserBase::GetAttributes(void) const
 {
    std::vector<C_OSCXMLAttribute> c_AttributeList;
@@ -640,9 +570,8 @@ std::vector<C_OSCXMLAttribute> C_OSCXMLParserBase::GetAttributes(void) const
    return c_AttributeList;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Create a node under the currently selected node.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Create a node under the currently selected node.
 
    Add a new node under the currently selected node.
    The current selection will not be changed.
@@ -650,10 +579,8 @@ std::vector<C_OSCXMLAttribute> C_OSCXMLParserBase::GetAttributes(void) const
 
    \param[in]  orc_Name     name of new node
    \param[in]  orc_Content  content of new node
-
-   \created     07.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCXMLParserBase::CreateNodeChild(const C_SCLString & orc_Name, const C_SCLString & orc_Content)
 {
    tinyxml2::XMLElement * const pc_Node = mc_Document.NewElement("");
@@ -672,9 +599,8 @@ void C_OSCXMLParserBase::CreateNodeChild(const C_SCLString & orc_Name, const C_S
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Create a node under the currently selected node and select it.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Create a node under the currently selected node and select it.
 
    Add a new node under the currently selected node.
    The current selection will be changed to the new node.
@@ -683,10 +609,8 @@ void C_OSCXMLParserBase::CreateNodeChild(const C_SCLString & orc_Name, const C_S
    \param[in]  orc_Name     name of new node
 
    \return   name of the new node
-
-   \created     07.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCXMLParserBase::CreateAndSelectNodeChild(const C_SCLString & orc_Name)
 {
    C_SCLString c_Name;
@@ -709,18 +633,15 @@ C_SCLString C_OSCXMLParserBase::CreateAndSelectNodeChild(const C_SCLString & orc
    return c_Name;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Delete the current node.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Delete the current node.
 
    Remove the currently selected node.
    The selection will be set to NULL (= nothing selected).
 
    \return  if a node was selected: name of deleted node (otherwise "")
-
-   \created     07.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCXMLParserBase::DeleteNode(void)
 {
    C_SCLString c_Name;
@@ -735,17 +656,14 @@ C_SCLString C_OSCXMLParserBase::DeleteNode(void)
    return c_Name;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Set content of currently selected node.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set content of currently selected node.
 
    Set content of currently selected node from a string.
 
    \param[in]  orc_Content   new content
-
-   \created     07.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCXMLParserBase::SetNodeContent(const C_SCLString & orc_Content)
 {
    if (mpc_CurrentNode != NULL)
@@ -754,18 +672,15 @@ void C_OSCXMLParserBase::SetNodeContent(const C_SCLString & orc_Content)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Set string content of one attribute of currently selected node.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set string content of one attribute of currently selected node.
 
    Set content of one attribute of currently selected node from a string.
 
    \param[in]  orc_Name   name of attribute
    \param[in]  orc_Value  new value of attribute
-
-   \created     07.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCXMLParserBase::SetAttributeString(const C_SCLString & orc_Name, const C_SCLString & orc_Value)
 {
    if (mpc_CurrentNode != NULL)
@@ -774,18 +689,15 @@ void C_OSCXMLParserBase::SetAttributeString(const C_SCLString & orc_Name, const 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Set sint32 content of attribute of currently selected node.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set sint32 content of attribute of currently selected node.
 
    Set content of one attribute of currently selected node from an sint32.
 
    \param[in]  orc_Name    name of attribute
    \param[in]  os32_Value  new value of attribute
-
-   \created     08.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCXMLParserBase::SetAttributeSint32(const C_SCLString & orc_Name, const sint32 os32_Value)
 {
    if (mpc_CurrentNode != NULL)
@@ -794,18 +706,15 @@ void C_OSCXMLParserBase::SetAttributeSint32(const C_SCLString & orc_Name, const 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Set uint32 content of attribute of currently selected node.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set uint32 content of attribute of currently selected node.
 
    Set content of one attribute of currently selected node from a uint32.
 
    \param[in]  orc_Name    name of attribute
    \param[in]  ou32_Value  new value of attribute
-
-   \created     08.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCXMLParserBase::SetAttributeUint32(const C_SCLString & orc_Name, const uint32 ou32_Value)
 {
    if (mpc_CurrentNode != NULL)
@@ -814,18 +723,15 @@ void C_OSCXMLParserBase::SetAttributeUint32(const C_SCLString & orc_Name, const 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Set sint64 content of attribute of currently selected node.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set sint64 content of attribute of currently selected node.
 
    Set content of one attribute of currently selected node from an sint64.
 
    \param[in]  orc_Name    name of attribute
    \param[in]  os64_Value  new value of attribute
-
-   \created     08.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCXMLParserBase::SetAttributeSint64(const C_SCLString & orc_Name, const sint64 os64_Value)
 {
    if (mpc_CurrentNode != NULL)
@@ -835,9 +741,8 @@ void C_OSCXMLParserBase::SetAttributeSint64(const C_SCLString & orc_Name, const 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Set bool content of attribute of currently selected node.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set bool content of attribute of currently selected node.
 
    Set content of one attribute of currently selected node from a bool.
    "true" will be written as "1"
@@ -845,10 +750,8 @@ void C_OSCXMLParserBase::SetAttributeSint64(const C_SCLString & orc_Name, const 
 
    \param[in]  orc_Name    name of attribute
    \param[in]  oq_Value    new value of attribute
-
-   \created     08.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCXMLParserBase::SetAttributeBool(const C_SCLString & orc_Name, const bool oq_Value)
 {
    if (mpc_CurrentNode != NULL)
@@ -857,18 +760,15 @@ void C_OSCXMLParserBase::SetAttributeBool(const C_SCLString & orc_Name, const bo
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Set float32 content of attribute of currently selected node.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set float32 content of attribute of currently selected node.
 
    Set content of one attribute of currently selected node from a float32.
 
    \param[in]  orc_Name      name of attribute
    \param[in]  of32_Value    new value of attribute
-
-   \created     08.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCXMLParserBase::SetAttributeFloat32(const C_SCLString & orc_Name, const float32 of32_Value)
 {
    if (mpc_CurrentNode != NULL)
@@ -877,18 +777,15 @@ void C_OSCXMLParserBase::SetAttributeFloat32(const C_SCLString & orc_Name, const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Set float64 content of attribute of currently selected node.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set float64 content of attribute of currently selected node.
 
    Set content of one attribute of currently selected node from a float64.
 
    \param[in]  orc_Name      name of attribute
    \param[in]  of64_Value    new value of attribute
-
-   \created     08.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCXMLParserBase::SetAttributeFloat64(const C_SCLString & orc_Name, const float64 of64_Value)
 {
    if (mpc_CurrentNode != NULL)
@@ -897,31 +794,24 @@ void C_OSCXMLParserBase::SetAttributeFloat64(const C_SCLString & orc_Name, const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief    Default constructor
-
-   \created     21.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCXMLParserString::C_OSCXMLParserString(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     21.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCXMLParserString::~C_OSCXMLParserString(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Open XML data from string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Open XML data from string
 
    Parse XML data from string.
    If the data cannot be parsed the function will return an error and prepare an empty XML structure.
@@ -931,10 +821,8 @@ C_OSCXMLParserString::~C_OSCXMLParserString(void)
    \return
    C_NO_ERR   data was read from string
    C_NOACT    could not parse data from string
-
-   \created     25.01.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCXMLParserString::LoadFromString(const C_SCLString & orc_String)
 {
    tinyxml2::XMLError e_Error;
@@ -951,17 +839,14 @@ sint32 C_OSCXMLParserString::LoadFromString(const C_SCLString & orc_String)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Write XML data to string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Write XML data to string
 
    Write XML data to string
 
    \param[out]   orc_String   Resulting XML data
-
-   \created     21.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCXMLParserString::SaveToString(C_SCLString & orc_String) const
 {
    tinyxml2::XMLPrinter c_Printer;

@@ -1,34 +1,28 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Tab widget with tool tip (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.03.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OGETAWTOOLTIPBASE_H
 #define C_OGETAWTOOLTIPBASE_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <map>
 #include <QTabWidget>
 #include "stwtypes.h"
 #include "C_NagToolTip.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_elements
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OgeTawToolTipBase :
    public QTabWidget
@@ -47,6 +41,8 @@ protected:
    virtual bool event(QEvent * const opc_Event) override;
    //lint -restore
 
+   void m_HideToolTip(void);
+
 private:
    class C_ToolTipContent
    {
@@ -59,11 +55,10 @@ private:
    stw_opensyde_gui::C_NagToolTip * mpc_ToolTip;
    stw_types::sint32 ms32_CurrentHoveredIndex;
 
-   void m_HideTooltip(void);
    void m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

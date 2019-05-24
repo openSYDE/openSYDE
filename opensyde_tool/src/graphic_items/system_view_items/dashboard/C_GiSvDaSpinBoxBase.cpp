@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Class for system view dashboard spin box item (implementation)
 
    Class for system view dashboard spin box item
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     11.08.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QGraphicsView>
@@ -38,7 +31,7 @@
 #include "C_OSCNodeDataPoolListElement.h"
 #include "C_PuiSdHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -47,21 +40,20 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -70,10 +62,8 @@ using namespace stw_opensyde_gui_elements;
    \param[in]     ors32_DataIndex        Index of data element in dashboard in system view
    \param[in]     oru64_ID               Unique ID
    \param[in,out] opc_Parent             Optional pointer to parent
-
-   \created     11.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvDaSpinBoxBase::C_GiSvDaSpinBoxBase(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
                                          const sint32 & ors32_DataIndex, const uint64 & oru64_ID,
                                          QGraphicsItem * const opc_Parent) :
@@ -91,41 +81,32 @@ C_GiSvDaSpinBoxBase::C_GiSvDaSpinBoxBase(const uint32 & oru32_ViewIndex, const u
    this->mpc_Widget->SetWidget(this->mpc_SpinBoxWidget);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     11.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvDaSpinBoxBase::~C_GiSvDaSpinBoxBase(void)
 {
    //lint -e{1540}  no memory leak because of the parent of mpc_SpinBoxWidget and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the type of this item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the type of this item
 
    \return  ID
-
-   \created     25.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_GiSvDaSpinBoxBase::type(void) const
 {
    return msn_GRAPHICS_ITEM_DB_SPIN_BOX;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adjust font to current size
-
-   \created     17.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adjust font to current size
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSpinBoxBase::ReInitializeSize(void)
 {
    if (this->mpc_SpinBoxWidget != NULL)
@@ -134,13 +115,10 @@ void C_GiSvDaSpinBoxBase::ReInitializeSize(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load data from system view dashboard
-
-   \created     11.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load data from system view dashboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSpinBoxBase::LoadData(void)
 {
    const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
@@ -161,13 +139,10 @@ void C_GiSvDaSpinBoxBase::LoadData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update data in system view dashboard
-
-   \created     11.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update data in system view dashboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSpinBoxBase::UpdateData(void)
 {
    const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
@@ -193,13 +168,10 @@ void C_GiSvDaSpinBoxBase::UpdateData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete data in system view dashboard
-
-   \created     11.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete data in system view dashboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSpinBoxBase::DeleteData(void)
 {
    if (this->ms32_Index >= 0)
@@ -212,15 +184,12 @@ void C_GiSvDaSpinBoxBase::DeleteData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Information about the start or stop of a connection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the start or stop of a connection
 
    \param[in]  oq_Active Flag if connection is active or not active now
-
-   \created     04.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSpinBoxBase::ConnectionActiveChanged(const bool oq_Active)
 {
    const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
@@ -255,13 +224,10 @@ void C_GiSvDaSpinBoxBase::ConnectionActiveChanged(const bool oq_Active)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sends the current set value of the element
-
-   \created     29.08.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sends the current set value of the element
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSpinBoxBase::SendCurrentValue(void)
 {
    if (this->mpc_SpinBoxWidget != NULL)
@@ -298,13 +264,10 @@ void C_GiSvDaSpinBoxBase::SendCurrentValue(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Call properties for widgets
-
-   \created     12.09.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Call properties for widgets
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaSpinBoxBase::CallProperties(void)
 {
    const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
@@ -362,7 +325,10 @@ bool C_GiSvDaSpinBoxBase::CallProperties(void)
             c_Tmp.c_ElementId = pc_Dialog->GetDataElementId();
             c_Tmp.c_ElementScaling = pc_Dialog->GetScalingInformation();
             c_Box.c_DataPoolElementsConfig.clear();
-            c_Box.c_DataPoolElementsConfig.push_back(c_Tmp);
+            if (c_Tmp.c_ElementId.GetIsValid())
+            {
+               c_Box.c_DataPoolElementsConfig.push_back(c_Tmp);
+            }
             c_Box.e_ElementWriteMode = pc_Dialog->GetWriteMode();
 
             //Apply
@@ -370,7 +336,10 @@ bool C_GiSvDaSpinBoxBase::CallProperties(void)
             this->SetDisplayStyle(this->me_Style, this->mq_DarkMode);
             this->UpdateTypePe(c_Box.e_Type, c_Box.q_ShowUnit);
             this->ClearDataPoolElements();
-            this->RegisterDataPoolElement(pc_Dialog->GetDataElementId(), pc_Dialog->GetScalingInformation());
+            if (c_Tmp.c_ElementId.GetIsValid())
+            {
+               this->RegisterDataPoolElement(pc_Dialog->GetDataElementId(), pc_Dialog->GetScalingInformation());
+            }
 
             tgl_assert(C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex,
                                                                            this->mu32_DashboardIndex,
@@ -390,18 +359,15 @@ bool C_GiSvDaSpinBoxBase::CallProperties(void)
    return true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update type
 
    Warning: Only use for preview
 
    \param[in] oe_Type        Type
    \param[in] oq_ShowUnit    Show unit
-
-   \created     12.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSpinBoxBase::UpdateTypePe(const C_PuiSvDbSpinBox::E_Type oe_Type, const bool oq_ShowUnit)
 {
    if (this->mpc_SpinBoxWidget != NULL)
@@ -411,17 +377,14 @@ void C_GiSvDaSpinBoxBase::UpdateTypePe(const C_PuiSvDbSpinBox::E_Type oe_Type, c
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set value
 
    Warning: Only use for preview
 
    \param[in] os32_Value New value
-
-   \created     12.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSpinBoxBase::SetValuePe(const sint32 os32_Value)
 {
    if (this->mpc_SpinBoxWidget != NULL)
@@ -444,17 +407,14 @@ void C_GiSvDaSpinBoxBase::SetValuePe(const sint32 os32_Value)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set unit
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set unit
 
    Warning: Only use for preview
 
    \param[in] orc_Value New unit
-
-   \created     12.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSpinBoxBase::SetUnitPe(const QString & orc_Value)
 {
    if (this->mpc_SpinBoxWidget != NULL)
@@ -463,7 +423,7 @@ void C_GiSvDaSpinBoxBase::SetUnitPe(const QString & orc_Value)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSpinBoxBase::m_UpdateStaticValues(void)
 {
    if (this->mpc_SpinBoxWidget != NULL)

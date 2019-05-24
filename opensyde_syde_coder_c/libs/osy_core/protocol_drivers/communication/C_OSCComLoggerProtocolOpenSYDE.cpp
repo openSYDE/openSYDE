@@ -1,18 +1,11 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Translate L2 CAN message to openSYDE interpretation (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     08.10.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -49,10 +42,7 @@ using namespace stw_cmon_protocol;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     08.10.2018  STW/B.Bayer
+/*! \brief   Default constructor
 */
 //-----------------------------------------------------------------------------
 C_OSCComLoggerProtocolOpenSYDE::C_OSCComLoggerProtocolOpenSYDE(void) :
@@ -61,12 +51,9 @@ C_OSCComLoggerProtocolOpenSYDE::C_OSCComLoggerProtocolOpenSYDE(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Adds an openSYDE system definition configuration for analyzing
+/*! \brief   Adds an openSYDE system definition configuration for analyzing
 
    \param[in]     opc_SysDefConfig               Pointer to openSYDE system definition configuration
-
-   \created     09.10.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCComLoggerProtocolOpenSYDE::AddOsySysDef(const C_OSCComMessageLoggerOsySysDefConfig * const opc_SysDefConfig)
@@ -75,12 +62,9 @@ void C_OSCComLoggerProtocolOpenSYDE::AddOsySysDef(const C_OSCComMessageLoggerOsy
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Removes an openSYDE system definition configuration
+/*! \brief   Removes an openSYDE system definition configuration
 
    \param[in]     opc_SysDefConfig               Pointer to openSYDE system definition configuration
-
-   \created     09.10.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCComLoggerProtocolOpenSYDE::RemoveOsySysDef(const C_OSCComMessageLoggerOsySysDefConfig * const opc_SysDefConfig)
@@ -89,15 +73,12 @@ void C_OSCComLoggerProtocolOpenSYDE::RemoveOsySysDef(const C_OSCComMessageLogger
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert the openSYDE address information to text
+/*! \brief   Convert the openSYDE address information to text
 
    \param[in]     ort_CanAddressInformation   Address information
 
    \return
    Text interpretation of address information
-
-   \created     08.10.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_OSCComLoggerProtocolOpenSYDE::m_AddressInformationToText(
@@ -281,8 +262,7 @@ C_SCLString C_OSCComLoggerProtocolOpenSYDE::m_AddressInformationToText(
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert 24bit openSYDE data pool identifier code to text
+/*! \brief   Convert 24bit openSYDE data pool identifier code to text
 
    \param[in]     ou32_DataPoolIdentifier      Data pool data identifier
    \param[in]     oq_IsResponse                Flag if service for accessing the datapool element was a response or
@@ -291,8 +271,6 @@ C_SCLString C_OSCComLoggerProtocolOpenSYDE::m_AddressInformationToText(
 
    \return
    Text interpretation of data pool data identifier
-
-   \created     09.10.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_OSCComLoggerProtocolOpenSYDE::m_DataPoolIdentifierToText(const uint32 ou32_DataPoolIdentifier,

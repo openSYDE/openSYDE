@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for system definition topology
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     11.07.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QGraphicsItem>
@@ -34,39 +27,36 @@
 #include "C_UsHandler.h"
 #include "C_OgeWiUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_types;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const sintn C_SdTopologyWidget::mhsn_WidgetBorder = 25;
 const sintn C_SdTopologyWidget::mhsn_ToolboxInitPosY = 150;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in]     opc_UIProject     Optional pointer to project information
    \param[in,out] opc_parent        Optional pointer to parent
-
-   \created     11.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdTopologyWidget::C_SdTopologyWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdTopologyWidget)
@@ -114,15 +104,12 @@ C_SdTopologyWidget::C_SdTopologyWidget(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_GraphicsView->SetViewPos(C_UsHandler::h_GetInstance()->GetProjSdTopologyViewPos());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     11.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdTopologyWidget::~C_SdTopologyWidget()
 {
    // store configuration of the view
@@ -134,15 +121,12 @@ C_SdTopologyWidget::~C_SdTopologyWidget()
    //lint -e{1740} Toolbox cleaned up via Qt parent mechanism
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function to set the parent of the widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function to set the parent of the widget
 
    The toolbox will be placed on the parent widget.
-
-   \created     13.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyWidget::SetParentHook(QWidget * const opc_Parent)
 {
    if (opc_Parent != NULL)
@@ -165,7 +149,7 @@ void C_SdTopologyWidget::SetParentHook(QWidget * const opc_Parent)
          // use available desktop space to have real information about screen (widget sizes are not reliable here)
          const QDesktopWidget * const pc_Desktop = QApplication::desktop();
          this->mpc_Toolbox->setGeometry(((pc_Desktop->availableGeometry().width() - sn_ToolboxWidth) -
-                                        mhsn_WidgetBorder) - sn_ToolboxOffset,
+                                         mhsn_WidgetBorder) - sn_ToolboxOffset,
                                         mhsn_ToolboxInitPosY, sn_ToolboxWidth, sn_ToolboxHeight);
          this->mpc_Toolbox->SetMaximizedHeight(sn_ToolboxHeight);
       }
@@ -202,29 +186,23 @@ void C_SdTopologyWidget::SetParentHook(QWidget * const opc_Parent)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function for toolbar
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function for toolbar
 
    Saves the project.
-
-   \created     12.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyWidget::SaveToData(void) const
 {
    this->mpc_Scene->Save();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Hide or show the entire widget with the toolbox
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Hide or show the entire widget with the toolbox
 
    \param[in]  oq_Hide     Flag for hiding or showing
-
-   \created     12.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyWidget::HideAll(const bool oq_Hide)
 {
    if (oq_Hide == true)
@@ -240,31 +218,25 @@ void C_SdTopologyWidget::HideAll(const bool oq_Hide)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function to prepare closing the widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function to prepare closing the widget
 
    Updating of the system definition without saving it into the files
-
-   \created     22.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyWidget::PrepareToClose(void) const
 {
    this->mpc_Scene->UpdateSystemDefinition();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten resize event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten resize event
 
    Move the toolbox.
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     08.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyWidget::resizeEvent(QResizeEvent * const opc_Event)
 {
    Q_UNUSED(opc_Event)
@@ -316,9 +288,8 @@ void C_SdTopologyWidget::resizeEvent(QResizeEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Getter of graphicsscene of topology widget.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Getter of graphicsscene of topology widget.
 
    Example use case is to print 'Network Topology'.
 
@@ -326,10 +297,8 @@ void C_SdTopologyWidget::resizeEvent(QResizeEvent * const opc_Event)
 
    \return
    graphicsscene of topology widget
-
-   \created     29.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdTopologyScene * C_SdTopologyWidget::GetScene(void)
 {
    return this->mpc_Scene;

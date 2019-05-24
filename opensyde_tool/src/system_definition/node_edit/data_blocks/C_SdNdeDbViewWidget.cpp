@@ -1,34 +1,29 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for showing all node applications of a specific node (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     30.01.2016 STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "TGLUtils.h"
 #include "stwerrors.h"
 #include "C_UsHandler.h"
 #include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
 #include "C_SdNdeDbAdd.h"
+#include "C_PuiProject.h"
+#include "C_PuiSdHandler.h"
 #include "C_SdNdeDbViewWidget.h"
-#include "ui_C_SdNdeDbViewWidget.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_SdNdeDbAddNewProject.h"
 #include "C_SdNdeDbProperties.h"
+#include "C_OgeWiCustomMessage.h"
+#include "ui_C_SdNdeDbViewWidget.h"
+#include "C_SdNdeDbAddNewProject.h"
+#include "C_PopSaveAsDialogWidget.h"
 #include "C_SdNdeProgrammingOptions.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -37,28 +32,25 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SdNdeDbViewWidget::mhc_DefaultDataBlockName = "DataBlock";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     30.01.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDbViewWidget::C_SdNdeDbViewWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDbViewWidget),
@@ -79,8 +71,6 @@ C_SdNdeDbViewWidget::C_SdNdeDbViewWidget(QWidget * const opc_Parent) :
            &C_SdNdeDbViewWidget::m_OnDelete);
    connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDbListWidget::SigErrorChange, this,
            &C_SdNdeDbViewWidget::SigErrorChange);
-   connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDbListWidget::SigDuplicate, this,
-           &C_SdNdeDbViewWidget::m_OnDuplicate);
    connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDbListWidget::SigAppDisplay, this,
            &C_SdNdeDbViewWidget::m_OnAppDisplay);
    connect(this->mpc_Ui->pc_PushButtonAdd, &stw_opensyde_gui_elements::C_OgePubIconOnly::clicked, this,
@@ -95,27 +85,21 @@ C_SdNdeDbViewWidget::C_SdNdeDbViewWidget(QWidget * const opc_Parent) :
            &C_SdNdeDbViewWidget::m_ProgrammingOptions);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     30.01.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDbViewWidget::~C_SdNdeDbViewWidget()
 {
    delete this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     26.03.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::InitStaticNames(void) const
 {
    //Tool tips
@@ -136,20 +120,18 @@ void C_SdNdeDbViewWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_PushButtonAdd->SetToolTipInformation(C_GtGetText::h_GetText("Add"),
                                                          C_GtGetText::h_GetText("Add new Data Block."));
 
-   this->mpc_Ui->pc_PushButtonCodeGenerationOptions->SetToolTipInformation(C_GtGetText::h_GetText("Code Generation Settings"),
+   this->mpc_Ui->pc_PushButtonCodeGenerationOptions->SetToolTipInformation(C_GtGetText::h_GetText(
+                                                                              "Code Generation Settings"),
                                                                            C_GtGetText::h_GetText(
                                                                               "Edit code generation settings."));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set node index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node index
 
    \param[in] ou32_NodeIndex Node index
-
-   \created     15.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::SetNodeIndex(const stw_types::uint32 ou32_NodeIndex)
 {
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
@@ -173,122 +155,127 @@ void C_SdNdeDbViewWidget::SetNodeIndex(const stw_types::uint32 ou32_NodeIndex)
    this->m_HandleCodeGenerationSettingsButtonAvailability();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Scrolls to the application with the index ou32_ApplicationIndex
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Scrolls to the application with the index ou32_ApplicationIndex
 
    \param[in]     ou32_ApplicationIndex     Index of application
-
-   \created     26.01.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::ShowApplication(const uint32 ou32_ApplicationIndex) const
 {
    this->mpc_Ui->pc_ListWidget->scrollToItem(
       this->mpc_Ui->pc_ListWidget->item(static_cast<sintn>(ou32_ApplicationIndex)));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add a new application
-
-   \created     15.12.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add a new application
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::AddApp(void)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   bool q_Continue;
 
-   tgl_assert(pc_Node != NULL);
-   if (pc_Node != NULL)
+   // check if empty path (new unsaved project)
+   if (C_PuiProject::h_GetInstance()->IsEmptyProject() == true)
    {
       C_OgeWiCustomMessage c_MessageBox(this);
+      c_MessageBox.SetType(C_OgeWiCustomMessage::eINFORMATION);
+      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Add Datablocks"));
+      c_MessageBox.SetDescription(C_GtGetText::h_GetText(
+                                     "Datablocks cannot be added if the project is not saved yet. Please save the project and retry."));
+      c_MessageBox.Execute();
+      q_Continue = false;
+   }
+   else
+   {
+      q_Continue = true;
+   }
+   if (q_Continue)
+   {
+      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
 
-      if (pc_Node->IsAnyUpdateAvailable() == true)
+      tgl_assert(pc_Node != NULL);
+      if (pc_Node != NULL)
       {
-         QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
-         const C_SdNdeDbAdd * const pc_Dialog = new C_SdNdeDbAdd(*c_New, this->mu32_NodeIndex);
-
-         //Resize
-         c_New->SetSize(QSize(710, 390));
-
-         if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+         if (pc_Node->IsAnyUpdateAvailable() == true)
          {
-            if ((pc_Dialog->GetApplicationType() == C_OSCNodeApplication::eFILE_CONTAINER) ||
-                (pc_Dialog->GetApplicationType() == C_OSCNodeApplication::eBINARY))
+            QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
+            const C_SdNdeDbAdd * const pc_Dialog = new C_SdNdeDbAdd(*c_New, this->mu32_NodeIndex);
+
+            //Resize
+            c_New->SetSize(QSize(710, 390));
+
+            if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
             {
-               m_AddManualApplication(pc_Dialog->GetApplicationType());
-            }
-            else
-            {
-               if (pc_Dialog->GetFromTSP() == true)
+               if (pc_Dialog->GetApplicationType() == C_OSCNodeApplication::eBINARY)
                {
-                  const uint32 u32_NumApplications = pc_Node->c_Applications.size();
-                  //Clear all existing
-                  for (uint32 u32_It = u32_NumApplications; u32_It > 0UL; --u32_It)
-                  {
-                     //Re-get application as our vector might not be valid anymore
-                     const C_OSCNodeApplication * const pc_App = C_PuiSdHandler::h_GetInstance()->GetApplication(
-                        this->mu32_NodeIndex,
-                        u32_It -
-                        1UL);
-                     if ((pc_App != NULL) && (pc_App->e_Type == C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION))
-                     {
-                        tgl_assert(C_PuiSdHandler::h_GetInstance()->RemoveApplication(this->mu32_NodeIndex,
-                                                                                      u32_It - 1UL) == C_NO_ERR);
-                     }
-                  }
-                  //First reload: update deleted data blocks
-                  this->SetNodeIndex(this->mu32_NodeIndex);
-                  m_AddFromTSP();
-                  //Second/final reload: show data blocks as they were imported
-                  this->SetNodeIndex(this->mu32_NodeIndex);
+                  m_AddManualApplication(pc_Dialog->GetApplicationType());
                }
                else
                {
-                  m_AddManualApplication(C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION);
+                  if (pc_Dialog->GetFromTSP() == true)
+                  {
+                     const uint32 u32_NumApplications = pc_Node->c_Applications.size();
+                     //Clear all existing
+                     for (uint32 u32_It = u32_NumApplications; u32_It > 0UL; --u32_It)
+                     {
+                        //Re-get application as our vector might not be valid anymore
+                        const C_OSCNodeApplication * const pc_App = C_PuiSdHandler::h_GetInstance()->GetApplication(
+                           this->mu32_NodeIndex,
+                           u32_It -
+                           1UL);
+                        if ((pc_App != NULL) && (pc_App->e_Type == C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION))
+                        {
+                           tgl_assert(C_PuiSdHandler::h_GetInstance()->RemoveApplication(this->mu32_NodeIndex,
+                                                                                         u32_It - 1UL) == C_NO_ERR);
+                        }
+                     }
+                     //First reload: update deleted data blocks
+                     this->SetNodeIndex(this->mu32_NodeIndex);
+                     m_AddFromTSP();
+                     //Second/final reload: show data blocks as they were imported
+                     this->SetNodeIndex(this->mu32_NodeIndex);
+                  }
+                  else
+                  {
+                     m_AddManualApplication(C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION);
+                  }
                }
             }
-         }
 
-         if (c_New != NULL)
-         {
-            c_New->HideOverlay();
+            if (c_New != NULL)
+            {
+               c_New->HideOverlay();
+            }
+            //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
          }
-         //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-      }
-      else
-      {
-         //no fbl support
-         c_MessageBox.SetType(C_OgeWiCustomMessage::E_Type::eWARNING);
-         c_MessageBox.SetHeading(C_GtGetText::h_GetText("Data Blocks add"));
-         c_MessageBox.SetDescription(C_GtGetText::h_GetText(
-                                        "There is no Flashloader support for this device type. Data Blocks cannot be added."));
-         c_MessageBox.Execute();
+         else
+         {
+            //no fbl support
+            C_OgeWiCustomMessage c_MessageBox(this);
+            c_MessageBox.SetType(C_OgeWiCustomMessage::E_Type::eWARNING);
+            c_MessageBox.SetHeading(C_GtGetText::h_GetText("Add Datablocks"));
+            c_MessageBox.SetDescription(C_GtGetText::h_GetText(
+                                           "There is no Flashloader support for this device type. Data Blocks cannot be added."));
+            c_MessageBox.Execute();
+         }
       }
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update applications
-
-   \created     03.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update applications
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::UpdateApplications(void) const
 {
    this->mpc_Ui->pc_ListWidget->UpdateApplications();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show/hide no data blocks declared label
-
-
-   \created     20.03.2018  STW/S.Singer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show/hide no data blocks declared label
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::m_HandleNoDatablocksLabel(void) const
 {
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
@@ -313,69 +300,46 @@ void C_SdNdeDbViewWidget::m_HandleNoDatablocksLabel(void) const
    {
       this->mpc_Ui->pc_LabelNoDatablocks->setVisible(true);
       this->mpc_Ui->pc_LabelNoDatablocks->setText(C_GtGetText::h_GetText(
-                                                     "No Flashloader support. Data Blocks cannot be added."));
+                                                     "No openSYDE/KEFEX protocol support. Data Blocks cannot be added."));
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle add button availability
-
-   \created     20.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle add button availability
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::m_HandleAddButtonAvailability(void) const
 {
+   bool q_Enabled = true;
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
 
-   if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL))
+   if (pc_Node != NULL)
    {
-      bool q_Enabled = true;
       if (pc_Node->IsAnyUpdateAvailable() == true)
       {
-         if (pc_Node->pc_DeviceDefinition->q_FlashloaderOpenSydeIsFileBased == true)
-         {
-            if (pc_Node->pc_DeviceDefinition->q_ProgrammingSupport == false)
-            {
-               if (pc_Node->c_Applications.size() > 0UL)
-               {
-                  q_Enabled = false;
-               }
-               else
-               {
-                  q_Enabled = true;
-               }
-            }
-            else
-            {
-               q_Enabled = true;
-            }
-         }
-         else
-         {
-            q_Enabled = true;
-         }
+         q_Enabled = true;
       }
       else
       {
          q_Enabled = false;
       }
-      this->mpc_Ui->pc_PushButtonAdd->setEnabled(q_Enabled);
    }
+   else
+   {
+      q_Enabled = false;
+   }
+   this->mpc_Ui->pc_PushButtonAdd->setEnabled(q_Enabled);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new application
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new application
 
    \param[in] oe_Type Application type
 
    \return
    Application position (in node)
-
-   \created     05.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SdNdeDbViewWidget::m_AddApplication(const C_OSCNodeApplication::E_Type oe_Type) const
 {
    C_OSCNodeApplication c_Appl;
@@ -391,19 +355,15 @@ uint32 C_SdNdeDbViewWidget::m_AddApplication(const C_OSCNodeApplication::E_Type 
    return u32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new application
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new application
 
    \param[in,out] orc_Application Application content
 
    \return
    Application position (in node)
-
-
-   \created     05.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SdNdeDbViewWidget::m_AddApplication(C_OSCNodeApplication & orc_Application) const
 {
    uint32 u32_Retval = 0UL;
@@ -425,16 +385,13 @@ uint32 C_SdNdeDbViewWidget::m_AddApplication(C_OSCNodeApplication & orc_Applicat
    return u32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On App Display
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On App Display
 
    \param[in] ou32_NodeIndex        Node index
    \param[in] ou32_ApplicationIndex Application index
-
-   \created     15.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::m_OnAppDisplay() const
 {
    this->m_UpdateCount();
@@ -443,16 +400,13 @@ void C_SdNdeDbViewWidget::m_OnAppDisplay() const
    this->m_HandleCodeGenerationSettingsButtonAvailability();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle delete
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle delete
 
    \param[in] ou32_NodeIndex        Node index
    \param[in] ou32_ApplicationIndex Application index
-
-   \created     15.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::m_OnDelete(const uint32 ou32_NodeIndex, const uint32 ou32_ApplicationIndex)
 {
    tgl_assert(this->mu32_NodeIndex == ou32_NodeIndex);
@@ -468,56 +422,10 @@ void C_SdNdeDbViewWidget::m_OnDelete(const uint32 ou32_NodeIndex, const uint32 o
    this->m_HandleCodeGenerationSettingsButtonAvailability();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle duplicate action
-
-   \param[in] ou32_NodeIndex        Node index
-   \param[in] ou32_ApplicationIndex Application index
-
-   \created     28.02.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new project action
 */
-//-----------------------------------------------------------------------------
-void C_SdNdeDbViewWidget::m_OnDuplicate(const uint32 ou32_NodeIndex, const uint32 ou32_ApplicationIndex) const
-{
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
-
-   tgl_assert(pc_Node != NULL);
-   if ((pc_Node != NULL) && (ou32_ApplicationIndex < pc_Node->c_Applications.size()))
-   {
-      const C_OSCDeviceDefinition * const pc_DevDef = pc_Node->pc_DeviceDefinition;
-      C_OgeWiCustomMessage c_MessageBox(this->parentWidget());
-      const uint32 u32_ApplicationIndex = pc_Node->c_Applications.size();
-      C_OSCNodeApplication c_Appl = pc_Node->c_Applications[ou32_ApplicationIndex];
-
-      //if file based, only one datablock is permitted
-      if ((pc_DevDef->q_FlashloaderOpenSydeIsFileBased == true) && (pc_Node->c_Applications.empty() == false))
-      {
-         //if file based and there is already a datablock
-         c_MessageBox.SetType(C_OgeWiCustomMessage::E_Type::eERROR);
-         c_MessageBox.SetHeading(C_GtGetText::h_GetText("Data Block duplicate"));
-         c_MessageBox.SetDescription(C_GtGetText::h_GetText("There is only one Data Block permitted on nodes with file "
-                                                            "based flash access."));
-         c_MessageBox.Execute();
-      }
-      else
-      {
-         //do it
-         tgl_assert(C_PuiSdHandler::h_GetInstance()->InsertApplication(ou32_NodeIndex, u32_ApplicationIndex,
-                                                                       c_Appl) == C_NO_ERR);
-         //No reload required
-         this->mpc_Ui->pc_ListWidget->AddApplication(ou32_NodeIndex, u32_ApplicationIndex);
-      }
-   }
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new project action
-
-   \created     02.10.2018  STW/M.Echtler
-*/
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::m_AddFromTSP(void)
 {
    QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
@@ -560,13 +468,10 @@ void C_SdNdeDbViewWidget::m_AddFromTSP(void)
    //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update data block count
-
-   \created     15.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update data block count
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::m_UpdateCount(void) const
 {
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
@@ -578,13 +483,10 @@ void C_SdNdeDbViewWidget::m_UpdateCount(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of programming options button
-
-   \created     08.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of programming options button
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::m_ProgrammingOptions(void) const
 {
    const std::vector<const C_OSCNodeApplication *> c_ProgrammableApplications =
@@ -627,15 +529,12 @@ void C_SdNdeDbViewWidget::m_ProgrammingOptions(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new manual application
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new manual application
 
    \param[in] oe_Type Application type to create
-
-   \created     05.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::m_AddManualApplication(const C_OSCNodeApplication::E_Type oe_Type)
 {
    C_OSCNodeApplication c_Tmp;
@@ -680,13 +579,10 @@ void C_SdNdeDbViewWidget::m_AddManualApplication(const C_OSCNodeApplication::E_T
    //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle visibility of button "Code generation settings"
-
-   \created     08.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle visibility of button "Code generation settings"
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::m_HandleCodeGenerationSettingsButtonAvailability(void) const
 {
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);

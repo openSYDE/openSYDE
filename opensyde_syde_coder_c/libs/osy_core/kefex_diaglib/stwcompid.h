@@ -1,6 +1,6 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \file        stwcompid.h
+   \file
    \brief       Utility functions concerning the STW company-ID
 
    This module provides functionality to convert the STW company-ID
@@ -8,22 +8,9 @@
    It is written in plain ANSI-C and can thus be used in most C / C++
     projects.
 
-   \implementation
-   project
-   copyright   STW (c) 1999-200x
-   license     use only under terms of contract / confidential
-
-   created     03.11.2008  STW/A.Stangl
-   \endimplementation
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   12.11.2008        STW/A.Stangl  added conditional package definitions for Borland C++ Builder
-   03.11.2008        STW/A.Stangl  file created
-   \endhistory
+   \copyright   Copyright 2008 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef STWCOMPIDH
 #define STWCOMPIDH
 

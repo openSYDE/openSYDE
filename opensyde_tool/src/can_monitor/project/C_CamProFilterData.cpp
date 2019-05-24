@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Filter package and filter item data structure (implementation)
 
@@ -15,46 +14,37 @@
       filter item                filter
       filter                     package of one ore more filters
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     05.12.2018  STW/G.Landsgesell
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_CamProFilterData.h"
 #include "CSCLChecksums.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor of filter class.
-
-   \created     05.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor of filter class.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamProFilterData::C_CamProFilterData(void)
 {
    this->c_Name = "DefaultFilterName";
@@ -63,17 +53,14 @@ C_CamProFilterData::C_CamProFilterData(void)
    this->c_FilterItems.clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
 
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
-
-   \created     05.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamProFilterData::CalcHash(stw_types::uint32 & oru32_HashValue) const
 {
    // filter properties (name, comment, state)
@@ -88,13 +75,10 @@ void C_CamProFilterData::CalcHash(stw_types::uint32 & oru32_HashValue) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor of filter item class.
-
-   \created     05.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor of filter item class.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamProFilterItemData::C_CamProFilterItemData()
 {
    this->q_Enabled = true;
@@ -110,17 +94,14 @@ C_CamProFilterItemData::C_CamProFilterItemData()
    this->c_DatabaseMatch = "";
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
 
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
-
-   \created     06.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamProFilterItemData::CalcHash(uint32 & oru32_HashValue) const
 {
    stw_scl::C_SCLChecksums::CalcCRC32(&this->q_PassFilter, sizeof(this->q_PassFilter), oru32_HashValue);

@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       DiagLib Target Glue Layer: Task system related functionality.
 
    DiagLib Target Glue Layer module containing task system related functionality.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.07.2009  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef TGLTASKSH
 #define TGLTASKSH
 

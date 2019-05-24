@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Precompiled header (header)
@@ -11,19 +11,13 @@
    Contains a list of header files to be pre-compiled.
    see http://doc.qt.io/qt-5/qmake-precompiledheaders.html for details
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.07.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef  PRECOMP_HEADERS_TEST_H
 #define  PRECOMP_HEADERS_TEST_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 //don't include anything here; so the test project can also verify whether all required headers are included
 

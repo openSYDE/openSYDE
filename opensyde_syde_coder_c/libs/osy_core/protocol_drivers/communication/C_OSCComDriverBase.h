@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Core communication driver base class (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     03.09.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCCOMDRIVERBASE_H
 #define C_OSCCOMDRIVERBASE_H
 
@@ -60,6 +54,8 @@ public:
 
    virtual void ContinueLogging(void);
    virtual void PauseLogging(void);
+
+   virtual void UpdateBitrate(const stw_types::sint32 os32_Bitrate);
 
    virtual void DistributeMessages(void);
    virtual void SendCanMessageQueued(const stw_can::T_STWCAN_Msg_TX & orc_Msg);

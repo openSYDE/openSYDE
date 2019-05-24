@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Utility class to centralize tooltip handling (implementation)
 
    Utility class to centralize tooltip handling
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.01.2019  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -25,36 +18,33 @@
 #include "C_SdTooltipUtil.h"
 #include "C_SdNdeDataPoolContentUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get string for tooltip content for message.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get string for tooltip content for message.
 
    \param[in] orc_Message Message for which the tooltip is requested
 
    \return
    Content as string
-
-   \created     21.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SdTooltipUtil::h_GetToolTipContentMessage(const stw_opensyde_core::C_OSCCanMessage & orc_Message)
 {
    QString c_ToolTipContent;
@@ -106,9 +96,8 @@ QString C_SdTooltipUtil::h_GetToolTipContentMessage(const stw_opensyde_core::C_O
    return c_ToolTipContent;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get string for tooltip content for signal.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get string for tooltip content for signal.
 
    \param[in]     orc_Signal                   Signal information for which the tooltip is requested
    \param[in]     orc_Message                  Message information
@@ -120,10 +109,8 @@ QString C_SdTooltipUtil::h_GetToolTipContentMessage(const stw_opensyde_core::C_O
 
    \return
       content as string
-
-   \created     21.01.2019  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SdTooltipUtil::h_GetToolTipContentSignal(const C_OSCCanSignal & orc_Signal,
                                                    const C_OSCCanMessage & orc_Message,
                                                    const C_OSCNodeDataPoolListElement & orc_DpListElement,
@@ -226,18 +213,15 @@ QString C_SdTooltipUtil::h_GetToolTipContentSignal(const C_OSCCanSignal & orc_Si
    return c_ToolTipContent;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert node data pool content type to simplified name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert node data pool content type to simplified name
 
    \param[in] ore_Type Node data pool content type
 
    \return
    Simplified name
-
-   \created     21.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SdTooltipUtil::h_ConvertTypeToNameSimplified(const C_OSCNodeDataPoolContent::E_Type & ore_Type)
 {
    QString c_Retval;
@@ -269,13 +253,10 @@ QString C_SdTooltipUtil::h_ConvertTypeToNameSimplified(const C_OSCNodeDataPoolCo
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     21.01.2019  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdTooltipUtil::C_SdTooltipUtil(void)
 {
 }

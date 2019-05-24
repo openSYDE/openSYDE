@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Node data pool list array edit model (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.11.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVDAITPAARMODEL_H
 #define C_SYVDAITPAARMODEL_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <QAbstractTableModel>
 #include "stwtypes.h"
@@ -25,12 +19,12 @@
 #include "C_OSCNodeDataPoolListElement.h"
 #include "C_PuiSvDbNodeDataPoolListElementId.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SyvDaItPaArModel :
    public QAbstractTableModel
@@ -79,9 +73,10 @@ private:
 
    const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId * m_GetElementId(void) const;
    stw_types::sint32 m_GetDataSetIndex(void) const;
+   bool m_CheckError(const QModelIndex & orc_Index) const;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

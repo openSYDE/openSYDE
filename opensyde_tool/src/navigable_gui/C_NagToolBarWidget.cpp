@@ -1,23 +1,16 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for upper toolbar with dynamic buttons
 
    Toolbar offers dynamic buttons for specific functions.
    This widget is designed in a ui file.
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.07.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QEvent>
@@ -35,37 +28,34 @@
 #include "constants.h"
 #include "C_OgeWiCustomMessage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_types;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const stw_types::sintn C_NagToolBarWidget::mhsn_SPACER_SIZE = 24;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     06.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_NagToolBarWidget::C_NagToolBarWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_NagToolBarWidget),
@@ -76,7 +66,10 @@ C_NagToolBarWidget::C_NagToolBarWidget(QWidget * const opc_Parent) :
    mpc_Ui->setupUi(this);
 
    this->mpc_Ui->pc_LabelSearchImg->SetSvg("://images/IconSearch.svg");
-   this->mpc_Ui->pc_BtnCancelSearch->setIcon(QIcon(":images/CheckBoxDisabled.png"));
+   this->mpc_Ui->pc_BtnCancelSearch->SetCustomIcons(":images/DeleteSearchInput.svg",  // enabled
+                                                    ":images/DeleteSearchInput.svg",  // hovered
+                                                    ":images/DeleteSearchInput.svg",  // clicked
+                                                    ":images/DeleteSearchInput.svg"); // disabled
 
    //init mc_SearchResultWidget
    this->mc_SearchResultWidget.setVisible(false);
@@ -107,40 +100,31 @@ C_NagToolBarWidget::C_NagToolBarWidget(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_LineEditSearch->installEventFilter(this);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     06.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_NagToolBarWidget::~C_NagToolBarWidget()
 {
    delete mpc_Ui;
    //lint -e{1740}  no memory leak because mpc_ActUseCaseWidget is not created and removed here
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initializes all visible strings on the widget
-
-   \created     07.07.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initializes all visible strings on the widget
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::InitText(void) const
 {
-   this->mpc_Ui->pc_LineEditSearch->setPlaceholderText(C_GtGetText::h_GetText("Search in SYSTEM DEFINITION"));
+   this->mpc_Ui->pc_LineEditSearch->setPlaceholderText(C_GtGetText::h_GetText("What are you looking for?"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Configures the function buttons
-
-   \created     12.07.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Configures the function buttons
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void stw_opensyde_gui::C_NagToolBarWidget::ConfigureButtons(C_NagUseCaseWidget * const opc_UseCaseWidget)
 {
    QVector<C_NagToolBarButtonProperties> c_VecFuncs;
@@ -204,13 +188,10 @@ void stw_opensyde_gui::C_NagToolBarWidget::ConfigureButtons(C_NagUseCaseWidget *
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Disables and hides all function buttons
-
-   \created     12.07.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Disables and hides all function buttons
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::ResetButtons(void)
 {
    QVector<C_OgePubToolBar *>::iterator pc_ItButton;
@@ -239,29 +220,23 @@ void C_NagToolBarWidget::ResetButtons(void)
    this->mpc_ActUseCaseWidget = NULL;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set top widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set top widget
 
    Necessary because of top level scroll area
 
    \param[in,out] opc_Widget Top widget
-
-   \created     11.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::SetTopWidget(QWidget * const opc_Widget)
 {
    this->mc_SearchResultWidget.setParent(opc_Widget);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Hide all registered buttons and saves the actual visible state for restoring
-
-   \created     25.01.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Hide all registered buttons and saves the actual visible state for restoring
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::HideAllButtonsAndStoreState(void)
 {
    QVector<QWidget *>::iterator pc_VecGroupBox;
@@ -276,13 +251,10 @@ void C_NagToolBarWidget::HideAllButtonsAndStoreState(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore the visible state of all buttons which are stored by the previous call of HideAllButtons
-
-   \created     25.01.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore the visible state of all buttons which are stored by the previous call of HideAllButtons
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::RestoreAllButtonsVisibility(void)
 {
    if (this->mc_VecGroupBox.size() == this->mc_VecGroupBoxVisible.size())
@@ -295,15 +267,12 @@ void C_NagToolBarWidget::RestoreAllButtonsVisibility(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Showing the search
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Showing the search
 
    \param[in]     oq_Active      Flag for showing search
-
-   \created     05.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::ShowSearch(const bool oq_Active)
 {
    this->mq_ShowSearch = oq_Active;
@@ -315,22 +284,18 @@ void C_NagToolBarWidget::ShowSearch(const bool oq_Active)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set search focus
-
-   \created     15.11.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set search focus
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::Search(void) const
 {
    this->mpc_Ui->pc_LineEditSearch->setFocus();
    this->mpc_Ui->pc_LineEditSearch->selectAll();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten event filter slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten event filter slot
 
    \param[in,out] opc_Object Sender object information
    \param[in,out] opc_Event  Event identification and information
@@ -338,10 +303,8 @@ void C_NagToolBarWidget::Search(void) const
    \return
    true     the event will be filtered
    false    the event will not be filtered
-
-   \created     15.03.2017  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_NagToolBarWidget::eventFilter(QObject * const opc_Object, QEvent * const opc_Event)
 {
    bool q_FilterEvent = false;
@@ -472,13 +435,26 @@ bool C_NagToolBarWidget::eventFilter(QObject * const opc_Object, QEvent * const 
    return q_FilterEvent;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot function for button
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
-   \created     12.07.2016  STW/B.Bayer
+   Here: draw background
+   (Not automatically drawn in any QWidget derivative)
+
+   \param[in,out] opc_Event Event identification and information
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagToolBarWidget::paintEvent(QPaintEvent * const opc_Event)
+{
+   stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
+
+   QWidget::paintEvent(opc_Event);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for button
+*/
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::m_BtnClicked(const uint32 ou32_Index)
 {
    if (this->mpc_ActUseCaseWidget != NULL)
@@ -487,20 +463,17 @@ void C_NagToolBarWidget::m_BtnClicked(const uint32 ou32_Index)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger help
-
-   \created     04.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger help
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::m_TriggerHelp(void)
 {
    //lint -e{10,48,64,746,1013,1055} Will be defined via moc compiler, PC lint unable to handle this construct
    stw_opensyde_gui_logic::C_HeHandler::GetInstance().CallSpecificHelpPage(this->metaObject()->className());
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::m_ShowBtn(const uint32 ou32_Index, const bool oq_Show) const
 {
    const sintn sn_Index = static_cast<sintn>(ou32_Index);
@@ -512,7 +485,7 @@ void C_NagToolBarWidget::m_ShowBtn(const uint32 ou32_Index, const bool oq_Show) 
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::m_EnableBtn(const uint32 ou32_Index, const bool oq_Enable) const
 {
    const sintn sn_Index = static_cast<sintn>(ou32_Index);
@@ -524,7 +497,7 @@ void C_NagToolBarWidget::m_EnableBtn(const uint32 ou32_Index, const bool oq_Enab
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::m_ShowBackgroundOfBtn(const uint32 ou32_Index, const bool oq_Enable) const
 {
    const sintn sn_Index = static_cast<sintn>(ou32_Index);
@@ -542,7 +515,7 @@ void C_NagToolBarWidget::m_ShowBackgroundOfBtn(const uint32 ou32_Index, const bo
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::m_SetIconForBtn(const uint32 ou32_Index, const QIcon & orc_Icon) const
 {
    const sintn sn_Index = static_cast<sintn>(ou32_Index);
@@ -555,17 +528,14 @@ void C_NagToolBarWidget::m_SetIconForBtn(const uint32 ou32_Index, const QIcon & 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the tool tip of the button
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the tool tip of the button
 
    \param[in]     ou32_Index            Index of button
    \param[in]     orc_ToolTipHeading    New tool tip heading
    \param[in]     orc_ToolTipContent    New tool tip content
-
-   \created     06.02.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::m_SetToolTipForBtn(const uint32 ou32_Index, const QString & orc_ToolTipHeading,
                                             const QString & orc_ToolTipContent) const
 {
@@ -579,13 +549,13 @@ void C_NagToolBarWidget::m_SetToolTipForBtn(const uint32 ou32_Index, const QStri
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::m_ShowSearchTree(void)
 {
    this->mc_SearchResultWidget.show();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::m_RepositionSearchTree()
 {
    QPoint c_ParentPos = this->mpc_Ui->pc_GroupBoxSearch->mapToGlobal(QPoint(0, 0));
@@ -597,7 +567,7 @@ void C_NagToolBarWidget::m_RepositionSearchTree()
    this->mc_SearchResultWidget.move(c_ParentPos.x(), c_ParentPos.y() + this->mpc_Ui->pc_GroupBoxSearch->height());
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::m_CancelSearch(void)
 {
    //cancel search
@@ -607,7 +577,7 @@ void C_NagToolBarWidget::m_CancelSearch(void)
    this->mc_SearchResultWidget.hide();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::m_ChangeMode(const sint32 os32_Mode, const sint32 os32_SubMode, const uint32 ou32_Index,
                                       const QString & orc_Name, const QString & orc_SubSubItemName,
                                       const uint32 ou32_Flag)
@@ -616,7 +586,7 @@ void C_NagToolBarWidget::m_ChangeMode(const sint32 os32_Mode, const sint32 os32_
    Q_EMIT this->SigChangeMode(os32_Mode, os32_SubMode, ou32_Index, orc_Name, orc_SubSubItemName, ou32_Flag);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::m_Hide(void)
 {
    this->mpc_Ui->pc_LineEditSearch->setFocus();
@@ -624,7 +594,7 @@ void C_NagToolBarWidget::m_Hide(void)
    this->mc_SearchResultWidget.hide();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::m_FocusOut(void)
 {
    if (this->mpc_Ui->pc_LineEditSearch->hasFocus() == false)
@@ -634,18 +604,15 @@ void C_NagToolBarWidget::m_FocusOut(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get button string width
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get button string width
 
    \param[in] orc_Text Button text
 
    \return
    Button string width
-
-   \created     29.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_NagToolBarWidget::mh_GetButtonStringWidth(const QString & orc_Text)
 {
    sint32 s32_Retval;
@@ -665,28 +632,17 @@ sint32 C_NagToolBarWidget::mh_GetButtonStringWidth(const QString & orc_Text)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the dark theme of the widget
-
-   \created     06.07.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the dark theme of the widget
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::SetDarkTheme(void)
 {
-   QPalette c_Pal;
-
    this->mpc_Ui->pc_BtnHelp->SetCustomIcons("://images/main_page_and_navi_bar/Icon_help_bright.svg",
                                             "://images/main_page_and_navi_bar/Icon_help_dark_Hovered.svg",
                                             "://images/main_page_and_navi_bar/Icon_help_dark_Clicked.svg",
                                             "://images/main_page_and_navi_bar/Icon_help_dark_Disabled.svg");
-   c_Pal = this->palette();
-   c_Pal.setColor(QPalette::Window, mc_STYLE_GUIDE_COLOR_2);
-   c_Pal.setColor(QPalette::Base, mc_STYLE_GUIDE_COLOR_2);
-   c_Pal.setColor(QPalette::Text, mc_STYLE_GUIDE_COLOR_9);
-   c_Pal.setColor(QPalette::ButtonText, mc_STYLE_GUIDE_COLOR_10);
-   c_Pal.setColor(QPalette::BrightText, mc_STYLE_GUIDE_COLOR_12);
-   this->setPalette(c_Pal);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "DarkMode", true);
    //this->mpc_Ui->pc_LineEditSearch->SetDarkTheme();
    this->mpc_Ui->pc_LineEditSearch->setVisible(false);
    this->mpc_Ui->pc_LabelSearchImg->setVisible(false);
@@ -694,28 +650,17 @@ void C_NagToolBarWidget::SetDarkTheme(void)
    this->mc_SearchResultWidget.setVisible(false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the light theme of the widget
-
-   \created     06.07.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the light theme of the widget
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::SetLightTheme(void)
 {
-   QPalette c_Pal;
-
    this->mpc_Ui->pc_BtnHelp->SetCustomIcons("://images/main_page_and_navi_bar/Icon_help_dark.svg",
                                             "://images/main_page_and_navi_bar/Icon_help_dark_Hovered.svg",
                                             "://images/main_page_and_navi_bar/Icon_help_dark_Clicked.svg",
                                             "://images/main_page_and_navi_bar/Icon_help_dark_Disabled.svg");
-   c_Pal = this->palette();
-   c_Pal.setColor(QPalette::Window, mc_STYLE_GUIDE_COLOR_0);
-   c_Pal.setColor(QPalette::Base, mc_STYLE_GUIDE_COLOR_0);
-   c_Pal.setColor(QPalette::Text, mc_STYLE_GUIDE_COLOR_4);
-   c_Pal.setColor(QPalette::ButtonText, mc_STYLE_GUIDE_COLOR_4);
-   c_Pal.setColor(QPalette::BrightText, mc_STYLE_GUIDE_COLOR_10);
-   this->setPalette(c_Pal);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "DarkMode", false);
    //this->mpc_Ui->pc_LineEditSearch->SetLightTheme();
    this->mpc_Ui->pc_LineEditSearch->setVisible(true);
    this->mpc_Ui->pc_LabelSearchImg->setVisible(true);

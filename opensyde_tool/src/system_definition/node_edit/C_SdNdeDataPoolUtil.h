@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Node data pool util class (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.02.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SDNDEDATAPOOLUTIL_H
 #define C_SDNDEDATAPOOLUTIL_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <vector>
 #include <QItemSelection>
@@ -31,13 +25,14 @@
 #include "stwtypes.h"
 #include "C_PuiSdNodeDataPoolListElement.h"
 #include "C_OSCNodeDataPool.h"
+#include "C_OSCNodeDataPoolId.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SdNdeDataPoolUtil
 {
@@ -125,7 +120,13 @@ public:
                                              const stw_types::uint32 & oru32_Index);
    static stw_types::sint32 h_GetTableSize(const stw_types::uint32 ou32_NodeIndex,
                                            const stw_types::uint32 ou32_DataPoolIndex,
-                                           const stw_types::uint32 ou32_ListIndex);
+                                           const stw_types::uint32 ou32_ListIndex,
+                                           const stw_types::sintn osn_MaximumHeight = 0);
+
+   static stw_types::sint32 GetSharedDatapoolGroup(const stw_types::uint32 ou32_SharedDatapoolGroup,
+                                                   const stw_opensyde_core::C_OSCNodeDataPoolId & orc_BaseDatapoolId,
+                                                   const stw_types::uint32 ou32_NodeIndex,
+                                                   std::vector<QString> & orc_SharedDatapoolNameGroup);
 
 private:
    C_SdNdeDataPoolUtil();
@@ -133,7 +134,7 @@ private:
    static void mh_ApplyStyleSheet(QWidget * const opc_Widget, const QFont & orc_Font, const QColor & orc_Color);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

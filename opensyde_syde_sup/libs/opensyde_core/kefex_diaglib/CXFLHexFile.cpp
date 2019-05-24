@@ -1,13 +1,10 @@
-//14.07.09  AST   use C_SCLString instead of AnsiString to become more target independent
-//16.07.08  AST   Added ::CalcFileChecksum
-
-#include "precomp_headers.h"  //pre-compiled headers
-#ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
+#include "precomp_headers.h" //pre-compiled headers
+#ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
 #pragma hdrstop
 #pragma package(smart_init)
 #endif
 
-#include "DiagLib_config.h"  //diaglib configuration
+#include "DiagLib_config.h" //diaglib configuration
 
 #include <string.h>
 #include "stwtypes.h"
@@ -33,15 +30,14 @@ using namespace stw_tgl;
 
    \return
    Textual representation of error.
-
-   \created     xx.xx.20xx  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_XFLHexFile::ErrorCodeToErrorText(const uint32 ou32_ErrorCode) const
 {
    C_SCLString c_Text;
    uint32 u32_Address;
-   switch(ou32_ErrorCode & ERR_MASK)
+
+   switch (ou32_ErrorCode & ERR_MASK)
    {
    case WRN_NO_EOF_RECORD:
       c_Text = TGL_LoadStr(STR_FM_ERR_RD_HF_EOF);
@@ -91,11 +87,9 @@ C_SCLString C_XFLHexFile::ErrorCodeToErrorText(const uint32 ou32_ErrorCode) cons
    \return
    C_NO_ERR     everything OK (data in oat_InfoBlocks); but maybe there are 0 blocks
    C_NOACT      if oq_ExactAddressMatch: no block found at specified address
-
-   \created     11.07.2008  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
-sint32 C_XFLHexFile::GetECUInformationBlocks(SCLDynamicArray <C_XFLECUInformation> & orc_InfoBlocks,
+sint32 C_XFLHexFile::GetECUInformationBlocks(SCLDynamicArray<C_XFLECUInformation> & orc_InfoBlocks,
                                              const uint32 ou32_SearchStartAddress, const bool oq_OnlyOneBlock,
                                              const bool oq_ExactAddressMatch, const bool oq_Block0Only)
 {
@@ -105,6 +99,7 @@ sint32 C_XFLHexFile::GetECUInformationBlocks(SCLDynamicArray <C_XFLECUInformatio
    uint16 u16_Size = static_cast<uint16>(c_Block.GetMaxSizeOnECU());
    uint8 * pu8_Buffer = new uint8[u16_Size];
    uint16 u16_Help;
+
    s32_Return = C_NO_ERR;
    charn acn_Magic[XFL_DEVICE_INFO_MAGIC_LENGTH_V2];
 
@@ -171,7 +166,7 @@ sint32 C_XFLHexFile::GetECUInformationBlocks(SCLDynamicArray <C_XFLECUInformatio
          {
          case 0:
             break; //great ...
-         case -2: //data read but not fully
+         case -2:  //data read but not fully
             s32_Return = 0;
             if (u16_Size < 2U) //we need at least 2 bytes for the header information
             {
@@ -225,13 +220,10 @@ sint32 C_XFLHexFile::GetECUInformationBlocks(SCLDynamicArray <C_XFLECUInformatio
    \return
    C_NO_ERR      checksum calculated
    C_CONFIG      error
-
-   \created     16.07.2008  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_XFLHexFile::CalcFileChecksum(uint32 & oru32_Checksum)
 {
-   uint32 u32_Index;
    uint32 u32_Return;
    const C_HexDataDump * pc_Dump;
 
@@ -242,10 +234,20 @@ sint32 C_XFLHexFile::CalcFileChecksum(uint32 & oru32_Checksum)
    }
 
    oru32_Checksum = ~0x56489437UL; //fixed start value !
-   for (u32_Index = 0U; u32_Index < static_cast<uint32>(pc_Dump->at_Blocks.GetLength()); u32_Index++)
+   for (uint32 u32_Index = 0U; u32_Index < static_cast<uint32>(pc_Dump->at_Blocks.GetLength()); u32_Index++)
    {
+      //address (serialize to make the code endian-safe):
+      const uint32 u32_AddressOffset = pc_Dump->at_Blocks[u32_Index].u32_AddressOffset;
+      const uint8 au8_AddressOffset[4] =
+      {
+         static_cast<uint8>(u32_AddressOffset),
+         static_cast<uint8>(u32_AddressOffset >> 8),
+         static_cast<uint8>(u32_AddressOffset >> 16),
+         static_cast<uint8>(u32_AddressOffset >> 24),
+      };
+
       //address:
-      C_SCLChecksums::CalcCRC32(&pc_Dump->at_Blocks[u32_Index].u32_AddressOffset, sizeof(uint32), oru32_Checksum);
+      C_SCLChecksums::CalcCRC32(&au8_AddressOffset[0], 4U, oru32_Checksum);
 
       //data:
       C_SCLChecksums::CalcCRC32(&pc_Dump->at_Blocks[u32_Index].au8_Data[0],
@@ -256,4 +258,3 @@ sint32 C_XFLHexFile::CalcFileChecksum(uint32 & oru32_Checksum)
 
    return C_NO_ERR;
 }
-

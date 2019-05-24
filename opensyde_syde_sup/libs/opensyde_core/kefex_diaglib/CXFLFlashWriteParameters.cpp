@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
-   \file        CXFLFlashWriteParams.cpp
+   \file
    \brief       Software flashing parameters class
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     14.01.2010  STW/A.Stangl (refactored to this module from CXFLDownload.h/.c)
-   \endimplementation
+   \copyright   Copyright 2010 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------ */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -32,24 +25,24 @@
 #include "CSCLString.h"
 #include "CSCLIniFile.h"
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_scl;
 using namespace stw_diag_lib;
 
-/* -- Defines ------------------------------------------------------------- */
+/* -- Defines ------------------------------------------------------------------------------------------------------- */
 
-/* -- Types --------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ---------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables --------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ----------------------------------- */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------ */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 C_XFLFlashWriteParameters::C_XFLFlashWriteParameters(void) :
    u16_Version(0U),
    e_EraseMode(eXFL_ERASE_MODE_AUTOMATIC),
@@ -75,16 +68,15 @@ C_XFLFlashWriteParameters::C_XFLFlashWriteParameters(void) :
    au8_DivertUserID[1] = 0U;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_XFLFlashWriteParameters::~C_XFLFlashWriteParameters(void)
 {
    //nothing special to do here, just provide it so inheriting classes may reimplement the destructor
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   load flashing parameters from an INI file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   load flashing parameters from an INI file
 
    Note: will not load all parameters !
    If the specified section does not exists default values will be used !
@@ -120,10 +112,8 @@ C_XFLFlashWriteParameters::~C_XFLFlashWriteParameters(void)
 
    \return
    C_NO_ERR     data loaded
-
-   \created     28.07.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_XFLFlashWriteParameters::LoadFromIni(C_SCLIniFile & orc_IniFile, const C_SCLString & orc_Section)
 {
    sint32 i;
@@ -170,9 +160,8 @@ void C_XFLFlashWriteParameters::LoadFromIni(C_SCLIniFile & orc_IniFile, const C_
    c_HexFile = orc_IniFile.ReadString(orc_Section, "Filename", "");
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   save flashing parameters to an INI file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   save flashing parameters to an INI file
 
    Note: will not save all parameters !
    The following table lists all saved parameters. The other member variables of the structure will not be stored.
@@ -206,10 +195,8 @@ void C_XFLFlashWriteParameters::LoadFromIni(C_SCLIniFile & orc_IniFile, const C_
    \return
    C_NO_ERR     data stored   \n
    else         could not write values
-
-   \created     28.07.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLFlashWriteParameters::SaveToIni(C_SCLIniFile & orc_IniFile, const C_SCLString & orc_Section) const
 {
    sint32 i;
@@ -250,5 +237,5 @@ sint32 C_XFLFlashWriteParameters::SaveToIni(C_SCLIniFile & orc_IniFile, const C_
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 

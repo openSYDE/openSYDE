@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       View for project file table (implementation)
 
    View for project file table
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     12.05.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QHeaderView>
@@ -28,35 +21,32 @@
 #include "constants.h"
 #include "C_OgeWiUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     12.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PopFileTableView::C_PopFileTableView(QWidget * const opc_Parent) :
    C_TblViewToolTipBase(opc_Parent)
 {
@@ -84,8 +74,8 @@ C_PopFileTableView::C_PopFileTableView(QWidget * const opc_Parent) :
    this->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
    this->horizontalHeader()->setSectionResizeMode(C_PopFileTableModel::h_EnumToColumn(
                                                      C_PopFileTableModel::ePATH), QHeaderView::Stretch);
-   this->setColumnWidth(C_PopFileTableModel::h_EnumToColumn(C_PopFileTableModel::eNAME), 250);
-   this->setColumnWidth(C_PopFileTableModel::h_EnumToColumn(C_PopFileTableModel::eVERSION), 120);
+   this->setColumnWidth(C_PopFileTableModel::h_EnumToColumn(C_PopFileTableModel::eNAME), 315);
+   this->setColumnWidth(C_PopFileTableModel::h_EnumToColumn(C_PopFileTableModel::eVERSION), 80);
    this->setColumnWidth(C_PopFileTableModel::h_EnumToColumn(C_PopFileTableModel::ePATH), 200);
 
    //Row Height
@@ -107,22 +97,18 @@ C_PopFileTableView::C_PopFileTableView(QWidget * const opc_Parent) :
    this->verticalScrollBar()->style()->polish(this->verticalScrollBar());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal data changes to table
-
-   \created     12.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal data changes to table
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PopFileTableView::UpdateData(const std::vector<QString> & orc_RecentFilePaths,
                                     const std::vector<stw_opensyde_core::C_OSCProject> & orc_RecentProjects)
 {
    this->mc_Model.UpdateData(orc_RecentFilePaths, orc_RecentProjects);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert row to message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert row to message
 
    \param[in]  ors32_Row     Model row
    \param[out] orc_MessageId Message identification indices
@@ -130,26 +116,21 @@ void C_PopFileTableView::UpdateData(const std::vector<QString> & orc_RecentFileP
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     01.08.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PopFileTableView::ConvertRowToFile(const sint32 & ors32_Row, QString & orc_FilePath) const
 {
    return this->mc_Model.ConvertRowToFile(ors32_Row, orc_FilePath);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse move event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse move event slot
 
    Here: Track mouse hover
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     12.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PopFileTableView::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
    sint32 s32_HoveredRow = -1;
@@ -167,17 +148,14 @@ void C_PopFileTableView::mouseMoveEvent(QMouseEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse press event slot
 
    Here: Paint background
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     12.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PopFileTableView::mousePressEvent(QMouseEvent * const opc_Event)
 {
    sint32 s32_ClickedRow = -1;
@@ -198,17 +176,14 @@ void C_PopFileTableView::mousePressEvent(QMouseEvent * const opc_Event)
    C_TblViewToolTipBase::mousePressEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse release event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse release event slot
 
    Here: Paint background
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     12.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_PopFileTableView::mouseReleaseEvent(QMouseEvent * const opc_Event)
 {
@@ -220,17 +195,14 @@ void C_PopFileTableView::mouseReleaseEvent(QMouseEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse leave event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse leave event slot
 
    Here: Handle hover effect change
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     18.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PopFileTableView::leaveEvent(QEvent * const opc_Event)
 {
    C_TblViewToolTipBase::leaveEvent(opc_Event);

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Custom pop-up dialog (implementation)
 
    Custom pop-up dialog
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.07.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
@@ -31,37 +24,34 @@
 
 #include "constants.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent            Optional pointer to parent
    \param[in]     opc_EffectTargetChild Optional pointer to child widget of dialog to apply shadow effect to
    \param[in]     oq_AddShadow          Optional flag to add shadow effect (warning: costs performance on redraw)
-
-   \created     20.07.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgePopUpDialog::C_OgePopUpDialog(QWidget * const opc_Parent, QWidget * const opc_EffectTargetChild,
                                    const bool oq_AddShadow) :
    QDialog(opc_Parent),
@@ -125,15 +115,12 @@ C_OgePopUpDialog::C_OgePopUpDialog(QWidget * const opc_Parent, QWidget * const o
    connect(this, &C_OgePopUpDialog::rejected, this, &C_OgePopUpDialog::HideOverlay);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     20.07.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_OgePopUpDialog::~C_OgePopUpDialog()
 {
@@ -143,15 +130,12 @@ C_OgePopUpDialog::~C_OgePopUpDialog()
    //lint -e{1540} Never took ownership of item
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Place widget in pop up dialog
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Place widget in pop up dialog
 
    \param[in,out] opc_Widget Widget to place in pop up dialog
-
-   \created     21.07.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_OgePopUpDialog::SetWidget(QWidget * const opc_Widget)
 {
@@ -172,15 +156,12 @@ void C_OgePopUpDialog::SetWidget(QWidget * const opc_Widget)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set title
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set title
 
    \param[in,out] orc_Str New title (rich text supported)
-
-   \created     21.07.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_OgePopUpDialog::SetTitle(const QString & orc_Str)
 {
@@ -189,15 +170,12 @@ void C_OgePopUpDialog::SetTitle(const QString & orc_Str)
    m_SetWindowTitle();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set sub title
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set sub title
 
    \param[in,out] orc_Str New sub title (rich text supported)
-
-   \created     28.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_OgePopUpDialog::SetSubTitle(const QString & orc_Str)
 {
@@ -206,30 +184,24 @@ void C_OgePopUpDialog::SetSubTitle(const QString & orc_Str)
    m_SetWindowTitle();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set window title
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set window title
 
    Set the title of the little window shown as preview when hovering
    over the windows task bar.
-
-   \created     22.05.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgePopUpDialog::m_SetWindowTitle()
 {
    this->setWindowTitle("openSYDE - " + mc_Title + " - " + mc_Subtitle);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Activate move window
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Activate move window
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     20.07.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_OgePopUpDialog::HandleMousePressEvent(const QMouseEvent * const opc_Event)
 {
@@ -237,15 +209,12 @@ void C_OgePopUpDialog::HandleMousePressEvent(const QMouseEvent * const opc_Event
    this->mc_LastPos = this->mapToGlobal(opc_Event->pos());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Deactivate move window
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Deactivate move window
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     20.07.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_OgePopUpDialog::HandleMouseReleaseEvent(QMouseEvent * const opc_Event)
 {
@@ -253,15 +222,12 @@ void C_OgePopUpDialog::HandleMouseReleaseEvent(QMouseEvent * const opc_Event)
    mq_Pressed = false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Move window
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Move window
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     20.07.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgePopUpDialog::HandleMouseMoveEvent(const QMouseEvent * const opc_Event)
 {
    if (mq_Pressed == true)
@@ -273,31 +239,25 @@ void C_OgePopUpDialog::HandleMouseMoveEvent(const QMouseEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Resize new size
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Resize new size
 
    \param[in] orc_Size New size
-
-   \created     30.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgePopUpDialog::SetSize(const QSize & orc_Size)
 {
    this->resize(orc_Size);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Resize widget to allowed maximum
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Resize widget to allowed maximum
 
    If opc_Widget is NULL, the top widget will be used as orientation.
 
    \param[in]  opc_Widget   Optional widget for orientation for maximum size
-
-   \created     01.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgePopUpDialog::ApplyMaximumSize(const QWidget * const opc_Widget)
 {
    const QWidget * pc_UsedWidget;
@@ -317,25 +277,19 @@ void C_OgePopUpDialog::ApplyMaximumSize(const QWidget * const opc_Widget)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Hide title bar
-
-   \created     01.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Hide title bar
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgePopUpDialog::HideTitle(void) const
 {
    this->mpc_Ui->pc_GroupBoxTitle->hide();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Hide overlay
-
-   \created     28.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Hide overlay
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgePopUpDialog::HideOverlay(void) const
 {
    if (this->mc_Overlay != NULL)
@@ -344,33 +298,27 @@ void C_OgePopUpDialog::HideOverlay(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Activate close notification
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Activate close notification
 
    Warning: proper handling of SigCloseIgnored required
 
    \param[in] oq_NotifyClose Flag to notify on close
-
-   \created     07.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgePopUpDialog::SetNotifyAndBlockClose(const bool oq_NotifyAndBlockClose)
 {
    this->mq_NotifyAndBlockClose = oq_NotifyAndBlockClose;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Trigger help key press handling
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     04.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgePopUpDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    if (stw_opensyde_gui_logic::C_HeHandler::CheckHelpKey(opc_KeyEvent) == true)
@@ -380,17 +328,14 @@ void C_OgePopUpDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    QDialog::keyPressEvent(opc_KeyEvent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten show event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten show event slot
 
    Here: Reposition to main window center
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     15.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgePopUpDialog::showEvent(QShowEvent * const opc_Event)
 {
    const QWidget * pc_TopWidget;
@@ -414,17 +359,14 @@ void C_OgePopUpDialog::showEvent(QShowEvent * const opc_Event)
    QDialog::showEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten close event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten close event slot
 
    Here: Ignore and forward close requests
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     07.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgePopUpDialog::closeEvent(QCloseEvent * const opc_Event)
 {
    if (this->mq_NotifyAndBlockClose == true)

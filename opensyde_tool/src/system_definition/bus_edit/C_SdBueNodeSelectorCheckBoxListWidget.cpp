@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Handling all node selector widgets in a kind of list (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     29.03.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QScrollArea>
@@ -25,34 +18,31 @@
 
 #include "ui_C_SdBueNodeSelectorCheckBoxListWidget.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_parent Optional pointer to parent
-
-   \created     29.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueNodeSelectorCheckBoxListWidget::C_SdBueNodeSelectorCheckBoxListWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueNodeSelectorCheckBoxListWidget)
@@ -71,30 +61,24 @@ C_SdBueNodeSelectorCheckBoxListWidget::C_SdBueNodeSelectorCheckBoxListWidget(QWi
            &C_SdBueNodeSelectorCheckBoxListWidget::m_ScrollBarRangeChanged);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     30.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueNodeSelectorCheckBoxListWidget::~C_SdBueNodeSelectorCheckBoxListWidget()
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds new nodes to the checkbox list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds new nodes to the checkbox list
 
    \param[in]     orc_Names       Names of Nodes
    \param[in]     orc_Indexes     Indexes of Nodes
-
-   \created     30.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxListWidget::AddNodes(const std::vector<QString> & orc_Names,
                                                      const std::vector<uint32> & orc_Indexes,
                                                      const std::vector<uint32> & orc_SubIndexes)
@@ -144,16 +128,13 @@ void C_SdBueNodeSelectorCheckBoxListWidget::AddNodes(const std::vector<QString> 
    //lint -e{429}  no memory leak because of the parent of pc_Spacer by addSpacerItem and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checks nodes in the checkbox list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks nodes in the checkbox list
 
    \param[in]     orc_Indexes        Indexes of Nodes
    \param[in]     orc_SubIndexes     Subindexes of Nodes
-
-   \created     04.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxListWidget::CheckNodes(const std::vector<uint32> & orc_Indexes,
                                                        const std::vector<uint32> & orc_SubIndexes) const
 {
@@ -195,17 +176,14 @@ void C_SdBueNodeSelectorCheckBoxListWidget::CheckNodes(const std::vector<uint32>
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checks a specific node in the checkbox list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks a specific node in the checkbox list
 
    \param[in]     ou32_Index        Index of Node
    \param[in]     ou32_SubIndex     Subindex of Node
    \param[in]     oq_Checked        Flag for checked
-
-   \created     12.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxListWidget::CheckSpecificNode(const uint32 ou32_Index, const uint32 ou32_SubIndex,
                                                               const bool oq_Checked) const
 {
@@ -239,15 +217,12 @@ void C_SdBueNodeSelectorCheckBoxListWidget::CheckSpecificNode(const uint32 ou32_
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the actual protocol to mark the protocol using nodes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the actual protocol to mark the protocol using nodes
 
    \param[in]     oe_Protocol     Protocol id
-
-   \created     09.05.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxListWidget::SetProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol)
 const
 {
@@ -267,13 +242,10 @@ const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates in case of changed the items
-
-   \created     09.05.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates in case of changed the items
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxListWidget::Refresh(void) const
 {
    for (sint32 s32_ItItem = 0; s32_ItItem < this->mpc_Ui->pc_CbxVerticalLayout->count(); ++s32_ItItem)
@@ -292,15 +264,12 @@ void C_SdBueNodeSelectorCheckBoxListWidget::Refresh(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds a new node to the checkbox list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds a new node to the checkbox list
 
    \param[in]     orc_Name       Name of Node
-
-   \created     30.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxListWidget::m_AddNode(const QString & orc_Name, const uint32 ou32_Index,
                                                       const uint32 ou32_SubIndex)
 {
@@ -321,7 +290,7 @@ void C_SdBueNodeSelectorCheckBoxListWidget::m_AddNode(const QString & orc_Name, 
    //lint -e{429}  no memory leak because of the parent of pc_SelectorItem by addWidget and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxListWidget::m_ScrollBarRangeChanged(const sintn osn_Min, const sintn osn_Max) const
 {
    // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar

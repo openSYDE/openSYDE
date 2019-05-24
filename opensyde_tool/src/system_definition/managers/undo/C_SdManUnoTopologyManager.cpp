@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Handler class for topology undo command stack (implementation)
 
    Handler class for topology undo command stack
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     18.11.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_SdManUnoTopologyManager.h"
@@ -29,55 +22,48 @@
 #include "C_SdManUnoTopologyReconnectBusCommand.h"
 #include "C_SdManUnoTopologyChangeInterfaceCommand.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace std;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Scene  Scene to use undo redo framework for
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     18.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyManager::C_SdManUnoTopologyManager(QGraphicsScene * const opc_Scene, QObject * const opc_Parent) :
    C_SebUnoTopBaseManager(opc_Scene, opc_Parent)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     18.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyManager::~C_SdManUnoTopologyManager(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt z order of selected items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt z order of selected items
 
    With check for z order priority
 
@@ -86,10 +72,8 @@ C_SdManUnoTopologyManager::~C_SdManUnoTopologyManager(void)
    \param[in]     of64_Diff         Difference to add to all selected items
    \param[in,out] orf64_ZOrderHigh  Reference to highest z value
    \param[in,out] orf64_ZOrderLow   Reference to lowest z value
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::AdaptZOrder(const QList<QGraphicsItem *> & orc_SelectedItems,
                                             const QList<QGraphicsItem *> & orc_Items, const float64 of64_Diff,
                                             float64 & orf64_ZOrderHigh, float64 & orf64_ZOrderLow)
@@ -117,15 +101,12 @@ void C_SdManUnoTopologyManager::AdaptZOrder(const QList<QGraphicsItem *> & orc_S
    this->DoPush(pc_ZOrderCommand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do delete
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do delete
 
    \param[in,out] orc_Items Items to delete
-
-   \created     23.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoDelete(const QList<QGraphicsItem *> & orc_Items)
 {
    if (orc_Items.size() > 0)
@@ -156,18 +137,15 @@ void C_SdManUnoTopologyManager::DoDelete(const QList<QGraphicsItem *> & orc_Item
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add one element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add one element
 
    \param[in]     ore_Type                  Type
    \param[in]     oru64_UniqueID            Unique ID
    \param[in]     orc_NewPos                Position
    \param[in]     orc_AdditionalInformation Additional string information
-
-   \created     23.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoAddGeneric(const C_SdManUnoTopologyAddCommand::E_ElementType & ore_Type,
                                              const uint64 & oru64_UniqueID, const QPointF & orc_NewPos,
                                              const QString & orc_AdditionalInformation)
@@ -183,17 +161,15 @@ void C_SdManUnoTopologyManager::DoAddGeneric(const C_SdManUnoTopologyAddCommand:
    this->DoPush(pc_AddCommand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add one element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add one element
 
    \param[in]     ore_Type                  Type
    \param[in]     oru64_UniqueIDBus         Unique ID for bus element
    \param[in]     oru64_UniqueIDBusName     Unique ID for bus name text element
    \param[in]     orc_NewPos                Position
-   \created     23.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoAddBus(const C_SdManUnoTopologyAddCommand::E_ElementType & ore_Type,
                                          const uint64 & oru64_UniqueIDBus, const uint64 & oru64_UniqueIDBusName,
                                          const QPointF & orc_NewPos)
@@ -210,9 +186,8 @@ void C_SdManUnoTopologyManager::DoAddBus(const C_SdManUnoTopologyAddCommand::E_E
    this->DoPush(pc_AddCommand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add one bus connector element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add one bus connector element
 
    \param[in]     ore_Type             Type
    \param[in]     oru64_UniqueID       Unique ID
@@ -221,10 +196,8 @@ void C_SdManUnoTopologyManager::DoAddBus(const C_SdManUnoTopologyAddCommand::E_E
    \param[in]     opc_Bus              Bus for bus connector creation
    \param[in]     oru8_InterfaceNumber Interface number for bus connector creation
    \param[in]     oru8_NodeId          New node id
-
-   \created     24.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoAddBusConnector(const uint64 & oru64_UniqueID, const QPointF & orc_NewPos,
                                                   const QGraphicsItem * const opc_Node,
                                                   const QGraphicsItem * const opc_Bus,
@@ -251,9 +224,8 @@ void C_SdManUnoTopologyManager::DoAddBusConnector(const uint64 & oru64_UniqueID,
    this->m_CleanupAction();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do add one node to node connection and create a new bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do add one node to node connection and create a new bus
 
    \param[in] orc_FourUniqueIds         Four unique IDs for the four new items created by this action
    \param[in] ore_BusType               Bus type to create
@@ -265,10 +237,8 @@ void C_SdManUnoTopologyManager::DoAddBusConnector(const uint64 & oru64_UniqueID,
    \param[in] oru8_Node2InterfaceNumber Node 2 interface number
    \param[in] oru8_Node1NodeID          Node 1 node ID
    \param[in] oru8_Node2NodeID          Node 2 node ID
-
-   \created     19.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(const std::vector<uint64> & orc_FourUniqueIds,
                                                                          const stw_opensyde_core::C_OSCSystemBus::E_Type & ore_BusType, const QString & orc_BusName, const QPointF & orc_BusPosition, const uint64 & oru64_Node1UniqueID, const uint64 & oru64_Node2UniqueID, const uint8 & oru8_Node1InterfaceNumber, const uint8 & oru8_Node2InterfaceNumber, const uint8 & oru8_Node1NodeID,
                                                                          const uint8 & oru8_Node2NodeID)
@@ -322,9 +292,8 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(const s
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do add one node to node connection and use an existing bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do add one node to node connection and use an existing bus
 
    \param[in] orc_ThreeUniqueIds        Two unique IDs for the two new items created by this action
    \param[in] oru64_BusUniqueID         Bus unique ID
@@ -336,10 +305,8 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(const s
    \param[in] oru8_Node2InterfaceNumber Node 2 interface number
    \param[in] oru8_Node1NodeID          Node 1 node ID
    \param[in] oru8_Node2NodeID          Node 2 node ID
-
-   \created     19.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionUsingExistingBus(const std::vector<uint64> & orc_TwoUniqueIds,
                                                                           const uint64 & oru64_BusUniqueID,
                                                                           const QPointF & orc_Node1Position,
@@ -378,16 +345,13 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionUsingExistingBus(const 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new data based on a snapshot and reserved IDs
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new data based on a snapshot and reserved IDs
 
    \param[in]     oru64_UniqueIDs      Reserved unique IDs for snapshot data
    \param[in]     orc_Snapshot         Snapshot data
-
-   \created     24.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoAddSnapshot(const std::vector<uint64> & oru64_UniqueIDs,
                                               const C_SdTopologyDataSnapshot & orc_Snapshot, const QPointF & orc_NewPos)
 {
@@ -400,9 +364,8 @@ void C_SdManUnoTopologyManager::DoAddSnapshot(const std::vector<uint64> & oru64_
    this->DoPush(pc_AddCommand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reconnect to different node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reconnect to different node
 
    \param[in] opc_BusConnector    Bus connector to reconnect
    \param[in] opc_StartingNode    Initial node
@@ -410,10 +373,8 @@ void C_SdManUnoTopologyManager::DoAddSnapshot(const std::vector<uint64> & oru64_
    \param[in] orc_ConnectionPos   Event position
    \param[in] ors32_Interface     Interface to connect to
    \param[in] oru8_NodeId         New node id
-
-   \created     05.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoReconnectNode(const C_GiLiBusConnector * const opc_BusConnector,
                                                 const C_GiNode * const opc_StartingNode,
                                                 const C_GiNode * const opc_LastNode, const QPointF & orc_ConnectionPos,
@@ -442,9 +403,8 @@ void C_SdManUnoTopologyManager::DoReconnectNode(const C_GiLiBusConnector * const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reconnect to different bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reconnect to different bus
 
    \param[in] opc_BusConnector    Bus connector to reconnect
    \param[in] opc_StartingNode    Initial bus
@@ -452,10 +412,8 @@ void C_SdManUnoTopologyManager::DoReconnectNode(const C_GiLiBusConnector * const
    \param[in] orc_ConnectionPos   Event position
    \param[in] ors32_Interface     Interface to connect to
    \param[in] oru8_NodeId         New node id
-
-   \created     05.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoReconnectBus(const C_GiLiBusConnector * const opc_BusConnector,
                                                const C_GiLiBus * const opc_StartingBus,
                                                const C_GiLiBus * const opc_LastBus, const QPointF & orc_ConnectionPos,
@@ -484,19 +442,16 @@ void C_SdManUnoTopologyManager::DoReconnectBus(const C_GiLiBusConnector * const 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Change used node interface of bus connector
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Change used node interface of bus connector
 
    \param[in] opc_BusConnector             Bus connector to change interface of
    \param[in] oru8_PreviousInterfaceNumber Last used interface number
    \param[in] oru8_NewInterfaceNumber      New interface number to use
    \param[in] oru8_PreviousNodeId          Previous node id
    \param[in] oru8_NewNodeId               New node id
-
-   \created     12.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoChangeInterface(const C_GiLiBusConnector * const opc_BusConnector,
                                                   const uint8 & oru8_PreviousInterfaceNumber,
                                                   const uint8 & oru8_NewInterfaceNumber,
@@ -524,34 +479,28 @@ void C_SdManUnoTopologyManager::DoChangeInterface(const C_GiLiBusConnector * con
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get new style command (Destruction has to be handled by calling function)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get new style command (Destruction has to be handled by calling function)
 
    \param[in] orc_Items   Item IDs
    \param[in] oq_DarkMode Optional flag if dark mode active
 
    \return
    Valid pointer to new style command
-
-   \created     25.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoSetupStyleCommand * C_SdManUnoTopologyManager::m_GetNewStyleCommand(const std::vector<uint64> & orc_Items,
                                                                             const bool oq_DarkMode)
 {
    return new C_SdManUnoTopologySetupStyleCommand(this->mpc_Scene, orc_Items, oq_DarkMode);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Merge specified command with previous command on stack
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Merge specified command with previous command on stack
 
    \param[in,out] opc_Command Command to add the last command on stack to
-
-   \created     06.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::m_MergeWithPrev(QUndoCommand * const opc_Command)
 {
    const sint32 s32_LastIndex = static_cast<sint32>(this->count()) - 1L;
@@ -568,7 +517,7 @@ void C_SdManUnoTopologyManager::m_MergeWithPrev(QUndoCommand * const opc_Command
    //lint -e{429}  never took ownership of any of these objects in this function
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::m_OnErrorChange(void)
 {
    Q_EMIT this->SigErrorChanged();

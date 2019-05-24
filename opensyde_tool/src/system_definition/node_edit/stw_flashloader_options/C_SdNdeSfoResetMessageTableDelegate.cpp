@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       short description (implementation)
 
    detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     07.12.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "constants.h"
@@ -26,43 +19,39 @@
 #include "C_SdNdeSfoResetMessageTableModel.h"
 #include "C_SdNdeSfoResetMessageTableDelegate.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     07.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeSfoResetMessageTableDelegate::C_SdNdeSfoResetMessageTableDelegate(QObject * const opc_Parent) :
    QStyledItemDelegate(opc_Parent)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten create editor event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten create editor event slot
 
    Here: Create appropiate editor widget
 
@@ -72,10 +61,8 @@ C_SdNdeSfoResetMessageTableDelegate::C_SdNdeSfoResetMessageTableDelegate(QObject
 
    \return
    Editor widget
-
-   \created     07.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QWidget * C_SdNdeSfoResetMessageTableDelegate::createEditor(QWidget * const opc_Parent,
                                                             const QStyleOptionViewItem & orc_Option,
                                                             const QModelIndex & orc_Index) const
@@ -140,18 +127,15 @@ QWidget * C_SdNdeSfoResetMessageTableDelegate::createEditor(QWidget * const opc_
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten set editor data event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten set editor data event slot
 
    Here: Pass relevant data
 
    \param[in,out] opc_Editor Editor widget
    \param[in]     orc_Index  Correlating index
-
-   \created     07.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeSfoResetMessageTableDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex & orc_Index) const
 {
    if ((opc_Editor != NULL) && (orc_Index.isValid() == true))
@@ -193,19 +177,16 @@ void C_SdNdeSfoResetMessageTableDelegate::setEditorData(QWidget * const opc_Edit
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten set model data event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten set model data event slot
 
    Here: Pass relevant data
 
    \param[in,out] opc_Editor Editor widget
    \param[in,out] opc_Model  Model object
    \param[in]     orc_Index  Correlating index
-
-   \created     07.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeSfoResetMessageTableDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel * const opc_Model,
                                                        const QModelIndex & orc_Index) const
 {

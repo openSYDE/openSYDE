@@ -1,40 +1,33 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Tree widget for bus messages (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.03.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SDBUEMESSAGESELECTORTREEWIDGET_H
 #define C_SDBUEMESSAGESELECTORTREEWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
-
-#include <QTreeWidget>
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QItemSelection>
 
 #include "stwtypes.h"
 #include "C_SdBueUnoManager.h"
+#include "C_OgeTreeWidgetToolTipBase.h"
 #include "C_PuiSdNodeCanMessageSyncManager.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SdBueMessageSelectorTreeWidget :
-   public QTreeWidget
+   public stw_opensyde_gui_elements::C_OgeTreeWidgetToolTipBase
 {
    Q_OBJECT
 
@@ -119,6 +112,8 @@ protected:
    virtual QStringList mimeTypes(void) const override;
    //lint -restore
 
+   virtual void m_LastMinuteToolTipUpdate(void) override;
+
 private:
    //Avoid call
    C_SdBueMessageSelectorTreeWidget(const C_SdBueMessageSelectorTreeWidget &);
@@ -181,7 +176,7 @@ private:
    bool mq_NoSelectionUpdate;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

@@ -1,17 +1,11 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for showing system view setup
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.06.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #include "precomp_headers.h"
 
 #include "stwerrors.h"
@@ -30,50 +24,58 @@
 #include "C_SyvDcWidget.h"
 #include "C_OgePopUpDialog.h"
 
-// TODO BAY
-#include "C_OgeWiCustomMessage.h"
-
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvSeSetupWidget::C_SyvSeSetupWidget(const uint32 ou32_ViewIndex, QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvSeSetupWidget),
    mpc_Scene(NULL),
    mu32_ViewIndex(ou32_ViewIndex),
-   mq_EditModeActive(false)
+   mq_EditModeActive(false),
+   mq_IgnoreSelectAllCheckboxChanges(false)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
    QString c_Name;
 
    mpc_Ui->setupUi(this);
+
+   //Style error label
+   this->mpc_Ui->pc_ErrorLabelTitle->SetForegroundColor(24);
+   this->mpc_Ui->pc_ErrorLabelTitle->SetFontPixel(14, false, true);
+   this->mpc_Ui->pc_ErrorLabelIcon->SetSvg("://images/Error_iconV2.svg");
+
+   //Handle button icons
+   this->mpc_Ui->pc_PbCancel->SetSvg("://images/system_views/IconTabCloseClickedDark.svg");
+   this->mpc_Ui->pc_PbCancel->setIconSize(QSize(16, 16));
+   this->mpc_Ui->pc_PbCancel->SetMargins(14, 23);
+
+   //Remove debug label
+   this->mpc_Ui->pc_GroupBoxButtons->setTitle("");
 
    // create scene for graphics view
    this->mpc_Scene = new C_SyvSeScene(mu32_ViewIndex);
@@ -100,17 +102,16 @@ C_SyvSeSetupWidget::C_SyvSeSetupWidget(const uint32 ou32_ViewIndex, QWidget * co
    connect(this->mpc_Scene, &C_SebScene::SigTriggerUpdateTransform, this->mpc_Ui->pc_GraphicsView,
            &C_SebGraphicsView::UpdateTransform);
    // Connect buttons
-   connect(this->mpc_Ui->pc_PbCheckAll, &stw_opensyde_gui_elements::C_OgePubTextOnlyEdit::clicked,
-           this, &C_SyvSeSetupWidget::m_CheckAllClicked);
-   connect(this->mpc_Ui->pc_PbCheckNone, &stw_opensyde_gui_elements::C_OgePubTextOnlyEdit::clicked,
-           this, &C_SyvSeSetupWidget::m_CheckNoneClicked);
-   connect(this->mpc_Ui->pc_PbConfirm, &stw_opensyde_gui_elements::C_OgePubTextWithBorderEdit::clicked,
+   connect(this->mpc_Ui->pc_CheckBoxSelectAll, &stw_opensyde_gui_elements::C_OgeChxSystemCommisioningEdit::stateChanged,
+           this, &C_SyvSeSetupWidget::m_SelectAllStateChanged);
+   connect(this->mpc_Ui->pc_PbConfirm, &stw_opensyde_gui_elements::C_OgePubSystemCommissioningEdit::clicked,
            this, &C_SyvSeSetupWidget::m_ConfirmClicked);
-   connect(this->mpc_Ui->pc_PbCancel, &stw_opensyde_gui_elements::C_OgePubTextWithBorderEdit::clicked,
+   connect(this->mpc_Ui->pc_PbCancel, &stw_opensyde_gui_elements::C_OgePubSystemCommissioningEdit::clicked,
            this, &C_SyvSeSetupWidget::m_CancelClicked);
    // Scene forwarding
    connect(this->mpc_Scene, &C_SebScene::SigChanged, this, &C_SyvSeSetupWidget::m_ViewChanged);
    connect(this->mpc_Scene, &C_SyvSeScene::SigErrorCheck, this, &C_SyvSeSetupWidget::m_CheckViewForErrorGeneral);
+   connect(this->mpc_Scene, &C_SyvSeScene::SigConnectionChange, this, &C_SyvSeSetupWidget::m_OnViewConnectionChange);
 
    //Update all items with initial zoom & pos value
    if (pc_View != NULL)
@@ -127,43 +128,32 @@ C_SyvSeSetupWidget::C_SyvSeSetupWidget(const uint32 ou32_ViewIndex, QWidget * co
    this->m_CheckViewForError();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvSeSetupWidget::~C_SyvSeSetupWidget(void)
 {
    delete mpc_Ui;
    delete mpc_Scene;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initializes all visible strings on the widget
-
-   \created     21.06.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initializes all visible strings on the widget
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeSetupWidget::InitText(void) const
 {
-   this->mpc_Ui->pc_PbCheckAll->setText(C_GtGetText::h_GetText("Check All"));
-   this->mpc_Ui->pc_PbCheckNone->setText(C_GtGetText::h_GetText("Uncheck All"));
-   this->mpc_Ui->pc_PbConfirm->setText(C_GtGetText::h_GetText("Confirm"));
+   this->mpc_Ui->pc_CheckBoxSelectAll->setText(C_GtGetText::h_GetText("Select All"));
    this->mpc_Ui->pc_PbCancel->setText(C_GtGetText::h_GetText("Cancel"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save data
-
-   \created     28.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeSetupWidget::Save(void) const
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
@@ -182,13 +172,10 @@ void C_SyvSeSetupWidget::Save(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delayed load of scene
-
-   \created     04.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delayed load of scene
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeSetupWidget::LoadScene(void)
 {
    if (this->mpc_Scene != NULL)
@@ -197,36 +184,32 @@ void C_SyvSeSetupWidget::LoadScene(void)
 
       this->SetEditMode(false);
       this->m_CheckViewForError(false);
+      this->m_OnViewConnectionChange();
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle abort action
-
-   \created     27.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle abort action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeSetupWidget::Abort(void)
 {
    m_CancelClicked();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the edit mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the edit mode
 
    \param[in]     oq_Active      Flag for edit mode
-
-   \created     20.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeSetupWidget::SetEditMode(const bool oq_Active, const bool oq_WithSave)
 {
    this->mq_EditModeActive = oq_Active;
 
    this->mpc_Ui->pc_BackgroundWidget->SetEditBackground(oq_Active);
-   this->mpc_Ui->pc_GroupBoxButtons->setVisible(oq_Active);
+   this->mpc_Ui->pc_PbCancel->setVisible(oq_Active);
+   this->mpc_Ui->pc_CheckBoxSelectAll->setVisible(oq_Active);
 
    if (this->mpc_Scene != NULL)
    {
@@ -239,12 +222,23 @@ void C_SyvSeSetupWidget::SetEditMode(const bool oq_Active, const bool oq_WithSav
 
    if (oq_Active == true)
    {
+      //Handle button
+      this->mpc_Ui->pc_PbConfirm->SetSvg("://images/system_views/IconConfirm.svg");
+      this->mpc_Ui->pc_PbConfirm->setIconSize(QSize(22, 22));
+      this->mpc_Ui->pc_PbConfirm->SetMargins(12, 20);
+      this->mpc_Ui->pc_PbConfirm->setText(C_GtGetText::h_GetText("Confirm"));
+
       // create copy of view in case of clicking cancel
       this->mc_ViewCopy = *C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-      this->mpc_Ui->pc_BackgroundWidget->layout()->setContentsMargins(8, 0, 8, 8);
    }
    else
    {
+      //Handle button
+      this->mpc_Ui->pc_PbConfirm->SetSvg("://images/main_page_and_navi_bar/IconEdit.svg");
+      this->mpc_Ui->pc_PbConfirm->setIconSize(QSize(24, 24));
+      this->mpc_Ui->pc_PbConfirm->SetMargins(16, 25);
+      this->mpc_Ui->pc_PbConfirm->setText(C_GtGetText::h_GetText("Edit"));
+
       if (oq_WithSave == true)
       {
          this->Save();
@@ -253,102 +247,60 @@ void C_SyvSeSetupWidget::SetEditMode(const bool oq_Active, const bool oq_WithSav
       {
          this->mpc_Scene->ClearUndoStack();
       }
-      this->mpc_Ui->pc_BackgroundWidget->layout()->setContentsMargins(0, 0, 0, 8);
-      Q_EMIT this->SigEditModeClosed();
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the state of the edit mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the state of the edit mode
 
    \return
    true     edit mode is active
    true     edit mode is not active
-
-   \created     20.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvSeSetupWidget::GetEditMode(void) const
 {
    return this->mq_EditModeActive;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Starts the device configuration
-
-   \created     23.11.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Starts the device configuration
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeSetupWidget::StartDeviceConfiguration(void)
 {
-   // TODO BAY: No Ethernet configuration available. The check must be removed again
-   // Start Check for Ethernet
-   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-   bool q_CanInterface = false;
+   QPointer<C_OgePopUpDialog> c_New;
+   C_SyvDcWidget * pc_Dialog;
 
-   if (pc_View != NULL)
+   //Confirm if necessary
+   if (this->GetEditMode() == true)
    {
-      const uint32 u32_BusIndex = pc_View->GetPcData().GetBusIndex();
-      const stw_opensyde_core::C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(u32_BusIndex);
-
-      if ((pc_Bus != NULL) &&
-          (pc_Bus->e_Type == stw_opensyde_core::C_OSCSystemBus::eCAN))
-      {
-         q_CanInterface = true;
-      }
+      this->SetEditMode(false);
    }
-   // End Check for Ethernet
 
-   if (q_CanInterface == false)
+   //Show dialog
+   c_New = new C_OgePopUpDialog(this, this);
+   pc_Dialog = new C_SyvDcWidget(*c_New, this->mu32_ViewIndex);
+
+   Q_UNUSED(pc_Dialog)
+
+   //Resize
+   c_New->SetSize(QSize(900, 743));
+
+   c_New->exec();
+
+   if (c_New != NULL)
    {
-      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eWARNING);
-      c_Message.SetHeading(C_GtGetText::h_GetText("Device configuration via Ethernet is not available"));
-      c_Message.SetDescription(C_GtGetText::h_GetText(
-                                  "This version of the tool does not support the Ethernet device configuration. "
-                                  "Support of Ethernet device configuration will come soon. In this case use a CAN bus "
-                                  "for device configuration."));
-      c_Message.Execute();
+      pc_Dialog->CleanUp();
+      c_New->HideOverlay();
    }
-   else
-   {
-      QPointer<C_OgePopUpDialog> c_New;
-      C_SyvDcWidget * pc_Dialog;
-
-      //Confirm if necessary
-      if (this->GetEditMode() == true)
-      {
-         this->SetEditMode(false);
-      }
-
-      //Show dialog
-      c_New = new C_OgePopUpDialog(this, this);
-      pc_Dialog = new C_SyvDcWidget(*c_New, this->mu32_ViewIndex);
-
-      Q_UNUSED(pc_Dialog)
-
-      //Resize
-      c_New->SetSize(QSize(900, 743));
-
-      c_New->exec();
-
-      if (c_New != NULL)
-      {
-         pc_Dialog->CleanUp();
-         c_New->HideOverlay();
-      }
-      //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
-   }
+   //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function to prepare closing the scene
-
-   \created     24.01.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function to prepare closing the scene
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeSetupWidget::PrepareToClose(void)
 {
    if (this->mpc_Scene != NULL)
@@ -357,15 +309,12 @@ void C_SyvSeSetupWidget::PrepareToClose(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overrided key press event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overrided key press event
 
    \param[in,out] opc_event  Pointer to key event
-
-   \created     04.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeSetupWidget::keyPressEvent(QKeyEvent * const opc_Event)
 {
    if ((opc_Event->key() == static_cast<sintn>(Qt::Key_Escape)) &&
@@ -379,39 +328,42 @@ void C_SyvSeSetupWidget::keyPressEvent(QKeyEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeSetupWidget::m_ViewChanged(void)
 {
    Q_EMIT this->SigChanged();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle error check trigger
-
-   \created     20.08.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle error check trigger
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeSetupWidget::m_CheckViewForErrorGeneral(void) const
 {
    m_CheckViewForError();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeSetupWidget::m_CheckViewForError(const bool oq_SendError) const
 {
    QString c_ErrorText;
-   const bool q_ViewSetupError = C_SyvUtil::h_CheckViewSetupError(this->mu32_ViewIndex, c_ErrorText);
+   QString c_ErrorTextHeading;
+   QString c_ErrorTextTooltip;
+   const bool q_ViewSetupError =
+      C_SyvUtil::h_CheckViewSetupError(this->mu32_ViewIndex, c_ErrorTextHeading, c_ErrorText, c_ErrorTextTooltip);
 
    if (q_ViewSetupError == true)
    {
-      this->mpc_Ui->pc_ErrorLabel->SetCompleteText(c_ErrorText);
-      this->mpc_Ui->pc_ErrorFrame->setVisible(true);
+      this->mpc_Ui->pc_ErrorLabelIcon->SetToolTipInformation("", c_ErrorTextTooltip, C_NagToolTip::eERROR);
+      this->mpc_Ui->pc_ErrorLabelTitle->setText(c_ErrorTextHeading);
+      this->mpc_Ui->pc_ErrorLabelTitle->SetToolTipInformation("", c_ErrorTextTooltip, C_NagToolTip::eERROR);
+      this->mpc_Ui->pc_ErrorLabel->SetCompleteText(c_ErrorText, c_ErrorTextTooltip);
+      this->mpc_Ui->pc_GroupBoxErrorContent->setVisible(true);
       Q_EMIT this->SigEnableConfiguration(false);
    }
    else
    {
-      this->mpc_Ui->pc_ErrorFrame->setVisible(false);
+      this->mpc_Ui->pc_GroupBoxErrorContent->setVisible(false);
       Q_EMIT this->SigEnableConfiguration(true);
    }
    if (oq_SendError == true)
@@ -420,31 +372,58 @@ void C_SyvSeSetupWidget::m_CheckViewForError(const bool oq_SendError) const
    }
 }
 
-//-----------------------------------------------------------------------------
-void C_SyvSeSetupWidget::m_CheckAllClicked(void)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle change of any node connectionn state
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvSeSetupWidget::m_OnViewConnectionChange(void)
 {
-   if (this->mpc_Scene != NULL)
+   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+
+   if (pc_View != NULL)
    {
-      this->mpc_Scene->SetAllNodesConnected(true);
+      const std::vector<uint8> & rc_ActiveFlags = pc_View->GetNodeActiveFlags();
+      bool q_AllActive = true;
+      for (uint32 u32_ItActive = 0UL; u32_ItActive < rc_ActiveFlags.size(); ++u32_ItActive)
+      {
+         if (rc_ActiveFlags[u32_ItActive] == 0U)
+         {
+            q_AllActive = false;
+         }
+      }
+      this->mq_IgnoreSelectAllCheckboxChanges = true;
+      this->mpc_Ui->pc_CheckBoxSelectAll->setChecked(q_AllActive);
+      this->mq_IgnoreSelectAllCheckboxChanges = false;
    }
 }
 
-//-----------------------------------------------------------------------------
-void C_SyvSeSetupWidget::m_CheckNoneClicked(void)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle state change for select all checkbox
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvSeSetupWidget::m_SelectAllStateChanged(void)
 {
-   if (this->mpc_Scene != NULL)
+   //Flag to ignore automated changes triggering this function
+   if ((this->mq_IgnoreSelectAllCheckboxChanges == false) && (this->mpc_Scene != NULL))
    {
-      this->mpc_Scene->SetAllNodesConnected(false);
+      if (this->mpc_Ui->pc_CheckBoxSelectAll->isChecked())
+      {
+         this->mpc_Scene->SetAllNodesConnected(true);
+      }
+      else
+      {
+         this->mpc_Scene->SetAllNodesConnected(false);
+      }
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeSetupWidget::m_ConfirmClicked(void)
 {
-   this->SetEditMode(false);
+   this->SetEditMode(!this->GetEditMode());
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeSetupWidget::m_CancelClicked(void)
 {
    // restore the saved view

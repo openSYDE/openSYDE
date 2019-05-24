@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       A datapool item widget for the list widget
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.02.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QPainter>
 
 #include "constants.h"
@@ -25,44 +18,49 @@
 #include "C_Uti.h"
 #include "C_OgeWiUtil.h"
 #include "C_GtGetText.h"
+#include "TGLUtils.h"
+#include "C_PuiSdHandler.h"
+#include "C_OSCNode.h"
+#include "C_OSCNodeDataPool.h"
+#include "C_SdNdeDataPoolUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
+using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QSize C_SdNdeDataPoolSelectorItemWidget::hc_MaximumSize = QSize(145, 151);
 const QSize C_SdNdeDataPoolSelectorItemWidget::hc_MinimumSize = QSize(145, 61);
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     oq_UsageViewActive   Flag for showing usage bars for datapool
    \param[in,out] opc_Parent           Optional pointer to parent
-
-   \created     01.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolSelectorItemWidget::C_SdNdeDataPoolSelectorItemWidget(const bool oq_UsageViewActive,
                                                                      QWidget * const opc_Parent) :
    C_OgeWiWithToolTip(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDataPoolSelectorItemWidget),
    mpc_UsageBar(NULL),
+   mc_DatapoolId(C_OSCNodeDataPoolId()),
    mq_StateSafety(false),
    mq_StateConflict(false),
+   mq_Shared(false),
    mq_Maximized(true),
    mq_Active(false),
    mq_UsageViewActive(oq_UsageViewActive),
@@ -74,12 +72,17 @@ C_SdNdeDataPoolSelectorItemWidget::C_SdNdeDataPoolSelectorItemWidget(const bool 
    mpc_Ui->setupUi(this);
 
    this->mc_ConflictImg = QIcon("://images/Error_iconV2.svg").pixmap(mc_ICON_SIZE_24);
-   this->mc_SafetyImg.load(":images/SafetyIcon24px.png");
 
    this->mpc_LabelStateImg = new C_OgeLabToolTipBase(this);
    this->mpc_LabelStateImg->raise();
    this->mpc_LabelStateImg->move(114, 0);
    this->mpc_LabelStateImg->setVisible(false);
+
+   this->mpc_LabelShareImg = new QLabel(this);
+   this->mpc_LabelShareImg->raise();
+   this->mpc_LabelShareImg->move(114, 114);
+   this->mpc_LabelShareImg->setVisible(false);
+   this->mpc_LabelShareImg->setPixmap(QIcon("://images/system_definition/IconShare.svg").pixmap(mc_ICON_SIZE_20));
 
    if (this->mq_UsageViewActive == false)
    {
@@ -94,31 +97,25 @@ C_SdNdeDataPoolSelectorItemWidget::C_SdNdeDataPoolSelectorItemWidget(const bool 
            &C_SdNdeDataPoolSelectorItemWidget::SigUpdateErrorToolTip);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     01.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolSelectorItemWidget::~C_SdNdeDataPoolSelectorItemWidget()
 {
    delete mpc_Ui;
    //lint -e{1740}  no memory leak because of the parent of mpc_LabelStateImg and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialization of the widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialization of the widget
 
    It is only necessary if the showEvent will not be triggered.
    For example in a delegate class.
-
-   \created     24.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorItemWidget::InitWidget(void)
 {
    if (this->mpc_UsageBar != NULL)
@@ -128,16 +125,13 @@ void C_SdNdeDataPoolSelectorItemWidget::InitWidget(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Error tool tip
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Error tool tip
 
    \param[in] orc_Heading Error tool tip heading
    \param[in] orc_Content Error tool tip content
-
-   \created     19.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorItemWidget::SetErrorToolTip(const QString & orc_Heading, const QString & orc_Content)
 {
    if (this->mpc_LabelStateImg != NULL)
@@ -146,95 +140,33 @@ void C_SdNdeDataPoolSelectorItemWidget::SetErrorToolTip(const QString & orc_Head
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the number of the item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the number of the item
 
    \param[in]     ou32_Number          Actual number
-
-   \created     01.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorItemWidget::SetNumber(const uint32 ou32_Number)
 {
    this->mu32_Number = ou32_Number;
    this->m_UpdateName();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the shown datapool data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the shown datapool data
 
-   \param[in]     orc_OSCDataPool          Actual datapool with its informations
-
-   \created     01.02.2017  STW/B.Bayer
+   \param[in]     orc_OSCDataPoolId        Actual datapool ID with its information
 */
-//-----------------------------------------------------------------------------
-void C_SdNdeDataPoolSelectorItemWidget::SetData(const stw_opensyde_core::C_OSCNodeDataPool & orc_OSCDataPool)
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDataPoolSelectorItemWidget::SetData(const stw_opensyde_core::C_OSCNodeDataPoolId & orc_OSCDataPoolId)
 {
-   this->mc_Name = orc_OSCDataPool.c_Name.c_str();
-   this->m_UpdateName();
-   this->mpc_Ui->pc_TextEditDpComment->setText(orc_OSCDataPool.c_Comment.c_str());
-   this->mq_StateSafety = orc_OSCDataPool.q_IsSafety;
+   this->mc_DatapoolId = orc_OSCDataPoolId;
 
-   if (this->mpc_UsageBar != NULL)
-   {
-      uint32 u32_PercentageUsed;
-      uint32 u32_PercentageReserved;
-      QString c_TextUsage;
-      QString c_TextReservation;
-      QString c_ToolTipText;
-      QString c_Label("%1% %2");
-
-      this->mu32_Size = orc_OSCDataPool.u32_NvMSize;
-      this->mu32_Used = orc_OSCDataPool.GetNumBytesUsed();
-      this->mu32_Reserved = orc_OSCDataPool.GetListsSize();
-
-      this->mpc_UsageBar->SetData(this->mu32_Size, this->mu32_Used, this->mu32_Reserved, u32_PercentageUsed,
-                                  u32_PercentageReserved);
-
-      // update the label
-      if ((this->mu32_Reserved > this->mu32_Size) && (this->mu32_Reserved > this->mu32_Used))
-      {
-         c_Label = c_Label.arg(QString::number(u32_PercentageReserved), C_GtGetText::h_GetText("Reservation"));
-      }
-      else
-      {
-         c_Label = c_Label.arg(QString::number(u32_PercentageUsed), C_GtGetText::h_GetText("Usage"));
-      }
-      this->mpc_Ui->pc_LabelUsage->setText(c_Label);
-
-      // udpate the tool tip
-      c_TextUsage = QString("%1% %2 (%3 / %4)\n").arg(QString::number(u32_PercentageUsed),
-                                                      C_GtGetText::h_GetText("used by parameters"),
-                                                      C_Uti::h_GetByteCountAsString(this->mu32_Used),
-                                                      C_Uti::h_GetByteCountAsString(this->mu32_Size));
-      c_TextReservation = QString("%1% %2 (%3 / %4)").arg(QString::number(u32_PercentageReserved),
-                                                          C_GtGetText::h_GetText("reserved by lists"),
-                                                          C_Uti::h_GetByteCountAsString(this->mu32_Reserved),
-                                                          C_Uti::h_GetByteCountAsString(this->mu32_Size));
-
-      c_ToolTipText = this->mpc_Ui->pc_TextEditDpComment->toPlainText();
-      if (c_ToolTipText != "")
-      {
-         c_ToolTipText += "\n\n";
-      }
-      c_ToolTipText += "Statistics:\n" + c_TextUsage + c_TextReservation;
-
-      this->SetToolTipInformation(this->mc_Name, c_ToolTipText);
-   }
-   else
-   {
-      // update the tool tip
-      this->SetToolTipInformation(this->mc_Name, this->mpc_Ui->pc_TextEditDpComment->toPlainText());
-   }
-
-   this->m_UpdateLabel();
+   this->UpdateData();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the shown datapool data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the shown datapool data
 
    \param[in]     orc_DatapoolName         Datapool name
    \param[in]     orc_DatapoolComment      Datapool comment
@@ -242,10 +174,8 @@ void C_SdNdeDataPoolSelectorItemWidget::SetData(const stw_opensyde_core::C_OSCNo
    \param[in]     ou32_Size                Size of the datapool
    \param[in]     ou32_Used                Used size of the datapool
    \param[in]     ou32_Reserved            Reserved size of the datapool
-
-   \created     01.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorItemWidget::SetData(const QString & orc_DatapoolName, const QString & orc_DatapoolComment,
                                                 const bool oq_Safety, const uint32 ou32_Size, const uint32 ou32_Used,
                                                 const uint32 ou32_Reserved)
@@ -282,17 +212,146 @@ void C_SdNdeDataPoolSelectorItemWidget::SetData(const QString & orc_DatapoolName
    this->m_UpdateLabel();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the widget active or inactive
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the shown datapool data
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDataPoolSelectorItemWidget::UpdateData(void)
+{
+   const C_OSCNodeDataPool * const pc_OSCDataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+      this->mc_DatapoolId.u32_NodeIndex, this->mc_DatapoolId.u32_DataPoolIndex);
+
+   tgl_assert(pc_OSCDataPool != NULL);
+   if (pc_OSCDataPool != NULL)
+   {
+      QString c_ToolTipText;
+      const C_PuiSdSharedDatapools & rc_SharedDatapools = C_PuiSdHandler::h_GetInstance()->GetSharedDatapoolsConst();
+      uint32 u32_SharedGroup = 0U;
+
+      this->mc_Name = pc_OSCDataPool->c_Name.c_str();
+      this->m_UpdateName();
+      this->mpc_Ui->pc_TextEditDpComment->setText(pc_OSCDataPool->c_Comment.c_str());
+      this->mq_StateSafety = pc_OSCDataPool->q_IsSafety;
+      this->mq_Shared = rc_SharedDatapools.IsSharedDatapool(this->mc_DatapoolId, &u32_SharedGroup);
+
+      // Tooltip
+      c_ToolTipText = this->mpc_Ui->pc_TextEditDpComment->toPlainText();
+      c_ToolTipText += C_GtGetText::h_GetText("\n\nVersion: ");
+      c_ToolTipText += QString("v%1.%2r%3").
+                       arg(pc_OSCDataPool->au8_Version[0], 2, 10, QChar('0')).
+                       arg(pc_OSCDataPool->au8_Version[1], 2, 10, QChar('0')).
+                       arg(pc_OSCDataPool->au8_Version[2], 2, 10, QChar('0'));
+
+      c_ToolTipText += C_GtGetText::h_GetText("\n\nConfiguration:\n");
+
+      // Safety flag
+      c_ToolTipText += C_GtGetText::h_GetText("   Safety relevant content: ");
+      if (pc_OSCDataPool->q_IsSafety == true)
+      {
+         c_ToolTipText += C_GtGetText::h_GetText("Yes");
+      }
+      else
+      {
+         c_ToolTipText += C_GtGetText::h_GetText("No");
+      }
+
+      // Application
+      c_ToolTipText += C_GtGetText::h_GetText("\n   Related Programmable Application: ");
+      if (pc_OSCDataPool->s32_RelatedDataBlockIndex >= 0)
+      {
+         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+            this->mc_DatapoolId.u32_NodeIndex);
+
+         tgl_assert(pc_Node != NULL);
+         if (pc_Node != NULL)
+         {
+            tgl_assert(static_cast<uint32>(pc_OSCDataPool->s32_RelatedDataBlockIndex) < pc_Node->c_Applications.size());
+            if (static_cast<uint32>(pc_OSCDataPool->s32_RelatedDataBlockIndex) < pc_Node->c_Applications.size())
+            {
+               c_ToolTipText += pc_Node->c_Applications[pc_OSCDataPool->s32_RelatedDataBlockIndex].c_Name.c_str();
+            }
+         }
+      }
+      else
+      {
+         c_ToolTipText += C_GtGetText::h_GetText("Not Assigned");
+      }
+      c_ToolTipText += "\n\n";
+
+      // Share state
+      if (this->mq_Shared == true)
+      {
+         //c_ToolTipText += C_GtGetText::h_GetText("   Shared Datapool: ");
+
+         std::vector<QString> c_SharedDatapoolGroup;
+         uint32 u32_DatapoolCounter;
+
+         c_ToolTipText += C_GtGetText::h_GetText("Share configuration with:\n");
+
+         C_SdNdeDataPoolUtil::GetSharedDatapoolGroup(u32_SharedGroup, this->mc_DatapoolId,
+                                                     this->mc_DatapoolId.u32_NodeIndex, c_SharedDatapoolGroup);
+
+         for (u32_DatapoolCounter = 0U; u32_DatapoolCounter < c_SharedDatapoolGroup.size(); ++u32_DatapoolCounter)
+         {
+            c_ToolTipText += "   " + c_SharedDatapoolGroup[u32_DatapoolCounter] + "\n";
+         }
+         c_ToolTipText += "\n";
+      }
+
+      if (this->mpc_UsageBar != NULL)
+      {
+         uint32 u32_PercentageUsed;
+         uint32 u32_PercentageReserved;
+         QString c_TextUsage;
+         QString c_TextReservation;
+         QString c_Label("%1% %2");
+
+         this->mu32_Size = pc_OSCDataPool->u32_NvMSize;
+         this->mu32_Used = pc_OSCDataPool->GetNumBytesUsed();
+         this->mu32_Reserved = pc_OSCDataPool->GetListsSize();
+
+         this->mpc_UsageBar->SetData(this->mu32_Size, this->mu32_Used, this->mu32_Reserved, u32_PercentageUsed,
+                                     u32_PercentageReserved);
+
+         // update the label
+         if ((this->mu32_Reserved > this->mu32_Size) && (this->mu32_Reserved > this->mu32_Used))
+         {
+            c_Label = c_Label.arg(QString::number(u32_PercentageReserved), C_GtGetText::h_GetText("Reservation"));
+         }
+         else
+         {
+            c_Label = c_Label.arg(QString::number(u32_PercentageUsed), C_GtGetText::h_GetText("Usage"));
+         }
+         this->mpc_Ui->pc_LabelUsage->setText(c_Label);
+
+         // udpate the tool tip
+         c_TextUsage = "   " + QString("%1% %2 (%3 / %4)\n").arg(QString::number(u32_PercentageUsed),
+                                                                 C_GtGetText::h_GetText("used by parameters"),
+                                                                 C_Uti::h_GetByteCountAsString(this->mu32_Used),
+                                                                 C_Uti::h_GetByteCountAsString(this->mu32_Size));
+         c_TextReservation = "   " + QString("%1% %2 (%3 / %4)").arg(QString::number(u32_PercentageReserved),
+                                                                     C_GtGetText::h_GetText("reserved by lists"),
+                                                                     C_Uti::h_GetByteCountAsString(this->mu32_Reserved),
+                                                                     C_Uti::h_GetByteCountAsString(this->mu32_Size));
+
+         c_ToolTipText += "NVM Statistics:\n" + c_TextUsage + c_TextReservation;
+      }
+
+      // update the tool tip
+      this->SetToolTipInformation(this->mc_Name, c_ToolTipText);
+
+      this->m_UpdateLabel();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the widget active or inactive
 
    Adapts the stylesheet
 
    \param[in]     oq_Active   Is widget active or not active
-
-   \created     06.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorItemWidget::SetActive(const bool oq_Active)
 {
    if (oq_Active == true)
@@ -314,92 +373,111 @@ void C_SdNdeDataPoolSelectorItemWidget::SetActive(const bool oq_Active)
    this->mq_Active = oq_Active;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets conflict state of the widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets conflict state of the widget
 
    Enables or disables the conflict icon
 
    \param[in]     oq_Active   Is conflict active or not active
-
-   \created     22.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorItemWidget::SetStateConflict(const bool oq_Active)
 {
    this->mq_StateConflict = oq_Active;
    this->m_UpdateLabel();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the datapool name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set the shared datapool flag
+
+   \param[in]     oq_Shared       Flag if datapool is shared
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDataPoolSelectorItemWidget::SetShareDatapool(const bool oq_Shared)
+{
+   this->mq_Shared = oq_Shared;
+   this->m_UpdateLabel();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the current Datapool Id
+
+   \return
+   Datapool Id
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const C_OSCNodeDataPoolId & C_SdNdeDataPoolSelectorItemWidget::GetDatapoolId(void) const
+{
+   return this->mc_DatapoolId;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the datapool name
 
    \return
    Name of datapool
-
-   \created     01.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SdNdeDataPoolSelectorItemWidget::GetDatapoolName(void) const
 {
    return this->mpc_Ui->pc_TextEditDpName->toPlainText();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the datapool comment
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the datapool comment
 
    \return
    Comment of datapool
-
-   \created     01.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SdNdeDataPoolSelectorItemWidget::GetDatapoolComment(void) const
 {
    return this->mpc_Ui->pc_TextEditDpComment->toPlainText();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the safety state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the safety state
 
    \return
    Safety state
-
-   \created     07.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolSelectorItemWidget::GetStateSafety(void) const
 {
    return this->mq_StateSafety;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the conflict state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the conflict state
 
    \return
    Conflict state
-
-   \created     07.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolSelectorItemWidget::GetStateConflict(void) const
 {
    return this->mq_StateConflict;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the widget in maximized or minimized mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the shared flag of the datapool
+
+   \return
+   true     Datapool is shared
+   false    Datapool is not shared
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdNdeDataPoolSelectorItemWidget::GetShareDatapool(void) const
+{
+   return this->mq_Shared;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the widget in maximized or minimized mode
 
    \param[in]     oq_Maximized   Flag for maximized
-
-   \created     07.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorItemWidget::SetMaximized(const bool oq_Maximized)
 {
    this->mpc_Ui->pc_TextEditDpComment->setVisible(oq_Maximized);
@@ -432,105 +510,84 @@ void C_SdNdeDataPoolSelectorItemWidget::SetMaximized(const bool oq_Maximized)
    this->mq_Maximized = oq_Maximized;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the maximized state of the widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the maximized state of the widget
 
    \return
    Flag for maximized
-
-   \created     08.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolSelectorItemWidget::GetMaximized(void) const
 {
    return this->mq_Maximized;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the active state of the widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the active state of the widget
 
    \return
    Flag for active
-
-   \created     21.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolSelectorItemWidget::GetActive(void) const
 {
    return this->mq_Active;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the state of the usage view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the state of the usage view
 
    \return
    Flag for usage view active
-
-   \created     23.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolSelectorItemWidget::GetUsageViewActive() const
 {
    return this->mq_UsageViewActive;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the size of the datapool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the size of the datapool
 
    \return
    Size of datapool
-
-   \created     23.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_types::uint32 C_SdNdeDataPoolSelectorItemWidget::GetDataPoolSize(void) const
 {
    return this->mu32_Size;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the size of the used datapool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the size of the used datapool
 
    \return
    Size of used datapool
-
-   \created     23.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_types::uint32 C_SdNdeDataPoolSelectorItemWidget::GetDataPoolUsedSize(void) const
 {
    return this->mu32_Used;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the size of the reserved datapool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the size of the reserved datapool
 
    \return
    Size of reserved datapool
-
-   \created     29.05.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_types::uint32 C_SdNdeDataPoolSelectorItemWidget::GetDataPoolReservedSize(void) const
 {
    return this->mu32_Reserved;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On Show Event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On Show Event
 
    \param[in,out] opc_Event  Pointer to paint event
-
-   \created     23.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorItemWidget::showEvent(QShowEvent * const opc_Event)
 {
    QWidget::showEvent(opc_Event);
@@ -538,7 +595,7 @@ void C_SdNdeDataPoolSelectorItemWidget::showEvent(QShowEvent * const opc_Event)
    this->InitWidget();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorItemWidget::m_UpdateLabel(void)
 {
    // adapt the color of the percentage label
@@ -546,33 +603,11 @@ void C_SdNdeDataPoolSelectorItemWidget::m_UpdateLabel(void)
        (this->mu32_Reserved > this->mu32_Size) ||
        (this->mu32_Used > this->mu32_Reserved))
    {
-      //Deactivate error tool tip on interaction item
-      //const QString c_Heading = C_GtGetText::h_GetText("Invalid list content");
-      //QString c_Content;
-      //if (this->mu32_Reserved > this->mu32_Size)
-      //{
-      //   c_Content += C_GtGetText::h_GetText("- Lists use too much space");
-      //}
-      //if (this->mu32_Used > this->mu32_Reserved)
-      //{
-      //   c_Content += C_GtGetText::h_GetText("- Parameters use more space than available in the lists");
-      //}
       C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelUsage, "Conflict", true);
-      //this->mpc_Ui->pc_LabelUsage->SetToolTipInformation(c_Heading, c_Content, true);
-      //if (this->mpc_UsageBar != NULL)
-      //{
-      //   this->mpc_UsageBar->SetToolTipInformation(c_Heading, c_Content, true);
-      //}
    }
    else
    {
       C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelUsage, "Conflict", false);
-      //Deactivate error tool tip on interaction item
-      //this->mpc_Ui->pc_LabelUsage->SetToolTipInformation("", "", false);
-      //if (this->mpc_UsageBar != NULL)
-      //{
-      //   this->mpc_UsageBar->SetToolTipInformation("", "", false);
-      //}
    }
 
    // adapt the icon
@@ -599,10 +634,17 @@ void C_SdNdeDataPoolSelectorItemWidget::m_UpdateLabel(void)
          this->mpc_LabelStateImg->setVisible(false);
       }
    }
+
+   // adapt the shared icon
+   if (this->mpc_LabelShareImg != NULL)
+   {
+      this->mpc_LabelShareImg->setVisible(this->mq_Shared);
+   }
+
    this->update();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorItemWidget::m_UpdateName(void) const
 {
    this->mpc_Ui->pc_TextEditDpName->setText(QString("#") + QString::number(this->mu32_Number) + QString(" - ") +

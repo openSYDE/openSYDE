@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief    Checksum calculation algorithms
@@ -9,15 +9,9 @@
    Provides implementations of various checksumming algorithms.
    For now only CRC routines.
 
-   \implementation
-   project     project name
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.04.2015  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2015 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CSCLCHECKSUMSH
 #define CSCLCHECKSUMSH
 

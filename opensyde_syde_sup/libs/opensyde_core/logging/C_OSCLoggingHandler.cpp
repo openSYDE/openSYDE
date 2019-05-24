@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Handler class for logging operations (implementation)
 
    Handler class for logging operations
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     14.09.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <iostream>
@@ -26,20 +19,20 @@
 #include "C_OSCLoggingHandler.h"
 #include "stwerrors.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_scl;
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 bool C_OSCLoggingHandler::mhq_WriteToFile = false;
 bool C_OSCLoggingHandler::mhq_WriteToConsole = true;
 C_SCLString C_OSCLoggingHandler::mhc_FileName = "";
@@ -47,19 +40,16 @@ C_TGLCriticalSection C_OSCLoggingHandler::mhc_ConsoleCriticalSection;
 C_TGLCriticalSection C_OSCLoggingHandler::mhc_FileCriticalSection;
 std::ofstream C_OSCLoggingHandler::mhc_File;
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set write to file active flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set write to file active flag
 
    \param[in] oq_Active New write to file active flag
-
-   \created     14.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCLoggingHandler::h_SetWriteToFileActive(const bool oq_Active)
 {
    if (C_OSCLoggingHandler::mhc_File.is_open() == true)
@@ -70,29 +60,23 @@ void C_OSCLoggingHandler::h_SetWriteToFileActive(const bool oq_Active)
    mh_OpenFile();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set write to console active flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set write to console active flag
 
    \param[in] oq_Active New write to console active flag
-
-   \created     14.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCLoggingHandler::h_SetWriteToConsoleActive(const bool oq_Active)
 {
    C_OSCLoggingHandler::mhq_WriteToConsole = oq_Active;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set log file location path and file name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set log file location path and file name
 
    \param[in] orc_CompleteLogFileLocation Log file location path and file name
-
-   \created     14.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCLoggingHandler::h_SetCompleteLogFileLocation(const C_SCLString & orc_CompleteLogFileLocation)
 {
    if (C_OSCLoggingHandler::mhc_File.is_open() == true)
@@ -103,33 +87,27 @@ void C_OSCLoggingHandler::h_SetCompleteLogFileLocation(const C_SCLString & orc_C
    mh_OpenFile();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get complete log file location
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get complete log file location
 
    \return
    Current complete log file location
-
-   \created     16.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_SCLString & C_OSCLoggingHandler::h_GetCompleteLogFileLocation(void)
 {
    return C_OSCLoggingHandler::mhc_FileName;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Write info message to log
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Write info message to log
 
    \param[in] orc_Activity Current activity
    \param[in] orc_Message  Message to write (No '\n' necessary)
    \param[in] opc_Class    Current class
    \param[in] opc_Function Current function
-
-   \created     14.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCLoggingHandler::h_WriteLogInfo(const C_SCLString & orc_Activity, const C_SCLString & orc_Message,
                                          const stw_types::charn * const opc_Class,
                                          const stw_types::charn * const opc_Function)
@@ -137,18 +115,15 @@ void C_OSCLoggingHandler::h_WriteLogInfo(const C_SCLString & orc_Activity, const
    C_OSCLoggingHandler::mh_WriteLog("INFO", orc_Activity, orc_Message, opc_Class, opc_Function);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Write warning message to log
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Write warning message to log
 
    \param[in] orc_Activity Current activity
    \param[in] orc_Message  Message to write (No '\n' necessary)
    \param[in] opc_Class    Current class
    \param[in] opc_Function Current function
-
-   \created     14.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCLoggingHandler::h_WriteLogWarning(const C_SCLString & orc_Activity, const C_SCLString & orc_Message,
                                             const stw_types::charn * const opc_Class,
                                             const stw_types::charn * const opc_Function)
@@ -156,18 +131,15 @@ void C_OSCLoggingHandler::h_WriteLogWarning(const C_SCLString & orc_Activity, co
    C_OSCLoggingHandler::mh_WriteLog("WARNING", orc_Activity, orc_Message, opc_Class, opc_Function);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Write error message to log
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Write error message to log
 
    \param[in] orc_Activity Current activity
    \param[in] orc_Message  Message to write (No '\n' necessary)
    \param[in] opc_Class    Current class
    \param[in] opc_Function Current function
-
-   \created     14.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCLoggingHandler::h_WriteLogError(const C_SCLString & orc_Activity, const C_SCLString & orc_Message,
                                           const stw_types::charn * const opc_Class,
                                           const stw_types::charn * const opc_Function)
@@ -175,18 +147,15 @@ void C_OSCLoggingHandler::h_WriteLogError(const C_SCLString & orc_Activity, cons
    C_OSCLoggingHandler::mh_WriteLog("ERROR", orc_Activity, orc_Message, opc_Class, opc_Function);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get readable stw error
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get readable stw error
 
    \param[in] os32_Error STW error value
 
    \return
    STW error string
-
-   \created     20.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCLoggingHandler::h_StwError(const sint32 os32_Error)
 {
    C_SCLString c_Retval;
@@ -238,13 +207,10 @@ C_SCLString C_OSCLoggingHandler::h_StwError(const sint32 os32_Error)
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility to flush current log entries (No manual call necessary)
-
-   \created     22.02.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility to flush current log entries (No manual call necessary)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCLoggingHandler::h_Flush(void)
 {
    if (C_OSCLoggingHandler::mhq_WriteToConsole == true)
@@ -267,9 +233,8 @@ void C_OSCLoggingHandler::h_Flush(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get date time as formatted string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get date time as formatted string
 
    Format:2017-08-29 07:32:19.123
 
@@ -277,10 +242,8 @@ void C_OSCLoggingHandler::h_Flush(void)
 
    \return
    Formatted string
-
-   \created     14.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::string C_OSCLoggingHandler::h_UtilConvertDateTimeToString(const C_TGLDateTime & orc_DateTime)
 {
    std::stringstream c_Stream;
@@ -295,9 +258,8 @@ std::string C_OSCLoggingHandler::h_UtilConvertDateTimeToString(const C_TGLDateTi
    return c_Stream.str();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Write message to log
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Write message to log
 
    \param[in] oe_Type      Message type (maximum 7 characters)
    \param[in] orc_Activity Current activity (maximum 26 characters)
@@ -305,10 +267,8 @@ std::string C_OSCLoggingHandler::h_UtilConvertDateTimeToString(const C_TGLDateTi
    \param[in] opc_Class    Current class (combined with function: maximum 50 characters)
                            May be file path string which is reduced to file base name automatically
    \param[in] opc_Function Current function (combined with function: maximum 50 characters)
-
-   \created     14.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCLoggingHandler::mh_WriteLog(const C_SCLString & orc_Type, const C_SCLString & orc_Activity,
                                       const C_SCLString & orc_Message, const stw_types::charn * const opc_Class,
                                       const stw_types::charn * const opc_Function)
@@ -377,13 +337,10 @@ void C_OSCLoggingHandler::mh_WriteLog(const C_SCLString & orc_Type, const C_SCLS
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Open file if necessary
-
-   \created     22.02.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Open file if necessary
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCLoggingHandler::mh_OpenFile(void)
 {
    if (((C_OSCLoggingHandler::mhc_FileName != "") && (C_OSCLoggingHandler::mhq_WriteToFile == true)) &&
@@ -399,26 +356,20 @@ void C_OSCLoggingHandler::mh_OpenFile(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     22.02.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCLoggingHandler::C_OSCLoggingHandler(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     22.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCLoggingHandler::~C_OSCLoggingHandler(void)
 {
    if (C_OSCLoggingHandler::mhc_File.is_open() == true)

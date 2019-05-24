@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Class with concrete implementation for BLF log files (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.12.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <cstring>
@@ -24,7 +17,7 @@
 
 #include "C_SyvComMessageLoggerFileBlf.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui_logic;
@@ -32,41 +25,35 @@ using namespace stw_opensyde_core;
 using namespace Vector;
 using namespace BLF;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]  orc_FilePath                 Path for file
-
-   \created     13.12.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvComMessageLoggerFileBlf::C_SyvComMessageLoggerFileBlf(const stw_scl::C_SCLString & orc_FilePath) :
    C_OSCComMessageLoggerFileBase(orc_FilePath, "")
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Writes the end line and closes the open file
-
-   \created     08.01.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvComMessageLoggerFileBlf::~C_SyvComMessageLoggerFileBlf(void)
 {
    if (this->mc_File.is_open() == true)
@@ -75,19 +62,16 @@ C_SyvComMessageLoggerFileBlf::~C_SyvComMessageLoggerFileBlf(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Creates, if necessary, and opens file and adds the default header of the file.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Creates, if necessary, and opens file and adds the default header of the file.
 
    An already opened file will be closed and deleted.
 
    \return
    C_NO_ERR    File successfully opened and created
    C_RD_WR     Error on creating file, folders or deleting old file
-
-   \created     08.01.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComMessageLoggerFileBlf::OpenFile(void)
 {
    sint32 s32_Return;
@@ -120,15 +104,12 @@ sint32 C_SyvComMessageLoggerFileBlf::OpenFile(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adding of a concrete CAN message to the log file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adding of a concrete CAN message to the log file
 
    \param[in]     orc_MessageData      Current CAN message
-
-   \created     14.12.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvComMessageLoggerFileBlf::AddMessageToFile(const C_OSCComMessageLoggerData & orc_MessageData)
 {
    if (this->mc_File.is_open() == true)

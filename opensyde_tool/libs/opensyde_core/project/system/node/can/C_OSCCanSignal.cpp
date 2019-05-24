@@ -1,50 +1,40 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data class for a signal positioning in a CAN message (implementation)
 
    Data class for a signal positioning in a CAN message
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     05.04.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_OSCCanSignal.h"
 #include "CSCLChecksums.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     05.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCCanSignal::C_OSCCanSignal(void) :
    e_ComByteOrder(eBYTE_ORDER_INTEL),
    u16_ComBitLength(8),
@@ -53,19 +43,16 @@ C_OSCCanSignal::C_OSCCanSignal(void) :
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if current not equal to orc_Cmp
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if current not equal to orc_Cmp
 
    \param[in] orc_Cmp Compared instance
 
    \return
    Current not equal to orc_Cmp
    Else false
-
-   \created     12.09.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCCanSignal::operator !=(const C_OSCCanSignal & orc_Cmp) const
 {
    bool q_Return = false;
@@ -81,18 +68,15 @@ bool C_OSCCanSignal::operator !=(const C_OSCCanSignal & orc_Cmp) const
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
    It is not endian-safe, so it should only be used on the same system it is created on.
 
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
-
-   \created     21.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanSignal::CalcHash(uint32 & oru32_HashValue) const
 {
    stw_scl::C_SCLChecksums::CalcCRC32(&this->e_ComByteOrder, sizeof(this->e_ComByteOrder), oru32_HashValue);
@@ -102,36 +86,30 @@ void C_OSCCanSignal::CalcHash(uint32 & oru32_HashValue) const
                                       oru32_HashValue);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the position of a signal bit in the data bytes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the position of a signal bit in the data bytes
 
    \param[in]     ou16_SignalBitPosition   Signal bit position starting at 0
 
    \return
    Data bytes bit position
-
-   \created     13.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint16 C_OSCCanSignal::GetDataBytesBitPosOfSignalBit(const uint16 ou16_SignalBitPosition) const
 {
    return this->GetDataBytesBitPosOfSignalBit(this->u16_ComBitStart, ou16_SignalBitPosition);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the position of a signal bit in the data bytes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the position of a signal bit in the data bytes
 
    \param[in]     ou16_StartBit            New start bit for the signal
    \param[in]     ou16_SignalBitPosition   Signal bit position starting at 0
 
    \return
    Data bytes bit position
-
-   \created     19.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint16 C_OSCCanSignal::GetDataBytesBitPosOfSignalBit(const uint16 ou16_StartBit,
                                                      const uint16 ou16_SignalBitPosition) const
 {
@@ -171,15 +149,12 @@ uint16 C_OSCCanSignal::GetDataBytesBitPosOfSignalBit(const uint16 ou16_StartBit,
    return u16_DataBytesBitPos;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the positions of all signal bits in the data bytes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the positions of all signal bits in the data bytes
 
    \param[out]     orc_SetPositions   Signal bit positions
-
-   \created     13.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanSignal::GetDataBytesBitPositionsOfSignal(std::set<uint16> & orc_SetPositions) const
 {
    uint16 u16_Counter;

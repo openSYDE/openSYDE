@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Translate L2 CAN message to openSYDE interpretation (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     08.10.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCCOMLOGGERPROTOCOLOPENSYDE_H
 #define C_OSCCOMLOGGERPROTOCOLOPENSYDE_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <list>
 
 #include "CSCLString.h"
@@ -25,12 +19,12 @@
 #include "CCMONProtocolOpenSYDE.h"
 #include "C_OSCComMessageLoggerOsySysDefConfig.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCComLoggerProtocolOpenSYDE :
    public stw_cmon_protocol::C_CMONProtocolOpenSYDE
@@ -52,7 +46,7 @@ protected:
    std::list<const C_OSCComMessageLoggerOsySysDefConfig *> mc_SysDefConfigs;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

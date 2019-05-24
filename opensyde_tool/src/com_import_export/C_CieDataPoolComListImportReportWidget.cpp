@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Dialog for system node data pool list import report (implementation)
 
    Dialog for system node data pool list import report.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.04.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QFileInfo>
 #include "C_SdUtil.h"
 #include "TGLUtils.h"
@@ -29,7 +22,7 @@
 #include "C_CieDataPoolComListImportReportWidget.h"
 #include "ui_C_CieDataPoolComListImportReportWidget.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -37,25 +30,24 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_CieDataPoolComListImportReportWidget::mhc_HTML_TABLE_HEADER_START =
    "<td align=\"left\" valign=\"top\" style=\"padding: 5px 18px 5px 0px;white-space:pre;font-weight:bold;\">";
 const QString C_CieDataPoolComListImportReportWidget::mhc_HTML_TABLE_DATA_START =
    "<td align=\"left\" valign=\"top\" style=\"padding: 5px 18px 5px 0px;white-space:pre;\">";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -64,10 +56,8 @@ const QString C_CieDataPoolComListImportReportWidget::mhc_HTML_TABLE_DATA_START 
    \param[in]     ou32_DataPoolIndex  Data pool index
    \param[in]     ou32_InterfaceIndex Interface index
    \param[in]     orc_FilePath        Loaded file path
-
-   \created     13.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CieDataPoolComListImportReportWidget::C_CieDataPoolComListImportReportWidget(
    stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, const uint32 ou32_NodeIndex,
    const uint32 ou32_DataPoolIndex, const uint32 ou32_InterfaceIndex, const QString & orc_FilePath) :
@@ -102,27 +92,21 @@ C_CieDataPoolComListImportReportWidget::C_CieDataPoolComListImportReportWidget(
            &C_CieDataPoolComListImportReportWidget::m_CancelClicked);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     13.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CieDataPoolComListImportReportWidget::~C_CieDataPoolComListImportReportWidget(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     13.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolComListImportReportWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelHeadingReport->setText(C_GtGetText::h_GetText("Details"));
@@ -130,28 +114,16 @@ void C_CieDataPoolComListImportReportWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_BushButtonOk->setText(C_GtGetText::h_GetText("Import"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set message data for report
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set message data for report
 
-   \param[in] orc_OSCRxMessageData         Imported core RX message data
-   \param[in] orc_UiRxMessageData          Imported UI RX message data
-   \param[in] orc_OSCTxMessageData         Imported core TX message data
-   \param[in] orc_UiTxMessageData          Imported UI TX message data
-   \param[in] orc_OSCRxSignalData          Imported core RX signal data
-   \param[in] orc_UiRxSignalData           Imported UI RX signal data
-   \param[in] orc_OSCTxSignalData          Imported core TX signal data
-   \param[in] orc_UiTxSignalData           Imported UI TX signal data
-   \param[in] orc_InfoMessagesPerRxMessage Info messages for imported RX messages
-   \param[in] orc_InfoMessagesPerTxMessage Info messages for imported TX messages
+   \param[in]  orc_Param    messages and signals data
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     13.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieDataPoolComListImportReportWidget::SetMessageData(const C_CieDataPoolListStructure & orc_Param)
 {
    sint32 s32_Retval;
@@ -180,17 +152,14 @@ sint32 C_CieDataPoolComListImportReportWidget::SetMessageData(const C_CieDataPoo
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     13.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolComListImportReportWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
@@ -216,38 +185,29 @@ void C_CieDataPoolComListImportReportWidget::keyPressEvent(QKeyEvent * const opc
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Ok button click
-
-   \created     13.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Ok button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolComListImportReportWidget::m_OkClicked(void)
 {
    this->mrc_ParentDialog.accept();
    m_InsertMessages();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Ok button click
-
-   \created     13.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Ok button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolComListImportReportWidget::m_CancelClicked(void)
 {
    this->mrc_ParentDialog.reject();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Fix signal count
-
-   \created     13.07.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Fix signal count
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolComListImportReportWidget::m_FixSignalCount(void)
 {
    mh_CutSignalCount(this->mc_OSCRxMessageData, this->mc_UiRxMessageData, this->mc_OSCRxSignalData,
@@ -256,16 +216,13 @@ void C_CieDataPoolComListImportReportWidget::m_FixSignalCount(void)
                      this->mc_UiTxSignalData, this->mc_WarningMessagesPerTxMessage);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt all stored message names as specified
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt all stored message names as specified
 
    * Eliminate spaces
    * Cut after 31 characters
-
-   \created     13.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolComListImportReportWidget::m_AdaptMessageNames(void)
 {
    //Each message
@@ -292,13 +249,10 @@ void C_CieDataPoolComListImportReportWidget::m_AdaptMessageNames(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt all stored messages to protocol restrictions if necessary
-
-   \created     17.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt all stored messages to protocol restrictions if necessary
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolComListImportReportWidget::m_AdaptMessagesToProtocolType(void)
 {
    //Each message
@@ -343,19 +297,16 @@ void C_CieDataPoolComListImportReportWidget::m_AdaptMessagesToProtocolType(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Cut signal count if necessary
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Cut signal count if necessary
 
    \param[in] orc_OSCRxMessageData            Core RX message data
    \param[in] orc_UiRxMessageData             UI RX message data
    \param[in] orc_OSCRxSignalData             Core RX signal data
    \param[in] orc_UiRxSignalData              UI RX signal data
    \param[in] orc_WarningMessagesPerRxMessage Warning message vector for each message
-
-   \created     13.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolComListImportReportWidget::mh_CutSignalCount(std::vector<C_OSCCanMessage> & orc_OSCRxMessageData,
                                                                std::vector<C_PuiSdNodeCanMessage> & orc_UiRxMessageData,
                                                                std::vector<C_OSCNodeDataPoolListElement> & orc_OSCRxSignalData, std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiRxSignalData,
@@ -428,19 +379,16 @@ void C_CieDataPoolComListImportReportWidget::mh_CutSignalCount(std::vector<C_OSC
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if signal indices are ordered ascending
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if signal indices are ordered ascending
 
    \param[in] orc_OSCRxMessageData Messages to check
 
    \return
    True  Ascending
    False Unknown order
-
-   \created     13.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_CieDataPoolComListImportReportWidget::mh_CheckAscendingSignalIndices(
    const std::vector<C_OSCCanMessage> & orc_OSCRxMessageData)
 {
@@ -467,15 +415,12 @@ bool C_CieDataPoolComListImportReportWidget::mh_CheckAscendingSignalIndices(
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Renumber all message signal indices ascending and continuous
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Renumber all message signal indices ascending and continuous
 
    \param[in,out] orc_OSCRxMessageData Message data to renumber
-
-   \created     13.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolComListImportReportWidget::mh_RenumberMessageSignalIndicesAscending(
    std::vector<C_OSCCanMessage> & orc_OSCRxMessageData)
 {
@@ -493,18 +438,15 @@ void C_CieDataPoolComListImportReportWidget::mh_RenumberMessageSignalIndicesAsce
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt name as specified
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt name as specified
 
    * Eliminate spaces
    * Cut after 31 characters
 
    \param[in,out] orc_Name Old/New name
-
-   \created     13.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolComListImportReportWidget::mh_AdaptName(stw_scl::C_SCLString & orc_Name,
                                                           stw_scl::C_SCLString & orc_Comment)
 {
@@ -546,17 +488,14 @@ void C_CieDataPoolComListImportReportWidget::mh_AdaptName(stw_scl::C_SCLString &
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show/update report
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show/update report
 
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: parameter invalid
-
-   \created     13.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieDataPoolComListImportReportWidget::m_ShowReport(void)
 {
    //Check
@@ -716,17 +655,14 @@ sint32 C_CieDataPoolComListImportReportWidget::m_ShowReport(void)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check messages
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check messages
 
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: parameter invalid
-
-   \created     13.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieDataPoolComListImportReportWidget::m_CheckMessages(void) const
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -810,17 +746,14 @@ sint32 C_CieDataPoolComListImportReportWidget::m_CheckMessages(void) const
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check for matching messages
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check for matching messages
 
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     13.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieDataPoolComListImportReportWidget::m_CheckMessageMatches(void)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -854,13 +787,10 @@ sint32 C_CieDataPoolComListImportReportWidget::m_CheckMessageMatches(void)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Basic implementation for insert messages action
-
-   \created     13.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Basic implementation for insert messages action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolComListImportReportWidget::m_InsertMessages(void) const
 {
    sint32 s32_Retval = mh_InsertMessages(this->mu32_NodeIndex, this->me_ProtocolType, this->mu32_InterfaceIndex, true,
@@ -877,13 +807,10 @@ void C_CieDataPoolComListImportReportWidget::m_InsertMessages(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize the current protocol type based on the current indices
-
-   \created     13.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize the current protocol type based on the current indices
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieDataPoolComListImportReportWidget::m_InitProtocolType(void)
 {
    sint32 s32_Retval;
@@ -926,9 +853,8 @@ sint32 C_CieDataPoolComListImportReportWidget::m_InitProtocolType(void)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Format multiple message entries in import report
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Format multiple message entries in import report
 
    \param[in,out] oru32_NewEntryCount        Number of entries in table for new messages
    \param[in,out] oru32_UpdatedEntryCount    Number of entries in table for updated messages
@@ -943,10 +869,8 @@ sint32 C_CieDataPoolComListImportReportWidget::m_InitProtocolType(void)
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     13.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieDataPoolComListImportReportWidget::mh_GetMessageEntries(uint32 & oru32_NewEntryCount,
                                                                     uint32 & oru32_UpdatedEntryCount,
                                                                     QString & orc_TableNew, QString & orc_TableUpdated,
@@ -992,9 +916,8 @@ sint32 C_CieDataPoolComListImportReportWidget::mh_GetMessageEntries(uint32 & oru
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Format one message entry in import report
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Format one message entry in import report
 
    \param[in] ou32_Index           Current index (Displayed)
    \param[in] orc_CurMessage       Current message
@@ -1004,10 +927,8 @@ sint32 C_CieDataPoolComListImportReportWidget::mh_GetMessageEntries(uint32 & oru
 
    \return
    One message entry in import report
-
-   \created     13.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_CieDataPoolComListImportReportWidget::mh_GetMessageEntry(const uint32 ou32_Index,
                                                                    const C_OSCCanMessage & orc_CurMessage,
                                                                    const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCAllSignalData, const QString & orc_InfoMessages,
@@ -1075,9 +996,8 @@ QString C_CieDataPoolComListImportReportWidget::mh_GetMessageEntry(const uint32 
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Find matching message index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Find matching message index
 
    \param[in] orc_OSCMessageToFind Message to search for
    \param[in] orc_OSCMessages      Vector of messages to search in
@@ -1085,10 +1005,8 @@ QString C_CieDataPoolComListImportReportWidget::mh_GetMessageEntry(const uint32 
    \return
    -1   Message not found
    Else Valid index
-
-   \created     13.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieDataPoolComListImportReportWidget::mh_FindMatchingMessageIndex(const C_OSCCanMessage & orc_OSCMessageToFind,
                                                                            const std::vector<C_OSCCanMessage> & orc_OSCMessages)
 {
@@ -1107,9 +1025,8 @@ sint32 C_CieDataPoolComListImportReportWidget::mh_FindMatchingMessageIndex(const
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Insert all specified messages into the specified message container
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Insert all specified messages into the specified message container
 
    \param[in] ou32_NodeIndex             Node index (ID)
    \param[in] oe_Type                    COMM protocol type (ID)
@@ -1124,10 +1041,8 @@ sint32 C_CieDataPoolComListImportReportWidget::mh_FindMatchingMessageIndex(const
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     11.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieDataPoolComListImportReportWidget::mh_InsertMessages(const uint32 ou32_NodeIndex,
                                                                  const C_OSCCanProtocol::E_Type oe_Type,
                                                                  const uint32 ou32_InterfaceIndex,

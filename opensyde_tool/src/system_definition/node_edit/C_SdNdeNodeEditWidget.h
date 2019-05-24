@@ -1,29 +1,23 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for node edit
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     31.01.2017  STW/S.Singer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 #ifndef C_SDNDENODEEDITWIDGET_H
 #define C_SDNDENODEEDITWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 
 #include "stwtypes.h"
 
 #include "C_SdBueComIfDescriptionWidget.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace Ui
 {
@@ -32,9 +26,9 @@ class C_SdNdeNodeEditWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SdNdeNodeEditWidget :
    public QWidget
@@ -71,6 +65,7 @@ protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
    //lint -save -e1960
    virtual void showEvent(QShowEvent * const opc_Event) override;
+   virtual void hideEvent(QHideEvent * const opc_Event) override;
    //lint -restore
 
 private:
@@ -78,6 +73,7 @@ private:
    C_SdNdeNodeEditWidget(const C_SdNdeNodeEditWidget &);
    C_SdNdeNodeEditWidget & operator =(const C_SdNdeNodeEditWidget &);
 
+   void m_SaveUserSettings(void) const;
    void m_DataChanged(void);
    void m_OnSwitchToBus(const stw_types::uint32 & oru32_BusIndex, const QString & orc_BusName);
    void m_EditComDataPool(const stw_types::uint32 ou32_DataPoolIndex, const stw_types::uint32 ou32_ListIndex);
@@ -93,7 +89,7 @@ private:
    bool mq_DataChanged;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

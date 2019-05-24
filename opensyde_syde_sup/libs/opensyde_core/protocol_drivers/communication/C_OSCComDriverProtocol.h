@@ -1,24 +1,19 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Core communication driver protocol class (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.12.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSYCOMDRIVERH
 #define C_OSYCOMDRIVERH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
+#include <set>
 #include <map>
 #include "stwtypes.h"
 #include "C_OSCRoutingRoute.h"
@@ -33,12 +28,12 @@
 #include "TGLTasks.h"
 #include "CSCLString.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCComDriverProtocol :
    public C_OSCComDriverBase
@@ -52,7 +47,7 @@ public:
                                   const std::vector<stw_types::uint8> & orc_ActiveNodes,
                                   stw_can::C_CAN_Dispatcher * const opc_CanDispatcher,
                                   C_OSCIpDispatcher * const opc_IpDispatcher);
-   stw_types::sint32 SendTesterPresent(void);
+   stw_types::sint32 SendTesterPresent(const std::set<stw_types::uint32> * const opc_SkipNodes = NULL);
    stw_types::sint32 StartRouting(const stw_types::uint32 ou32_NodeIndex,
                                   stw_types::uint32 * const opu32_ErrorNodeIndex = NULL);
    stw_types::sint32 StopRouting(const stw_types::uint32 ou32_NodeIndex);
@@ -71,37 +66,31 @@ public:
 
    stw_types::sint32 ReConnectNode(const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerId) const;
    stw_types::sint32 DisconnectNode(const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerId) const;
+   void DisconnectNodes(void) const;
 
    virtual void PrepareForDestruction(void);
 
+   stw_opensyde_core::C_OSCProtocolDriverOsyTpBase * GetOsyTransportProtocol(const stw_types::uint32 ou32_NodeIndex);
+
 protected:
-   bool mq_Initialized;                                                      ///< Init state
-   std::vector<stw_types::uint32> mc_ActiveNodesIndexes;                     ///< Holds all indices of all relevant
-                                                                             // nodes for the current use case
-   std::vector<stw_opensyde_core::C_OSCProtocolDriverOsy *> mc_OsyProtocols; ///< Has pointer to created
-                                                                             // instances of
-                                                                             // generic openSYDE protocol if
-                                                                             // available.
-                                                                             // Lifetime is handled by child
-                                                                             // classes
-   std::vector<stw_opensyde_core::C_OSCRoutingRoute> mc_Routes;              ///< Holds routes to use
-                                                                             // for
-   ///< each node
-   std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> mc_ServerIDs; ///< Holds server Ids for
-   ///< each node
-   std::vector<C_OSCNodeComInterfaceSettings::C_IpAddress> mc_ServerIpAddresses;         //< Holds server IP
-                                                                                         // addresses
-                                                                                         // for each node
-   std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyTpBase *> mc_TransportProtocols; ///< Holds created
-   ///< instances
-   ///< of either CAN or IP
-   // TP.
-   std::vector<stw_opensyde_core::C_OSCCanDispatcherOsyRouter *> mc_LegacyRouterDispatchers; ///< Holds created
-                                                                                             // instances
-   ///< of routing dispatcher
-   ///< (one for each routed
-   ///< KEFEX diagnostic
-   ///< server)
+   ///Init state
+   bool mq_Initialized;
+   ///Holds all indices of all relevant nodes for the current use case
+   std::vector<stw_types::uint32> mc_ActiveNodesIndexes;
+   ///Has pointer to created instances of generic openSYDE protocol if available. Lifetime is handled by child classes.
+   ///Length matches number of active nodes.
+   std::vector<stw_opensyde_core::C_OSCProtocolDriverOsy *> mc_OsyProtocols;
+   ///Holds routes to use for each active node
+   std::vector<stw_opensyde_core::C_OSCRoutingRoute> mc_Routes;
+   ///Holds server Ids for each active node
+   std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> mc_ServerIDs;
+   ///Holds server IP addresses for each active node
+   std::vector<C_OSCNodeComInterfaceSettings::C_IpAddress> mc_ServerIpAddresses;
+   ///Holds created instances of either CAN or IP TP. Length matches number of active nodes.
+   std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyTpBase *> mc_TransportProtocols;
+   ///Holds created instances of routing dispatcher (one for each routed KEFEX diagnostic server).
+   ///Length matches number of active nodes.
+   std::vector<stw_opensyde_core::C_OSCCanDispatcherOsyRouter *> mc_LegacyRouterDispatchers;
 
    stw_opensyde_core::C_OSCProtocolDriverOsyTpCan * mpc_CanTransportProtocolBroadcast;
    stw_opensyde_core::C_OSCProtocolDriverOsyTpIp * mpc_IpTransportProtocolBroadcast;
@@ -122,7 +111,7 @@ protected:
    stw_types::sint32 m_SetNodeSessionId(const stw_types::uint32 ou32_ActiveNode, const stw_types::uint8 ou8_SessionId,
                                         const bool oq_CheckForSession, stw_types::uint8 * const opu8_NrCode) const;
    stw_types::sint32 m_SetNodesSessionId(const stw_types::uint8 ou8_SessionId, const bool oq_CheckForSession,
-                                         std::vector<stw_types::uint32> & orc_DefectNodeIndices) const;
+                                         std::set<stw_types::uint32> & orc_DefectNodeIndices) const;
    stw_types::sint32 m_SetNodeSessionIdWithExpectation(const stw_types::uint32 ou32_ActiveNode,
                                                        const stw_types::uint8 ou8_ExpectedNeededSession) const;
    stw_types::sint32 m_SetNodeSecurityAccess(const stw_types::uint32 ou32_ActiveNode,
@@ -227,7 +216,7 @@ private:
    C_OSCComDriverProtocol & operator =(const C_OSCComDriverProtocol &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

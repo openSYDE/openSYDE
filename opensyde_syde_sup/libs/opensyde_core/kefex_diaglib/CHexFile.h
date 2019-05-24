@@ -1,25 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       header for class HexFile
 
    defines the structure of class HexFile
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     10.04.2000  STW/U.Herb
-   \endimplementation
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   10.04.2000        STW/U.Herb    file created
-   \endhistory
+   \copyright   Copyright 2000 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CHexfileH
 #define CHexfileH
 
@@ -30,9 +18,9 @@
 namespace stw_hex_file
 {
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // defines
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //maybe this will be a part of a Borland library:
 #ifndef STWHEXFILE_PACKAGE
 #ifdef __BORLANDC__
@@ -55,9 +43,9 @@ const stw_types::uint32 ERR_CANT_OPEN_FILE    = 0xF0000000UL;
 
 const stw_types::uint32 ERR_MASK              = 0xF0000000UL;
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // data structures
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 ///Element fuer eine Zeile einer Hex-Datei (wird in einem dynamischen Ringpuffer angelegt)
 struct STWHEXFILE_PACKAGE T_HexLine
@@ -68,9 +56,9 @@ struct STWHEXFILE_PACKAGE T_HexLine
   stw_types::uint8 * pu8_HexLine;  ///< Daten Hex Zeile in Hex ohne ':'
 };
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // class definition, prototypes
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Container for on block of memory dump
 class STWHEXFILE_PACKAGE C_HexDataDumpBlock
 {
@@ -107,7 +95,6 @@ public:
                                     const stw_types::uint8 ou8_FillPattern);
    //Reformat hex files (using C_HexDataDump internally; so no RAM penalty for gaps within hex file)
    stw_types::uint32 Optimize(const stw_types::uint32 ou32_RecSize);
-
 
    //Datenzeiger auf ERSTES Element setzen (tHexLine)
    //      und Daten von aktueller Hex Zeile zurueck geben
@@ -218,6 +205,6 @@ protected:
 
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 #endif

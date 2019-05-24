@@ -1,25 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       header for class HexFile
 
    defines the structure of class HexFile
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     10.04.2000  STW/U.Herb
-   \endimplementation
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   10.04.2000        STW/U.Herb    file created
-   \endhistory
+   \copyright   Copyright 2000 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CHexfileH
 #define CHexfileH
 
@@ -107,7 +95,6 @@ public:
                                     const stw_types::uint8 ou8_FillPattern);
    //Reformat hex files (using C_HexDataDump internally; so no RAM penalty for gaps within hex file)
    stw_types::uint32 Optimize(const stw_types::uint32 ou32_RecSize);
-
 
    //Datenzeiger auf ERSTES Element setzen (tHexLine)
    //      und Daten von aktueller Hex Zeile zurueck geben

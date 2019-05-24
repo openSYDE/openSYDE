@@ -1,25 +1,19 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \file       stwtypes.h
+   \file
    \brief      STW specific standard defines and types
 
    Standard typedefs in compliance with STW C++ Coding Rules.
    here: for Windows applications.
 
    Suitable for applications compiled with:
-   - Borland C++ Builder
+   - Embarcadero C++ Builder
    - MinGW
    - MS Visual C++
 
-   \implementation
-   project     to be used in all kinds of applications
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     23.08.2007  STW/U.Meyler
-   \endimplementation
+   \copyright   Copyright 2007 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef STWTYPESH
 #define STWTYPESH
 

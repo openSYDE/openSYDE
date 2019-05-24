@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       openSYDE Core gettext utilities
 
    Wrapper for the gettext library.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     08.07.2016  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -27,27 +20,26 @@
 #include "TGLUtils.h"
 #include "libintl.h" //gettext header
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_scl;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 bool C_GtGetText::mhq_Initialized = false;
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief    Initialize wrapper
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Initialize wrapper
 
    - define file name for .mo files
    - define base path to place .mo files
@@ -71,10 +63,8 @@ bool C_GtGetText::mhq_Initialized = false;
    C_NO_ERR    all set up
    C_RANGE     orc_BasePath or orc_MoFileName are empty strings
    C_NOACT     internal error in gettext library
-
-   \created     11.07.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_GtGetText::h_Initialize(const C_SCLString & orc_BasePath, const C_SCLString & orc_MoFileName)
 {
    sint32 s32_Return;
@@ -113,9 +103,8 @@ sint32 C_GtGetText::h_Initialize(const C_SCLString & orc_BasePath, const C_SCLSt
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief    Set active language
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Set active language
 
    Allow application to override active language.
    By default the system environment variable "LANG" determines the used language.
@@ -135,10 +124,8 @@ sint32 C_GtGetText::h_Initialize(const C_SCLString & orc_BasePath, const C_SCLSt
    \return
    C_NO_ERR    language set
    C_NOACT     could not set language
-
-   \created     11.07.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_GtGetText::h_SetLanguage(const C_SCLString & orc_Language)
 {
    sint32 s32_Return;
@@ -147,9 +134,8 @@ sint32 C_GtGetText::h_SetLanguage(const C_SCLString & orc_Language)
    return (s32_Return == -1) ? stw_errors::C_NOACT : stw_errors::C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief    Read string from .mo file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Read string from .mo file
 
    Try to read string for configured language from .mo file.
    If the .mo file is present and contains a translation for the requested string a pointer to this translation is
@@ -164,10 +150,8 @@ sint32 C_GtGetText::h_SetLanguage(const C_SCLString & orc_Language)
 
    \return
    Pointer to text (see description)
-
-   \created     11.07.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const charn * C_GtGetText::h_GetText(const charn * const opcn_MessageID)
 {
    static const charn hacn_Error[] = "C_GtGetText not initialized";

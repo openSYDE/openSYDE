@@ -1,58 +1,48 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Resize line undo command (implementation)
 
    Resize line undo command
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.11.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_SebUnoResizeLineCommand.h"
 #include "C_GiLiLineGroup.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace std;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Scene               Pointer to currently active scene
    \param[in]     orc_IDs                 Affected unique IDs
    \param[in]     oru8_InteractionPointID Interaction point ID
    \param[in]     orc_PositionDifference  Position difference
    \param[in]     opc_Parent              Optional pointer to parent
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoTopResizeLineCommand::C_SebUnoTopResizeLineCommand(QGraphicsScene * const opc_Scene,
                                                            const std::vector<stw_types::uint64> & orc_IDs,
                                                            const stw_types::sint32 & ors32_InteractionPointID,
@@ -64,24 +54,18 @@ C_SebUnoTopResizeLineCommand::C_SebUnoTopResizeLineCommand(QGraphicsScene * cons
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     22.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoTopResizeLineCommand::~C_SebUnoTopResizeLineCommand()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Undo move
-
-   \created     22.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Undo move
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoTopResizeLineCommand::undo(void)
 {
    vector<QGraphicsItem *> c_Items = this->m_GetSceneItems();
@@ -92,13 +76,10 @@ void C_SebUnoTopResizeLineCommand::undo(void)
    QUndoCommand::undo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Redo move
-
-   \created     22.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Redo move
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoTopResizeLineCommand::redo(void)
 {
    vector<QGraphicsItem *> c_Items = this->m_GetSceneItems();
@@ -109,15 +90,12 @@ void C_SebUnoTopResizeLineCommand::redo(void)
    QUndoCommand::redo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Undo for one item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Undo for one item
 
    \param[in,out] opc_Item Item to perform action on
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoTopResizeLineCommand::m_UndoSingle(QGraphicsItem * const opc_Item) const
 {
    if (opc_Item != NULL)
@@ -136,15 +114,12 @@ void C_SebUnoTopResizeLineCommand::m_UndoSingle(QGraphicsItem * const opc_Item) 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Redo for one item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Redo for one item
 
    \param[in,out] opc_Item Item to perform action on
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoTopResizeLineCommand::m_RedoSingle(QGraphicsItem * const opc_Item) const
 {
    if (opc_Item != NULL)

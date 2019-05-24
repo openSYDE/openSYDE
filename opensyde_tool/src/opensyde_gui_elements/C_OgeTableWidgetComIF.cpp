@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Table Widget for Node COM Interface Settings  (implementation)
 
@@ -9,17 +8,11 @@
    but needs to exist, to have a unique group,
    to apply a specific stylesheet for.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     28.09.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QEvent>
@@ -31,34 +24,31 @@
 #include "constants.h"
 #include "C_OgeTableWidgetComIF.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     28.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeTableWidgetComIF::C_OgeTableWidgetComIF(QWidget * const opc_Parent) :
    QTableWidget(opc_Parent),
    mpc_ToolTip(NULL)
@@ -97,32 +87,26 @@ C_OgeTableWidgetComIF::C_OgeTableWidgetComIF(QWidget * const opc_Parent) :
            &C_OgeTableWidgetComIF::m_ScrollBarRangeChangedVer);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     18.08.2017  STW/Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeTableWidgetComIF::~C_OgeTableWidgetComIF(void)
 {
    delete mpc_ToolTip;
    mpc_ToolTip = NULL;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set tool tip at position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set tool tip at position
 
    \param[in] ou32_Row     Row (ID)
    \param[in] ou32_Col     Column (ID)
    \param[in] orc_Heading  Tool tip heading
    \param[in] orc_Content  Tool tip content
    \param[in] oq_ErrorType Tool tip error type
-
-   \created     26.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTableWidgetComIF::SetToolTipAt(const uint32 ou32_Row, const uint32 ou32_Col, const QString & orc_Heading,
                                          const QString & orc_Content, const C_NagToolTip::E_Type oe_Type)
 {
@@ -149,18 +133,15 @@ void C_OgeTableWidgetComIF::SetToolTipAt(const uint32 ou32_Row, const uint32 ou3
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set header tool tip at position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set header tool tip at position
 
    \param[in] ou32_Section   Header section (ID)
    \param[in] oe_Orientation Header orientation (ID)
    \param[in] orc_Heading    Tool tip heading
    \param[in] orc_Content    Tool tip content
-
-   \created     28.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTableWidgetComIF::SetToolTipHeadingAt(const uint32 ou32_Section, const Qt::Orientation oe_Orientation,
                                                 const QString & orc_Heading, const QString & orc_Content) const
 {
@@ -170,26 +151,22 @@ void C_OgeTableWidgetComIF::SetToolTipHeadingAt(const uint32 ou32_Section, const
                                 msn_USER_ROLE_TOOL_TIP_CONTENT);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse move event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse move event slot
 
    Here: Handle tooltip if necessary
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     26.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTableWidgetComIF::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
    QTableWidget::mouseMoveEvent(opc_Event);
    m_HandleMouseMoveToolTip(opc_Event->globalPos());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten default event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten default event slot
 
    Here: Handle tool tip
 
@@ -198,10 +175,8 @@ void C_OgeTableWidgetComIF::mouseMoveEvent(QMouseEvent * const opc_Event)
    \return
    True  Event was recognized and processed
    False Event ignored
-
-   \created     26.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OgeTableWidgetComIF::event(QEvent * const opc_Event)
 {
    bool q_Return;
@@ -317,7 +292,7 @@ bool C_OgeTableWidgetComIF::event(QEvent * const opc_Event)
    else if (opc_Event->type() == QEvent::Leave)
    {
       //hide on leave
-      m_HideTooltip();
+      m_HideToolTip();
 
       opc_Event->accept();
       q_Return = true;
@@ -365,33 +340,27 @@ bool C_OgeTableWidgetComIF::event(QEvent * const opc_Event)
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Compare this smaller than other item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Compare this smaller than other item
 
    \param[in] orc_Item Other item
 
    \return
    True  This is smaller
    False This is bigger or equal
-
-   \created     26.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OgeTableWidgetComIF::C_ItemID::operator <(const C_OgeTableWidgetComIF::C_ItemID & orc_Item) const
 {
    return (this->s32_Row < orc_Item.s32_Row) ||
           ((this->s32_Row == orc_Item.s32_Row) && (this->s32_Col < orc_Item.s32_Col));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Hide tool-tip
-
-   \created     26.03.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Hide tool-tip
 */
-//-----------------------------------------------------------------------------
-void C_OgeTableWidgetComIF::m_HideTooltip(void)
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeTableWidgetComIF::m_HideToolTip(void)
 {
    if (this->mpc_ToolTip != NULL)
    {
@@ -405,15 +374,12 @@ void C_OgeTableWidgetComIF::m_HideTooltip(void)
    this->setMouseTracking(false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle mouse move (tool tip related)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle mouse move (tool tip related)
 
    \param[in] orc_GlobalPos Global mouse position
-
-   \created     27.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTableWidgetComIF::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos)
 {
    if ((this->mc_HoveredRow.s32_Row >= 0) && (this->mc_HoveredRow.s32_Col >= 0))
@@ -424,13 +390,13 @@ void C_OgeTableWidgetComIF::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPo
          if ((this->mc_HoveredRow.s32_Row != c_Index.row()) || (this->mc_HoveredRow.s32_Col != c_Index.column()))
          {
             //Hide Tooltip
-            m_HideTooltip();
+            m_HideToolTip();
          }
       }
       else
       {
          //Hide Tooltip
-         m_HideTooltip();
+         m_HideToolTip();
       }
    }
    if ((this->verticalHeader()->isVisible() == true) && (this->ms32_HoveredVertHeader >= 0))
@@ -441,7 +407,7 @@ void C_OgeTableWidgetComIF::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPo
       if (s32_VisualIndex != this->ms32_HoveredVertHeader)
       {
          //Hide Tooltip
-         m_HideTooltip();
+         m_HideToolTip();
       }
       else
       {
@@ -449,7 +415,7 @@ void C_OgeTableWidgetComIF::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPo
                 this->verticalHeader()->mapFromGlobal(orc_GlobalPos)) == false)
          {
             //Hide Tooltip
-            m_HideTooltip();
+            m_HideToolTip();
          }
       }
    }
@@ -461,7 +427,7 @@ void C_OgeTableWidgetComIF::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPo
       if (s32_VisualIndex != this->ms32_HoveredHorzHeader)
       {
          //Hide Tooltip
-         m_HideTooltip();
+         m_HideToolTip();
       }
       else
       {
@@ -469,13 +435,13 @@ void C_OgeTableWidgetComIF::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPo
                 this->horizontalHeader()->mapFromGlobal(orc_GlobalPos)) == false)
          {
             //Hide Tooltip
-            m_HideTooltip();
+            m_HideToolTip();
          }
       }
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTableWidgetComIF::m_ScrollBarRangeChangedVer(const sintn osn_Min, const sintn osn_Max) const
 {
    // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar

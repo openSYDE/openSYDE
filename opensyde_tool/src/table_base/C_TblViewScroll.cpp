@@ -1,55 +1,45 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Table view base class with extra scrollbar feature (implementation)
 
    Table view base class that shows/hides scrollbars without resizing the widget.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     30.01.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QScrollBar>
 #include "C_TblViewScroll.h"
 #include "constants.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     30.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_TblViewScroll::C_TblViewScroll(QWidget * const opc_Parent) :
    C_TblViewToolTipBase(opc_Parent)
 {
@@ -74,7 +64,7 @@ C_TblViewScroll::C_TblViewScroll(QWidget * const opc_Parent) :
            &C_TblViewScroll::m_ScrollBarRangeChangedHor);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblViewScroll::m_ScrollBarRangeChangedVer(const sintn osn_Min, const sintn osn_Max) const
 {
    // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar
@@ -88,7 +78,7 @@ void C_TblViewScroll::m_ScrollBarRangeChangedVer(const sintn osn_Min, const sint
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblViewScroll::m_ScrollBarRangeChangedHor(const sintn osn_Min, const sintn osn_Max) const
 {
    // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar

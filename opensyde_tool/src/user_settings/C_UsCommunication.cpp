@@ -1,49 +1,39 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Project bus user settings (implementation)
 
    Project bus user settings
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.04.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_UsCommunication.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     27.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_UsCommunication::C_UsCommunication(void) :
    me_SelectedProtocol(C_OSCCanProtocol::eLAYER2),
    mq_MessageSelected(false),
@@ -51,19 +41,16 @@ C_UsCommunication::C_UsCommunication(void) :
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set last selected message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set last selected message
 
    \param[in] oe_SelectedProtocol     Currently selected protocol
    \param[in] oq_MessageSelected      Set flag if there is a selected message
    \param[in] orc_SelectedMessageName Selected message name if any
    \param[in] oq_SignalSelected       Flag if signal selected
    \param[in] orc_SelectedSignalName  Selected signal name if any
-
-   \created     27.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsCommunication::SetMessageSelected(const C_OSCCanProtocol::E_Type oe_SelectedProtocol,
                                            const bool oq_MessageSelected, const QString & orc_SelectedMessageName,
                                            const bool oq_SignalSelected, const QString & orc_SelectedSignalName)
@@ -75,19 +62,16 @@ void C_UsCommunication::SetMessageSelected(const C_OSCCanProtocol::E_Type oe_Sel
    this->mc_SelectedSignalName = orc_SelectedSignalName;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get last selected message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get last selected message
 
    \param[out] ore_SelectedProtocol    Currently selected protocol
    \param[out] orq_MessageSelected     Set flag if there is a selected message
    \param[out] orc_SelectedMessageName Selected message name if any
    \param[out] orq_SignalSelected      Flag if signal selected
    \param[out] orc_SelectedSignalName  Selected signal name if any
-
-   \created     27.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsCommunication::GetLastSelectedMessage(C_OSCCanProtocol::E_Type & ore_SelectedProtocol,
                                                bool & orq_MessageSelected, QString & orc_SelectedMessageName,
                                                bool & orq_SignalSelected, QString & orc_SelectedSignalName) const

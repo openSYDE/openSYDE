@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for system view dashboard data element update mode node header (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     08.09.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "TGLUtils.h"
@@ -26,37 +19,34 @@
 #include "C_SyvDaPeUpdateModeNodeHeader.h"
 #include "ui_C_SyvDaPeUpdateModeNodeHeader.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const uint32 C_SyvDaPeUpdateModeNodeHeader::mhu32_HeaderHeight = 66;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     08.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeUpdateModeNodeHeader::C_SyvDaPeUpdateModeNodeHeader(const stw_types::uint32 ou32_ViewIndex,
                                                              const stw_types::uint32 ou32_NodeIndex,
                                                              QTreeWidgetItem * const opc_Item,
@@ -106,27 +96,21 @@ C_SyvDaPeUpdateModeNodeHeader::C_SyvDaPeUpdateModeNodeHeader(const stw_types::ui
            &C_SyvDaPeUpdateModeNodeHeader::m_OnPushButtonExpandClicked);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     08.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeUpdateModeNodeHeader::~C_SyvDaPeUpdateModeNodeHeader(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     11.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeNodeHeader::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelCount->setText(C_GtGetText::h_GetText("Used Transmissions:"));
@@ -140,16 +124,13 @@ void C_SyvDaPeUpdateModeNodeHeader::InitStaticNames(void) const
                                                                "\nThese transmissions will be registered on the server during dashboard connect."));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update count value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update count value
 
    \param[in] os32_Count <  0: Actual count is calculated from system view data
                          >= 0: Valid count assumed
-
-   \created     11.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeNodeHeader::UpdateCount(const sint32 os32_Count) const
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
@@ -171,16 +152,13 @@ void C_SyvDaPeUpdateModeNodeHeader::UpdateCount(const sint32 os32_Count) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register expand or collapse
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register expand or collapse
 
    \param[in]     orq_Expanded true:  expanded
                                false: collapsed
-
-   \created     02.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeNodeHeader::RegisterExpandOrCollapse(const bool & orq_Expanded) const
 {
    this->mpc_Ui->pc_PushButtonExpand->setChecked(orq_Expanded);
@@ -200,30 +178,24 @@ void C_SyvDaPeUpdateModeNodeHeader::RegisterExpandOrCollapse(const bool & orq_Ex
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse double click event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse double click event slot
 
    Here: Trigger manual expand
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     06.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeNodeHeader::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
 {
    QWidget::mouseDoubleClickEvent(opc_Event);
    m_OnPushButtonExpandClicked(!this->mpc_Ui->pc_PushButtonExpand->isChecked());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle event push button expand clicked
-
-   \created     02.11.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle event push button expand clicked
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeNodeHeader::m_OnPushButtonExpandClicked(const bool oq_Checked)
 {
    //Resize expanded

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       System definition utility functions (implementation)
 
    System definition utility functions
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.04.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <set>
@@ -40,7 +33,7 @@
 #include "C_SdNdeDataPoolContentUtil.h"
 #include "C_SdNdeDataPoolUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -49,32 +42,28 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     25.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdUtil::C_SdUtil(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Generate node and interface names
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Generate node and interface names
 
    \param[in]  orc_NodeIndices      Node indices (match with interface indices expected)
    \param[in]  orc_InterfaceIndices Interface indices (match with node indices expected)
@@ -83,10 +72,8 @@ C_SdUtil::C_SdUtil(void)
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     25.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdUtil::h_GetNames(const std::vector<uint32> & orc_NodeIndices,
                             const std::vector<uint32> & orc_InterfaceIndices, std::vector<QString> & orc_Names)
 {
@@ -133,9 +120,8 @@ sint32 C_SdUtil::h_GetNames(const std::vector<uint32> & orc_NodeIndices,
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Generate node name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Generate node name
 
    \param[in]  orc_NodeIndices      Node index
    \param[out] orc_Names            Generate node & interface name
@@ -143,10 +129,8 @@ sint32 C_SdUtil::h_GetNames(const std::vector<uint32> & orc_NodeIndices,
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     09.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdUtil::h_GetName(const uint32 & oru32_NodeIndex, QString & orc_Name)
 {
    sint32 s32_Retval = C_RANGE;
@@ -163,9 +147,8 @@ sint32 C_SdUtil::h_GetName(const uint32 & oru32_NodeIndex, QString & orc_Name)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Generate node and interface name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Generate node and interface name
 
    \param[in]  orc_NodeIndices      Node index
    \param[in]  orc_InterfaceIndices Interface index
@@ -174,10 +157,8 @@ sint32 C_SdUtil::h_GetName(const uint32 & oru32_NodeIndex, QString & orc_Name)
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     25.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdUtil::h_GetName(const uint32 & oru32_NodeIndex, const uint32 & oru32_InterfaceIndex, QString & orc_Name)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -204,18 +185,15 @@ sint32 C_SdUtil::h_GetName(const uint32 & oru32_NodeIndex, const uint32 & oru32_
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init icon image for all states
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init icon image for all states
 
    \param[in] orc_File File to use as icon
 
    \return
    Static icon
-
-   \created     27.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QIcon C_SdUtil::h_InitStaticIcon(const QString & orc_File)
 {
    QIcon c_Retval;
@@ -231,19 +209,16 @@ QIcon C_SdUtil::h_InitStaticIcon(const QString & orc_File)
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init icon SVG image for all states
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init icon SVG image for all states
 
    \param[in] orc_File SVG file to use as icon
    \param[in] orc_Size Icon size
 
    \return
    Static icon
-
-   \created     18.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QIcon C_SdUtil::h_InitStaticIconSvg(const QString & orc_File, const QSize & orc_Size)
 {
    QIcon c_Retval;
@@ -260,18 +235,15 @@ QIcon C_SdUtil::h_InitStaticIconSvg(const QString & orc_File, const QSize & orc_
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert tx method to name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert tx method to name
 
    \param[in] ore_Type Tx method
 
    \return
    Name
-
-   \created     04.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SdUtil::h_ConvertTxMethodToName(const C_OSCCanMessage::E_TxMethodType & ore_Type)
 {
    QString c_Retval;
@@ -294,18 +266,15 @@ QString C_SdUtil::h_ConvertTxMethodToName(const C_OSCCanMessage::E_TxMethodType 
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert byte order to name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert byte order to name
 
    \param[in] ore_Type Byte order
 
    \return
    Name
-
-   \created     04.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SdUtil::h_ConvertByteOrderToName(const C_OSCCanSignal::E_ByteOrderType & ore_Type)
 {
    QString c_Retval;
@@ -325,19 +294,16 @@ QString C_SdUtil::h_ConvertByteOrderToName(const C_OSCCanSignal::E_ByteOrderType
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get error tooltip suggestion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get error tooltip suggestion
 
    \param[in]  ou32_NodeIndex    Node index (identifier)
    \param[in]  orc_Indices       Invalid datapool indices
    \param[in]  oq_NvmSizeInvalid Flag if NVM size invalid
    \param[out] orc_Heading       Heading suggestion
    \param[out] orc_Content       Content suggestion
-
-   \created     18.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdUtil::h_GetErrorToolTipDataPools(const uint32 ou32_NodeIndex, const std::vector<uint32> & orc_Indices,
                                           const bool oq_NvmSizeInvalid, QString & orc_Heading, QString & orc_Content)
 {
@@ -365,16 +331,13 @@ void C_SdUtil::h_GetErrorToolTipDataPools(const uint32 ou32_NodeIndex, const std
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sort source vector descending ( Sorting steps are done for the target vector in sync)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sort source vector descending ( Sorting steps are done for the target vector in sync)
 
    \param[in,out] orc_Source Unsorted source indices
    \param[in,out] orc_Target Unsorted target indices
-
-   \created     13.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdUtil::h_SortSourceDescending(std::vector<uint32> & orc_Source, std::vector<uint32> & orc_Target)
 {
    if (h_CheckSortedDescending(orc_Source) == false)
@@ -404,19 +367,16 @@ void C_SdUtil::h_SortSourceDescending(std::vector<uint32> & orc_Source, std::vec
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if input vector is sorted descending
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if input vector is sorted descending
 
    \param[in] orc_Indices Input vector to evaluate
 
    \return
    true:  Sorted
    false: Unsorted
-
-   \created     13.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdUtil::h_CheckSortedDescending(const std::vector<uint32> & orc_Indices)
 {
    bool q_Retval = true;
@@ -440,15 +400,12 @@ bool C_SdUtil::h_CheckSortedDescending(const std::vector<uint32> & orc_Indices)
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sort indices ascending
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sort indices ascending
 
    \param[in,out] orc_IndicesTmp Unsorted indices
-
-   \created     31.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdUtil::h_SortIndicesAscending(std::vector<uint32> & orc_IndicesTmp)
 {
    if (C_Uti::h_CheckSortedAscending(orc_IndicesTmp) == false)
@@ -474,18 +431,15 @@ void C_SdUtil::h_SortIndicesAscending(std::vector<uint32> & orc_IndicesTmp)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get node id maximum
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get node id maximum
 
    \param[in] oru32_NodeIndex Node index
 
    \return
    Node id maximum
-
-   \created     14.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint8 C_SdUtil::h_GetNodeIdMaximum(const uint32 & oru32_NodeIndex)
 {
    uint8 u8_Retval;
@@ -506,9 +460,8 @@ uint8 C_SdUtil::h_GetNodeIdMaximum(const uint32 & oru32_NodeIndex)
    return u8_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get selected node interface
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get selected node interface
 
    \param[in] opc_ComboBox     ComboBox with node interfaces
    \param[in] oru32_NodeIndex  Corresponding node index
@@ -516,10 +469,8 @@ uint8 C_SdUtil::h_GetNodeIdMaximum(const uint32 & oru32_NodeIndex)
 
    \return
    Selected node interface (Not necessarily the index)
-
-   \created     29.01.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SdUtil::h_GetActiveNodeInterface(const QComboBox & orc_ComboBox, const uint32 & oru32_NodeIndex,
                                           const C_OSCSystemBus::E_Type & ore_Type)
 {
@@ -552,9 +503,8 @@ uint32 C_SdUtil::h_GetActiveNodeInterface(const QComboBox & orc_ComboBox, const 
    return u32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize the combo box for one interface
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize the combo box for one interface
 
    \param[in]     orc_Interfaces             Node interfaces
    \param[in]     ore_BusType                Bus type
@@ -567,10 +517,8 @@ uint32 C_SdUtil::h_GetActiveNodeInterface(const QComboBox & orc_ComboBox, const 
    \return
    True  At least one radio button is intractable
    False No interaction possible
-
-   \created     29.01.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdUtil::h_InitNodeInterfaceComboBox(const C_OSCNode & orc_Node, const C_OSCSystemBus::E_Type & ore_BusType,
                                            QComboBox * const opc_ComboBox, const sint32 & ors32_SpecialInterface,
                                            bool & orq_ComProtocolL2, bool & orq_ComProtocolECeS,
@@ -651,9 +599,8 @@ bool C_SdUtil::h_InitNodeInterfaceComboBox(const C_OSCNode & orc_Node, const C_O
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all used node ids for current bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all used node ids for current bus
 
    \param[in] oru32_BusIndex         Bus index
    \param[in] oru32_SpecialNodeIndex Special node index to skip
@@ -661,10 +608,8 @@ bool C_SdUtil::h_InitNodeInterfaceComboBox(const C_OSCNode & orc_Node, const C_O
 
    \return
    Vector of used node ids (unique and sorted ascending)
-
-   \created     19.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint32> C_SdUtil::h_GetUsedNodeIdsForBusUniqueAndSortedAscending(const uint32 & oru32_BusIndex,
                                                                              const uint32 & oru32_SpecialNodeIndex,
                                                                              const sint32 & ors32_SpecialInterface)
@@ -711,20 +656,16 @@ std::vector<uint32> C_SdUtil::h_GetUsedNodeIdsForBusUniqueAndSortedAscending(con
    return C_Uti::h_UniquifyAndSortAscending(c_Retval);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all used process ids for current node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all used process ids for current node
 
    \param[in] ou32_NodeIndex               Node index
    \param[in] os32_SpecialApplicationIndex Special application to skip
 
    \return
    Vector of used process ids (unique and sorted ascending)
-
-
-   \created     20.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint32> C_SdUtil::h_GetUsedProcessIdsForApplicationUniqueAndSortedAscending(const uint32 ou32_NodeIndex,
                                                                                         const sint32 os32_SpecialApplicationIndex)
 {
@@ -747,19 +688,15 @@ std::vector<uint32> C_SdUtil::h_GetUsedProcessIdsForApplicationUniqueAndSortedAs
    return C_Uti::h_UniquifyAndSortAscending(c_Retval);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all used bus ids
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all used bus ids
 
    \param[in] os32_SpecialBusIndex Special bus to skip
 
    \return
    Vector of bus process ids (unique and sorted ascending)
-
-
-   \created     21.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint32> C_SdUtil::h_GetUsedBusIdsUniqueAndSortedAscending(const sint32 os32_SpecialBusIndex)
 {
    std::vector<uint32> c_Retval;
@@ -777,17 +714,14 @@ std::vector<uint32> C_SdUtil::h_GetUsedBusIdsUniqueAndSortedAscending(const sint
    return C_Uti::h_UniquifyAndSortAscending(c_Retval);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt message to protocol restrictions
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt message to protocol restrictions
 
    \param[in,out] orc_Message         Message to adapt
    \param[in]     oe_Type             Protocol type
    \param[in,out] opc_AdaptationInfos Optional report about adaptations
-
-   \created     17.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdUtil::h_AdaptMessageToProtocolType(C_OSCCanMessage & orc_Message,  const C_OSCCanProtocol::E_Type oe_Type,
                                             QString * const opc_AdaptationInfos)
 {
@@ -868,17 +802,14 @@ void C_SdUtil::h_AdaptMessageToProtocolType(C_OSCCanMessage & orc_Message,  cons
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt used node ids label handling
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt used node ids label handling
 
    \param[in]     orc_UsedNodeIds Unused node ids (unique and sorted ascending)
    \param[in]     orc_BusName     Bus name
    \param[in,out] opc_Label       Label to adapt
-
-   \created     19.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdUtil::h_InitUsedNodeIdsLabel(const std::vector<uint32> & orc_UsedNodeIds, const QString & orc_BusName,
                                       QLabel * const opc_Label)
 {
@@ -898,9 +829,8 @@ void C_SdUtil::h_InitUsedNodeIdsLabel(const std::vector<uint32> & orc_UsedNodeId
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt used ids string handling
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt used ids string handling
 
    \param[in] orc_UsedIds  Unused ids (unique and sorted ascending)
    \param[in] orc_ItemName Item name
@@ -908,10 +838,8 @@ void C_SdUtil::h_InitUsedNodeIdsLabel(const std::vector<uint32> & orc_UsedNodeId
 
    \return
    String for already used IDs
-
-   \created     19.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SdUtil::h_InitUsedIdsString(const std::vector<uint32> & orc_UsedIds, const QString & orc_ItemName,
                                       const QString & orc_ItemType, const bool oq_SkipItem)
 {
@@ -941,9 +869,8 @@ QString C_SdUtil::h_InitUsedIdsString(const std::vector<uint32> & orc_UsedIds, c
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get next free node id
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get next free node id
 
    \param[in] orc_Interfaces         Node interfaces
    \param[in] orc_UsedNodeIds        Unused node ids (unique and sorted ascending)
@@ -951,10 +878,8 @@ QString C_SdUtil::h_InitUsedIdsString(const std::vector<uint32> & orc_UsedIds, c
 
    \return
    Node ID proposal (Always in range but may be invalid)
-
-   \created     19.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SdUtil::h_GetNextFreeNodeId(const std::vector<C_OSCNodeComInterfaceSettings> & orc_Interfaces,
                                      const std::vector<uint32> & orc_UsedNodeIds, const sint32 & ors32_SpecialInterface)
 {
@@ -984,9 +909,8 @@ uint32 C_SdUtil::h_GetNextFreeNodeId(const std::vector<C_OSCNodeComInterfaceSett
    return u32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if node has at least one connection of this bus type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if node has at least one connection of this bus type
 
    \param[in] orc_Node  Node for check
    \param[in] oe_Type   Bus type
@@ -994,11 +918,8 @@ uint32 C_SdUtil::h_GetNextFreeNodeId(const std::vector<C_OSCNodeComInterfaceSett
    \return
    true     Node has connection of this type
    false    Node has not a connection of this type
-
-
-   \created     15.02.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdUtil::h_HasConnectionType(const C_OSCNode & orc_Node, const C_OSCSystemBus::E_Type oe_Type)
 {
    bool q_Return = false;
@@ -1017,9 +938,8 @@ bool C_SdUtil::h_HasConnectionType(const C_OSCNode & orc_Node, const C_OSCSystem
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if any com interfaces for the specified bus type are available and free
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if any com interfaces for the specified bus type are available and free
 
    \param[in] orc_ComInterfaces Com interfaces
    \param[in] ore_BusType       Bus type
@@ -1027,10 +947,8 @@ bool C_SdUtil::h_HasConnectionType(const C_OSCNode & orc_Node, const C_OSCSystem
    \return
    True  At least one selectable interface available
    False No free interface available
-
-   \created     20.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdUtil::h_CheckNodeInterfaceAvailable(const std::vector<C_OSCNodeComInterfaceSettings> & orc_ComInterfaces,
                                              const C_OSCSystemBus::E_Type & ore_BusType)
 {
@@ -1051,9 +969,38 @@ bool C_SdUtil::h_CheckNodeInterfaceAvailable(const std::vector<C_OSCNodeComInter
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check the total number of datapool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if at least one com interfaces for the specified bus type is connected
+
+   \param[in] orc_ComInterfaces Com interfaces
+   \param[in] ore_BusType       Bus type
+
+   \return
+   True  At least one selectable interface connected
+   False No interface connected
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdUtil::h_CheckNodeInterfaceConnected(const std::vector<C_OSCNodeComInterfaceSettings> & orc_ComInterfaces,
+                                             const C_OSCSystemBus::E_Type & ore_BusType)
+{
+   bool q_Retval = false;
+
+   for (uint32 u32_ItInterface = 0; u32_ItInterface < orc_ComInterfaces.size(); ++u32_ItInterface)
+   {
+      const C_OSCNodeComInterfaceSettings & rc_Interface = orc_ComInterfaces[u32_ItInterface];
+      if (rc_Interface.e_InterfaceType == ore_BusType)
+      {
+         if (rc_Interface.q_IsBusConnected == true)
+         {
+            q_Retval = true;
+            break;
+         }
+      }
+   }
+   return q_Retval;
+}
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check the total number of datapool
 
    The total number of datapools is bounded above by mu32_NODE_DATA_POOL_MAX.
 
@@ -1065,10 +1012,8 @@ bool C_SdUtil::h_CheckNodeInterfaceAvailable(const std::vector<C_OSCNodeComInter
    \return
       true:  total number is ok
       false: total number exceeds maximum
-
-   \created     15.06.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdUtil::h_CheckDatapoolNumber(const uint32 & oru32_NodeIndex, const C_OSCNodeDataPool::E_Type & ore_DataPoolType,
                                      const bool & orq_AlreadyChecked, QWidget * const opc_Parent)
 {
@@ -1118,9 +1063,8 @@ bool C_SdUtil::h_CheckDatapoolNumber(const uint32 & oru32_NodeIndex, const C_OSC
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get error tool tip for node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get error tool tip for node
 
    \param[in]  oru32_NodeIndex   Node index
    \param[out] orc_Text          Tool tip text
@@ -1129,10 +1073,8 @@ bool C_SdUtil::h_CheckDatapoolNumber(const uint32 & oru32_NodeIndex, const C_OSC
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     01.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString & orc_Text, bool & orq_ErrorDetected)
 {
    bool q_NameConflict;
@@ -1237,9 +1179,8 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get error tool tip for bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get error tool tip for bus
 
    \param[in]  oru32_BusIndex Bus index
    \param[out] orc_Text       Tool tip text
@@ -1247,10 +1188,8 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     01.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdUtil::h_GetErrorToolTipBus(const uint32 & oru32_BusIndex, QString & orc_Text)
 {
    bool q_NameConflict;
@@ -1304,9 +1243,8 @@ void C_SdUtil::h_GetErrorToolTipBus(const uint32 & oru32_BusIndex, QString & orc
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get string for tooltip content for datapool list.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get string for tooltip content for datapool list.
 
    \param[in]     orc_NodeIndex        index of node where the list belongs to
    \param[in]     oru32_DatapoolIndex  index of datapool where the list belongs to
@@ -1314,10 +1252,8 @@ void C_SdUtil::h_GetErrorToolTipBus(const uint32 & oru32_BusIndex, QString & orc
 
    \return
       content as string
-
-   \created     21.06.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 QString C_SdUtil::h_GetToolTipContentDpList(const uint32 & oru32_NodeIndex, const uint32 & oru32_DatapoolIndex,
                                             const uint32 & oru32_ListIndex)
@@ -1368,9 +1304,8 @@ QString C_SdUtil::h_GetToolTipContentDpList(const uint32 & oru32_NodeIndex, cons
    return c_ToolTipContent;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get string for tooltip content for datapool list element.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get string for tooltip content for datapool list element.
 
    \param[in]     orc_NodeDatapoolListElementId    indexes of element for which the tooltip is requested
    \param[in]     orc_AdditionalInformation        Optional additional information string which will get inserted after comment
@@ -1378,10 +1313,8 @@ QString C_SdUtil::h_GetToolTipContentDpList(const uint32 & oru32_NodeIndex, cons
 
    \return
       content as string
-
-   \created     19.06.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListElementId & orc_NodeDatapoolListElementId,
                                                    const QString & orc_AdditionalInformation)
 {
@@ -1619,18 +1552,15 @@ QString C_SdUtil::h_GetToolTipContentDpListElement(const C_OSCNodeDataPoolListEl
    return c_ToolTipContent;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get string for tooltip content for message.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get string for tooltip content for message.
 
    \param[in] orc_MessageId Message id belonging to the signal for which the tooltip is requested
 
    \return
    Content as string
-
-   \created     28.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SdUtil::h_GetToolTipContentMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 {
    QString c_ToolTipContent = "";
@@ -1644,9 +1574,8 @@ QString C_SdUtil::h_GetToolTipContentMessage(const C_OSCCanMessageIdentification
    return c_ToolTipContent;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get string for tooltip content for signal.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get string for tooltip content for signal.
 
    \param[in]     orc_MessageId                message id belonging to the signal for which the tooltip is requested
    \param[in]     ou32_SignalIndex             for which the tooltip is requested
@@ -1655,10 +1584,8 @@ QString C_SdUtil::h_GetToolTipContentMessage(const C_OSCCanMessageIdentification
 
    \return
       content as string
-
-   \created     19.06.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SdUtil::h_GetToolTipContentSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                             const uint32 & oru32_SignalIndex, const QString & orc_AdditionalInformation)
 {
@@ -1695,17 +1622,14 @@ QString C_SdUtil::h_GetToolTipContentSignal(const C_OSCCanMessageIdentificationI
    return c_ToolTipContent;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sort indices descending ( Sorting steps are done for the content vectors in sync)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sort indices descending ( Sorting steps are done for the content vectors in sync)
 
    \param[in,out] orc_IndicesTmp    Unsorted indices
    \param[in,out] orc_OSCContentTmp Unsorted OSC content
    \param[in,out] orc_UIContentTmp  Unsorted UI content
-
-   \created     13.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 template <typename T, typename U>
 void C_SdUtil::h_SortIndicesDescendingAndSync(std::vector<stw_types::uint32> & orc_IndicesTmp,
                                               std::vector<T> & orc_OSCContentTmp, std::vector<U> & orc_UIContentTmp)
@@ -1762,17 +1686,14 @@ void C_SdUtil::h_SortIndicesDescendingAndSync<C_OSCNodeDataPoolListElement, C_Pu
    std::vector<stw_types::uint32> & orc_IndicesTmp, std::vector<C_OSCNodeDataPoolListElement> & orc_OSCContentTmp,
    std::vector<C_PuiSdNodeDataPoolListElement> & orc_UIContentTmp);
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sort indices ascending ( Sorting steps are done for the content vectors in sync)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sort indices ascending ( Sorting steps are done for the content vectors in sync)
 
    \param[in,out] orc_IndicesTmp    Unsorted indices
    \param[in,out] orc_OSCContentTmp Unsorted OSC content
    \param[in,out] orc_UIContentTmp  Unsorted UI content
-
-   \created     13.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 template <typename T, typename U>
 void C_SdUtil::h_SortIndicesAscendingAndSync(std::vector<stw_types::uint32> & orc_IndicesTmp,
                                              std::vector<T> & orc_OSCContentTmp, std::vector<U> & orc_UIContentTmp)

@@ -1,49 +1,41 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Base class for reconnect bus connector (implementation)
 
    Base class for reconnect bus connector
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     05.12.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
 #include "C_SdManUnoTopologyReconnectBaseCommand.h"
 #include "C_SebUnoTopBusConnectorMoveCommand.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
 using namespace std;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Scene            Pointer to currently active scene
    \param[in]     orc_IDs              Affected unique IDs
@@ -54,10 +46,8 @@ using namespace std;
    \param[in]     oru8_NodeId          New node id
    \param[in]     orc_Description      Undo step description
    \param[in,out] opc_Parent           Optional pointer to parent
-
-   \created     05.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyReconnectBaseCommand::C_SdManUnoTopologyReconnectBaseCommand(QGraphicsScene * const opc_Scene,
                                                                                const std::vector<uint64> & orc_IDs,
                                                                                const uint64 & oru64_StartingItemID,
@@ -79,24 +69,18 @@ C_SdManUnoTopologyReconnectBaseCommand::C_SdManUnoTopologyReconnectBaseCommand(Q
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     05.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyReconnectBaseCommand::~C_SdManUnoTopologyReconnectBaseCommand()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Undo reconnect
-
-   \created     05.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Undo reconnect
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyReconnectBaseCommand::undo(void)
 {
    m_Reconnect(this->mu64_LastItemID, this->mu64_StartingItemID, static_cast<sint32>(this->mu8_InitialInterface),
@@ -104,26 +88,20 @@ void C_SdManUnoTopologyReconnectBaseCommand::undo(void)
    QUndoCommand::undo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Redo reconnect
-
-   \created     05.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Redo reconnect
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyReconnectBaseCommand::redo(void)
 {
    m_Reconnect(this->mu64_StartingItemID, this->mu64_LastItemID, this->ms32_Interface, this->mu8_NodeId);
    QUndoCommand::redo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current bus connector
-
-   \created     05.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current bus connector
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiLiBusConnector * C_SdManUnoTopologyReconnectBaseCommand::m_GetBusConnector(void)
 {
    C_GiLiBusConnector * pc_Retval = NULL;

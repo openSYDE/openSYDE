@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Parse / write XML file with CRC protection
 
    see .h file header for details
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     14.07.2016  STW/A.Stangl (refactored from existing CDLSecureXML)
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h" //pre-compiled headers
 #include "stwtypes.h"
 #include "stwerrors.h"
@@ -25,43 +18,39 @@
 #include "CSCLString.h"
 #include "CSCLChecksums.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_scl;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 static const C_SCLString mc_NAME_CRC_ATTRIBUTE = "file_crc";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Constructor
 
    Set up class
-
-   \created     19.09.2014  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCChecksummedXML::C_OSCChecksummedXML(void) :
    C_OSCXMLParser(),
    mu16_CRCDepth(0U)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Open XML data from file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Open XML data from file
 
    Open XML file.
    If the file could not be opened the function will return an error and prepare an empty XML structure.
@@ -76,10 +65,8 @@ C_OSCChecksummedXML::C_OSCChecksummedXML(void) :
    C_NOACT     could not load from file; invalid XML
    C_RD_WR     file was read but checksum entry not found at defined position
    C_CHECKSUM  data was read but CRC is not correct
-
-   \created     25.01.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCChecksummedXML::LoadFromFile(const C_SCLString & orc_FileName)
 {
    sint32 s32_Return;
@@ -115,9 +102,8 @@ sint32 C_OSCChecksummedXML::LoadFromFile(const C_SCLString & orc_FileName)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Write XML data to file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Write XML data to file
 
    Update CRC and write data to file.
    After calculation the checksum value is written to the attribute "c_NAME_CRC_ATTRIBUTE" of the root name.
@@ -130,10 +116,8 @@ sint32 C_OSCChecksummedXML::LoadFromFile(const C_SCLString & orc_FileName)
    \return
    C_NO_ERR   data was written to file
    C_NOACT    could not write data from file
-
-   \created     07.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCChecksummedXML::SaveToFile(const C_SCLString & orc_FileName)
 {
    sint32 s32_Return;
@@ -152,7 +136,7 @@ sint32 C_OSCChecksummedXML::SaveToFile(const C_SCLString & orc_FileName)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_OSCChecksummedXML::m_CalcXMLCRCNode(uint16 & oru16_CRC)
 {
@@ -189,7 +173,7 @@ void C_OSCChecksummedXML::m_CalcXMLCRCNode(uint16 & oru16_CRC)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 uint16 C_OSCChecksummedXML::m_CalcXMLCRC(void)
 {
@@ -223,4 +207,4 @@ uint16 C_OSCChecksummedXML::m_CalcXMLCRC(void)
    return u16_CRC;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------

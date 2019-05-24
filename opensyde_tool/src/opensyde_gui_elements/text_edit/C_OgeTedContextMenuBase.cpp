@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Text edit with custom context menu (implementation)
 
@@ -8,17 +7,11 @@
    Shows no options for text editing (e.g. undo, paste, delete) when the
    text edit is in read only state.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     17.05.2018  STW/G.Scupin
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QScrollBar>
@@ -27,34 +20,31 @@
 #include "C_OgeTedContextMenuBase.h"
 #include "C_GtGetText.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor.
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     17.05.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeTedContextMenuBase::C_OgeTedContextMenuBase(QWidget * const opc_Parent) :
    QTextEdit(opc_Parent),
    mpc_ContextMenu(NULL)
@@ -62,13 +52,10 @@ C_OgeTedContextMenuBase::C_OgeTedContextMenuBase(QWidget * const opc_Parent) :
    m_InitContextMenu();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize custom context menu functionality
-
-   \created     17.05.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize custom context menu functionality
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTedContextMenuBase::m_InitContextMenu(void)
 {
    this->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -81,13 +68,10 @@ void C_OgeTedContextMenuBase::m_InitContextMenu(void)
    this->horizontalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Setup context menu entries
-
-   \created     17.05.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Setup context menu entries
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTedContextMenuBase::m_SetupContextMenu(void)
 {
    // reset to empty menu
@@ -140,15 +124,12 @@ void C_OgeTedContextMenuBase::m_SetupContextMenu(void)
                                     static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_A));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show custom context menu
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show custom context menu
 
    \param[in] orc_Pos Local context menu position
-
-   \created     17.05.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTedContextMenuBase::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 {
    m_SetupContextMenu(); // setup the custom menu here to have real "is-read-only" information
@@ -158,15 +139,12 @@ void C_OgeTedContextMenuBase::m_OnCustomContextMenuRequested(const QPoint & orc_
    this->mpc_ContextMenu->popup(c_PosGlobal);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete selected text.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete selected text.
 
    If there is a selection, delete its content; otherwise do nothing.
-
-   \created     17.05.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTedContextMenuBase::m_Delete() const
 {
    QTextCursor c_TextCursor;

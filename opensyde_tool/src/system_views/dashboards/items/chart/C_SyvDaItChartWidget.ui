@@ -30,7 +30,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeSpiVertical" name="pc_Splitter">
+    <widget class="stw_opensyde_gui_elements::C_OgeSpiStandard" name="pc_Splitter">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -136,9 +136,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeSpiVertical</class>
+   <class>stw_opensyde_gui_elements::C_OgeSpiStandard</class>
    <extends>QSplitter</extends>
-   <header>C_OgeSpiVertical.h</header>
+   <header>C_OgeSpiStandard.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

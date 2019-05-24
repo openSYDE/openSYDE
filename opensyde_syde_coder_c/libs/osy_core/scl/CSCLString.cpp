@@ -1,21 +1,14 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       String class
 
    ANSI C++ string handling class.
    For details cf. documentation in .h file.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     16.04.2009  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h" //pre-compiled headers
@@ -103,12 +96,9 @@ void C_SCLString::m_ThrowIfOutOfRange(const sint32 os32_Index) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Constructor.
+/*! \brief    Constructor.
 
    Initialize string data to "".
-
-   \created     04.09.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString::C_SCLString(void) :
@@ -117,14 +107,11 @@ C_SCLString::C_SCLString(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Constructor.
+/*! \brief    Constructor.
 
    Initialize string data to opcn_InitValue.
 
    \param[in]  opcn_InitValue      pointer to zero-terminated initial string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString::C_SCLString(const charn * const opcn_InitValue)
@@ -133,8 +120,7 @@ C_SCLString::C_SCLString(const charn * const opcn_InitValue)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Constructor.
+/*! \brief    Constructor.
 
    Initialize string data to opcn_InitValue.
    The function will do its best to make sense of the wchar_t array based on the configured LOCALE
@@ -142,8 +128,6 @@ C_SCLString::C_SCLString(const charn * const opcn_InitValue)
    For details cf. documentation of wcstombs.
 
    \param[in]  opwcn_InitValue      pointer to zero-terminated initial string
-
-   \created     26.05.2011  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString::C_SCLString(const wchar_t * const opwcn_InitValue)
@@ -165,14 +149,11 @@ C_SCLString::C_SCLString(const wchar_t * const opwcn_InitValue)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Constructor.
+/*! \brief    Constructor.
 
    Initialize string data to oc_InitValue.
 
    \param[in]  orc_InitValue      initial string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString::C_SCLString(const C_SCLString & orc_InitValue)
@@ -181,15 +162,12 @@ C_SCLString::C_SCLString(const C_SCLString & orc_InitValue)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Constructor.
+/*! \brief    Constructor.
 
    Initialize string data to opcn_InitValue. Number of bytes to use can be specified.
 
    \param[in]  opcn_InitValue   pointer to string data
    \param[in]  oun_Length       number of bytes from opcn_InitValue to use
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString::C_SCLString(const charn * const opcn_InitValue, const uintn oun_Length)
@@ -198,14 +176,11 @@ C_SCLString::C_SCLString(const charn * const opcn_InitValue, const uintn oun_Len
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Constructor.
+/*! \brief    Constructor.
 
    Initialize string data to contain one character.
 
    \param[in]  ocn_InitValue    initial character
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString::C_SCLString(const charn ocn_InitValue)
@@ -214,14 +189,11 @@ C_SCLString::C_SCLString(const charn ocn_InitValue)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Constructor.
+/*! \brief    Constructor.
 
    Initialize string data to string representation of numeric value.
 
    \param[in]  os16_InitValue    numeric init value
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString::C_SCLString(const sint16 os16_InitValue)
@@ -230,14 +202,11 @@ C_SCLString::C_SCLString(const sint16 os16_InitValue)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Constructor.
+/*! \brief    Constructor.
 
    Initialize string data to string representation of numeric value.
 
    \param[in]  ou16_InitValue    numeric init value
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString::C_SCLString(const uint16 ou16_InitValue)
@@ -246,14 +215,11 @@ C_SCLString::C_SCLString(const uint16 ou16_InitValue)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Constructor.
+/*! \brief    Constructor.
 
    Initialize string data to string representation of numeric value.
 
    \param[in]  osn_InitValue    numeric init value
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString::C_SCLString(const sintn osn_InitValue)
@@ -262,14 +228,11 @@ C_SCLString::C_SCLString(const sintn osn_InitValue)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Constructor.
+/*! \brief    Constructor.
 
    Initialize string data to string representation of numeric value.
 
    \param[in]  oun_InitValue    numeric init value
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString::C_SCLString(const uintn oun_InitValue)
@@ -278,14 +241,11 @@ C_SCLString::C_SCLString(const uintn oun_InitValue)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Constructor.
+/*! \brief    Constructor.
 
    Initialize string data to string representation of numeric value.
 
    \param[in]  os32_InitValue    numeric init value
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString::C_SCLString(const sint32 os32_InitValue)
@@ -294,14 +254,11 @@ C_SCLString::C_SCLString(const sint32 os32_InitValue)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Constructor.
+/*! \brief    Constructor.
 
    Initialize string data to string representation of numeric value.
 
    \param[in]  ou32_InitValue    numeric init value
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString::C_SCLString(const uint32 ou32_InitValue)
@@ -310,14 +267,11 @@ C_SCLString::C_SCLString(const uint32 ou32_InitValue)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Constructor.
+/*! \brief    Constructor.
 
    Initialize string data to string representation of numeric value.
 
    \param[in]  os64_InitValue    numeric init value
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString::C_SCLString(const sint64 os64_InitValue)
@@ -326,14 +280,11 @@ C_SCLString::C_SCLString(const sint64 os64_InitValue)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Constructor.
+/*! \brief    Constructor.
 
    Initialize string data to string representation of numeric value.
 
    \param[in]  ou64_InitValue    numeric init value
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString::C_SCLString(const uint64 ou64_InitValue)
@@ -342,8 +293,7 @@ C_SCLString::C_SCLString(const uint64 ou64_InitValue)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Constructor.
+/*! \brief    Constructor.
 
    Initialize string data to string representation of float-value.
    The number of digits after the decimal separator is 6.
@@ -363,8 +313,6 @@ C_SCLString::C_SCLString(const uint64 ou64_InitValue)
    Also it does not remove the trailing zeroes, like AnsiString does.
 
    \param[in]  of64_InitValue    numeric init value
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString::C_SCLString(const float64 of64_InitValue)
@@ -373,12 +321,9 @@ C_SCLString::C_SCLString(const float64 of64_InitValue)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Destructor.
+/*! \brief    Destructor.
 
    Nothing to do explicitly.
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString::~C_SCLString(void)
@@ -386,8 +331,7 @@ C_SCLString::~C_SCLString(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Assignment operator.
+/*! \brief    Assignment operator.
 
    Assign string to instance's string data.
 
@@ -395,8 +339,6 @@ C_SCLString::~C_SCLString(void)
 
    \return
    reference to new string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString & C_SCLString::operator =(const C_SCLString & orc_Source)
@@ -409,8 +351,7 @@ C_SCLString & C_SCLString::operator =(const C_SCLString & orc_Source)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Append operator.
+/*! \brief    Append operator.
 
    Append string to instance's string data.
 
@@ -418,8 +359,6 @@ C_SCLString & C_SCLString::operator =(const C_SCLString & orc_Source)
 
    \return
    reference to new combined string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString & C_SCLString::operator +=(const C_SCLString & orc_Source)
@@ -429,8 +368,7 @@ C_SCLString & C_SCLString::operator +=(const C_SCLString & orc_Source)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Add operator.
+/*! \brief    Add operator.
 
    Concatenate 2 strings and return combined strings.
 
@@ -439,8 +377,6 @@ C_SCLString & C_SCLString::operator +=(const C_SCLString & orc_Source)
 
    \return
    new combined string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString SCL_PACKAGE stw_scl::operator +(const C_SCLString & orc_Par1, const C_SCLString & orc_Par2)
@@ -452,8 +388,7 @@ C_SCLString SCL_PACKAGE stw_scl::operator +(const C_SCLString & orc_Par1, const 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Compare equals operator.
+/*! \brief    Compare equals operator.
 
    Compare 2 strings.
 
@@ -463,8 +398,6 @@ C_SCLString SCL_PACKAGE stw_scl::operator +(const C_SCLString & orc_Par1, const 
    \return
    true    -> both strings are identical   \n
    false   -> strings are not identical
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool SCL_PACKAGE stw_scl::operator ==(const C_SCLString & orc_Par1, const C_SCLString & orc_Par2)
@@ -473,8 +406,7 @@ bool SCL_PACKAGE stw_scl::operator ==(const C_SCLString & orc_Par1, const C_SCLS
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Compare not equals operator.
+/*! \brief    Compare not equals operator.
 
    Compare 2 strings.
 
@@ -484,8 +416,6 @@ bool SCL_PACKAGE stw_scl::operator ==(const C_SCLString & orc_Par1, const C_SCLS
    \return
    true     -> strings are not identical    \n
    false    -> both strings are identical
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool SCL_PACKAGE stw_scl::operator !=(const C_SCLString & orc_Par1, const C_SCLString & orc_Par2)
@@ -494,8 +424,7 @@ bool SCL_PACKAGE stw_scl::operator !=(const C_SCLString & orc_Par1, const C_SCLS
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Less than operator.
+/*! \brief    Less than operator.
 
    Compare whether oc_Par1 is less than oc_Par2.
    This is done by comparing the ASCII codes of the individual characters.
@@ -506,8 +435,6 @@ bool SCL_PACKAGE stw_scl::operator !=(const C_SCLString & orc_Par1, const C_SCLS
    \return
    true     -> orc_Par1 <  orc_Par2
    false    -> orc_Par1 >= orc_Par2
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool SCL_PACKAGE stw_scl::operator <(const C_SCLString & orc_Par1, const C_SCLString & orc_Par2)
@@ -516,8 +443,7 @@ bool SCL_PACKAGE stw_scl::operator <(const C_SCLString & orc_Par1, const C_SCLSt
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Greater than operator.
+/*! \brief    Greater than operator.
 
    Compare whether oc_Par1 is greater than oc_Par2.
    This is done by comparing the ASCII codes of the individual characters.
@@ -528,8 +454,6 @@ bool SCL_PACKAGE stw_scl::operator <(const C_SCLString & orc_Par1, const C_SCLSt
    \return
    true     -> orc_Par1 >  orc_Par2
    false    -> orc_Par1 <= orc_Par2
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool SCL_PACKAGE stw_scl::operator >(const C_SCLString & orc_Par1, const C_SCLString & orc_Par2)
@@ -538,8 +462,7 @@ bool SCL_PACKAGE stw_scl::operator >(const C_SCLString & orc_Par1, const C_SCLSt
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Less equals operator.
+/*! \brief    Less equals operator.
 
    Compare whether oc_Par1 is less than oc_Par2.
    This is done by comparing the ASCII codes of the individual characters.
@@ -550,8 +473,6 @@ bool SCL_PACKAGE stw_scl::operator >(const C_SCLString & orc_Par1, const C_SCLSt
    \return
    true     -> orc_Par1 <= orc_Par2
    false    -> orc_Par1 >  orc_Par2
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool SCL_PACKAGE stw_scl::operator <=(const C_SCLString & orc_Par1, const C_SCLString & orc_Par2)
@@ -560,8 +481,7 @@ bool SCL_PACKAGE stw_scl::operator <=(const C_SCLString & orc_Par1, const C_SCLS
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Greater equals operator.
+/*! \brief    Greater equals operator.
 
    Compare whether oc_Par1 is greater than or equal to oc_Par2.
    This is done by comparing the ASCII codes of the individual characters.
@@ -572,8 +492,6 @@ bool SCL_PACKAGE stw_scl::operator <=(const C_SCLString & orc_Par1, const C_SCLS
    \return
    true     -> orc_Par1 >= orc_Par2
    false    -> orc_Par1 <  orc_Par2
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool SCL_PACKAGE stw_scl::operator >=(const C_SCLString & orc_Par1, const C_SCLString & orc_Par2)
@@ -582,8 +500,7 @@ bool SCL_PACKAGE stw_scl::operator >=(const C_SCLString & orc_Par1, const C_SCLS
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Compare string with other string
+/*! \brief    Compare string with other string
 
    Compare our data with data of a specified string.
 
@@ -593,8 +510,6 @@ bool SCL_PACKAGE stw_scl::operator >=(const C_SCLString & orc_Par1, const C_SCLS
    0: strings are identical
    <0: "this" string is < than orc_Source
    >0: "this" string is > than orc_Source
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sintn C_SCLString::AnsiCompare(const C_SCLString & orc_Source) const
@@ -603,8 +518,7 @@ sintn C_SCLString::AnsiCompare(const C_SCLString & orc_Source) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Compare string with other string and ignore case
+/*! \brief    Compare string with other string and ignore case
 
    Compare our data with data of a specified string.
    Upper/Lower case will be ignored.
@@ -615,8 +529,6 @@ sintn C_SCLString::AnsiCompare(const C_SCLString & orc_Source) const
    0: strings are identical
    <0: "this" string is < than orc_Source
    >0: "this" string is > than orc_Source
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sintn C_SCLString::AnsiCompareIC(const C_SCLString & orc_Source) const
@@ -628,8 +540,7 @@ sintn C_SCLString::AnsiCompareIC(const C_SCLString & orc_Source) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Compose a string consisting an array of defined characters
+/*! \brief    Compose a string consisting an array of defined characters
 
    Create a string consisting of "ou32_Count" characters of type "ocn_Char"
 
@@ -638,8 +549,6 @@ sintn C_SCLString::AnsiCompareIC(const C_SCLString & orc_Source) const
 
    \return
    String consisting of ou32_Count characters of type ocn_Char
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLString::StringOfChar(const charn ocn_Char, const uint32 ou32_Count)
@@ -652,8 +561,7 @@ C_SCLString C_SCLString::StringOfChar(const charn ocn_Char, const uint32 ou32_Co
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Utility: get number of required characters for "printf"
+/*! \brief    Utility: get number of required characters for "printf"
 
    Return number of required characters for "printfing".
    Used for calculating the required size of a dynamic buffer for performing the
@@ -667,8 +575,6 @@ C_SCLString C_SCLString::StringOfChar(const charn ocn_Char, const uint32 ou32_Co
 
    \return
    number of characters required (without terminating zero)
-
-   \created     05.12.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sintn C_SCLString::mh_GetRequiredPrintfSize(const charn * const opcn_Format, va_list opv_Args)
@@ -699,8 +605,7 @@ void C_SCLString::m_CatSNPrintf(const stw_types::sintn osn_Size, const stw_types
 } //lint !e952 //va_list can be const on some targets but not all
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Print formatted text to string
+/*! \brief    Print formatted text to string
 
    Alias for C_SCLString::PrintFormatted.
    Provided for compatibility with VCL AnsiString.
@@ -710,8 +615,6 @@ void C_SCLString::m_CatSNPrintf(const stw_types::sintn osn_Size, const stw_types
 
    \return
    number of characters in resulting string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sintn C_SCLString::printf(const charn * const opcn_Format, ...) //lint !e1960 !e1916
@@ -731,8 +634,7 @@ sintn C_SCLString::printf(const charn * const opcn_Format, ...) //lint !e1960 !e
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Print formatted text to string
+/*! \brief    Print formatted text to string
 
    Alias for C_SCLString::StringPrintFormatted.
    Provided for compatibility with VCL AnsiString.
@@ -742,8 +644,6 @@ sintn C_SCLString::printf(const charn * const opcn_Format, ...) //lint !e1960 !e
 
    \return
    resulting string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString & C_SCLString::sprintf(const charn * const opcn_Format, ...) //lint !e1960 !e1916
@@ -763,8 +663,7 @@ C_SCLString & C_SCLString::sprintf(const charn * const opcn_Format, ...) //lint 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Print formatted text to string
+/*! \brief    Print formatted text to string
 
    Print formatted data to "this" string.
    Regular C printf formatters are permitted.
@@ -774,8 +673,6 @@ C_SCLString & C_SCLString::sprintf(const charn * const opcn_Format, ...) //lint 
 
    \return
    number of characters in resulting string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sintn C_SCLString::PrintFormatted(const charn * const opcn_Format, ...) //lint !e1960 !e1916
@@ -795,8 +692,7 @@ sintn C_SCLString::PrintFormatted(const charn * const opcn_Format, ...) //lint !
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Print formatted text to string
+/*! \brief    Print formatted text to string
 
    Print formatted data to "this" string.
    Regular C printf formatters are permitted.
@@ -806,8 +702,6 @@ sintn C_SCLString::PrintFormatted(const charn * const opcn_Format, ...) //lint !
 
    \return
    resulting string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString & C_SCLString::StringPrintFormatted(const charn * const opcn_Format, ...) //lint !e1960 !e1916
@@ -827,8 +721,7 @@ C_SCLString & C_SCLString::StringPrintFormatted(const charn * const opcn_Format,
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Print formatted text to string
+/*! \brief    Print formatted text to string
 
    Print formatted data to "this" string.
    Text will be appended to existing string data.
@@ -839,8 +732,6 @@ C_SCLString & C_SCLString::StringPrintFormatted(const charn * const opcn_Format,
 
    \return
    length of string after adding new text
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sintn C_SCLString::cat_printf(const charn * const opcn_Format, ...) //lint !e1960 !e1916
@@ -861,8 +752,7 @@ sintn C_SCLString::cat_printf(const charn * const opcn_Format, ...) //lint !e196
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Print formatted text to string
+/*! \brief    Print formatted text to string
 
    Print formatted data to "this" string.
    Text will be appended to existing string data.
@@ -873,8 +763,6 @@ sintn C_SCLString::cat_printf(const charn * const opcn_Format, ...) //lint !e196
 
    \return
    Resulting string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString & C_SCLString::cat_sprintf(const charn * const opcn_Format, ...) //lint !e1960 !e1916
@@ -894,8 +782,7 @@ C_SCLString & C_SCLString::cat_sprintf(const charn * const opcn_Format, ...) //l
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Convert integer to hexadecimal string
+/*! \brief    Convert integer to hexadecimal string
 
    Compose string from integer value data.
    Does not insert a "0x" prefix before the data.
@@ -908,8 +795,6 @@ C_SCLString & C_SCLString::cat_sprintf(const charn * const opcn_Format, ...) //l
 
    \return
    Resulting string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLString::IntToHex(const sintn osn_Value, const uint32 ou32_Digits)
@@ -925,8 +810,7 @@ C_SCLString C_SCLString::IntToHex(const sintn osn_Value, const uint32 ou32_Digit
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Convert integer to hexadecimal string
+/*! \brief    Convert integer to hexadecimal string
 
    Compose string from integer value data.
    Does not insert a "0x" prefix before the data.
@@ -939,8 +823,6 @@ C_SCLString C_SCLString::IntToHex(const sintn osn_Value, const uint32 ou32_Digit
 
    \return
    Resulting string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLString::IntToHex(const sint64 os64_Value, const uint32 ou32_Digits)
@@ -956,8 +838,7 @@ C_SCLString C_SCLString::IntToHex(const sint64 os64_Value, const uint32 ou32_Dig
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Insert string into existing string data
+/*! \brief    Insert string into existing string data
 
    Insert string into existing string at specified position.
 
@@ -966,8 +847,6 @@ C_SCLString C_SCLString::IntToHex(const sint64 os64_Value, const uint32 ou32_Dig
 
    \return
    Resulting string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString & C_SCLString::Insert(const C_SCLString & orc_Source, const uint32 ou32_Index)
@@ -987,8 +866,7 @@ C_SCLString & C_SCLString::Insert(const C_SCLString & orc_Source, const uint32 o
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Delete characters from existing string
+/*! \brief    Delete characters from existing string
 
    Delete characters from existing string.
    If the index is larger than the length of the string or less than 1, no characters are deleted.
@@ -1000,8 +878,6 @@ C_SCLString & C_SCLString::Insert(const C_SCLString & orc_Source, const uint32 o
 
    \return
    Resulting string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString & C_SCLString::Delete(const uint32 ou32_Index, const uint32 ou32_Count)
@@ -1014,8 +890,7 @@ C_SCLString & C_SCLString::Delete(const uint32 ou32_Index, const uint32 ou32_Cou
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Change length of string.
+/*! \brief    Change length of string.
 
    Resize string.
    Pre-existing data will be preserved.
@@ -1025,8 +900,6 @@ C_SCLString & C_SCLString::Delete(const uint32 ou32_Index, const uint32 ou32_Cou
 
    \return
    Resulting string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString & C_SCLString::SetLength(const uint32 ou32_NewLength)
@@ -1036,8 +909,7 @@ C_SCLString & C_SCLString::SetLength(const uint32 ou32_NewLength)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Get first position of specified string in existing string
+/*! \brief    Get first position of specified string in existing string
 
    Return first position of specified string in existing string data
 
@@ -1050,8 +922,6 @@ C_SCLString & C_SCLString::SetLength(const uint32 ou32_NewLength)
    \return
    0: string not found
    >0: position of string in exsiting string (1 = beginning of string)
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 uint32 C_SCLString::Pos(const C_SCLString & orc_SubString) const
@@ -1072,8 +942,7 @@ uint32 C_SCLString::Pos(const C_SCLString & orc_SubString) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Get last position of specified string in existing string
+/*! \brief    Get last position of specified string in existing string
 
    Return last position of specified string in existing string data
 
@@ -1086,8 +955,6 @@ uint32 C_SCLString::Pos(const C_SCLString & orc_SubString) const
    \return
    0: string not found
    >0: last position of string in exsiting string (1 = beginning of string)
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 uint32 C_SCLString::LastPos(const C_SCLString & orc_SubString) const
@@ -1108,8 +975,7 @@ uint32 C_SCLString::LastPos(const C_SCLString & orc_SubString) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Remove whitespaces around string
+/*! \brief    Remove whitespaces around string
 
    Remove the following whitespaces around string data:
    - blank
@@ -1125,8 +991,6 @@ uint32 C_SCLString::LastPos(const C_SCLString & orc_SubString) const
 
    \return
    String with outer whitespaces removed.
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLString::Trim(void) const
@@ -1138,8 +1002,7 @@ C_SCLString C_SCLString::Trim(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Remove whitespaces at the beginning of string
+/*! \brief    Remove whitespaces at the beginning of string
 
    Remove the following whitespaces at the beginning of string data:
    - blank
@@ -1153,8 +1016,6 @@ C_SCLString C_SCLString::Trim(void) const
 
    \return
    String with beginning whitespaces removed.
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLString::TrimLeft(void) const
@@ -1170,8 +1031,7 @@ C_SCLString C_SCLString::TrimLeft(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Remove whitespaces at the end of string
+/*! \brief    Remove whitespaces at the end of string
 
    Remove the following whitespaces at the end of string data:
    - blank
@@ -1185,8 +1045,6 @@ C_SCLString C_SCLString::TrimLeft(void) const
 
    \return
    String with trailing whitespaces removed.
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLString::TrimRight(void) const
@@ -1197,16 +1055,13 @@ C_SCLString C_SCLString::TrimRight(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Convert string to lower case letters
+/*! \brief    Convert string to lower case letters
 
    Convert all upper case letters to lower case letters.
    Will not modify the existing object, just return the resulting string.
 
    \return
    Resulting string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLString::LowerCase(void) const
@@ -1226,16 +1081,13 @@ C_SCLString C_SCLString::LowerCase(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Convert string to upper case letters
+/*! \brief    Convert string to upper case letters
 
    Convert all lower case letters to upper case letters.
    Will not modify the existing object, just return the resulting string.
 
    \return
    Resulting string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLString::UpperCase(void) const
@@ -1255,8 +1107,7 @@ C_SCLString C_SCLString::UpperCase(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Extract part of the string
+/*! \brief    Extract part of the string
 
    Get a part of the string.
    If more characters are requested than the string contains only the available characters will be returned.
@@ -1267,8 +1118,6 @@ C_SCLString C_SCLString::UpperCase(void) const
    \return
    Resulting string
    if index is zero: ""
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLString::SubString(const uint32 ou32_Index, const uint32 ou32_Count) const
@@ -1286,8 +1135,7 @@ C_SCLString C_SCLString::SubString(const uint32 ou32_Index, const uint32 ou32_Co
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Convert string to sint32 number
+/*! \brief    Convert string to sint32 number
 
    Convert string to sint32 values.
    Will throw exception if string is not a number.
@@ -1299,8 +1147,6 @@ C_SCLString C_SCLString::SubString(const uint32 ou32_Index, const uint32 ou32_Co
 
    \return
    string as number
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sintn C_SCLString::ToInt(void) const
@@ -1470,8 +1316,7 @@ sint64 C_SCLString::m_StrTos64(const charn * const opcn_String, const bool oq_He
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Convert string to sint64 number
+/*! \brief    Convert string to sint64 number
 
    Convert string to sint64 values.
    Will throw exception if string is not a number.
@@ -1483,8 +1328,6 @@ sint64 C_SCLString::m_StrTos64(const charn * const opcn_String, const bool oq_He
 
    \return
    string as number
-
-   \created     01.09.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint64 C_SCLString::ToInt64(void) const
@@ -1538,8 +1381,7 @@ sint64 C_SCLString::ToInt64(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Convert string to sintn number. Apply default if conversion fails.
+/*! \brief    Convert string to sintn number. Apply default if conversion fails.
 
    Try to convert string to sintn value.
    If the conversion fails return a specified default instead.
@@ -1554,8 +1396,6 @@ sint64 C_SCLString::ToInt64(void) const
 
    \return
    string as number (or default)
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sintn C_SCLString::ToIntDef(const sintn osn_Default) const
@@ -1574,8 +1414,7 @@ sintn C_SCLString::ToIntDef(const sintn osn_Default) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Convert string to float64 number
+/*! \brief    Convert string to float64 number
 
    Try to convert string to a float64 value.
    "," and "." separators are accepted.
@@ -1584,8 +1423,6 @@ sintn C_SCLString::ToIntDef(const sintn osn_Default) const
 
    \return
    string as float64
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 float64 C_SCLString::ToDouble(void) const
@@ -1615,8 +1452,7 @@ float64 C_SCLString::ToDouble(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Get character at position.
+/*! \brief    Get character at position.
 
    Return character at specified position.
    If the position is invalid the functions throws.
@@ -1625,8 +1461,6 @@ float64 C_SCLString::ToDouble(void) const
 
    \return
    character at position
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 charn C_SCLString::operator [](const sintn osn_Index) const
@@ -1636,8 +1470,7 @@ charn C_SCLString::operator [](const sintn osn_Index) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Get const character at position.
+/*! \brief    Get const character at position.
 
    Return character at specified position.
    If the position is invalid the functions throws.
@@ -1646,8 +1479,6 @@ charn C_SCLString::operator [](const sintn osn_Index) const
 
    \return
    character at position
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 charn & C_SCLString::operator [](const sintn osn_Index)
@@ -1657,15 +1488,12 @@ charn & C_SCLString::operator [](const sintn osn_Index)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Get string data as std::string
+/*! \brief    Get string data as std::string
 
    Returns the std::string encapsulated by C_SCLString.
 
    \return
    String data as std::string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 std::string * C_SCLString::AsStdString(void)
@@ -1674,15 +1502,12 @@ std::string * C_SCLString::AsStdString(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Get string data as const std::string
+/*! \brief    Get string data as const std::string
 
    Returns the std::string encapsulated by C_SCLString.
 
    \return
    String data as std::string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 const std::string * C_SCLString::AsStdString(void) const
@@ -1691,8 +1516,7 @@ const std::string * C_SCLString::AsStdString(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Convert sint64 value to string
+/*! \brief    Convert sint64 value to string
 
    Converts sint64 number to string.
 
@@ -1700,8 +1524,6 @@ const std::string * C_SCLString::AsStdString(void) const
 
    \return
    value converted to string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLString::IntToStr(const sint64 os64_Value)
@@ -1712,8 +1534,7 @@ C_SCLString C_SCLString::IntToStr(const sint64 os64_Value)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Convert uint64 value to string
+/*! \brief    Convert uint64 value to string
 
    Converts uint64 number to string.
 
@@ -1721,8 +1542,6 @@ C_SCLString C_SCLString::IntToStr(const sint64 os64_Value)
 
    \return
    value converted to string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLString::IntToStr(const uint64 ou64_Value)
@@ -1733,8 +1552,7 @@ C_SCLString C_SCLString::IntToStr(const uint64 ou64_Value)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Convert sint32 value to string
+/*! \brief    Convert sint32 value to string
 
    Converts sint32 number to string.
 
@@ -1742,8 +1560,6 @@ C_SCLString C_SCLString::IntToStr(const uint64 ou64_Value)
 
    \return
    value converted to string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLString::IntToStr(const sint32 os32_Value)
@@ -1754,8 +1570,7 @@ C_SCLString C_SCLString::IntToStr(const sint32 os32_Value)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Convert uint32 value to string
+/*! \brief    Convert uint32 value to string
 
    Converts uint32 number to string.
 
@@ -1763,8 +1578,6 @@ C_SCLString C_SCLString::IntToStr(const sint32 os32_Value)
 
    \return
    value converted to string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLString::IntToStr(const uint32 ou32_Value)
@@ -1775,8 +1588,7 @@ C_SCLString C_SCLString::IntToStr(const uint32 ou32_Value)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Convert sintn value to string
+/*! \brief    Convert sintn value to string
 
    Converts sintn number to string.
 
@@ -1784,8 +1596,6 @@ C_SCLString C_SCLString::IntToStr(const uint32 ou32_Value)
 
    \return
    value converted to string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLString::IntToStr(const sintn osn_Value)
@@ -1796,8 +1606,7 @@ C_SCLString C_SCLString::IntToStr(const sintn osn_Value)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Convert uintn value to string
+/*! \brief    Convert uintn value to string
 
    Converts uintn number to string.
 
@@ -1805,8 +1614,6 @@ C_SCLString C_SCLString::IntToStr(const sintn osn_Value)
 
    \return
    value converted to string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLString::IntToStr(const uintn oun_Value)
@@ -1817,8 +1624,7 @@ C_SCLString C_SCLString::IntToStr(const uintn oun_Value)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Convert float32 value to string
+/*! \brief    Convert float32 value to string
 
    Converts float32 number to string.
    Will return 6 digits after the decimal separator.
@@ -1827,8 +1633,6 @@ C_SCLString C_SCLString::IntToStr(const uintn oun_Value)
 
    \return
    value converted to string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLString::FloatToStr(const float32 of32_Value)
@@ -1839,8 +1643,7 @@ C_SCLString C_SCLString::FloatToStr(const float32 of32_Value)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Convert of64_Value value to string
+/*! \brief    Convert of64_Value value to string
 
    Converts of64_Value number to string.
    Will return 6 digits after the decimal separator.
@@ -1849,8 +1652,6 @@ C_SCLString C_SCLString::FloatToStr(const float32 of32_Value)
 
    \return
    value converted to string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLString::FloatToStr(const float64 of64_Value)
@@ -1861,15 +1662,12 @@ C_SCLString C_SCLString::FloatToStr(const float64 of64_Value)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Get pointer to raw string data
+/*! \brief    Get pointer to raw string data
 
    Return pointer to ram string data.
 
    \return
    pointer to data
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 const charn * C_SCLString::c_str(void) const
@@ -1878,15 +1676,12 @@ const charn * C_SCLString::c_str(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Get pointer to raw string data
+/*! \brief    Get pointer to raw string data
 
    Return pointer to ram string data.
 
    \return
    pointer to data
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 const void * C_SCLString::data(void) const
@@ -1895,14 +1690,11 @@ const void * C_SCLString::data(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Get number of characters in string
+/*! \brief    Get number of characters in string
 
    Returns the number of characters in the string (i.e.: number of characters before '\0').
 
    \return  number of characters in string
-
-   \created     xx.xx.20xx  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 uint32 C_SCLString::Length(void) const
@@ -1911,14 +1703,11 @@ uint32 C_SCLString::Length(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Check whether string contains any characters
+/*! \brief    Check whether string contains any characters
 
    \return
    true: no characters in string
    false: more than zero characters in string
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool C_SCLString::IsEmpty(void) const
@@ -1927,15 +1716,12 @@ bool C_SCLString::IsEmpty(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Get index of rightmost character that contains any of the delimiter characters.
+/*! \brief    Get index of rightmost character that contains any of the delimiter characters.
 
    \param[in]    orc_Delimiters   string containing all possible delimiters
 
    \return
    1-based rightmost position that contains any of the characters on orc_Delimiters (0 if not found)
-
-   \created     19.05.2010  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 uint32 C_SCLString::LastDelimiter(const C_SCLString & orc_Delimiters) const
@@ -1959,8 +1745,7 @@ uint32 C_SCLString::LastDelimiter(const C_SCLString & orc_Delimiters) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Convert float64 to a C_SCLString with a configurable number of digits.
+/*! \brief    Convert float64 to a C_SCLString with a configurable number of digits.
 
    Will always use the point (".") as decimal separator.
 
@@ -1969,8 +1754,6 @@ uint32 C_SCLString::LastDelimiter(const C_SCLString & orc_Delimiters) const
 
    \return
    resulting string
-
-   \created     08.06.2010  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLString::FloatToStr(const float64 of64_Value, const sint32 os32_Digits)
@@ -1982,8 +1765,7 @@ C_SCLString C_SCLString::FloatToStr(const float64 of64_Value, const sint32 os32_
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Tokenize string.
+/*! \brief    Tokenize string.
 
    Parses string data for token-separated fields.
    The parsed data will be returned.
@@ -1992,8 +1774,6 @@ C_SCLString C_SCLString::FloatToStr(const float64 of64_Value, const sint32 os32_
 
    \param[in]    orc_Delimiters       token delimiters (e.g. ";.-" or simply ";")
    \param[out]   orc_TokenizedData    array containing parsed tokens
-
-   \created     08.06.2010  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_SCLString::Tokenize(const C_SCLString & orc_Delimiters, SCLDynamicArray<C_SCLString> & orc_TokenizedData) const

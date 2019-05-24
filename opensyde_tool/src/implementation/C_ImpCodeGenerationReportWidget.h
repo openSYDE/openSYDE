@@ -1,17 +1,11 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Dialog for code generation report (header)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     16.10.2018  STW/G.Landsgesell (copied and adapted from DBC export report)
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_IMPCODEGENERATIONREPORTWIDGET_H
 #define C_IMPCODEGENERATIONREPORTWIDGET_H
 
@@ -23,12 +17,12 @@ namespace Ui
 {
 class C_ImpCodeGenerationReportWidget;
 }
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_ImpCodeGenerationReportWidget :
    public QWidget
 {
@@ -63,7 +57,7 @@ private:
    C_ImpCodeGenerationReportWidget & operator =(const C_ImpCodeGenerationReportWidget &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

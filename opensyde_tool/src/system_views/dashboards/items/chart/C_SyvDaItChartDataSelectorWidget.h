@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for showing information and offering configuration of all chart data series (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.08.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVDAITCHARTDATASELECTORWIDGET_H
 #define C_SYVDAITCHARTDATASELECTORWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 #include <QSpacerItem>
 #include <QColor>
@@ -29,7 +23,7 @@
 #include "C_SyvDaItChartDataItemWidget.h"
 #include "C_OSCNodeDataPool.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
 {
 class C_SyvDaItChartDataSelectorWidget;
@@ -37,9 +31,9 @@ class C_SyvDaItChartDataSelectorWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_SyvDaItChartDataSelectorWidget :
    public QWidget
 {
@@ -59,7 +53,7 @@ public:
    bool RemoveDataSerie(const stw_types::uint32 ou32_DataPoolElementConfigIndex);
    void UpdateDataSerieValue(const stw_types::uint32 ou32_DataPoolElementConfigIndex, const QString & orc_Value) const;
    void UpdateError(const stw_types::uint32 ou32_DataElementIndex, const QString & orc_ErrorText,
-                    const bool oq_IsTransmissionError) const;
+                    const bool oq_IsTransmissionError, const bool oq_ErrorActive) const;
    void ResetError(void) const;
    void UpdateTransparence(const stw_types::uint32 ou32_DataElementIndex, const stw_types::sintn osn_Value);
    QString GetDataElementName(const stw_types::uint32 ou32_DataPoolElementConfigIndex);
@@ -94,7 +88,7 @@ private:
    C_SyvDaItChartDataSelectorWidget & operator =(const C_SyvDaItChartDataSelectorWidget &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

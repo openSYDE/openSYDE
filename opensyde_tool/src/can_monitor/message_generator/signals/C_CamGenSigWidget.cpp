@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Top widget for message generator signal edit (implementation)
 
    Top widget for message generator signal edit
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.12.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_GtGetText.h"
@@ -26,34 +19,31 @@
 #include "C_CamGenSigWidget.h"
 #include "ui_C_CamGenSigWidget.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamGenSigWidget::C_CamGenSigWidget(QWidget * const opc_Parent) :
    C_OgeWiOnlyBackground(opc_Parent),
    mpc_Ui(new Ui::C_CamGenSigWidget),
@@ -84,25 +74,19 @@ C_CamGenSigWidget::C_CamGenSigWidget(QWidget * const opc_Parent) :
            &C_CamGenSigWidget::m_Reset);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     13.12.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamGenSigWidget::~C_CamGenSigWidget(void)
 {
    delete this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     13.12.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelHeading->setText(C_GtGetText::h_GetText("Signals of selected message:"));
@@ -115,37 +99,28 @@ void C_CamGenSigWidget::InitStaticNames(void) const
                                                 "   - Database loaded but message missing"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save all user settings
-
-   \created     14.12.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save all user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigWidget::SaveUserSettings(void) const
 {
    this->mpc_Ui->pc_TableView->SaveUserSettings();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle user settings
-
-   \created     04.02.2019  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigWidget::LoadUserSettings(void)
 {
    this->mpc_Ui->pc_TableView->LoadUserSettings();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle signal reload on external trigger
-
-   \created     22.01.2019  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle signal reload on external trigger
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigWidget::TriggerSignalReload(void)
 {
    this->mpc_Ui->pc_TableView->TriggerSignalReload();
@@ -153,30 +128,24 @@ void C_CamGenSigWidget::TriggerSignalReload(void)
    this->UpdateSelection(this->mu32_NumSelectedItems, this->mu32_Row);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update the message DLC
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update the message DLC
 
    \param[in] ou32_MessageIndex Message index
-
-   \created     14.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigWidget::UpdateMessageDLC(const stw_types::uint32 ou32_MessageIndex) const
 {
    this->mpc_Ui->pc_TableView->UpdateMessageDLC(ou32_MessageIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update current selected message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update current selected message
 
    \param[in] ou32_NumSelectedItems Number of selected items
    \param[in] ou32_Row              Selected row
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigWidget::UpdateSelection(const stw_types::uint32 ou32_NumSelectedItems, const stw_types::uint32 ou32_Row)
 {
    this->mu32_NumSelectedItems = ou32_NumSelectedItems;
@@ -241,13 +210,10 @@ void C_CamGenSigWidget::UpdateSelection(const stw_types::uint32 ou32_NumSelected
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reset
-
-   \created     21.12.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reset
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigWidget::m_Reset(void)
 {
    this->UpdateSelection(0UL, 0UL);

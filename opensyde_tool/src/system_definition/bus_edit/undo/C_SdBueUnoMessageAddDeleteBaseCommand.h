@@ -1,35 +1,29 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Message base class for add and delete commands (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.04.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SDBUEUNOMESSAGEADDDELETEBASECOMMAND_H
 #define C_SDBUEUNOMESSAGEADDDELETEBASECOMMAND_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SdBueUnoMessageBaseCommand.h"
 #include "C_OSCCanMessage.h"
 #include "C_OSCNodeDataPoolListElement.h"
 #include "C_PuiSdNodeDataPoolListElement.h"
 #include "C_PuiSdNodeCanSignal.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SdBueUnoMessageAddDeleteBaseCommand :
    public C_SdBueUnoMessageBaseCommand
@@ -59,7 +53,7 @@ private:
    static stw_types::sint32 mh_CheckSync(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

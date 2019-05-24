@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       DiagLib Target Glue Layer: File functions
@@ -8,19 +8,13 @@
    - file size
    - file exists
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.07.2009  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef TGLFILEH
 #define TGLFILEH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 #include "CSCLString.h"
 #include "SCLDynamicArray.h"
@@ -33,12 +27,12 @@
 #endif
 #endif
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_tgl
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 ///Information about found files
 struct TGL_FileSearchRecord
@@ -67,7 +61,7 @@ stw_types::sint32 TGL_PACKAGE TGL_CreateDirectory(const stw_scl::C_SCLString & o
 stw_types::sint32 TGL_PACKAGE TGL_RemoveDirectory(const stw_scl::C_SCLString & orc_Directory,
                                                   const bool oq_ContentOnly);
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

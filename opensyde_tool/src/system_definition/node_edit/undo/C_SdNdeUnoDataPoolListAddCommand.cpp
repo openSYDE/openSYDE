@@ -1,58 +1,48 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data pool list add undo command (implementation)
 
    Data pool list add undo command
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.01.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
 #include "C_PuiSdHandler.h"
 #include "C_SdNdeUnoDataPoolListAddCommand.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     oru32_NodeIndex             Node index
    \param[in]     oru32_DataPoolIndex         Node data pool index
    \param[in,out] opc_DataPoolListsTreeWidget Data pool lists tree widget to perform actions on
    \param[in]     orc_Indices                 Node data pool list indices
    \param[in,out] opc_Parent                  Optional pointer to parent
-
-   \created     27.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoDataPoolListAddCommand::C_SdNdeUnoDataPoolListAddCommand(const uint32 & oru32_NodeIndex,
                                                                    const uint32 & oru32_DataPoolIndex,
                                                                    stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget,
@@ -88,26 +78,20 @@ C_SdNdeUnoDataPoolListAddCommand::C_SdNdeUnoDataPoolListAddCommand(const uint32 
    this->SetInitialData(c_OSCContent, c_UIContent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Redo add
-
-   \created     27.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Redo add
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListAddCommand::redo(void)
 {
    this->Add();
    C_SdNdeUnoDataPoolListAddDeleteBaseCommand::redo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Undo add
-
-   \created     27.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Undo add
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListAddCommand::undo(void)
 {
    C_SdNdeUnoDataPoolListAddDeleteBaseCommand::undo();

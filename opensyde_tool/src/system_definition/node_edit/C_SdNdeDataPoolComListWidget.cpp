@@ -1,56 +1,46 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget to display data pool list com entries (implementation)
 
    Widget to display data pool list com entries
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     23.03.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SdNdeDataPoolComListWidget.h"
 #include "ui_C_SdNdeDataPoolComListWidget.h"
 #include "C_PuiSdHandler.h"
 #include "C_SdNdeDataPoolListComHeaderWidget.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     23.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolComListWidget::C_SdNdeDataPoolComListWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDataPoolComListWidget)
@@ -62,15 +52,12 @@ C_SdNdeDataPoolComListWidget::C_SdNdeDataPoolComListWidget(QWidget * const opc_P
    this->mpc_Ui->pc_ScrollAreaWidgetContents->SetBackgroundColor(-1);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     23.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolComListWidget::~C_SdNdeDataPoolComListWidget(void)
 {
    delete mpc_Ui;
@@ -82,16 +69,13 @@ C_SdNdeDataPoolComListWidget::~C_SdNdeDataPoolComListWidget(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set new data pool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new data pool
 
    \param[in] oru32_NodeIndex     Node index
    \param[in] oru32_DataPoolIndex Data pool index
-
-   \created     23.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolComListWidget::SetDataPool(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex)
 {
    const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(oru32_NodeIndex,
@@ -126,13 +110,10 @@ void C_SdNdeDataPoolComListWidget::SetDataPool(const uint32 & oru32_NodeIndex, c
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clear content
-
-   \created     19.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clear content
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolComListWidget::Clear(void)
 {
    //Clean up last list
@@ -146,13 +127,10 @@ void C_SdNdeDataPoolComListWidget::Clear(void)
    this->mc_LastWidgets.clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update messages & signals
-
-   \created     12.01.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update messages & signals
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolComListWidget::Update(void)
 {
    for (uint32 u32_ItWidget = 0; u32_ItWidget < this->mc_LastWidgets.size(); ++u32_ItWidget)
@@ -167,13 +145,10 @@ void C_SdNdeDataPoolComListWidget::Update(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle list error change
-
-   \created     18.07.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle list error change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolComListWidget::m_OnErrorChange(void)
 {
    bool q_Error = false;
@@ -194,31 +169,25 @@ void C_SdNdeDataPoolComListWidget::m_OnErrorChange(void)
    Q_EMIT this->SigErrorChange(q_Error);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Forward signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Forward signal
 
    \param[in] ou32_DataPoolIndex Data pool index
    \param[in] ou32_ListIndex     List index
-
-   \created     23.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolComListWidget::m_OnEdit(const uint32 ou32_DataPoolIndex, const uint32 ou32_ListIndex)
 {
    Q_EMIT this->SigEdit(ou32_DataPoolIndex, ou32_ListIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Forward signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Forward signal
 
    \param[in] oru32_BusIndex Bus index
    \param[in] orc_BusName  Bus name
-
-   \created     23.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolComListWidget::m_OnSwitchToBus(const uint32 & oru32_BusIndex, const QString & orc_BusName)
 {
    Q_EMIT this->SigSwitchToBus(oru32_BusIndex, orc_BusName);

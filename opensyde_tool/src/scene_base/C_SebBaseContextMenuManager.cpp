@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Context menu manager of base scene (implementation)
 
    Context menu manager of base scene
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -26,31 +19,28 @@
 #include "C_GtGetText.h"
 #include "gitypes.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     21.04.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebBaseContextMenuManager::C_SebBaseContextMenuManager() :
    mpc_ActiveItem(NULL)
 {
@@ -143,31 +133,25 @@ C_SebBaseContextMenuManager::C_SebBaseContextMenuManager() :
    m_InsertBendLineActions(this->mpc_ActionOrderObjects);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     21.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebBaseContextMenuManager::~C_SebBaseContextMenuManager()
 {
    //lint -e{1540}  no memory leak because of the parent of all mpc_Action* and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handles a context menu event and shows the context menu with the necessary actions
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handles a context menu event and shows the context menu with the necessary actions
 
    \param[in]     opc_Event            Event identification and information
    \param[in]     orc_SelectedItems    All selected and for the context menu relevant items
    \param[in]     orq_ShowPaste        Indicator if paste functionality is available
-
-   \created     08.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::HandleContextMenuEvent(QGraphicsSceneContextMenuEvent * const opc_Event,
                                                          const QList<QGraphicsItem *> & orc_SelectedItems,
                                                          const bool & orq_ShowPaste)
@@ -214,7 +198,6 @@ void C_SebBaseContextMenuManager::HandleContextMenuEvent(QGraphicsSceneContextMe
       }
       else
       {
-         QGraphicsItem * pc_CurItem;
          float64 f64_CurZ = std::numeric_limits<float64>::max() * -1.0;
          // more than one element was selected. only common functionality is available
          this->mpc_ActionCut->setVisible(true);
@@ -226,13 +209,38 @@ void C_SebBaseContextMenuManager::HandleContextMenuEvent(QGraphicsSceneContextMe
          //Get current guideline item for alignment
          for (sint32 s32_ItItem = 0; s32_ItItem < orc_SelectedItems.size(); ++s32_ItItem)
          {
-            pc_CurItem = C_SebUtil::h_GetHighestParent(orc_SelectedItems[s32_ItItem]);
+            QGraphicsItem * const pc_CurItem = C_SebUtil::h_GetHighestParent(orc_SelectedItems[s32_ItItem]);
             if (pc_CurItem->isUnderMouse() == true)
             {
                if (f64_CurZ < pc_CurItem->zValue())
                {
                   this->mpc_ActiveItem = pc_CurItem;
                   f64_CurZ = pc_CurItem->zValue();
+               }
+            }
+         }
+         //Check for common setup style (only makes sense for more than one selected item)
+         if (orc_SelectedItems.size() > 1)
+         {
+            const QGraphicsItem * const pc_FirstItem = C_SebUtil::h_GetHighestParent(orc_SelectedItems[0]);
+            if (pc_FirstItem != NULL)
+            {
+               bool q_AllEqual = true;
+               for (sint32 s32_ItItem = 0; s32_ItItem < orc_SelectedItems.size(); ++s32_ItItem)
+               {
+                  const QGraphicsItem * const pc_CurItem = C_SebUtil::h_GetHighestParent(orc_SelectedItems[s32_ItItem]);
+                  if (pc_CurItem->type() != pc_FirstItem->type())
+                  {
+                     q_AllEqual = false;
+                     break;
+                  }
+               }
+               if (q_AllEqual)
+               {
+                  if (m_ItemTypeHasSetupStyle(pc_FirstItem->type()))
+                  {
+                     this->mpc_ActionSetupStyle->setVisible(true);
+                  }
                }
             }
          }
@@ -246,7 +254,7 @@ void C_SebBaseContextMenuManager::HandleContextMenuEvent(QGraphicsSceneContextMe
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::m_SetActionsInvisible(void)
 {
    this->mpc_ActionCut->setVisible(false);
@@ -260,21 +268,33 @@ void C_SebBaseContextMenuManager::m_SetActionsInvisible(void)
    this->mpc_ActionRemoveBendLine->setVisible(false);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if the input item type requires a setup style in the context menu
+
+   \param[in] osn_ItemType Item type to check
+
+   \retval   True    Setup style menu is required
+   \retval   False   Setup style menu should stay hidden
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SebBaseContextMenuManager::m_ItemTypeHasSetupStyle(const sintn osn_ItemType)
+{
+   Q_UNUSED(osn_ItemType)
+   return false;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::m_ContextMenuClosed(void)
 {
    Q_EMIT this->SigContextMenuClosed();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Insert bend line actions after specified item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Insert bend line actions after specified item
 
    \param[in,out] opc_Action Add actions after this action
-
-   \created     03.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::m_InsertBendLineActions(QAction * const opc_Action)
 {
    this->mc_ContextMenu.removeAction(this->mpc_ActionBendLine);
@@ -283,115 +303,97 @@ void C_SebBaseContextMenuManager::m_InsertBendLineActions(QAction * const opc_Ac
    this->mc_ContextMenu.insertAction(opc_Action, this->mpc_ActionRemoveBendLine);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::m_Cut(void)
 {
    Q_EMIT this->SigCut();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::m_Copy(void)
 {
    Q_EMIT this->SigCopy();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::m_Paste(void)
 {
    Q_EMIT this->SigPaste();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::m_Delete(void)
 {
    Q_EMIT this->SigDelete();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::m_SetupStyle()
 {
    Q_EMIT this->SigSetupStyle(this->mpc_ActiveItem);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::m_BendLine(void)
 {
    Q_EMIT this->SigBendLine(this->mpc_ActiveItem, this->mc_ScenePos);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::m_RemoveBendLine(void)
 {
    Q_EMIT this->SigRemoveBendLine(this->mpc_ActiveItem, this->mc_ScenePos);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Align left
-
-   \created     07.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Align left
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::m_AlignLeft(void)
 {
    Q_EMIT this->SigAlign(this->mpc_ActiveItem, eAL_LEFT);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Align horizontal center
-
-   \created     07.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Align horizontal center
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::m_AlignHorizontalCenter(void)
 {
    Q_EMIT this->SigAlign(this->mpc_ActiveItem, eAL_HORIZONTAL_CENTER);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Align right
-
-   \created     07.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Align right
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::m_AlignRight(void)
 {
    Q_EMIT this->SigAlign(this->mpc_ActiveItem, eAL_RIGHT);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Align top
-
-   \created     07.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Align top
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::m_AlignTop(void)
 {
    Q_EMIT this->SigAlign(this->mpc_ActiveItem, eAL_TOP);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Align vertical center
-
-   \created     07.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Align vertical center
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::m_AlignVerticalCenter(void)
 {
    Q_EMIT this->SigAlign(this->mpc_ActiveItem, eAL_VERTICAL_CENTER);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Align bottom
-
-   \created     07.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Align bottom
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebBaseContextMenuManager::m_AlignBottom(void)
 {
    Q_EMIT this->SigAlign(this->mpc_ActiveItem, eAL_BOTTOM);

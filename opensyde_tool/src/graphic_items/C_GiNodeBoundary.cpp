@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief      Visualization of the node boundary with its filled colors (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     04.08.2016  STW/S.Singer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QLinearGradient>
@@ -24,26 +17,25 @@
 #include "C_GiNodeBoundary.h"
 #include "C_Uti.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -51,10 +43,8 @@ using namespace stw_opensyde_gui;
    \param[in]     of64_Width   Width of node
    \param[in]     of64_Height  Height of node
    \param[in,out] opc_Parent   Optional pointer to parent
-
-   \created     22.07.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiNodeBoundary::C_GiNodeBoundary(const QString & orc_Text, const stw_types::float64 of64_Width,
                                    const stw_types::float64 of64_Height, QGraphicsItem * const opc_Parent) :
    QGraphicsItem(opc_Parent),
@@ -65,17 +55,6 @@ C_GiNodeBoundary::C_GiNodeBoundary(const QString & orc_Text, const stw_types::fl
    mq_DrawWhiteFilter(false)
 {
    this->setFlag(ItemIsMovable);
-
-   /*
-   //shadow
-   this->mpc_Shadow = new QGraphicsDropShadowEffect();
-   this->mpc_Shadow->setBlurRadius(1.0);
-   //pc_Shadow->setColor(QColor(128, 128, 128, 180));
-   this->mpc_Shadow->setColor(QColor(227, 227, 230, 255));
-   this->mpc_Shadow->setOffset(-10.0, 20.0);
-   this->setGraphicsEffect(this->mpc_Shadow);
-   */
-
    this->Redraw();
 
    // Init z order
@@ -85,40 +64,38 @@ C_GiNodeBoundary::C_GiNodeBoundary(const QString & orc_Text, const stw_types::fl
    this->SetFont(mc_STYLE_GUIDE_FONT_REGULAR_18);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     19.10.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiNodeBoundary::~C_GiNodeBoundary()
 {
    this->mpc_Shadow = NULL;
    //lint -e{1740}  no memory leak because of the parent of mpc_Shadow and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   boundingRect
-            Returns an estimate of the area painted by the item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get bounding rectangle (estimate of the area painted by the item)
 
-   \created     04.08.2016  STW/S.Singer
+   \return
+   bounding rectangle
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QRectF C_GiNodeBoundary::boundingRect() const
 {
    return this->GetSizeRect();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   paint
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overridden paint event
 
+   Here: Custom paint operation
 
-   \created     04.08.2016  STW/S.Singer
+   \param[in]     opc_Painter    Pointer to Painter
+   \param[in]     opc_Option     Style option
+   \param[in]     opc_Widget     Optional widget to paint on
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNodeBoundary::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                              QWidget * const opc_Widget)
 {
@@ -149,42 +126,33 @@ void C_GiNodeBoundary::paint(QPainter * const opc_Painter, const QStyleOptionGra
                                                                             static_cast<float64>(c_Rect.width())));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the drawing of the rounded bounding rect with its gradient
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the drawing of the rounded bounding rect with its gradient
 
    It will be drawn into a pixmap which is used by the paint method
-
-   \created     12.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNodeBoundary::Redraw(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets new text for showing
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets new text for showing
 
    \param[in]     orc_Text      New text
-
-   \created     21.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNodeBoundary::SetText(const QString & orc_Text)
 {
    this->mc_Text = orc_Text;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets new font for text
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets new font for text
 
-   \param[in]     orc_Text      New font
-
-   \created     27.06.2017  STW/B.Bayer
+   \param[in]     orc_Font      New font
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNodeBoundary::SetFont(const QFont & orc_Font)
 {
    this->mc_Font = orc_Font;
@@ -193,15 +161,12 @@ void C_GiNodeBoundary::SetFont(const QFont & orc_Font)
    this->mc_Font.setPixelSize(this->mc_Font.pointSize());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Activates the drawing of the border line
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Activates the drawing of the border line
 
    \param[in]     oq_Active       Flag for activating or deactivating the border
-
-   \created     22.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNodeBoundary::SetDrawBorder(const bool oq_Active)
 {
    this->mq_DrawBoder = oq_Active;
@@ -209,193 +174,28 @@ void C_GiNodeBoundary::SetDrawBorder(const bool oq_Active)
    this->update();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Activates the drawing of the white filter
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Activates the drawing of the white filter
 
    \param[in]     oq_Active       Flag for activating or deactivating the white filter
-
-   \created     22.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNodeBoundary::SetDrawWhiteFilter(const bool oq_Active)
 {
    this->mq_DrawWhiteFilter = oq_Active;
    this->update();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the drawing of the rounded bounding rect with its gradient
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the drawing of the rounded bounding rect with its gradient
 
    It will be drawn into a pixmap which is used by the paint method
 
    \param[in,out] opc_Painter Current painter to draw on
-
-   \created     12.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
-/*void C_GiNodeBoundary::m_DrawBackground(QPainter * const opc_Painter) const
-{
-   if (opc_Painter != NULL)
-   {
-      QLinearGradient c_Gradient;
-      QRectF c_Rect = boundingRect();
-
-      //rounded rect
-      c_Gradient.setColorAt(0.0, QColor(251, 251, 252));
-      c_Gradient.setColorAt(0.5, QColor(251, 251, 252));
-      c_Gradient.setColorAt(1.0, QColor(237, 237, 237));
-
-      //c_Gradient.setStart(-50.0, 20.0);
-      c_Gradient.setStart(-60.0, 30.0);
-      c_Gradient.setFinalStop(c_Rect.width(), c_Rect.height());
-
-      opc_Painter->setBrush(c_Gradient);
-      if (this->mq_DrawBoder == false)
-      {
-         opc_Painter->setPen(Qt::NoPen);
-      }
-      else
-      {
-         QPen c_Pen;
-         if (this->mq_DrawWhiteFilter == false)
-         {
-            c_Pen.setColor(mc_STYLE_GUIDE_COLOR_1);
-         }
-         else
-         {
-            c_Pen.setColor(mc_STYLE_GUIDE_COLOR_11);
-         }
-         opc_Painter->setPen(c_Pen);
-      }
-
-      opc_Painter->drawRoundedRect(c_Rect, 10.0, 10.0);
-
-      if (this->mq_DrawWhiteFilter == true)
-      {
-         // draw the white filter
-         QColor c_Color = mc_STYLE_GUIDE_COLOR_0;
-         QBrush c_Brush;
-
-         // half transparent
-         c_Color.setAlpha(127);
-         c_Brush.setColor(c_Color);
-         c_Brush.setStyle(Qt::SolidPattern);
-
-         opc_Painter->setBrush(c_Brush);
-         opc_Painter->setPen(Qt::NoPen);
-         opc_Painter->drawRoundedRect(c_Rect, 10.0, 10.0);
-      }
-   }
-}*/
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNodeBoundary::m_DrawBackground(QPainter * const opc_Painter) const
 {
-   //   static sintn sn_Counter = 0;
-
-   //   std::cout << sn_Counter << &std::endl;
-   //   sn_Counter++;
-   //   if (opc_Painter != NULL)
-   //   {
-   //      QLinearGradient c_Gradient;
-   //      QRectF c_Rect = boundingRect();
-   //      QRectF c_ShaddowRect;
-   //      QRectF c_SurroundingRect;
-
-   //      if (this->mq_DrawDefinitionRand == false)
-   //      {
-   //         if (this->mq_DrawWhiteFilter == false)
-   //         {
-   //            //Draw Surrounding Rect
-   //            c_SurroundingRect.setRect(static_cast<float64>(c_Rect.left()) - 3.5,
-   //                                      static_cast<float64>(c_Rect.top()) - 2.5,
-   //                                      static_cast<float64>(c_Rect.width()) + 7.0,
-   //                                      static_cast<float64>(c_Rect.height()) + 5.75);
-   //            opc_Painter->setPen(Qt::NoPen);
-   //            opc_Painter->setBrush(QBrush(mc_STYLE_GUIDE_COLOR_3));
-   //            opc_Painter->drawRoundedRect(c_SurroundingRect, 10.0, 10.0);
-
-   //            // Draw shaddow as bigger rect than base -> smaler when surrounding rect is drawn
-   //            c_ShaddowRect.setRect(static_cast<float64>(c_Rect.left()) - 1.5,
-   //                                  static_cast<float64>(c_Rect.top()) - 0.5, static_cast<float64>(c_Rect.width()) +
-   // 3.0,
-   //                                  static_cast<float64>(c_Rect.height()) + 1.75);
-   //         }
-   //         else
-   //         {
-   //            // Draw shaddow as bigger rect than base -> bigger when no surrounding rect
-   //            c_ShaddowRect.setRect(static_cast<float64>(c_Rect.left()) - 1.5,
-   //                                  static_cast<float64>(c_Rect.top()) - 0.5, static_cast<float64>(c_Rect.width()) +
-   // 3.0,
-   //                                  static_cast<float64>(c_Rect.height()) + 2.75);
-   //         }
-   //      }
-   //      else
-   //      {
-   //         // Draw shaddow as bigger rect than base -> bigger when no surrounding rect
-   //         c_ShaddowRect.setRect(static_cast<float64>(c_Rect.left()) - 1.5,
-   //                               static_cast<float64>(c_Rect.top()) - 0.5, static_cast<float64>(c_Rect.width()) +
-   // 3.0,
-   //                               static_cast<float64>(c_Rect.height()) + 2.75);
-   //      }
-   //      opc_Painter->setPen(Qt::NoPen);
-   //      opc_Painter->setBrush(QBrush(QColor(206, 206, 217)));
-   //      opc_Painter->drawRoundedRect(c_ShaddowRect, 10.0, 10.0);
-
-   //      // Scalings depending on assumed c_Rect with  w:210, h:137.5
-   //      //rounded rect
-   //      c_Gradient.setColorAt(0.0, QColor(251, 251, 252));
-   //      c_Gradient.setColorAt(0.33, QColor(251, 251, 252));
-   //      c_Gradient.setColorAt(0.86, QColor(237, 237, 237));
-   //      c_Gradient.setColorAt(1.0, QColor(237, 237, 237));
-
-   //      c_Gradient.setStart(static_cast<float64>(c_Rect.left()) - ((7.5 * static_cast<float64>(c_Rect.width())) /
-   // 210.0),
-   //                          static_cast<float64>(c_Rect.top()) +
-   //                          ((27.5 * static_cast<float64>(c_Rect.height())) / 137.5));
-   //      c_Gradient.setFinalStop(static_cast<float64>(c_Rect.right()) +
-   //                              ((6.25 * static_cast<float64>(c_Rect.width())) / 210.0),
-   //                              static_cast<float64>(c_Rect.bottom()) -
-   //                              ((27.5 * static_cast<float64>(c_Rect.height())) / 137.5));
-
-   //      opc_Painter->setBrush(c_Gradient);
-   //      if (this->mq_DrawBoder == false)
-   //      {
-   //         opc_Painter->setPen(Qt::NoPen);
-   //         std::cout << "Border off" << &std::endl;
-   //      }
-   //      else
-   //      {
-   //         QPen c_Pen;
-   //         if (this->mq_DrawWhiteFilter == false)
-   //         {
-   //            c_Pen.setColor(QColor(227, 227, 230, 255));
-   //         }
-   //         else
-   //         {
-   //            c_Pen.setColor(mc_STYLE_GUIDE_COLOR_11);
-   //         }
-   //         opc_Painter->setPen(c_Pen);
-   //      }
-
-   //      opc_Painter->drawRoundedRect(c_Rect, 10.0, 10.0);
-
-   //      if (this->mq_DrawWhiteFilter == true)
-   //      {
-   //         // draw the white filter
-   //         QColor c_Color = mc_STYLE_GUIDE_COLOR_0;
-   //         QBrush c_Brush;
-
-   //         // half transparent
-   //         c_Color.setAlpha(127);
-   //         c_Brush.setColor(c_Color);
-   //         c_Brush.setStyle(Qt::SolidPattern);
-
-   //         opc_Painter->setBrush(c_Brush);
-   //         opc_Painter->setPen(Qt::NoPen);
-   //         opc_Painter->drawRoundedRect(c_Rect, 10.0, 10.0);
-   //      }
-   //   }
    if (opc_Painter != NULL)
    {
       QLinearGradient c_Gradient;

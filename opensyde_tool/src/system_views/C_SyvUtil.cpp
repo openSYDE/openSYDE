@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       System view utility class (implementation)
 
    System view utility class
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.01.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_SdUtil.h"
@@ -30,40 +23,40 @@
 #include "C_OSCSystemBus.h"
 #include "TGLUtils.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check system view errors
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check system view errors
 
-   \param[in]  ou32_ViewIndex     View index
-   \param[out] orc_ErrorLabelText Detailed error information
+   \param[in]  ou32_ViewIndex            View index
+   \param[out] orc_ErrorLabelHeadingText Error heading information
+   \param[out] orc_ErrorLabelText        Detailed error information
+   \param[out] orc_ErrorTooltipText      Error tooltip information
 
    \return
    True  Error detected
    False No error detected
-
-   \created     25.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
-bool C_SyvUtil::h_CheckViewSetupError(const uint32 ou32_ViewIndex, QString & orc_ErrorLabelText)
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvUtil::h_CheckViewSetupError(const uint32 ou32_ViewIndex, QString & orc_ErrorLabelHeadingText,
+                                      QString & orc_ErrorLabelText, QString & orc_ErrorTooltipText)
 {
    bool q_Retval;
    bool q_NameInvalid;
@@ -89,20 +82,24 @@ bool C_SyvUtil::h_CheckViewSetupError(const uint32 ou32_ViewIndex, QString & orc
    {
       if (s32_Return == C_RANGE)
       {
-         orc_ErrorLabelText = C_GtGetText::h_GetText("Invalid View: View is invalid.");
+         orc_ErrorLabelHeadingText = C_GtGetText::h_GetText("Invalid View:");
+         orc_ErrorLabelText = C_GtGetText::h_GetText("View is invalid.");
       }
       else if (q_NoActiveNodes == true)
       {
-         orc_ErrorLabelText = C_GtGetText::h_GetText("Invalid View: There are no active nodes.");
+         orc_ErrorLabelHeadingText = C_GtGetText::h_GetText("Invalid View:");
+         orc_ErrorLabelText = C_GtGetText::h_GetText("There are no active nodes.");
       }
       else if (q_NameInvalid == true)
       {
-         orc_ErrorLabelText = C_GtGetText::h_GetText("Invalid View: Name of view is already used.");
+         orc_ErrorLabelHeadingText = C_GtGetText::h_GetText("Invalid View:");
+         orc_ErrorLabelText = C_GtGetText::h_GetText("Name of view is already used.");
       }
       else if (q_PcNotConnected == true)
       {
+         orc_ErrorLabelHeadingText = C_GtGetText::h_GetText("Invalid View:");
          orc_ErrorLabelText = C_GtGetText::h_GetText(
-            "Invalid View: There are no active buses. PC connection could not be established.");
+            "There are no active buses. PC connection could not be established.");
       }
       else if (q_UpdateDisabledButDataBlocks == true)
       {
@@ -112,21 +109,24 @@ bool C_SyvUtil::h_CheckViewSetupError(const uint32 ou32_ViewIndex, QString & orc
                                                                           c_ErrorText);
          if (q_UpdateError == true)
          {
+            orc_ErrorLabelHeadingText = C_GtGetText::h_GetText("Invalid View:");
             orc_ErrorLabelText =
                QString(C_GtGetText::h_GetText(
-                          "Invalid View: There are Data Blocks defined for %1"
+                          "There are Data Blocks defined for %1"
                           " but there are no interfaces which support update for these nodes."))
                .arg(c_ErrorText);
          }
       }
       else if (q_RoutingInvalid == true)
       {
-         orc_ErrorLabelText = QString(C_GtGetText::h_GetText("Invalid View: %1")).arg(c_RoutingErrorText);
+         orc_ErrorLabelHeadingText = C_GtGetText::h_GetText("Invalid View:");
+         orc_ErrorLabelText = c_RoutingErrorText;
       }
       else if (q_SysDefInvalid == true)
       {
+         orc_ErrorLabelHeadingText = C_GtGetText::h_GetText("Invalid View:");
          orc_ErrorLabelText = C_GtGetText::h_GetText(
-            "Invalid View: At least one of the active view items (node or bus) has invalid definition.");
+            "At least one of the active view items (node or bus) has invalid definition.");
       }
       else
       {
@@ -140,12 +140,16 @@ bool C_SyvUtil::h_CheckViewSetupError(const uint32 ou32_ViewIndex, QString & orc
       orc_ErrorLabelText = "";
       q_Retval = false;
    }
+   //Combine strings for tooltip
+   if ((orc_ErrorLabelHeadingText.isEmpty() == false) || (orc_ErrorLabelText.isEmpty() == false))
+   {
+      orc_ErrorTooltipText = orc_ErrorLabelHeadingText + " " + orc_ErrorLabelText;
+   }
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert bus ID and node id to SD indices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert bus ID and node id to SD indices
 
    \param[in]  ou8_BusIdentifier  Bus id
    \param[in]  ou8_NodeIdentifier Node Id within bus
@@ -155,10 +159,8 @@ bool C_SyvUtil::h_CheckViewSetupError(const uint32 ou32_ViewIndex, QString & orc
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     09.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvUtil::h_GetIndicesFromBusId(const uint8 ou8_BusIdentifier, const uint8 ou8_NodeIdentifier,
                                         uint32 & oru32_NodeIndex, uint32 & oru32_BusIndex)
 {
@@ -204,19 +206,16 @@ sint32 C_SyvUtil::h_GetIndicesFromBusId(const uint8 ou8_BusIdentifier, const uin
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get update mode details for specified ID in specified view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get update mode details for specified ID in specified view
 
    \param[in] ou32_ViewIndex Current view index
    \param[in] orc_Id         ID to get details for
 
    \return
    Update mode details
-
-   \created     20.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvUtil::h_GetUpdateModeDescription(const uint32 ou32_ViewIndex,
                                               const C_PuiSvDbNodeDataPoolListElementId & orc_Id)
 {
@@ -355,9 +354,8 @@ QString C_SyvUtil::h_GetUpdateModeDescription(const uint32 ou32_ViewIndex,
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get common dashboard item tool tip for specified ID in specified view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get common dashboard item tool tip for specified ID in specified view
 
    \param[in] ou32_ViewIndex Current view index
    \param[in] orc_Id         ID to get details for
@@ -365,10 +363,8 @@ QString C_SyvUtil::h_GetUpdateModeDescription(const uint32 ou32_ViewIndex,
 
    \return
    Common dashboard item tool tip
-
-   \created     20.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvUtil::h_GetCommonDashboardItemToolTip(const uint32 ou32_ViewIndex,
                                                    const C_PuiSvDbNodeDataPoolListElementId & orc_Id,
                                                    const bool oq_ReadItem,
@@ -414,18 +410,15 @@ QString C_SyvUtil::h_GetCommonDashboardItemToolTip(const uint32 ou32_ViewIndex,
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get view name to display
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get view name to display
 
    \param[in]  ou32_ViewIndex View index
    \param[in]  os32_SubMode   Current sub mode (skipped if invalid)
    \param[out] orc_SubMode    Sub mode heading
    \param[out] orc_SubSubMode Sub sub mode heading
-
-   \created     13.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUtil::h_GetViewDisplayName(const uint32 ou32_ViewIndex, const sint32 os32_SubMode, QString & orc_SubMode,
                                      QString & orc_SubSubMode)
 {
@@ -442,7 +435,7 @@ void C_SyvUtil::h_GetViewDisplayName(const uint32 ou32_ViewIndex, const sint32 o
          orc_SubSubMode = QString(C_GtGetText::h_GetText("Update"));
          break;
       case ms32_SUBMODE_SYSVIEW_DASHBOARD:
-         orc_SubSubMode = QString(C_GtGetText::h_GetText("Dashboards"));
+         orc_SubSubMode = QString(C_GtGetText::h_GetText("Dashboards (%1)")).arg(pc_View->GetDashboards().size());
          break;
       default:
          //Skip addendum
@@ -453,13 +446,10 @@ void C_SyvUtil::h_GetViewDisplayName(const uint32 ou32_ViewIndex, const sint32 o
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     25.01.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvUtil::C_SyvUtil(void)
 {
 }

@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for handling the process of recording an NVM image to a file. (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.08.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVDAITPAIMAGERECORDWIDGET_H
 #define C_SYVDAITPAIMAGERECORDWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <QWidget>
 #include <QTimer>
@@ -28,7 +22,7 @@
 #include "C_SyvComDriverDiag.h"
 #include "C_OSCNodeDataPoolListElementId.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace Ui
 {
@@ -37,9 +31,9 @@ class C_SyvDaItPaImageRecordWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_SyvDaItPaImageRecordWidget :
    public QWidget
 {
@@ -82,12 +76,15 @@ private:
    void m_FilePathChanged(void);
    void m_ReadClicked(void);
    void m_StartReadElementsOfNode(void);
-   void m_ReadElementsOfNode(void);
-   stw_types::sint32 m_CreateParameterSetFile(void);
+   void m_PrepareVariablesForParametrization(void);
+   void m_ReadElementsOfNode(const QString & orc_Comment);
+   stw_types::sint32 m_CreateParameterSetFile(const QString & orc_Comment);
    stw_types::sint32 m_ReadBackElementsOfNodeFromFile(void);
+   QString m_GetTextForStep(
+      const std::vector<std::vector<stw_opensyde_core::C_OSCNodeDataPoolListId> > & orc_DataPoolListsForEachNode,
+      const bool oq_IsConfirm) const;
    void m_PrepareConfirmStep(
-      const std::vector<std::vector<stw_opensyde_core::C_OSCNodeDataPoolListId> > & orc_DataPoolListsForEachNode)
-   const;
+      const std::vector<std::vector<stw_opensyde_core::C_OSCNodeDataPoolListId> > & orc_DataPoolListsForEachNode);
    void m_WriteCrcOfNodeToFile(void);
 
    void m_OkClicked(void);
@@ -102,6 +99,7 @@ private:
    void m_ReportError(const QString & orc_FunctionName, const QString & orc_ErrorText,
                       const stw_types::sint32 os32_ErrorCode);
    void m_ReportErrorNvmSafeReadParameterValues(const stw_types::sint32 os32_ErrorCode);
+   stw_opensyde_core::C_OSCParamSetInterpretedFileInfoData m_GetFileInfoData(const QString & orc_Comment) const;
 
    Ui::C_SyvDaItPaImageRecordWidget * mpc_Ui;
 
@@ -116,12 +114,14 @@ private:
    stw_types::uint32 mu32_CurrentNode;
    bool mq_RequestPending;
    QString mc_FilePath;
+   QString mc_FinishedText;
    const QString mc_ViewName;
 
    static const QString mhc_FILE_EXTENSION;
+   QString m_GetPathForNode(const stw_types::uint32 ou32_NodeIndex, const QString & orc_Path) const;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data class for data set related, additional information (implementation)
 
    Data class for data set related, additional information
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.12.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -40,10 +33,7 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     22.12.2016  STW/M.Echtler
+/*! \brief   Default constructor
 */
 //-----------------------------------------------------------------------------
 C_OSCNodeDataPoolDataSet::C_OSCNodeDataPoolDataSet(void) :
@@ -53,14 +43,11 @@ C_OSCNodeDataPoolDataSet::C_OSCNodeDataPoolDataSet(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
 
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
-
-   \created     21.03.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCNodeDataPoolDataSet::CalcHash(uint32 & oru32_HashValue) const

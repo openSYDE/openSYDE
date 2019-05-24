@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Handle most parts of copy paste implementation for scene (implementation)
 
    Handle most parts of copy paste implementation for scene
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     11.11.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -38,7 +31,7 @@
 #include "C_SebUtil.h"
 #include "TGLUtils.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
@@ -46,67 +39,55 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     11.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdManTopologyCopyPasteManager::C_SdManTopologyCopyPasteManager(void) :
    C_SebBaseCopyPasteManager()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     10.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdManTopologyCopyPasteManager::~C_SdManTopologyCopyPasteManager(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data snapshot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data snapshot
 
    Warning: calling function has to delete the created object
 
    \return
    NULL No valid data snap shot found
    Else Valid data snapshot
-
-   \created     09.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_PuiBsElements * C_SdManTopologyCopyPasteManager::GetSnapshot(QWidget * const opc_Parent)
 {
    Q_UNUSED(opc_Parent)
    return &this->mc_LastKnownData;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy selected files to copy paste manager
-
-   \created     11.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy selected files to copy paste manager
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManTopologyCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *> & orc_SelectedItems)
 {
    C_SdTopologyDataSnapshot c_Snapshot;
@@ -289,34 +270,28 @@ void C_SdManTopologyCopyPasteManager::CopyFromSceneToManager(const QList<QGraphi
    C_SdClipBoardHelper::h_StoreDataSnapShotToClipboard(c_Snapshot);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Indicator if copy paste manager has some content
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Indicator if copy paste manager has some content
 
    Warning: is expected to be called bevore getting any data
 
    \return
    true: content
    false: no content
-
-   \created     14.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdManTopologyCopyPasteManager::CheckValidContentAndPrepareData(void)
 {
    this->mc_LastKnownData.Clear();
    return (C_SdClipBoardHelper::h_LoadDataSnapShotFromClipboard(this->mc_LastKnownData) == C_NO_ERR);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Evaluate all items to get top left point
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Evaluate all items to get top left point
 
    \param[in] opc_Data Data
-
-   \created     14.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManTopologyCopyPasteManager::m_CalcOriginalPosition(const C_PuiBsElements * const opc_Data)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -356,17 +331,14 @@ void C_SdManTopologyCopyPasteManager::m_CalcOriginalPosition(const C_PuiBsElemen
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Remove connection from snap shot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove connection from snap shot
 
    \param[in,out] orc_Data         Snap shot data
    \param[in]     oru32_NodeIndex  Node index
    \param[in]     orc_ConnectionId Connection ID
-
-   \created     09.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManTopologyCopyPasteManager::mh_RemoveConnection(C_SdTopologyDataSnapshot & orc_Data,
                                                           const uint32 & oru32_NodeIndex,
                                                           const C_PuiSdNodeConnectionId & orc_ConnectionId)

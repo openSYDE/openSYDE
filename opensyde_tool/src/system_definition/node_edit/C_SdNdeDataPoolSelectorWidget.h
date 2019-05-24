@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for showing all datapools of a node and a specific category
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.02.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SDNDEDATAPOOLSELECTORWIDGET_H
 #define C_SDNDEDATAPOOLSELECTORWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include "stwtypes.h"
 
@@ -28,7 +22,7 @@
 #include "C_SdNdeDataPoolSelectorUsageWidget.h"
 #include "C_OgeContextMenu.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
 {
 class C_SdNdeDataPoolSelectorWidget;
@@ -36,9 +30,9 @@ class C_SdNdeDataPoolSelectorWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SdNdeDataPoolSelectorWidget :
    public stw_opensyde_gui_elements::C_OgeWiWithToolTip
@@ -58,7 +52,7 @@ public:
    void SetMaximized(const bool oq_Maximized);
    bool SetTypeAndNode(const stw_opensyde_core::C_OSCNodeDataPool::E_Type oe_Type,
                        const stw_types::uint32 ou32_NodeIndex, const bool oq_UsageViewActive);
-   void SetActualDataPoolConflict(const bool oq_Active);
+   void SetCurrentDataPoolConflict(const bool oq_Active);
    void UpdateActualDataPool(void) const;
    bool SetDataPoolActive(const stw_types::uint32 ou32_DataPoolIndex) const;
    void ErrorCheck(void);
@@ -116,5 +110,5 @@ private:
 };
 }
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 #endif // C_SDNDEDATAPOOLSELECTORWIDGET_H

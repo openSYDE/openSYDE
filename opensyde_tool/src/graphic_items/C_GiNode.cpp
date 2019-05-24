@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Offers visualization and functionality of a node (implementation)
 
    detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     09.08.2016  STW/S.Singer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -35,7 +28,7 @@
 #include "C_SdUtil.h"
 #include "C_PuiSdUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_types;
 using namespace stw_errors;
@@ -43,7 +36,7 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const sint32 ms32_IndexAbove = 0;
 const sint32 ms32_IndexRight = 1;
 const sint32 ms32_IndexLeft = 2;
@@ -76,19 +69,18 @@ const float64 C_GiNode::mahf64_ScaleMinHeightNode[6] =
    130.0, 165.0, 200.0, 230.0, 265.0, 300.0
 };
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -97,10 +89,8 @@ const float64 C_GiNode::mahf64_ScaleMinHeightNode[6] =
    \param[in]       orf64_Width          Width of node
    \param[in]       orf64_Height         Height of node
    \param[in,out]   opc_Parent           Optional pointer to parent
-
-   \created     09.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiNode::C_GiNode(const sint32 & ors32_Index, const uint64 & oru64_ID, const float64 & orf64_Width,
                    const float64 & orf64_Height, QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
@@ -150,7 +140,7 @@ C_GiNode::C_GiNode(const sint32 & ors32_Index, const uint64 & oru64_ID, const fl
    this->CheckNodeForChanges();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::m_InitPorts()
 {
    //Create ports
@@ -212,7 +202,7 @@ void C_GiNode::m_InitPorts()
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::m_InitConflictIcon(void)
 {
    //   QPixmap c_Pixmap;
@@ -233,7 +223,7 @@ void C_GiNode::m_InitConflictIcon(void)
    this->mpc_ConflictIcon->setVisible(false);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::m_DetectIconSize(void)
 {
    const uint32 u32_ScaleCategory = this->m_GetScaleCategory();
@@ -273,7 +263,7 @@ void C_GiNode::m_DetectIconSize(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::m_UpdateItems(const float64 of64_DiffWidth, const float64 of64_DiffHeight, const bool oq_Initial)
 {
    const uint32 u32_ScaleCategory = this->m_GetScaleCategory();
@@ -370,15 +360,12 @@ void C_GiNode::m_UpdateItems(const float64 of64_DiffWidth, const float64 of64_Di
    this->mpc_Boundary->SetFont(c_BoundaryFont);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     18.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiNode::~C_GiNode()
 {
    for (sint32 s32_ItConn = 0; s32_ItConn < this->mc_Connections.size(); ++s32_ItConn)
@@ -399,16 +386,13 @@ C_GiNode::~C_GiNode()
    //lint -e{1740}  no memory leak because of the parent of mpc_Boundary, mpc_ConflictIcon and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Find closest point in shape to scene position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Find closest point in shape to scene position
 
    \param[in]  orc_ScenePoint Scene position
    \param[out] orc_Closest    Closest point in shape
-
-   \created     24.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Closest) const
 {
    //
@@ -428,16 +412,13 @@ void C_GiNode::FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Cl
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Find closest port in shape to scene position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Find closest port in shape to scene position
 
    \param[in]  orc_ScenePoint Scene position
-   \param[out] opc_Closest    Closest port in shape
-
-   \created     25.08.2016  STW/M.Echtler
+   \param[out] orpc_Closest   Closest port in shape
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::FindClosestPort(const QPointF & orc_ScenePoint, C_GiPort * (&orpc_Closest)) const
 {
    QPointF c_CurClosest;
@@ -456,33 +437,27 @@ void C_GiNode::FindClosestPort(const QPointF & orc_ScenePoint, C_GiPort * (&orpc
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the type of this itme
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the type of this itme
 
    \return  ID
-
-   \created     01.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_GiNode::type() const
 {
    return msn_GRAPHICS_ITEM_NODE;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if node has at least one connection of this bus type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if node has at least one connection of this bus type
 
    \param[in] oe_Type   Bus type
 
    \return
    true     Node has connection of this type
    false    Node has not a connection of this type
-
-   \created     15.02.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiNode::HasConnectionType(const C_OSCSystemBus::E_Type oe_Type) const
 {
    bool q_Return = false;
@@ -497,15 +472,15 @@ bool C_GiNode::HasConnectionType(const C_OSCSystemBus::E_Type oe_Type) const
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if there are any connections available for this bus type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if there are any connections available for this bus type
 
-   \param[in] ore_Type Bus type
+   \param[in]  ore_Type    Bus type
 
-   \created     25.08.2016  STW/M.Echtler
+   \retval  true   connection available
+   \retval  false  connection not available
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiNode::CheckConnectionAvailable(const C_OSCSystemBus::E_Type & ore_Type) const
 {
    bool q_Retval = false;
@@ -520,16 +495,16 @@ bool C_GiNode::CheckConnectionAvailable(const C_OSCSystemBus::E_Type & ore_Type)
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if the specified interface is available
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if the specified interface is available
 
    \param[in] ore_Type       Bus type
    \param[in] oru8_Interface Interface number
 
-   \created     07.12.2016  STW/M.Echtler
+   \retval  true   interface available
+   \retval  false  interface not available
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiNode::CheckInterfaceAvailable(const C_OSCSystemBus::E_Type & ore_Type, const uint8 & oru8_Interface)
 {
    bool q_Retval = CheckConnectionAvailable(ore_Type);
@@ -551,15 +526,15 @@ bool C_GiNode::CheckInterfaceAvailable(const C_OSCSystemBus::E_Type & ore_Type, 
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get index of specified connection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get index of specified connection
 
    \param[in]   opc_Connection   Connection
 
-   \created     21.09.2016  STW/M.Echtler
+   \return
+   index of specified connection
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_GiNode::GetIndexOfConnector(const C_GiLiBusConnector * const opc_Connection) const
 {
    sint32 s32_Retval = -1;
@@ -577,53 +552,41 @@ sint32 C_GiNode::GetIndexOfConnector(const C_GiLiBusConnector * const opc_Connec
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data node
 
    \param[out]   orpc_Node   Node
-
-   \created     21.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::GetOSCNodeConst(const C_OSCNode * & orpc_Node) const
 {
    orpc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(static_cast<uint32>(this->ms32_Index));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore default mouse cursor
-
-   \created     18.10.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore default mouse cursor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::RestoreDefaultCursor(void)
 {
    C_GiRectBaseGroup::RestoreDefaultCursor();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Change mouse cursor temporarily
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Change mouse cursor temporarily
 
    \param[in] orc_TemporaryCursor New mouse cursor
-
-   \created     18.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::SetTemporaryCursor(const QCursor & orc_TemporaryCursor)
 {
    C_GiRectBaseGroup::SetTemporaryCursor(orc_TemporaryCursor);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   generate custom tool tip
-
-   \created     25.10.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   generate custom tool tip
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::GenerateHint(void)
 {
    if (this->mq_ErrorIconHovered == true)
@@ -730,7 +693,7 @@ void C_GiNode::GenerateHint(void)
                                  {
                                     c_EnabledString = C_GtGetText::h_GetText("NO");
                                  }
-                                 c_BusName.append(QString(" Diagnostic: %1;").arg(c_EnabledString));
+                                 c_BusName.append(QString(" Diagnostic: %1").arg(c_EnabledString));
                                  q_Found = true;
                               }
                            }
@@ -812,7 +775,7 @@ void C_GiNode::GenerateHint(void)
                                  {
                                     c_EnabledString = C_GtGetText::h_GetText("NO");
                                  }
-                                 c_BusName.append(QString(" Diagnostic: %1;").arg(c_EnabledString));
+                                 c_BusName.append(QString(" Diagnostic: %1").arg(c_EnabledString));
                                  q_Found = true;
                               }
                            }
@@ -845,15 +808,12 @@ void C_GiNode::GenerateHint(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reset port looks
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reset port looks
 
    Recount port connections and display ports accordingly
-
-   \created     02.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::ReevaluatePortState(void)
 {
    C_GiPort * pc_CurPort;
@@ -890,13 +850,10 @@ void C_GiNode::ReevaluatePortState(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking the node data for errors and updates the conflict icon
-
-   \created     14.03.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking the node data for errors and updates the conflict icon
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::CheckNodeForChanges(void)
 {
    //check node (Datapools)
@@ -917,15 +874,12 @@ void C_GiNode::CheckNodeForChanges(void)
    this->mpc_Boundary->update();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse press event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     13.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    C_GiRectBaseGroup::mousePressEvent(opc_Event);
@@ -934,15 +888,12 @@ void C_GiNode::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
    Q_EMIT this->SigHideToolTip();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse move event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse move event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     18.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_Event)
 {
    bool q_PreviousState = this->mq_ErrorIconHovered;
@@ -967,17 +918,14 @@ void C_GiNode::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_Event)
    C_GiRectBaseGroup::hoverMoveEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten hover leave event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten hover leave event slot
 
    Here: Hide tool tip
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     26.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event)
 {
    Q_EMIT this->SigHideToolTip();
@@ -985,17 +933,14 @@ void C_GiNode::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event)
    C_GiRectBaseGroup::hoverLeaveEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Get current error state and update error tooltip accordingly
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get current error state and update error tooltip accordingly
 
    \return
    True  Error detected
    False No error detected
-
-   \created     15.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiNode::m_UpdateError(void)
 {
    bool q_ErrorDetected;
@@ -1004,13 +949,25 @@ bool C_GiNode::m_UpdateError(void)
    return q_ErrorDetected;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get current error status
+
+   \retval   true    Error active
+   \retval   false   Error not yet detected
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiNode::m_GetErrorStatus(void) const
+{
+   return this->mpc_ConflictIcon->isVisible();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::m_ResizeUpdateItems(const float64 of64_DiffWidth, const float64 of64_DiffHeight)
 {
    this->m_UpdateItems(of64_DiffWidth, of64_DiffHeight, false);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::m_SetDrawBorder(const bool oq_Active)
 {
    sintn sn_Counter;
@@ -1023,19 +980,19 @@ void C_GiNode::m_SetDrawBorder(const bool oq_Active)
    this->mpc_Boundary->SetDrawBorder(oq_Active);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_GiNodeBoundary * C_GiNode::m_GetBoundary(void) const
 {
    return this->mpc_Boundary;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_GiNode::m_GetIconSize(void) const
 {
    return this->ms32_IconSize;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_GiNode::m_GetScaleCategory(void) const
 {
    const QSizeF c_ActSize = this->mpc_Boundary->boundingRect().size();
@@ -1096,31 +1053,25 @@ uint32 C_GiNode::m_GetScaleCategory(void) const
    return u32_ScaleCategory;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get flag for node data in valid state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get flag for node data in valid state
 
    \return
    true  Node valid
    false Node invalid (Probably about to be deleted)
-
-   \created     29.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiNode::GetValid(void) const
 {
    return mq_Valid;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the white filter for the node drawing
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the white filter for the node drawing
 
    \param[in]     oq_Active      Flag if filter is active or not
-
-   \created     23.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::SetDrawWhiteFilter(const bool oq_Active)
 {
    sintn sn_Counter;
@@ -1137,15 +1088,12 @@ void C_GiNode::SetDrawWhiteFilter(const bool oq_Active)
    this->CheckNodeForChanges();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the text
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the text
 
    \return     Text
-
-   \created     01.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_GiNode::GetText(void) const
 {
    QString c_Name = "Node";
@@ -1160,30 +1108,30 @@ QString C_GiNode::GetText(void) const
    return c_Name;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function for initially loading internal data
-
-   \created     10.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function for initially loading internal data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::LoadData(void)
 {
    const C_PuiSdNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetUINode(ms32_Index);
+   const C_OSCNode * const pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ms32_Index);
 
    if (pc_Node != NULL)
    {
       this->LoadBasicData(*pc_Node);
    }
+   //Object name for test
+   if (pc_OSCNode != NULL)
+   {
+      this->setObjectName(QString("Node: %1").arg(pc_OSCNode->c_Properties.c_Name.c_str()));
+   }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot function for updating internal data
-
-   \created     09.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for updating internal data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::UpdateData(void)
 {
    C_PuiBsBox c_BoxData;
@@ -1203,15 +1151,12 @@ void C_GiNode::UpdateData(void)
    C_PuiSdHandler::h_GetInstance()->SetUINodeConnections(ms32_Index, c_BusConnections);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Remove pointer to connection and all dependencies
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove pointer to connection and all dependencies
 
    \param[in]   opc_BusConnectorGraphicsItem   Referenced connection
-
-   \created     14.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::RemoveConnector(const C_GiLiBusConnector * const opc_BusConnectorGraphicsItem)
 {
    sint32 s32_ItConn;
@@ -1233,28 +1178,22 @@ void C_GiNode::RemoveConnector(const C_GiLiBusConnector * const opc_BusConnector
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete data in system definition
-
-   \created     14.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete data in system definition
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::DeleteData(void)
 {
    C_PuiSdHandler::h_GetInstance()->RemoveNode(ms32_Index);
    this->mq_Valid = false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Disconnect all refreneces to this bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Disconnect all refreneces to this bus
 
    \param[in]   orc_BusName   Bus name
-
-   \created     14.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::DisconnectBus(const QString & orc_BusName)
 {
    for (sint32 s32_ItConn = 0; s32_ItConn < this->mc_Connections.size();)
@@ -1283,32 +1222,26 @@ void C_GiNode::DisconnectBus(const QString & orc_BusName)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Remember associated connection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remember associated connection
 
    \param[in,out]   opc_Connection   New connection
-
-   \created     13.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::AddConnection(C_GiLiBusConnector * const opc_Connection)
 {
    this->mc_Connections.push_back(opc_Connection);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new connection with data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new connection with data
 
    \param[in,out] opc_Connection     New connection
    \param[in,out] orc_NodeConnection New data
    \param[in]     oru8_NodeId        New node id
    \param[in,out] oru32_BusIndex     New bus index to connect to
-
-   \created     18.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::AddConnectionAndData(C_GiLiBusConnector * const opc_Connection,
                                     const C_PuiSdNodeConnectionId & orc_NodeConnection, const uint8 & oru8_NodeId,
                                     const uint32 & oru32_BusIndex)
@@ -1321,18 +1254,15 @@ void C_GiNode::AddConnectionAndData(C_GiLiBusConnector * const opc_Connection,
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update internal connection data identified by specified C_GiLiBusConnector instance
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update internal connection data identified by specified C_GiLiBusConnector instance
 
    \param[in] opc_Connection     Old connection for reference only
    \param[in] orc_NodeConnection New connection data
    \param[in] oru8_NodeId        New node id
    \param[in] oru32_BusIndex     Bus index to use instead of last used one
-
-   \created     17.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::UpdateConnection(const C_GiLiBusConnector * const opc_Connection,
                                 const C_PuiSdNodeConnectionId & orc_NodeConnection, const uint8 & oru8_NodeId,
                                 const uint32 & oru32_BusIndex) const
@@ -1346,16 +1276,14 @@ void C_GiNode::UpdateConnection(const C_GiLiBusConnector * const opc_Connection,
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reconnect bus connection to new interface
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reconnect bus connection to new interface
 
    \param[in] ou8_Interface  New interface number
    \param[in] opc_Connection Associated connection
-
-   \created     12.01.2017  STW/M.Echtler
+   \param[in] oru8_NodeId    Node id
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::ChangeInterface(const uint8 ou8_Interface, const C_GiLiBusConnector * const opc_Connection,
                                const uint8 & oru8_NodeId) const
 {
@@ -1375,19 +1303,16 @@ void C_GiNode::ChangeInterface(const uint8 ou8_Interface, const C_GiLiBusConnect
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Search for id of connection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Search for id of connection
 
    \param[in,out] opc_Connection Connection to search for
 
    \return
    NULL Error
    else Pointer to associated node connection id
-
-   \created     12.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_PuiSdNodeConnectionId * C_GiNode::GetNodeConnectionId(const C_GiLiBusConnector * const opc_Connection) const
 {
    const C_PuiSdNodeConnectionId * pc_Retval = NULL;
@@ -1409,32 +1334,4 @@ const C_PuiSdNodeConnectionId * C_GiNode::GetNodeConnectionId(const C_GiLiBusCon
       }
    }
    return pc_Retval;
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Search for id of connection
-
-   \param[in,out] opc_Connection Connection to search for
-
-   \return
-   NULL Error
-   else Pointer to associated node connection id
-
-   \created     12.01.2017  STW/M.Echtler
-*/
-//-----------------------------------------------------------------------------
-void C_GiNode::SetNodeConnectionId(const C_GiLiBusConnector * const opc_Connection,
-                                   const C_PuiSdNodeConnectionId & orc_ConnId) const
-{
-   if (opc_Connection != NULL)
-   {
-      sint32 s32_Index = GetIndexOfConnector(opc_Connection);
-      if (s32_Index >= 0)
-      {
-         uint32 u32_Index = static_cast<uint32>(s32_Index);
-         C_PuiSdHandler::h_GetInstance()->SetUINodeConnectionId(static_cast<uint32>(this->ms32_Index), u32_Index,
-                                                                orc_ConnId);
-      }
-   }
 }

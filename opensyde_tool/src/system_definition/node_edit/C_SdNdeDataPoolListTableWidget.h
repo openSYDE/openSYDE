@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget to display one data pool list content (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.01.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SDNDEDATAPOOLLISTTABLEWIDGET_H
 #define C_SDNDEDATAPOOLLISTTABLEWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <QWidget>
 #include <QTreeWidgetItem>
@@ -28,7 +22,7 @@
 #include "C_SdNdeUnoDataPoolManager.h"
 #include "C_SdNdeDataPoolListModelViewManager.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace Ui
 {
@@ -37,9 +31,9 @@ class C_SdNdeDataPoolListTableWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_SdNdeDataPoolListTableWidget :
    public QWidget
 {
@@ -47,7 +41,8 @@ class C_SdNdeDataPoolListTableWidget :
 
 public:
    explicit C_SdNdeDataPoolListTableWidget(QWidget * const opc_Parent = NULL, QTreeWidget * const opc_TreeWidget = NULL, stw_opensyde_gui_logic::C_SdNdeUnoDataPoolManager * const opc_UndoStack =
-                                              NULL, const bool oq_PopUp=true);
+                                              NULL,
+                                           const bool oq_PopUp = true);
    ~C_SdNdeDataPoolListTableWidget(void);
    void InitStaticNames(void) const;
    void SetTreeWidgetAndUndoManager(QTreeWidget * const opc_TreeWidget,
@@ -107,7 +102,7 @@ private:
    C_SdNdeDataPoolListTableWidget & operator =(const C_SdNdeDataPoolListTableWidget &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

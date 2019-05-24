@@ -1,28 +1,22 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for showing use case specific widgets based on class C_NagUseCaseWidget
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     11.07.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 #ifndef C_NAGUSECASEVIEWWIDGET_H
 #define C_NAGUSECASEVIEWWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 #include "stwtypes.h"
 
 #include "C_NagUseCaseWidget.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace Ui
 {
@@ -31,9 +25,9 @@ class C_NagUseCaseViewWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_NagUseCaseViewWidget :
    public QWidget
 {
@@ -55,17 +49,9 @@ public:
    void InitText(void) const;
    void InitBackground(void);
 
-   void SetPushButtonIcon(const QString & orc_IconPath) const;
-
-   //The signals keyword is necessary for Qt signal slot functionality
-   //lint -save -e1736
-
-Q_SIGNALS:
-   //lint -restore
-   void SigPushButtonIconPressed(void);
+   void SetInteractionWidget(QWidget * const opc_Widget);
 
 private:
-   void m_OnPushButtonIconPress(void);
    void m_HandleSubSections(void) const;
 
    //Avoid call
@@ -81,7 +67,7 @@ private:
    static const QString mhc_SVGIconPath;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

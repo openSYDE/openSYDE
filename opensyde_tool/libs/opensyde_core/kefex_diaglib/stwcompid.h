@@ -1,6 +1,6 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \file        stwcompid.h
+   \file
    \brief       Utility functions concerning the STW company-ID
 
    This module provides functionality to convert the STW company-ID
@@ -8,26 +8,13 @@
    It is written in plain ANSI-C and can thus be used in most C / C++
     projects.
 
-   \implementation
-   project
-   copyright   STW (c) 1999-200x
-   license     use only under terms of contract / confidential
-
-   created     03.11.2008  STW/A.Stangl
-   \endimplementation
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   12.11.2008        STW/A.Stangl  added conditional package definitions for Borland C++ Builder
-   03.11.2008        STW/A.Stangl  file created
-   \endhistory
+   \copyright   Copyright 2008 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef STWCOMPIDH
 #define STWCOMPIDH
 
-/* -- Includes ------------------------------------------------------------ */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 
 #ifdef __cplusplus
@@ -35,7 +22,7 @@
 namespace stw_company_id
 {
 
-/* -- Defines ------------------------------------------------------------- */
+/* -- Defines ------------------------------------------------------------------------------------------------------- */
 //maybe this will be a part of a Borland library:
 #ifndef STWCOMPID_PACKAGE
 #ifdef __BORLANDC__
@@ -45,11 +32,11 @@ namespace stw_company_id
 #endif
 #endif
 
-/* -- Types --------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ---------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Function Prototypes ------------------------------------------------- */
+/* -- Function Prototypes ------------------------------------------------------------------------------------------- */
 extern "C"
 {
 
@@ -71,6 +58,6 @@ extern sintn CID_bytes_to_string(const uint8 * const opu8_Bytes, const uint8 ou8
                                  charn * const opcn_String);
 #endif
 
-/* -- Implementation ------------------------------------------------------ */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 #endif

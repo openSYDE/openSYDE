@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for complete lists handling (implementation)
 
    Widget for complete lists handling
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     23.02.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_SdNdeDataPoolListsWidget.h"
@@ -24,35 +17,32 @@
 #include "C_GtGetText.h"
 #include "C_PuiSdHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     23.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListsWidget::C_SdNdeDataPoolListsWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDataPoolListsWidget),
@@ -98,27 +88,21 @@ C_SdNdeDataPoolListsWidget::C_SdNdeDataPoolListsWidget(QWidget * const opc_Paren
    this->m_InitButtonIcons();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     23.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListsWidget::~C_SdNdeDataPoolListsWidget(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initializes all visible strings on the widget
-
-   \created     22.05.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initializes all visible strings on the widget
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsWidget::InitText(void) const
 {
    this->mpc_Ui->pc_PushButtonAdd->SetToolTipInformation(C_GtGetText::h_GetText("Add"), "");
@@ -130,13 +114,10 @@ void C_SdNdeDataPoolListsWidget::InitText(void) const
    this->mpc_Ui->pc_PushButtonMoveUp->SetToolTipInformation(C_GtGetText::h_GetText("Move up"), "");
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clear list widget
-
-   \created     18.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clear list widget
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsWidget::Clear(void) const
 {
    //Initially deactivate all buttons
@@ -162,16 +143,13 @@ void C_SdNdeDataPoolListsWidget::Clear(void) const
    this->mpc_Ui->pc_SelectionLabel->setVisible(false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set new data pool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new data pool
 
    \param[in] oru32_NodeIndex     Node index
    \param[in] oru32_DataPoolIndex Data pool index
-
-   \created     27.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsWidget::SetDataPool(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex)
 {
    //Reactivate all buttons
@@ -193,28 +171,22 @@ void C_SdNdeDataPoolListsWidget::SetDataPool(const uint32 & oru32_NodeIndex, con
    this->mpc_Ui->pc_TreeWidget->SetDataPool(oru32_NodeIndex, oru32_DataPoolIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function to open a concrete datapool list or dataelement
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function to open a concrete datapool list or dataelement
 
    \param[in] os32_ListIndex          Optional list index (if not used set to -1)
    \param[in] os32_DataElementIndex   Optional data element index (if not used set to -1)
-
-   \created     16.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsWidget::OpenDetail(const sint32 os32_ListIndex, const sint32 os32_DataElementIndex) const
 {
    this->mpc_Ui->pc_TreeWidget->OpenDetail(os32_ListIndex, os32_DataElementIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize icons of buttons for all states.
-
-   \created     10.08.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize icons of buttons for all states.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsWidget::m_InitButtonIcons() const
 {
    this->mpc_Ui->pc_PushButtonAdd->SetCustomIcons("://images/IconAddEnabled.svg", "://images/IconAddHovered.svg",
@@ -245,42 +217,33 @@ void C_SdNdeDataPoolListsWidget::m_InitButtonIcons() const
                                                     "://images/system_definition/NodeEdit/lists/PasteDisabled.svg");
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle error change for complete data pool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle error change for complete data pool
 
    \param[in] orq_Error Error status
-
-   \created     27.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsWidget::m_HandleErrorChange(const bool & orq_Error)
 {
    Q_EMIT this->SigErrorChange(orq_Error);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle size change for complete data pool
-
-   \created     27.02.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle size change for complete data pool
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsWidget::m_HandleSizeChange(void)
 {
    Q_EMIT this->SigSizeChange();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle table selection change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle table selection change
 
    \param[in] oru32_Count Number of selected items
    \param[in] orq_List    Flag if items belong to list
-
-   \created     27.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsWidget::m_HandleSelection(const uint32 & oru32_Count, const bool & orq_List)
 {
    QString c_Text;
@@ -355,9 +318,8 @@ void C_SdNdeDataPoolListsWidget::m_HandleSelection(const uint32 & oru32_Count, c
    this->mpc_Ui->pc_SelectionLabel->setVisible(true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set buttons status
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set buttons status
 
    \param[in] orq_AddActive      Push button add active
    \param[in] orq_CutActive      Push button cut active
@@ -366,10 +328,8 @@ void C_SdNdeDataPoolListsWidget::m_HandleSelection(const uint32 & oru32_Count, c
    \param[in] orq_DeleteActive   Push button delete active
    \param[in] orq_MoveDownActive Push button move down active
    \param[in] orq_MoveUpActive   Push button move up active
-
-   \created     27.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsWidget::m_HandleButtonChange(const bool & orq_AddActive, const bool & orq_CutActive,
                                                       const bool & orq_CopyActive, const bool & orq_PasteActive,
                                                       const bool & orq_DeleteActive, const bool & orq_MoveDownActive,
@@ -384,13 +344,10 @@ void C_SdNdeDataPoolListsWidget::m_HandleButtonChange(const bool & orq_AddActive
    this->mpc_Ui->pc_PushButtonMoveUp->setEnabled(orq_MoveUpActive);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle change detected
-
-   \created     14.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle change detected
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsWidget::m_HandleChanged(void)
 {
    Q_EMIT this->SigChanged();

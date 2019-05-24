@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data class for a list in a data pool (implementation)
 
    Data class for a list in a data pool
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.12.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -42,10 +35,7 @@ using namespace stw_errors;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     09.01.2017  STW/M.Echtler
+/*! \brief   Default constructor
 */
 //-----------------------------------------------------------------------------
 C_OSCNodeDataPoolList::C_OSCNodeDataPoolList(void) :
@@ -62,15 +52,12 @@ C_OSCNodeDataPoolList::C_OSCNodeDataPoolList(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
    It is not endian-safe, so it should only be used on the same system it is created on.
 
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
-
-   \created     21.03.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCNodeDataPoolList::CalcHash(uint32 & oru32_HashValue) const
@@ -95,10 +82,7 @@ void C_OSCNodeDataPoolList::CalcHash(uint32 & oru32_HashValue) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Recalculate data pool list element addresses
-
-   \created     26.01.2017  STW/M.Echtler
+/*! \brief   Recalculate data pool list element addresses
 */
 //-----------------------------------------------------------------------------
 void C_OSCNodeDataPoolList::RecalculateAddress(void)
@@ -119,13 +103,10 @@ void C_OSCNodeDataPoolList::RecalculateAddress(void)
    }
 }
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Move list in data pool
+/*! \brief   Move list in data pool
 
    \param[in] oru32_Start  Start index
    \param[in] oru32_Target Target index
-
-   \created     06.02.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCNodeDataPoolList::MoveElement(const stw_types::uint32 & oru32_Start, const stw_types::uint32 & oru32_Target)
@@ -143,13 +124,10 @@ void C_OSCNodeDataPoolList::MoveElement(const stw_types::uint32 & oru32_Start, c
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get number of bytes occupied by variables (including CRC space)
+/*! \brief   Get number of bytes occupied by variables (including CRC space)
 
    \return
    Number of bytes occupied by variables (including CRC space)
-
-   \created     22.02.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 uint32 C_OSCNodeDataPoolList::GetNumBytesUsed(void) const
@@ -169,13 +147,10 @@ uint32 C_OSCNodeDataPoolList::GetNumBytesUsed(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get number of bytes not occupied by variables
+/*! \brief   Get number of bytes not occupied by variables
 
    \return
    Number of bytes not occupied by variables
-
-   \created     22.02.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolList::GetFreeBytes(void) const
@@ -184,14 +159,11 @@ sint32 C_OSCNodeDataPoolList::GetFreeBytes(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check error for specified data set
+/*! \brief   Check error for specified data set
 
    \param[in]  oru32_DataSetIndex  Node data pool list data set index
    \param[out] opq_NameConflict    Name conflict
    \param[out] opq_NameInvalid     Name not usable as variable
-
-   \created     16.03.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCNodeDataPoolList::CheckErrorDataSet(const uint32 & oru32_DataSetIndex, bool * const opq_NameConflict,
@@ -245,8 +217,7 @@ void C_OSCNodeDataPoolList::CheckErrorDataSet(const uint32 & oru32_DataSetIndex,
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check error for specified element
+/*! \brief   Check error for specified element
 
    \param[in]  oru32_ElementIndex         Node data pool list element index
    \param[out] opq_NameConflict           Name conflict
@@ -254,8 +225,6 @@ void C_OSCNodeDataPoolList::CheckErrorDataSet(const uint32 & oru32_DataSetIndex,
    \param[out] opq_MinOverMax             Minimum value over maximum value
    \param[out] opq_DataSetValueInvalid    Data set value out of range
    \param[out] opc_InvalidDataSetIndices  List of indexes of troublesome data sets
-
-   \created     23.02.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCNodeDataPoolList::CheckErrorElement(const uint32 & oru32_ElementIndex, bool * const opq_NameConflict,
@@ -346,16 +315,13 @@ void C_OSCNodeDataPoolList::CheckErrorElement(const uint32 & oru32_ElementIndex,
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check error for specified data set value
+/*! \brief   Check error for specified data set value
 
    \param[in]  oru32_ElementIndex Node data pool list element index
    \param[in]  oru32_DataSetIndex Node data pool list data set index
    \param[out] opq_ValueBelowMin  Data set value below minimum
    \param[out] opq_ValueOverMax   Data set value over maximum
    \param[in] opu32_ArrayIndex   Optional parameter to check only a single data set array index
-
-   \created     23.02.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCNodeDataPoolList::CheckErrorDataSetValue(const uint32 & oru32_ElementIndex, const uint32 & oru32_DataSetIndex,
@@ -417,8 +383,7 @@ void C_OSCNodeDataPoolList::CheckErrorDataSetValue(const uint32 & oru32_ElementI
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Set CRC from big endian BLOB
+/*! \brief   Set CRC from big endian BLOB
 
    Convert BLOB to CRC.
    Warning: 2 Byte CRC expected
@@ -428,8 +393,6 @@ void C_OSCNodeDataPoolList::CheckErrorDataSetValue(const uint32 & oru32_ElementI
    \return
    C_NO_ERR   value set
    C_RANGE    size of orc_Data does not match our size
-
-   \created     17.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolList::SetCRCFromBigEndianBlob(const std::vector<uint8> & orc_Data)
@@ -448,8 +411,7 @@ sint32 C_OSCNodeDataPoolList::SetCRCFromBigEndianBlob(const std::vector<uint8> &
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Set CRC from little endian BLOB
+/*! \brief   Set CRC from little endian BLOB
 
    Convert BLOB to CRC.
    Warning: 2 Byte CRC expected
@@ -459,8 +421,6 @@ sint32 C_OSCNodeDataPoolList::SetCRCFromBigEndianBlob(const std::vector<uint8> &
    \return
    C_NO_ERR   value set
    C_RANGE    size of orc_Data does not match our size
-
-   \created     17.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolList::SetCRCFromLittleEndianBlob(const std::vector<uint8> & orc_Data)
@@ -479,15 +439,12 @@ sint32 C_OSCNodeDataPoolList::SetCRCFromLittleEndianBlob(const std::vector<uint8
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get CRC as big endian BLOB
+/*! \brief   Get CRC as big endian BLOB
 
    Convert content CRC to BLOB.
    Warning: 2 Byte CRC expected
 
    \param[out]     orc_Data    data to set
-
-   \created     17.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCNodeDataPoolList::GetCRCAsBigEndianBlob(std::vector<uint8> & orc_Data) const
@@ -500,15 +457,12 @@ void C_OSCNodeDataPoolList::GetCRCAsBigEndianBlob(std::vector<uint8> & orc_Data)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get CRC as little endian BLOB
+/*! \brief   Get CRC as little endian BLOB
 
    Convert content CRC to BLOB.
    Warning: 2 Byte CRC expected
 
    \param[out]     orc_Data    data to set
-
-   \created     17.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCNodeDataPoolList::GetCRCAsLittleEndianBlob(std::vector<uint8> & orc_Data) const

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Spin box which should avoid a zero value (implementation)
 
    Spin box which should avoid a zero value
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     07.03.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <cmath>
@@ -25,36 +18,33 @@
 #include "C_OSCUtils.h"
 #include "C_OgeSpxFactor.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const stw_types::float64 C_OgeSpxFactor::mhf64_FACTOR_MIN = std::pow(10, -msn_DOUBLE_SPIN_BOX_DECIMAL_COUNT);
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     07.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeSpxFactor::C_OgeSpxFactor(QWidget * const opc_Parent) :
    C_OgeSpxDoubleToolTipBase(opc_Parent)
 {
@@ -64,17 +54,14 @@ C_OgeSpxFactor::C_OgeSpxFactor(QWidget * const opc_Parent) :
    this->setValue(1.0); // default value
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten step by event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten step by event slot
 
    Here: Skip 0
 
    \param[in] osn_Steps Steps
-
-   \created     07.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxFactor::stepBy(const sintn osn_Steps)
 {
    //Only allow step if resulting value is ABOVE zero
@@ -105,18 +92,15 @@ void C_OgeSpxFactor::stepBy(const sintn osn_Steps)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten validate event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten validate event slot
 
    Here: Skip 0
 
    \param[in] orc_Text Text
    \param[in] orsn_Pos Pos
-
-   \created     07.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QValidator::State C_OgeSpxFactor::validate(QString & orc_Text, sintn & orsn_Pos) const
 {
    QValidator::State e_Retval = C_OgeSpxDoubleToolTipBase::validate(orc_Text, orsn_Pos);
@@ -129,18 +113,15 @@ QValidator::State C_OgeSpxFactor::validate(QString & orc_Text, sintn & orsn_Pos)
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Return allowed step actions
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Return allowed step actions
 
    \return
    StepDownEnabled                 Down action allowed
    StepUpEnabled                   Up action allowed
    StepUpEnabled | StepDownEnabled Up and down actions allowed
-
-   \created     30.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QAbstractSpinBox::StepEnabled C_OgeSpxFactor::stepEnabled(void) const
 {
    QAbstractSpinBox::StepEnabled c_Retval;

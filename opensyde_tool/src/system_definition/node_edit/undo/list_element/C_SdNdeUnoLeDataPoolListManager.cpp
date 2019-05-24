@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data pool list command stack (implementation)
 
    Data pool list command stack
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.01.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -30,39 +23,35 @@
 #include "C_SdNdeDataPoolListTableView.h"
 #include "C_SdNdeDataPoolListTableModel.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     25.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoLeDataPoolListManager::C_SdNdeUnoLeDataPoolListManager(void) :
    mpc_UndoStack(NULL)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register move command
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register move command
 
    \param[in]     oru32_NodeIndex                  Node index
    \param[in]     oru32_DataPoolIndex              Node data pool index
@@ -71,11 +60,8 @@ C_SdNdeUnoLeDataPoolListManager::C_SdNdeUnoLeDataPoolListManager(void) :
    \param[in]     orc_StartIndex                   Source row index
    \param[in]     orc_TargetIndex                  Target row index
    \param[in]     orq_AdaptIndices                 Flag, if target rows should be adapted to source row deletion
-
-   \created     26.01.2017  STW/M.Echtler
-
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListManager::DoMoveElements(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
                                                      const uint32 & oru32_DataPoolListIndex,
                                                      C_SdNdeDataPoolListModelViewManager * const opc_DataPoolListModelViewManager, const std::vector<uint32> & orc_StartIndex, const std::vector<uint32> & orc_TargetIndex,
@@ -96,19 +82,16 @@ void C_SdNdeUnoLeDataPoolListManager::DoMoveElements(const uint32 & oru32_NodeIn
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do delete
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do delete
 
    \param[in]     oru32_NodeIndex                  Node index
    \param[in]     oru32_DataPoolIndex              Node data pool index
    \param[in]     oru32_DataPoolListIndex          Node data pool list index
    \param[in,out] opc_DataPoolListModelViewManager Data pool lists model view manager to get objects to perform actions on
    \param[in]     orc_Indices                      Node data pool list indices
-
-   \created     26.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListManager::DoDeleteElements(const uint32 & oru32_NodeIndex,
                                                        const uint32 & oru32_DataPoolIndex,
                                                        const uint32 & oru32_DataPoolListIndex,
@@ -148,19 +131,16 @@ void C_SdNdeUnoLeDataPoolListManager::DoDeleteElements(const uint32 & oru32_Node
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do paste
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do paste
 
    \param[in]     oru32_NodeIndex                  Node index
    \param[in]     oru32_DataPoolIndex              Node data pool index
    \param[in]     oru32_DataPoolListIndex          Node data pool list index
    \param[in,out] opc_DataPoolListModelViewManager Data pool lists model view manager to get objects to perform actions on
    \param[in]     oru32_InsertListIndex            Node data pool list index to insert new elements at
-
-   \created     27.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListManager::DoPaste(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
                                               const uint32 & oru32_DataPoolListIndex,
                                               C_SdNdeDataPoolListModelViewManager * const opc_DataPoolListModelViewManager,
@@ -183,19 +163,16 @@ void C_SdNdeUnoLeDataPoolListManager::DoPaste(const uint32 & oru32_NodeIndex, co
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do add
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do add
 
    \param[in]     oru32_NodeIndex                  Node index
    \param[in]     oru32_DataPoolIndex              Node data pool index
    \param[in]     oru32_DataPoolListIndex          Node data pool list index
    \param[in,out] opc_DataPoolListModelViewManager Data pool lists model view manager to get objects to perform actions on
    \param[in]     orc_Indices                      Node data pool list indices
-
-   \created     27.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListManager::DoAddElements(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
                                                     const uint32 & oru32_DataPoolListIndex,
                                                     C_SdNdeDataPoolListModelViewManager * const opc_DataPoolListModelViewManager,
@@ -213,9 +190,8 @@ void C_SdNdeUnoLeDataPoolListManager::DoAddElements(const uint32 & oru32_NodeInd
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do add specific
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do add specific
 
    \param[in]     oru32_NodeIndex                  Node index
    \param[in]     oru32_DataPoolIndex              Node data pool index
@@ -224,10 +200,8 @@ void C_SdNdeUnoLeDataPoolListManager::DoAddElements(const uint32 & oru32_NodeInd
    \param[in]     orc_Indices                      Node data pool list indices
    \param[in]     orc_OSCData                      OSC node data pool list data
    \param[in]     orc_UIData                       UI node data pool list data
-
-   \created     20.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListManager::DoAddSpecificElements(const uint32 & oru32_NodeIndex,
                                                             const uint32 & oru32_DataPoolIndex,
                                                             const uint32 & oru32_DataPoolListIndex,
@@ -247,9 +221,8 @@ void C_SdNdeUnoLeDataPoolListManager::DoAddSpecificElements(const uint32 & oru32
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do data change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do data change
 
    \param[in]     oru32_NodeIndex                  Node index
    \param[in]     oru32_DataPoolIndex              Node data pool index
@@ -260,10 +233,8 @@ void C_SdNdeUnoLeDataPoolListManager::DoAddSpecificElements(const uint32 & oru32
    \param[in]     ore_DataChangeType               Data change type
    \param[in]     oru32_ArrayIndex                 Optional array index
    \param[in]     ors32_DataSetIndex               Optional data set index
-
-   \created     09.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListManager::DoDataChangeElements(const uint32 & oru32_NodeIndex,
                                                            const uint32 & oru32_DataPoolIndex,
                                                            const uint32 & oru32_DataPoolListIndex,
@@ -280,31 +251,25 @@ void C_SdNdeUnoLeDataPoolListManager::DoDataChangeElements(const uint32 & oru32_
    DoPush(pc_ChangeCommand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set undo stack
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set undo stack
 
    \param[in,out] opc_Value Undo stack
-
-   \created     09.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListManager::SetUndoStack(C_UtiUndoStack * const opc_Value)
 {
    this->mpc_UndoStack = opc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Push command on stack
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Push command on stack
 
    Object is handled by stack or deleted
 
    \param[in,out] opc_Command Command to push onto undo stack
-
-   \created     09.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListManager::DoPush(QUndoCommand * const opc_Command)
 {
    if (opc_Command != NULL)

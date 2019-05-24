@@ -1,50 +1,40 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Proxy widget with cumstom functions for graphics scenes to use widgets (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     03.05.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QGraphicsSceneMouseEvent>
 
 #include "C_GiWiProxyBase.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     03.05.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiWiProxyBase::C_GiWiProxyBase(const stw_types::float64 of64_InitWidth, const stw_types::float64 of64_InitHeight,
                                  QGraphicsItem * const opc_Parent) :
    QGraphicsProxyWidget(opc_Parent),
@@ -57,153 +47,120 @@ C_GiWiProxyBase::C_GiWiProxyBase(const stw_types::float64 of64_InitWidth, const 
    this->resize(of64_InitWidth, of64_InitHeight);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Redraw item
-
-   \created     24.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Redraw item
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiWiProxyBase::Redraw(void)
 {
    this->setGeometry(this->GetSizeRect());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger mouse press event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger mouse press event
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     31.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiWiProxyBase::TriggerMousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    QGraphicsProxyWidget::mousePressEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger mouse move event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger mouse move event
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     31.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiWiProxyBase::TriggerMouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    QGraphicsProxyWidget::mouseMoveEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger mouse release event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger mouse release event
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     31.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiWiProxyBase::TriggerMouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    QGraphicsProxyWidget::mouseReleaseEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger key press event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger key press event
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     31.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiWiProxyBase::TriggerKeyPressEvent(QKeyEvent * const opc_Event)
 {
    QGraphicsProxyWidget::keyPressEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger key release event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger key release event
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     31.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiWiProxyBase::TriggerKeyReleaseEvent(QKeyEvent * const opc_Event)
 {
    QGraphicsProxyWidget::keyReleaseEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger focus out event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger focus out event
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     31.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiWiProxyBase::TriggerFocusOutEvent(QFocusEvent * const opc_Event)
 {
    QGraphicsProxyWidget::focusOutEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger wheel event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger wheel event
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     31.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiWiProxyBase::TriggerWheelEvent(QGraphicsSceneWheelEvent * const opc_Event)
 {
    QGraphicsProxyWidget::wheelEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger hover enter event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger hover enter event
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     11.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiWiProxyBase::TriggerHoverEnterEvent(QGraphicsSceneHoverEvent * const opc_Event)
 {
    QGraphicsProxyWidget::hoverEnterEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger hover move event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger hover move event
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     11.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiWiProxyBase::TriggerHoverMoveEvent(QGraphicsSceneHoverEvent * const opc_Event)
 {
    QGraphicsProxyWidget::hoverMoveEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger hover leave event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger hover leave event
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     11.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiWiProxyBase::TriggerHoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event)
 {
    QGraphicsProxyWidget::hoverLeaveEvent(opc_Event);

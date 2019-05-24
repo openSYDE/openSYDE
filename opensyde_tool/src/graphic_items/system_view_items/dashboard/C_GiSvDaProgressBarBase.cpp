@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Class for system view dashboard progress bar item (implementation)
 
    Class for system view dashboard progress bar item
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.08.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QGraphicsView>
@@ -34,7 +27,7 @@
 #include "C_SdNdeDataPoolContentUtil.h"
 #include "C_SyvDaPeProgressBar.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -43,21 +36,20 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -66,11 +58,8 @@ using namespace stw_opensyde_gui_elements;
    \param[in]     ors32_DataIndex      Index of data element in dashboard in system view
    \param[in]     oru64_ID             Unique ID
    \param[in,out] opc_Parent           Optional pointer to parent
-
-
-   \created     21.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvDaProgressBarBase::C_GiSvDaProgressBarBase(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
                                                  const sint32 & ors32_DataIndex, const uint64 & oru64_ID,
                                                  QGraphicsItem * const opc_Parent) :
@@ -83,44 +72,35 @@ C_GiSvDaProgressBarBase::C_GiSvDaProgressBarBase(const uint32 & oru32_ViewIndex,
    this->mpc_Widget->SetWidget(this->mpc_ProgressBarWidget);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     21.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvDaProgressBarBase::~C_GiSvDaProgressBarBase(void)
 {
    //lint -e{1540}  no memory leak because of the parent of mpc_ProgressBarWidget and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the type of this item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the type of this item
 
    \return  ID
-
-   \created     25.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_GiSvDaProgressBarBase::type(void) const
 {
    return msn_GRAPHICS_ITEM_DB_PROGRESS_BAR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply style
 
    \param[in] oe_Style    New style type
    \param[in] oq_DarkMode Flag if dark mode is active
-
-   \created     21.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaProgressBarBase::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode)
 {
    C_GiSvDaRectBaseGroup::SetDisplayStyle(oe_Style, oq_DarkMode);
@@ -142,13 +122,10 @@ void C_GiSvDaProgressBarBase::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adjust font to current size
-
-   \created     21.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adjust font to current size
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaProgressBarBase::ReInitializeSize(void)
 {
    if (this->mpc_ProgressBarWidget != NULL)
@@ -157,13 +134,10 @@ void C_GiSvDaProgressBarBase::ReInitializeSize(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load data from system view dashboard
-
-   \created     21.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load data from system view dashboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaProgressBarBase::LoadData(void)
 {
    const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
@@ -186,13 +160,10 @@ void C_GiSvDaProgressBarBase::LoadData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update data in system view dashboard
-
-   \created     21.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update data in system view dashboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaProgressBarBase::UpdateData(void)
 {
    const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
@@ -213,13 +184,10 @@ void C_GiSvDaProgressBarBase::UpdateData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete data in system view dashboard
-
-   \created     21.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete data in system view dashboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaProgressBarBase::DeleteData(void)
 {
    if (this->ms32_Index >= 0)
@@ -231,13 +199,10 @@ void C_GiSvDaProgressBarBase::DeleteData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the shown value of the element
-
-   \created     04.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the shown value of the element
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaProgressBarBase::UpdateShowValue(void)
 {
    float64 f64_Value;
@@ -254,15 +219,12 @@ void C_GiSvDaProgressBarBase::UpdateShowValue(void)
    C_GiSvDaRectBaseGroup::UpdateShowValue();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Information about the start or stop of a connection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the start or stop of a connection
 
    \param[in]  oq_Active Flag if connection is active or not active now
-
-   \created     04.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaProgressBarBase::ConnectionActiveChanged(const bool oq_Active)
 {
    if (oq_Active == true)
@@ -273,13 +235,10 @@ void C_GiSvDaProgressBarBase::ConnectionActiveChanged(const bool oq_Active)
    C_GiSvDaRectBaseGroup::ConnectionActiveChanged(oq_Active);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Call properties for widgets
-
-   \created     13.09.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Call properties for widgets
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaProgressBarBase::CallProperties(void)
 {
    const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
@@ -339,7 +298,10 @@ bool C_GiSvDaProgressBarBase::CallProperties(void)
             c_Tmp.c_ElementId = pc_Dialog->GetDataElementId();
             c_Tmp.c_ElementScaling = pc_Dialog->GetScalingInformation();
             c_Box.c_DataPoolElementsConfig.clear();
-            c_Box.c_DataPoolElementsConfig.push_back(c_Tmp);
+            if (c_Tmp.c_ElementId.GetIsValid())
+            {
+               c_Box.c_DataPoolElementsConfig.push_back(c_Tmp);
+            }
             c_Box.e_ElementWriteMode = pc_Dialog->GetWriteMode();
 
             //Force update
@@ -348,7 +310,10 @@ bool C_GiSvDaProgressBarBase::CallProperties(void)
             this->SetDisplayStyle(this->me_Style, this->mq_DarkMode);
             this->UpdateTypePe(c_Box.e_Type, c_Box.e_Alignment, c_Box.q_ShowMinMax);
             this->ClearDataPoolElements();
-            this->RegisterDataPoolElement(pc_Dialog->GetDataElementId(), pc_Dialog->GetScalingInformation());
+            if (c_Tmp.c_ElementId.GetIsValid())
+            {
+               this->RegisterDataPoolElement(pc_Dialog->GetDataElementId(), pc_Dialog->GetScalingInformation());
+            }
 
             tgl_assert(C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex,
                                                                            this->mu32_DashboardIndex,
@@ -370,19 +335,16 @@ bool C_GiSvDaProgressBarBase::CallProperties(void)
    return true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update type
 
    Warning: Only use for preview
 
    \param[in] oe_Type        Type
    \param[in] oe_Alignment   Alignment
    \param[in] oq_ShowMinMax  Show minimum / maximum
-
-   \created     13.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaProgressBarBase::UpdateTypePe(const C_PuiSvDbProgressBar::E_Type oe_Type,
                                            const C_PuiSvDbProgressBar::E_Alignment oe_Alignment,
                                            const bool oq_ShowMinMax)
@@ -420,17 +382,14 @@ void C_GiSvDaProgressBarBase::UpdateTypePe(const C_PuiSvDbProgressBar::E_Type oe
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set value
 
    Warning: Only use for preview
 
    \param[in] osn_Value   New value
-
-   \created     13.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaProgressBarBase::SetValuePe(const sintn osn_Value)
 {
    if (this->mpc_ProgressBarWidget != NULL)
@@ -439,16 +398,13 @@ void C_GiSvDaProgressBarBase::SetValuePe(const sintn osn_Value)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update of the color transparence value configured by the actual timeout state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update of the color transparence value configured by the actual timeout state
 
    \param[in]     ou32_WidgetDataPoolElementIndex     Index of shown datapool element in widget
    \param[in]     osn_Value                           Value for transparence (0..255)
-
-   \created     18.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaProgressBarBase::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
 {
    if ((ou32_DataElementIndex == 0) &&
@@ -459,7 +415,7 @@ void C_GiSvDaProgressBarBase::UpdateTransparence(const uint32 ou32_DataElementIn
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaProgressBarBase::m_UpdateStaticValues(void)
 {
    if (this->mpc_ProgressBarWidget != NULL)

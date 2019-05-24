@@ -1,31 +1,25 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Header file with constants
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.07.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 #include <QColor>
 #include <QFont>
 #include <QSize>
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 //Timing output
 const bool mq_TIMING_OUTPUT = false;
 //Modes and Submodes
@@ -103,6 +97,7 @@ const QColor mc_STYLE_GUIDE_COLOR_40 = QColor(97, 97, 150, 255);
 const QColor mc_STYLE_GUIDE_COLOR_52 = QColor(66, 66, 66, 255);
 const QColor mc_STYLE_GUIDE_COLOR_1353 = QColor(22, 22, 44, 255);
 const QColor mc_STYLE_GUIDE_COLOR_2706 = QColor(83, 83, 117);
+const QColor mc_STYLE_GUIDE_COLOR_3001 = QColor(73, 73, 133);
 const QColor mc_STYLE_GUIDE_COLOR_5413 = QColor(126, 126, 188);
 const QColor mc_STYLE_GUIDE_COLOR_LINK = mc_STYLE_GUIDE_COLOR_4;
 
@@ -148,7 +143,7 @@ const QFont mc_STYLE_GUIDE_FONT_REGULAR_48  = QFont("Segoe UI", 48);
 const stw_types::sintn msn_DOUBLE_SPIN_BOX_DECIMAL_COUNT = 300;
 
 //Transparence configuration for timeout visualization
-const stw_types::sintn msn_TRANSPARENCY_START = 75;
+const stw_types::sintn msn_TRANSPARENCY_START = 80;
 const stw_types::sintn msn_TRANSPARENCY_END = 255;
 
 //Name restrictions
@@ -180,7 +175,7 @@ const QSize mc_ICON_SIZE_24 = QSize(24, 24);
 const QSize mc_ICON_SIZE_20 = QSize(20, 20);
 
 //User roles
-//----------
+//----------------------------------------------------------------------------------------------------------------------
 //Generic string for additional information (type: QString)
 const stw_types::sintn msn_USER_ROLE_ADDITIONAL_INFORMATION = static_cast<stw_types::sintn>(Qt::UserRole) + 10;
 //Tooltip (standard interface)
@@ -193,7 +188,13 @@ const stw_types::sintn msn_USER_ROLE_TOOL_TIP_TYPE = static_cast<stw_types::sint
 //Pixmap for dark/bright switch (type: QPixmap)
 const stw_types::sintn msn_USER_ROLE_PIXMAP_DARK_MODE = static_cast<stw_types::sintn>(Qt::UserRole) + 30;
 const stw_types::sintn msn_USER_ROLE_PIXMAP_BRIGHT_MODE = static_cast<stw_types::sintn>(Qt::UserRole) + 31;
-//Used for custom icon painting (type: QIcon)
+//Used for custom SVG icon painting (type: QStringList)
+//Current: either two entries -> one icon for all, or expecting three entries
+//0: Simple number for icon size, e.g. "16" for 16x16 or "24" for 24x24
+//1:
+//Case size two: Always use this icon path
+//Case size three: Enabled icon path
+//2 (Optional): Disabled icon path
 const stw_types::sintn msn_USER_ROLE_ICON = static_cast<stw_types::sintn>(Qt::UserRole) + 32;
 //Generic flag for a conditional value (type: bool)
 const stw_types::sintn msn_USER_ROLE_CONDITIONAL_VALUE = static_cast<stw_types::sintn>(Qt::UserRole) + 50;
@@ -236,9 +237,14 @@ const stw_types::sintn msn_USER_ROLE_INTERACTION_GENERIC_SPIN_BOX_PARAMETERS_LIS
 const QString mc_DLL_PATH_PEAK = "STW_dlls\\stwpeak2\\stwpeak2.dll";
 const QString mc_DLL_PATH_VECTOR = "STW_dlls\\stwvec32\\stwvec32.dll";
 
-/* -- Types ---------------------------------------------------------------- */
+// Identifier of update package subsections
+const stw_types::uint32 mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK = 0U;
+const stw_types::uint32 mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET = 1U;
+const stw_types::uint32 mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_FILE = 2U;
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
+
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif // CONSTANTS_H

@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget to display one data pool list entry (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     17.01.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SDNDEDATAPOOLLISTHEADERWIDGET_H
 #define C_SDNDEDATAPOOLLISTHEADERWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <QIcon>
 #include <QTimer>
@@ -27,7 +21,7 @@
 #include "C_SdNdeUnoDataPoolManager.h"
 #include "C_SdNdeDataPoolListModelViewManager.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace Ui
 {
@@ -36,9 +30,9 @@ class C_SdNdeDataPoolListHeaderWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_SdNdeDataPoolListHeaderWidget :
    public QWidget
 {
@@ -94,7 +88,6 @@ private:
    static const stw_types::uint32 mhu32_HeaderHeight;
    static const stw_types::uint32 mhu32_HeaderExpandedHeight;
    static const stw_types::sintn mhsn_GroupSize;
-   stw_types::uint32 mu32_ExpandedHeight;
    bool mq_InitActive;
    bool mq_DataSetError;
    QTimer mc_DoubleClickTimer;
@@ -118,7 +111,7 @@ private:
    C_SdNdeDataPoolListHeaderWidget & operator =(const C_SdNdeDataPoolListHeaderWidget &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

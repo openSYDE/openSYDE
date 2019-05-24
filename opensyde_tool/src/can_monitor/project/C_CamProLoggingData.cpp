@@ -1,51 +1,41 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Logging data structure (implementation)
 
    Logging data structure containing e.g. directory, file name and flags.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     16.01.2019  STW/G.Landsgesell
-   \endimplementation
+   \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_CamProLoggingData.h"
 #include "CSCLChecksums.h"
 #include "C_Uti.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor.
-
-   \created     16.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamProLoggingData::C_CamProLoggingData(void) :
    c_Directory(""),
    c_FileName(""),
@@ -56,17 +46,14 @@ C_CamProLoggingData::C_CamProLoggingData(void) :
    this->Clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
 
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value.
-
-   \created     16.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamProLoggingData::CalcHash(stw_types::uint32 & oru32_HashValue) const
 {
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_FileName.toStdString().c_str(), this->c_FileName.length(),
@@ -78,13 +65,10 @@ void C_CamProLoggingData::CalcHash(stw_types::uint32 & oru32_HashValue) const
    stw_scl::C_SCLChecksums::CalcCRC32(&this->e_FileFormat, sizeof(this->e_FileFormat), oru32_HashValue);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reset all member variables.
-
-   \created     16.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reset all member variables.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamProLoggingData::Clear(void)
 {
    c_Directory = "";
@@ -94,18 +78,15 @@ void C_CamProLoggingData::Clear(void)
    e_FileFormat = eASC;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert enum to string.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert enum to string.
 
    \param[in]     oe_Format        format type
 
    \return
    format as string
-
-   \created     16.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_CamProLoggingData::h_FormatEnumToString(const C_CamProLoggingData::E_Format oe_Format)
 {
    QString c_Return;
@@ -122,18 +103,15 @@ QString C_CamProLoggingData::h_FormatEnumToString(const C_CamProLoggingData::E_F
    return c_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert string to enum.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert string to enum.
 
    \param[in]     orc_Format        format string
 
    \return
    format as enum
-
-   \created     16.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamProLoggingData::E_Format C_CamProLoggingData::h_FormatStringToEnum(const QString & orc_Format)
 {
    E_Format e_Return;

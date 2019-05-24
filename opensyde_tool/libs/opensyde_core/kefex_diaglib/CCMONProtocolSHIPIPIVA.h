@@ -1,3 +1,13 @@
+//----------------------------------------------------------------------------------------------------------------------
+/*!
+   \file
+   \brief       Translate L2 CAN message to L7 interpretation
+
+   Translate L2 CAN message to SHIP-IP! resp. IVA protocol L7 interpretation
+
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
+*/
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CCMONProtocolSHIPIPIVAH
 #define CCMONProtocolSHIPIPIVAH
 
@@ -12,12 +22,12 @@
 #endif
 #endif
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 namespace stw_cmon_protocol
 {
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 ///class for descriptions of SHIP-IP! services, only used internally
 class C_CMONProtocolSIPPayload
@@ -34,7 +44,7 @@ public:
    stw_scl::C_SCLString Decode(const stw_types::uint8 * const opu8_Data, const bool oq_Decimal) const;
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 ///class for descriptions of SHIP-IP! services, only used internally
 class C_CMONProtocolSIPASPDescription
@@ -49,7 +59,7 @@ public:
    void Set(const stw_scl::C_SCLString & orc_ShortName, const stw_types::uint16 ou16_Length);
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 ///class for descriptions of SHIP-IP! services, only used internally
 class C_CMONProtocolSIPASNDescription
@@ -61,14 +71,13 @@ public:
    stw_types::uint16 u16_Length;       ///< if c_ASPs.GetLength() == 0: expected size of APAY
    stw_scl::SCLDynamicArray<C_CMONProtocolSIPPayload> c_Payload; //if c_ASPs.GetLength() == 0
 
-
    stw_scl::SCLDynamicArray<C_CMONProtocolSIPASPDescription> c_ASPs;
 
    void Set(const stw_scl::C_SCLString & orc_ShortName, const stw_types::uint8 ou8_NumASPs,
             const stw_scl::C_SCLString & orc_ASPPrefix = "", const stw_types::uint16 ou16_Length = 0);
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 ///class for descriptions of SHIP-IP! services, only used internally
 class C_CMONProtocolSIPASADescription
@@ -79,7 +88,7 @@ public:
    stw_scl::SCLDynamicArray<C_CMONProtocolSIPASNDescription> c_ASNs;
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 ///Interpretation of SHIP-IP!/IVA protocol:
 class CMONPROTOCOL_PACKAGE C_CMONProtocolSHIP_IP_IVA : public C_CMONProtocolKEFEX_IVA
@@ -120,7 +129,7 @@ public:
    virtual stw_scl::C_SCLString GetProtocolName(void) const;
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 }
 

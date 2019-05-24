@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for toolbox of system definition
 
    Offers devices in different lists (C_SdTopologyListWidget) as icons.
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.08.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QLabel>
@@ -34,7 +27,7 @@
 #include "stwtypes.h"
 #include "stwerrors.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
@@ -45,29 +38,26 @@ using namespace stw_tgl;
 using namespace stw_scl;
 using namespace stw_errors;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     01.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdTopologyToolbox::C_SdTopologyToolbox(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdTopologyToolbox)
@@ -97,32 +87,26 @@ C_SdTopologyToolbox::C_SdTopologyToolbox(QWidget * const opc_Parent) :
    mpc_Ui->pc_ListWidgetSearch->setDropIndicatorShown(false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     01.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdTopologyToolbox::~C_SdTopologyToolbox()
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for a search entry change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for a search entry change
 
    If the search text is empty, the search was finished.
    If the search text is not empty, the search result has to be updated.
 
    \param[in] opc_Text   Updated search text
-
-   \created     09.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyToolbox::SearchChanged(const QString & orc_Text)
 {
    this->mpc_Ui->pc_ListWidgetSearch->clear();
@@ -167,13 +151,10 @@ void C_SdTopologyToolbox::SearchChanged(const QString & orc_Text)
    this->mpc_Ui->pc_LabelSearchNotFound->setVisible(q_NoItemsFound);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     28.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyToolbox::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_TabWidget->tabBar()->setTabText(0, C_GtGetText::h_GetText("Nodes"));
@@ -182,18 +163,15 @@ void C_SdTopologyToolbox::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelFreeElements->setText(C_GtGetText::h_GetText("Meta Information Elements"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten enter event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten enter event slot
 
    To get the correct cursor back from the resizing implementation of
    C_OgeWiHover.
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     04.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyToolbox::enterEvent(QEvent * const opc_Event)
 {
    Q_UNUSED(opc_Event)
@@ -202,18 +180,15 @@ void C_SdTopologyToolbox::enterEvent(QEvent * const opc_Event)
    this->parentWidget()->setMouseTracking(false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten leave event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten leave event slot
 
    To get the correct cursor back from the resizing implementation of
    C_OgeWiHover.
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     04.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyToolbox::leaveEvent(QEvent * const opc_Event)
 {
    Q_UNUSED(opc_Event)
@@ -221,13 +196,10 @@ void C_SdTopologyToolbox::leaveEvent(QEvent * const opc_Event)
    this->parentWidget()->setMouseTracking(true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Fill toolbox with dynamic content
-
-   \created     12.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Fill toolbox with dynamic content
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyToolbox::m_FillToolboxDynamic(void)
 {
    C_SdTopologyListWidget * pc_List = NULL;
@@ -240,8 +212,7 @@ void C_SdTopologyToolbox::m_FillToolboxDynamic(void)
       c_Devices = c_DeviceGroups[u32_ItDeviceGroup].GetDevices();
       pc_List = C_SebToolboxUtil::h_AddNewList(
          c_DeviceGroups[u32_ItDeviceGroup].GetGroupName().c_str(),
-         this->mpc_Ui->pc_VerticalLayout1, this->mc_ListWidgets,
-         this);
+         this->mpc_Ui->pc_VerticalLayout1, this->mc_ListWidgets, this);
       if (pc_List != NULL)
       {
          QIcon c_Icon;
@@ -251,19 +222,21 @@ void C_SdTopologyToolbox::m_FillToolboxDynamic(void)
          {
             const C_OSCDeviceDefinition & rc_Device = c_Devices[u32_ItDevice];
             const QString c_DeviceName = rc_Device.c_DeviceName.c_str();
+            const QString c_NVM =
+               rc_Device.q_ProgrammingSupport ? QString(C_GtGetText::h_GetText("NVM-Size: %1 Bytes")).arg(
+                  rc_Device.u32_UserEepromSizeBytes) : "";
             //Tooltip
             const QString c_DeviceDescription = QString(rc_Device.c_DeviceDescription.c_str()) + "\n \n" +
                                                 QString(C_GtGetText::h_GetText("Available buses: CAN=%1, Ethernet=%2\n"))
                                                 .arg(rc_Device.u8_NumCanBusses).arg(rc_Device.u8_NumEthernetBusses) +
-                                                QString(C_GtGetText::h_GetText("NVM-Size: %1 Bytes")).arg(
-               rc_Device.u32_UserEepromSizeBytes);
+                                                c_NVM;
             pc_List->addItem(rc_Device.GetDisplayName().c_str());
             pc_Item = pc_List->item(pc_List->count() - 1);
             pc_Item->setData(msn_USER_ROLE_ADDITIONAL_INFORMATION, c_DeviceName);
             //Toolbox icon
             pc_Item->setIcon(c_Icon);
             //Tooltip
-            pc_Item->setData(msn_USER_ROLE_TOOL_TIP_HEADING, c_DeviceName);
+            pc_Item->setData(msn_USER_ROLE_TOOL_TIP_HEADING, rc_Device.GetDisplayName().c_str());
             pc_Item->setData(msn_USER_ROLE_TOOL_TIP_CONTENT, c_DeviceDescription);
          }
       }
@@ -273,13 +246,10 @@ void C_SdTopologyToolbox::m_FillToolboxDynamic(void)
    C_SebToolboxUtil::h_AddFinalSpacer(this->mpc_Ui->pc_VerticalLayout1, pc_List);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Fill toolbox with static content
-
-   \created     12.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Fill toolbox with static content
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyToolbox::m_FillToolboxStatic(void)
 {
    QListWidget * pc_List;

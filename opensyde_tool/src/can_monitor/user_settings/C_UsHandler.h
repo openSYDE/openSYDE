@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Handle user settings data (header)
@@ -6,20 +6,14 @@
    This class handles all actions concerning user settings.
    (note: main module description should be in .cpp file)
 
-   \implementation
-   project     STW Qt user settings
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     30.06.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 #ifndef C_USHANDLER_H
 #define C_USHANDLER_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>
 #include <QStringList>
 #include <QFile>
@@ -28,13 +22,13 @@
 #include <QMap>
 #include "stwtypes.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_UsHandler
 {
@@ -97,11 +91,11 @@ public:
    void SetSelectedProtocolIndex(const stw_types::sint32 os32_New);
    void SetCurrentSaveAsPath(const QString & orc_Value);
    void SetLastKnownDatabasePath(const QString & orc_Value);
-   void SetSplitterSettingsX(const stw_types::sint32 & ors32_New);
+   void SetSplitterSettingsX(const stw_types::sint32 os32_New);
    void SetSettingsAreExpanded(const bool oq_New);
-   void SetSplitterMessageGenY(const stw_types::sint32 & ors32_New);
+   void SetSplitterMessageGenY(const stw_types::sint32 os32_New);
    void SetMessageGenIsExpanded(const bool oq_New);
-   void SetSplitterMesSigX(const stw_types::sint32 & ors32_New);
+   void SetSplitterMesSigX(const stw_types::sint32 os32_New);
    void SetSelectedMessages(const std::vector<stw_types::sint32> & orc_Value);
    void SetTraceColWidths(const std::vector<stw_types::sint32> & orc_Value);
    void SetTraceColPositions(const std::vector<stw_types::sint32> & orc_Value);
@@ -161,14 +155,14 @@ private:
    bool mq_WiLoggingExpanded;                            ///< History of last known logging widget expanded state
    std::vector<stw_types::sint32> mc_SelectedMessages;   ///< History of last known selected message generator indices
    std::vector<stw_types::sint32> mc_TraceColWidth;      ///< History of last known trace column widths
-   std::vector<stw_types::sint32> mc_TraceColPosition;      ///< History of last known trace column widths
+   std::vector<stw_types::sint32> mc_TraceColPosition;   ///< History of last known trace column widths
    std::vector<stw_types::sint32> mc_MessageGenColWidth; ///< History of last known message generator column widths
    std::vector<stw_types::sint32> mc_SignalsColWidth;    ///< History of last known message generator signals table
                                                          // column widths
    E_SettingsSubSection me_PopOpenSection;               ///< History of last known expanded settings subsection
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

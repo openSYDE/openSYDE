@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for system view dashboard widget properties (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     05.09.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_GtGetText.h"
@@ -22,38 +15,35 @@
 #include "C_SyvDaPeLabel.h"
 #include "ui_C_SyvDaPeLabel.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const sintn C_SyvDaPeLabel::mhsn_INDEX_STYLE_TYPE_DEFAULT = 0;
 const sintn C_SyvDaPeLabel::mhsn_INDEX_STYLE_TYPE_TRANSPARENT = 1;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent  Optional pointer to parent
    \param[in]     oq_DarkMode Flag for dark mode
-
-   \created     05.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeLabel::C_SyvDaPeLabel(C_SyvDaPeBase & orc_Parent, const bool oq_DarkMode) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvDaPeLabel),
@@ -85,27 +75,21 @@ C_SyvDaPeLabel::C_SyvDaPeLabel(C_SyvDaPeBase & orc_Parent, const bool oq_DarkMod
    connect(this->mpc_Ui->pc_LineEditCaption, &C_OgeLeProperties::editingFinished, this, &C_SyvDaPeLabel::m_ToUpper);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     05.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeLabel::~C_SyvDaPeLabel(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     05.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeLabel::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelCaption->setText(C_GtGetText::h_GetText("Caption"));
@@ -117,16 +101,13 @@ void C_SyvDaPeLabel::InitStaticNames(void) const
    this->mpc_Ui->pc_ComboBoxType->addItem(C_GtGetText::h_GetText("Transparent"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get type
 
    \return
    Current type
-
-   \created     05.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbLabel::E_Type C_SyvDaPeLabel::GetType(void) const
 {
    C_PuiSvDbLabel::E_Type e_Retval;
@@ -143,60 +124,48 @@ C_PuiSvDbLabel::E_Type C_SyvDaPeLabel::GetType(void) const
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get show unit flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get show unit flag
 
    \return
    Current show unit flag
-
-   \created     05.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaPeLabel::GetShowUnit(void) const
 {
    return this->mpc_Ui->pc_CheckBoxUnit->isChecked();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get show caption flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get show caption flag
 
    \return
    Current show caption flag
-
-   \created     05.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaPeLabel::GetShowCaption(void) const
 {
    return this->mpc_Ui->pc_CheckBoxCaption->isChecked();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get caption
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get caption
 
    \return
    Current caption
-
-   \created     05.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaPeLabel::GetCaption(void) const
 {
    return this->mpc_Ui->pc_LineEditCaption->text();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set type
 
    \param[in] oe_Type New type
-
-   \created     05.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeLabel::SetType(const C_PuiSvDbLabel::E_Type oe_Type) const
 {
    switch (oe_Type)
@@ -212,55 +181,43 @@ void C_SyvDaPeLabel::SetType(const C_PuiSvDbLabel::E_Type oe_Type) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set show unit flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set show unit flag
 
    \param[in] oq_Value New show unit flag
-
-   \created     05.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeLabel::SetShowUnit(const bool oq_Value) const
 {
    this->mpc_Ui->pc_CheckBoxUnit->setChecked(oq_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set show caption flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set show caption flag
 
    \param[in] oq_Value New show caption flag
-
-   \created     05.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeLabel::SetShowCaption(const bool oq_Value) const
 {
    this->mpc_Ui->pc_CheckBoxCaption->setChecked(oq_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set caption
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set caption
 
    \param[in] oq_Value New caption
-
-   \created     05.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeLabel::SetCaption(const QString & orc_Value) const
 {
    this->mpc_Ui->pc_LineEditCaption->setText(orc_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update of preview click
-
-   \created     05.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update of preview click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeLabel::m_UpdatePreview(void)
 {
    C_GiSvDaLabelBase * pc_Item = new C_GiSvDaLabelBase(0UL, 0UL, -1L, 0ULL, NULL);
@@ -287,13 +244,10 @@ void C_SyvDaPeLabel::m_UpdatePreview(void)
    //lint -e{429}  no memory leak because of the parent of pc_Item, the call of addItem and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set line edit text always upper case
-
-   \created     19.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set line edit text always upper case
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeLabel::m_ToUpper(void) const
 {
    this->mpc_Ui->pc_LineEditCaption->setText(this->mpc_Ui->pc_LineEditCaption->text().toUpper());

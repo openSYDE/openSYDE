@@ -1,86 +1,70 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Button for options (implementation)
 
    Button for options.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.12.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
 
 #include "C_OgePubOptions.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     06.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgePubOptions::C_OgePubOptions(QWidget * const opc_Parent) :
    C_OgePubToolTipBase(opc_Parent)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set the icon for enabled and disabled mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set the icon for enabled and disabled mode
 
    \param[in]     oc_IconPathEnabled      String for Enabled Icon Path
                   oc_IconPathDisabled     String for Disabled Icon Path
-
-   \created     22.08.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgePubOptions::SetCustomIcon(QString oc_IconPathEnabled, QString oc_IconPathDisabled)
 {
    mc_IconEnabled.addPixmap(QPixmap(oc_IconPathEnabled));
    mc_IconDisabled.addPixmap(QPixmap(oc_IconPathDisabled));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overridden paint event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overridden paint event
 
    Here: Draw icon
 
    \param[in,out] opc_Event  Event identification and information
-
-   \created     22.08.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgePubOptions::paintEvent(QPaintEvent * const opc_Event)
 {
    C_OgePubToolTipBase::paintEvent(opc_Event);

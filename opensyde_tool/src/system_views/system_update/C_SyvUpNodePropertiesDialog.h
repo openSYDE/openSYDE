@@ -1,39 +1,34 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Dialog for system update node properties view (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.02.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVUPNODEPROPERTIESDIALOG_H
 #define C_SYVUPNODEPROPERTIESDIALOG_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 #include "stwtypes.h"
 #include "C_SyvUtil.h"
 #include "C_OgePopUpDialog.h"
 #include "C_SyvUpDeviceInfo.h"
+#include "C_PuiSvNodeUpdateParamInfo.h"
 
 namespace Ui
 {
 class C_SyvUpNodePropertiesDialog;
 }
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SyvUpNodePropertiesDialog :
    public QWidget
@@ -48,9 +43,13 @@ public:
 
    void InitStaticNames(void) const;
    void SetStatus(const stw_opensyde_gui_logic::C_SyvUtil::E_NodeUpdateInitialStatus oe_Status,
-                  const std::vector<stw_diag_lib::C_XFLECUInformation> * const opc_FileInfos,
+                  const std::vector<stw_diag_lib::C_XFLECUInformation> * const opc_HexFileInfos,
+                  const std::vector<bool> * const opc_HexAppInfoAmbiguous,
+                  const std::vector<QString> * const opc_ParamFileInfos,
+                  const std::vector<QString> * const opc_FileInfos,
                   const stw_opensyde_core::C_OSCSuSequences::C_XflDeviceInformation * const opc_STWDevice,
-                  const stw_opensyde_core::C_OSCSuSequences::C_OsyDeviceInformation * const opc_OSYDevice);
+                  const stw_opensyde_core::C_OSCSuSequences::C_OsyDeviceInformation * const opc_OSYDevice,
+                  const bool oq_UpdateSuccessfull, const bool oq_ValidStatus);
    stw_opensyde_gui_logic::C_SyvUtil::E_NodeUpdateInitialStatus GetStatus(void) const;
    const stw_opensyde_core::C_OSCSuSequences::C_XflDeviceInformation * GetSTWDevice(void) const;
    const stw_opensyde_core::C_OSCSuSequences::C_OsyDeviceInformation * GetOSYDevice(void) const;
@@ -69,11 +68,16 @@ private:
    stw_opensyde_gui_elements::C_OgePopUpDialog & mrc_ParentDialog;
    const stw_types::uint32 mu32_NodeIndex;
    stw_opensyde_gui_logic::C_SyvUtil::E_NodeUpdateInitialStatus me_Status;
-   const std::vector<stw_diag_lib::C_XFLECUInformation> * mpc_FileInfos;
+   const std::vector<stw_diag_lib::C_XFLECUInformation> * mpc_HexFileInfos;
+   const std::vector<bool> * mpc_HexAppInfoAmbiguous;
+   const std::vector<QString> * mpc_ParamFileInfos;
+   const std::vector<QString> * mpc_FileInfos;
    const stw_opensyde_core::C_OSCSuSequences::C_XflDeviceInformation * mpc_STWDevice;
    const stw_opensyde_core::C_OSCSuSequences::C_OsyDeviceInformation * mpc_OSYDevice;
    const bool mq_UpdateFailed;
+   bool mq_UpdateSuccessfull;
    bool mq_Discarded;
+   bool mq_ValidStatus;
    const stw_types::uint32 mu32_FailedApplicationIndex;
 
    void m_OkClicked(void);
@@ -87,7 +91,7 @@ private:
    C_SyvUpNodePropertiesDialog & operator =(const C_SyvUpNodePropertiesDialog &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

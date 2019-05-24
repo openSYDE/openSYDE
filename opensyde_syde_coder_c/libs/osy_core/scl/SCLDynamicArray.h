@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Container class for arrays of elements
@@ -11,15 +11,9 @@
 
    Technically the class is a wrapper around std::vector.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.02.2007  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2007 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef SCLDYNAMICARRAYH
 #define SCLDYNAMICARRAYH
 
@@ -77,16 +71,13 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Set length of array
+/*! \brief   Set length of array
 
    Sets the number of elements in the array.
    New elements will be constructed using their default constructor.
    For plain numeric types this means the content will be random.
 
    \param[in]     os32_Length    new array length
-
-   \created     01.02.2007  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused
@@ -100,16 +91,13 @@ template <class T> void SCLDynamicArray<T>::SetLength(const stw_types::sint32 os
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Increase length of array
+/*! \brief   Increase length of array
 
    Increase length of array.
    New elements will be constructed using their default constructor.
    For plain numeric types this means the content will be random.
 
    \param[in]     os32_By   number of elements to add (use a negative value to reduce length)
-
-   \created     01.02.2007  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused
@@ -119,15 +107,12 @@ template <class T> void SCLDynamicArray<T>::IncLength(const stw_types::sint32 os
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   get number of entries in array
+/*! \brief   get number of entries in array
 
    Return length of array.
 
    \return
    number of elements in array
-
-   \created     01.02.2007  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused
@@ -137,8 +122,7 @@ template <class T> stw_types::sint32 SCLDynamicArray<T>::GetLength(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   get index of last entry in array
+/*! \brief   get index of last entry in array
 
    Return highest valid index of array.
    In most cases this is one less than the length.
@@ -146,8 +130,6 @@ template <class T> stw_types::sint32 SCLDynamicArray<T>::GetLength(void) const
 
    \return
    Index of last entry in array
-
-   \created     01.02.2007  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused
@@ -163,8 +145,7 @@ template <class T> stw_types::sint32 SCLDynamicArray<T>::GetHigh(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   get reference to array element
+/*! \brief   get reference to array element
 
    Return reference to array element.
    Accessing an index that is out if range will result in undefined behavior.
@@ -173,8 +154,6 @@ template <class T> stw_types::sint32 SCLDynamicArray<T>::GetHigh(void) const
 
    \return
    Reference to selected index
-
-   \created     01.02.2007  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused
@@ -184,8 +163,7 @@ template <class T> T & SCLDynamicArray<T>::operator [](const stw_types::sint32 o
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   get const reference to array element
+/*! \brief   get const reference to array element
 
    Return const reference to array element.
    Accessing an index that is out if range will result in undefined behavior.
@@ -194,8 +172,6 @@ template <class T> T & SCLDynamicArray<T>::operator [](const stw_types::sint32 o
 
    \return
    Reference to selected index
-
-   \created     01.02.2007  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused
@@ -205,14 +181,11 @@ template <class T> const T & SCLDynamicArray<T>::operator [](const stw_types::si
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   copy constructor
+/*! \brief   copy constructor
 
    Assign content from pre-existing array.
 
    \param[in]   orc_Src   source array
-
-   \created     01.02.2007  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused
@@ -222,12 +195,9 @@ template <class T> SCLDynamicArray<T>::SCLDynamicArray(const SCLDynamicArray<T> 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   default constructor
+/*! \brief   default constructor
 
    Nothing special to do here ...
-
-   \created     01.02.2007  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused
@@ -236,12 +206,9 @@ template <class T> SCLDynamicArray<T>::SCLDynamicArray(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+/*! \brief   default destructor
 
    Nothing special to do here ...
-
-   \created     01.02.2007  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused
@@ -250,16 +217,13 @@ template <class T> SCLDynamicArray<T>::~SCLDynamicArray(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   assignment operator
+/*! \brief   assignment operator
 
    Copy specified data over existing data.
 
    \param[in]  orc_Src   source data to copy over
 
    \return  reference to (*this)
-
-   \created     01.02.2007  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused
@@ -273,8 +237,7 @@ template <class T> SCLDynamicArray<T> & SCLDynamicArray<T>::operator =(const SCL
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   delete one element from array
+/*! \brief   delete one element from array
 
    Delete (destroy) one element from the array.
    Specifying an index that is out if range will result in undefined behavior.
@@ -283,8 +246,6 @@ template <class T> SCLDynamicArray<T> & SCLDynamicArray<T>::operator =(const SCL
    The content of all elements needs to be copied over.
 
    \param[in]  os32_Index   index of element to erase (0 = first element)
-
-   \created     01.02.2007  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused
@@ -300,8 +261,7 @@ template <class T> void SCLDynamicArray<T>::Delete(const stw_types::sint32 os32_
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   insert one element into array
+/*! \brief   insert one element into array
 
    Insert one element into the array.
    Specifying an index that is out if range will result in undefined behavior.
@@ -311,8 +271,6 @@ template <class T> void SCLDynamicArray<T>::Delete(const stw_types::sint32 os32_
 
    \param[in]  os32_Index   index to insert the new element at (0 = first element)
    \param[in]  orc_Src      element to insert
-
-   \created     01.02.2007  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 //lint -e{1960}  false positive in PC-Lint: as an inline function implementation this can be reused

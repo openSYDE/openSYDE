@@ -1,3 +1,11 @@
+//----------------------------------------------------------------------------------------------------------------------
+/*!
+   \file
+   \brief       Translate L2 CAN message to textual interpretation
+
+   \copyright   Copyright 2002 Sensor-Technik Wiedemann GmbH. All rights reserved.
+*/
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CCMONProtocolBASEH
 #define CCMONProtocolBASEH
 

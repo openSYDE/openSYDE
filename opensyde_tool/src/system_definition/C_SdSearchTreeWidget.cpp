@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Tree widget for searching in the system definition (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     14.03.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <vector>
@@ -28,14 +21,14 @@
 #include "C_OgeTreeWidgetToolBarSearchItemDelegate.h"
 #include "C_PuiSdUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const sintn C_SdSearchTreeWidget::mhsn_DATAROLE_TITLE = static_cast<sintn>(Qt::DisplayRole);
 const sintn C_SdSearchTreeWidget::mhsn_DATAROLE_SUBTITLE = static_cast<sintn>(Qt::UserRole) + 1;
 const sintn C_SdSearchTreeWidget::mhsn_DATAROLE_NAME = static_cast<sintn>(Qt::UserRole) + 2;
@@ -49,25 +42,22 @@ const uint8 C_SdSearchTreeWidget::mhu8_DATAELEMENT_TYPE_PARAMETER = 0U;
 const uint8 C_SdSearchTreeWidget::mhu8_DATAELEMENT_TYPE_VARIABLE = 1U;
 const uint8 C_SdSearchTreeWidget::mhu8_DATAELEMENT_TYPE_SIGNAL = 2U;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in] opc_Parent  Optional parent
-
-   \created     16.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdSearchTreeWidget::C_SdSearchTreeWidget(QWidget * const opc_Parent) :
    C_OgeTreeWidgetToolBarSearch(opc_Parent)
 {
@@ -111,33 +101,27 @@ C_SdSearchTreeWidget::C_SdSearchTreeWidget(QWidget * const opc_Parent) :
    connect(this, &QTreeWidget::itemClicked, this, &C_SdSearchTreeWidget::m_ItemClicked);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     06.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdSearchTreeWidget::~C_SdSearchTreeWidget()
 {
    //lint -e{1540}  no memory leak because of the parent all elements and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Searching for substring in the names of system definition items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Searching for substring in the names of system definition items
 
    \param[in]     orc_SearchString   Search substring
 
    \return
    true: results found
    false: no results found
-
-   \created     15.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdSearchTreeWidget::Search(const QString & orc_SearchString)
 {
    bool q_ResultsFound = false;
@@ -157,19 +141,19 @@ bool C_SdSearchTreeWidget::Search(const QString & orc_SearchString)
       this->expandAll();
 
       // show the result counter
-      this->mpc_TreeItemRootNodes->setText(0, C_GtGetText::h_GetText("Nodes") +
+      this->mpc_TreeItemRootNodes->setText(0, C_GtGetText::h_GetText("  Nodes") +
                                            c_CounterResult.arg(QString::number(this->mu32_NodesFound)));
-      this->mpc_TreeItemRootBusses->setText(0, C_GtGetText::h_GetText("Buses") +
+      this->mpc_TreeItemRootBusses->setText(0, C_GtGetText::h_GetText("  Buses") +
                                             c_CounterResult.arg(QString::number(this->mu32_BussesFound)));
-      this->mpc_TreeItemRootDataPools->setText(0, C_GtGetText::h_GetText("Datapools") +
+      this->mpc_TreeItemRootDataPools->setText(0, C_GtGetText::h_GetText("  Datapools") +
                                                c_CounterResult.arg(QString::number(this->mu32_DataPoolsFound)));
-      this->mpc_TreeItemRootLists->setText(0, C_GtGetText::h_GetText("Lists") +
+      this->mpc_TreeItemRootLists->setText(0, C_GtGetText::h_GetText("  Lists") +
                                            c_CounterResult.arg(QString::number(this->mu32_ListsFound)));
-      this->mpc_TreeItemRootMessages->setText(0, C_GtGetText::h_GetText("Messages") +
+      this->mpc_TreeItemRootMessages->setText(0, C_GtGetText::h_GetText("  Messages") +
                                               c_CounterResult.arg(QString::number(this->mu32_MessagesFound)));
-      this->mpc_TreeItemRootDataElements->setText(0, C_GtGetText::h_GetText("Data elements") +
+      this->mpc_TreeItemRootDataElements->setText(0, C_GtGetText::h_GetText("  Data elements") +
                                                   c_CounterResult.arg(QString::number(this->mu32_DataElementsFound)));
-      this->mpc_TreeItemRootApplications->setText(0, C_GtGetText::h_GetText("Data Blocks") +
+      this->mpc_TreeItemRootApplications->setText(0, C_GtGetText::h_GetText("  Data Blocks") +
                                                   c_CounterResult.arg(QString::number(this->mu32_ApplicationsFound)));
 
       //get result found status
@@ -188,13 +172,10 @@ bool C_SdSearchTreeWidget::Search(const QString & orc_SearchString)
    return q_ResultsFound;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Removes all search results
-
-   \created     16.03.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Removes all search results
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::ClearResult(void)
 {
    this->clear();
@@ -212,13 +193,10 @@ void C_SdSearchTreeWidget::ClearResult(void)
    this->mq_ResultsFound = false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the first element selected and the sets the focus to the tree widget
-
-   \created     13.06.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the first element selected and the sets the focus to the tree widget
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::SetSearchResultFocus(void)
 {
    QTreeWidgetItem * pc_Item;
@@ -261,17 +239,14 @@ void C_SdSearchTreeWidget::SetSearchResultFocus(void)
    this->setCurrentItem(pc_Item);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Open concrete item or hide this tree widget
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     13.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return))
@@ -288,17 +263,14 @@ void C_SdSearchTreeWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten focus in event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten focus in event slot
 
    Here: Remove the selection
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     13.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::focusOutEvent(QFocusEvent * const opc_Event)
 {
    QList<QTreeWidgetItem *> c_SelectedItems = this->selectedItems();
@@ -314,7 +286,7 @@ void C_SdSearchTreeWidget::focusOutEvent(QFocusEvent * const opc_Event)
    C_OgeTreeWidgetToolBarSearch::focusOutEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_StartSearch(void)
 {
    const std::vector<C_OSCNode> & rc_Nodes = C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().c_Nodes;
@@ -335,7 +307,7 @@ void C_SdSearchTreeWidget::m_StartSearch(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_SearchNodeContent(const C_OSCNode & orc_Node, const uint32 ou32_NodeIndex)
 {
    uint32 u32_Counter;
@@ -373,7 +345,7 @@ void C_SdSearchTreeWidget::m_SearchNodeContent(const C_OSCNode & orc_Node, const
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_SearchDataPoolContent(const C_OSCNodeDataPool & orc_DataPool,
                                                    const uint32 ou32_DataPoolIndex, const QString & orc_NodeName,
                                                    const uint32 ou32_NodeIndex)
@@ -434,7 +406,7 @@ void C_SdSearchTreeWidget::m_SearchDataPoolContent(const C_OSCNodeDataPool & orc
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_SearchCanProtocolContent(const C_OSCCanProtocol & orc_CanProtocol,
                                                       const QString & orc_NodeName, const uint32 ou32_NodeIndex)
 {
@@ -490,7 +462,7 @@ void C_SdSearchTreeWidget::m_SearchCanProtocolContent(const C_OSCCanProtocol & o
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_SearchBusContent(const C_OSCSystemBus & orc_Bus, const uint32 ou32_BusIndex)
 {
    QString c_Name;
@@ -510,7 +482,7 @@ void C_SdSearchTreeWidget::m_SearchBusContent(const C_OSCSystemBus & orc_Bus, co
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdSearchTreeWidget::m_CheckWhereToJump(const QTreeWidgetItem * const opc_Item,
                                               uint32 & oru32_InterfaceIndex) const
 {
@@ -562,7 +534,7 @@ bool C_SdSearchTreeWidget::m_CheckWhereToJump(const QTreeWidgetItem * const opc_
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_ItemClicked(void)
 {
    QTreeWidgetItem * pc_Item = this->currentItem();
@@ -700,7 +672,7 @@ void C_SdSearchTreeWidget::m_ItemClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_AddNodeResult(const QString & orc_NodeName, const uint32 ou32_NodeIndex,
                                            const QString & orc_DeviceType)
 {
@@ -724,7 +696,7 @@ void C_SdSearchTreeWidget::m_AddNodeResult(const QString & orc_NodeName, const u
    //lint -e{429}  no memory leak because of the parent of pc_Item and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_AddBusResult(const QString & orc_BusName, const uint32 ou32_BusIndex,
                                           const bool oq_Ethernet)
 {
@@ -757,7 +729,7 @@ void C_SdSearchTreeWidget::m_AddBusResult(const QString & orc_BusName, const uin
    //lint -e{429}  no memory leak because of the parent of pc_Item and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_AddDataPoolResult(const QString & orc_DataPoolName, const uint32 ou32_DataPoolIndex,
                                                const QString & orc_NodeName, const uint32 ou32_NodeIndex)
 {
@@ -782,7 +754,7 @@ void C_SdSearchTreeWidget::m_AddDataPoolResult(const QString & orc_DataPoolName,
    //lint -e{429}  no memory leak because of the parent of pc_Item and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_AddListResult(const QString & orc_ListName, const uint32 ou32_ListIndex,
                                            const QString & orc_DataPoolName, const uint32 ou32_DataPoolIndex,
                                            const QString & orc_NodeName, const uint32 ou32_NodeIndex)
@@ -809,7 +781,7 @@ void C_SdSearchTreeWidget::m_AddListResult(const QString & orc_ListName, const u
    //lint -e{429}  no memory leak because of the parent of pc_Item and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_AddMessageResult(const QString & orc_MessageName, const uint32 ou32_MessageIndex,
                                               const bool oq_IsTx, const uint32 ou32_ListIndex,
                                               const QString & orc_ProtocolName, const uint32 ou32_DataPoolIndex,
@@ -848,7 +820,7 @@ void C_SdSearchTreeWidget::m_AddMessageResult(const QString & orc_MessageName, c
    //lint -e{429}  no memory leak because of the parent of pc_Item and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_AddDataElementsResult(const QString & orc_DataElementName,
                                                    const uint32 ou32_DataElementIndex, const QString & orc_ListName,
                                                    const uint32 ou32_ListIndex, const QString & orc_DataPoolName,
@@ -891,7 +863,7 @@ void C_SdSearchTreeWidget::m_AddDataElementsResult(const QString & orc_DataEleme
    //lint -e{429}  no memory leak because of the parent of pc_Item and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_AddApplicationResult(const QString & orc_ApplicationName,
                                                   const uint32 ou32_ApplicationIndex, const QString & orc_NodeName,
                                                   const uint32 ou32_NodeIndex)
@@ -917,13 +889,10 @@ void C_SdSearchTreeWidget::m_AddApplicationResult(const QString & orc_Applicatio
    //lint -e{429}  no memory leak because of the parent of pc_Item and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Setup/restore starting state
-
-   \created     21.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Setup/restore starting state
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_SetupStartingState(void)
 {
    this->mpc_TreeItemRootNodes = new QTreeWidgetItem();

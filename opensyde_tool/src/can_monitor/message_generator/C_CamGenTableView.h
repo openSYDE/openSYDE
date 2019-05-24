@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       View (display) component for message generator table (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     26.11.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_CAMGENTABLEVIEW_H
 #define C_CAMGENTABLEVIEW_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QSortFilterProxyModel>
 #include "C_OgePubIconOnly.h"
 #include "C_OgeContextMenu.h"
@@ -25,12 +19,12 @@
 #include "C_TblViewInteraction.h"
 #include "C_CamGenTableDelegate.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_CamGenTableView :
    public C_TblViewInteraction
@@ -110,7 +104,7 @@ private:
    void m_HandleNewItemScrollingAndSelection(const std::vector<stw_types::uint32> & orc_Indices);
    static std::vector<stw_types::sint32> mh_ConvertVector(const std::vector<stw_types::uint32> & orc_Input);
    void m_SetSelectedMessages(const std::vector<stw_types::sint32> & orc_SelectedIndices);
-   void m_SelectRow(const stw_types::sint32 os32_Row,const QItemSelectionModel::SelectionFlags & orc_Flags);
+   void m_SelectRow(const stw_types::sint32 os32_Row, const QItemSelectionModel::SelectionFlags & orc_Flags);
    void m_HandleCheckChange(const QModelIndex & orc_Index);
 
    //Avoid call
@@ -118,7 +112,7 @@ private:
    C_CamGenTableView & operator =(const C_CamGenTableView &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

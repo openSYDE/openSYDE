@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       A button displaying an arrow cursor (implementation)
 
    A button displaying an arrow cursor
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     29.08.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPixmap>
@@ -26,35 +19,32 @@
 #include "C_GtGetText.h"
 #include "C_GiArrowCursorButton.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     29.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiArrowCursorButton::C_GiArrowCursorButton(QGraphicsItem * const opc_Parent) :
    QGraphicsSvgItem("://images/graphic_items/IconNodeConnect.svg", opc_Parent),
    C_GiBiCustomToolTip(),
@@ -67,27 +57,21 @@ C_GiArrowCursorButton::C_GiArrowCursorButton(QGraphicsItem * const opc_Parent) :
    this->setCursor(Qt::ArrowCursor);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     29.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiArrowCursorButton::~C_GiArrowCursorButton()
 {
    mpc_ConnectedNode = NULL;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Stop listening to node position changes
-
-   \created     30.08.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Stop listening to node position changes
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiArrowCursorButton::DetachNode(void)
 {
    if (mpc_ConnectedNode != NULL)
@@ -99,17 +83,14 @@ void C_GiArrowCursorButton::DetachNode(void)
    this->setVisible(false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start listening to node position changes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start listening to node position changes
 
    Implicit: Detach last node
 
    \param[in] opc_Node New node to connect to
-
-   \created     30.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiArrowCursorButton::AttachToNode(const C_GiNode * const opc_Node)
 {
    if (opc_Node != NULL)
@@ -126,29 +107,23 @@ void C_GiArrowCursorButton::AttachToNode(const C_GiNode * const opc_Node)
    this->setVisible(true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the type of this itme
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the type of this itme
 
    \return  ID
-
-   \created     01.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_GiArrowCursorButton::type() const
 {
    return msn_GRAPHICS_ITEM_ARROWCURSORBTN;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal for update of current scaling
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal for update of current scaling
 
    \param[in] orc_Transform Current scaling
-
-   \created     16.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiArrowCursorButton::UpdateTransform(const QTransform & orc_Transform) const
 {
    Q_UNUSED(orc_Transform)
@@ -160,33 +135,27 @@ void C_GiArrowCursorButton::UpdateTransform(const QTransform & orc_Transform) co
    //}
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle tool tip generation
-
-   \created     17.08.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle tool tip generation
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiArrowCursorButton::GenerateHint(void)
 {
    //Tool tip
    this->SetDefaultToolTipHeading(C_GtGetText::h_GetText("Link Use"));
    this->SetDefaultToolTipContent(C_GtGetText::h_GetText(
                                      "Connect existing elements: Click on the link icon and drag and drop it "
-                                     "\neither to an existing node or to a bus element."));
+                                     "either to an existing node or to a bus element."));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse press event slot
 
    Here: Trigger connector
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     30.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiArrowCursorButton::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    if (mpc_ConnectedNode !=  NULL)
@@ -202,13 +171,10 @@ void C_GiArrowCursorButton::mousePressEvent(QGraphicsSceneMouseEvent * const opc
    QGraphicsSvgItem::mousePressEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle position change of node
-
-   \created     30.08.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle position change of node
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiArrowCursorButton::m_OnNodeChange(void)
 {
    if (this->mpc_ConnectedNode != NULL)

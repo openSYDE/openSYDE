@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       openSYDE protocol IP transport-protocol
 
    For details cf. documentation in .h file.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     26.04.2017  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <iostream>
@@ -29,61 +22,54 @@
 #include "C_OSCProtocolDriverOsyTpIp.h"
 #include "C_OSCIpDispatcher.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_scl;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Constructor
 
    Initialize class fields with defaults
-
-   \created     16.05.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCProtocolDriverOsyTpIp::C_DoIpHeader::C_DoIpHeader(void) :
    u16_PayloadType(0U),
    u32_PayloadSize(0U)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Constructor
 
    Initialize class fields with specified values
 
    \param[in]  ou16_PayloadType   DoIp payload type
    \param[in]  ou32_PayloadSize   number of bytes in payload
-
-   \created     16.05.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCProtocolDriverOsyTpIp::C_DoIpHeader::C_DoIpHeader(const uint16 ou16_PayloadType, const uint32 ou32_PayloadSize) :
    u16_PayloadType(ou16_PayloadType),
    u32_PayloadSize(ou32_PayloadSize)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Decode DoIp request header
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Decode DoIp request header
 
    Decode DoIp request header into individual elements.
    - DoIp header with payload type, payload size
@@ -94,10 +80,8 @@ C_OSCProtocolDriverOsyTpIp::C_DoIpHeader::C_DoIpHeader(const uint16 ou16_Payload
    C_NO_ERR    decoded; data stored in instance data
    C_RANGE     not enough data
    C_CONFIG    incorrect version
-
-   \created     27.04.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpIp::C_DoIpHeader::DecodeHeader(const std::vector<uint8> & orc_Header)
 {
    sint32 s32_Return;
@@ -126,18 +110,15 @@ sint32 C_OSCProtocolDriverOsyTpIp::C_DoIpHeader::DecodeHeader(const std::vector<
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Compose DoIp request header
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Compose DoIp request header
 
    Set up DoIp request header:
    - DoIp header with version, payload type, payload size
 
    \param[out]   orc_Request        composed header (length will be set to accommodate header and payload)
-
-   \created     27.04.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCProtocolDriverOsyTpIp::C_DoIpHeader::ComposeHeader(std::vector<uint8> & orc_Header) const
 {
    orc_Header.resize(static_cast<uintn>(hu8_DOIP_HEADER_SIZE + u32_PayloadSize));
@@ -151,23 +132,19 @@ void C_OSCProtocolDriverOsyTpIp::C_DoIpHeader::ComposeHeader(std::vector<uint8> 
    orc_Header[7] = static_cast<uint8>(u32_PayloadSize);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Constructor
 
    Initialize class fields with defaults
-
-   \created     27.04.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCProtocolDriverOsyTpIp::C_TcpRxServiceState::C_TcpRxServiceState(void) :
    e_Status(eIDLE)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Make IP communication dispatcher to use known
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Make IP communication dispatcher to use known
 
    The caller is responsible to connect and disconnect.
    Here we simply remember the installed dispatcher to use for communication.
@@ -177,10 +154,8 @@ C_OSCProtocolDriverOsyTpIp::C_TcpRxServiceState::C_TcpRxServiceState(void) :
 
    \return
    C_NO_ERR   no problems
-
-   \created     27.04.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpIp::SetDispatcher(C_OSCIpDispatcher * const opc_Dispatcher,
                                                  const uint32 ou32_DispatcherHandle)
 {
@@ -191,15 +166,14 @@ sint32 C_OSCProtocolDriverOsyTpIp::SetDispatcher(C_OSCIpDispatcher * const opc_D
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checks the connection of the TCP socket
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks the connection of the TCP socket
 
    \return
    C_NO_ERR   is connected
    C_NOACT    is not connected
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpIp::IsConnected(void)
 {
    sint32 s32_Return;
@@ -217,19 +191,16 @@ sint32 C_OSCProtocolDriverOsyTpIp::IsConnected(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reconnect to server
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reconnect to server
 
    Here: re-connect via TCP
 
    \return
    C_NO_ERR   no problems
    C_BUSY     could not establish connection
-
-   \created     05.01.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpIp::ReConnect(void)
 {
    sint32 s32_Return;
@@ -251,19 +222,16 @@ sint32 C_OSCProtocolDriverOsyTpIp::ReConnect(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Disconnect from server
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Disconnect from server
 
    Here: disconnect via TCP
 
    \return
    C_NO_ERR   no problems
    C_NOACT    could not disconnect
-
-   \created     19.04.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpIp::Disconnect(void)
 {
    sint32 s32_Return;
@@ -286,9 +254,8 @@ sint32 C_OSCProtocolDriverOsyTpIp::Disconnect(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get device information from all devices on local bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get device information from all devices on local bus
 
    Send broadcast to read device information.
    Report back list of nodes that sent a response (with the sent serial number and node IDs).
@@ -302,10 +269,8 @@ sint32 C_OSCProtocolDriverOsyTpIp::Disconnect(void)
    C_NO_ERR   no problems; zero or more responses received; data placed in orc_DeviceInfos
    C_COM      could not send request
    C_CONFIG   no dispatcher installed
-
-   \created     15.05.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpIp::BroadcastGetDeviceInfo(std::vector<C_BroadcastGetDeviceInfoResults> & orc_DeviceInfos)
 const
 {
@@ -404,9 +369,8 @@ const
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set IP address of one node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set IP address of one node
 
    Send broadcast to change the IP address of one specific node.
    Only the node with a specified serial number is expected to send a response and change its IP address.
@@ -428,10 +392,8 @@ const
    C_COM      could not send request
    C_CONFIG   no dispatcher installed
    C_TIMEOUT  no response within timeout
-
-   \created     15.05.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpIp::BroadcastSetIpAddress(const uint8 (&orau8_SerialNumber)[6],
                                                          const uint8 (&orau8_NewIpAddress)[4],
                                                          const uint8 (&orau8_NetMask)[4],
@@ -552,9 +514,8 @@ sint32 C_OSCProtocolDriverOsyTpIp::BroadcastSetIpAddress(const uint8 (&orau8_Ser
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Request that all devices stay in the flashloader after the next reset
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Request that all devices stay in the flashloader after the next reset
 
    Send broadcast to set "stay-in-flashloader" flag.
    Report back list of nodes that sent a response (with pass/fail information).
@@ -568,10 +529,8 @@ sint32 C_OSCProtocolDriverOsyTpIp::BroadcastSetIpAddress(const uint8 (&orau8_Ser
    C_NO_ERR   no problems; zero or more responses received; data placed in orc_Results
    C_COM      could not send request
    C_CONFIG   no dispatcher installed
-
-   \created     20.11.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpIp::BroadcastRequestProgramming(
    std::vector<C_OSCProtocolDriverOsyTpIp::C_BroadcastRequestProgrammingResults> & orc_Results) const
 {
@@ -660,9 +619,8 @@ sint32 C_OSCProtocolDriverOsyTpIp::BroadcastRequestProgramming(
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Send network reset broadcast
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Send network reset broadcast
 
    Send broadcast to reset all nodes.
    Optionally only the node with a specified serial number is expected to reset itself.
@@ -678,10 +636,8 @@ sint32 C_OSCProtocolDriverOsyTpIp::BroadcastRequestProgramming(
    C_COM      could not send request
    C_CONFIG   no dispatcher installed
    C_RANGE    oq_SpecificSerialNumberOnly is true but opau8_SerialNumber is NULL
-
-   \created     15.05.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpIp::BroadcastNetReset(const uint8 ou8_ResetType, const bool oq_SpecificSerialNumberOnly,
                                                      const uint8 (*const opau8_SerialNumber)[6]) const
 {
@@ -725,17 +681,14 @@ sint32 C_OSCProtocolDriverOsyTpIp::BroadcastNetReset(const uint8 ou8_ResetType, 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   constructor
 
    Set up class
 
    \param[in]  ou16_MaxServiceQueueSize   maximum number of entries in TX/RX queue
-
-   \created     26.04.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCProtocolDriverOsyTpIp::C_OSCProtocolDriverOsyTpIp(const uint16 ou16_MaxServiceQueueSize) :
    C_OSCProtocolDriverOsyTpBase(ou16_MaxServiceQueueSize),
    mpc_Dispatcher(NULL),
@@ -743,23 +696,19 @@ C_OSCProtocolDriverOsyTpIp::C_OSCProtocolDriverOsyTpIp(const uint16 ou16_MaxServ
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   destructor
 
    clean up ...
-
-   \created     26.04.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCProtocolDriverOsyTpIp::~C_OSCProtocolDriverOsyTpIp(void)
 {
    mpc_Dispatcher = NULL;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Compose DoIp request
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Compose DoIp request
 
    Set up one DoIp frame:
    - DoIp header with payload type "DiagnosticMessage"
@@ -767,10 +716,8 @@ C_OSCProtocolDriverOsyTpIp::~C_OSCProtocolDriverOsyTpIp(void)
 
    \param[in]    orc_Service    service to put into request
    \param[out]   orc_Request    composed data, ready for sending via IP
-
-   \created     27.04.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCProtocolDriverOsyTpIp::m_ComposeRequest(const C_OSCProtocolDriverOsyService & orc_Service,
                                                   std::vector<uint8> & orc_Request) const
 {
@@ -806,9 +753,8 @@ void C_OSCProtocolDriverOsyTpIp::m_ComposeRequest(const C_OSCProtocolDriverOsySe
    (void)std::memcpy(&orc_Request[12], &orc_Service.c_Data[0], orc_Service.c_Data.size());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Perform cyclic communication tasks for IP-TP
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Perform cyclic communication tasks for IP-TP
 
    Perform cyclic communication tasks for IP-TP.
    - send services from TX queue via TCP connection
@@ -821,10 +767,8 @@ void C_OSCProtocolDriverOsyTpIp::m_ComposeRequest(const C_OSCProtocolDriverOsySe
    C_NO_ERR   cycle finished
    C_CONFIG   no dispatcher installed
    C_COM      error on sending service
-
-   \created     26.04.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpIp::Cycle(void)
 {
    sint32 s32_ReturnFunc = C_NO_ERR;
@@ -1003,19 +947,16 @@ sint32 C_OSCProtocolDriverOsyTpIp::Cycle(void)
    return s32_ReturnFunc;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Print logging text
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Print logging text
 
    Add information about this class and the current server-id configuration and call logging handler function
     to perform the actual logging.
 
    \param[in]     orc_Information     text to log
    \param[in]     opcn_Function       function name
-
-   \created     26.04.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCProtocolDriverOsyTpIp::m_LogWarningWithHeader(const C_SCLString & orc_Information,
                                                         const charn * const opcn_Function) const
 {
@@ -1027,9 +968,8 @@ void C_OSCProtocolDriverOsyTpIp::m_LogWarningWithHeader(const C_SCLString & orc_
                                         opcn_Function);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Print logging text with IP
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Print logging text with IP
 
    Add
    * information about this class
@@ -1040,10 +980,8 @@ void C_OSCProtocolDriverOsyTpIp::m_LogWarningWithHeader(const C_SCLString & orc_
    \param[in]     orc_Information     text to log
    \param[in]     opcn_Function       function name
    \param[in]     orau8_Ip            IP address to report
-
-   \created     21.02.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCProtocolDriverOsyTpIp::m_LogWarningWithHeaderAndIp(const C_SCLString & orc_Information,
                                                              const charn * const opcn_Function,
                                                              const uint8 (&orau8_Ip)[4]) const
@@ -1056,9 +994,8 @@ void C_OSCProtocolDriverOsyTpIp::m_LogWarningWithHeaderAndIp(const C_SCLString &
    m_LogWarningWithHeader(c_Text, opcn_Function);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if current equal to orc_Cmp
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if current equal to orc_Cmp
 
    IP Address will not be checked. It is not an unique identifier for a device.
 
@@ -1067,10 +1004,8 @@ void C_OSCProtocolDriverOsyTpIp::m_LogWarningWithHeaderAndIp(const C_SCLString &
    \return
    Current equal to orc_Cmp
    Else false
-
-   \created     22.03.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults::operator ==(
    const C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults & orc_Cmp) const
 {
@@ -1091,9 +1026,8 @@ bool C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults::operator ==(
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if current smaller than orc_Cmp
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if current smaller than orc_Cmp
 
    IP Address will not be checked. It is not an unique identifier for a device.
 
@@ -1102,10 +1036,8 @@ bool C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults::operator ==(
    \return
    Current smaller than orc_Cmp
    Else false
-
-   \created     22.03.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults::operator <(
    const C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults & orc_Cmp) const
 {
@@ -1144,9 +1076,8 @@ bool C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults::operator <(
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Extract device information from binary data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Extract device information from binary data
 
    Extract device information from binary data stream.
    Caller is responsible to provide data with the correct size.
@@ -1154,10 +1085,8 @@ bool C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults::operator <(
 
    \param[in]  orc_Data            binary data
    \param[in]  ou8_DataStartIndex  offset index within orc_Data where data to parse starts
-
-   \created     16.05.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults::ParseFromArray(const std::vector<uint8> & orc_Data,
                                                                                  const uint8 ou8_DataStartIndex)
 {

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Signal table model (implementation)
 
    Signal table model
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     03.05.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -29,36 +22,33 @@
 #include "C_SdTooltipUtil.h"
 #include "C_SdNdeDataPoolContentUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     03.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueSignalTableModel::C_SdBueSignalTableModel(QObject * const opc_Parent) :
    QAbstractTableModel(opc_Parent),
    mpc_SyncManager(NULL),
@@ -66,27 +56,21 @@ C_SdBueSignalTableModel::C_SdBueSignalTableModel(QObject * const opc_Parent) :
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set message sync manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set message sync manager
 
    \param[in,out] opc_Value Message sync manager
-
-   \created     03.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalTableModel::SetMessageSyncManager(C_PuiSdNodeCanMessageSyncManager * const opc_Value)
 {
    this->mpc_SyncManager = opc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal data changes to table
-
-   \created     03.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal data changes to table
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalTableModel::UpdateData(void)
 {
    if (this->mpc_SyncManager != NULL)
@@ -107,9 +91,8 @@ void C_SdBueSignalTableModel::UpdateData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get header data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get header data
 
    \param[in] osn_Section    Section
    \param[in] oe_Orientation Orientation
@@ -117,10 +100,8 @@ void C_SdBueSignalTableModel::UpdateData(void)
 
    \return
    Header string
-
-   \created     03.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_SdBueSignalTableModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
                                              const sintn osn_Role) const
 {
@@ -197,18 +178,15 @@ QVariant C_SdBueSignalTableModel::headerData(const sintn osn_Section, const Qt::
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get table row count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get table row count
 
    \param[in] orc_Parent Parent
 
    \return
    Row count
-
-   \created     03.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SdBueSignalTableModel::rowCount(const QModelIndex & orc_Parent) const
 {
    stw_types::sintn sn_Retval = 0;
@@ -219,18 +197,15 @@ sintn C_SdBueSignalTableModel::rowCount(const QModelIndex & orc_Parent) const
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get table column count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get table column count
 
    \param[in] orc_Parent Parent
 
    \return
    Column count
-
-   \created     03.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SdBueSignalTableModel::columnCount(const QModelIndex & orc_Parent) const
 {
    sintn sn_Retval = 0;
@@ -243,19 +218,16 @@ sintn C_SdBueSignalTableModel::columnCount(const QModelIndex & orc_Parent) const
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data at index
 
    \param[in] orc_Index Index
    \param[in] osn_Role  Data role
 
    \return
    Data
-
-   \created     03.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
 {
    QVariant c_Retval;
@@ -431,7 +403,7 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
             break;
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::DecorationRole))
+      else if (osn_Role == msn_USER_ROLE_ICON)
       {
          switch (e_Col)
          {
@@ -460,6 +432,7 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                      bool q_ValueBelowMin;
                      bool q_ValueOverMax;
                      bool q_SignalValid;
+                     QStringList c_Tmp;
                      pc_Message->CheckErrorSignalDetailed(pc_List, u32_SignalIndex, &q_LayoutConflict,
                                                           &q_BorderConflict,
                                                           &q_NameConflict, &q_NameInvalid, &q_MinOverMax,
@@ -471,14 +444,16 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
                              (q_NameConflict == false)) &&
                             (q_NameInvalid == false)) && (q_MinOverMax == false)) && (q_ValueBelowMin == false)) &&
                          (q_ValueOverMax == false));
+                     c_Tmp.push_back(QString::number(20));
                      if (q_SignalValid == false)
                      {
-                        c_Retval = C_SdUtil::h_InitStaticIcon("://images/system_definition/IconSignalError.svg");
+                        c_Tmp.push_back("://images/system_definition/IconSignalError.svg");
                      }
                      else
                      {
-                        c_Retval = C_SdUtil::h_InitStaticIcon("://images/system_definition/IconSignal.svg");
+                        c_Tmp.push_back("://images/system_definition/IconSignal.svg");
                      }
+                     c_Retval = c_Tmp;
                   }
                }
             }
@@ -548,18 +523,15 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get flags for item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get flags for item
 
    \param[in] orc_Index Item
 
    \return
    Flags for item
-
-   \created     01.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 Qt::ItemFlags C_SdBueSignalTableModel::flags(const QModelIndex & orc_Index) const
 {
    Qt::ItemFlags c_Retval;
@@ -587,18 +559,15 @@ Qt::ItemFlags C_SdBueSignalTableModel::flags(const QModelIndex & orc_Index) cons
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Column to enum conversion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Column to enum conversion
 
    \param[in]  ors32_Column Column
 
    \return
    Enum value
-
-   \created     03.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueSignalTableModel::E_Columns C_SdBueSignalTableModel::h_ColumnToEnum(const sint32 & ors32_Column)
 {
    C_SdBueSignalTableModel::E_Columns e_Retval = eNAME;
@@ -660,19 +629,16 @@ C_SdBueSignalTableModel::E_Columns C_SdBueSignalTableModel::h_ColumnToEnum(const
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Enum to column conversion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Enum to column conversion
 
    \param[in] ore_Value Enum value
 
    \return
    Column
    -1 Error
-
-   \created     20.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueSignalTableModel::h_EnumToColumn(const C_SdBueSignalTableModel::E_Columns & ore_Value)
 {
    sint32 s32_Retval;
@@ -735,9 +701,8 @@ sint32 C_SdBueSignalTableModel::h_EnumToColumn(const C_SdBueSignalTableModel::E_
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert row to signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert row to signal
 
    \param[in]  ors32_Row     Model row
    \param[out] orc_MessageId Message identification indices
@@ -746,10 +711,8 @@ sint32 C_SdBueSignalTableModel::h_EnumToColumn(const C_SdBueSignalTableModel::E_
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     04.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueSignalTableModel::ConvertRowToSignal(const sint32 & ors32_Row,
                                                    C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                    uint32 & oru32_Signal) const

@@ -1,57 +1,48 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Message and signal table drawing delegate (implementation)
 
    Message and signal table drawing delegate
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     04.05.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
 #include "stwtypes.h"
 #include "constants.h"
+#include "C_TblTreDelegateUtil.h"
 #include "C_SdBueMessageSignalTableDelegate.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     04.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageSignalTableDelegate::C_SdBueMessageSignalTableDelegate(QObject * const opc_Parent) :
    QStyledItemDelegate(opc_Parent),
    mpc_Model(NULL),
@@ -60,23 +51,23 @@ C_SdBueMessageSignalTableDelegate::C_SdBueMessageSignalTableDelegate(QObject * c
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paint item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paint item
 
    Here: special handling for boolean & hovered cells
 
    \param[in,out] opc_Painter Painter
    \param[in]     orc_Option  Option
    \param[in]     orc_Index   Index
-
-   \created     04.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalTableDelegate::paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
                                               const QModelIndex & orc_Index) const
 {
    QStyledItemDelegate::paint(opc_Painter, orc_Option, orc_Index);
+
+   // paint icon
+   C_TblTreDelegateUtil::h_PaintIcon(opc_Painter, orc_Option, orc_Index);
 
    //Draw hover effect manually
    if (orc_Index.isValid() == true)
@@ -111,19 +102,16 @@ void C_SdBueMessageSignalTableDelegate::paint(QPainter * const opc_Painter, cons
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set hovered row index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set hovered row index
 
    \param[in] ors32_Value New hovered row index
 
    \return
    true  Change
    false No change
-
-   \created     04.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdBueMessageSignalTableDelegate::SetHoveredRow(const stw_types::sint32 & ors32_Value)
 {
    bool q_Retval;
@@ -140,15 +128,12 @@ bool C_SdBueMessageSignalTableDelegate::SetHoveredRow(const stw_types::sint32 & 
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set model for column look up
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set model for column look up
 
    \param[in] opc_Model Model for column look up
-
-   \created     04.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalTableDelegate::SetModel(const QAbstractTableModel * const opc_Value)
 {
    this->mpc_Model = opc_Value;

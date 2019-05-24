@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       header for class C_XFLFlashWrite
 
    Class for performing the actual write flash procedure
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     xx.xx.20xx  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2002 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CXFLFLASHWRITEH
 #define CXFLFLASHWRITEH
 
@@ -25,12 +19,12 @@
 #include "DiagLib_config.h"
 #include "CXFLFlashWriteParameters.h"
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 namespace stw_diag_lib
 {
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /// User interaction reasons passed to TRG_UserInteraction by C_XFLDownload::Execute:
 enum E_XFLUserInteractionReason
@@ -53,7 +47,7 @@ enum E_XFLUserInteractionReason
    eXFL_USER_INTERACTION_REASON_FINISHED        = 3
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Class for performing the actual write flash procedure
 class STW_DIAGLIB_EXPORT C_XFLFlashWrite : public C_XFLActions
 {
@@ -115,9 +109,9 @@ public:
    virtual ~C_XFLFlashWrite(void);
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #endif

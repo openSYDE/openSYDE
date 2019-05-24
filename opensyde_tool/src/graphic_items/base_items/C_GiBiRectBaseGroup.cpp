@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Base class for all graphic items which are rectangle based (implementation)
 
    The class offers resize functionality.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.10.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QGraphicsSceneMouseEvent>
@@ -34,12 +27,12 @@
 #include "gitypes.h"
 #include "constants.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const sintn msn_IndexTopLeft = 0;
 const sintn msn_IndexTopRight = 1;
 const sintn msn_IndexBottomLeft = 2;
@@ -53,19 +46,18 @@ const sintn msn_IndexElementMax = 8;
 
 const float64 mf64_BOUNDINGRECT_BORDER = 10.0;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
    Function m_SetBiggestItem must be called after construction.
@@ -78,10 +70,8 @@ const float64 mf64_BOUNDINGRECT_BORDER = 10.0;
    \param[in,out] opc_Parent             Optional pointer to parent
    \param[in]     orc_PosOffset          Optional offset for the position (values must be in 0.0 <= x < 1.0)
                                          Negative value deactivates the function
-
-   \created     25.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiBiRectBaseGroup::C_GiBiRectBaseGroup(const uint64 & oru64_ID, const float64 of64_MinWidth,
                                          const float64 of64_MinHeight, const stw_types::float64 of64_ActionPointOffset,
                                          const bool oq_KeepAspectRatio, QGraphicsItem * const opc_Parent,
@@ -129,18 +119,15 @@ C_GiBiRectBaseGroup::C_GiBiRectBaseGroup(const uint64 & oru64_ID, const float64 
    this->RestoreDefaultCursor();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the biggest sub item of the group.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the biggest sub item of the group.
 
    It is necessary for calculation the correct position of the interaction points and
    the show bounding rect.
 
    \param[in]  orc_Item    Sizeable item
-
-   \created     26.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiRectBaseGroup::m_SetBiggestItem(C_GiBiSizeableItem & orc_Item)
 {
    this->mpc_BiggestSubItem = &orc_Item;
@@ -154,48 +141,39 @@ void C_GiBiRectBaseGroup::m_SetBiggestItem(C_GiBiSizeableItem & orc_Item)
    this->mf64_AspectRatio = this->mpc_BiggestSubItem->f64_Width / this->mpc_BiggestSubItem->f64_Height;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore default mouse cursor
-
-   \created     10.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore default mouse cursor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiRectBaseGroup::RestoreDefaultCursor(void)
 {
    this->setCursor(this->mc_DefaultCursor);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Change mouse cursor temporarily
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Change mouse cursor temporarily
 
    \param[in] orc_TemporaryCursor New mouse cursor
-
-   \created     10.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiRectBaseGroup::SetTemporaryCursor(const QCursor & orc_TemporaryCursor)
 {
    this->setCursor(orc_TemporaryCursor);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set default mouse cursor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set default mouse cursor
 
    \param[in] orc_Value New default mouse cursor
-
-   \created     04.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiRectBaseGroup::SetDefaultCursor(const QCursor & orc_Value)
 {
    this->setCursor(orc_Value);
    this->mc_DefaultCursor = orc_Value;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiRectBaseGroup::m_InitActionPoints()
 {
    QVector<C_GiPointInteraction *>::iterator pc_ItPoint;
@@ -228,7 +206,7 @@ void C_GiBiRectBaseGroup::m_InitActionPoints()
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiRectBaseGroup::m_UpdateActionPoints(void)
 {
    // adapt the shown bounding rect coordinatesESX-3CM
@@ -268,7 +246,7 @@ void C_GiBiRectBaseGroup::m_UpdateActionPoints(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QRectF C_GiBiRectBaseGroup::m_GetBiggestSubItemBoundingRect(void) const
 {
    QRectF c_Rect;
@@ -283,7 +261,7 @@ QRectF C_GiBiRectBaseGroup::m_GetBiggestSubItemBoundingRect(void) const
    return c_Rect;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiRectBaseGroup::m_SetAdaptedPos(const QPointF & orc_Pos)
 {
    if ((this->mc_PosOffset.x() >= 0.0) ||
@@ -317,7 +295,7 @@ void C_GiBiRectBaseGroup::m_SetAdaptedPos(const QPointF & orc_Pos)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiRectBaseGroup::m_BiggestItemChanged(void)
 {
    // keep GraphicsScene up to date and get a clean drawing
@@ -332,22 +310,19 @@ void C_GiBiRectBaseGroup::m_BiggestItemChanged(void)
    this->update();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiRectBaseGroup::m_BlockMoveAndResize(void)
 {
    this->mq_BlockMoveAndResize = true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get interaction point width
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get interaction point width
 
    \return
    Interaction point width
-
-   \created     11.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 float64 C_GiBiRectBaseGroup::m_GetInteractionPointSceneWidth(void) const
 {
    float64 f64_Retval = 1.0;
@@ -359,31 +334,25 @@ float64 C_GiBiRectBaseGroup::m_GetInteractionPointSceneWidth(void) const
    return f64_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     25.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiBiRectBaseGroup::~C_GiBiRectBaseGroup()
 {
    //lint -e{1540}  no memory leak because of the parent of mpc_BiggestSubItem and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    \param[in,out] opc_Painter Painter
    \param[in,out] opc_Option  Option
    \param[in,out] opc_Widget  Widget
-
-   \created     16.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiRectBaseGroup::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                                 QWidget * const opc_Widget)
 {
@@ -401,16 +370,16 @@ void C_GiBiRectBaseGroup::paint(QPainter * const opc_Painter, const QStyleOption
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns an estimate of the area painted by the item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get bounding rectangle (estimate of the area painted by the item)
 
    The real bounding rect is slightly bigger than the shown bounding rect.
    The interaction have to be inside the bounding rect.
 
-   \created     19.08.2016  STW/B.Bayer
+   \return
+   bounding rectangle
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QRectF C_GiBiRectBaseGroup::boundingRect() const
 {
    QRectF c_BoundingRect = this->mc_ShowBoundingRect;
@@ -429,42 +398,33 @@ QRectF C_GiBiRectBaseGroup::boundingRect() const
    return c_BoundingRect;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get visible bounding rect for better alignment
-
-   \created     09.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get visible bounding rect for better alignment
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QRectF C_GiBiRectBaseGroup::GetVisibleBoundingRect() const
 {
    return this->mc_ShowBoundingRect;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Find closest point in shape to scene position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Find closest point in shape to scene position
 
    \param[in]  orc_ScenePoint Scene position
    \param[out] orc_Closest    Closest point in shape
-
-   \created     27.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiRectBaseGroup::FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Closest) const
 {
    orc_Closest = orc_ScenePoint;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   De- or activates the resizing of a node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   De- or activates the resizing of a node
 
    \param[in]     oq_Active      True activates the resizing, false deactivates the resizing
-
-   \created     16.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiRectBaseGroup::SetResizing(const bool oq_Active)
 {
    QVector<C_GiPointInteraction *>::iterator pc_ItPoint;
@@ -478,15 +438,12 @@ void C_GiBiRectBaseGroup::SetResizing(const bool oq_Active)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the size of the biggest sub item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the size of the biggest sub item
 
    \return  Actual size
-
-   \created     02.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QSizeF C_GiBiRectBaseGroup::GetSize(void) const
 {
    QSizeF c_Size(0.0, 0.0);
@@ -501,30 +458,24 @@ QSizeF C_GiBiRectBaseGroup::GetSize(void) const
    return c_Size;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function for initially loading basic internal data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function for initially loading basic internal data
 
    \param[in,out] orc_Data Data element to load
-
-   \created     10.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiRectBaseGroup::LoadBasicData(const stw_opensyde_gui_logic::C_PuiBsBox & orc_Data)
 {
    this->m_SetAdaptedPos(orc_Data.c_UIPosition);
    this->setZValue(orc_Data.f64_ZOrder);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Enter basic line info
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Enter basic line info
 
    \param[in,out] orc_Data Data element to update
-
-   \created     02.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiRectBaseGroup::UpdateBasicData(stw_opensyde_gui_logic::C_PuiBsBox & orc_Data) const
 {
    tgl_assert(this->mpc_BiggestSubItem != NULL);
@@ -544,15 +495,13 @@ void C_GiBiRectBaseGroup::UpdateBasicData(stw_opensyde_gui_logic::C_PuiBsBox & o
    orc_Data.f64_ZOrder = this->zValue();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   External trigger for size change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   External trigger for size change
 
    \param[in] orc_NewPos  New position
    \param[in] orc_NewSize New size
-   \created     22.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiRectBaseGroup::ApplySizeChange(const QPointF & orc_NewPos, const QSizeF & orc_NewSize)
 {
    QPointF c_Pos = orc_NewPos;
@@ -630,15 +579,25 @@ void C_GiBiRectBaseGroup::ApplySizeChange(const QPointF & orc_NewPos, const QSiz
    this->update();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal for update of current scaling
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Copy the style of the provided element
+
+   Warning: Only expected to work if the provided item is of the same type as this element
+
+   \param[in] opc_GuidelineItem Detailed input parameter description
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiBiRectBaseGroup::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
+{
+   Q_UNUSED(opc_GuidelineItem)
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal for update of current scaling
 
    \param[in] orc_Transform Current scaling
-
-   \created     16.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiRectBaseGroup::UpdateTransform(const QTransform & orc_Transform)
 {
    this->prepareGeometryChange();
@@ -653,16 +612,16 @@ void C_GiBiRectBaseGroup::UpdateTransform(const QTransform & orc_Transform)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten itemChange event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten itemChange event slot
 
-   \param[in,out] opc_Change Indicator what changed
+   \param[in]     oe_Change  Indicator what changed
    \param[in]     orc_Value  Value corresponding to change
 
-   \created     25.10.2016  STW/B.Bayer
+   \return
+   new value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_GiBiRectBaseGroup::itemChange(const GraphicsItemChange oe_Change, const QVariant & orc_Value)
 {
    QVariant c_Return = C_GiCustomFunctions::h_ItemChange(oe_Change, orc_Value, this);
@@ -711,7 +670,7 @@ QVariant C_GiBiRectBaseGroup::itemChange(const GraphicsItemChange oe_Change, con
    case ItemTransformHasChanged:            // use the same signal
    case ItemScaleHasChanged:                // use the same signal
    case ItemTransformOriginPointHasChanged: // use the same signal
-      Q_EMIT ChangedGraphic();
+      Q_EMIT this->ChangedGraphic();
       break;
    default:
       break;
@@ -720,15 +679,12 @@ QVariant C_GiBiRectBaseGroup::itemChange(const GraphicsItemChange oe_Change, con
    return c_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse press event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     13.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiRectBaseGroup::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    this->mc_LastKnownPosition = this->pos();
@@ -795,15 +751,12 @@ void C_GiBiRectBaseGroup::mousePressEvent(QGraphicsSceneMouseEvent * const opc_E
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse move event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse move event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     19.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiRectBaseGroup::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    if ((this->msn_ActiveResizeMode != msn_IndexElementMax) &&
@@ -944,15 +897,12 @@ void C_GiBiRectBaseGroup::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Ev
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse release event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse release event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     19.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiRectBaseGroup::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    Q_UNUSED(opc_Event)
@@ -986,9 +936,8 @@ void C_GiBiRectBaseGroup::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc
    QGraphicsItemGroup::mouseReleaseEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten scene event filter event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten scene event filter event slot
 
    Prevent action points from receiving events
 
@@ -998,10 +947,8 @@ void C_GiBiRectBaseGroup::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc
    \return
    true     Event will be ignored
    false    Event will be forwarded normally
-
-   \created     04.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiBiRectBaseGroup::sceneEventFilter(QGraphicsItem * const opc_Watched, QEvent * const opc_Event)
 {
    bool q_Return = true;

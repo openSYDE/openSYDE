@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Vertical splitter for navi bar (implementation)
 
    Vertical splitter for navi bar
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.08.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
@@ -24,35 +17,32 @@
 #include "C_UsHandler.h"
 #include "C_OgeSpiVerticalNavi.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     06.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeSpiVerticalNavi::C_OgeSpiVerticalNavi(QWidget * const opc_Parent) :
    C_OgeSpiBase(opc_Parent),
    mq_Loaded(false),
@@ -61,26 +51,20 @@ C_OgeSpiVerticalNavi::C_OgeSpiVerticalNavi(QWidget * const opc_Parent) :
    this->setHandleWidth(9);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore size from user settings
-
-   \created     06.08.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore size from user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpiVerticalNavi::LoadUserSettings(void)
 {
    this->mq_Loaded = true;
    this->SetFirstSegment(std::max(250, static_cast<sintn>(C_UsHandler::h_GetInstance()->GetNaviBarSize())));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Store size in user settings
-
-   \created     06.08.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Store size in user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpiVerticalNavi::StoreUserSettings(void) const
 {
    if (this->mq_Loaded == true)
@@ -99,13 +83,10 @@ void C_OgeSpiVerticalNavi::StoreUserSettings(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle splitter handle double click
-
-   \created     06.08.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle splitter handle double click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpiVerticalNavi::m_OnDoubleClick(void)
 {
    if (this->sizes().at(0) == 0)
@@ -121,13 +102,13 @@ void C_OgeSpiVerticalNavi::m_OnDoubleClick(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create splitter handle
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create splitter handle for custom handle
 
-   \created     06.08.2018  STW/M.Echtler
+   \return
+   splitter handle
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QSplitterHandle * C_OgeSpiVerticalNavi::createHandle(void)
 {
    //technically it is a horizontal splitter
@@ -141,51 +122,42 @@ QSplitterHandle * C_OgeSpiVerticalNavi::createHandle(void)
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     06.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeSpiVerticalNaviHandle::C_OgeSpiVerticalNaviHandle(const Qt::Orientation oe_Orientation,
                                                        QSplitter * const opc_Parent) :
    QSplitterHandle(oe_Orientation, opc_Parent)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten double click event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten double click event slot
 
    Here: forward double click
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     06.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpiVerticalNaviHandle::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
 {
    QSplitterHandle::mouseDoubleClickEvent(opc_Event);
    Q_EMIT this->SigDoubleClick();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overrided paint event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overrided paint event
 
    Draws the background element
 
    \param[in,out] opc_Event  Pointer to paint event
-
-   \created     06.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpiVerticalNaviHandle::paintEvent(QPaintEvent * const opc_Event)
 {
    Q_UNUSED(opc_Event)

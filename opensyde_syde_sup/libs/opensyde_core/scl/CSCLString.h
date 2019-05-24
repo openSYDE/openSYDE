@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       String class
@@ -23,28 +23,22 @@
    - AnsiLastChar
    - vprintf and cat_vprintf are private as they have not been explicitely tested yet
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     16.04.2009  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CSCLSTRINGH
 #define CSCLSTRINGH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <string>
 #include <cstdarg>
 #include "stwtypes.h"
 #include "SCLDynamicArray.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_scl
 {
-/* -- Defines ------------------------------------------------------------- */
+/* -- Defines ------------------------------------------------------------------------------------------------------- */
 //maybe this will be a part of a Borland library:
 #ifndef SCL_PACKAGE
 #ifdef __BORLANDC__
@@ -75,9 +69,9 @@ namespace stw_scl
 #endif
 #endif
 
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 ///String wrapper class
 class SCL_PACKAGE C_SCLString
 {
@@ -203,7 +197,7 @@ extern bool SCL_PACKAGE operator <= (const C_SCLString & orc_Par1, const C_SCLSt
 extern bool SCL_PACKAGE operator >= (const C_SCLString & orc_Par1, const C_SCLString & orc_Par2);
 extern C_SCLString SCL_PACKAGE operator + (const C_SCLString & orc_Par1, const C_SCLString & orc_Par2);
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

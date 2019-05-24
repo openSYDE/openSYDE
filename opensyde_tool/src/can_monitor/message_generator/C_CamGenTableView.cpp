@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       View (display) component for message generator table (implementation)
 
    View (display) component for message generator table
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     26.11.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QSpinBox>
@@ -40,7 +33,7 @@
 #include "C_OgeWiCustomMessage.h"
 #include "C_CamMosDatabaseSelectionPopup.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -49,29 +42,26 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     26.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamGenTableView::C_CamGenTableView(QWidget * const opc_Parent) :
    C_TblViewInteraction(opc_Parent),
    mq_CommunicationActive(false)
@@ -115,27 +105,21 @@ C_CamGenTableView::C_CamGenTableView(QWidget * const opc_Parent) :
    connect(&this->mc_Model, &C_CamGenTableModel::SigItemCheck, this, &C_CamGenTableView::m_HandleCheckChange);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamGenTableView::~C_CamGenTableView(void)
 {
    //lint -e{1540} never took ownership of any context menu item or button
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle add new message from data base action
-
-   \created     26.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle add new message from data base action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::AddMessageFromDatabase(void)
 {
    QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
@@ -161,13 +145,10 @@ void C_CamGenTableView::AddMessageFromDatabase(void)
    //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle add new message action
-
-   \created     26.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle add new message action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::AddMessage(void)
 {
    uint32 u32_Item;
@@ -179,13 +160,10 @@ void C_CamGenTableView::AddMessage(void)
    QApplication::restoreOverrideCursor();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle copy message action
-
-   \created     27.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle copy message action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::CopyMessage(void) const
 {
    QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -193,13 +171,10 @@ void C_CamGenTableView::CopyMessage(void) const
    QApplication::restoreOverrideCursor();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle paste message action
-
-   \created     27.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle paste message action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::PasteMessage(void)
 {
    std::vector<uint32> c_Items;
@@ -209,13 +184,10 @@ void C_CamGenTableView::PasteMessage(void)
    QApplication::restoreOverrideCursor();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle cut message action
-
-   \created     27.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle cut message action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::CutMessage(void)
 {
    uint32 u32_NewSelection;
@@ -228,13 +200,10 @@ void C_CamGenTableView::CutMessage(void)
    QApplication::restoreOverrideCursor();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle delete message action
-
-   \created     27.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle delete message action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::DeleteMessage(void)
 {
    uint32 u32_NewSelection;
@@ -247,13 +216,10 @@ void C_CamGenTableView::DeleteMessage(void)
    QApplication::restoreOverrideCursor();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle move message up action
-
-   \created     27.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle move message up action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::MoveMessageUp(void)
 {
    const std::vector<uint32> c_Input = this->m_GetSelectedRows();
@@ -263,13 +229,10 @@ void C_CamGenTableView::MoveMessageUp(void)
    QApplication::restoreOverrideCursor();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle move message down action
-
-   \created     27.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle move message down action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::MoveMessageDown(void)
 {
    const std::vector<uint32> c_Input = this->m_GetSelectedRows();
@@ -279,15 +242,12 @@ void C_CamGenTableView::MoveMessageDown(void)
    QApplication::restoreOverrideCursor();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore column widths
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore column widths
 
    \param[in] orc_ColumnWidths Stored column widths (Restores default values if empty)
-
-   \created     12.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::SetCurrentColumnWidths(const std::vector<sint32> & orc_ColumnWidths)
 {
    if (orc_ColumnWidths.size() > 0)
@@ -313,16 +273,13 @@ void C_CamGenTableView::SetCurrentColumnWidths(const std::vector<sint32> & orc_C
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current column widths
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current column widths
 
    \return
    Current column widths
-
-   \created     12.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<sint32> C_CamGenTableView::GetCurrentColumnWidths(void) const
 {
    std::vector<sint32> c_Retval;
@@ -334,41 +291,32 @@ std::vector<sint32> C_CamGenTableView::GetCurrentColumnWidths(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save all user settings
-
-   \created     12.12.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save all user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::SaveUserSettings(void) const
 {
    C_UsHandler::h_GetInstance()->SetMessageColWidths(this->GetCurrentColumnWidths());
    C_UsHandler::h_GetInstance()->SetSelectedMessages(C_CamGenTableView::mh_ConvertVector(this->m_GetSelectedRows()));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle user settings
-
-   \created     12.12.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::LoadUserSettings(void)
 {
    this->SetCurrentColumnWidths(C_UsHandler::h_GetInstance()->GetMessageColWidths());
    this->m_SetSelectedMessages(C_UsHandler::h_GetInstance()->GetSelectedMessages());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Remove all messages for the specified file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove all messages for the specified file
 
    \param[in] orc_File Database to remove all messages for
-
-   \created     05.02.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::RemoveMessagesForFile(const QString & orc_File)
 {
    std::vector<uint32> c_Indices;
@@ -379,13 +327,10 @@ void C_CamGenTableView::RemoveMessagesForFile(const QString & orc_File)
    QApplication::restoreOverrideCursor();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal communication start
-
-   \created     14.12.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal communication start
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::SetCommunicationStarted(void)
 {
    this->mq_CommunicationActive = true;
@@ -407,62 +352,50 @@ void C_CamGenTableView::SetCommunicationStarted(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal communication stop
-
-   \created     14.12.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal communication stop
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::SetCommunicationStopped(void)
 {
    this->mq_CommunicationActive = false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update message data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update message data
 
    \param[in] ou32_MessageIndex Message index
-
-   \created     14.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::UpdateMessageData(const uint32 ou32_MessageIndex)
 {
    this->mc_Model.UpdateMessageData(ou32_MessageIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Request trigger of model function for update cyclic message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Request trigger of model function for update cyclic message
 
    Reason: have one central point for each check which has to be done when changing an existing message
 
    \param[in] ou32_MessageIndex Message index
    \param[in] oq_Active         Change of cyclic message state
-
-   \created     15.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::TriggerModelUpdateCyclicMessage(const uint32 ou32_MessageIndex, const bool oq_Active)
 {
    this->mc_Model.TriggerModelUpdateCyclicMessage(ou32_MessageIndex, oq_Active);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if the key needs to be handled by this widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if the key needs to be handled by this widget
 
    \param[in] orc_Input Key input interpreted as text
 
    \return
    True  Handled by this widget
    False No handling
-
-   \created     15.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_CamGenTableView::CheckAndHandleKey(const QString & orc_Input)
 {
    bool q_Retval = false;
@@ -496,17 +429,14 @@ bool C_CamGenTableView::CheckAndHandleKey(const QString & orc_Input)
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten keypress event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten keypress event slot
 
    Here: add new actions
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     29.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::keyPressEvent(QKeyEvent * const opc_Event)
 {
    bool q_CallOrig = true;
@@ -621,52 +551,43 @@ void C_CamGenTableView::keyPressEvent(QKeyEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten show event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten show event slot
 
    Here: move scroll bar buttons
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::showEvent(QShowEvent * const opc_Event)
 {
    C_TblViewToolTipBase::showEvent(opc_Event);
    m_RepositionButtons();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten resize event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten resize event slot
 
    Here: move scroll bar buttons
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::resizeEvent(QResizeEvent * const opc_Event)
 {
    C_TblViewToolTipBase::resizeEvent(opc_Event);
    m_RepositionButtons();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten selection change event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten selection change event slot
 
    Here: notify model of change (selection indicator)
 
    \param[in] orc_Selected   Selected items
    \param[in] orc_Deselected Deselected items
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::selectionChanged(const QItemSelection & orc_Selected, const QItemSelection & orc_Deselected)
 {
    std::vector<uint32> c_Selection;
@@ -684,16 +605,13 @@ void C_CamGenTableView::selectionChanged(const QItemSelection & orc_Selected, co
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get selected row index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get selected row index
 
    \return
    Selected row index
-
-   \created     27.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint32> C_CamGenTableView::m_GetSelectedRows(void) const
 {
    std::vector<uint32> c_Retval;
@@ -715,13 +633,10 @@ std::vector<uint32> C_CamGenTableView::m_GetSelectedRows(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init context menu entries
-
-   \created     28.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init context menu entries
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::m_SetupContextMenu(void)
 {
    this->mpc_ContextMenu = new C_OgeContextMenu(this);
@@ -772,15 +687,12 @@ void C_CamGenTableView::m_SetupContextMenu(void)
            &C_CamGenTableView::m_OnCustomContextMenuRequested);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show custom context menu
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show custom context menu
 
    \param[in] orc_Pos Local context menu position
-
-   \created     28.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 {
    bool q_SelectionVisibility;
@@ -800,17 +712,14 @@ void C_CamGenTableView::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
    this->mpc_ContextMenu->popup(this->mapToGlobal(orc_Pos));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility function to select the specified rows
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility function to select the specified rows
 
    Info: selection is updated, not cleared
 
    \param[in] orc_Items Rows to select, expected sorted ascending
-
-   \created     11.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::SelectRange(const std::vector<uint32> & orc_Items)
 {
    if (orc_Items.size() > 0UL)
@@ -823,15 +732,12 @@ void C_CamGenTableView::SelectRange(const std::vector<uint32> & orc_Items)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility function to select the specified row (clear other selection) and scroll to this row (first column)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility function to select the specified row (clear other selection) and scroll to this row (first column)
 
    \param[in] ou32_Row Row index
-
-   \created     11.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::SelectAndScrollToRow(const uint32 ou32_Row)
 {
    const QModelIndex c_Index = this->mc_SortProxyModel.mapFromSource(this->mc_Model.index(ou32_Row, 0));
@@ -841,13 +747,10 @@ void C_CamGenTableView::SelectAndScrollToRow(const uint32 ou32_Row)
    this->scrollTo(c_Index);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reposition the buttons as necessary
-
-   \created     13.12.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reposition the buttons as necessary
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::m_RepositionButtons(void)
 {
    const QSize c_ButtonSizeUp(25, 27);
@@ -856,15 +759,12 @@ void C_CamGenTableView::m_RepositionButtons(void)
    this->mpc_PushButtonScrollTop->setGeometry(QRect(QPoint(0, 0), c_ButtonSizeUp));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle link clicked signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle link clicked signal
 
    \param[in] orc_Index Clicked index
-
-   \created     14.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::m_HandleLinkClicked(const QModelIndex & orc_Index)
 {
    const sint32 s32_Row = this->mc_SortProxyModel.mapToSource(orc_Index).row();
@@ -917,15 +817,12 @@ void C_CamGenTableView::m_HandleLinkClicked(const QModelIndex & orc_Index)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Stop cyclic communication for these items if necessary (if currently is registered)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Stop cyclic communication for these items if necessary (if currently is registered)
 
    \param[in] orc_Items Item indices to change the state for
-
-   \created     15.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::m_StopCyclicCommunication(const std::vector<uint32> & orc_Items)
 {
    //only relevant if communication active
@@ -948,18 +845,15 @@ void C_CamGenTableView::m_StopCyclicCommunication(const std::vector<uint32> & or
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle cyclic change request
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle cyclic change request
 
    Add check if necessary
 
    \param[in] ou32_MessageIndex Message index
    \param[in] oq_Active         Flag if cyclic message is active
-
-   \created     15.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::m_ModelRegisterCyclicMessage(const uint32 ou32_MessageIndex, const bool oq_Active)
 {
    //only relevant if communication active or while paused
@@ -969,18 +863,15 @@ void C_CamGenTableView::m_ModelRegisterCyclicMessage(const uint32 ou32_MessageIn
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle add message from data base action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle add message from data base action
 
    \param[in] orc_NewItems New item description
                            array:
                            0: database name
                            1: message name
-
-   \created     18.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::m_AddMessageFromDatabase(const std::vector<std::array<QString, 2> > & orc_NewItems)
 {
    std::vector<uint32> c_NewItems;
@@ -1112,15 +1003,12 @@ void C_CamGenTableView::m_AddMessageFromDatabase(const std::vector<std::array<QS
    this->m_HandleNewItemScrollingAndSelection(c_NewItems);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle new item selection and scrolling
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle new item selection and scrolling
 
    \param[in] orc_Indices New item indices
-
-   \created     22.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::m_HandleNewItemScrollingAndSelection(const std::vector<uint32> & orc_Indices)
 {
    //Select newest items
@@ -1151,18 +1039,15 @@ void C_CamGenTableView::m_HandleNewItemScrollingAndSelection(const std::vector<u
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert uint32 vector to sint32
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert uint32 vector to sint32
 
    \param[in] orc_Input Vector to convert
 
    \return
    Converted vector
-
-   \created     06.02.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<sint32> C_CamGenTableView::mh_ConvertVector(const std::vector<uint32> & orc_Input)
 {
    std::vector<sint32> c_Retval;
@@ -1174,15 +1059,12 @@ std::vector<sint32> C_CamGenTableView::mh_ConvertVector(const std::vector<uint32
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Select the specified items (clear all other selection)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Select the specified items (clear all other selection)
 
    \param[in] orc_SelectedIndices Indices of items to select
-
-   \created     06.02.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::m_SetSelectedMessages(const std::vector<sint32> & orc_SelectedIndices)
 {
    this->selectionModel()->clearSelection();
@@ -1192,15 +1074,12 @@ void C_CamGenTableView::m_SetSelectedMessages(const std::vector<sint32> & orc_Se
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Select one row
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Select one row
 
    \param[in] os32_Row Row index
-
-   \created     06.02.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::m_SelectRow(const sint32 os32_Row, const QItemSelectionModel::SelectionFlags & orc_Flags)
 {
    const QModelIndex c_StartIndex = this->mc_SortProxyModel.mapFromSource(this->mc_Model.index(os32_Row, 0));
@@ -1211,15 +1090,12 @@ void C_CamGenTableView::m_SelectRow(const sint32 os32_Row, const QItemSelectionM
    this->selectionModel()->select(c_SelectionRange, orc_Flags);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle checkbox item change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle checkbox item change
 
    \param[in] orc_Index Changed item
-
-   \created     06.02.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::m_HandleCheckChange(const QModelIndex & orc_Index)
 {
    if (orc_Index.isValid())

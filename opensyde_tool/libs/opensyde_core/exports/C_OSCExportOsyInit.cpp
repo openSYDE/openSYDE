@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Export initialization module for DPD and DPH.
 
    Create a .c and .h file providing initialization structures for the OSS DPD and DPH init functions.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     23.03.2018  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -32,52 +25,45 @@
 #include "C_OSCProtocolDriverOsyTpBase.h"
 #include "C_OSCLoggingHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_scl;
 using namespace stw_tgl;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Constructor
 
    Initialize all elements with default values
-
-   \created     23.03.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCExportOsyInit::C_OSCExportOsyInit(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     23.03.2018  STW/A.Stangl
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCExportOsyInit::~C_OSCExportOsyInit(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create source files
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create source files
 
    Create .c and .h files with DPD / DPH initialization.
    The specified file path is used for the ".c" file to create.
@@ -93,10 +79,8 @@ C_OSCExportOsyInit::~C_OSCExportOsyInit(void)
    \return
    C_NO_ERR Operation success
    C_RD_WR  Operation failure: cannot store files
-
-   \created     23.03.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, const C_OSCNode & orc_Node,
                                               const bool oq_RunsDpd, const uint16 ou16_ApplicationIndex)
 {
@@ -632,9 +616,8 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility: check whether DPD initialization needs to be performed
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility: check whether DPD initialization needs to be performed
 
    Logic:
    Initialization is required if
@@ -648,10 +631,8 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
    \return
    true: DPD needs to be initialized on interface
    false: DPD does not need to be initialized on interface
-
-   \created     25.05.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCExportOsyInit::mh_IsDpdInitRequired(const C_OSCNodeComInterfaceSettings & orc_Settings)
 {
    return ((orc_Settings.q_IsBusConnected == true) &&
@@ -660,9 +641,8 @@ bool C_OSCExportOsyInit::mh_IsDpdInitRequired(const C_OSCNodeComInterfaceSetting
             (orc_Settings.q_IsUpdateEnabled == true)));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility: get size of greatest data pool element or list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility: get size of greatest data pool element or list
 
    For NVM data pools:
    *  Go through vector of data pools and check which is the greatest list
@@ -676,10 +656,8 @@ bool C_OSCExportOsyInit::mh_IsDpdInitRequired(const C_OSCNodeComInterfaceSetting
 
    \return
    size of the greatest data pool element/list in bytes
-
-   \created     26.03.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_OSCExportOsyInit::mh_GetSizeOfLargestDataPoolElement(const std::vector<C_OSCNodeDataPool> & orc_DataPools)
 {
    uint32 u32_GreatestSize = 0U;

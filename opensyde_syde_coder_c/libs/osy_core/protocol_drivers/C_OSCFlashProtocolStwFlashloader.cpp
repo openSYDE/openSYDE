@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Provides functions to use STW flashloader protocol services to interact with flashloader server nodes
 
    detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     23.11.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -47,15 +40,12 @@ using namespace stw_scl;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   constructor
+/*! \brief   constructor
 
    Set up class
 
    \param[in]  opr_Progress  function to call when reporting progress
    \param[in]  opv_Instance  instance pointer to pass as parameter when reporting progress
-
-   \created     23.11.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_OSCFlashProtocolStwFlashloader::C_OSCFlashProtocolStwFlashloader(const PR_ReportProgress opr_Progress,
@@ -67,12 +57,9 @@ C_OSCFlashProtocolStwFlashloader::C_OSCFlashProtocolStwFlashloader(const PR_Repo
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   destructor
+/*! \brief   destructor
 
    Tear down class
-
-   \created     23.11.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_OSCFlashProtocolStwFlashloader::~C_OSCFlashProtocolStwFlashloader(void)
@@ -82,8 +69,7 @@ C_OSCFlashProtocolStwFlashloader::~C_OSCFlashProtocolStwFlashloader(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   report progress to application
+/*! \brief   report progress to application
 
    Convert progress information from STW Flashloader driver to openSYDE format and invoke installed reporting function
 
@@ -93,8 +79,6 @@ C_OSCFlashProtocolStwFlashloader::~C_OSCFlashProtocolStwFlashloader(void)
    \return
    C_NO_ERR    continue operation
    else        abort operation (not honored at each position)
-
-   \created     12.02.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCFlashProtocolStwFlashloader::TRG_ReportProgress(const uint16 ou16_Progress1_1000,
@@ -111,15 +95,12 @@ sint32 C_OSCFlashProtocolStwFlashloader::TRG_ReportProgress(const uint16 ou16_Pr
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   report status to application
+/*! \brief   report status to application
 
    Convert status information from STW Flashloader driver to openSYDE format and invoke installed reporting function
 
    \param[in]   orc_Text          textual information about status
    \param[in]   ou8_Type          type of reported status (see gu8_DL_REPORT_STATUS_TYPE_* constants)
-
-   \created     12.02.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_OSCFlashProtocolStwFlashloader::TRG_ReportStatus(const C_SCLString & orc_Text, const uint8 ou8_Type)

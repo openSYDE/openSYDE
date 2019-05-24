@@ -1,52 +1,42 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       UI base class for dashboard widget data (implementation)
 
    UI base class for dashboard widget data
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     10.08.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwerrors.h"
 #include "C_PuiSvDbWidgetBase.h"
 #include "CSCLChecksums.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     10.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbWidgetBase::C_PuiSvDbWidgetBase(void) :
    C_PuiBsBox(),
    e_ElementWriteMode(eWM_MANUAL),
@@ -54,17 +44,14 @@ C_PuiSvDbWidgetBase::C_PuiSvDbWidgetBase(void) :
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
 
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
-
-   \created     24.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbWidgetBase::CalcHash(uint32 & oru32_HashValue) const
 {
    uint32 u32_Counter;
@@ -79,9 +66,8 @@ void C_PuiSvDbWidgetBase::CalcHash(uint32 & oru32_HashValue) const
    C_PuiBsBox::CalcHash(oru32_HashValue);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current index for specifed element ID
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current index for specifed element ID
 
    \param[in]  orc_Id      Data element id
    \param[out] oru32_Index Data element index
@@ -89,10 +75,8 @@ void C_PuiSvDbWidgetBase::CalcHash(uint32 & oru32_HashValue) const
    \return
    C_NO_ERR Data element id found
    C_RANGE  Data element id not found
-
-   \created     10.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvDbWidgetBase::GetIndex(const C_PuiSvDbNodeDataPoolListElementId & orc_Id, uint32 & oru32_Index) const
 {
    sint32 s32_Retval = C_RANGE;
@@ -105,6 +89,30 @@ sint32 C_PuiSvDbWidgetBase::GetIndex(const C_PuiSvDbNodeDataPoolListElementId & 
          s32_Retval = C_NO_ERR;
          oru32_Index = u32_It;
       }
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Remove element from widget
+
+   \param[in] oru32_Index Internal index
+
+   \retval   C_NO_ERR   Index found
+   \retval   C_RANGE    Index not found
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvDbWidgetBase::RemoveElement(const uint32 & oru32_Index)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (oru32_Index < this->c_DataPoolElementsConfig.size())
+   {
+      this->c_DataPoolElementsConfig.erase(this->c_DataPoolElementsConfig.begin() + oru32_Index);
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
    }
    return s32_Retval;
 }

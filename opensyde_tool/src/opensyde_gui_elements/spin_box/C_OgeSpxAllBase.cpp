@@ -1,68 +1,55 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Base class for all spin boxes (implementation)
 
    Base class for all spin boxes
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.06.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QHelpEvent>
 #include "C_GtGetText.h"
 #include "C_OgeSpxAllBase.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     19.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeSpxAllBase::C_OgeSpxAllBase() :
    C_OgeToolTipBase(),
    me_ToolTipAdditionalType(stw_opensyde_gui::C_NagToolTip::eDEFAULT)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set additional tooltip info
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set additional tooltip info
 
    \param[in] orc_Text     Additional text
    \param[in] oq_ErrorType New error type
-
-   \created     20.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxAllBase::SetToolTipAdditionalInfo(const QString & orc_Text,
                                                const stw_opensyde_gui::C_NagToolTip::E_Type oe_Type)
 {
@@ -71,13 +58,10 @@ void C_OgeSpxAllBase::SetToolTipAdditionalInfo(const QString & orc_Text,
    m_ApplyToolTipInfo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Activate default range tool tip
-
-   \created     02.05.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Activate default range tool tip
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxAllBase::ActivateDefaultToolTip(void)
 {
    const QString c_Heading = C_GtGetText::h_GetText("Value Range");
@@ -89,9 +73,8 @@ void C_OgeSpxAllBase::ActivateDefaultToolTip(void)
    this->SetToolTipInformation(c_Heading, c_Content);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten default event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten default event slot
 
    Here: Handle tool tip
 
@@ -100,10 +83,8 @@ void C_OgeSpxAllBase::ActivateDefaultToolTip(void)
    \return
    True  Event was recognized and processed
    False Event ignored
-
-   \created     19.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OgeSpxAllBase::m_HandleEvent(QEvent * const opc_Event)
 {
    bool q_Return;
@@ -156,13 +137,10 @@ bool C_OgeSpxAllBase::m_HandleEvent(QEvent * const opc_Event)
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply updated tool tip info
-
-   \created     20.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply updated tool tip info
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxAllBase::m_ApplyToolTipInfo(void)
 {
    if (this->m_GetToolTip() != NULL)

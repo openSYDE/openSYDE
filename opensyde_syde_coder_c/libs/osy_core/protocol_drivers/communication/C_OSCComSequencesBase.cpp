@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Basic sequences to communicate with flashloader protocols. (implementation)
 
    Initialization for C_OSCComDriverFlash
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     14.12.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -45,12 +38,9 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+/*! \brief   Default constructor
 
    \param[in]  oq_RoutingActive     Flag for activating routing
-
-   \created     14.12.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_OSCComSequencesBase::C_OSCComSequencesBase(const bool oq_RoutingActive) :
@@ -64,12 +54,9 @@ C_OSCComSequencesBase::C_OSCComSequencesBase(const bool oq_RoutingActive) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   destructor
+/*! \brief   destructor
 
    Tear down class
-
-   \created     08.12.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_OSCComSequencesBase::~C_OSCComSequencesBase(void)
@@ -79,8 +66,7 @@ C_OSCComSequencesBase::~C_OSCComSequencesBase(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize class parameters to use for communication
+/*! \brief   Initialize class parameters to use for communication
 
    Set parameters required for processes:
    * whole system definition
@@ -115,8 +101,6 @@ C_OSCComSequencesBase::~C_OSCComSequencesBase(void)
    C_CHECKSUM    Internal buffer overflow detected
    C_DEFAULT     Parameter ou32_ActiveBusIndex invalid
    C_RANGE       Routing configuration failed (can all nodes marked as active be reached from the defined bus ?)
-
-   \created     14.12.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComSequencesBase::Init(const C_OSCSystemDefinition & orc_SystemDefinition, const uint32 ou32_ActiveBusIndex,
@@ -158,13 +142,10 @@ sint32 C_OSCComSequencesBase::Init(const C_OSCSystemDefinition & orc_SystemDefin
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get is initialized flag
+/*! \brief   Get is initialized flag
 
    \return
    Is initialized flag
-
-   \created     14.12.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 bool C_OSCComSequencesBase::IsInitialized(void) const
@@ -173,8 +154,7 @@ bool C_OSCComSequencesBase::IsInitialized(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Gets the node index by the server id
+/*! \brief   Gets the node index by the server id
 
    \param[in]     orc_ServerId         Server id
    \param[out]    oru32_NodeIndex      Found node index
@@ -182,8 +162,6 @@ bool C_OSCComSequencesBase::IsInitialized(void) const
    \return
    true     Node index found
    false    Node index not found
-
-   \created     14.12.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 bool C_OSCComSequencesBase::GetNodeIndex(const C_OSCProtocolDriverOsyNode & orc_ServerId,
@@ -193,16 +171,13 @@ bool C_OSCComSequencesBase::GetNodeIndex(const C_OSCProtocolDriverOsyNode & orc_
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Gets the information if at least one openSYDE device is active
+/*! \brief   Gets the information if at least one openSYDE device is active
 
    Init function must be called first.
 
    \return
    true     At least one device found
    false    No device found
-
-   \created     23.01.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 bool C_OSCComSequencesBase::IsAtLeastOneOpenSydeNodeActive(void) const
@@ -211,16 +186,13 @@ bool C_OSCComSequencesBase::IsAtLeastOneOpenSydeNodeActive(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Gets the information if at least one STW flashloader device is active
+/*! \brief   Gets the information if at least one STW flashloader device is active
 
    Init function must be called first.
 
    \return
    true     At least one device found
    false    No device found
-
-   \created     23.01.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 bool C_OSCComSequencesBase::IsAtLeastOneStwFlashloaderNodeActive(void) const
@@ -229,16 +201,13 @@ bool C_OSCComSequencesBase::IsAtLeastOneStwFlashloaderNodeActive(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Gets the information if at least one STW flashloader device is on the local bus active
+/*! \brief   Gets the information if at least one STW flashloader device is on the local bus active
 
    Init function must be called first.
 
    \return
    true     At least one device found
    false    No device found
-
-   \created     25.04.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 bool C_OSCComSequencesBase::IsAtLeastOneStwFlashloaderNodeActiveOnLocalBus(void) const
@@ -247,16 +216,13 @@ bool C_OSCComSequencesBase::IsAtLeastOneStwFlashloaderNodeActiveOnLocalBus(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Checks if the node is reachable on the current route
+/*! \brief   Checks if the node is reachable on the current route
 
    \param[in]     ou32_NodeIndex         Index of current node
 
    \return
    true     Node is reachable on the current route
    false    Node is not reachable on the current route
-
-   \created     26.07.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 bool C_OSCComSequencesBase::mq_IsNodeReachable(const uint32 ou32_NodeIndex) const
@@ -292,8 +258,7 @@ bool C_OSCComSequencesBase::mq_IsNodeReachable(const uint32 ou32_NodeIndex) cons
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   report progress of STW Flashloader operation to application
+/*! \brief   report progress of STW Flashloader operation to application
 
    Report progress information from STW Flashloader driver via virtual function.
 
@@ -305,8 +270,6 @@ bool C_OSCComSequencesBase::mq_IsNodeReachable(const uint32 ou32_NodeIndex) cons
    \return
    C_NO_ERR    continue operation
    else        abort operation (not honored at each position)
-
-   \created     12.02.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComSequencesBase::mh_MyXflReportProgress(void * const opv_Instance, const uint8 ou8_Progress,
@@ -317,8 +280,7 @@ sint32 C_OSCComSequencesBase::mh_MyXflReportProgress(void * const opv_Instance, 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   report progress of STW Flashloader operation to application
+/*! \brief   report progress of STW Flashloader operation to application
 
    Report progress information from STW Flashloader driver via virtual function.
 
@@ -329,8 +291,6 @@ sint32 C_OSCComSequencesBase::mh_MyXflReportProgress(void * const opv_Instance, 
    \return
    C_NO_ERR    continue operation
    else        abort operation (not honored at each position)
-
-   \created     12.02.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComSequencesBase::m_MyXflReportProgress(const uint8 ou8_Progress, const C_SCLString & orc_Text)
@@ -340,14 +300,11 @@ sint32 C_OSCComSequencesBase::m_MyXflReportProgress(const uint8 ou8_Progress, co
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Gets the information if at least one openSYDE device is active
+/*! \brief   Gets the information if at least one openSYDE device is active
 
    \return
    true     At least one device found
    false    No device found
-
-   \created     23.01.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 bool C_OSCComSequencesBase::m_IsAtLeastOneOpenSydeNodeActive(void) const
@@ -375,14 +332,11 @@ bool C_OSCComSequencesBase::m_IsAtLeastOneOpenSydeNodeActive(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Gets the information if at least one STW flashloader device is active
+/*! \brief   Gets the information if at least one STW flashloader device is active
 
    \return
    true     At least one device found
    false    No device found
-
-   \created     23.01.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 bool C_OSCComSequencesBase::m_IsAtLeastOneStwFlashloaderNodeActive(void) const
@@ -410,16 +364,13 @@ bool C_OSCComSequencesBase::m_IsAtLeastOneStwFlashloaderNodeActive(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Gets the information if at least one STW flashloader device is active on the local bus
+/*! \brief   Gets the information if at least one STW flashloader device is active on the local bus
 
    \param[out]    orc_StwFlashloaderDeviceOnLocalBus     The first found STW flashloader node on the local bus
 
    \return
    true     At least one device found
    false    No device found
-
-   \created     25.04.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 bool C_OSCComSequencesBase::m_IsAtLeastOneStwFlashloaderNodeOnLocalBusActive(

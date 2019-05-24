@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Class for system view dashboard toggle item (implementation)
 
    Class for system view dashboard toggle item
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.08.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QGraphicsView>
@@ -35,7 +28,7 @@
 #include "C_SyvDaPeToggle.h"
 #include "C_SdNdeDataPoolContentUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -44,31 +37,28 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     oru32_ViewIndex        Index of system view
    \param[in]     oru32_DashboardIndex   Index of dashboard in system view
    \param[in]     ors32_DataIndex        Index of data element in dashboard in system view
    \param[in]     oru64_ID               Unique ID
    \param[in,out] opc_Parent             Optional pointer to parent
-
-   \created     25.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvDaToggleBase::C_GiSvDaToggleBase(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
                                        const sint32 & ors32_DataIndex, const uint64 & oru64_ID,
                                        QGraphicsItem * const opc_Parent) :
@@ -80,45 +70,36 @@ C_GiSvDaToggleBase::C_GiSvDaToggleBase(const uint32 & oru32_ViewIndex, const uin
    this->mpc_Widget->SetWidget(this->mpc_CheckBoxWidget);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     25.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvDaToggleBase::~C_GiSvDaToggleBase(void)
 {
    //lint -e{1540}  no memory leak because of the parent of mpc_CheckBoxWidget by calling SetWidget and
    // the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the type of this item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the type of this item
 
    \return  ID
-
-   \created     25.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_GiSvDaToggleBase::type(void) const
 {
    return msn_GRAPHICS_ITEM_DB_TOGGLE;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply style
 
    \param[in] oe_Style    New style type
    \param[in] oq_DarkMode Flag if dark mode is active
-
-   \created     28.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaToggleBase::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode)
 {
    C_GiSvDaRectBaseGroup::SetDisplayStyle(oe_Style, oq_DarkMode);
@@ -140,24 +121,18 @@ void C_GiSvDaToggleBase::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_S
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adjust font to current size
-
-   \created     25.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adjust font to current size
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaToggleBase::ReInitializeSize(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load data from system view dashboard
-
-   \created     25.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load data from system view dashboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaToggleBase::LoadData(void)
 {
    const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
@@ -178,13 +153,10 @@ void C_GiSvDaToggleBase::LoadData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update data in system view dashboard
-
-   \created     25.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update data in system view dashboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaToggleBase::UpdateData(void)
 {
    const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
@@ -209,13 +181,10 @@ void C_GiSvDaToggleBase::UpdateData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete data in system view dashboard
-
-   \created     25.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete data in system view dashboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaToggleBase::DeleteData(void)
 {
    if (this->ms32_Index >= 0)
@@ -228,13 +197,10 @@ void C_GiSvDaToggleBase::DeleteData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sends the current set value of the element
-
-   \created     28.08.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sends the current set value of the element
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaToggleBase::SendCurrentValue(void)
 {
    if (this->mpc_CheckBoxWidget != NULL)
@@ -247,13 +213,10 @@ void C_GiSvDaToggleBase::SendCurrentValue(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Call properties for widgets
-
-   \created     12.09.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Call properties for widgets
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaToggleBase::CallProperties(void)
 {
    const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
@@ -318,7 +281,10 @@ bool C_GiSvDaToggleBase::CallProperties(void)
                c_Tmp.c_ElementId = pc_Dialog->GetDataElementId();
                c_Tmp.c_ElementScaling = pc_Dialog->GetScalingInformation();
                c_Box.c_DataPoolElementsConfig.clear();
-               c_Box.c_DataPoolElementsConfig.push_back(c_Tmp);
+               if (c_Tmp.c_ElementId.GetIsValid())
+               {
+                  c_Box.c_DataPoolElementsConfig.push_back(c_Tmp);
+               }
                c_Box.e_ElementWriteMode = pc_Dialog->GetWriteMode();
 
                //Force update
@@ -328,7 +294,10 @@ bool C_GiSvDaToggleBase::CallProperties(void)
                this->SetDisplayStyle(this->me_Style, this->mq_DarkMode);
                this->UpdateType(c_Box.e_Type);
                this->ClearDataPoolElements();
-               this->RegisterDataPoolElement(pc_Dialog->GetDataElementId(), pc_Dialog->GetScalingInformation());
+               if (c_Tmp.c_ElementId.GetIsValid())
+               {
+                  this->RegisterDataPoolElement(pc_Dialog->GetDataElementId(), pc_Dialog->GetScalingInformation());
+               }
 
                tgl_assert(C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex,
                                                                               this->mu32_DashboardIndex,
@@ -347,15 +316,12 @@ bool C_GiSvDaToggleBase::CallProperties(void)
    return true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Information about the start or stop of a connection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the start or stop of a connection
 
    \param[in]  oq_Active      Flag if connection is active or not active now
-
-   \created     17.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaToggleBase::ConnectionActiveChanged(const bool oq_Active)
 {
    const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
@@ -379,17 +345,14 @@ void C_GiSvDaToggleBase::ConnectionActiveChanged(const bool oq_Active)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update type
 
    Warning: Only use for preview
 
    \param[in] oe_Type        Type
-
-   \created     12.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaToggleBase::UpdateType(const C_PuiSvDbToggle::E_Type oe_Type)
 {
    if (this->mpc_CheckBoxWidget != NULL)
@@ -559,22 +522,19 @@ void C_GiSvDaToggleBase::UpdateType(const C_PuiSvDbToggle::E_Type oe_Type)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check for any invalid elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check for any invalid elements
 
    \return
    true  Found
    false Not found
-
-   \created     16.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
-bool C_GiSvDaToggleBase::m_CheckInvalidElements(QString & orc_FirstInvalidElementName) const
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvDaToggleBase::m_CheckHasValidElements(QString & orc_FirstInvalidElementName) const
 {
-   bool q_Retval = C_GiSvDaRectBaseGroup::m_CheckInvalidElements(orc_FirstInvalidElementName);
+   bool q_Retval = C_GiSvDaRectBaseGroup::m_CheckHasValidElements(orc_FirstInvalidElementName);
 
-   if (q_Retval == false)
+   if (q_Retval == true)
    {
       const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->GetMappingDpElementToDataSerie();
 
@@ -610,7 +570,7 @@ bool C_GiSvDaToggleBase::m_CheckInvalidElements(QString & orc_FirstInvalidElemen
                      //Check if out of range
                      if ((f64_MinScaled > 0.0) || (f64_MaxScaled < 1.0))
                      {
-                        q_Retval = true;
+                        q_Retval = false;
                         orc_FirstInvalidElementName = pc_Element->c_Name.c_str();
                      }
                   }

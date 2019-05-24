@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       System views manager (add, delete, ...) (implementation)
 
    System views manager (add, delete, ...)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.06.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "TGLUtils.h"
@@ -24,11 +17,12 @@
 #include "constants.h"
 #include "C_SyvUtil.h"
 #include "C_GtGetText.h"
+#include "C_UsHandler.h"
 #include "C_SyvManager.h"
 #include "C_PuiSvHandler.h"
 #include "C_OgeWiCustomMessage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -36,41 +30,35 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     13.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvManager::C_SyvManager(QObject * const opc_Parent) :
    QObject(opc_Parent)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle add new view action
-
-   \created     13.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle add new view action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvManager::AddView(void)
 {
    const uint32 u32_NewViewIndex = C_PuiSvHandler::h_GetInstance()->GetViewCount();
@@ -89,25 +77,19 @@ void C_SyvManager::AddView(void)
    Q_EMIT this->SigChangeMode(ms32_MODE_SYSVIEW, ms32_SUBMODE_SYSVIEW_SETUP, u32_NewViewIndex, c_SubMode, c_SubSubMode);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update all view names
-
-   \created     13.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update all view names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvManager::UpdateAllViewNames(void) const
 {
    Q_EMIT this->SigReloadNaviBarSystemViewNames();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle initial view setup
-
-   \created     21.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle initial view setup
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvManager::HandleInitialSystemView(void)
 {
    //Check if new project
@@ -117,33 +99,27 @@ void C_SyvManager::HandleInitialSystemView(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle rename view action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle rename view action
 
    Warning: Name assumed to be correct
 
    \param[in] ou32_Index Index identifier
    \param[in] orc_Name   New name
-
-   \created     13.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvManager::RenameView(const uint32 ou32_Index, const QString & orc_Name) const
 {
    tgl_assert(C_PuiSvHandler::h_GetInstance()->SetViewName(ou32_Index, orc_Name) == C_NO_ERR);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle move view action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle move view action
 
    \param[in] ou32_StartIndex  Start index
    \param[in] ou32_TargetIndex Target index
-
-   \created     11.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvManager::MoveView(const uint32 ou32_StartIndex, const uint32 ou32_TargetIndex)
 {
    if ((ou32_StartIndex < C_PuiSvHandler::h_GetInstance()->GetViewCount()) &&
@@ -163,28 +139,33 @@ void C_SyvManager::MoveView(const uint32 ou32_StartIndex, const uint32 ou32_Targ
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Duplicate system view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Duplicate system view
 
    \param[in] ou32_Index System view index
-
-   \created     13.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvManager::DuplicateSysView(const uint32 ou32_Index)
 {
-   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_Index);
+   const C_PuiSvData * const pc_ViewPrev = C_PuiSvHandler::h_GetInstance()->GetView(ou32_Index);
 
-   if (pc_View != NULL)
+   if (pc_ViewPrev != NULL)
    {
       const uint32 u32_NewViewIndex = ou32_Index + 1UL;
       QString c_SubMode;
       QString c_SubSubMode;
+      const C_PuiSvData * pc_ViewNew;
 
-      C_PuiSvHandler::h_GetInstance()->InsertView(u32_NewViewIndex, *pc_View, true, false);
+      C_PuiSvHandler::h_GetInstance()->InsertView(u32_NewViewIndex, *pc_ViewPrev, true, false);
 
       C_SyvUtil::h_GetViewDisplayName(u32_NewViewIndex, ms32_SUBMODE_SYSVIEW_SETUP, c_SubMode, c_SubSubMode);
+
+      //User settings
+      pc_ViewNew = C_PuiSvHandler::h_GetInstance()->GetView(u32_NewViewIndex);
+      if (pc_ViewNew != NULL)
+      {
+         C_UsHandler::h_GetInstance()->CopyProjSvSettings(pc_ViewPrev->GetName(), pc_ViewNew->GetName());
+      }
       //Trigger reload
       Q_EMIT this->SigReloadNaviBarSystemViewContent();
       //Select new view
@@ -193,17 +174,14 @@ void C_SyvManager::DuplicateSysView(const uint32 ou32_Index)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle delete view action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle delete view action
 
    \param[in] ou32_Index           View index to delete
    \param[in] os32_SelectedSubMode Currently selected submode
    \param[in] ou32_SelectedIndex   Currently selected view index
-
-   \created     13.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvManager::DeleteSysView(const uint32 ou32_Index, const sint32 os32_SelectedSubMode,
                                  const uint32 ou32_SelectedIndex, QWidget * const opc_Parent)
 {

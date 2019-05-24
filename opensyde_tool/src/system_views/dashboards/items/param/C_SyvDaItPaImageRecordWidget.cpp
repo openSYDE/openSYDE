@@ -1,23 +1,20 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for handling the process of recording an NVM image to a file.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.08.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
+
+#include <QFileInfo>
 #include <QFileDialog>
+#include <QDateTime>
 
 #include "stwerrors.h"
 
@@ -31,11 +28,13 @@
 #include "C_UsHandler.h"
 #include "C_GtGetText.h"
 #include "C_SyvDaItUtil.h"
+#include "C_OSCSystemFilerUtil.h"
 #include "C_OSCLoggingHandler.h"
+#include "C_PuiProject.h"
 #include "C_PuiSdHandler.h"
 #include "C_OgeWiCustomMessage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
@@ -43,30 +42,27 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvDaItPaImageRecordWidget::mhc_FILE_EXTENSION = ".syde_psi";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     25.10.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaImageRecordWidget::C_SyvDaItPaImageRecordWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
                                                            C_SyvComDriverDiag & orc_ComDriver,
                                                            const std::vector<C_OSCNodeDataPoolListElementId > & orc_ListItemIds,
@@ -94,6 +90,7 @@ C_SyvDaItPaImageRecordWidget::C_SyvDaItPaImageRecordWidget(stw_opensyde_gui_elem
    this->mpc_Ui->pc_CbConfirm->setEnabled(false);
    this->mpc_Ui->pc_CbConfirm->setVisible(false);
    this->mpc_Ui->pc_BushButtonOk->setVisible(false);
+   this->mpc_Ui->pc_WiConfirm->setVisible(false);
 
    //Register close
    this->mpc_ParentDialog->SetNotifyAndBlockClose(true);
@@ -103,9 +100,14 @@ C_SyvDaItPaImageRecordWidget::C_SyvDaItPaImageRecordWidget(stw_opensyde_gui_elem
 
    this->InitText();
 
-   this->mpc_Ui->pc_TextEditConfirm->setHtml(C_GtGetText::h_GetText("Empty, not read yet."));
+   this->mpc_Ui->pc_TextBrowserConfirm->setHtml(C_GtGetText::h_GetText("Empty, not read yet."));
 
    m_LoadUserSettings();
+
+   m_PrepareVariablesForParametrization();
+
+   //Remove debug text
+   this->mpc_Ui->pc_GroupBoxUserComment->setTitle("");
 
    // connects
    connect(this->mpc_Ui->pc_BushButtonOk, &QPushButton::clicked, this, &C_SyvDaItPaImageRecordWidget::m_OkClicked);
@@ -125,15 +127,12 @@ C_SyvDaItPaImageRecordWidget::C_SyvDaItPaImageRecordWidget(stw_opensyde_gui_elem
    this->mc_Timer.setInterval(15);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     25.10.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaImageRecordWidget::~C_SyvDaItPaImageRecordWidget()
 {
    //Clean up
@@ -141,13 +140,10 @@ C_SyvDaItPaImageRecordWidget::~C_SyvDaItPaImageRecordWidget()
    //lint -e{1740}  no memory leak because of the parent of mpc_ParentDialog and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initializes all visible strings on the widget
-
-   \created     27.10.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initializes all visible strings on the widget
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::InitText(void)
 {
    // set title
@@ -155,30 +151,32 @@ void C_SyvDaItPaImageRecordWidget::InitText(void)
    this->mpc_ParentDialog->SetSubTitle(QString(C_GtGetText::h_GetText("Record Parameter Set from System")));
 
    this->mpc_Ui->pc_LabelFinished->setText(QString(C_GtGetText::h_GetText("Finished")));
-   this->mpc_Ui->pc_LabelSelectFile->setText(QString(C_GtGetText::h_GetText("Select File")));
+   this->mpc_Ui->pc_LabelSelectFile->setText(QString(C_GtGetText::h_GetText("File")));
    this->mpc_Ui->pc_LabelRead->setText(QString(C_GtGetText::h_GetText("Read")));
    this->mpc_Ui->pc_LabelConfirm->setText(QString(C_GtGetText::h_GetText("Confirm")));
-   this->mpc_Ui->pc_LabelValidateFile->setText(QString(C_GtGetText::h_GetText("Validate File")));
+   this->mpc_Ui->pc_LabelValidateFile->setText(QString(C_GtGetText::h_GetText("Validate File(s)")));
 
-   this->mpc_Ui->pc_LabelHeadingSelectFile->setText(C_GtGetText::h_GetText("Select File"));
+   this->mpc_Ui->pc_LabelHeadingSelectFile->setText(C_GtGetText::h_GetText("File"));
    this->mpc_Ui->pc_LabelStepDescription->setText(C_GtGetText::h_GetText("Choose a path to save the file to and click "
-                                                                         "\"Read\" to start the parameter set record process."));
+                                                                         "\"Read Parameters\" to start the parameter set record process."));
+   this->mpc_Ui->pc_LabelComment->setText(C_GtGetText::h_GetText("Comment"));
+   this->mpc_Ui->pc_CommentText->setPlaceholderText(C_GtGetText::h_GetText("Add your comment here ..."));
    this->mpc_Ui->pc_LabelHeadingConfirm->setText(C_GtGetText::h_GetText("Read Parameter Lists"));
    this->mpc_Ui->pc_LineEditPath->setPlaceholderText(C_GtGetText::h_GetText(""));
    this->mpc_Ui->pc_PushButtonBrowse->setText(C_GtGetText::h_GetText("..."));
+   this->mpc_Ui->pc_LabelMultipleNodes->setText(C_GtGetText::h_GetText(
+                                                   "Attention: Recording for multiple nodes will result in one file per node."
+                                                   " Name format: \"<SelectedPathAndFileName>_<NodeName>.syde_psi\""));
 
-   this->mpc_Ui->pc_PbConfirm->setText(QString(C_GtGetText::h_GetText("Read")));
+   this->mpc_Ui->pc_PbConfirm->setText(QString(C_GtGetText::h_GetText("Read Parameters")));
    this->mpc_Ui->pc_CbConfirm->setText(QString(C_GtGetText::h_GetText(
                                                   "Confirmed, all required parameter lists are included")));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle save user settings operation
-
-   \created     25.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle save user settings operation
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::SaveUserSettings(void) const
 {
    //Save
@@ -190,17 +188,14 @@ void C_SyvDaItPaImageRecordWidget::SaveUserSettings(void) const
    C_UsHandler::h_GetInstance()->SetProjSvParamRecord(this->mc_ViewName, c_Path, c_Name);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: handle escape key
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     10.07.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::keyPressEvent(QKeyEvent * const opc_Event)
 {
    if (opc_Event->key() == static_cast<sintn>(Qt::Key_Escape))
@@ -213,13 +208,10 @@ void C_SyvDaItPaImageRecordWidget::keyPressEvent(QKeyEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle browse event
-
-   \created     27.10.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle browse event
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_OnBrowse(void)
 {
    QString c_Folder = m_GetValidPath(this->mpc_Ui->pc_LineEditPath->text());
@@ -236,18 +228,15 @@ void C_SyvDaItPaImageRecordWidget::m_OnBrowse(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Replace empty path if necessary
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Replace empty path if necessary
 
    \param[in] orc_Path Some path
 
    \return
    Non empty path
-
-   \created     01.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaItPaImageRecordWidget::m_GetValidPath(const QString & orc_Path) const
 {
    QString c_Retval = orc_Path;
@@ -259,17 +248,14 @@ QString C_SyvDaItPaImageRecordWidget::m_GetValidPath(const QString & orc_Path) c
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Split the full path of a file into path and name.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Split the full path of a file into path and name.
 
    \param[in]     orc_FullPath   full path to file
    \param[out]    orc_Name       file name
    \param[out]    orc_Path       path without file name
-
-   \created     28.06.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_SplitNameAndPath(const QString & orc_FullPath, QString & orc_Name,
                                                       QString & orc_Path) const
 {
@@ -282,29 +268,41 @@ void C_SyvDaItPaImageRecordWidget::m_SplitNameAndPath(const QString & orc_FullPa
       orc_Path.remove(orc_Name);
    }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_FilePathChanged(void)
 {
    this->mc_FilePath = this->mpc_Ui->pc_LineEditPath->text();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the current set path and project name
-
-   \created     27.10.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the current set path and project name
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
 {
    if (this->mc_FilePath.compare("") != 0)
    {
-      const QFileInfo c_Info(this->mc_FilePath);
-      if (c_Info.dir().exists() == true)
+      std::vector<QString> c_ConflictedFiles;
+      const QFileInfo c_BaseInfo(this->mc_FilePath);
+      //Check conflicted files with automated file creation
+      if (this->mc_AllNodeIndexes.size() > 1UL)
       {
-         if (("." + c_Info.completeSuffix()) == mhc_FILE_EXTENSION)
+         for (uint32 u32_ItNodes = 0UL; u32_ItNodes < this->mc_AllNodeIndexes.size(); ++u32_ItNodes)
          {
-            if (C_OSCUtils::h_CheckValidCName(c_Info.baseName().toStdString().c_str(),
+            const QString c_FullPath = this->m_GetPathForNode(this->mc_AllNodeIndexes[u32_ItNodes],
+                                                              this->mc_FilePath);
+            const QFileInfo c_NodeFileInfo(c_FullPath);
+            if (c_NodeFileInfo.exists() == true)
+            {
+               c_ConflictedFiles.push_back(c_FullPath);
+            }
+         }
+      }
+      if (c_BaseInfo.dir().exists() == true)
+      {
+         if (("." + c_BaseInfo.completeSuffix()) == mhc_FILE_EXTENSION)
+         {
+            if (C_OSCUtils::h_CheckValidCName(c_BaseInfo.baseName().toStdString().c_str(),
                                               std::numeric_limits<uint16>::max()))
             {
                // Check if file exists already
@@ -313,14 +311,26 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
 
                c_File.setFileName(this->mc_FilePath);
 
-               if (c_File.exists() == true)
+               if (((c_File.exists() == true) && (this->mc_AllNodeIndexes.size() == 1UL)) ||
+                   (c_ConflictedFiles.size() > 0UL))
                {
+                  QString c_Details;
                   C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
                   C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
 
                   c_MessageBox.SetHeading(C_GtGetText::h_GetText("Parameter Set Image File save"));
                   c_MessageBox.SetDescription(C_GtGetText::h_GetText(
-                                                 "Do you really want to overwrite the existing file?"));
+                                                 "Do you really want to overwrite the existing file(s)?"));
+                  //Append conflicted files as details if necessary
+                  if (c_ConflictedFiles.size() > 0UL)
+                  {
+                     for (uint32 u32_ItFile = 0UL; u32_ItFile < c_ConflictedFiles.size(); ++u32_ItFile)
+                     {
+                        c_Details += c_ConflictedFiles[u32_ItFile];
+                        c_Details += "\n";
+                     }
+                     c_MessageBox.SetDetails(c_Details);
+                  }
                   c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Overwrite"));
                   c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Back"));
                   e_ReturnMessageBox = c_MessageBox.Execute();
@@ -328,14 +338,35 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
                   switch (e_ReturnMessageBox)
                   {
                   case C_OgeWiCustomMessage::eYES:
-                     // Delete old file
-                     q_Continue = c_File.remove();
+                     if (this->mc_AllNodeIndexes.size() == 1UL)
+                     {
+                        // Delete old file
+                        q_Continue = c_File.remove();
+                     }
+                     else
+                     {
+                        //Delete automatically generated files
+                        for (uint32 u32_ItFile = 0UL; (u32_ItFile < c_ConflictedFiles.size()) && (q_Continue == true);
+                             ++u32_ItFile)
+                        {
+                           QFile c_CurFile;
+
+                           c_CurFile.setFileName(c_ConflictedFiles[u32_ItFile]);
+
+                           // Delete old file
+                           q_Continue = c_CurFile.remove();
+                        }
+                     }
                      if (q_Continue == false)
                      {
                         // Error on deleting file
                         C_OgeWiCustomMessage c_MessageBoxErrorRemove(this, C_OgeWiCustomMessage::E_Type::eERROR);
                         c_MessageBoxErrorRemove.SetHeading(C_GtGetText::h_GetText("Parameter Set Image File save"));
                         c_MessageBoxErrorRemove.SetDescription(C_GtGetText::h_GetText("File cannot be overwritten!"));
+                        if (this->mc_AllNodeIndexes.size() > 1UL)
+                        {
+                           c_MessageBox.SetDetails(c_Details);
+                        }
                         c_MessageBoxErrorRemove.Execute();
                      }
                      break;
@@ -356,6 +387,8 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
                {
                   // Adapt GUI
                   this->mpc_Ui->pc_ProgressSelectFile->SetProgress(100);
+                  this->mpc_Ui->pc_GroupBoxUserComment->setVisible(false);
+                  this->mpc_Ui->pc_WiConfirm->setVisible(true);
                   this->mpc_Ui->pc_LineEditPath->setVisible(false);
                   this->mpc_Ui->pc_PushButtonBrowse->setVisible(false);
                   this->mpc_Ui->pc_LabelRead->setEnabled(true);
@@ -384,7 +417,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
             c_MessageBox.SetDescription(QString(C_GtGetText::h_GetText(
                                                    "The specified file has the wrong extension, use: \"%1\".")).arg(
                                            C_SyvDaItPaImageRecordWidget::mhc_FILE_EXTENSION));
-            c_MessageBox.SetDetails(QString("Invalid extension: \"%1\"").arg("." + c_Info.completeSuffix()));
+            c_MessageBox.SetDetails(QString("Invalid extension: \"%1\"").arg("." + c_BaseInfo.completeSuffix()));
             c_MessageBox.Execute();
          }
       }
@@ -407,21 +440,34 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Starts the read of all elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Starts the read of all elements
 
    Implemented steps: 1
-
-   \created     27.10.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_StartReadElementsOfNode(void)
 {
-   uint32 u32_Counter;
-
+   //Each node
    // Prepare all data dealer (Step 1)
-   this->mrc_ComDriver.NvmSafeClearInternalContent();
+   for (uint32 u32_ItNode = 0U; u32_ItNode < this->mc_AllNodeIndexes.size(); ++u32_ItNode)
+   {
+      tgl_assert(this->mrc_ComDriver.NvmSafeClearInternalContent(this->mc_AllNodeIndexes[u32_ItNode]) == C_NO_ERR);
+   }
+
+   //Create file
+   this->me_Step = eCREATEPARAMETERSETFILE;
+
+   this->mc_Timer.start();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Prepare all variables for parametrization
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItPaImageRecordWidget::m_PrepareVariablesForParametrization(void)
+{
+   uint32 u32_Counter;
 
    // Prepare the writing for each node
    this->mc_AllNodeIndexes.clear();
@@ -459,21 +505,19 @@ void C_SyvDaItPaImageRecordWidget::m_StartReadElementsOfNode(void)
          static_cast<C_OSCNodeDataPoolListId>(this->mc_ListItemIds[u32_Counter]));
    }
 
-   this->me_Step = eCREATEPARAMETERSETFILE;
-
-   this->mc_Timer.start();
+   //Handle user info
+   this->mpc_Ui->pc_LabelMultipleNodes->setVisible(this->mc_AllNodeIndexes.size() > 1UL);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Read parameters for all parameter lists
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read parameters for all parameter lists
 
    Implemented steps: 2
 
-   \created     06.11.2017  STW/B.Bayer
+   \param[in] orc_Comment User comment for file
 */
-//-----------------------------------------------------------------------------
-void C_SyvDaItPaImageRecordWidget::m_ReadElementsOfNode(void)
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItPaImageRecordWidget::m_ReadElementsOfNode(const QString & orc_Comment)
 {
    if (this->mu32_CurrentNode < this->mc_AllNodeIndexes.size())
    {
@@ -522,7 +566,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadElementsOfNode(void)
                   this->mc_Timer.stop();
 
                   // Start step 3
-                  s32_Return = this->m_CreateParameterSetFile();
+                  s32_Return = this->m_CreateParameterSetFile(orc_Comment);
                   if (s32_Return == C_NO_ERR)
                   {
                      // Start step 4
@@ -540,8 +584,8 @@ void C_SyvDaItPaImageRecordWidget::m_ReadElementsOfNode(void)
                            C_GtGetText::h_GetText("Parameter lists are read from system. Check if all required "
                                                   "parameter lists are listed below. If yes, check "
                                                   "\"All required parameter lists are included\" "
-                                                  "and click \"Validate File\"."));
-                        this->mpc_Ui->pc_PbConfirm->setText(QString(C_GtGetText::h_GetText("Validate File")));
+                                                  "and click \"Validate File(s)\"."));
+                        this->mpc_Ui->pc_PbConfirm->setText(QString(C_GtGetText::h_GetText("Validate File(s)")));
                         this->mpc_Ui->pc_CbConfirm->setVisible(true);
                         this->mpc_Ui->pc_CbConfirm->setEnabled(true);
 
@@ -572,11 +616,12 @@ void C_SyvDaItPaImageRecordWidget::m_ReadElementsOfNode(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create parameter set file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create parameter set file
 
    Implemented steps: 3
+
+   \param[in] orc_Comment User comment for file
 
    \return
    C_NO_ERR   data saved
@@ -584,13 +629,19 @@ void C_SyvDaItPaImageRecordWidget::m_ReadElementsOfNode(void)
    C_CONFIG   Internal data invalid
    C_BUSY     File already exists
    C_RD_WR    could not write to file (e.g. missing write permissions; missing folder)
-
-   \created     13.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
-sint32 C_SyvDaItPaImageRecordWidget::m_CreateParameterSetFile(void)
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_SyvDaItPaImageRecordWidget::m_CreateParameterSetFile(const QString & orc_Comment)
 {
-   const sint32 s32_Return = this->mrc_ComDriver.NvmSafeCreateCleanFileWithoutCRC(this->mc_FilePath);
+   const C_OSCParamSetInterpretedFileInfoData c_FileInfo = this->m_GetFileInfoData(orc_Comment);
+   sint32 s32_Return = C_NO_ERR;
+
+   for (uint32 u32_ItNode = 0U; (u32_ItNode < this->mc_AllNodeIndexes.size()) && (s32_Return == C_NO_ERR); ++u32_ItNode)
+   {
+      s32_Return = this->mrc_ComDriver.NvmSafeCreateCleanFileWithoutCRC(this->mc_AllNodeIndexes[u32_ItNode], this->m_GetPathForNode(
+                                                                           this->mc_AllNodeIndexes[u32_ItNode],
+                                                                           this->mc_FilePath), c_FileInfo);
+   }
 
    if (s32_Return != C_NO_ERR)
    {
@@ -621,9 +672,8 @@ sint32 C_SyvDaItPaImageRecordWidget::m_CreateParameterSetFile(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Read parameters back from file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read parameters back from file
 
    Implemented steps: 4, 5
 
@@ -636,19 +686,23 @@ sint32 C_SyvDaItPaImageRecordWidget::m_CreateParameterSetFile(void)
               specified file is present but structure is invalid (e.g. invalid XML file)
    C_CONFIG   Mismatch of data with current node
                or no valid pointer to the original instance of "C_OSCNode" is set in "C_OSCDataDealer"
-
-   \created     13.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDaItPaImageRecordWidget::m_ReadBackElementsOfNodeFromFile(void)
 {
-   sint32 s32_Return;
+   sint32 s32_Return = C_NO_ERR;
    uint32 u32_Counter;
 
    this->me_Step = eREADBACKFROMFILE;
 
    // Step 4
-   s32_Return = this->mrc_ComDriver.NvmSafeReadFileWithoutCRC(this->mc_FilePath);
+   for (u32_Counter = 0U; (u32_Counter < this->mc_AllNodeIndexes.size()) && (s32_Return == C_NO_ERR); ++u32_Counter)
+   {
+      s32_Return =
+         this->mrc_ComDriver.NvmSafeReadFileWithoutCRC(this->mc_AllNodeIndexes[u32_Counter],
+                                                       this->m_GetPathForNode(this->mc_AllNodeIndexes[u32_Counter],
+                                                                              this->mc_FilePath));
+   }
 
    if (s32_Return == C_NO_ERR)
    {
@@ -659,7 +713,10 @@ sint32 C_SyvDaItPaImageRecordWidget::m_ReadBackElementsOfNodeFromFile(void)
       {
          // Step 5
          s32_Return = this->mrc_ComDriver.NvmSafeCheckParameterFileContents(this->mc_AllNodeIndexes[u32_Counter],
-                                                                            this->mc_FilePath,
+                                                                            this->m_GetPathForNode(this->
+                                                                                                   mc_AllNodeIndexes[
+                                                                                                      u32_Counter],
+                                                                                                   this->mc_FilePath),
                                                                             c_DataPoolListsForEachNode[u32_Counter]);
 
          if (s32_Return != C_NO_ERR)
@@ -707,19 +764,19 @@ sint32 C_SyvDaItPaImageRecordWidget::m_ReadBackElementsOfNodeFromFile(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Displays the read values
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get text to display for a step
 
-   Implemented steps: 6
+   \param[in] orc_DataPoolListsForEachNode Read infos
+   \param[in] oq_IsConfirm                 Flag if confirm step
 
-   \param[in]  orc_DataPoolListsForEachNode   Result of step 5
-
-   \created     13.11.2017  STW/B.Bayer
+   \return
+   Text to display
 */
-//-----------------------------------------------------------------------------
-void C_SyvDaItPaImageRecordWidget::m_PrepareConfirmStep(
-   const std::vector<std::vector<C_OSCNodeDataPoolListId> > & orc_DataPoolListsForEachNode) const
+//----------------------------------------------------------------------------------------------------------------------
+QString C_SyvDaItPaImageRecordWidget::m_GetTextForStep(
+   const std::vector<std::vector<C_OSCNodeDataPoolListId> > & orc_DataPoolListsForEachNode,
+   const bool oq_IsConfirm) const
 {
    std::list<QString> c_NodeText;
    std::list<QString>::const_iterator c_ItNodeText;
@@ -739,10 +796,29 @@ void C_SyvDaItPaImageRecordWidget::m_PrepareConfirmStep(
          {
             uint32 u32_ListCounter;
             uint32 u32_CurDataPoolIndex = 0xFFFFFFFFU;
+            const QString c_Path = this->m_GetPathForNode(u32_CurNodeIndex, this->mc_FilePath);
+            const QString c_PathHtml = C_Uti::h_GetLink(c_Path, mc_STYLE_GUIDE_COLOR_LINK, "file:///" + c_Path);
 
             // Node name
-            c_Text += "<u>" + QString(C_GtGetText::h_GetText("Node")) + " - " +
-                      QString(pc_OSCNode->c_Properties.c_Name.c_str()) + "</u>";
+            if (!oq_IsConfirm)
+            {
+               c_Text += "<div>" + QString(C_GtGetText::h_GetText("Path: %1")).arg(c_PathHtml) + "</div>";
+            }
+            if (oq_IsConfirm)
+            {
+               c_Text += "<div><u>";
+            }
+            else
+            {
+               c_Text += QString("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(1UL));
+            }
+            c_Text += QString(C_GtGetText::h_GetText("Node")) + " - " +
+                      QString(pc_OSCNode->c_Properties.c_Name.c_str());
+            if (oq_IsConfirm)
+            {
+               c_Text += "</u>";
+            }
+            c_Text += "</div>";
 
             for (u32_ListCounter = 0U;
                  u32_ListCounter < orc_DataPoolListsForEachNode[u32_NodeCounter].size();
@@ -768,9 +844,15 @@ void C_SyvDaItPaImageRecordWidget::m_PrepareConfirmStep(
 
                   if (pc_OSCDataPool != NULL)
                   {
-                     c_Text += QString("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(1UL));
-                     c_Text += QString(C_GtGetText::h_GetText("DataPool #")) +
-                               QString::number(u32_CurDataPoolIndex + 1U) +
+                     if (oq_IsConfirm)
+                     {
+                        c_Text += QString("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(1UL));
+                     }
+                     else
+                     {
+                        c_Text += QString("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(2UL));
+                     }
+                     c_Text += QString(C_GtGetText::h_GetText("DataPool")) +
                                " - " + QString(pc_OSCDataPool->c_Name.c_str()) + "</div>";
                   }
                }
@@ -778,15 +860,20 @@ void C_SyvDaItPaImageRecordWidget::m_PrepareConfirmStep(
                if (pc_OSCList != NULL)
                {
                   // Listname
-                  c_Text += QString("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(2UL));
-                  c_Text += QString(C_GtGetText::h_GetText("List #")) +
-                            QString::number(
-                     orc_DataPoolListsForEachNode[u32_NodeCounter][u32_ListCounter].u32_ListIndex + 1U) +
+                  if (oq_IsConfirm)
+                  {
+                     c_Text += QString("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(2UL));
+                  }
+                  else
+                  {
+                     c_Text += QString("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(3UL));
+                  }
+                  c_Text += QString(C_GtGetText::h_GetText("List")) +
                             " - " + QString(pc_OSCList->c_Name.c_str()) + "</div>";
                }
             }
          }
-         c_Text += "<br>";
+         c_Text += "<br />";
          c_NodeText.push_back(c_Text);
       }
    }
@@ -794,21 +881,36 @@ void C_SyvDaItPaImageRecordWidget::m_PrepareConfirmStep(
    // Sort for node names. The node name is always at the start of each string and must be unique.
    c_NodeText.sort();
    // Font and style configuration. Stylesheets does not work with html. Color is STYLE_GUIDE_COLOR_6
-   c_Text = "<span style=\" font-family:Segoe UI; font-size:13px; font-weight: normal; color:#565668;\">";
+   c_Text = "<html><body><span style=\" font-family:Segoe UI; font-size:13px; font-weight: normal; color:#565668;\">";
 
    for (c_ItNodeText = c_NodeText.begin(); c_ItNodeText != c_NodeText.end(); ++c_ItNodeText)
    {
       c_Text += *c_ItNodeText;
    }
 
-   c_Text += "</span>";
-
-   this->mpc_Ui->pc_TextEditConfirm->setHtml(c_Text);
+   c_Text += "</span></body></html>";
+   return c_Text;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Writes the CRC of relevant lists
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Displays the read values
+
+   Implemented steps: 6
+
+   \param[in]  orc_DataPoolListsForEachNode   Result of step 5
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItPaImageRecordWidget::m_PrepareConfirmStep(
+   const std::vector<std::vector<C_OSCNodeDataPoolListId> > & orc_DataPoolListsForEachNode)
+{
+   const QString c_TextConfirm = this->m_GetTextForStep(orc_DataPoolListsForEachNode, true);
+
+   this->mc_FinishedText = this->m_GetTextForStep(orc_DataPoolListsForEachNode, false);
+   this->mpc_Ui->pc_TextBrowserConfirm->setHtml(c_TextConfirm);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Writes the CRC of relevant lists
 
    Implemented steps: 8
 
@@ -818,13 +920,18 @@ void C_SyvDaItPaImageRecordWidget::m_PrepareConfirmStep(
    C_RANGE    Path does not match the path of the preceding function calls
    C_RD_WR    specified file does not exist
               specified file is present but structure is invalid (e.g. invalid XML file)
-
-   \created     06.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_WriteCrcOfNodeToFile(void)
 {
-   const sint32 s32_Return = this->mrc_ComDriver.NvmSafeUpdateCRCForFile(this->mc_FilePath);
+   sint32 s32_Return = C_NO_ERR;
+
+   for (uint32 u32_ItNode = 0U; (u32_ItNode < this->mc_AllNodeIndexes.size()) && (s32_Return == C_NO_ERR); ++u32_ItNode)
+   {
+      s32_Return = this->mrc_ComDriver.NvmSafeUpdateCRCForFile(this->mc_AllNodeIndexes[u32_ItNode], this->m_GetPathForNode(
+                                                                  this->mc_AllNodeIndexes[u32_ItNode],
+                                                                  this->mc_FilePath));
+   }
 
    if (s32_Return == C_NO_ERR)
    {
@@ -835,7 +942,7 @@ void C_SyvDaItPaImageRecordWidget::m_WriteCrcOfNodeToFile(void)
       this->mpc_Ui->pc_BopperleFinished->SetMainBopperleColor(mc_STYLE_GUIDE_COLOR_21, mc_STYLE_GUIDE_COLOR_13);
       this->mpc_Ui->pc_LabelHeadingSelectFile->setText(C_GtGetText::h_GetText("Finished"));
       this->mpc_Ui->pc_LabelStepDescription->setText(C_GtGetText::h_GetText(
-                                                        "Parameter set file recording finished successfully."));
+                                                        "Parameter set file(s) recording finished successfully."));
       this->me_Step = eFINISHED;
    }
    else
@@ -863,25 +970,19 @@ void C_SyvDaItPaImageRecordWidget::m_WriteCrcOfNodeToFile(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Ok button click
-
-   \created     25.10.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Ok button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_OkClicked(void)
 {
    this->mpc_ParentDialog->accept();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Cancel button
-
-   \created     25.10.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Cancel button
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_OnCancel(void)
 {
    if ((this->me_Step == eCREATEPARAMETERSETFILE) ||
@@ -893,7 +994,7 @@ void C_SyvDaItPaImageRecordWidget::m_OnCancel(void)
       C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
       c_Message.SetHeading(C_GtGetText::h_GetText("Parameter Set Record interrupt"));
       c_Message.SetDescription(C_GtGetText::h_GetText("Do you really want to interrupt the process? \n"
-                                                      "The unfinished file will be deleted."));
+                                                      "The unfinished file(s) will be deleted."));
       c_Message.SetNOButtonText("Interrupt");
       c_Message.SetOKButtonText("Don't Interrupt");
       C_OgeWiCustomMessage::E_Outputs e_Output;
@@ -902,10 +1003,25 @@ void C_SyvDaItPaImageRecordWidget::m_OnCancel(void)
       {
          this->mpc_ParentDialog->reject();
          // Delete the not finished and not valid file
-         QFile c_File;
+         if (this->mc_AllNodeIndexes.size() == 1UL)
+         {
+            QFile c_File;
 
-         c_File.setFileName(this->mc_FilePath);
-         c_File.remove();
+            c_File.setFileName(this->mc_FilePath);
+            c_File.remove();
+         }
+         else
+         {
+            for (uint32 u32_ItNodes = 0UL; u32_ItNodes < this->mc_AllNodeIndexes.size(); ++u32_ItNodes)
+            {
+               const QString c_FullPath = this->m_GetPathForNode(this->mc_AllNodeIndexes[u32_ItNodes],
+                                                                 this->mc_FilePath);
+               QFile c_File;
+
+               c_File.setFileName(c_FullPath);
+               c_File.remove();
+            }
+         }
       }
    }
    else
@@ -914,29 +1030,23 @@ void C_SyvDaItPaImageRecordWidget::m_OnCancel(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Change of confirm status of correctness of the NVM lists
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Change of confirm status of correctness of the NVM lists
 
    Implemented steps: 7
-
-   \created     27.10.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_ConfirmCheckBoxChanged(void) const
 {
    this->mpc_Ui->pc_PbConfirm->setEnabled(this->mpc_Ui->pc_CbConfirm->isChecked());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   User confirms the correctness of the NVM lists
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   User confirms the correctness of the NVM lists
 
    Implemented steps: 7
-
-   \created     27.10.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_ConfirmClicked(void)
 {
    if (this->me_Step == eSELECTFILE)
@@ -951,9 +1061,10 @@ void C_SyvDaItPaImageRecordWidget::m_ConfirmClicked(void)
          this->mpc_Ui->pc_PbConfirm->setVisible(false);
          this->mpc_Ui->pc_CbConfirm->setVisible(false);
          this->mpc_Ui->pc_LabelValidateFile->setEnabled(true);
+         this->mpc_Ui->pc_TextBrowserConfirm->setHtml(this->mc_FinishedText);
          this->mpc_Ui->pc_BopperleValidateFile->SetMainBopperleColor(mc_STYLE_GUIDE_COLOR_21, mc_STYLE_GUIDE_COLOR_13);
-         this->mpc_Ui->pc_LabelHeadingSelectFile->setText(C_GtGetText::h_GetText("Validate File"));
-         this->mpc_Ui->pc_LabelStepDescription->setText(C_GtGetText::h_GetText("Validating parameter set file..."));
+         this->mpc_Ui->pc_LabelHeadingSelectFile->setText(C_GtGetText::h_GetText("Validate File(s)"));
+         this->mpc_Ui->pc_LabelStepDescription->setText(C_GtGetText::h_GetText("Validating parameter set file(s)..."));
          this->me_Step = eWRITECRC;
 
          // Step 8
@@ -962,13 +1073,10 @@ void C_SyvDaItPaImageRecordWidget::m_ConfirmClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore user settings value
-
-   \created     05.12.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore user settings value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_LoadUserSettings(void)
 {
    const C_UsSystemView c_View = C_UsHandler::h_GetInstance()->GetProjSvSetupView(this->mc_ViewName);
@@ -1003,16 +1111,16 @@ void C_SyvDaItPaImageRecordWidget::m_LoadUserSettings(void)
    m_FilePathChanged();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_Timer(void)
 {
    if (this->me_Step == eCREATEPARAMETERSETFILE)
    {
-      this->m_ReadElementsOfNode();
+      this->m_ReadElementsOfNode(this->mpc_Ui->pc_CommentText->toPlainText());
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_ReportError(const QString & orc_FunctionName, const QString & orc_ErrorText,
                                                  const stw_types::sint32 os32_ErrorCode)
 {
@@ -1033,15 +1141,12 @@ void C_SyvDaItPaImageRecordWidget::m_ReportError(const QString & orc_FunctionNam
    this->m_OnCancel();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle error for function "NvmSafeReadParameterValues"
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle error for function "NvmSafeReadParameterValues"
 
    \param[in] os32_ErrorCode Function result
-
-   \created     17.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_ReportErrorNvmSafeReadParameterValues(const sint32 os32_ErrorCode)
 {
    const QString c_Log = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
@@ -1144,10 +1249,71 @@ void C_SyvDaItPaImageRecordWidget::m_ReportErrorNvmSafeReadParameterValues(const
       break;
    }
 
+   c_Message.SetType(C_OgeWiCustomMessage::eERROR);
    c_Message.SetDescription(c_Description);
    c_Message.SetDetails(c_Details);
 
    c_Message.Execute();
-   // Close dialog on error
-   this->m_OnCancel();
+   // Close dialog on error (WITHOUT user confirmation)
+   this->mpc_ParentDialog->reject();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get file info
+
+   \param[in] orc_Comment User comment for file
+
+   \return
+   File info
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OSCParamSetInterpretedFileInfoData C_SyvDaItPaImageRecordWidget::m_GetFileInfoData(const QString & orc_Comment) const
+{
+   C_OSCParamSetInterpretedFileInfoData c_Retval;
+   QString c_Name = qgetenv("USER");
+
+   if (c_Name.isEmpty())
+   {
+      c_Name = qgetenv("USERNAME");
+   }
+   c_Retval.c_Creator = c_Name.toStdString().c_str();
+   c_Retval.c_DateTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss").toStdString().c_str();
+   c_Retval.c_ToolName = "openSYDE";
+   //lint -e{40} Defined by project file
+   c_Retval.c_ToolVersion = C_Uti::h_GetApplicationVersion().toStdString().c_str();
+   c_Retval.c_ProjectName = C_PuiProject::h_GetInstance()->GetName().toStdString().c_str();
+   c_Retval.c_ProjectVersion = C_PuiProject::h_GetInstance()->c_Version;
+   c_Retval.c_UserComment = orc_Comment.toStdString().c_str();
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adapt the base path for this node as necessary
+
+   \param[in] ou32_NodeIndex Node index (which node is this file for)
+   \param[in] orc_Path       Base path to use as base and fallback in special cases
+
+   \return
+   The adapted path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_SyvDaItPaImageRecordWidget::m_GetPathForNode(const uint32 ou32_NodeIndex, const QString & orc_Path) const
+{
+   QString c_Retval = orc_Path;
+
+   //Only use special handling for recording more than one node
+   if (this->mc_AllNodeIndexes.size() > 1UL)
+   {
+      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(ou32_NodeIndex);
+      if (pc_Node != NULL)
+      {
+         const QFileInfo c_FileInfo(orc_Path);
+         const QDir c_Dir(c_FileInfo.absoluteDir());
+         const QString c_NodeFileNameBase = C_OSCSystemFilerUtil::mh_PrepareItemNameForFileName(
+            pc_Node->c_Properties.c_Name).c_str();
+         const QString c_NodeFileName = c_FileInfo.baseName() + "_" + c_NodeFileNameBase + "." + c_FileInfo.suffix();
+         c_Retval = c_Dir.absoluteFilePath(c_NodeFileName);
+      }
+   }
+   return c_Retval;
 }

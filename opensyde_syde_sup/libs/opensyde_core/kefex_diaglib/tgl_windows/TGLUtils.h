@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       DiagLib Target Glue Layer: Utilities
 
    DiagLib Target Glue Layer module containing utilities
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.07.2009  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef TGLUTILSH
 #define TGLUTILSH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 #include "CSCLString.h"
 
@@ -48,12 +42,12 @@
 #endif
 //lint -restore
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_tgl
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 void TGL_PACKAGE TGL_ReportAssertion(const stw_types::charn * const opcn_Module,
                                      const stw_types::charn * const opcn_Func, const stw_types::sint32 os32_Line);
@@ -69,7 +63,7 @@ stw_types::sint32 TGL_PACKAGE TGL_SetEnvironmentVariable(const stw_scl::C_SCLStr
 //resource string handling:
 stw_scl::C_SCLString TGL_PACKAGE TGL_LoadStr(const stw_types::uint16 ou16_StringIndex);
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

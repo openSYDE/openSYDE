@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       UI line arrow data: stores UI information (implementation)
 
    UI line arrow data: stores UI information
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.10.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "constants.h"
@@ -24,31 +17,28 @@
 
 #include "CSCLChecksums.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_scl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     27.10.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiBsLineArrow::C_PuiBsLineArrow() :
    C_PuiBsLineBase(),
    c_UIColorDark(mc_STYLE_GUIDE_COLOR_36),
@@ -61,17 +51,14 @@ C_PuiBsLineArrow::C_PuiBsLineArrow() :
    f64_ZOrder = 0.0;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
 
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
-
-   \created     22.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsLineArrow::CalcHash(uint32 & oru32_HashValue) const
 {
    sintn sn_Value;
@@ -92,15 +79,12 @@ void C_PuiBsLineArrow::CalcHash(uint32 & oru32_HashValue) const
    C_PuiBsLineBase::CalcHash(oru32_HashValue);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Failsafe arrow head type to string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Failsafe arrow head type to string
 
    \param[in] ore_Type Arrow head type
-
-   \created     28.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_scl::C_SCLString C_PuiBsLineArrow::ArrowHeadTypeToString(const E_ArrowHeadType & ore_Type)
 {
    stw_scl::C_SCLString c_Retval;
@@ -129,15 +113,12 @@ stw_scl::C_SCLString C_PuiBsLineArrow::ArrowHeadTypeToString(const E_ArrowHeadTy
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Failsafe line type to string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Failsafe line type to string
 
    \param[in] ore_Type Line type
-
-   \created     28.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_scl::C_SCLString C_PuiBsLineArrow::LineTypeToString(const E_LineType & ore_Type)
 {
    stw_scl::C_SCLString c_Retval;
@@ -163,15 +144,12 @@ stw_scl::C_SCLString C_PuiBsLineArrow::LineTypeToString(const E_LineType & ore_T
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Failsafe arrow head type from string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Failsafe arrow head type from string
 
    \param[in] orc_Str Stringified arrow head type
-
-   \created     28.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiBsLineArrow::E_ArrowHeadType C_PuiBsLineArrow::ArrowHeadTypeFromString(const stw_scl::C_SCLString & orc_Str)
 {
    C_PuiBsLineArrow::E_ArrowHeadType e_Retval;
@@ -202,15 +180,12 @@ C_PuiBsLineArrow::E_ArrowHeadType C_PuiBsLineArrow::ArrowHeadTypeFromString(cons
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Failsafe line type from string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Failsafe line type from string
 
    \param[in] orc_Str Stringified line type
-
-   \created     28.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiBsLineArrow::E_LineType C_PuiBsLineArrow::LineTypeFromString(const stw_scl::C_SCLString & orc_Str)
 {
    C_PuiBsLineArrow::E_LineType e_Retval;

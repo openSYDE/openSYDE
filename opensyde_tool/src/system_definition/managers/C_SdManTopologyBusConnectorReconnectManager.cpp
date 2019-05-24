@@ -1,51 +1,41 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Bus connector reconnect action manager of system definition toplogy (implementation)
 
    Bus connector reconnect action manager of system definition toplogy
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.12.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
 #include "C_SdManTopologyBusConnectorReconnectManager.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     01.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdManTopologyBusConnectorReconnectManager::C_SdManTopologyBusConnectorReconnectManager() :
    mpc_BusConnector(NULL),
    mpc_StartingNode(NULL),
@@ -59,16 +49,13 @@ C_SdManTopologyBusConnectorReconnectManager::C_SdManTopologyBusConnectorReconnec
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start connect mode and save all relevant data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start connect mode and save all relevant data
 
    \param[in,out] opc_BusConnector Bus connector which has started the reconnect mode
    \param[in]     ore_ConnectState Conect state of bus connector
-
-   \created     02.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManTopologyBusConnectorReconnectManager::StartReconnectMode(C_GiLiBusConnector * const opc_BusConnector,
                                                                      const C_GiLiBusConnector::E_ConnectState & ore_ConnectState)
 {
@@ -82,17 +69,14 @@ void C_SdManTopologyBusConnectorReconnectManager::StartReconnectMode(C_GiLiBusCo
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register waiting for context menu being finished
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register waiting for context menu being finished
 
    \param[in]     orc_ScenePos Event scene position
    \param[in,out] opc_Node     Current node
    \param[in]     opc_Bus      Current bus
-
-   \created     05.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManTopologyBusConnectorReconnectManager::EnterWaitForContextMenuState(const QPointF & orc_ScenePos,
                                                                                C_GiNode * const opc_Node,
                                                                                const C_GiLiBus * const opc_Bus)
@@ -103,29 +87,23 @@ void C_SdManTopologyBusConnectorReconnectManager::EnterWaitForContextMenuState(c
    this->mq_ContextMenuActive = true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for context menu being closed soon
-
-   \created     05.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for context menu being closed soon
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManTopologyBusConnectorReconnectManager::ContextMenuAboutToClose(void)
 {
    this->mq_ContextMenuActive = false;
    m_FinishReconnect();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register interface accepted
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register interface accepted
 
    \param[in] ors32_Interface Selected interface number
    \param[in] oru8_NodeId     New node id
-
-   \created     05.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManTopologyBusConnectorReconnectManager::ContextMenuAccepted(const sint32 & ors32_Interface,
                                                                       const uint8 & oru8_NodeId)
 {
@@ -133,13 +111,10 @@ void C_SdManTopologyBusConnectorReconnectManager::ContextMenuAccepted(const sint
    this->mu8_NodeId = oru8_NodeId;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Deactivate reconnection
-
-   \created     12.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Deactivate reconnection
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManTopologyBusConnectorReconnectManager::DeactivateReconnection(void)
 {
    //Delay if timer active
@@ -155,31 +130,25 @@ void C_SdManTopologyBusConnectorReconnectManager::DeactivateReconnection(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Is reconnect manager expected to handle this event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Is reconnect manager expected to handle this event
 
    \return
    true:  Handling done by reconnect manager
    false: No handling expected
-
-   \created     12.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdManTopologyBusConnectorReconnectManager::Active(void) const
 {
    return this->mq_ContextMenuActive;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Final step of reconnection when all events should have occured
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Final step of reconnection when all events should have occured
 
    This function expects to have all information necessary to either fully do or undo the reconnection step
-
-   \created     05.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManTopologyBusConnectorReconnectManager::m_FinishReconnect(void)
 {
    if (this->ms32_NewInterface >= 0)
@@ -217,13 +186,10 @@ void C_SdManTopologyBusConnectorReconnectManager::m_FinishReconnect(void)
    Q_EMIT this->SigCleanUpTemporaryLine();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize last known interaction point position with current value
-
-   \created     12.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize last known interaction point position with current value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManTopologyBusConnectorReconnectManager::m_InitLastKnownInteractionPointPosition(void)
 {
    if (this->mpc_BusConnector != NULL)

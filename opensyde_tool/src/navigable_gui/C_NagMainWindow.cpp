@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Main window with all sub widgets
 
@@ -8,18 +7,11 @@
    the use cases.
    This widget is designed in a ui file.
 
-   \implementation
-
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.07.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <iostream>
@@ -61,7 +53,7 @@
 #include "C_PopUtil.h"
 #include "C_TblTreDataElementModel.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -69,27 +61,24 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
-
-   \created     07.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_NagMainWindow::C_NagMainWindow(void) :
    QMainWindow(NULL),
    mpc_Ui(new Ui::C_NagMainWindow),
@@ -144,10 +133,6 @@ C_NagMainWindow::C_NagMainWindow(void) :
    connect(this->mpc_Ui->pc_TopToolBar, &C_NagToolBarWidget::SigChangeMode, this, &C_NagMainWindow::m_ChangeMode);
    connect(this->mpc_Ui->pc_TopToolBar, &C_NagToolBarWidget::SigOpenDetail, this, &C_NagMainWindow::m_OpenDetail);
 
-   // connect to C_NagUseCaseViewWidget
-   connect(this->mpc_UseCaseWidget, &C_NagUseCaseViewWidget::SigPushButtonIconPressed, this,
-           &C_NagMainWindow::m_HandlePushButtonClick);
-
    // connect to C_SyvManager
    connect(&this->mc_SystemViewManager, &C_SyvManager::SigChangeMode, this, &C_NagMainWindow::m_ChangeMode);
    connect(&this->mc_SystemViewManager, &C_SyvManager::SigReloadNaviBarSystemViewNames, this->mpc_Ui->pc_NaviBar,
@@ -180,7 +165,7 @@ C_NagMainWindow::C_NagMainWindow(void) :
    {
       QPoint c_Position = C_UsHandler::h_GetInstance()->GetScreenPos();
       QSize c_Size = C_UsHandler::h_GetInstance()->GetAppSize();
-      C_OgeWiUtil::h_CheckAndFixDialogPositionAndSize(c_Position, c_Size, QSize(1000, 700));
+      C_OgeWiUtil::h_CheckAndFixDialogPositionAndSize(c_Position, c_Size, QSize(1000, 700), true);
       this->setGeometry(c_Position.x(), c_Position.y(), c_Size.width(), c_Size.height());
 
       if (C_UsHandler::h_GetInstance()->GetAppMaximized() == true)
@@ -211,15 +196,12 @@ C_NagMainWindow::C_NagMainWindow(void) :
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     07.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_NagMainWindow::~C_NagMainWindow()
 {
    // save position
@@ -244,13 +226,10 @@ C_NagMainWindow::~C_NagMainWindow()
    //lint -e{1579}  no memory leak because of the parent all elements and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Return to start view
-
-   \created     07.07.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Return to start view
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_ShowStartView()
 {
    bool q_Continue;
@@ -291,15 +270,21 @@ void C_NagMainWindow::m_ShowStartView()
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_ChangeUseCase(const sint32 os32_Mode, const sint32 os32_SubIndex)
 {
+   bool q_Worked;
+
    this->mq_ChangeUseCase = true;
-   m_ChangeMode(os32_Mode, os32_SubIndex);
+   q_Worked = m_ChangeMode(os32_Mode, os32_SubIndex);
    this->mq_ChangeUseCase = false;
+   if (q_Worked == false)
+   {
+      this->mpc_Ui->pc_NaviBar->ResetUseCaseAfterChangeFailure(this->ms32_Mode);
+   }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_OpenDetail(const sint32 os32_Index, const sint32 os32_SubIndex, const sint32 os32_SubSubIndex,
                                    const sint32 os32_SubSubSubIndex, const sint32 os32_Flag)
 {
@@ -309,17 +294,14 @@ void C_NagMainWindow::m_OpenDetail(const sint32 os32_Index, const sint32 os32_Su
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Trigger help key press handling
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     04.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_ToolTipHidden1 = false;
@@ -377,6 +359,16 @@ void C_NagMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
             this->mpc_MainWidget->UpdateRecentProjects();
          }
       }
+      // Save as on F12
+      else if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_F12))
+      {
+         // open save as dialog
+         this->mpc_MainWidget->OnSaveProjAs();
+      }
+      else
+      {
+         // nothing to do
+      }
    }
    //Trigger tool tip hide if necessary
    if (opc_KeyEvent->key() == Qt::Key_Escape)
@@ -428,15 +420,12 @@ void C_NagMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten close event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten close event slot
 
    \param[in,out] opc_Event    Event identification and information
-
-   \created     10.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::closeEvent(QCloseEvent * const opc_Event)
 {
    bool q_CallCloseEvent = false;
@@ -489,17 +478,14 @@ void C_NagMainWindow::closeEvent(QCloseEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten drag enter event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten drag enter event slot
 
    Here: Accept external *.syde file
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     17.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::dragEnterEvent(QDragEnterEvent * const opc_Event)
 {
    const QMimeData * const pc_MimeData = opc_Event->mimeData();
@@ -512,17 +498,14 @@ void C_NagMainWindow::dragEnterEvent(QDragEnterEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten drag move event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten drag move event slot
 
    Here: Accept external *.syde file
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     17.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::dragMoveEvent(QDragMoveEvent * const opc_Event)
 {
    const QMimeData * const pc_MimeData = opc_Event->mimeData();
@@ -535,17 +518,14 @@ void C_NagMainWindow::dragMoveEvent(QDragMoveEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten drop event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten drop event slot
 
    Here: Handle dropped *.syde file
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     17.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::dropEvent(QDropEvent * const opc_Event)
 {
    if (C_PopUtil::h_AskUserToContinue(this) == true)
@@ -579,15 +559,12 @@ void C_NagMainWindow::dropEvent(QDropEvent * const opc_Event)
    QMainWindow::dropEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Preparation for showing a specific widget in the 'work area'
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Preparation for showing a specific widget in the 'work area'
 
    \param[in]  oq_DeleteActualWidget   Flag for deleting the previous widget
-
-   \created     07.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_PrepareForSpecificWidget(const bool oq_DeleteActualWidget)
 {
    QRect c_Rect;
@@ -620,27 +597,26 @@ void C_NagMainWindow::m_PrepareForSpecificWidget(const bool oq_DeleteActualWidge
    this->setGeometry(c_Rect);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Showing a specific widget in the 'work area'
-
-   \created     13.07.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Showing a specific widget in the 'work area'
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_SetNewSpecificWidget(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode,
                                              QString oc_ItemName, const QString & orc_SubSubModeName,
                                              const uint32 ou32_Index)
 {
    connect(this->mpc_ActiveWidget, &C_NagUseCaseWidget::SigChangeMode,
            this, &C_NagMainWindow::m_ChangeMode);
-   connect(this->mpc_ActiveWidget, &C_NagUseCaseWidget::SigDataChanged,
-           this->mpc_Ui->pc_NaviBar, &C_NagNaviBarWidget::MarkModeForDataChanged);
+   connect(this->mpc_ActiveWidget, &C_NagUseCaseWidget::SigTriggerUpdateTitle,
+           this, &C_NagMainWindow::m_UpdateTitle);
    connect(this->mpc_ActiveWidget, &C_NagUseCaseWidget::SigErrorChanged,
            this->mpc_Ui->pc_NaviBar, &C_NagNaviBarWidget::UpdateViewIcons);
+   connect(this->mpc_ActiveWidget, &C_NagUseCaseWidget::SigDataChanged,
+           this->mpc_Ui->pc_NaviBar, &C_NagNaviBarWidget::MarkModeForDataChanged);
    connect(this->mpc_ActiveWidget, &C_NagUseCaseWidget::SigStartViewClicked,
            this, &C_NagMainWindow::m_ShowStartView);
-   connect(this->mpc_ActiveWidget, &C_NagUseCaseWidget::SigSetPushButtonIcon,
-           this, &C_NagMainWindow::m_SetPushButtonIcon);
+   connect(this->mpc_ActiveWidget, &C_NagUseCaseWidget::SigSetInteractionWidget,
+           this, &C_NagMainWindow::m_SetInteractionWidget);
    connect(this->mpc_ActiveWidget, &C_NagUseCaseWidget::SigSearch, this->mpc_Ui->pc_TopToolBar,
            &C_NagToolBarWidget::Search);
    connect(this->mpc_ActiveWidget, &C_NagUseCaseWidget::SigNewUserSettings, this->mpc_MainWidget,
@@ -659,7 +635,7 @@ void C_NagMainWindow::m_SetNewSpecificWidget(const stw_types::sint32 os32_Mode, 
    this->mpc_Ui->pc_TopToolBar->ConfigureButtons(this->mpc_ActiveWidget);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_RemoveUseCaseWidget(void)
 {
    this->mpc_Ui->pc_TopToolBar->ResetButtons();
@@ -668,14 +644,18 @@ void C_NagMainWindow::m_RemoveUseCaseWidget(void)
    {
       disconnect(this->mpc_ActiveWidget, &C_NagUseCaseWidget::SigChangeMode,
                  this, &C_NagMainWindow::m_ChangeMode);
+      disconnect(this->mpc_ActiveWidget, &C_NagUseCaseWidget::SigTriggerUpdateTitle,
+                 this, &C_NagMainWindow::m_UpdateTitle);
       disconnect(this->mpc_ActiveWidget, &C_NagUseCaseWidget::SigErrorChanged,
                  this->mpc_Ui->pc_NaviBar, &C_NagNaviBarWidget::UpdateViewIcons);
       disconnect(this->mpc_ActiveWidget, &C_NagUseCaseWidget::SigDataChanged,
                  this->mpc_Ui->pc_NaviBar, &C_NagNaviBarWidget::MarkModeForDataChanged);
       disconnect(this->mpc_ActiveWidget, &C_NagUseCaseWidget::SigStartViewClicked,
                  this, &C_NagMainWindow::m_ShowStartView);
-      disconnect(this->mpc_ActiveWidget, &C_NagUseCaseWidget::SigSetPushButtonIcon,
-                 this, &C_NagMainWindow::m_SetPushButtonIcon);
+      disconnect(this->mpc_ActiveWidget, &C_NagUseCaseWidget::SigSetInteractionWidget,
+                 this, &C_NagMainWindow::m_SetInteractionWidget);
+      disconnect(this->mpc_ActiveWidget, &C_NagUseCaseWidget::SigSearch, this->mpc_Ui->pc_TopToolBar,
+                 &C_NagToolBarWidget::Search);
       disconnect(this->mpc_ActiveWidget, &C_NagUseCaseWidget::SigNewUserSettings, this->mpc_MainWidget,
                  &C_NagMainWidget::UpdateRecentProjects);
       disconnect(this->mpc_ActiveWidget, &C_NagUseCaseWidget::SigBlockDragAndDrop,
@@ -685,9 +665,8 @@ void C_NagMainWindow::m_RemoveUseCaseWidget(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapts the parameter if a switch from main widget to system definition or system view was triggered.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapts the parameter if a switch from main widget to system definition or system view was triggered.
 
    The last used parameter for the use case will be used.
 
@@ -697,10 +676,8 @@ void C_NagMainWindow::m_RemoveUseCaseWidget(void)
    \param[in,out] orc_Name         Name of next screen
    \param[in,out] orc_SubItemName  Selected sub sub mode name
    \param[in,out] oru32_Flag       Flag value for next screen
-
-   \created     31.01.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_AdaptParameter(const sint32 os32_Mode, sint32 & ors32_SubMode, uint32 & oru32_Index,
                                        QString & orc_Name, QString & orc_SubItemName, uint32 & oru32_Flag)
 {
@@ -760,13 +737,10 @@ void C_NagMainWindow::m_AdaptParameter(const sint32 os32_Mode, sint32 & ors32_Su
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   show node edit
-
-   \created     31.01.2017  STW/S.Singer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   show node edit
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_ShowSysDefItem(const sint32 os32_SubMode, const uint32 ou32_Index, const QString & orc_Name,
                                        const uint32 ou32_Flag)
 {
@@ -803,19 +777,16 @@ void C_NagMainWindow::m_ShowSysDefItem(const sint32 os32_SubMode, const uint32 o
    pc_Handler->SetSubMode(os32_SubMode, ou32_Index, ou32_Flag);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show system view item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show system view item
 
    \param[in,out] ors32_SubMode      Target submode (may be changed if necessary for PC reconnection feature)
    \param[in]     ou32_Index         View index
    \param[in]     orc_Name           Display name
    \param[in]     orc_SubSubModeName Selected sub sub mode name
    \param[in]     ou32_Flag          Currently unused flag
-
-   \created     09.02.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_ShowSysViewItem(sint32 & ors32_SubMode, const uint32 ou32_Index, const QString & orc_Name,
                                         const QString & orc_SubSubModeName, const uint32 ou32_Flag)
 {
@@ -869,7 +840,7 @@ void C_NagMainWindow::m_ShowSysViewItem(sint32 & ors32_SubMode, const uint32 ou3
    pc_Handler->SetSubMode(ors32_SubMode, ou32_Index, ou32_Flag);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_SaveScreenProperties(void) const
 {
    C_UsHandler::h_GetInstance()->SetScreenPos(this->normalGeometry().topLeft());
@@ -877,9 +848,8 @@ void C_NagMainWindow::m_SaveScreenProperties(void) const
    C_UsHandler::h_GetInstance()->SetAppMaximized(this->isMaximized());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if mime valid
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if mime valid
 
    \param[in]     opc_Mime     Mime to check
    \param[in,out] opc_FilePath Optional parameter for file path output if valid
@@ -887,10 +857,8 @@ void C_NagMainWindow::m_SaveScreenProperties(void) const
    \return
    true  Valid
    false Invalid
-
-   \created     17.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_NagMainWindow::mh_CheckMime(const QMimeData * const opc_Mime, QString * const opc_FilePath)
 {
    bool q_Retval = false;
@@ -928,23 +896,20 @@ bool C_NagMainWindow::mh_CheckMime(const QMimeData * const opc_Mime, QString * c
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Blocking of drag and drop for opening an other project file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Blocking of drag and drop for opening an other project file
 
    \param[in]     oq_Block        Flag if the drag and drop feature shall be active
                                   - true    drag and drop will be blocked
                                   - false   drag and drop will be allowed
-
-   \created     26.10.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_BlockDragAndDrop(const bool oq_Block)
 {
    this->mq_BlockDragAndDrop = oq_Block;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_NagMainWindow::m_CheckProjectForChanges(void) const
 {
    bool q_Result = C_PuiSdHandler::h_GetInstance()->HasHashChanged();
@@ -955,13 +920,10 @@ bool C_NagMainWindow::m_CheckProjectForChanges(void) const
    return q_Result;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   An other project will be loaded. Save project specific user settings.
-
-   \created     31.01.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   An other project will be loaded. Save project specific user settings.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_PrepareProjectLoad(void)
 {
    C_UsHandler::h_GetInstance()->SetProjLastScreenMode(this->ms32_SdSubMode, this->mu32_SdIndex, this->mu32_SdFlag,
@@ -970,9 +932,8 @@ void C_NagMainWindow::m_PrepareProjectLoad(void)
    C_UsHandler::h_GetInstance()->Save();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle change of current project.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle change of current project.
 
    Load project specific user settings and change mode to last known mode (SD/SC),
    where SD always goes to topology and SC also uses last sub mode.
@@ -986,10 +947,8 @@ void C_NagMainWindow::m_PrepareProjectLoad(void)
             (e.g. double click on openSYDE.exe, command line openSYDE.exe only, Qt run)
          - if project load returned an error and therefore the previous one gets restored
             (e.g. missing *.syde_sysdef file)
-
-   \created     31.01.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_ProjectLoaded(const bool & orq_SwitchToLastKnownMode)
 {
    C_UsHandler::h_GetInstance()->LoadActiveProject(C_PuiProject::h_GetInstance()->GetPath());
@@ -1064,13 +1023,10 @@ void C_NagMainWindow::m_ProjectLoaded(const bool & orq_SwitchToLastKnownMode)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   An other project will be loaded. Close recent project and save project specific user settings.
-
-   \created     26.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   An other project will be loaded. Close recent project and save project specific user settings.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_CloseAndPrepareProjectLoad(void)
 {
    // close active project
@@ -1086,45 +1042,24 @@ void C_NagMainWindow::m_CloseAndPrepareProjectLoad(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set generic push button icon
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set interaction widget
 
-   \param[in] orc_IconPath Icon path
-
-   \created     02.08.2017  STW/M.Echtler
+   \param[in] opc_Widget Interaction widget
 */
-//-----------------------------------------------------------------------------
-void C_NagMainWindow::m_SetPushButtonIcon(const QString & orc_IconPath)
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagMainWindow::m_SetInteractionWidget(QWidget * const opc_Widget)
 {
    if (this->mpc_UseCaseWidget != NULL)
    {
-      this->mpc_UseCaseWidget->SetPushButtonIcon(orc_IconPath);
+      this->mpc_UseCaseWidget->SetInteractionWidget(opc_Widget);
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle generic push button click
-
-   \created     02.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle add new view request
 */
-//-----------------------------------------------------------------------------
-void C_NagMainWindow::m_HandlePushButtonClick(void)
-{
-   if (this->mpc_ActiveWidget != NULL)
-   {
-      this->mpc_ActiveWidget->OnPushButtonIconPress();
-   }
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle add new view request
-
-   \created     29.06.2018  STW/M.Echtler
-*/
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_HandleAddViewRequest(void)
 {
    bool q_Continue;
@@ -1143,40 +1078,44 @@ void C_NagMainWindow::m_HandleAddViewRequest(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle rename view action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle rename view action
 
    Warning: Name assumed to be correct
 
    \param[in] ou32_Index Index identifier
    \param[in] orc_Name   New name
-
-   \created     03.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_HandleRenameView(const uint32 ou32_Index, const QString & orc_Name) const
 {
    this->mc_SystemViewManager.RenameView(ou32_Index, orc_Name);
    if (this->mu32_Index == ou32_Index)
    {
-      QString c_SubMode;
-      QString c_SubSubMode;
-      C_SyvUtil::h_GetViewDisplayName(this->mu32_Index, this->ms32_SubMode, c_SubMode, c_SubSubMode);
-      this->mpc_UseCaseWidget->UpdateItemName(c_SubMode, c_SubSubMode);
+      m_UpdateTitle();
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle move view request
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update title
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagMainWindow::m_UpdateTitle(void) const
+{
+   QString c_SubMode;
+   QString c_SubSubMode;
+
+   C_SyvUtil::h_GetViewDisplayName(this->mu32_Index, this->ms32_SubMode, c_SubMode, c_SubSubMode);
+   this->mpc_UseCaseWidget->UpdateItemName(c_SubMode, c_SubSubMode);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle move view request
 
    \param[in] ou32_StartIndex  Start index
    \param[in] ou32_TargetIndex Target index
-
-   \created     29.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_HandleMoveViewRequest(const uint32 ou32_StartIndex, const uint32 ou32_TargetIndex)
 {
    bool q_Continue;
@@ -1195,17 +1134,14 @@ void C_NagMainWindow::m_HandleMoveViewRequest(const uint32 ou32_StartIndex, cons
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle delete view request
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle delete view request
 
    \param[in] ou32_Index           View index to delete
    \param[in] os32_SelectedSubMode Currently selected submode
    \param[in] ou32_SelectedIndex   Currently selected view index
-
-   \created     29.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_HandleDeleteSysViewRequest(const uint32 ou32_Index, const sint32 os32_SelectedSubMode,
                                                    const uint32 ou32_SelectedIndex)
 {
@@ -1227,15 +1163,12 @@ void C_NagMainWindow::m_HandleDeleteSysViewRequest(const uint32 ou32_Index, cons
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle duplicate system view request
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle duplicate system view request
 
    \param[in] ou32_Index System view index
-
-   \created     29.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWindow::m_HandleDuplicateSysViewRequest(const uint32 ou32_Index)
 {
    bool q_Continue;
@@ -1254,8 +1187,8 @@ void C_NagMainWindow::m_HandleDuplicateSysViewRequest(const uint32 ou32_Index)
    }
 }
 
-//-----------------------------------------------------------------------------
-void C_NagMainWindow::m_ChangeMode(const stw_types::sint32 os32_Mode, const sint32 os32_SubMode,
+//----------------------------------------------------------------------------------------------------------------------
+bool C_NagMainWindow::m_ChangeMode(const stw_types::sint32 os32_Mode, const sint32 os32_SubMode,
                                    const uint32 ou32_Index, const QString & orc_Name, const QString & orc_SubSubName,
                                    const uint32 ou32_Flag)
 {
@@ -1346,4 +1279,5 @@ void C_NagMainWindow::m_ChangeMode(const stw_types::sint32 os32_Mode, const sint
    {
       std::cout << "Switch " << c_Timer.elapsed() << " ms" << &std::endl;
    }
+   return q_Continue;
 }

@@ -1,34 +1,28 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget with minimal progress bar. (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.10.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OGEWIPROGRESSBAR_H
 #define C_OGEWIPROGRESSBAR_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 #include <QPen>
 
 #include "stwtypes.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_elements
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OgeWiProgressBar :
    public QWidget
@@ -41,6 +35,7 @@ public:
    void SetColorFree(const QColor & orc_Color);
    void SetColorReserved(const QColor & orc_Color);
    void SetColorTooMuch(const QColor & orc_Color);
+   void SetSpacingWidth(const stw_types::sint32 os32_SpacingWidth);
 
    void SetProgress(const stw_types::uint32 ou32_Percentage, const bool oq_Full = false);
    stw_types::uint32 GetProgress(void) const;
@@ -57,12 +52,13 @@ private:
    QColor mc_ColorFree;
    QColor mc_ColorReserved;
    QColor mc_ColorTooMuch;
+   stw_types::sint32 ms32_SpacingWidth; // space between free bar and reserved bar
 
    stw_types::uint32 mu32_Percentage;
    bool mq_Full;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

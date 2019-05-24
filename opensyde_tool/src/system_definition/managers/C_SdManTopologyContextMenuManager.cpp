@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Context menu manager of system definition toplogy
 
    The context menu manager handles all request for context menus with its actions.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     08.09.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -26,31 +19,28 @@
 #include "C_GtGetText.h"
 #include "gitypes.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     08.09.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdManTopologyContextMenuManager::C_SdManTopologyContextMenuManager() :
    C_SebTopologyBaseContextMenuManager()
 {
@@ -74,21 +64,18 @@ C_SdManTopologyContextMenuManager::C_SdManTopologyContextMenuManager() :
    m_InsertBendLineActions(this->mpc_ActionOrderObjects);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     10.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdManTopologyContextMenuManager::~C_SdManTopologyContextMenuManager()
 {
    //lint -e{1540}  no memory leak because of the parent of all mpc_Action* and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManTopologyContextMenuManager::m_SetActionsInvisible(void)
 {
    this->mpc_ActionEdit->setVisible(false);
@@ -97,7 +84,7 @@ void C_SdManTopologyContextMenuManager::m_SetActionsInvisible(void)
    C_SebTopologyBaseContextMenuManager::m_SetActionsInvisible();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdManTopologyContextMenuManager::m_ActivateSpecificActions(void)
 {
    // specific functionality
@@ -115,7 +102,6 @@ bool C_SdManTopologyContextMenuManager::m_ActivateSpecificActions(void)
    case msn_GRAPHICS_ITEM_BUS:         // buses have the same functionality
    case msn_GRAPHICS_ITEM_CANBUS:      // buses have the same functionality
    case msn_GRAPHICS_ITEM_ETHERNETBUS: // buses have the same functionality
-      this->mpc_ActionSetupStyle->setVisible(true);
       this->mpc_ActionCut->setVisible(true);
       this->mpc_ActionCopy->setVisible(true);
       this->mpc_ActionDelete->setVisible(true);
@@ -129,7 +115,6 @@ bool C_SdManTopologyContextMenuManager::m_ActivateSpecificActions(void)
       this->mpc_ActionInterfaceAssignment->setVisible(true);
       break;
    case msn_GRAPHICS_ITEM_LINE_ARROW:
-      this->mpc_ActionSetupStyle->setVisible(true);
       this->mpc_ActionCut->setVisible(true);
       this->mpc_ActionCopy->setVisible(true);
       this->mpc_ActionDelete->setVisible(true);
@@ -137,14 +122,12 @@ bool C_SdManTopologyContextMenuManager::m_ActivateSpecificActions(void)
       break;
    case msn_GRAPHICS_ITEM_BOUNDARY:    // boundary and text element have the same functionality
    case msn_GRAPHICS_ITEM_TEXTELEMENT: // boundary and text element have the same functionality
-      this->mpc_ActionSetupStyle->setVisible(true);
       this->mpc_ActionCut->setVisible(true);
       this->mpc_ActionCopy->setVisible(true);
       this->mpc_ActionDelete->setVisible(true);
       this->mpc_ActionOrderObjects->setVisible(true);
       break;
    case msn_GRAPHICS_ITEM_TEXTELEMENT_BUS:
-      this->mpc_ActionSetupStyle->setVisible(true);
       this->mpc_ActionOrderObjects->setVisible(true);
       this->mpc_ActionEdit->setText(C_GtGetText::h_GetText("Edit Bus Properties"));
       this->mpc_ActionEdit->setVisible(true);
@@ -157,18 +140,54 @@ bool C_SdManTopologyContextMenuManager::m_ActivateSpecificActions(void)
       break;
    }
 
+   //Setup style
+   if (m_ItemTypeHasSetupStyle(this->mpc_ActiveItem->type()))
+   {
+      this->mpc_ActionSetupStyle->setVisible(true);
+   }
+
    C_SebTopologyBaseContextMenuManager::m_ActivateSpecificActions();
 
    return true;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if the input item type requires a setup style in the context menu
+
+   \param[in] osn_ItemType Item type to check
+
+   \retval   True    Setup style menu is required
+   \retval   False   Setup style menu should stay hidden
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdManTopologyContextMenuManager::m_ItemTypeHasSetupStyle(const sintn osn_ItemType)
+{
+   bool q_Retval;
+
+   switch (osn_ItemType)
+   {
+   case msn_GRAPHICS_ITEM_BUS:
+   case msn_GRAPHICS_ITEM_CANBUS:
+   case msn_GRAPHICS_ITEM_ETHERNETBUS:
+   case msn_GRAPHICS_ITEM_LINE_ARROW:
+   case msn_GRAPHICS_ITEM_BOUNDARY:
+   case msn_GRAPHICS_ITEM_TEXTELEMENT:
+   case msn_GRAPHICS_ITEM_TEXTELEMENT_BUS:
+      q_Retval = true;
+      break;
+   default:
+      q_Retval = false;
+   }
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManTopologyContextMenuManager::m_Edit()
 {
    Q_EMIT this->SigEdit(this->mpc_ActiveItem);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManTopologyContextMenuManager::m_InterfaceAssignment()
 {
    Q_EMIT this->SigInterfaceAssignment(this->mpc_ActiveItem);

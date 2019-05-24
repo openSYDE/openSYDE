@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Handle clipboard load and save (implementation)
 
    Handle clipboard load and save
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     26.01.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QClipboard>
@@ -31,37 +24,35 @@
 #include "C_OSCNodeDataPoolFiler.h"
 #include "C_OSCNodeFiler.h"
 #include "TGLUtils.h"
+#include "C_OSCNodeCommFiler.h"
 #include "C_OSCSystemDefinitionFiler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 using namespace stw_errors;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Store node data pool to clip board
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Store node data pool to clip board
 
    \param[in] orc_OSCContent  OSC content
    \param[in] orc_UIContent   UI content
-
-   \created     20.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreDataPool(const C_OSCNodeDataPool & orc_OSCContent,
                                           const C_PuiSdNodeDataPool & orc_UIContent)
 {
@@ -87,9 +78,8 @@ void C_SdClipBoardHelper::h_StoreDataPool(const C_OSCNodeDataPool & orc_OSCConte
    mh_SetClipBoard(c_XMLContent.c_str());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load node data pool from clip board
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load node data pool from clip board
 
    \param[out] orc_OSCContent  OSC content
    \param[out] orc_UIContent   UI content
@@ -97,10 +87,8 @@ void C_SdClipBoardHelper::h_StoreDataPool(const C_OSCNodeDataPool & orc_OSCConte
    \return
    C_NO_ERR Found and loaded
    C_CONFIG Clipboard invalid
-
-   \created     20.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdClipBoardHelper::h_LoadToDataPool(C_OSCNodeDataPool & orc_OSCContent, C_PuiSdNodeDataPool & orc_UIContent)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -125,9 +113,7 @@ sint32 C_SdClipBoardHelper::h_LoadToDataPool(C_OSCNodeDataPool & orc_OSCContent,
                {
                   if (c_StringXml.SelectNodeChild("data-pool") == "data-pool")
                   {
-                     s32_Retval = C_OSCNodeDataPoolFiler::h_LoadDataPool(
-                        C_OSCSystemDefinitionFiler::hu16_FILE_VERSION_LATEST, orc_OSCContent,
-                        c_StringXml);
+                     s32_Retval = C_OSCNodeDataPoolFiler::h_LoadDataPool(orc_OSCContent, c_StringXml);
                   }
                   else
                   {
@@ -158,17 +144,14 @@ sint32 C_SdClipBoardHelper::h_LoadToDataPool(C_OSCNodeDataPool & orc_OSCContent,
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Store node data pool lists to clip board
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Store node data pool lists to clip board
 
    \param[in] orc_OSCContent OSC content
    \param[in] orc_UIContent  UI content
    \param[in] ore_Type       Data pool type
-
-   \created     26.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreDataPoolLists(const std::vector<C_OSCNodeDataPoolList> & orc_OSCContent,
                                                const std::vector<C_PuiSdNodeDataPoolList> & orc_UIContent,
                                                const C_OSCNodeDataPool::E_Type & ore_Type)
@@ -201,9 +184,8 @@ void C_SdClipBoardHelper::h_StoreDataPoolLists(const std::vector<C_OSCNodeDataPo
    mh_SetClipBoard(c_XMLContent.c_str());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load node data pool lists from clip board
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load node data pool lists from clip board
 
    \param[out] orc_OSCContent OSC content
    \param[out] orc_UIContent  UI content
@@ -212,10 +194,8 @@ void C_SdClipBoardHelper::h_StoreDataPoolLists(const std::vector<C_OSCNodeDataPo
    \return
    C_NO_ERR Found and loaded
    C_CONFIG Clipboard invalid
-
-   \created     26.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdClipBoardHelper::h_LoadToDataPoolLists(std::vector<C_OSCNodeDataPoolList> & orc_OSCContent,
                                                   std::vector<C_PuiSdNodeDataPoolList> & orc_UIContent,
                                                   C_OSCNodeDataPool::E_Type & ore_Type)
@@ -249,8 +229,7 @@ sint32 C_SdClipBoardHelper::h_LoadToDataPoolLists(std::vector<C_OSCNodeDataPoolL
                      {
                         if (c_StringXml.SelectNodeChild("lists") == "lists")
                         {
-                           s32_Retval = C_OSCNodeDataPoolFiler::h_LoadDataPoolLists(
-                              C_OSCSystemDefinitionFiler::hu16_FILE_VERSION_LATEST, orc_OSCContent, c_StringXml);
+                           s32_Retval = C_OSCNodeDataPoolFiler::h_LoadDataPoolLists(orc_OSCContent, c_StringXml);
                         }
                         else
                         {
@@ -287,16 +266,13 @@ sint32 C_SdClipBoardHelper::h_LoadToDataPoolLists(std::vector<C_OSCNodeDataPoolL
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Store node data pool list elements to clip board
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Store node data pool list elements to clip board
 
    \param[in] orc_OSCContent OSC content
    \param[in] orc_UIContent  UI content
-
-   \created     26.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreDataPoolListElementsToClipBoard(
    const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCContent,
    const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UIContent)
@@ -307,9 +283,8 @@ void C_SdClipBoardHelper::h_StoreDataPoolListElementsToClipBoard(
    mh_SetClipBoard(c_Tmp);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load node data pool list elements from clip board
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load node data pool list elements from clip board
 
    \param[in] orc_OSCContent OSC content
    \param[in] orc_UIContent  UI content
@@ -317,10 +292,8 @@ void C_SdClipBoardHelper::h_StoreDataPoolListElementsToClipBoard(
    \return
    C_NO_ERR Found and loaded
    C_CONFIG Clipboard invalid
-
-   \created     26.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdClipBoardHelper::h_LoadToDataPoolListElementsFromClipBoard(
    std::vector<C_OSCNodeDataPoolListElement> & orc_OSCContent,
    std::vector<C_PuiSdNodeDataPoolListElement> & orc_UIContent)
@@ -328,17 +301,14 @@ sint32 C_SdClipBoardHelper::h_LoadToDataPoolListElementsFromClipBoard(
    return h_LoadToDataPoolListElementsFromString(orc_OSCContent, orc_UIContent, mh_GetClipBoard());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Store node data pool list elements to string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Store node data pool list elements to string
 
    \param[in]  orc_OSCContent OSC content
    \param[in]  orc_UIContent  UI content
    \param[out] orc_Output     String output
-
-   \created     09.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreDataPoolListElementsToString(
    const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCContent,
    const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UIContent, QString & orc_Output)
@@ -365,9 +335,8 @@ void C_SdClipBoardHelper::h_StoreDataPoolListElementsToString(
    orc_Output = c_XMLContent.c_str();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load node data pool list elements from string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load node data pool list elements from string
 
    \param[in] orc_OSCContent OSC content
    \param[in] orc_UIContent  UI content
@@ -376,10 +345,8 @@ void C_SdClipBoardHelper::h_StoreDataPoolListElementsToString(
    \return
    C_NO_ERR Found and loaded
    C_CONFIG String invalid
-
-   \created     09.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdClipBoardHelper::h_LoadToDataPoolListElementsFromString(
    std::vector<C_OSCNodeDataPoolListElement> & orc_OSCContent,
    std::vector<C_PuiSdNodeDataPoolListElement> & orc_UIContent, const QString & orc_Input)
@@ -406,9 +373,7 @@ sint32 C_SdClipBoardHelper::h_LoadToDataPoolListElementsFromString(
                {
                   if (c_StringXml.SelectNodeChild("data-elements") == "data-elements")
                   {
-                     s32_Retval = C_OSCNodeDataPoolFiler::h_LoadDataPoolListElements(
-                        C_OSCSystemDefinitionFiler::hu16_FILE_VERSION_LATEST,
-                        orc_OSCContent, c_StringXml);
+                     s32_Retval = C_OSCNodeDataPoolFiler::h_LoadDataPoolListElements(orc_OSCContent, c_StringXml);
                   }
                   else
                   {
@@ -439,16 +404,13 @@ sint32 C_SdClipBoardHelper::h_LoadToDataPoolListElementsFromString(
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Store indices to string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Store indices to string
 
    \param[in]  orc_Indices Indices
    \param[out] orc_Output  String output
-
-   \created     09.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreIndicesToString(const std::vector<uint32> & orc_Indices, QString & orc_Output)
 {
    stw_scl::C_SCLString c_XMLContent;
@@ -467,9 +429,8 @@ void C_SdClipBoardHelper::h_StoreIndicesToString(const std::vector<uint32> & orc
    orc_Output = c_XMLContent.c_str();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load indices from string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load indices from string
 
    \param[out] orc_Indices Indices
    \param[in]  orc_Input   String input
@@ -477,10 +438,8 @@ void C_SdClipBoardHelper::h_StoreIndicesToString(const std::vector<uint32> & orc
    \return
    C_NO_ERR Found and loaded
    C_CONFIG String invalid
-
-   \created     09.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdClipBoardHelper::h_LoadIndicesFromString(std::vector<uint32> & orc_Indices, const QString & orc_Input)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -513,16 +472,13 @@ sint32 C_SdClipBoardHelper::h_LoadIndicesFromString(std::vector<uint32> & orc_In
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Store node data pool list data sets to clip board
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Store node data pool list data sets to clip board
 
    \param[out] orc_OSCNames         Data set names
    \param[out] orc_OSCDataSetValues Data set values
-
-   \created     15.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreDataPoolListDataSetsToClipBoard(
    const std::vector<C_OSCNodeDataPoolDataSet> & orc_OSCNames,
    const std::vector<std::vector<C_OSCNodeDataPoolContent> > & orc_OSCDataSetValues)
@@ -533,16 +489,13 @@ void C_SdClipBoardHelper::h_StoreDataPoolListDataSetsToClipBoard(
    mh_SetClipBoard(c_Tmp);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load data sets from clipboard
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load data sets from clipboard
 
    \param[out] orc_OSCNames         Data set names
    \param[out] orc_OSCDataSetValues Data set values
-
-   \created     15.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdClipBoardHelper::h_LoadToDataPoolListDataSetsFromClipBoard(
    std::vector<C_OSCNodeDataPoolDataSet> & orc_OSCNames,
    std::vector<std::vector<C_OSCNodeDataPoolContent> > & orc_OSCDataSetValues)
@@ -550,17 +503,14 @@ sint32 C_SdClipBoardHelper::h_LoadToDataPoolListDataSetsFromClipBoard(
    return h_LoadToDataPoolListDataSetsFromString(orc_OSCNames, orc_OSCDataSetValues, mh_GetClipBoard());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Store node data pool list data sets to string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Store node data pool list data sets to string
 
    \param[out] orc_OSCNames         Data set names
    \param[out] orc_OSCDataSetValues Data set values
    \param[out] orc_Output           String output
-
-   \created     15.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreDataPoolListDataSetsToString(
    const std::vector<C_OSCNodeDataPoolDataSet> & orc_OSCNames,
    const std::vector<std::vector<C_OSCNodeDataPoolContent> > & orc_OSCDataSetValues, QString & orc_Output)
@@ -596,17 +546,14 @@ void C_SdClipBoardHelper::h_StoreDataPoolListDataSetsToString(
    orc_Output = c_XMLContent.c_str();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load data sets from clipboard
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load data sets from clipboard
 
    \param[out] orc_OSCNames         Data set names
    \param[out] orc_OSCDataSetValues Data set values
    \param[in]  orc_Input            String input
-
-   \created     15.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdClipBoardHelper::h_LoadToDataPoolListDataSetsFromString(std::vector<C_OSCNodeDataPoolDataSet> & orc_OSCNames,
                                                                    std::vector<std::vector<C_OSCNodeDataPoolContent> > & orc_OSCDataSetValues,
                                                                    const QString & orc_Input)
@@ -705,9 +652,8 @@ sint32 C_SdClipBoardHelper::h_LoadToDataPoolListDataSetsFromString(std::vector<C
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Store messages to clipboard
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Store messages to clipboard
 
    \param[in] orc_Messages                Message data
    \param[in] orc_OSCSignalCommons        Signal common osc data
@@ -716,10 +662,8 @@ sint32 C_SdClipBoardHelper::h_LoadToDataPoolListDataSetsFromString(std::vector<C
    \param[in] orc_OwnerNodeName           Owner node names
    \param[in] orc_OwnerNodeInterfaceIndex Owner node interface index
    \param[in] orc_OwnerIsTxFlag           Owner has message as TX flags
-
-   \created     24.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreMessages(const std::vector<C_OSCCanMessage> & orc_Messages,
                                           const std::vector<std::vector<C_OSCNodeDataPoolListElement> > & orc_OSCSignalCommons, const std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UISignalCommons, const std::vector<std::vector<C_PuiSdNodeCanSignal> > & orc_UISignals, const std::vector<std::vector<QString> > & orc_OwnerNodeName, std::vector<std::vector<uint32> > & orc_OwnerNodeInterfaceIndex,
                                           const std::vector<std::vector<bool> > & orc_OwnerIsTxFlag)
@@ -732,7 +676,7 @@ void C_SdClipBoardHelper::h_StoreMessages(const std::vector<C_OSCCanMessage> & o
    c_StringXml.CreateAndSelectNodeChild("clip-board");
    c_StringXml.CreateAndSelectNodeChild("core");
    c_StringXml.CreateAndSelectNodeChild("message");
-   C_OSCNodeFiler::h_SaveNodeComMessages(orc_Messages, c_StringXml);
+   C_OSCNodeCommFiler::h_SaveNodeComMessages(orc_Messages, c_StringXml);
    //Return
    tgl_assert(c_StringXml.SelectNodeParent() == "core");
    c_StringXml.CreateAndSelectNodeChild("message-common");
@@ -811,9 +755,8 @@ void C_SdClipBoardHelper::h_StoreMessages(const std::vector<C_OSCCanMessage> & o
    C_SdClipBoardHelper::mh_SetClipBoard(c_String);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore messages from clipboard
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore messages from clipboard
 
    \param[out] orc_Messages                Message data
    \param[out] orc_OSCSignalCommons        Signal common osc data
@@ -826,10 +769,8 @@ void C_SdClipBoardHelper::h_StoreMessages(const std::vector<C_OSCCanMessage> & o
    \return
    C_NO_ERR Found and loaded
    C_CONFIG Clipboard invalid
-
-   \created     24.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdClipBoardHelper::h_LoadMessages(std::vector<C_OSCCanMessage> & orc_Messages,
                                            std::vector<std::vector<C_OSCNodeDataPoolListElement> > & orc_OSCSignalCommons, std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UISignalCommons, std::vector<std::vector<C_PuiSdNodeCanSignal> > & orc_UISignals, std::vector<std::vector<QString> > & orc_OwnerNodeName, std::vector<std::vector<uint32> > & orc_OwnerNodeInterfaceIndex,
                                            std::vector<std::vector<bool> > & orc_OwnerIsTxFlag)
@@ -846,7 +787,7 @@ sint32 C_SdClipBoardHelper::h_LoadMessages(std::vector<C_OSCCanMessage> & orc_Me
       {
          if (c_StringXml.SelectNodeChild("message") == "message")
          {
-            s32_Retval = C_OSCNodeFiler::h_LoadNodeComMessages(orc_Messages, c_StringXml);
+            s32_Retval = C_OSCNodeCommFiler::h_LoadNodeComMessages(orc_Messages, c_StringXml);
             if (s32_Retval == C_NO_ERR)
             {
                //Return
@@ -860,8 +801,7 @@ sint32 C_SdClipBoardHelper::h_LoadMessages(std::vector<C_OSCCanMessage> & orc_Me
                      do
                      {
                         c_Tmp.clear();
-                        C_OSCNodeDataPoolFiler::h_LoadDataPoolListElements(
-                           C_OSCSystemDefinitionFiler::hu16_FILE_VERSION_LATEST, c_Tmp, c_StringXml);
+                        C_OSCNodeDataPoolFiler::h_LoadDataPoolListElements(c_Tmp, c_StringXml);
                         orc_OSCSignalCommons.push_back(c_Tmp);
                         c_CurrentNode = c_StringXml.SelectNodeNext("data-elements");
                      }
@@ -996,18 +936,15 @@ sint32 C_SdClipBoardHelper::h_LoadMessages(std::vector<C_OSCCanMessage> & orc_Me
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Store signals to clipboard
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Store signals to clipboard
 
    \param[in] orc_Signals          Signals data
    \param[in] orc_OSCSignalCommons Signal common osc data
    \param[in] orc_UISignalCommons  Signal common ui data
    \param[in] orc_UISignals        Signal ui data
-
-   \created     24.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreSignalsToClipboard(const std::vector<C_OSCCanSignal> & orc_Signals,
                                                     const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCSignalCommons, const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons,
                                                     const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals)
@@ -1018,9 +955,8 @@ void C_SdClipBoardHelper::h_StoreSignalsToClipboard(const std::vector<C_OSCCanSi
    C_SdClipBoardHelper::mh_SetClipBoard(c_String);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore signals from clipboard
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore signals from clipboard
 
    \param[out] orc_Signals          Signals data
    \param[out] orc_OSCSignalCommons Signal common osc data
@@ -1030,10 +966,8 @@ void C_SdClipBoardHelper::h_StoreSignalsToClipboard(const std::vector<C_OSCCanSi
    \return
    C_NO_ERR Found and loaded
    C_CONFIG Clipboard invalid
-
-   \created     24.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdClipBoardHelper::h_LoadSignalsFromClipboard(std::vector<C_OSCCanSignal> & orc_Signals,
                                                        std::vector<C_OSCNodeDataPoolListElement> & orc_OSCSignalCommons,
                                                        std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons,
@@ -1051,16 +985,13 @@ sint32 C_SdClipBoardHelper::h_LoadSignalsFromClipboard(std::vector<C_OSCCanSigna
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Store message ids to string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Store message ids to string
 
    \param[in]  orc_MessageIds Message identification indices
    \param[out] orc_Output     String output
-
-   \created     03.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreMessageIndexToString(
    const std::vector<C_OSCCanMessageIdentificationIndices> & orc_MessageIds, QString & orc_Output)
 {
@@ -1079,7 +1010,7 @@ void C_SdClipBoardHelper::h_StoreMessageIndexToString(
       c_StringXml.SetAttributeUint32("message-index", rc_CurrentElement.u32_MessageIndex);
       c_StringXml.SetAttributeBool("message-tx-flag", rc_CurrentElement.q_MessageIsTx);
       c_StringXml.CreateNodeChild("protocol-type",
-                                  C_OSCNodeFiler::h_CommunicationProtocolToString(rc_CurrentElement.e_ComProtocol));
+                                  C_OSCNodeCommFiler::h_CommunicationProtocolToString(rc_CurrentElement.e_ComProtocol));
       //Return
       tgl_assert(c_StringXml.SelectNodeParent() == "message-ids");
    }
@@ -1089,9 +1020,8 @@ void C_SdClipBoardHelper::h_StoreMessageIndexToString(
    orc_Output = c_XMLContent.c_str();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore message ids from string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore message ids from string
 
    \param[in]  orc_Input      String input
    \param[out] orc_MessageIds Message identification indices
@@ -1099,10 +1029,8 @@ void C_SdClipBoardHelper::h_StoreMessageIndexToString(
    \return
    C_NO_ERR Found and loaded
    C_RANGE  String invalid
-
-   \created     03.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdClipBoardHelper::h_LoadMessageIndexFromString(const QString & orc_Input,
                                                          std::vector<C_OSCCanMessageIdentificationIndices> & orc_MessageIds)
 {
@@ -1129,8 +1057,8 @@ sint32 C_SdClipBoardHelper::h_LoadMessageIndexFromString(const QString & orc_Inp
 
                if (c_StringXml.SelectNodeChild("protocol-type") == "protocol-type")
                {
-                  if (C_OSCNodeFiler::h_StringToCommunicationProtocol(c_StringXml.GetNodeContent(),
-                                                                      c_MessageId.e_ComProtocol) != C_NO_ERR)
+                  if (C_OSCNodeCommFiler::h_StringToCommunicationProtocol(c_StringXml.GetNodeContent(),
+                                                                          c_MessageId.e_ComProtocol) != C_NO_ERR)
                   {
                      s32_Retval = C_RANGE;
                   }
@@ -1165,15 +1093,12 @@ sint32 C_SdClipBoardHelper::h_LoadMessageIndexFromString(const QString & orc_Inp
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Store data snapshot to clipboard
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Store data snapshot to clipboard
 
    \param[in] orc_Data Snapshot data
-
-   \created     08.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreDataSnapShotToClipboard(const C_SdTopologyDataSnapshot & orc_Data)
 {
    QString c_String;
@@ -1182,13 +1107,17 @@ void C_SdClipBoardHelper::h_StoreDataSnapShotToClipboard(const C_SdTopologyDataS
    C_OSCXMLParserString c_StringXml;
 
    c_StringXml.CreateAndSelectNodeChild("opensyde-system-definition");
-   c_StringXml.CreateAndSelectNodeChild("nodes");
-   C_OSCSystemDefinitionFiler::h_SaveNodes(orc_Data.c_OSCNodes, c_StringXml);
+   c_StringXml.CreateAndSelectNodeChild("nodes-core");
+   C_OSCSystemDefinitionFiler::h_SaveNodes(orc_Data.c_OSCNodes, c_StringXml, "", NULL);
+   tgl_assert(c_StringXml.SelectNodeParent() == "opensyde-system-definition");
+   c_StringXml.CreateAndSelectNodeChild("nodes-ui");
    C_PuiSdHandlerFiler::h_SaveNodes(orc_Data.c_UINodes, c_StringXml);
    //Return
    tgl_assert(c_StringXml.SelectNodeParent() == "opensyde-system-definition");
-   c_StringXml.CreateAndSelectNodeChild("buses");
+   c_StringXml.CreateAndSelectNodeChild("buses-core");
    C_OSCSystemDefinitionFiler::h_SaveBuses(orc_Data.c_OSCBuses, c_StringXml);
+   tgl_assert(c_StringXml.SelectNodeParent() == "opensyde-system-definition");
+   c_StringXml.CreateAndSelectNodeChild("buses-ui");
    C_PuiSdHandlerFiler::h_SaveBuses(orc_Data.c_UIBuses, c_StringXml);
    //Return
    tgl_assert(c_StringXml.SelectNodeParent() == "opensyde-system-definition");
@@ -1206,19 +1135,16 @@ void C_SdClipBoardHelper::h_StoreDataSnapShotToClipboard(const C_SdTopologyDataS
    C_SdClipBoardHelper::mh_SetClipBoard(c_String);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore data snapshot from clipboard
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore data snapshot from clipboard
 
    \param[out] orc_Data Snapshot data
 
    \return
    C_NO_ERR Found and loaded
    C_RANGE  Clip board invalid
-
-   \created     08.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdClipBoardHelper::h_LoadDataSnapShotFromClipboard(C_SdTopologyDataSnapshot & orc_Data)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -1229,32 +1155,41 @@ sint32 C_SdClipBoardHelper::h_LoadDataSnapShotFromClipboard(C_SdTopologyDataSnap
 
    if (c_StringXml.SelectRoot() == "opensyde-system-definition")
    {
-      if (c_StringXml.SelectNodeChild("nodes") == "nodes")
+      if (c_StringXml.SelectNodeChild("nodes-core") == "nodes-core")
       {
-         s32_Retval = C_OSCSystemDefinitionFiler::h_LoadNodes(C_OSCSystemDefinitionFiler::hu16_FILE_VERSION_LATEST,
-                                                              orc_Data.c_OSCNodes, c_StringXml,
-                                                              C_OSCSystemDefinition::hc_Devices);
+         s32_Retval = C_OSCSystemDefinitionFiler::h_LoadNodes(orc_Data.c_OSCNodes, c_StringXml,
+                                                              C_OSCSystemDefinition::hc_Devices, "", true, false);
          if (s32_Retval == C_NO_ERR)
          {
-            s32_Retval = C_PuiSdHandlerFiler::h_LoadNodes(orc_Data.c_UINodes, c_StringXml);
-            if (s32_Retval == C_NO_ERR)
-            {
-               //Return
-               tgl_assert(c_StringXml.SelectNodeParent() == "opensyde-system-definition");
-            }
+            //Return
+            tgl_assert(c_StringXml.SelectNodeParent() == "opensyde-system-definition");
          }
       }
-      if ((c_StringXml.SelectNodeChild("buses") == "buses") && (s32_Retval == C_NO_ERR))
+      if ((c_StringXml.SelectNodeChild("nodes-ui") == "nodes-ui") && (s32_Retval == C_NO_ERR))
+      {
+         s32_Retval = C_PuiSdHandlerFiler::h_LoadNodes(orc_Data.c_UINodes, c_StringXml, NULL);
+         if (s32_Retval == C_NO_ERR)
+         {
+            //Return
+            tgl_assert(c_StringXml.SelectNodeParent() == "opensyde-system-definition");
+         }
+      }
+      if ((c_StringXml.SelectNodeChild("buses-core") == "buses-core") && (s32_Retval == C_NO_ERR))
       {
          s32_Retval = C_OSCSystemDefinitionFiler::h_LoadBuses(orc_Data.c_OSCBuses, c_StringXml);
          if (s32_Retval == C_NO_ERR)
          {
-            s32_Retval = C_PuiSdHandlerFiler::h_LoadBuses(orc_Data.c_UIBuses, c_StringXml);
-            if (s32_Retval == C_NO_ERR)
-            {
-               //Return
-               tgl_assert(c_StringXml.SelectNodeParent() == "opensyde-system-definition");
-            }
+            //Return
+            tgl_assert(c_StringXml.SelectNodeParent() == "opensyde-system-definition");
+         }
+      }
+      if ((c_StringXml.SelectNodeChild("buses-ui") == "buses-ui") && (s32_Retval == C_NO_ERR))
+      {
+         s32_Retval = C_PuiSdHandlerFiler::h_LoadBuses(orc_Data.c_UIBuses, c_StringXml);
+         if (s32_Retval == C_NO_ERR)
+         {
+            //Return
+            tgl_assert(c_StringXml.SelectNodeParent() == "opensyde-system-definition");
          }
       }
       if ((c_StringXml.SelectNodeChild("gui-only") == "gui-only") && (s32_Retval == C_NO_ERR))
@@ -1290,31 +1225,25 @@ sint32 C_SdClipBoardHelper::h_LoadDataSnapShotFromClipboard(C_SdTopologyDataSnap
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     26.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdClipBoardHelper::C_SdClipBoardHelper(void) :
    C_UtiClipBoardHelper()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Store signals to string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Store signals to string
 
    \param[in]  orc_Signals          Signals data
    \param[in]  orc_OSCSignalCommons Signal common osc data
    \param[in]  orc_UISignalCommons  Signal common ui data
    \param[in]  orc_UISignals        Signal ui data
    \param[out] orc_Output           String output
-
-   \created     24.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::mh_StoreSignalsToString(const std::vector<C_OSCCanSignal> & orc_Signals,
                                                   const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCSignalCommons, const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons, const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals,
                                                   QString & orc_Output)
@@ -1325,7 +1254,7 @@ void C_SdClipBoardHelper::mh_StoreSignalsToString(const std::vector<C_OSCCanSign
    c_StringXml.CreateAndSelectNodeChild("clip-board");
    c_StringXml.CreateAndSelectNodeChild("core");
    c_StringXml.CreateAndSelectNodeChild("com-signals");
-   C_OSCNodeFiler::h_SaveNodeComSignals(orc_Signals, c_StringXml);
+   C_OSCNodeCommFiler::h_SaveNodeComSignals(orc_Signals, c_StringXml);
    //Return
    tgl_assert(c_StringXml.SelectNodeParent() == "core");
    c_StringXml.CreateAndSelectNodeChild("data-elements");
@@ -1348,9 +1277,8 @@ void C_SdClipBoardHelper::mh_StoreSignalsToString(const std::vector<C_OSCCanSign
    orc_Output = c_XMLContent.c_str();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore signals from string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore signals from string
 
    \param[in]  orc_Input            String input
    \param[out] orc_Signals          Signals data
@@ -1361,10 +1289,8 @@ void C_SdClipBoardHelper::mh_StoreSignalsToString(const std::vector<C_OSCCanSign
    \return
    C_NO_ERR Found and loaded
    C_RANGE String invalid
-
-   \created     24.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdClipBoardHelper::mh_LoadSignalsFromString(const QString & orc_Input,
                                                      std::vector<C_OSCCanSignal> & orc_Signals,
                                                      std::vector<C_OSCNodeDataPoolListElement> & orc_OSCSignalCommons,
@@ -1382,15 +1308,14 @@ sint32 C_SdClipBoardHelper::mh_LoadSignalsFromString(const QString & orc_Input,
       {
          if (c_StringXml.SelectNodeChild("com-signals") == "com-signals")
          {
-            s32_Retval = C_OSCNodeFiler::h_LoadNodeComSignals(orc_Signals, c_StringXml);
+            s32_Retval = C_OSCNodeCommFiler::h_LoadNodeComSignals(orc_Signals, c_StringXml);
             if (s32_Retval == C_NO_ERR)
             {
                //Return
                tgl_assert(c_StringXml.SelectNodeParent() == "core");
                if (c_StringXml.SelectNodeChild("data-elements") == "data-elements")
                {
-                  C_OSCNodeDataPoolFiler::h_LoadDataPoolListElements(
-                     C_OSCSystemDefinitionFiler::hu16_FILE_VERSION_LATEST, orc_OSCSignalCommons, c_StringXml);
+                  C_OSCNodeDataPoolFiler::h_LoadDataPoolListElements(orc_OSCSignalCommons, c_StringXml);
                   //Return
                   tgl_assert(c_StringXml.SelectNodeParent() == "core");
                   //Return

@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Text element graphics item for showing bus name (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     12.05.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
@@ -30,36 +23,33 @@
 #include "C_SdUtil.h"
 #include "C_PuiSdUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in]       ors32_Index          Index of data element in system definition
    \param[in]       oru64_ID             Unique ID
    \param[in,out]   opc_parent           Optional pointer to parent
-
-   \created     12.05.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiTextElementBus::C_GiTextElementBus(const sint32 & ors32_Index, const uint64 & oru64_ID,
                                        QGraphicsItem * const opc_Parent) :
    C_GiBiTextElement(oru64_ID, false, opc_Parent),
@@ -72,9 +62,6 @@ C_GiTextElementBus::C_GiTextElementBus(const sint32 & ors32_Index, const uint64 
    mpc_SvgRenderer(NULL)
 {
    QFont c_Font;
-
-   //   this->mc_ErrorIcon.load(":images/SafetyIcon24px.png");
-   //   this->mc_ErrorIcon.scaled(mc_ICON_SIZE_24);
    QString c_SvgString("://images/Error_iconV2.svg");
 
    this->mpc_SvgRenderer = new QSvgRenderer(c_SvgString);
@@ -89,71 +76,56 @@ C_GiTextElementBus::C_GiTextElementBus(const sint32 & ors32_Index, const uint64 
    this->setAcceptHoverEvents(true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     12.05.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiTextElementBus::~C_GiTextElementBus()
 {
    delete mpc_SvgRenderer;
    mpc_SvgRenderer = NULL;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the associated bus index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the associated bus index
 
    \param[in]     ou32_BusIndex     Index of associated bus
-
-   \created     16.05.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiTextElementBus::SetBusIndex(const uint32 ou32_BusIndex)
 {
    this->mu32_BusIndex = ou32_BusIndex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the associated bus index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the associated bus index
 
    \return
    Index of associated bus
-
-   \created     17.05.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_GiTextElementBus::GetBusIndex(void) const
 {
    return this->mu32_BusIndex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the type of this itme
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the type of this itme
 
    \return  ID
-
-   \created     01.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_GiTextElementBus::type(void) const
 {
    return msn_GRAPHICS_ITEM_TEXTELEMENT_BUS;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function for initially loading internal data
-
-   \created     15.05.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function for initially loading internal data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiTextElementBus::LoadData(void)
 {
    if (C_PuiSdHandler::h_GetInstance()->c_BusTextElements.size() > static_cast<uint32>(this->ms32_Index))
@@ -167,13 +139,10 @@ void C_GiTextElementBus::LoadData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot function for updating internal data
-
-   \created     15.05.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for updating internal data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiTextElementBus::UpdateData(void)
 {
    if (C_PuiSdHandler::h_GetInstance()->c_BusTextElements.size() > static_cast<uint32>(this->ms32_Index))
@@ -186,26 +155,20 @@ void C_GiTextElementBus::UpdateData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete data in system definition
-
-   \created     15.05.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete data in system definition
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiTextElementBus::DeleteData(void)
 {
    C_PuiSdHandler::h_GetInstance()->c_BusTextElements.erase(C_PuiSdHandler::h_GetInstance()->c_BusTextElements.begin() +
                                                             ms32_Index);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle tooltip content
-
-   \created     21.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle tooltip content
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiTextElementBus::GenerateHint(void)
 {
    if ((this->mq_ErrorIconHovered == true) && (this->ms32_Index >= 0))
@@ -224,17 +187,14 @@ void C_GiTextElementBus::GenerateHint(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set font color
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set font color
 
    Saving the set color in case of switch to disabled look
 
    \param[in] orc_Color New color
-
-   \created     02.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiTextElementBus::SetFontColor(const QColor & orc_Color)
 {
    this->mc_OriginalColor = orc_Color;
@@ -242,15 +202,12 @@ void C_GiTextElementBus::SetFontColor(const QColor & orc_Color)
    C_GiBiTextElement::SetFontColor(this->mc_OriginalColor);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the actual error state for showing the error icon
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the actual error state for showing the error icon
 
    \param[in]     oq_Error      Actual error state
-
-   \created     18.05.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiTextElementBus::SetErrorState(const bool oq_Error)
 {
    this->mq_ErrorState = oq_Error;
@@ -268,15 +225,12 @@ void C_GiTextElementBus::SetErrorState(const bool oq_Error)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set item disabled look flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set item disabled look flag
 
    \param[in] oq_Disabled Flag if item is disabled
-
-   \created     11.01.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiTextElementBus::SetDisabledLook(const bool oq_Disabled)
 {
    if (oq_Disabled == true)
@@ -289,17 +243,14 @@ void C_GiTextElementBus::SetDisabledLook(const bool oq_Disabled)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    \param[in,out] opc_Painter Painter
    \param[in,out] opc_Option  Option
    \param[in,out] opc_Widget  Widget
-
-   \created     18.05.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiTextElementBus::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                                QWidget * const opc_Widget)
 {
@@ -312,15 +263,12 @@ void C_GiTextElementBus::paint(QPainter * const opc_Painter, const QStyleOptionG
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do mouse move tool tip handling
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do mouse move tool tip handling
 
    \param[in] orc_ScenePos Scene pos
-
-   \created     21.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiTextElementBus::HandleMouseMoveToolTip(const QPointF & orc_ScenePos)
 {
    this->mq_ErrorIconHovered = false;
@@ -338,17 +286,14 @@ void C_GiTextElementBus::HandleMouseMoveToolTip(const QPointF & orc_ScenePos)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten hover leave event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten hover leave event slot
 
    Here: Hide tool tip
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     21.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiTextElementBus::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event)
 {
    Q_EMIT this->SigHideToolTip();
@@ -356,16 +301,13 @@ void C_GiTextElementBus::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Ev
    C_GiBiTextElement::hoverLeaveEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get rect for error icon
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get rect for error icon
 
    \return
    Rect for error icon
-
-   \created     21.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QRectF C_GiTextElementBus::m_GetErrorIconRect(void) const
 {
    return QRectF(QPointF(static_cast<float64>(this->boundingRect().width()) - 55.0, -6.0), QSizeF(24.0, 24.0));

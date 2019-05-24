@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Core communication driver protocol class (implementation)
 
@@ -11,15 +10,9 @@
 
    Will be derived from for specific uses.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.12.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -59,12 +52,9 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+/*! \brief   Default constructor
 
    Initialize all members based on view
-
-   \created     28.07.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 C_OSCComDriverProtocol::C_OSCComDriverProtocol(void) :
@@ -80,12 +70,9 @@ C_OSCComDriverProtocol::C_OSCComDriverProtocol(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     28.07.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 C_OSCComDriverProtocol::~C_OSCComDriverProtocol(void)
@@ -116,8 +103,7 @@ C_OSCComDriverProtocol::~C_OSCComDriverProtocol(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all members
+/*! \brief   Initialize all members
 
    \param[in]  orc_SystemDefinition    Entire system definition
    \param[in]  ou32_ActiveBusIndex     Bus index of bus in system definition where we are connected to
@@ -135,8 +121,6 @@ C_OSCComDriverProtocol::~C_OSCComDriverProtocol(void)
    C_CHECKSUM    Internal buffer overflow detected
    C_DEFAULT     Parameter ou32_ActiveBusIndex invalid
    C_RANGE       Routing configuration failed
-
-   \created     28.07.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::Init(const C_OSCSystemDefinition & orc_SystemDefinition,
@@ -222,8 +206,7 @@ sint32 C_OSCComDriverProtocol::Init(const C_OSCSystemDefinition & orc_SystemDefi
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Sends the tester present message to all active nodes
+/*! \brief   Sends the tester present message to all active nodes
 
    \param[in]     opc_SkipNodes     optional pointer to a container with nodes for not sending the tester present
 
@@ -231,8 +214,6 @@ sint32 C_OSCComDriverProtocol::Init(const C_OSCSystemDefinition & orc_SystemDefi
    C_NO_ERR    All nodes set to session successfully
    C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
    C_COM       Error of service
-
-   \created     03.08.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::SendTesterPresent(const std::set<uint32> * const opc_SkipNodes)
@@ -270,8 +251,7 @@ sint32 C_OSCComDriverProtocol::SendTesterPresent(const std::set<uint32> * const 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize the necessary routing configuration to start the routing for one specific server
+/*! \brief   Initialize the necessary routing configuration to start the routing for one specific server
 
    Prepares all active nodes with its routing configurations if necessary
    Three different types of routing:
@@ -293,8 +273,6 @@ sint32 C_OSCComDriverProtocol::SendTesterPresent(const std::set<uint32> * const 
    C_RD_WR    malformed protocol response
    C_RANGE    node index out of range
    C_COM      communication driver reported error
-
-   \created     27.02.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::StartRouting(const uint32 ou32_NodeIndex, uint32 * const opu32_ErrorNodeIndex)
@@ -331,16 +309,13 @@ sint32 C_OSCComDriverProtocol::StartRouting(const uint32 ou32_NodeIndex, uint32 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Stops the entire routing configuration for one specific node
+/*! \brief   Stops the entire routing configuration for one specific node
 
    \param[in]   ou32_NodeIndex       node index to read from
 
    \return
    C_NO_ERR   routing stopped
    C_RANGE    node index out of range
-
-   \created     02.03.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::StopRouting(const uint32 ou32_NodeIndex)
@@ -361,8 +336,7 @@ sint32 C_OSCComDriverProtocol::StopRouting(const uint32 ou32_NodeIndex)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Checks the need of routing for a specific node
+/*! \brief   Checks the need of routing for a specific node
 
    \param[in]   ou32_NodeIndex       node index to read from
 
@@ -370,8 +344,6 @@ sint32 C_OSCComDriverProtocol::StopRouting(const uint32 ou32_NodeIndex)
    C_NO_ERR     Routing is necessary for node
    C_NOACT      Routing is not necessary for node or node is not active
    C_RANGE      Node index out of range
-
-   \created     28.02.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::IsRoutingNecessary(const uint32 ou32_NodeIndex)
@@ -404,8 +376,7 @@ sint32 C_OSCComDriverProtocol::IsRoutingNecessary(const uint32 ou32_NodeIndex)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Checks the need of routing for a specific node and returns the connected bus to the target by bus index
+/*! \brief   Checks the need of routing for a specific node and returns the connected bus to the target by bus index
 
    \param[in]   ou32_NodeIndex       node index to read from
    \param[out]  oru32_BusIndex       bus index
@@ -414,8 +385,6 @@ sint32 C_OSCComDriverProtocol::IsRoutingNecessary(const uint32 ou32_NodeIndex)
    C_NO_ERR     Routing is necessary for node
    C_NOACT      Routing is not necessary for node or node is not active
    C_RANGE      Node index out of range
-
-   \created     01.03.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::GetBusIndexOfRoutingNode(const uint32 ou32_NodeIndex, uint32 & oru32_BusIndex)
@@ -452,13 +421,10 @@ sint32 C_OSCComDriverProtocol::GetBusIndexOfRoutingNode(const uint32 ou32_NodeIn
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the maximum count of route points which are necessary to reach a node
+/*! \brief   Returns the maximum count of route points which are necessary to reach a node
 
    \return
    Maximum number of route points
-
-   \created     07.03.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 uint32 C_OSCComDriverProtocol::GetRoutingPointMaximum(void) const
@@ -479,16 +445,13 @@ uint32 C_OSCComDriverProtocol::GetRoutingPointMaximum(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the count of route points which are necessary to reach the node
+/*! \brief   Returns the count of route points which are necessary to reach the node
 
    \param[in]   ou32_NodeIndex       node index to read from
    \param[out]  orq_Active           flag if node was found and active
 
    \return
    Number of route points
-
-   \created     07.03.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 uint32 C_OSCComDriverProtocol::GetRoutingPointCount(const uint32 ou32_NodeIndex, bool & orq_Active) const
@@ -512,13 +475,10 @@ uint32 C_OSCComDriverProtocol::GetRoutingPointCount(const uint32 ou32_NodeIndex,
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the route of the node
+/*! \brief   Returns the route of the node
 
    \param[in]     ou32_NodeIndex         Index of node
    \param[out]    orc_Route              Route of node
-
-   \created     26.07.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCComDriverProtocol::GetRouteOfNode(const uint32 ou32_NodeIndex, C_OSCRoutingRoute & orc_Route) const
@@ -536,13 +496,10 @@ void C_OSCComDriverProtocol::GetRouteOfNode(const uint32 ou32_NodeIndex, C_OSCRo
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the client id
+/*! \brief   Returns the client id
 
    \return
    Client id
-
-   \created     22.11.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 const C_OSCProtocolDriverOsyNode & C_OSCComDriverProtocol::GetClientId(void) const
@@ -551,8 +508,7 @@ const C_OSCProtocolDriverOsyNode & C_OSCComDriverProtocol::GetClientId(void) con
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Gets the node index by the server id
+/*! \brief   Gets the node index by the server id
 
    \param[in]     orc_ServerId         Server id
    \param[out]    oru32_NodeIndex      Found node index
@@ -560,8 +516,6 @@ const C_OSCProtocolDriverOsyNode & C_OSCComDriverProtocol::GetClientId(void) con
    \return
    true     Node index found
    false    Node index not found
-
-   \created     01.12.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 bool C_OSCComDriverProtocol::GetNodeIndex(const C_OSCProtocolDriverOsyNode & orc_ServerId,
@@ -586,10 +540,7 @@ bool C_OSCComDriverProtocol::GetNodeIndex(const C_OSCProtocolDriverOsyNode & orc
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Dump all messages of receive queue of CAN dispatcher
-
-   \created     28.11.2017  STW/B.Bayer
+/*! \brief   Dump all messages of receive queue of CAN dispatcher
 */
 //-----------------------------------------------------------------------------
 void C_OSCComDriverProtocol::ClearDispatcherQueue(void)
@@ -624,13 +575,10 @@ void C_OSCComDriverProtocol::ClearDispatcherQueue(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get is initialized flag
+/*! \brief   Get is initialized flag
 
    \return
    Is initialized flag
-
-   \created     12.12.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 bool C_OSCComDriverProtocol::IsInitialized(void) const
@@ -639,8 +587,7 @@ bool C_OSCComDriverProtocol::IsInitialized(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Re-connect to openSYDE node
+/*! \brief   Re-connect to openSYDE node
 
    Required after losing the connection (e.g. after target reset)
    Assumptions (responsibility of the caller):
@@ -653,8 +600,6 @@ bool C_OSCComDriverProtocol::IsInitialized(void) const
    C_NO_ERR   re-connected
    C_BUSY     could not re-connect to node
    C_RANGE    node not found or no openSYDE protocol installed
-
-   \created     05.01.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::ReConnectNode(const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerId) const
@@ -675,8 +620,7 @@ sint32 C_OSCComDriverProtocol::ReConnectNode(const stw_opensyde_core::C_OSCProto
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Disconnect from openSYDE node
+/*! \brief   Disconnect from openSYDE node
 
    \param[in]  orc_ServerId   node to disconnect from
 
@@ -684,8 +628,6 @@ sint32 C_OSCComDriverProtocol::ReConnectNode(const stw_opensyde_core::C_OSCProto
    C_NO_ERR   disconnected
    C_NOACT    could not re-connect to node
    C_RANGE    node not found or no openSYDE protocol installed
-
-   \created     19.04.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::DisconnectNode(const C_OSCProtocolDriverOsyNode & orc_ServerId) const
@@ -706,12 +648,27 @@ sint32 C_OSCComDriverProtocol::DisconnectNode(const C_OSCProtocolDriverOsyNode &
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Prepare for shutting down class
+/*! \brief   Disconnecting from all openSYDE nodes
+*/
+//-----------------------------------------------------------------------------
+void C_OSCComDriverProtocol::DisconnectNodes(void) const
+{
+   uint32 u32_Counter;
+
+   for (u32_Counter = 0U; u32_Counter < this->mc_OsyProtocols.size(); ++u32_Counter)
+   {
+      C_OSCProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[u32_Counter];
+      if (pc_ProtocolOsy != NULL)
+      {
+         pc_ProtocolOsy->Disconnect();
+      }
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*! \brief   Prepare for shutting down class
 
    To be called by child classes on shutdown, before they destroy all owned class instances
-
-   \created     22.12.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_OSCComDriverProtocol::PrepareForDestruction(void)
@@ -753,13 +710,10 @@ void C_OSCComDriverProtocol::PrepareForDestruction(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the count of active nodes
+/*! \brief   Returns the count of active nodes
 
    \return
    Count of active registered nodes
-
-   \created     21.11.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 uint32 C_OSCComDriverProtocol::m_GetActiveNodeCount(void) const
@@ -768,8 +722,7 @@ uint32 C_OSCComDriverProtocol::m_GetActiveNodeCount(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get index of node in list of active nodes
+/*! \brief   Get index of node in list of active nodes
 
    If no active node is found that matches the passed absolute index the function will fail with an assertion.
 
@@ -777,8 +730,6 @@ uint32 C_OSCComDriverProtocol::m_GetActiveNodeCount(void) const
    \param[out]    opq_Found         Optional flag if server id was found
 
    \return   index of node within list of active nodes
-
-   \created     ??.??.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 uint32 C_OSCComDriverProtocol::m_GetActiveIndex(const uint32 ou32_NodeIndex, bool * const opq_Found) const
@@ -808,8 +759,7 @@ uint32 C_OSCComDriverProtocol::m_GetActiveIndex(const uint32 ou32_NodeIndex, boo
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get index of node in list of active nodes
+/*! \brief   Get index of node in list of active nodes
 
    If no active node is found that matches the passed absolute index the function will fail with an assertion.
 
@@ -817,8 +767,6 @@ uint32 C_OSCComDriverProtocol::m_GetActiveIndex(const uint32 ou32_NodeIndex, boo
    \param[out]    orq_Found                Flag if server id was found
 
    \return   index of node within list of active nodes
-
-   \created     04.12.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 uint32 C_OSCComDriverProtocol::m_GetActiveIndex(const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerId,
@@ -842,13 +790,10 @@ uint32 C_OSCComDriverProtocol::m_GetActiveIndex(const stw_opensyde_core::C_OSCPr
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Returns pointer to CAN dispatcher
+/*! \brief   Returns pointer to CAN dispatcher
 
    \return
    Pointer to CAN dispatcher
-
-   \created     22.11.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_CAN_Dispatcher * C_OSCComDriverProtocol::m_GetCanDispatcher(void)
@@ -857,16 +802,13 @@ C_CAN_Dispatcher * C_OSCComDriverProtocol::m_GetCanDispatcher(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the pointer to the openSYDE protocol of specific server id
+/*! \brief   Returns the pointer to the openSYDE protocol of specific server id
 
    \param[in]     orc_ServerId             Server id for communication
 
    \return
    Valid pointer  Protocol for server found
    NULL           No protocol for server found
-
-   \created     30.11.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_OSCProtocolDriverOsy * C_OSCComDriverProtocol::m_GetOsyProtocol(const C_OSCProtocolDriverOsyNode & orc_ServerId) const
@@ -892,15 +834,12 @@ C_OSCProtocolDriverOsy * C_OSCComDriverProtocol::m_GetOsyProtocol(const C_OSCPro
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get node name
+/*! \brief   Get node name
 
    \param[in] ou32_NodeIndex Node index
 
    \return
    Node name
-
-   \created     20.09.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_OSCComDriverProtocol::m_GetActiveNodeName(const uint32 ou32_NodeIndex) const
@@ -936,8 +875,7 @@ C_SCLString C_OSCComDriverProtocol::m_GetActiveNodeName(const uint32 ou32_NodeIn
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Sets a node into a session
+/*! \brief   Sets a node into a session
 
    \param[in]     ou32_ActiveNode       active node index of vector mc_ActiveNodes
    \param[in]     ou8_SessionId         session ID to switch to
@@ -952,8 +890,6 @@ C_SCLString C_OSCComDriverProtocol::m_GetActiveNodeName(const uint32 ou32_NodeIn
    C_COM       Communication problem
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
-
-   \created     07.08.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::m_SetNodeSessionId(const uint32 ou32_ActiveNode, const uint8 ou8_SessionId,
@@ -1030,8 +966,7 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSessionId(const uint32 ou32_ActiveNode, 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Sets a node into a session
+/*! \brief   Sets a node into a session
 
    \param[in]        ou8_SessionId         session ID to switch to
    \param[in]        oq_CheckForSession    checks the current session id on the server. only if it is different, the
@@ -1046,8 +981,6 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSessionId(const uint32 ou32_ActiveNode, 
    C_COM       Error of service
    C_TIMEOUT   Expected response not received within timeout
                or at least one node was registered in orc_DefectNodeIndices
-
-   \created     07.08.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::m_SetNodesSessionId(const uint8 ou8_SessionId, const bool oq_CheckForSession,
@@ -1103,8 +1036,7 @@ sint32 C_OSCComDriverProtocol::m_SetNodesSessionId(const uint8 ou8_SessionId, co
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Sets a node into an expected session
+/*! \brief   Sets a node into an expected session
 
    If ou8_ExpectedNeededSession session can not be set on the server (error response), the other
    session will be set.
@@ -1120,8 +1052,6 @@ sint32 C_OSCComDriverProtocol::m_SetNodesSessionId(const uint8 ou8_SessionId, co
    C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
    C_COM       Error of service
    C_TIMEOUT   Expected response not received within timeout
-
-   \created     22.06.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::m_SetNodeSessionIdWithExpectation(const uint32 ou32_ActiveNode,
@@ -1155,8 +1085,7 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSessionIdWithExpectation(const uint32 ou
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Sets a node into a security level
+/*! \brief   Sets a node into a security level
 
    \param[in]     ou32_ActiveNode       active node index of vector mc_ActiveNodes
    \param[in]     ou8_SecurityLevel     level of requested security
@@ -1169,8 +1098,6 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSessionIdWithExpectation(const uint32 ou
    C_COM       Communication problem
    C_WARN      Error response
    C_TIMEOUT   Expected response not received within timeout
-
-   \created     02.08.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::m_SetNodeSecurityAccess(const uint32 ou32_ActiveNode, const uint8 ou8_SecurityLevel,
@@ -1211,8 +1138,7 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSecurityAccess(const uint32 ou32_ActiveN
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Sets all nodes into a specific security level
+/*! \brief   Sets all nodes into a specific security level
 
    \param[in]     ou8_SecurityLevel     level of requested security
 
@@ -1221,8 +1147,6 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSecurityAccess(const uint32 ou32_ActiveN
    C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
    C_COM       Error of service
    C_TIMEOUT   Expected response not received within timeout
-
-   \created     02.08.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::m_SetNodesSecurityAccess(const uint8 ou8_SecurityLevel) const
@@ -1262,8 +1186,7 @@ sint32 C_OSCComDriverProtocol::m_SetNodesSecurityAccess(const uint8 ou8_Security
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize the necessary routing configuration for IP to IP routing for a specific node
+/*! \brief   Initialize the necessary routing configuration for IP to IP routing for a specific node
 
    Prepares the active nodes on the route with its configuration for IP to IP routing.
 
@@ -1284,8 +1207,6 @@ sint32 C_OSCComDriverProtocol::m_SetNodesSecurityAccess(const uint8 ou8_Security
    C_COM       Communication problem
    C_TIMEOUT   Expected response not received within timeout
    C_RD_WR     Unexpected content in response
-
-   \created     18.06.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
@@ -1520,8 +1441,7 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize the necessary routing configuration to start the routing for a specific node
+/*! \brief   Initialize the necessary routing configuration to start the routing for a specific node
 
    Prepares the active nodes on the route with its routing configurations if necessary
    Three different types of routing:
@@ -1553,8 +1473,6 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
    C_RD_WR    malformed protocol response
    C_RANGE    node index out of range
    C_COM      communication driver reported error
-
-   \created     27.02.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint32 * const opu32_ErrorActiveNodeIndex)
@@ -1829,16 +1747,13 @@ sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Stops the entire routing configuration for one specific node
+/*! \brief   Stops the entire routing configuration for one specific node
 
    \param[in]   ou32_ActiveNode       node index to stop routing for
 
    \return
    C_NO_ERR   routing stopped
    C_RANGE    node index out of range
-
-   \created     02.03.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCComDriverProtocol::m_StopRouting(const uint32 ou32_ActiveNode)
@@ -1894,8 +1809,7 @@ void C_OSCComDriverProtocol::m_StopRouting(const uint32 ou32_ActiveNode)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Stops the entire routing configuration for all active nodes
+/*! \brief   Stops the entire routing configuration for all active nodes
 
    Difference to m_StopRouting:
    Stopping the routing configuration from behind for all nodes.
@@ -1919,8 +1833,6 @@ void C_OSCComDriverProtocol::m_StopRouting(const uint32 ou32_ActiveNode)
    configurations on one node.
 
    For example closing A - B will close A - C as well. C - E could no be stopped properly.
-
-   \created     11.07.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCComDriverProtocol::m_StopRoutingOfActiveNodes(void)
@@ -2001,8 +1913,7 @@ void C_OSCComDriverProtocol::m_StopRoutingOfActiveNodes(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Stops the routing configuration for one specific point in the route to a node
+/*! \brief   Stops the routing configuration for one specific point in the route to a node
 
    \param[in]   ou32_ActiveNode            active node index to stop routing for
    \param[in]   ou32_ActiveOsyTargetNode   active node index of last openSYDE node in the route
@@ -2014,8 +1925,6 @@ void C_OSCComDriverProtocol::m_StopRoutingOfActiveNodes(void)
    C_NO_ERR    Routing for point deactivated
    C_NOACT     Routing for point deactivated and no further stopping necessary for this node
    C_COM       communication driver reported error
-
-   \created     11.07.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::m_StopRoutingOfRoutingPoint(const uint32 ou32_ActiveNode,
@@ -2151,14 +2060,11 @@ sint32 C_OSCComDriverProtocol::m_StopRoutingOfRoutingPoint(const uint32 ou32_Act
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Stops the specific routing configuration for one specific node
+/*! \brief   Stops the specific routing configuration for one specific node
 
    Cleans up the legacy router dispatcher. Must be called be overloaded functions
 
    \param[in]     ou32_ActiveNode                      Active node index of vector mc_ActiveNodes
-
-   \created     02.03.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCComDriverProtocol::m_StopRoutingSpecific(const stw_types::uint32 ou32_ActiveNode)
@@ -2185,8 +2091,7 @@ void C_OSCComDriverProtocol::m_StopRoutingSpecific(const stw_types::uint32 ou32_
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize Routes for each node
+/*! \brief   Initialize Routes for each node
 
    Route configuration depends on child implementation of m_GetRoutingMode.
 
@@ -2195,8 +2100,6 @@ void C_OSCComDriverProtocol::m_StopRoutingSpecific(const stw_types::uint32 ou32_
    C_CONFIG      Invalid system definition
    C_RANGE       Minimum one target node does not exist
    C_COM         For minimum one target no routes were found
-
-   \created     31.07.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::m_InitRoutesAndActiveNodes(void)
@@ -2265,8 +2168,7 @@ sint32 C_OSCComDriverProtocol::m_InitRoutesAndActiveNodes(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize Server ID for each node
+/*! \brief   Initialize Server ID for each node
 
    Assemble a table of all server IDs seen from the bus interface we are connected to.
    Also create table of IP addresses.
@@ -2274,8 +2176,6 @@ sint32 C_OSCComDriverProtocol::m_InitRoutesAndActiveNodes(void)
    \return
    C_NO_ERR Operation success
    C_CONFIG Invalid initialization
-
-   \created     31.07.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::m_InitServerIds(void)
@@ -2412,8 +2312,7 @@ sint32 C_OSCComDriverProtocol::m_InitServerIds(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize for CAN connection
+/*! \brief   Initialize for CAN connection
 
    \return
    C_NO_ERR      Operation success
@@ -2421,8 +2320,6 @@ sint32 C_OSCComDriverProtocol::m_InitServerIds(void)
    C_CHECKSUM    Internal buffer overflow detected
    C_OVERFLOW    Error on setting dispatcher or node identifier in transport protocol
    C_RANGE       Count of server ids does not match to the count of nodes
-
-   \created     28.07.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::m_InitForCAN(void)
@@ -2521,8 +2418,7 @@ sint32 C_OSCComDriverProtocol::m_InitForCAN(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize for Ethernet connection
+/*! \brief   Initialize for Ethernet connection
 
    \return
    C_NO_ERR      Operation success
@@ -2530,8 +2426,6 @@ sint32 C_OSCComDriverProtocol::m_InitForCAN(void)
    C_COM         IP dispatcher is NULL or UPD Socket initialization failed
    C_OVERFLOW    Error on setting dispatcher or node identifier in transport protocol
    C_RANGE       Count of server ids does not match to the count of nodes
-
-   \created     28.07.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::m_InitForEthernet(void)
@@ -2741,8 +2635,7 @@ sint32 C_OSCComDriverProtocol::m_InitForEthernet(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Gets the active index of the node which is necessary for IP to IP routing
+/*! \brief   Gets the active index of the node which is necessary for IP to IP routing
 
    The IP to IP router oru32_ActiveIndexRouterClient is connected to the client directly.
    The IP to IP router target oru32_ActiveIndexRouterTarget is the last server connected to Ethernet bus.
@@ -2762,8 +2655,6 @@ sint32 C_OSCComDriverProtocol::m_InitForEthernet(void)
                No Ethernet to Ethernet routing on the first node in the route
    C_RANGE     ou32_ActiveIndexTarget invalid
    C_CONFIG    Route of ou32_ActiveIndexTarget is invalid
-
-   \created     15.06.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::m_GetActiveIndexOfIp2IpRouter(const uint32 ou32_ActiveIndexTarget,
@@ -2850,8 +2741,7 @@ sint32 C_OSCComDriverProtocol::m_GetActiveIndexOfIp2IpRouter(const uint32 ou32_A
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Gets the active index of the node which is necessary for IP to CAN routing
+/*! \brief   Gets the active index of the node which is necessary for IP to CAN routing
 
    \param[in]     ou32_ActiveIndexTarget        The node which will be communicated to
    \param[out]    oru32_ActiveIndexRouter       The node which is on the first route point for IP to CAN routing on
@@ -2863,8 +2753,6 @@ sint32 C_OSCComDriverProtocol::m_GetActiveIndexOfIp2IpRouter(const uint32 ou32_A
                No Ethernet to Ethernet routing on the first node in the route
    C_RANGE     ou32_ActiveIndexTarget invalid
    C_CONFIG    Route of ou32_ActiveIndexTarget is invalid
-
-   \created     12.07.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverProtocol::m_GetActiveIndexOfIp2CanRouter(const uint32 ou32_ActiveIndexTarget,

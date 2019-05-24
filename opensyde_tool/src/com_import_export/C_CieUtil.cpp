@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Utility class with functions for comm import export (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     08.05.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QFileDialog>
@@ -42,7 +35,7 @@
 #include "C_CieDataPoolComListExportReportWidget.h"
 #include "constants.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
@@ -50,32 +43,28 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     08.05.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CieUtil::C_CieUtil(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Imports a specific file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Imports a specific file
 
    Supported are dbc, eds and dcf files.
 
@@ -87,10 +76,8 @@ C_CieUtil::C_CieUtil(void)
    \return
    C_NO_ERR    File imported
    C_NOACT     Nothing done, aborted by user
-
-   \created     06.04.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieUtil::h_ImportFile(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
                                const uint32 ou32_InterfaceIndex, QWidget * const opc_Parent)
 {
@@ -136,84 +123,95 @@ sint32 C_CieUtil::h_ImportFile(const uint32 ou32_NodeIndex, const uint32 ou32_Da
          s32_ImportReturn = C_CieImportDbc::h_ImportNetwork(c_FullFilePath.toStdString().c_str(),
                                                             c_CommDef,
                                                             c_WarningMessages,
-                                                            c_ErrorMessage);
+                                                            c_ErrorMessage, false);
          QApplication::restoreOverrideCursor(); // get old cursor again
          QApplication::processEvents();         // update cursor
 
          if ((s32_ImportReturn == stw_errors::C_NO_ERR) || (s32_ImportReturn == stw_errors::C_WARN))
          {
-            if ((s32_ImportReturn == stw_errors::C_WARN) && (c_WarningMessages.GetCount() > 0))
+            if (c_CommDef.c_Nodes.size() > 0UL)
             {
-               // display global warning messages
-               QString c_Warnings;
-               for (uint32 u32_Pos = 0; u32_Pos < c_WarningMessages.GetCount(); u32_Pos++)
+               if ((s32_ImportReturn == stw_errors::C_WARN) && (c_WarningMessages.GetCount() > 0))
                {
-                  c_Warnings += c_WarningMessages.Strings[u32_Pos].c_str();
-                  c_Warnings += "\n";
+                  // display global warning messages
+                  QString c_Warnings;
+                  for (uint32 u32_Pos = 0; u32_Pos < c_WarningMessages.GetCount(); u32_Pos++)
+                  {
+                     c_Warnings += c_WarningMessages.Strings[u32_Pos].c_str();
+                     c_Warnings += "\n";
+                  }
+                  C_OgeWiCustomMessage c_ImportWarnings(opc_Parent, C_OgeWiCustomMessage::E_Type::eWARNING);
+                  c_ImportWarnings.SetHeading(C_GtGetText::h_GetText("DBC file import"));
+                  c_ImportWarnings.SetDescription(C_GtGetText::h_GetText("Warnings occurred during DBC file import."));
+                  c_ImportWarnings.SetDetails(c_Warnings);
+                  c_ImportWarnings.Execute();
                }
-               C_OgeWiCustomMessage c_ImportWarnings(opc_Parent, C_OgeWiCustomMessage::E_Type::eWARNING);
-               c_ImportWarnings.SetHeading(C_GtGetText::h_GetText("DBC file import"));
-               c_ImportWarnings.SetDescription(C_GtGetText::h_GetText("Warnings occurred during DBC file import."));
-               c_ImportWarnings.SetDetails(c_Warnings);
-               c_ImportWarnings.Execute();
-            }
 
-            // create node selector
-            QPointer<C_OgePopUpDialog> const c_PopUpDialogNodeSelection = new C_OgePopUpDialog(opc_Parent, opc_Parent);
-            C_CieDataPoolComListDBCImportWidget * const pc_DialogNodeSelection =
-               new C_CieDataPoolComListDBCImportWidget(*c_PopUpDialogNodeSelection, c_CommDef);
+               // create node selector
+               QPointer<C_OgePopUpDialog> const c_PopUpDialogNodeSelection =
+                  new C_OgePopUpDialog(opc_Parent, opc_Parent);
+               C_CieDataPoolComListDBCImportWidget * const pc_DialogNodeSelection =
+                  new C_CieDataPoolComListDBCImportWidget(*c_PopUpDialogNodeSelection, c_CommDef);
 
-            // resize node selector
-            c_PopUpDialogNodeSelection->SetSize(QSize(600, 380));
+               // resize node selector
+               c_PopUpDialogNodeSelection->SetSize(QSize(600, 380));
 
-            // display node selector
-            if (c_PopUpDialogNodeSelection->exec() == static_cast<sintn>(QDialog::Accepted))
-            {
-               // get node position
-               sint32 s32_NodePos = pc_DialogNodeSelection->GetNodeSelection();
-               if (s32_NodePos > -1)
+               // display node selector
+               if (c_PopUpDialogNodeSelection->exec() == static_cast<sintn>(QDialog::Accepted))
                {
-                  // assign node messages and signals
-                  C_CieConverter::C_CIENode c_CIENode = c_CommDef.c_Nodes[s32_NodePos];
-                  // get openSYDE Ui data pool list structure
-                  C_CieDataPoolListStructure c_DataPoolStructure =
-                     C_CieDataPoolListAdapter::h_GetStructureFromDBCFileImport(c_CIENode);
+                  // get node position
+                  sint32 s32_NodePos = pc_DialogNodeSelection->GetNodeSelection();
+                  if (s32_NodePos > -1)
+                  {
+                     // assign node messages and signals
+                     C_CieConverter::C_CIENode c_CIENode = c_CommDef.c_Nodes[s32_NodePos];
+                     // get openSYDE Ui data pool list structure
+                     C_CieDataPoolListStructure c_DataPoolStructure =
+                        C_CieDataPoolListAdapter::h_GetStructureFromDBCFileImport(c_CIENode);
 
-                  // create message report for user
-                  QPointer<C_OgePopUpDialog> const c_PopUpDialogReportDialog = new C_OgePopUpDialog(opc_Parent,
-                                                                                                    opc_Parent);
-                  C_CieDataPoolComListImportReportWidget * const pc_DialogImportReport =
-                     new C_CieDataPoolComListImportReportWidget(*c_PopUpDialogReportDialog, ou32_NodeIndex,
-                                                                ou32_DataPoolIndex,
-                                                                ou32_InterfaceIndex, c_FullFilePath);
+                     // create message report for user
+                     QPointer<C_OgePopUpDialog> const c_PopUpDialogReportDialog = new C_OgePopUpDialog(opc_Parent,
+                                                                                                       opc_Parent);
+                     C_CieDataPoolComListImportReportWidget * const pc_DialogImportReport =
+                        new C_CieDataPoolComListImportReportWidget(*c_PopUpDialogReportDialog, ou32_NodeIndex,
+                                                                   ou32_DataPoolIndex,
+                                                                   ou32_InterfaceIndex, c_FullFilePath);
 
-                  //Hide previous overlay before showing the next one
+                     //Hide previous overlay before showing the next one
+                     c_PopUpDialogNodeSelection->HideOverlay();
+
+                     // init message report
+                     tgl_assert(pc_DialogImportReport->SetMessageData(c_DataPoolStructure) == C_NO_ERR);
+
+                     // resize
+                     c_PopUpDialogReportDialog->SetSize(c_SizeImportReport);
+
+                     // display message report
+                     if (c_PopUpDialogReportDialog->exec() == static_cast<sintn>(QDialog::Accepted))
+                     {
+                        s32_Return = C_NO_ERR;
+                     }
+
+                     if (c_PopUpDialogReportDialog != NULL)
+                     {
+                        c_PopUpDialogReportDialog->HideOverlay();
+                     }
+                     //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
+                  }
+               }
+               if (c_PopUpDialogNodeSelection != NULL)
+               {
                   c_PopUpDialogNodeSelection->HideOverlay();
-
-                  // init message report
-                  tgl_assert(pc_DialogImportReport->SetMessageData(c_DataPoolStructure) == C_NO_ERR);
-
-                  // resize
-                  c_PopUpDialogReportDialog->SetSize(c_SizeImportReport);
-
-                  // display message report
-                  if (c_PopUpDialogReportDialog->exec() == static_cast<sintn>(QDialog::Accepted))
-                  {
-                     s32_Return = C_NO_ERR;
-                  }
-
-                  if (c_PopUpDialogReportDialog != NULL)
-                  {
-                     c_PopUpDialogReportDialog->HideOverlay();
-                  }
-                  //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
                }
+               //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
             }
-            if (c_PopUpDialogNodeSelection != NULL)
+            else
             {
-               c_PopUpDialogNodeSelection->HideOverlay();
+               C_OgeWiCustomMessage c_NodesError(opc_Parent, C_OgeWiCustomMessage::eERROR);
+               c_NodesError.SetHeading(C_GtGetText::h_GetText("DBC file import"));
+               c_NodesError.SetDescription(C_GtGetText::h_GetText("No nodes found in selected DBC file."));
+               c_NodesError.Execute();
             }
-            //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
          }
          else
          {
@@ -341,9 +339,8 @@ sint32 C_CieUtil::h_ImportFile(const uint32 ou32_NodeIndex, const uint32 ou32_Da
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Exports network with active nodes in a specific file.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Exports network with active nodes in a specific file.
 
    Only DBC files are supported yet.
 
@@ -353,14 +350,11 @@ sint32 C_CieUtil::h_ImportFile(const uint32 ou32_NodeIndex, const uint32 ou32_Da
    \param[in]  ou32_NumOfMessages    number of input messages for x-check.
    \param[in]  ou32_NumOfSignals     number of input signals for x-check.
 
-
    \return
    C_NO_ERR    Network to file exported
    C_NOACT     Nothing done, aborted by user
-
-   \created     16.05.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieUtil::h_ExportFile(const stw_opensyde_gui_logic::C_CieConverter::C_CIECommDefinition & orc_CommDef,
                                QWidget * const opc_Parent, const uint32 ou32_NumOfNodes,
                                const uint32 ou32_NumOfMessages, const uint32 ou32_NumOfSignals)

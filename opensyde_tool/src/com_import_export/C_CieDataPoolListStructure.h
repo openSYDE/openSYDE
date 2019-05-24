@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Project internal openSYDE structure to fill data pool lists (header)
@@ -6,31 +6,25 @@
    Class was introduced for easier handling (and extension)
    of openSYDE data structures to fill up the data pool lists.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     17.04.2018  STW/D.Pohl
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_CIEDATAPOOLLISTSTRUCTURE_H
 #define C_CIEDATAPOOLLISTSTRUCTURE_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>
 #include "C_PuiSdNodeCanMessage.h"
 #include "C_PuiSdNodeDataPoolListElement.h"
 #include "C_OSCCanMessage.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 // structure for core data pool list
 class C_CieDataPoolListCoreStructure
@@ -66,7 +60,7 @@ public:
    C_Ui c_Ui;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

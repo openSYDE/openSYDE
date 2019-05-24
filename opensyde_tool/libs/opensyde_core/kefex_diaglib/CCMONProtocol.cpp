@@ -1,17 +1,3 @@
-//30.09.10:  FHI  added support for J1939 protocol
-//26.08.10:  AST  Only display a maximum of 8 bytes (even if the DLC is greater); prevents out-of-bounds read access
-//20.04.10:  AST  Major refactoring: each protocol has a class (and .cpp file) of its own
-//12.01.10:  AST  added support for IVA protocol
-//15.12.09:  AST  added function MessageToStringLog
-//09.09.09:  AST  L2-Display: added support for displaying RTR flag
-//10.08.09:  AST  removed all non ANSI C++ code (protocol parameter configuration + KEFEX project hooking)
-//29.07.09:  AST  replace all AnsiStrings by C_SCLStrings
-//28.11.08:  AST  moved KEFEX, XFL, CANopen, PPP functions to specific modules
-//02.10.08:  AST  Adapted to be used with Borland C++ Builder 2009
-//10.11.06:  AST  added ShowEditProtocolParameters
-//09.05.06:  FHI  added GD protocol
-//17.01.03:  AST  added GetProtocolName
-
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -48,7 +34,7 @@ using namespace stw_tgl;
 using namespace stw_can;
 
 //---------------------------------------------------------------------------
-//12.01.2010   A.Stangl  added support for STW-IVA protocol
+
 sint32 C_CMONProtocols::GetProtocolName(const e_CMONL7Protocols oe_L7Protocol, C_SCLString & orc_Description) const
 {
    sint32 s32_Return = C_NO_ERR;
@@ -95,8 +81,6 @@ C_SCLString C_CMONProtocols::MessageToStringLog(const T_STWCAN_Msg_TX & orc_Msg)
 //---------------------------------------------------------------------------
 //for logging to file; the layer 2 part has a different format than the one for the screen
 // (mainly separating ";" inserted for easier parsing)
-//24.02.2012 STW/A.Stangl Consider currently configured dec/hex setting
-//26.08.2010 STW/A.Stangl Only display a maximum of 8 bytes (prevents potential out-of-bounds read access)
 C_SCLString C_CMONProtocols::MessageToStringLog(const T_STWCAN_Msg_RX & orc_Msg) const
 {
    const uint16 u16_MAX_CHARS_RAW_DATA = 73U;
@@ -147,8 +131,7 @@ C_SCLString C_CMONProtocols::MessageToStringLog(const T_STWCAN_Msg_RX & orc_Msg)
 }
 
 //---------------------------------------------------------------------------
-//12.01.2010   A.Stangl  added support for STW-IVA protocol
-//09.09.2009   A.Stangl  added support for displaying RTR flag
+
 C_SCLString C_CMONProtocols::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) const
 {
    C_SCLString c_Text;
@@ -267,33 +250,22 @@ sint32 C_CMONProtocols::SetDecimalMode(const bool oq_Decimal)
    \return
    C_NO_ERR  -> written
    C_RD_WR   -> could not write
-
-   \created     17.04.2008  STW/A.Stangl
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   17.04.2008        STW/A.Stangl  created
-   \endhistory
 */
 //-----------------------------------------------------------------------------
 sint32 C_CMONProtocols::SaveProtocolParametersToINI(const C_SCLString & orc_FileName, const C_SCLString & orc_Section)
    const
 {
-   C_SCLIniFile * pc_IniFile;
    sint32 s32_Return;
    sint32 s32_Loop;
 
    try
    {
-      pc_IniFile = new C_SCLIniFile(orc_FileName);
-
-      s32_Return  = 0;
+      C_SCLIniFile c_IniFile(orc_FileName);
+      s32_Return = 0;
       for (s32_Loop = 0; s32_Loop < gs32_KFX_CMON_NUM_PROTOCOLS; s32_Loop++)
       {
-         s32_Return += mapc_Protocols[s32_Loop]->SaveParamsToIni(*pc_IniFile, orc_Section);
+         s32_Return += mapc_Protocols[s32_Loop]->SaveParamsToIni(c_IniFile, orc_Section);
       }
-      delete pc_IniFile;
       if (s32_Return != C_NO_ERR)
       {
          s32_Return = C_RD_WR;
@@ -320,20 +292,11 @@ sint32 C_CMONProtocols::SaveProtocolParametersToINI(const C_SCLString & orc_File
    \return
    C_NO_ERR  -> written
    C_RD_WR   -> could not read (file does not exist)
-
-   \created     17.04.2008  STW/A.Stangl
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   17.04.2008        STW/A.Stangl  created
-   \endhistory
 */
 //-----------------------------------------------------------------------------
 sint32 C_CMONProtocols::LoadProtocolParametersFromINI(const C_SCLString & orc_FileName, const C_SCLString & orc_Section)
    const
 {
-   C_SCLIniFile * pc_IniFile;
    sint32 s32_Return;
    sint32 s32_Loop;
 
@@ -343,14 +306,13 @@ sint32 C_CMONProtocols::LoadProtocolParametersFromINI(const C_SCLString & orc_Fi
    }
    else
    {
-      pc_IniFile = new C_SCLIniFile(orc_FileName);
+      C_SCLIniFile c_IniFile(orc_FileName);
 
       s32_Return  = 0;
       for (s32_Loop = 0; s32_Loop < gs32_KFX_CMON_NUM_PROTOCOLS; s32_Loop++)
       {
-         s32_Return += mapc_Protocols[s32_Loop]->LoadParamsFromIni(*pc_IniFile, orc_Section);
+         s32_Return += mapc_Protocols[s32_Loop]->LoadParamsFromIni(c_IniFile, orc_Section);
       }
-      delete pc_IniFile;
       if (s32_Return != C_NO_ERR)
       {
          s32_Return = C_RD_WR;
@@ -369,15 +331,6 @@ sint32 C_CMONProtocols::LoadProtocolParametersFromINI(const C_SCLString & orc_Fi
 
    \return
    Formatted timestamp ("mmmmmmmmmm.uuu").
-
-   \created     16.12.2009  STW/A.Stangl
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   12.01.2010        STW/A.Stangl  added oq_LeftFillBlanks
-   16.12.2009        STW/A.Stangl  created
-   \endhistory
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocols::FormatTimeStamp(const uint64 ou64_TimeStampUs, const bool oq_LeftFillBlanks)
@@ -404,8 +357,7 @@ C_SCLString C_CMONProtocols::FormatTimeStamp(const uint64 ou64_TimeStampUs, cons
 }
 
 //---------------------------------------------------------------------------
-//30.09.2010   F.Hiltensberger  added support for J1939 protocol
-//12.01.2010   A.Stangl  added support for STW-IVA protocol
+
 bool C_CMONProtocols::GetProtocolHasParameters(const e_CMONL7Protocols oe_L7Protocol) const
 {
    bool q_HasParams;

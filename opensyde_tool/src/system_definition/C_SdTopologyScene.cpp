@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Main graphics scene for system topology (implementation)
 
    It handles the graphics item functionality.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     10.08.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <climits>
@@ -54,7 +47,7 @@
 #include "C_SdBueUnoBusProtNodeDisconnectCommand.h"
 #include "C_OgeWiCustomMessage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
@@ -62,31 +55,28 @@ using namespace stw_opensyde_core;
 using namespace stw_types;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString mc_CAN_BUS = "CAN Bus";
 const QString mc_ETHERNET_BUS = "Ethernet Bus";
 const bool C_SdTopologyScene::mhq_NewConnectState = false;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     orq_LoadSystemDefintion Optional indicator if system definition should be loaded
    \param[in,out] opc_Parent              Optional pointer to parent
-
-   \created     10.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdTopologyScene::C_SdTopologyScene(const bool & orq_LoadSystemDefintion, QObject * const opc_Parent) :
    C_SebTopologyBaseScene(opc_Parent),
    mpc_EmptyConnectItem(NULL),
@@ -145,32 +135,26 @@ C_SdTopologyScene::C_SdTopologyScene(const bool & orq_LoadSystemDefintion, QObje
    connect(this, &C_SdTopologyScene::selectionChanged, this, &C_SdTopologyScene::m_SelectionChanged);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     10.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdTopologyScene::~C_SdTopologyScene()
 {
    UpdateSystemDefinition();
    //lint -e{1540}  no memory leak because of the parents of the items and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds a new node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds a new node
 
    \param[in] orc_NodeType   Node type
    \param[in] orc_Pos        Position to place item at
    \param[in] opu64_UniqueID Optional pointer to unique ID to use for new item
-
-   \created     12.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::AddNode(const QString & orc_NodeType, const QPointF & orc_Pos,
                                 const uint64 * const opu64_UniqueID)
 {
@@ -218,18 +202,15 @@ void C_SdTopologyScene::AddNode(const QString & orc_NodeType, const QPointF & or
    Q_EMIT this->SigNodeChanged(s32_Index);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds a new CAN bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds a new CAN bus
 
    \param[in] orc_Pos            Position to place item at
    \param[in] opu64_UniqueID     Optional pointer to unique ID to use for new item
    \param[in] opc_TextElementBus Pointer to bus text element
    \param[in] orc_NameProposal   Name proposal
-
-   \created     12.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::AddCanBus(const QPointF & orc_Pos, const stw_types::uint64 * const opu64_UniqueID,
                                   C_GiTextElementBus * const opc_TextElementBus, const QString * const opc_NameProposal)
 {
@@ -276,18 +257,15 @@ void C_SdTopologyScene::AddCanBus(const QPointF & orc_Pos, const stw_types::uint
    Q_EMIT this->SigBusChanged(s32_Index);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds a new Ethernet bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds a new Ethernet bus
 
    \param[in] orc_Pos            Position to place item at
    \param[in] opu64_UniqueID     Optional pointer to unique ID to use for new item
    \param[in] opc_TextElementBus Pointer to bus text element
    \param[in] orc_NameProposal   Name proposal
-
-   \created     12.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::AddEthernetBus(const QPointF & orc_Pos, const stw_types::uint64 * const opu64_UniqueID,
                                        C_GiTextElementBus * const opc_TextElementBus,
                                        const QString * const opc_NameProposal)
@@ -332,16 +310,13 @@ void C_SdTopologyScene::AddEthernetBus(const QPointF & orc_Pos, const stw_types:
    Q_EMIT this->SigBusChanged(s32_Index);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds a new boundary
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds a new boundary
 
    \param[in] orc_Pos        Position to place item at
    \param[in] opu64_UniqueID Optional pointer to unique ID to use for new item
-
-   \created     12.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::AddBoundary(const QPointF & orc_Pos, const stw_types::uint64 * const opu64_UniqueID)
 {
    C_PuiBsBoundary c_BoundaryData;
@@ -380,17 +355,14 @@ void C_SdTopologyScene::AddBoundary(const QPointF & orc_Pos, const stw_types::ui
    m_UpdateSelection(pc_Item);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds a new text element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds a new text element
 
    \param[in] orc_Text       Initial text
    \param[in] orc_Pos        Position to place item at
    \param[in] opu64_UniqueID Optional pointer to unique ID to use for new item
-
-   \created     12.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::AddTextElement(const QString & orc_Text, const QPointF & orc_Pos,
                                        const stw_types::uint64 * const opu64_UniqueID)
 {
@@ -432,15 +404,12 @@ void C_SdTopologyScene::AddTextElement(const QString & orc_Text, const QPointF &
    m_UpdateSelection(pc_Item);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds a new text element for a concrete bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds a new text element for a concrete bus
 
    \param[in] opu64_UniqueID Optional pointer to unique ID to use for new item
-
-   \created     12.05.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiTextElementBus * C_SdTopologyScene::AddTextElementBus(const uint64 * const opu64_UniqueID)
 {
    C_GiTextElementBus * pc_Item;
@@ -468,16 +437,13 @@ C_GiTextElementBus * C_SdTopologyScene::AddTextElementBus(const uint64 * const o
    return pc_Item;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds a new line
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds a new line
 
    \param[in] orc_Pos        Position to place item at
    \param[in] opu64_UniqueID Optional pointer to unique ID to use for new item
-
-   \created     12.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::AddLine(const QPointF & orc_Pos, const stw_types::uint64 * const opu64_UniqueID)
 {
    C_PuiBsLineArrow c_LineArrowData;
@@ -518,9 +484,8 @@ void C_SdTopologyScene::AddLine(const QPointF & orc_Pos, const stw_types::uint64
    this->m_AddLineArrowToScene(pc_Item);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds a new bus connector
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds a new bus connector
 
    \param[in,out] opc_Node             Node to connect to
    \param[in]     opc_Bus              Bus to connect to
@@ -528,10 +493,8 @@ void C_SdTopologyScene::AddLine(const QPointF & orc_Pos, const stw_types::uint64
    \param[in]     oru8_NodeId          New node id
    \param[in]     orc_Pos              Position to place item at
    \param[in]     opu64_UniqueID       Optional pointer to unique ID to use for new item
-
-   \created     24.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::AddBusConnector(C_GiNode * const opc_Node, const C_GiLiBus * const opc_Bus,
                                         const stw_types::uint8 & oru8_InterfaceNumber,
                                         const stw_types::uint8 & oru8_NodeId, const QPointF & orc_Pos,
@@ -573,15 +536,12 @@ void C_SdTopologyScene::AddBusConnector(C_GiNode * const opc_Node, const C_GiLiB
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal for update of current scaling
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal for update of current scaling
 
    \param[in] orc_Transform Current scaling
-
-   \created     16.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::UpdateTransform(const QTransform & orc_Transform)
 {
    //Not necessary with new connect icon
@@ -599,17 +559,14 @@ void C_SdTopologyScene::UpdateTransform(const QTransform & orc_Transform)
    C_SebTopologyBaseScene::UpdateTransform(orc_Transform);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds a new image
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds a new image
 
    \param[in] orc_FilePath   Image file path
    \param[in] orc_Pos        Position to place item at
    \param[in] opu64_UniqueID Optional pointer to unique ID to use for new item
-
-   \created     12.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::AddImage(const QString & orc_FilePath, const QPointF & orc_Pos,
                                  const stw_types::uint64 * const opu64_UniqueID)
 {
@@ -641,15 +598,12 @@ void C_SdTopologyScene::AddImage(const QString & orc_FilePath, const QPointF & o
    m_UpdateSelection(pc_Item);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy items to scene from copy paste manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy items to scene from copy paste manager
 
    \param[in] opc_Pos Optional position offset
-
-   \created     11.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::CopyFromManagerToScene(const QPointF * const opc_Pos)
 {
    QGraphicsView * const pc_View = this->views().at(0);
@@ -686,17 +640,14 @@ void C_SdTopologyScene::CopyFromManagerToScene(const QPointF * const opc_Pos)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy snapshot to scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy snapshot to scene
 
    \param[in] orc_Snapshot Object snapshot
    \param[in] opc_Pos      Optional position offset
    \param[in] opc_IDMap    Optional map for IDs to use
-
-   \created     23.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::CopyFromSnapshotToScene(const stw_opensyde_gui_logic::C_SdTopologyDataSnapshot & orc_Snapshot,
                                                 const QPointF * const opc_Pos, const QMap<C_PuiBsTemporaryDataID,
                                                                                           uint64> * const opc_IDMap)
@@ -820,31 +771,25 @@ void C_SdTopologyScene::CopyFromSnapshotToScene(const stw_opensyde_gui_logic::C_
                   opc_IDMap);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save system definition
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save system definition
 
    \param[in] orc_Path File path
-
-   \created     12.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::Save(void) const
 {
    UpdateSystemDefinition();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clear item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clear item
 
    Hint: leaves all items which are not included in the system definition
 
    \param[in,out]   opc_Item   Pointer to item which may be deleted
-
-   \created     16.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::DeleteItem(QGraphicsItem * const opc_Item)
 {
    // if the selected item is a bus, the bus class itself is the parent
@@ -965,17 +910,14 @@ void C_SdTopologyScene::DeleteItem(QGraphicsItem * const opc_Item)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if the graphics item is movable on the scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if the graphics item is movable on the scene
 
    \return
    true     Item is movable
    false    Item is not movable
-
-   \created     24.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdTopologyScene::IsItemMovable(const QGraphicsItem * const opc_Item) const
 {
    bool q_Return = false;
@@ -997,17 +939,14 @@ bool C_SdTopologyScene::IsItemMovable(const QGraphicsItem * const opc_Item) cons
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if the graphics item is selectable on the scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if the graphics item is selectable on the scene
 
    \return
    true     Item is selectable
    false    Item is not selectable
-
-   \created     24.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdTopologyScene::IsItemSelectable(const QGraphicsItem * const opc_Item) const
 {
    bool q_Return = false;
@@ -1030,17 +969,14 @@ bool C_SdTopologyScene::IsItemSelectable(const QGraphicsItem * const opc_Item) c
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if the graphics item is deletable on the scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if the graphics item is deletable on the scene
 
    \return
    true     Item is deletable
    false    Item is not deletable
-
-   \created     16.05.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdTopologyScene::IsItemDeletable(const QGraphicsItem * const opc_Item) const
 {
    bool q_Return = true;
@@ -1053,17 +989,14 @@ bool C_SdTopologyScene::IsItemDeletable(const QGraphicsItem * const opc_Item) co
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if the graphics item is changeable in the zorder
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if the graphics item is changeable in the zorder
 
    \return
    true     Z order is changeable
    false    Z order is not changeable
-
-   \created     24.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdTopologyScene::IsZOrderChangeable(const QGraphicsItem * const opc_Item) const
 {
    bool q_Return = false;
@@ -1085,17 +1018,14 @@ bool C_SdTopologyScene::IsZOrderChangeable(const QGraphicsItem * const opc_Item)
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if the graphics item can be aligned
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if the graphics item can be aligned
 
    \return
    true     Item can be aligned
    false    Item can not be alined
-
-   \created     24.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdTopologyScene::IsAlignmentUsable(const QGraphicsItem * const opc_Item) const
 {
    bool q_Return = true;
@@ -1110,78 +1040,66 @@ bool C_SdTopologyScene::IsAlignmentUsable(const QGraphicsItem * const opc_Item) 
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if the drag move over the scene can be used
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if the drag move over the scene can be used
 
    \return
    true     Drag move is available
    false    Drag move is available
-
-   \created     05.05.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdTopologyScene::IsSceneRubberBandAvailable(void) const
 {
    // no restrictions here
    return true;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebBaseContextMenuManager * C_SdTopologyScene::m_GetContextMenuManager(void)
 {
    return &this->mc_ContextMenuManager;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current copy paste manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current copy paste manager
 
    \return
    NULL No copy paste manager
    Else Valid copy paste manager
-
-   \created     10.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebBaseCopyPasteManager * C_SdTopologyScene::m_GetCopyPasteManager(void)
 {
    return &this->mc_CopyPasteManager;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current copy paste manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current copy paste manager
 
    \return
    NULL No copy paste manager
    Else Valid copy paste manager
-
-   \created     10.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_SebBaseCopyPasteManager * C_SdTopologyScene::m_GetCopyPasteManagerConst(void) const
 {
    return &this->mc_CopyPasteManager;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoBaseManager * C_SdTopologyScene::m_GetUndoManager(void)
 {
    return &this->mc_UndoManager;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse move event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse move event slot
 
    Here: Update temporary line
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     30.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    if (mq_ProxyWidgetInteractionActive == false)
@@ -1348,17 +1266,14 @@ void C_SdTopologyScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Even
    C_SebTopologyBaseScene::mouseMoveEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse release event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse release event slot
 
    Here: Handle connect
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     30.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    C_SebScene::mouseReleaseEvent(opc_Event);
@@ -1378,7 +1293,7 @@ void C_SdTopologyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_E
             c_MessageBox.SetHeading(C_GtGetText::h_GetText("Link Use"));
             c_MessageBox.SetDescription(C_GtGetText::h_GetText(
                                            "Connect existing elements: Click on the link icon and drag and drop it "
-                                           "\neither to an existing node or to a bus element."));
+                                           "either to an existing node or to a bus element."));
             c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("OK"));
             c_MessageBox.Execute();
          }
@@ -1427,15 +1342,12 @@ void C_SdTopologyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_E
    this->m_RemoveBusNameLine();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse double click event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse double click event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     08.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    const QList<QGraphicsItem *> & rc_SelectedItems = this->selectedItems();
@@ -1468,15 +1380,12 @@ void C_SdTopologyScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const o
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press release event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press release event slot
 
    \param[in,out] opc_KeyEvent  Key event identification and information
-
-   \created     01.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallBase = true;
@@ -1507,15 +1416,12 @@ void C_SdTopologyScene::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten context menu event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten context menu event
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     02.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * const opc_Event)
 {
    if (this->mq_BlockContextMenu == false)
@@ -1526,7 +1432,7 @@ void C_SdTopologyScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * const 
    C_SebScene::contextMenuEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_OpenContextMenu(const QPointF & orc_Pos)
 {
    if (this->mq_BlockContextMenu == false)
@@ -1544,25 +1450,21 @@ void C_SdTopologyScene::m_OpenContextMenu(const QPointF & orc_Pos)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add image to scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add image to scene
 
    \param[in] orc_Path     Image path
    \param[in] orc_Position Image scene position
-
-   \created     03.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_AddImage(const QString & orc_Path, const QPointF & orc_Position)
 {
    this->mc_UndoManager.DoAddGeneric(C_SdManUnoTopologyAddCommand::eIMAGE,
                                      m_GetNewUniqueID(), orc_Position, orc_Path);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add data from mime data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add data from mime data
 
    \param[in] opc_MimeData Mime data to add to scene
    \param[in] orc_Position Position to add data at
@@ -1570,10 +1472,8 @@ void C_SdTopologyScene::m_AddImage(const QString & orc_Path, const QPointF & orc
    \return
    true: Item was added
    false: No item was added
-
-   \created     13.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdTopologyScene::m_AddOfMime(const QMimeData * const opc_MimeData, const QPointF & orc_Position)
 {
    bool q_Retval = true;
@@ -1675,13 +1575,10 @@ bool C_SdTopologyScene::m_AddOfMime(const QMimeData * const opc_MimeData, const 
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy items
-
-   \created     11.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy items
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_Copy(void)
 {
    QList<QGraphicsItem *> c_SelectedItems;
@@ -1721,13 +1618,10 @@ void C_SdTopologyScene::m_Copy(void)
    this->mc_CopyPasteManager.CopyFromSceneToManager(c_SelectedItems);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Cut items
-
-   \created     14.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Cut items
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_Cut(void)
 {
    this->UpdateSystemDefinition();
@@ -1736,85 +1630,55 @@ void C_SdTopologyScene::m_Cut(void)
    m_Delete(true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Optional check for user confirmation on delete action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Optional check for user confirmation on delete action
+
+   \param[in] orc_SelectedItems Selected items
 
    \return
    true  Continue
    false Abort
-
-   \created     12.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdTopologyScene::m_HandleDeleteUserConfirmation(const QList<QGraphicsItem *> & orc_SelectedItems) const
 {
    bool q_Retval = true;
 
    Q_UNUSED(orc_SelectedItems)
-   //Optional check for special case to ask for confirm before delete
-   //bool q_ConfirmationNecessary = false;
 
-   //for (QList<QGraphicsItem *>::const_iterator c_ItItem =
-   //        orc_SelectedItems.begin(); c_ItItem != orc_SelectedItems.end();
-   //     ++c_ItItem)
-   //{
-   //   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   //   //lint -e{740}  no problem because of common base class
-   //   const C_GiNode * const pc_Node = dynamic_cast<const C_GiNode * const>(C_SebUtil::h_GetHighestParent(*c_ItItem));
-   //   if (pc_Node != NULL)
-   //   {
-   //      q_ConfirmationNecessary = true;
-   //      break;
-   //   }
-   //   else
-   //   {
-   //      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   //      //lint -e{740}  no problem because of common base class
-   //      const C_GiLiBus * const pc_Bus =
-   //         dynamic_cast<const C_GiLiBus * const>(C_SebUtil::h_GetHighestParent(*c_ItItem));
-   //      if (pc_Bus != NULL)
-   //      {
-   //         q_ConfirmationNecessary = true;
-   //         break;
-   //      }
-   //   }
-   //}
-   //if (q_ConfirmationNecessary == true)
-   //{
-
-   C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
-   QGraphicsView * const pc_View = this->views().at(0);
-   C_OgeWiCustomMessage c_MessageBox(pc_View, C_OgeWiCustomMessage::E_Type::eQUESTION);
-   c_MessageBox.SetDescription(C_GtGetText::h_GetText("Do you really want to delete the selected item(s)?"));
-   c_MessageBox.SetHeading(C_GtGetText::h_GetText("Items delete"));
-   c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
-   c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
-   e_ReturnMessageBox = c_MessageBox.Execute();
-
-   switch (e_ReturnMessageBox)
+   if (this->views().size() > 0)
    {
-   case C_OgeWiCustomMessage::eOK:
-      q_Retval = true;
-      break;
-   default:
-      q_Retval = false;
-      break;
-   }
+      QGraphicsView * const pc_View = this->views().at(0);
+      if (pc_View != NULL)
+      {
+         C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
+         C_OgeWiCustomMessage c_MessageBox(pc_View, C_OgeWiCustomMessage::E_Type::eQUESTION);
+         c_MessageBox.SetDescription(C_GtGetText::h_GetText("Do you really want to delete the selected item(s)?"));
+         c_MessageBox.SetHeading(C_GtGetText::h_GetText("Items delete"));
+         c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
+         c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+         e_ReturnMessageBox = c_MessageBox.Execute();
 
-   //}
+         switch (e_ReturnMessageBox)
+         {
+         case C_OgeWiCustomMessage::eOK:
+            q_Retval = true;
+            break;
+         default:
+            q_Retval = false;
+            break;
+         }
+      }
+   }
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paste objects of clipboard
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paste objects of clipboard
 
    \param[in] opc_Pos Optional position to paste at (Otherwise current mouse cursor position is chosen)
-
-   \created     13.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_PasteOfClipBoard(const QPointF * const opc_Pos)
 {
    QClipboard * pc_Clipboard = QApplication::clipboard();
@@ -1838,7 +1702,7 @@ void C_SdTopologyScene::m_PasteOfClipBoard(const QPointF * const opc_Pos)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiNode * C_SdTopologyScene::m_CreateNode(const sint32 & ors32_Index, const uint64 & oru64_ID,
                                            const float64 & orf64_Width, const float64 & orf64_Height,
                                            QGraphicsItem * const opc_Parent)
@@ -1846,9 +1710,8 @@ C_GiNode * C_SdTopologyScene::m_CreateNode(const sint32 & ors32_Index, const uin
    return new C_GiNode(ors32_Index, oru64_ID, orf64_Width, orf64_Height, opc_Parent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get specific CAN bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get specific CAN bus
 
    \param[in]     ors32_Index          Index of data element in system definition
    \param[in]     oru64_ID             Unique ID
@@ -1858,10 +1721,8 @@ C_GiNode * C_SdTopologyScene::m_CreateNode(const sint32 & ors32_Index, const uin
 
    \return
    Specific CAN bus
-
-   \created     15.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiLiCANBus * C_SdTopologyScene::m_CreateCANBus(const sint32 & ors32_Index, const uint64 & oru64_ID,
                                                  C_GiTextElementBus * const opc_TextElementName,
                                                  const std::vector<QPointF> * const opc_Points,
@@ -1870,9 +1731,8 @@ C_GiLiCANBus * C_SdTopologyScene::m_CreateCANBus(const sint32 & ors32_Index, con
    return new C_GiLiCANBus(ors32_Index, oru64_ID, opc_TextElementName, true, opc_Points, opc_Parent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get specific ethernet bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get specific ethernet bus
 
    \param[in]     ors32_Index          Index of data element in system definition
    \param[in]     oru64_ID             Unique ID
@@ -1882,10 +1742,8 @@ C_GiLiCANBus * C_SdTopologyScene::m_CreateCANBus(const sint32 & ors32_Index, con
 
    \return
    Specific ethernet bus
-
-   \created     15.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiLiEthernetBus * C_SdTopologyScene::m_CreateEthernetBus(const sint32 & ors32_Index, const uint64 & oru64_ID,
                                                            C_GiTextElementBus * const opc_TextElementName,
                                                            const std::vector<QPointF> * const opc_Points,
@@ -1894,32 +1752,26 @@ C_GiLiEthernetBus * C_SdTopologyScene::m_CreateEthernetBus(const sint32 & ors32_
    return new C_GiLiEthernetBus(ors32_Index, oru64_ID, opc_TextElementName, true, opc_Points, opc_Parent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get specific bus text element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get specific bus text element
 
    \param[in]       ors32_Index          Index of data element in system definition
    \param[in]       oru64_ID             Unique ID
    \param[in,out]   opc_parent           Optional pointer to parent
-
-   \created     15.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiTextElementBus * C_SdTopologyScene::m_CreateBusTextElement(const sint32 & ors32_Index, const uint64 & oru64_ID,
                                                                QGraphicsItem * const opc_Parent)
 {
    return new C_GiTextElementBus(ors32_Index, oru64_ID, opc_Parent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new node to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new node to scene and connect signals
 
    \param[in,out] opc_NodeGraphicsItem Pointer to new node
-
-   \created     20.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_AddNodeToScene(C_GiNode * const opc_NodeGraphicsItem)
 {
    // Context menu button of node
@@ -1930,15 +1782,12 @@ void C_SdTopologyScene::m_AddNodeToScene(C_GiNode * const opc_NodeGraphicsItem)
    C_SebTopologyBaseScene::m_AddNodeToScene(opc_NodeGraphicsItem);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new bus connector to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new bus connector to scene and connect signals
 
    \param[in,out] opc_BusConnectorGraphicsItem Connector item
-
-   \created     14.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_AddBusConnectorToScene(C_GiLiBusConnector * const opc_BusConnectorGraphicsItem)
 {
    if (opc_BusConnectorGraphicsItem != NULL)
@@ -1955,15 +1804,12 @@ void C_SdTopologyScene::m_AddBusConnectorToScene(C_GiLiBusConnector * const opc_
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new text element to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new text element to scene and connect signals
 
    \param[in,out] opc_Item  Text element
-
-   \created     04.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_AddTextElementToScene(C_GiBiTextElement * const opc_Item)
 {
    connect(opc_Item, &C_GiBiTextElement::SigTextInteractionModeStateChanged, this,
@@ -1972,16 +1818,13 @@ void C_SdTopologyScene::m_AddTextElementToScene(C_GiBiTextElement * const opc_It
    C_SebTopologyBaseScene::m_AddTextElementToScene(opc_Item);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle after resize action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle after resize action
 
    \param[in] ors32_InteractionPointIndex Interaction point index
    \param[in] orc_PositionDifference      Position difference of resize
-
-   \created     21.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_HandleRevertableResizeLine(const sint32 & ors32_InteractionPointIndex,
                                                      const QPointF & orc_PositionDifference)
 {
@@ -1991,19 +1834,16 @@ void C_SdTopologyScene::m_HandleRevertableResizeLine(const sint32 & ors32_Intera
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Call setup style dialog
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Call setup style dialog
 
    \param[in,out] opc_Item Item to change style for
 
    \return
    False Failure or abort by user
    True  Success and accept
-
-   \created     25.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdTopologyScene::m_CallSetupStyle(QGraphicsItem * const opc_Item) const
 {
    bool q_Retval = false;
@@ -2021,7 +1861,7 @@ bool C_SdTopologyScene::m_CallSetupStyle(QGraphicsItem * const opc_Item) const
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_SelectionChanged(void)
 {
    if (this->mq_ProxyWidgetInteractionActive == false)
@@ -2141,16 +1981,13 @@ void C_SdTopologyScene::m_SelectionChanged(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle start connection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle start connection
 
    \param[in] orc_LineStart       Start of connector position
    \param[in] orc_SceneTriggerPos Scene trigger position of event
-
-   \created     30.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_StartConnector(const QPointF & orc_LineStart, const QPointF & orc_SceneTriggerPos)
 {
    m_RemoveConnectorLine();
@@ -2165,7 +2002,7 @@ void C_SdTopologyScene::m_StartConnector(const QPointF & orc_LineStart, const QP
    this->m_EnterConnectState(C_GiLiBusConnector::E_ConnectState::eTO_GENERIC_AND_BUS, this->mpc_NodeConnectItem);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_EditPressed(void)
 {
    const QList<QGraphicsItem *> & rc_SelectedItems = this->selectedItems();
@@ -2187,19 +2024,16 @@ void C_SdTopologyScene::m_EditPressed(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_EditClicked(const QGraphicsItem * const opc_Item)
 {
    this->m_Edit(opc_Item, false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Edit actual item
-
-   \created     08.03.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Edit actual item
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_Edit(const QGraphicsItem * const opc_Item, const bool oq_FocusName)
 {
    uint32 u32_Flag;
@@ -2260,13 +2094,10 @@ void C_SdTopologyScene::m_Edit(const QGraphicsItem * const opc_Item, const bool 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Synchronize system definition and scene
-
-   \created     16.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Synchronize system definition and scene
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::UpdateSystemDefinition(void) const
 {
    QList<QGraphicsItem *> c_Items = this->items();
@@ -2285,33 +2116,27 @@ void C_SdTopologyScene::UpdateSystemDefinition(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if any item can be added to the scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if any item can be added to the scene
 
    \return
    true     Items can be added
    false    Items cannot be added
-
-   \created     03.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdTopologyScene::IsAnyItemAddable(void) const
 {
    return true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt index if item in array was deleted
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt index if item in array was deleted
 
    \param[in] ore_Type    Type of vector which changed
    \param[in] ors32_Index Index of vector which changed
    \param[in] ore_Action  Type of action
-
-   \created     14.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_SyncIndex(const stw_opensyde_gui_logic::C_PuiSdDataElement::E_Type & ore_Type,
                                     const stw_types::sint32 & ors32_Index,
                                     const stw_opensyde_gui_logic::C_PuiSdDataElement::E_Action & ore_Action) const
@@ -2342,16 +2167,13 @@ void C_SdTopologyScene::m_SyncIndex(const stw_opensyde_gui_logic::C_PuiSdDataEle
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new connection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new connection
 
    \param[in] oru8_InterfaceNumber Number of interface on bus
    \param[in] oru8_NodeId          Node id
-
-   \created     19.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_ConnectNodeToBus(const stw_types::uint8 & oru8_InterfaceNumber,
                                            const stw_types::uint8 & oru8_NodeId)
 {
@@ -2368,17 +2190,14 @@ void C_SdTopologyScene::m_ConnectNodeToBus(const stw_types::uint8 & oru8_Interfa
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Change existing connection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Change existing connection
 
    \param[in] oru8_InterfaceNumber Number of interface on bus
    \param[in] oru8_NodeId          New node id
    \param[in] opc_Connector        Current bus connector for change of interface
-
-   \created     19.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_ChangeInterface(const uint8 & oru8_InterfaceNumber, const uint8 & oru8_NodeId,
                                           C_GiLiBusConnector * const opc_Connector)
 {
@@ -2415,13 +2234,10 @@ void C_SdTopologyScene::m_ChangeInterface(const uint8 & oru8_InterfaceNumber, co
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore default ToolTips for all items
-
-   \created     20.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore default ToolTips for all items
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_RestoreToolTips(void) const
 {
    C_GiBiCustomToolTip * pc_CustomToolTip;
@@ -2450,15 +2266,12 @@ void C_SdTopologyScene::m_RestoreToolTips(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete node of scene and disconnect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete node of scene and disconnect signals
 
    \param[in,out] opc_NodeGraphicsItem Pointer to existing node
-
-   \created     29.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_RemoveNodeOfScene(C_GiNode * const opc_NodeGraphicsItem)
 {
    if (opc_NodeGraphicsItem != NULL)
@@ -2477,15 +2290,12 @@ void C_SdTopologyScene::m_RemoveNodeOfScene(C_GiNode * const opc_NodeGraphicsIte
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete bus of scene and disconnect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete bus of scene and disconnect signals
 
    \param[in,out] opc_BusGraphicsItem Pointer to existing bus
-
-   \created     26.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_RemoveBusOfScene(C_GiLiBus * const opc_BusGraphicsItem)
 {
    QList<QGraphicsItem *> c_Items = this->items();
@@ -2507,15 +2317,12 @@ void C_SdTopologyScene::m_RemoveBusOfScene(C_GiLiBus * const opc_BusGraphicsItem
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete bus connector of scene and disconnect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete bus connector of scene and disconnect signals
 
    \param[in,out] opc_BusConnectorGraphicsItem Connector item
-
-   \created     14.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_RemoveBusConnectorOfScene(C_GiLiBusConnector * const opc_BusConnectorGraphicsItem)
 {
    if (opc_BusConnectorGraphicsItem != NULL)
@@ -2545,15 +2352,12 @@ void C_SdTopologyScene::m_RemoveBusConnectorOfScene(C_GiLiBusConnector * const o
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete line arrow of scene and disconnect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete line arrow of scene and disconnect signals
 
    \param[in,out] opc_Item Line arrow item
-
-   \created     21.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_RemoveLineArrowOfScene(C_GiSdArrow * const opc_Item)
 {
    if (opc_Item != NULL)
@@ -2565,15 +2369,12 @@ void C_SdTopologyScene::m_RemoveLineArrowOfScene(C_GiSdArrow * const opc_Item)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete boundary of scene and disconnect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete boundary of scene and disconnect signals
 
    \param[in,out] opc_Item Boundary item
-
-   \created     27.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_RemoveBoundaryOfScene(C_GiSdBoundary * const opc_Item)
 {
    if (opc_Item != NULL)
@@ -2585,15 +2386,12 @@ void C_SdTopologyScene::m_RemoveBoundaryOfScene(C_GiSdBoundary * const opc_Item)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete image of scene and disconnect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete image of scene and disconnect signals
 
    \param[in,out] opc_Item Image group item
-
-   \created     08.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_RemoveImageGroupOfScene(C_GiSdImageGroup * const opc_Item)
 {
    if (opc_Item != NULL)
@@ -2605,15 +2403,12 @@ void C_SdTopologyScene::m_RemoveImageGroupOfScene(C_GiSdImageGroup * const opc_I
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete text element of scene and disconnect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete text element of scene and disconnect signals
 
    \param[in,out] opc_Item Text element
-
-   \created     04.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_RemoveTextElementOfScene(C_GiSdTextElement * const opc_Item)
 {
    if (opc_Item != NULL)
@@ -2627,15 +2422,12 @@ void C_SdTopologyScene::m_RemoveTextElementOfScene(C_GiSdTextElement * const opc
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete text element of scene and disconnect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete text element of scene and disconnect signals
 
    \param[in,out] opc_Item Text element
-
-   \created     04.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_RemoveTextElementBusOfScene(C_GiTextElementBus * const opc_Item)
 {
    if (opc_Item != NULL)
@@ -2649,9 +2441,8 @@ void C_SdTopologyScene::m_RemoveTextElementBusOfScene(C_GiTextElementBus * const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Enter connect state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Enter connect state
 
    if new connection is created or an existing connection is changed
    the scene switches to a custom state
@@ -2662,10 +2453,8 @@ void C_SdTopologyScene::m_RemoveTextElementBusOfScene(C_GiTextElementBus * const
    \param[in] opc_Node         Relevant node (optional)
    \param[in] ope_Type         Last used bus type (optional)
                                 NULL: No special handling for any bus type
-
-   \created     14.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_EnterConnectState(const C_GiLiBusConnector::E_ConnectState & ore_ConnectState,
                                             const C_GiNode * const opc_Node,
                                             const C_OSCSystemBus::E_Type * const ope_Type)
@@ -2763,11 +2552,11 @@ void C_SdTopologyScene::m_EnterConnectState(const C_GiLiBusConnector::E_ConnectS
                      //Check for node to node
                      if (q_NodeToNodeAllowEthernet == true)
                      {
-                        q_Allow = pc_Node->CheckConnectionAvailable(C_OSCSystemBus::eETHERNET);
+                        q_Allow = pc_Node->HasConnectionType(C_OSCSystemBus::eETHERNET);
                      }
                      if ((q_NodeToNodeAllowCAN == true) && (q_Allow == false))
                      {
-                        q_Allow = pc_Node->CheckConnectionAvailable(C_OSCSystemBus::eCAN);
+                        q_Allow = pc_Node->HasConnectionType(C_OSCSystemBus::eCAN);
                      }
                   }
                   if (q_Allow == false)
@@ -2878,15 +2667,12 @@ void C_SdTopologyScene::m_EnterConnectState(const C_GiLiBusConnector::E_ConnectS
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Leave connect state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Leave connect state
 
    Restore scene default state
-
-   \created     14.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_LeaveConnectState(void)
 {
    m_StopToolTip();
@@ -2925,30 +2711,24 @@ void C_SdTopologyScene::m_LeaveConnectState(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete temporary connector and leave connect state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete temporary connector and leave connect state
 
    Restore scene default state
-
-   \created     19.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_RemoveConnectorAndLeaveConnectState()
 {
    this->m_RemoveConnectorLine();
    this->m_LeaveConnectState();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set disabled mode for all interactable items in connect state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set disabled mode for all interactable items in connect state
 
    \param[in] opc_Node Node to skip
-
-   \created     19.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_DisableEverythingForConnectState(const C_GiNode * const opc_Node) const
 {
    //lint -e948 Variable necessary to deactivate feature until finished
@@ -2982,9 +2762,8 @@ void C_SdTopologyScene::m_DisableEverythingForConnectState(const C_GiNode * cons
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Display custom context menu for connection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Display custom context menu for connection
 
    \param[in] opc_Node               Node (part of connection)
    \param[in] opc_Bus                Bus (part of connection)
@@ -2992,10 +2771,8 @@ void C_SdTopologyScene::m_DisableEverythingForConnectState(const C_GiNode * cons
    \param[in] orq_Reconnect          Flag if in reconnect state
    \param[in] ors32_SpecialInterface Interface number to ignore
    \param[in] opc_Connector          Current bus connector for change of interface (and reconnect bus)
-
-   \created     18.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_ShowNewConnectionPopUp(const C_GiNode * const opc_Node, const C_GiLiBus * const opc_Bus,
                                                  const bool & orq_ChangeInterface, const bool & orq_Reconnect,
                                                  const sint32 & ors32_SpecialInterface,
@@ -3079,16 +2856,13 @@ void C_SdTopologyScene::m_ShowNewConnectionPopUp(const C_GiNode * const opc_Node
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Display custom context menu for connection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Display custom context menu for connection
 
    \param[in] opc_Node1 Node 1 (part of connection)
    \param[in] opc_Node2 Node 2 (part of connection)
-
-   \created     18.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * const opc_Node1,
                                                            const C_GiNode * const opc_Node2)
 {
@@ -3205,9 +2979,8 @@ void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * cons
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapts the state of the COM datapools
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapts the state of the COM datapools
 
    If a specific COM datapool does not exist, it will be created
 
@@ -3216,10 +2989,8 @@ void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * cons
    \param[in]    orq_ComProtocolL2          Flag if Layer 2 COM datapool exist
    \param[in]    orq_ComProtocolECeS        Flag if ECeS COM datapool exist
    \param[in]    orq_ComProtocolECoS        Flag if ECoS COM datapool exist
-
-   \created     30.01.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_ConfiugreComDatapools(const C_GiNode * const opc_Node, const uint32 ou32_InterfaceIndex,
                                                 const bool oq_ComProtocolL2, const bool oq_ComProtocolECeS,
                                                 const bool oq_ComProtocolECoS) const
@@ -3229,7 +3000,7 @@ void C_SdTopologyScene::m_ConfiugreComDatapools(const C_GiNode * const opc_Node,
    this->m_ConfiugreComDatapool(opc_Node, ou32_InterfaceIndex, C_OSCCanProtocol::eCAN_OPEN_SAFETY, oq_ComProtocolECoS);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_ConfiugreComDatapool(const C_GiNode * const opc_Node, const uint32 ou32_InterfaceIndex,
                                                const C_OSCCanProtocol::E_Type oe_ProtocolType,
                                                const bool oq_Active) const
@@ -3297,15 +3068,12 @@ void C_SdTopologyScene::m_ConfiugreComDatapool(const C_GiNode * const opc_Node, 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger change interface dialog
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger change interface dialog
 
    \param[in,out] opc_Item Bus connection item
-
-   \created     14.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_ShowInterfaceChangePopUp(QGraphicsItem * const opc_Item)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -3324,9 +3092,8 @@ void C_SdTopologyScene::m_ShowInterfaceChangePopUp(QGraphicsItem * const opc_Ite
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load subset of system definition entries
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load subset of system definition entries
 
    \param[in] orc_NodeIndices              Node indices to add
    \param[in] orc_BusIndices               Bus indices to add
@@ -3340,10 +3107,8 @@ void C_SdTopologyScene::m_ShowInterfaceChangePopUp(QGraphicsItem * const opc_Ite
    \param[in] orq_Selection                False: Ignore selection
    \param[in] opc_AdditionalConnectionData Additional data for bus connections
    \param[in] opc_IDMap                    Optional map for IDs to use
-
-   \created     11.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_LoadSnapshot(const QVector<uint32> & orc_NodeIndices, const QVector<uint32> & orc_BusIndices,
                                        const QVector<uint32> & orc_OtherStartIndices, const QPointF * const opc_Offset,
                                        const bool & orq_Selection,
@@ -3385,16 +3150,13 @@ void C_SdTopologyScene::m_LoadSnapshot(const QVector<uint32> & orc_NodeIndices, 
                       opc_AdditionalConnectionData, opc_IDMap);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add value to vector and update all values which are higher or equal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add value to vector and update all values which are higher or equal
 
    \param[in,out] orc_Vec   Vector
    \param[in]     oru32_New New value
-
-   \created     23.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::mh_AddAndUpdateHigher(QVector<uint32> & orc_Vec, const uint32 & oru32_New)
 {
    for (sint32 s32_ItVec = 0; s32_ItVec < orc_Vec.size(); ++s32_ItVec)
@@ -3408,18 +3170,15 @@ void C_SdTopologyScene::mh_AddAndUpdateHigher(QVector<uint32> & orc_Vec, const u
    orc_Vec.push_back(oru32_New);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Bus connector is starting reconnect state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Bus connector is starting reconnect state
 
    \param[in] ore_ConnectState Connection state
    \param[in] opc_Node         Relevant node (optional)
    \param[in] ope_Type         Last used bus type (optional)
                                 NULL: No special handling for any bus type
-
-   \created     14.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_BusConnectorReconnectionStart(const C_GiLiBusConnector::E_ConnectState & ore_ConnectState,
                                                         const QGraphicsItem * const opc_Item,
                                                         const C_OSCSystemBus::E_Type * const ope_Type,
@@ -3432,18 +3191,15 @@ void C_SdTopologyScene::m_BusConnectorReconnectionStart(const C_GiLiBusConnector
                                                             ore_ConnectState);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show context menu and signal reconnect manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show context menu and signal reconnect manager
 
    \param[in]     orc_ScenePos           Event scene position
    \param[in,out] opc_Node               Current node
    \param[in]     opc_Bus                Current bus
    \param[in]     ors32_SpecialInterface Last used interface
-
-   \created     05.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_ShowBusConnectorReconnectionContextMenu(const QPointF & orc_ScenePos,
                                                                   C_GiNode * const opc_Node,
                                                                   const C_GiLiBus * const opc_Bus,
@@ -3454,13 +3210,10 @@ void C_SdTopologyScene::m_ShowBusConnectorReconnectionContextMenu(const QPointF 
    m_ShowNewConnectionPopUp(opc_Node, opc_Bus, false, true, ors32_SpecialInterface, opc_BusConnector);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Helper to reinitialize port display behaviour
-
-   \created     05.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Helper to reinitialize port display behaviour
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_CleanUpPorts(void) const
 {
    C_GiNode * pc_Node;
@@ -3488,18 +3241,15 @@ void C_SdTopologyScene::m_CleanUpPorts(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Revert bus connector to previous node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Revert bus connector to previous node
 
    \param[in,out] opc_BusConnector Current bus connector
    \param[in,out] opc_StartingNode Previously connected node
    \param[in,out] opc_LastNode     New / current node
    \param[in]     orc_ScenePos     Last known scene position of interaction point
-
-   \created     05.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_RevertBusConnectorNode(stw_opensyde_gui::C_GiLiBusConnector * const opc_BusConnector,
                                                  stw_opensyde_gui::C_GiNode * const opc_StartingNode,
                                                  stw_opensyde_gui::C_GiNode * const opc_LastNode,
@@ -3511,9 +3261,8 @@ void C_SdTopologyScene::m_RevertBusConnectorNode(stw_opensyde_gui::C_GiLiBusConn
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Connect bus connector to new node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Connect bus connector to new node
 
    \param[in,out] opc_BusConnector  Current bus connector
    \param[in,out] opc_StartingNode  Previously connected node
@@ -3521,10 +3270,8 @@ void C_SdTopologyScene::m_RevertBusConnectorNode(stw_opensyde_gui::C_GiLiBusConn
    \param[in]     orc_ConnectionPos Position of connection event
    \param[in]     ors32_Interface   Newly used interface
    \param[in]     oru8_NodeId       New node id
-
-   \created     05.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_ReconnectBusConnectorNode(const stw_opensyde_gui::C_GiLiBusConnector * const opc_BusConnector,
                                                     const C_GiNode * const opc_StartingNode,
                                                     const C_GiNode * const opc_LastNode,
@@ -3537,18 +3284,15 @@ void C_SdTopologyScene::m_ReconnectBusConnectorNode(const stw_opensyde_gui::C_Gi
    m_UpdateHints();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Revert bus connector to previous bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Revert bus connector to previous bus
 
    \param[in,out] opc_BusConnector Current bus connector
    \param[in,out] opc_StartingBus  Previously connected bus
    \param[in,out] opc_LastBus      New / current bus
    \param[in]     orc_ScenePos     Last known scene position of interaction point
-
-   \created     05.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_RevertBusConnectorBus(stw_opensyde_gui::C_GiLiBusConnector * const opc_BusConnector,
                                                 const stw_opensyde_gui::C_GiLiBus * const opc_StartingBus,
                                                 const stw_opensyde_gui::C_GiLiBus * const opc_LastBus,
@@ -3560,9 +3304,8 @@ void C_SdTopologyScene::m_RevertBusConnectorBus(stw_opensyde_gui::C_GiLiBusConne
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Connect bus connector to new bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Connect bus connector to new bus
 
    \param[in,out] opc_BusConnector  Current bus connector
    \param[in,out] opc_StartingBus   Previously connected bus
@@ -3570,10 +3313,8 @@ void C_SdTopologyScene::m_RevertBusConnectorBus(stw_opensyde_gui::C_GiLiBusConne
    \param[in]     orc_ConnectionPos Position of connection event
    \param[in]     ors32_Interface   Newly used interface
    \param[in]     oru8_NodeId       New node id
-
-   \created     05.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_ReconnectBusConnectorBus(const stw_opensyde_gui::C_GiLiBusConnector * const opc_BusConnector,
                                                    const stw_opensyde_gui::C_GiLiBus * const opc_StartingBus,
                                                    const stw_opensyde_gui::C_GiLiBus * const opc_LastBus,
@@ -3586,13 +3327,10 @@ void C_SdTopologyScene::m_ReconnectBusConnectorBus(const stw_opensyde_gui::C_GiL
    m_UpdateHints();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up temporary line item
-
-   \created     09.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clean up temporary line item
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_RemoveConnectorLine(void)
 {
    this->m_RemoveTemporaryLine(&this->mpc_ConnectorLine);
@@ -3604,21 +3342,18 @@ void C_SdTopologyScene::m_RemoveConnectorLine(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_RemoveBusNameLine(void)
 {
    this->m_RemoveTemporaryLine(&this->mpc_BusNameLine);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up temporary line item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clean up temporary line item
 
    \param[in]  opc_TemporaryLine    Pointer to pointer of Temporary line
-
-   \created     09.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_RemoveTemporaryLine(C_GiLiTemporaryLine ** const opc_TemporaryLine)
 {
    if (*opc_TemporaryLine != NULL)
@@ -3631,15 +3366,12 @@ void C_SdTopologyScene::m_RemoveTemporaryLine(C_GiLiTemporaryLine ** const opc_T
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore all local override cursor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore all local override cursor
 
    TODO: evaluate if counter grows too big -> override cursor stack may cause performance problems
-
-   \created     15.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_RevertOverrideCursor(void)
 {
    for (uint64 u64_It = 0; u64_It < this->mu64_MouseOverrideCounter; ++u64_It)
@@ -3649,18 +3381,15 @@ void C_SdTopologyScene::m_RevertOverrideCursor(void)
    this->mu64_MouseOverrideCounter = 0;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init Node Com interface setting
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init Node Com interface setting
 
    This function is called after node create.
    Default concept: Activate all services if they are supported by the device type
 
    \param[in,out] orc_OSCNode      newly created node
-
-   \created     01.03.2017  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyScene::m_InitNodeComIfSettings(C_OSCNode & orc_OSCNode) const
 {
    //get available services of nodes device type

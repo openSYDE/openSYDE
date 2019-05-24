@@ -1,52 +1,42 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Message data structure with additional UI/ configuration info (implementation)
 
    Message data structure with additional UI/ configuration info
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     26.11.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwerrors.h"
 #include "CSCLChecksums.h"
 #include "C_CamProMessageData.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     26.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamProMessageData::C_CamProMessageData(void) :
    q_DoCyclicTrigger(false),
    u32_CyclicTriggerTime(100UL),
@@ -67,17 +57,14 @@ C_CamProMessageData::C_CamProMessageData(void) :
    this->au8_Data[7UL] = 0U;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
 
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
-
-   \created     26.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamProMessageData::CalcHash(uint32 & oru32_HashValue) const
 {
    stw_scl::C_SCLChecksums::CalcCRC32(this->c_DataBaseFilePath.c_str(),
@@ -96,49 +83,39 @@ void C_CamProMessageData::CalcHash(uint32 & oru32_HashValue) const
                                       oru32_HashValue);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get extended flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get extended flag
 
    \return
    True  Is extended format
    False Is standard format
-
-   \created     29.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_CamProMessageData::GetExtended(void) const
 {
    return this->u8_XTD == 1;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get remote transmission frame flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get remote transmission frame flag
 
    \return
    True  Is remote transmission frame
    False Is standard frame
-
-   \created     15.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_CamProMessageData::GetRTR(void) const
 {
    return this->u8_RTR == 1;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set message uint32 value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set message uint32 value
 
    \param[in] oe_Selector Data specifier
    \param[in] ou32_Value  New value
-
-
-   \created     29.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamProMessageData::SetMessageUint32Value(const C_CamProMessageData::E_GenericUint32DataSelector oe_Selector,
                                                 const uint32 ou32_Value)
 {
@@ -180,16 +157,13 @@ void C_CamProMessageData::SetMessageUint32Value(const C_CamProMessageData::E_Gen
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set message bool value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set message bool value
 
    \param[in] oe_Selector Data specifier
    \param[in] oq_Value    New value
-
-   \created     29.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamProMessageData::SetMessageBoolValue(const C_CamProMessageData::E_GenericBoolDataSelector oe_Selector,
                                               const bool oq_Value)
 {
@@ -221,35 +195,29 @@ void C_CamProMessageData::SetMessageBoolValue(const C_CamProMessageData::E_Gener
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set message key related values
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set message key related values
 
    \param[in] orc_Key     New key (single character only)
    \param[in] ou32_Offset Key trigger offset (ms)
-
-   \created     15.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamProMessageData::SetMessageKey(const QString & orc_Key, const uint32 ou32_Offset)
 {
    this->c_Key = orc_Key.toStdString().c_str();
    this->u32_KeyPressOffset = ou32_Offset;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set CAN message data bytes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set CAN message data bytes
 
    \param[in] orc_DataBytes New data byte content
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     16.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamProMessageData::SetMessageDataBytes(const std::vector<uint8> & orc_DataBytes)
 {
    sint32 s32_Retval = C_NO_ERR;

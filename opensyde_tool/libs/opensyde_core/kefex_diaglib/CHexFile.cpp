@@ -4,7 +4,6 @@
 // .FILE        hexfile.cpp
 // .PROGRAM
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //  - HexFile.LoadFromFile  loads a Intel HEX file into memory
@@ -24,24 +23,6 @@
 //  - HexFile.NextBinData   returns pointer to next HEX line binary data
 //                          additionally it returns the data address offset
 //                          and binary data size in byte
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  30.03.12    A. Stangl   Added variations of functions ::CreateHexFile ::Optimize that work without
-//                           needing to span dynamic memory over gaps in hex files
-//  23.09.08    A. Stangl   ::CreateHexFile: block offset is considered when checking for  record size
-//  13.08.08    A. Stangl   ::FindPattern: fixed finding pattern after 64kB offset
-//  16.07.08    A. Stangl   Removed ::CalcFileChecksum as the algorithm can be application specific.
-//  10.07.08    A. Stangl   Added ::AddedDataByAddres
-//                          Added ::FindPattern
-//                          Added ::DataToStruct
-//  23.04.08    A. Stangl   Added ::CalcFileChecksum
-//  13.12.06    A. Stangl   Fixed max. line length when parsing (was missing space for \r\n)
-//  24.09.04    U. Herb     LoadFromFile is able to load motorola S-Records
-//  13.04.04    U. Herb     new function NextBinData
-//  15.12.03    U. Herb     new function NextLineString: like NextLine but returns pointer to next HEX line as C-string
-//  15.12.03    U. Herb     new function Optimize: reorganize HEX file with defined record length and optional fill gaps
-//  10.04.00    U. Herb     file created
 //************************************************************************
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
@@ -135,7 +116,6 @@ uint32 C_HexFile::ByteCount(void) const
 //************************************************************************
 // .FUNCTION    LoadFromFile
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //  - HexFile.LoadFromFile load a HEX file into memory
@@ -155,11 +135,6 @@ uint32 C_HexFile::ByteCount(void) const
 //              ERR_CANT_OPEN_FILE      0xF0000000
 //
 //              xxxxxxx = error line number of input file
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  24.09.04    U. Herb     load also motorola S-Record files
-//  07.04.00    U. Herb     function created
 //************************************************************************
 uint32 C_HexFile::LoadFromFile(const charn * const opcn_FileName)
 {
@@ -205,6 +180,16 @@ uint32 C_HexFile::LoadFromFile(const charn * const opcn_FileName)
                RemoveFirst();                            // remove first element (zero offset)
             }
          }
+         else
+         {
+            //Release created file pointer
+            (void)fclose(pt_File);
+         }
+      }
+      else
+      {
+         //Release created file pointer
+         (void)fclose(pt_File);
       }
    }
 
@@ -220,7 +205,6 @@ uint32 C_HexFile::LoadFromFile(const charn * const opcn_FileName)
 //************************************************************************
 // .FUNCTION    LoadIntelHex
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //  - HexFile.LoadIntelHex load a Intel HEX file into memory
@@ -238,10 +222,6 @@ uint32 C_HexFile::LoadFromFile(const charn * const opcn_FileName)
 //              ERR_NOT_ENOUGH_MEMORY   0xExxxxxxx
 //
 //              xxxxxxx = error line number of input file
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  24.09.04    U. Herb     code separated from function LoadFromFile
 //************************************************************************
 uint32 C_HexFile::LoadIntelHex(std::FILE * const opt_File)
 {
@@ -344,7 +324,6 @@ uint32 C_HexFile::LoadIntelHex(std::FILE * const opt_File)
 //************************************************************************
 // .FUNCTION    LoadSRecord
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //  - HexFile.LoadSRecord load a Motorola S_Record file into memory
@@ -352,7 +331,7 @@ uint32 C_HexFile::LoadIntelHex(std::FILE * const opt_File)
 //    all records are sorted by address, for address offset
 //    Intel32 offset commands are used
 //------------------------------------------------------------------------
-// .PARAMETERS  opt_File  e             file handle
+// .PARAMETERS  opt_File                file handle
 //------------------------------------------------------------------------
 // .RETURNVALUE
 //              NO_ERR                  0x00000000
@@ -362,10 +341,6 @@ uint32 C_HexFile::LoadIntelHex(std::FILE * const opt_File)
 //              ERR_NOT_ENOUGH_MEMORY   0xExxxxxxx
 //
 //              xxxxxxx = error line number of input file
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  24.09.05    U. Herb     function created
 //************************************************************************
 uint32 C_HexFile::LoadSRecord(std::FILE * const opt_File)
 {
@@ -448,7 +423,6 @@ uint32 C_HexFile::LoadSRecord(std::FILE * const opt_File)
 //************************************************************************
 // .FUNCTION    GetFileType
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //  - check if input file opt_File is intel-hex or motorola srecord
@@ -461,11 +435,6 @@ uint32 C_HexFile::LoadSRecord(std::FILE * const opt_File)
 //              ERR_HEXLINE_CHECKSUM    0x9xxxxxxx
 //
 //              xxxxxxx = error line number of input file
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  01.07.10    A. Stangl   made ors32_FileType a reference to prevent pointer trouble
-//  24.09.05    U. Herb     function created
 //************************************************************************
 uint32 C_HexFile::GetFileType(std::FILE * const opt_File, sint32 & ors32_FileType) const
 {
@@ -512,7 +481,6 @@ uint32 C_HexFile::GetFileType(std::FILE * const opt_File, sint32 & ors32_FileTyp
 //************************************************************************
 // .FUNCTION    Optimize
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //  - HexFile.Optimize Intel HEX file into memory
@@ -531,10 +499,6 @@ uint32 C_HexFile::GetFileType(std::FILE * const opt_File, sint32 & ors32_FileTyp
 //              WRN_RECORD_OVERLAY      0x2xxxxxxx (xxxxxxx = lowest 7 nibbles of the offending address)
 //              ERR_NOT_ENOUGH_MEMORY   0xE0000000
 //              ERR_NO_DATA             0xB0000000
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  11.12.03    U. Herb     function created
 //************************************************************************
 uint32 C_HexFile::OptimizeLinear(const uint32 ou32_RecSize, const sint32 os32_FillFlag, const uint8 ou8_FillPattern)
 {
@@ -604,8 +568,6 @@ uint32 C_HexFile::OptimizeLinear(const uint32 ou32_RecSize, const sint32 os32_Fi
    WRN_RECORD_OVERLAY     -> address used twice (lowest 7 nibbles contain lowest 7 nibbles of the offending address)
    ERR_NOT_ENOUGH_MEMORY  -> PC out of memory
    ERR_NO_DATA            -> no hex file data available
-
-   \created     21.03.2012  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 uint32 C_HexFile::Optimize(const uint32 ou32_RecSize)
@@ -629,7 +591,6 @@ uint32 C_HexFile::Optimize(const uint32 ou32_RecSize)
 //************************************************************************
 // .FUNCTION    SaveToFile
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //  - HexFile.SaveToFile stores the Intel HEX data from memory into file
@@ -639,10 +600,6 @@ uint32 C_HexFile::Optimize(const uint32 ou32_RecSize)
 // .RETURNVALUE
 //              NO_ERR                  0x00000000
 //              ERR_CANT_OPEN_FILE      0xF0000000
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  07.04.00    U. Herb     function created
 //************************************************************************
 uint32 C_HexFile::SaveToFile(const charn * const opcn_FileName)
 {
@@ -676,7 +633,6 @@ uint32 C_HexFile::SaveToFile(const charn * const opcn_FileName)
 //************************************************************************
 // .FUNCTION    NextLineString
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //  - HexFile.NextLineString returns next HEX line as C-String
@@ -685,10 +641,6 @@ uint32 C_HexFile::SaveToFile(const charn * const opcn_FileName)
 //------------------------------------------------------------------------
 // .RETURNVALUE
 //              NULL if no data available
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  12.12.03    U. Herb     function created
 //************************************************************************
 const charn * C_HexFile::NextLineString(void)
 {
@@ -706,7 +658,6 @@ const charn * C_HexFile::NextLineString(void)
 //************************************************************************
 // .FUNCTION    NextBinData
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //  - HexFile.NextBinData returns pointer to next HEX line binary data
@@ -719,11 +670,6 @@ const charn * C_HexFile::NextLineString(void)
 //              NULL if no data available
 //              oru32_Address returns 32bit data address
 //              oru8_Size returns number of data bytes
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  01.07.10    A. Stangl   made parameters references to prevent pointer trouble
-//  13.04.04    U. Herb     function created
 //************************************************************************
 const uint8 * C_HexFile::NextBinData(uint32 & oru32_Address, uint8 & oru8_Size)
 {
@@ -752,7 +698,6 @@ const uint8 * C_HexFile::NextBinData(uint32 & oru32_Address, uint8 & oru8_Size)
 //************************************************************************
 // .FUNCTION    InitHexFile
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //    InitHexFile initialize class internal variables
@@ -761,10 +706,6 @@ const uint8 * C_HexFile::NextBinData(uint32 & oru32_Address, uint8 & oru8_Size)
 // .PARAMETERS  void
 //------------------------------------------------------------------------
 // .RETURNVALUE void
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  07.04.00    U. Herb     function created
 //************************************************************************
 void C_HexFile::InitHexFile(void)
 {
@@ -785,7 +726,6 @@ void C_HexFile::InitHexFile(void)
 //************************************************************************
 // .FUNCTION    ClearHexFile
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //    Clear frees all dynamic allocated memory
@@ -794,12 +734,8 @@ void C_HexFile::InitHexFile(void)
 // .PARAMETERS  void
 //------------------------------------------------------------------------
 // .RETURNVALUE void
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  07.04.00    U. Herb     function created
 //************************************************************************
-void C_HexFile::Clear()
+void C_HexFile::Clear(void)
 {
    const T_HexLine * pt_HexLine;
    const T_HexLine * pt_NextLine;
@@ -832,7 +768,6 @@ void C_HexFile::Clear()
 //************************************************************************
 // .FUNCTION    CopyHex2Mem
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //    copy HEX file data to memory image
@@ -845,12 +780,6 @@ void C_HexFile::Clear()
 //              WRN_RECORD_OVERLAY      0x2xxxxxxx
 //
 //              xxxxxxx = lowest 7 nibbles of the offending address
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  31.03.06    A. Stangl   on error encode the absolute address into the error code
-//                           (instead of the line in the hex-file)
-//  11.12.03    U. Herb     function created
 //************************************************************************
 uint32 C_HexFile::CopyHex2Mem(uint16 * const opu16_BinImage, const uint32 ou32_Offset)
 {
@@ -905,7 +834,6 @@ uint32 C_HexFile::CopyHex2Mem(uint16 * const opu16_BinImage, const uint32 ou32_O
 //************************************************************************
 // .FUNCTION    CreateHexFile
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //  Create hex file data from binary memory image
@@ -920,12 +848,6 @@ uint32 C_HexFile::CopyHex2Mem(uint16 * const opu16_BinImage, const uint32 ou32_O
 //              ERR_NOT_ENOUGH_MEMORY   0xExxxxxxx
 //
 //              xxxxxxx = line number of optimized file
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  23.09.08    A. Stangl   block offset is considered when checking for record size
-//  23.04.08    A. Stangl   update dwNumRawBytes
-//  11.12.03    U. Herb     function created
 //************************************************************************
 uint32 C_HexFile::CreateHexFile(const uint16 * const opu16_BinImage, const uint32 ou32_Offset, const uint32 ou32_Size,
                                 const uint32 ou32_RecSize)
@@ -1045,8 +967,6 @@ uint32 C_HexFile::CreateHexFile(const uint16 * const opu16_BinImage, const uint3
    \return
    NO_ERR                   no problems
    else                     error
-
-   \created     21.03.2012  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 uint32 C_HexFile::CreateHexFile(const C_HexDataDump & orc_Dump, const uint32 ou32_RecSize)
@@ -1160,7 +1080,6 @@ uint32 C_HexFile::CreateHexFile(const C_HexDataDump & orc_Dump, const uint32 ou3
 //************************************************************************
 // .FUNCTION    CloseRecord
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //    if open flag is set: store record data, clear open flag
@@ -1173,11 +1092,6 @@ uint32 C_HexFile::CreateHexFile(const C_HexDataDump & orc_Dump, const uint32 ou3
 //              ERR_NOT_ENOUGH_MEMORY   0xExxxxxxx
 //
 //              xxxxxxx = line number of optimized file
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  01.07.10    A. Stangl   made orq_RecordOpen a reference to prevent pointer trouble
-//  11.12.03    U. Herb     function created
 //************************************************************************
 uint32 C_HexFile::CloseRecord(charn * const opcn_Record, bool & orq_RecordOpen)
 {
@@ -1197,7 +1111,6 @@ uint32 C_HexFile::CloseRecord(charn * const opcn_Record, bool & orq_RecordOpen)
 //************************************************************************
 // .FUNCTION    HexLineString
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //  - HexFile.HexLineString converts binary HexLine stored in pbHexLine
@@ -1206,10 +1119,6 @@ uint32 C_HexFile::CloseRecord(charn * const opcn_Record, bool & orq_RecordOpen)
 // .PARAMETERS  opu8_HexLine  pointer to binary HexLine
 //------------------------------------------------------------------------
 // .RETURNVALUE pointer to C-String
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  12.12.00    U. Herb     function created
 //************************************************************************
 const charn * C_HexFile::HexLineString(const uint8 * const opu8_HexLine) //const
 {
@@ -1233,7 +1142,6 @@ const charn * C_HexFile::HexLineString(const uint8 * const opu8_HexLine) //const
 //************************************************************************
 // .FUNCTION    GetIHexCommand
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //    GetIHexCommand    fetch intel command byte from new HEX line
@@ -1249,11 +1157,6 @@ const charn * C_HexFile::HexLineString(const uint8 * const opu8_HexLine) //const
 //              ERR_HEXLINE_COMMAND     0xAxxxxxxx
 //
 //              xxxxxxx = line number of input file
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  01.07.10    A. Stangl   made oru8_Command a reference to prevent pointer trouble
-//  07.04.00    U. Herb     function created
 //************************************************************************
 uint32 C_HexFile::GetIHexCommand(const charn * const opcn_String, uint8 & oru8_Command) const
 {
@@ -1309,7 +1212,6 @@ uint32 C_HexFile::GetIHexCommand(const charn * const opcn_String, uint8 & oru8_C
 //************************************************************************
 // .FUNCTION    GetSRecordType
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //    GetSRecordType fetch s-record type from new HEX line
@@ -1324,11 +1226,6 @@ uint32 C_HexFile::GetIHexCommand(const charn * const opcn_String, uint8 & oru8_C
 //              ERR_HEXLINE_COMMAND     0xAxxxxxxx
 //
 //              xxxxxxx = line number of input file
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  01.07.10    A. Stangl   made oru8_RecordType a reference to prevent pointer trouble
-//  24.09.04    U. Herb     function created
 //************************************************************************
 uint32 C_HexFile::GetSRecordType(const charn * const opcn_String, uint8 & oru8_RecordType) const
 {
@@ -1380,7 +1277,6 @@ uint32 C_HexFile::GetSRecordType(const charn * const opcn_String, uint8 & oru8_R
 //************************************************************************
 // .FUNCTION    GetIntelAddress
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //    GetAddress fetch start address from new HEX line
@@ -1397,11 +1293,6 @@ uint32 C_HexFile::GetSRecordType(const charn * const opcn_String, uint8 & oru8_R
 //              ERR_HEXLINE_SYNTAX      0x8xxxxxxx
 //
 //              xxxxxxx = line number of input file
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  01.07.10    A. Stangl   made oru32_Adr a reference to prevent pointer trouble
-//  07.04.00    U. Herb     function created
 //************************************************************************
 uint32 C_HexFile::GetIntelAddress(const charn * const opcn_String, const uint8 ou8_Command, uint32 & oru32_Adr) const
 {
@@ -1451,7 +1342,6 @@ uint32 C_HexFile::GetIntelAddress(const charn * const opcn_String, const uint8 o
 //************************************************************************
 // .FUNCTION    GetSRecordAddress
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //    GetAddress fetch start address from new HEX line
@@ -1468,11 +1358,6 @@ uint32 C_HexFile::GetIntelAddress(const charn * const opcn_String, const uint8 o
 //              ERR_HEXLINE_SYNTAX      0x8xxxxxxx
 //
 //              xxxxxxx = line number of input file
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  01.07.10    A. Stangl   made oru32_Adr a reference to prevent pointer trouble
-//  07.04.00    U. Herb     function created
 //************************************************************************
 uint32 C_HexFile::GetSRecordAddress(const charn * const opcn_String, const uint8 ou8_RecordType,
                                     uint32 & oru32_Adr) const
@@ -1522,7 +1407,6 @@ uint32 C_HexFile::GetSRecordAddress(const charn * const opcn_String, const uint8
 //************************************************************************
 // .FUNCTION    SetDataPtr
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //    SetDataPtr set the internal data pointer to the element with lower
@@ -1533,10 +1417,6 @@ uint32 C_HexFile::GetSRecordAddress(const charn * const opcn_String, const uint8
 // .PARAMETERS  ou32_Adr   new address (from new HEX line)
 //------------------------------------------------------------------------
 // .RETURNVALUE void
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  07.04.00	U. Herb     function created
 //************************************************************************
 void C_HexFile::SetDataPtr(const uint32 ou32_Adr)
 {
@@ -1563,7 +1443,6 @@ void C_HexFile::SetDataPtr(const uint32 ou32_Adr)
 //************************************************************************
 // .FUNCTION    SetXAdrPtr
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //    SetXAdrPtr set the internal data pointer to the element with lower
@@ -1577,10 +1456,6 @@ void C_HexFile::SetDataPtr(const uint32 ou32_Adr)
 //------------------------------------------------------------------------
 // .RETURNVALUE true  address offset record don't exist
 //              false address offset record already exist
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  07.04.00    U. Herb     function created
 //************************************************************************
 uint32 C_HexFile::SetXAdrPtr(const uint32 ou32_Adr)
 {
@@ -1627,7 +1502,6 @@ uint32 C_HexFile::SetXAdrPtr(const uint32 ou32_Adr)
 //************************************************************************
 // .FUNCTION    SetEOFPtr
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //    SetEOFPtr set the internal data pointer to last element
@@ -1637,10 +1511,6 @@ uint32 C_HexFile::SetXAdrPtr(const uint32 ou32_Adr)
 // .PARAMETERS  void
 //------------------------------------------------------------------------
 // .RETURNVALUE void
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  07.04.00	U. Herb     function created
 //************************************************************************
 void C_HexFile::SetEOFPtr(void)
 {
@@ -1650,7 +1520,6 @@ void C_HexFile::SetEOFPtr(void)
 //************************************************************************
 // .FUNCTION    AddHexLine
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //    AddHexLine insert new HEX line as new data element at current
@@ -1665,10 +1534,6 @@ void C_HexFile::SetEOFPtr(void)
 //              ERR_NOT_ENOUGH_MEMORY   0xExxxxxxx
 //
 //              xxxxxxx = line number of input file
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  07.04.00	U. Herb     function created
 //************************************************************************
 uint32 C_HexFile::AddHexLine(const charn * const opcn_String)
 {
@@ -1727,7 +1592,6 @@ uint32 C_HexFile::AddHexLine(const charn * const opcn_String)
 //************************************************************************
 // .FUNCTION    CopyData
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //    CopyData copy data from new HEX line into new data element
@@ -1744,10 +1608,6 @@ uint32 C_HexFile::AddHexLine(const charn * const opcn_String)
 //              ERR_HEXLINE_CHECKSUM    0x9xxxxxxx
 //
 //              xxxxxxx = line number of input file
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  07.04.00    U. Herb     function created
 //************************************************************************
 uint32 C_HexFile::CopyData(const charn * const opcn_String, T_HexLine * const opt_HexLine, const uint32 ou32_Length)
 {
@@ -1811,7 +1671,6 @@ uint32 C_HexFile::CopyData(const charn * const opcn_String, T_HexLine * const op
 //************************************************************************
 // .FUNCTION    RemoveFirst
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //    RemoveFirst removes first HEX record entry
@@ -1820,10 +1679,6 @@ uint32 C_HexFile::CopyData(const charn * const opcn_String, T_HexLine * const op
 // .PARAMETERS  void
 //------------------------------------------------------------------------
 // .RETURNVALUE void
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  07.04.00    U. Herb     function created
 //************************************************************************
 void C_HexFile::RemoveFirst(void)
 {
@@ -1863,7 +1718,6 @@ void C_HexFile::RemoveFirst(void)
 //************************************************************************
 // .FUNCTION    ConvOffs16To32
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //    ConvOffs16To32 convert a Intel16 offset command to Intel32 offset
@@ -1875,10 +1729,6 @@ void C_HexFile::RemoveFirst(void)
 //              ERR_HEXLINE_SYNTAX      0x8xxxxxxx
 //
 //              xxxxxxx = line number of input file
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  07.04.00    U. Herb     function created
 //************************************************************************
 uint32 C_HexFile::ConvOffs16To32(charn * const opcn_String) const
 {
@@ -1906,7 +1756,6 @@ uint32 C_HexFile::ConvOffs16To32(charn * const opcn_String) const
 //************************************************************************
 // .FUNCTION    ConvRec16ToRec32
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //    ConvOffs16To32 convert Intel16 data records to Intel32 data records
@@ -1923,10 +1772,6 @@ uint32 C_HexFile::ConvOffs16To32(charn * const opcn_String) const
 //              ERR_NOT_ENOUGH_MEMORY   0xExxxxxxx
 //
 //              xxxxxxx = line number of input file
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  07.04.00    U. Herb     function created
 //************************************************************************
 uint32 C_HexFile::ConvRec16ToRec32(charn * const opcn_String)
 {
@@ -2027,7 +1872,6 @@ uint32 C_HexFile::ConvRec16ToRec32(charn * const opcn_String)
 //************************************************************************
 // .FUNCTION    SetOffset
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //    SetOffset insert a Intel32 offset command at address dwAdr
@@ -2042,10 +1886,6 @@ uint32 C_HexFile::ConvRec16ToRec32(charn * const opcn_String)
 //              ERR_NOT_ENOUGH_MEMORY   0xExxxxxxx
 //
 //              xxxxxxx = line number of input file
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  07.04.00    U. Herb     function created
 //************************************************************************
 uint32 C_HexFile::SetOffset(const uint32 ou32_Adr)
 {
@@ -2065,7 +1905,6 @@ uint32 C_HexFile::SetOffset(const uint32 ou32_Adr)
 //************************************************************************
 // .FUNCTION    CalcCheck
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //    CalcCheck calculate and insert checksum into HEX line
@@ -2075,10 +1914,6 @@ uint32 C_HexFile::SetOffset(const uint32 ou32_Adr)
 // .RETURNVALUE
 //              NO_ERR                  0x00000000
 //              ERR_HEXLINE_SYNTAX      0x80000000
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  07.04.00    U. Herb     function created
 //************************************************************************
 uint32 C_HexFile::CalcCheck(charn * const opcn_String)
 {
@@ -2115,7 +1950,6 @@ uint32 C_HexFile::CalcCheck(charn * const opcn_String)
 //************************************************************************
 // .FUNCTION    GetByte
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //    GetByte read byte out of HEX line at position dwIndex
@@ -2127,11 +1961,6 @@ uint32 C_HexFile::CalcCheck(charn * const opcn_String)
 // .RETURNVALUE
 //              NO_ERR                  0x00000000
 //              ERR_HEXLINE_SYNTAX      0x80000000
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  01.07.10    A. Stangl   made oru8_Data a reference to prevent pointer trouble
-//  07.04.00    U. Herb     function created
 //************************************************************************
 uint32 C_HexFile::GetByte(const charn * const opcn_String, const uint32 ou32_Index, uint8 & oru8_Data)
 {
@@ -2185,7 +2014,6 @@ uint32 C_HexFile::GetByte(const charn * const opcn_String, const uint32 ou32_Ind
 //************************************************************************
 // .FUNCTION    SetByte
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //    SetByte write one byte into HEX line at position dwIndex
@@ -2195,10 +2023,6 @@ uint32 C_HexFile::GetByte(const charn * const opcn_String, const uint32 ou32_Ind
 //              ou8_Data      data to write
 //------------------------------------------------------------------------
 // .RETURNVALUE void
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  07.04.00    U. Herb     function created
 //************************************************************************
 void C_HexFile::SetByte(charn * const opcn_String, const uint32 ou32_Index, const uint8 ou8_Byte)
 {
@@ -2227,7 +2051,6 @@ void C_HexFile::SetByte(charn * const opcn_String, const uint32 ou32_Index, cons
 //************************************************************************
 // .FUNCTION    GetWord
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //    GetWord read word out of HEX line at position dwIndex
@@ -2239,11 +2062,6 @@ void C_HexFile::SetByte(charn * const opcn_String, const uint32 ou32_Index, cons
 // .RETURNVALUE
 //              NO_ERR                  0x00000000
 //              ERR_HEXLINE_SYNTAX      0x80000000
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  01.07.10    A. Stangl   made oru32_Word a reference to prevent pointer trouble
-//  07.04.00    U. Herb     function created
 //************************************************************************
 uint32 C_HexFile::GetWord(const charn * const opcn_String, const uint32 ou32_Index, uint32 & oru32_Word)
 {
@@ -2267,7 +2085,6 @@ uint32 C_HexFile::GetWord(const charn * const opcn_String, const uint32 ou32_Ind
 //************************************************************************
 // .FUNCTION    SetWord
 // .GROUP
-// .AUTHOR      Herb
 //------------------------------------------------------------------------
 // .DESCRIPTION
 //    SetWord write one word into HEX line at position ou32_Index
@@ -2277,10 +2094,6 @@ uint32 C_HexFile::GetWord(const charn * const opcn_String, const uint32 ou32_Ind
 //              ou32_Data    data to write
 //------------------------------------------------------------------------
 // .RETURNVALUE void
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  07.04.00    U. Herb     function created
 //************************************************************************
 void C_HexFile::SetWord(charn * const opcn_String, const uint32 ou32_Index, const uint32 ou32_Data)
 {
@@ -2290,7 +2103,6 @@ void C_HexFile::SetWord(charn * const opcn_String, const uint32 ou32_Index, cons
 
 //------------------------------------------------------------------------
 
-//08.05.08   AST   corrected error code when we can't allocate enough memory (was: WRN_RECORD_OVERLAY)
 //check whether data from hexfile is valid
 //- address used twice
 uint32 C_HexFile::Validate(void)
@@ -2321,14 +2133,14 @@ uint32 C_HexFile::LineCount(void) const
 }
 
 //------------------------------------------------------------------------
-// ASW: Minmale Adresse Hex-File
+
 uint32 C_HexFile::MinAdr(void) const
 {
    return (mu32_MinAdr);
 }
 
 //------------------------------------------------------------------------
-// ASW: Maximale Adresse Hex-File
+
 uint32 C_HexFile::MaxAdr(void) const
 {
    return (mu32_MaxAdr);
@@ -2385,15 +2197,6 @@ const uint8 * C_HexFile::NextLine(void)
    -1       error (data not found at specified address)
    -2       data read (result in opu8_Data), but not all bytes were available before the next memory gap after
              ou32_Address
-
-   \created     10.07.2008  STW/A.Stangl
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   01.07.2010        STW/A.Stangl  made "oru16_NumBytes" a reference to prevent pointer trouble
-   10.07.2008        STW/A.Stangl  function created
-   \endhistory
 */
 //-----------------------------------------------------------------------------
 sint32 C_HexFile::GetDataByAddress(const uint32 ou32_Address, uint16 & oru16_NumBytes, uint8 * const opu8_Data)
@@ -2454,15 +2257,6 @@ sint32 C_HexFile::GetDataByAddress(const uint32 ou32_Address, uint16 & oru16_Num
    \return
    >= 0     pattern found (index within opu8_Buffer)
    -1       error (pattern not found)
-
-   \created     10.07.2008  STW/A.Stangl
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   13.08.2008        STW/A.Stangl  BufSize parameter is now 32bit (was 16bit)
-   10.07.2008        STW/A.Stangl  function created
-   \endhistory
 */
 //-----------------------------------------------------------------------------
 sint32 C_HexFile::prv_FindPattern(const uint8 * const opu8_Buffer, const uint8 * const opu8_Pattern,
@@ -2514,15 +2308,6 @@ sint32 C_HexFile::prv_FindPattern(const uint8 * const opu8_Buffer, const uint8 *
    \return
    0        pattern found (address in opu32_Address)
    -1       error (pattern not found)
-
-   \created     10.07.2008  STW/A.Stangl
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   01.07.2010        STW/A.Stangl  made "oru32_Address" a reference to prevent pointer trouble
-   10.07.2008        STW/A.Stangl  function created
-   \endhistory
 */
 //-----------------------------------------------------------------------------
 sint32 C_HexFile::FindPattern(uint32 & oru32_Address, const uint8 ou8_PatternLength,
@@ -2597,15 +2382,6 @@ sint32 C_HexFile::FindPattern(uint32 & oru32_Address, const uint8 ou8_PatternLen
    \return
    address  OK (address of data)
    NULL     error
-
-   \created     10.07.2008  STW/A.Stangl
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   14.07.2008        STW/A.Stangl  fixed for address offsets > sint32 max.
-   10.07.2008        STW/A.Stangl  function created
-   \endhistory
 */
 //-----------------------------------------------------------------------------
 const C_HexDataDump * C_HexFile::GetDataDump(uint32 & oru32_ErrorResult)
@@ -2760,8 +2536,6 @@ const C_HexDataDump * C_HexFile::GetDataDump(uint32 & oru32_ErrorResult)
 
    \return
    Offending address when generating last WRN_RECORD_OVERLAY return code.
-
-   \created     23.03.2012  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 uint32 C_HexFile::GetLastOverlayErrorAddress(void) const

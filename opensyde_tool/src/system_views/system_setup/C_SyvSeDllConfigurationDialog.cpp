@@ -1,17 +1,11 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Dialog for choosing and configuring the CAN communication DLL
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     04.07.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #include "precomp_headers.h"
 
 #include <QFile>
@@ -30,7 +24,7 @@
 #include "C_OgeWiCustomMessage.h"
 #include "C_ImpUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
@@ -38,29 +32,26 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_can;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_parent Optional pointer to parent
-
-   \created     04.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvSeDllConfigurationDialog::C_SyvSeDllConfigurationDialog(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvSeDllConfigurationDialog),
@@ -96,27 +87,21 @@ C_SyvSeDllConfigurationDialog::C_SyvSeDllConfigurationDialog(stw_opensyde_gui_el
            this, &C_SyvSeDllConfigurationDialog::m_OnBrowse);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     04.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvSeDllConfigurationDialog::~C_SyvSeDllConfigurationDialog()
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initializes all visible strings on the widget
-
-   \created     04.07.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initializes all visible strings on the widget
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeDllConfigurationDialog::InitText(void) const
 {
    this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("PC CAN Interface"));
@@ -134,15 +119,12 @@ void C_SyvSeDllConfigurationDialog::InitText(void) const
    this->mpc_Ui->pc_PushButtonBrowse->setText(C_GtGetText::h_GetText("..."));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the CAN DLL type.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the CAN DLL type.
 
    \param[in]     oe_Type       CAN DLL type
-
-   \created     07.02.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeDllConfigurationDialog::SetDllType(const C_PuiSvPc::E_CANDllType oe_Type) const
 {
    // toggle radio button depending on type
@@ -171,44 +153,35 @@ void C_SyvSeDllConfigurationDialog::SetDllType(const C_PuiSvPc::E_CANDllType oe_
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the custom CAN DLL path.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the custom CAN DLL path.
 
    \param[in]     orc_Path       Path of the CAN DLL
-
-   \created     05.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeDllConfigurationDialog::SetCustomDllPath(const QString & orc_Path) const
 {
    // set line edit text to last known custom path
    this->mpc_Ui->pc_LineEditCustomDllPath->SetPath(orc_Path, C_Uti::h_GetExePath());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the bitrate for the test connection in bit/s
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the bitrate for the test connection in bit/s
 
    \param[in]     ou64_Bitrate     Bitrate for test connection
-
-   \created     07.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeDllConfigurationDialog::SetBitrate(const uint64 ou64_Bitrate)
 {
    this->mu64_Bitrate = ou64_Bitrate;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get CAN DLL type.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get CAN DLL type.
 
    \return     CAN DLL type (PEAK/VECTOR/Other)
-
-   \created     07.02.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSvPc::E_CANDllType C_SyvSeDllConfigurationDialog::GetDllType(void) const
 {
    C_PuiSvPc::E_CANDllType e_Type;
@@ -229,35 +202,29 @@ C_PuiSvPc::E_CANDllType C_SyvSeDllConfigurationDialog::GetDllType(void) const
    return e_Type;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get custom CAN DLL path.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get custom CAN DLL path.
 
    \return     path of custom CAN DLL
-
-   \created     05.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvSeDllConfigurationDialog::GetCustomDllPath(void) const
 {
    QString c_Path;
 
-   c_Path = this->mpc_Ui->pc_LineEditCustomDllPath->GetCompletePath();
+   c_Path = this->mpc_Ui->pc_LineEditCustomDllPath->GetPath();
 
    return c_Path;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     02.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeDllConfigurationDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
@@ -283,31 +250,25 @@ void C_SyvSeDllConfigurationDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of OK button click
-
-   \created     16.08.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of OK button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeDllConfigurationDialog::m_OkClicked(void) const
 {
    this->mrc_ParentDialog.accept();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Cancel button
-
-   \created     04.07.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Cancel button
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeDllConfigurationDialog::m_CancelClicked(void) const
 {
    this->mrc_ParentDialog.reject();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeDllConfigurationDialog::m_ConfigureDllClicked(void) const
 {
    const QString c_Path = C_Uti::h_GetAbsolutePathFromExe(this->m_GetAbsoluteDllPath());
@@ -340,7 +301,7 @@ void C_SyvSeDllConfigurationDialog::m_ConfigureDllClicked(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeDllConfigurationDialog::m_TestConnectionClicked(void) const
 {
    // 3 of 4 message cases are of type "failed"
@@ -394,19 +355,19 @@ void C_SyvSeDllConfigurationDialog::m_TestConnectionClicked(void) const
    c_MessageBox.Execute();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeDllConfigurationDialog::m_ConcretDllClicked(void) const
 {
    this->m_ShowCustomDllPath(false);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeDllConfigurationDialog::m_OtherDllClicked(void) const
 {
    this->m_ShowCustomDllPath(true);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeDllConfigurationDialog::m_ShowCustomDllPath(const bool oq_Active) const
 {
    this->mpc_Ui->pc_LabelCustomDllPath->setVisible(oq_Active);
@@ -415,19 +376,16 @@ void C_SyvSeDllConfigurationDialog::m_ShowCustomDllPath(const bool oq_Active) co
    this->mpc_Ui->pc_PushButtonBrowse->setVisible(oq_Active);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for browse button click.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for browse button click.
 
    Browse for CAN DLL.
-
-   \created     07.02.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeDllConfigurationDialog::m_OnBrowse(void)
 {
    QString c_Path = "";
-   QString c_Folder = this->mpc_Ui->pc_LineEditCustomDllPath->GetCompletePath();
+   QString c_Folder = this->mpc_Ui->pc_LineEditCustomDllPath->GetPath();
    const QString c_Filter = QString(C_GtGetText::h_GetText("CAN DLL ")) + "(*.dll)";
    QFileDialog c_Dialog(this, C_GtGetText::h_GetText("Select CAN DLL"), c_Folder, c_Filter);
 
@@ -454,16 +412,13 @@ void C_SyvSeDllConfigurationDialog::m_OnBrowse(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the absolute CAN DLL path of currently selected DLL.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the absolute CAN DLL path of currently selected DLL.
 
    \return
    Absolute CAN DLL path
-
-   \created     08.02.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvSeDllConfigurationDialog::m_GetAbsoluteDllPath(void) const
 {
    QString c_Return;

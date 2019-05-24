@@ -1,18 +1,11 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Utility class for CAN specific operations (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     12.09.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -37,10 +30,7 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     12.09.2018  STW/B.Bayer
+/*! \brief   Default constructor
 */
 //-----------------------------------------------------------------------------
 C_OSCCanUtil::C_OSCCanUtil(void)
@@ -48,8 +38,7 @@ C_OSCCanUtil::C_OSCCanUtil(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Checks if signal fits into a CAN message with a specific DLC
+/*! \brief   Checks if signal fits into a CAN message with a specific DLC
 
    \param[in]     ou8_Dlc        Length of CAN message
    \param[in]     orc_Signal     Signal for checking
@@ -57,8 +46,6 @@ C_OSCCanUtil::C_OSCCanUtil(void)
    \return
    true     Signal fits into message
    false    Signal does not fit into message
-
-   \created     23.10.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 bool C_OSCCanUtil::h_IsSignalInMessage(const uint8 ou8_Dlc, const C_OSCCanSignal & orc_Signal)
@@ -82,16 +69,13 @@ bool C_OSCCanUtil::h_IsSignalInMessage(const uint8 ou8_Dlc, const C_OSCCanSignal
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Gets value for signal out of CAN message data bytes
+/*! \brief   Gets value for signal out of CAN message data bytes
 
    Signals will be converted to little endian (Intel)
 
    \param[in]     orau8_CanDb        Data bytes of CAN message
    \param[in]     orc_Signal         Signal configuration used for extraction
    \param[in,out] orc_DataPoolData   Data with extracted value (Size must be already set)
-
-   \created     13.09.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCCanUtil::h_GetSignalValue(const uint8(&orau8_CanDb)[8], const C_OSCCanSignal & orc_Signal,
@@ -202,14 +186,11 @@ void C_OSCCanUtil::h_GetSignalValue(const uint8(&orau8_CanDb)[8], const C_OSCCan
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Gets value for signal out of CAN message data bytes
+/*! \brief   Gets value for signal out of CAN message data bytes
 
    \param[in]     orau8_CanDb    Data bytes of CAN message
    \param[in]     orc_Signal     Signal configuration used for extraction
    \param[in,out] orc_Value      Extracted value and source for size of value
-
-   \created     13.09.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCCanUtil::h_GetSignalValue(const uint8(&orau8_CanDb)[8], const C_OSCCanSignal & orc_Signal,
@@ -225,16 +206,13 @@ void C_OSCCanUtil::h_GetSignalValue(const uint8(&orau8_CanDb)[8], const C_OSCCan
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Copy data bytes from data pool data to message payload data according to endianness.
+/*! \brief   Copy data bytes from data pool data to message payload data according to endianness.
 
    copied from: module: comm_stack/osy_com_utils.c function: m_fill_message_payload_from_data_pool_data
 
    \param[in,out] orau8_CanDb Current data bytes of CAN message
    \param[in]     orc_Signal  Current signal
    \param[in]     orc_Value   Data from data pool to write into the message
-
-   \created     21.01.2019  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCCanUtil::h_SetSignalValue(uint8 (&orau8_CanDb)[8], const C_OSCCanSignal & orc_Signal,

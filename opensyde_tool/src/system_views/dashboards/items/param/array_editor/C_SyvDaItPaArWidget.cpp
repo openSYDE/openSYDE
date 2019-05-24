@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data set array edit widget
 
    Data set array edit widget
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.11.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_GtGetText.h"
 #include "C_GiSvDaParam.h"
 #include "C_PuiSdHandler.h"
@@ -24,26 +17,25 @@
 #include "C_SyvDaItPaArWidget.h"
 #include "ui_C_SyvDaItPaArWidget.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -51,10 +43,8 @@ using namespace stw_opensyde_core;
    \param[in]     oru32_ElementIndex Element index
    \param[in]     opc_DataWidget     Data widget
    \param[in]     oq_ECUValues       Optional flag if the shown values are ECU values
-
-   \created     06.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaArWidget::C_SyvDaItPaArWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
                                          const uint32 & oru32_ElementIndex,
                                          C_PuiSvDbDataElementHandler * const opc_DataWidget, const bool oq_ECUValues) :
@@ -77,27 +67,21 @@ C_SyvDaItPaArWidget::C_SyvDaItPaArWidget(stw_opensyde_gui_elements::C_OgePopUpDi
            &C_SyvDaItPaArWidget::m_CancelClicked);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     06.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaArWidget::~C_SyvDaItPaArWidget(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     06.11.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaArWidget::InitStaticNames(void)
 {
    sint32 s32_DataSetIndex = -1;
@@ -160,17 +144,14 @@ void C_SyvDaItPaArWidget::InitStaticNames(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     06.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaArWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
@@ -196,25 +177,19 @@ void C_SyvDaItPaArWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On ok clicked
-
-   \created     06.11.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On ok clicked
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaArWidget::m_OkClicked(void)
 {
    mrc_Parent.accept();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On cancel clicked
-
-   \created     06.11.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On cancel clicked
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaArWidget::m_CancelClicked(void)
 {
    mrc_Parent.reject();

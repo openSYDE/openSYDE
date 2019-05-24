@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       List edit pop up widget
 
    List edit pop up widget.
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.06.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SdNdeDataPoolListPopUp.h"
 #include "ui_C_SdNdeDataPoolListPopUp.h"
 #include "C_GtGetText.h"
@@ -25,7 +18,7 @@
 #include "TGLUtils.h"
 #include "C_OgeWiUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_opensyde_gui;
@@ -33,19 +26,18 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -57,10 +49,8 @@ using namespace stw_opensyde_gui_elements;
    \param[in,out] opc_TreeWidget       Tree widget for notification events
    \param[in,out] opc_UndoManager      Undo manager
    \param[in,out] opc_Parent           Optional pointer to parent
-
-   \created     01.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListPopUp::C_SdNdeDataPoolListPopUp(C_OgePopUpDialog & orc_Parent, const uint32 & oru32_NodeIndex,
                                                    const uint32 & oru32_DataPoolIndex, const uint32 & oru32_ListIndex,
                                                    C_SdNdeDataPoolListModelViewManager * const opc_ModelViewManager,
@@ -151,27 +141,21 @@ C_SdNdeDataPoolListPopUp::C_SdNdeDataPoolListPopUp(C_OgePopUpDialog & orc_Parent
    this->mpc_Ui->pc_WidgetTable->SelectDataElement(0);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     01.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListPopUp::~C_SdNdeDataPoolListPopUp(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initializes all visible strings on the widget
-
-   \created     02.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initializes all visible strings on the widget
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListPopUp::InitText(void) const
 {
    const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
@@ -193,13 +177,10 @@ void C_SdNdeDataPoolListPopUp::InitText(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clear list widget
-
-   \created     02.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clear list widget
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListPopUp::Clear(void) const
 {
    //Initially deactivate all buttons
@@ -214,44 +195,35 @@ void C_SdNdeDataPoolListPopUp::Clear(void) const
    this->mpc_Ui->pc_SelectionLabel->setVisible(false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Manually trigger header update
-
-   \created     02.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Manually trigger header update
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListPopUp::UpdateHeader(void) const
 {
    this->mpc_Ui->pc_WidgetHeader->SetIndex(this->mu32_ListIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get save as after close flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get save as after close flag
 
    \return
    Save as after close flag
-
-   \created     11.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolListPopUp::GetSaveAsAfterClose(void) const
 {
    return mq_SaveAsAfterClose;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    Here: Manually draw background
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     02.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListPopUp::paintEvent(QPaintEvent * const opc_Event)
 {
    QPainter c_Painter(this);
@@ -262,17 +234,14 @@ void C_SdNdeDataPoolListPopUp::paintEvent(QPaintEvent * const opc_Event)
    QWidget::paintEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: handle list paste
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     26.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListPopUp::keyPressEvent(QKeyEvent * const opc_Event)
 {
    if (this->mpc_UndoManager != NULL)
@@ -337,13 +306,10 @@ void C_SdNdeDataPoolListPopUp::keyPressEvent(QKeyEvent * const opc_Event)
    QWidget::keyPressEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize icons of buttons for all states.
-
-   \created     10.08.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize icons of buttons for all states.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListPopUp::m_InitButtonIcons(void) const
 {
    this->mpc_Ui->pc_PushButtonAdd->SetCustomIcons("://images/IconAddEnabled.svg", "://images/IconAddHovered.svg",
@@ -374,28 +340,22 @@ void C_SdNdeDataPoolListPopUp::m_InitButtonIcons(void) const
                                                     "://images/system_definition/NodeEdit/lists/PasteDisabled.svg");
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Close pop up
-
-   \created     01.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Close pop up
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListPopUp::m_Close(void)
 {
    this->mrc_Parent.accept();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle table selection change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle table selection change
 
    \param[in] oru32_ListIndex List index
    \param[in] oru32_Count     Number of selected items
-
-   \created     02.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListPopUp::m_HandleSelection(const uint32 & oru32_ListIndex, const uint32 & oru32_Count) const
 {
    QString c_Text;
@@ -429,9 +389,8 @@ void C_SdNdeDataPoolListPopUp::m_HandleSelection(const uint32 & oru32_ListIndex,
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set buttons status
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set buttons status
 
    \param[in] orq_AddActive      Push button add active
    \param[in] orq_CutActive      Push button cut active
@@ -440,10 +399,8 @@ void C_SdNdeDataPoolListPopUp::m_HandleSelection(const uint32 & oru32_ListIndex,
    \param[in] orq_DeleteActive   Push button delete active
    \param[in] orq_MoveDownActive Push button move down active
    \param[in] orq_MoveUpActive   Push button move up active
-
-   \created     02.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListPopUp::m_HandleButtonChange(const bool & orq_AddActive, const bool & orq_CutActive,
                                                     const bool & orq_CopyActive, const bool & orq_PasteActive,
                                                     const bool & orq_DeleteActive, const bool & orq_MoveDownActive,

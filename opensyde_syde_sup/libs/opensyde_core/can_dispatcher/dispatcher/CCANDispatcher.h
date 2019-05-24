@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       CAN dispatcher class
@@ -8,19 +8,13 @@
    Provides a standardized reception mechanism for incoming CAN messages.
    Multiple clients can register in order to receive all incoming CAN traffic.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     14.04.2010  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2010 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef  CCANDISPATCHERH
 #define  CCANDISPATCHERH
 
-/* -- Includes ------------------------------------------------------------ */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <deque>
 #include "stwtypes.h"
 #include "CCANBase.h"
@@ -31,7 +25,7 @@
 namespace stw_can
 {
 
-/* -- Defines ------------------------------------------------------------- */
+/* -- Defines ------------------------------------------------------------------------------------------------------- */
 #ifndef STWCAN_PACKAGE
 #ifdef __BORLANDC__
 //maybe we want this module to be put into a VCL package ...
@@ -43,7 +37,7 @@ namespace stw_can
 
 const stw_types::uint32 mu32_CAN_QUEUE_DEFAULT_MAX_SIZE = 2048U;
 
-/* -- Types --------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 ///We wrap up a deque in order to provide thread safety.
 //Also we limit the maximum size, to make sure we don't waste all of the heap if nobody clears the RX queue.
 class STWCAN_PACKAGE C_CAN_RXQueue
@@ -67,7 +61,7 @@ public:
    stw_types::sint32 GetStatus(void);
 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Reception filter configuration
 //lint -sem(stw_can::C_CAN_RXFilter::PassAll,initializer)
 class STWCAN_PACKAGE C_CAN_RXFilter
@@ -89,7 +83,7 @@ public:
    bool DoesMessagePass(const T_STWCAN_Msg_RX & orc_Message) const;
 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Information about one registered dispatch client
 class STWCAN_PACKAGE C_CAN_DispatchClient
 {
@@ -99,7 +93,7 @@ public:
    stw_types::uint16 u16_Handle; //for resyncing with pointer list
 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Extends C_CAN_Base by queuing and filtering mechanisms
 class STWCAN_PACKAGE C_CAN_Dispatcher : public C_CAN_Base
 {
@@ -148,11 +142,11 @@ public:
    virtual stw_types::sint32 CAN_Read_Msg(T_STWCAN_Msg_RX & orc_Message);
 };
 
-/* -- Global Variables ---------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Function Prototypes ------------------------------------------------- */
+/* -- Function Prototypes ------------------------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------ */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 }
 

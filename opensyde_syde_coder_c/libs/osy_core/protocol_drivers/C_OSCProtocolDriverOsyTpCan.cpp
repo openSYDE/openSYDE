@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       openSYDE protocol CAN transport-protocol
 
    For details cf. documentation in .h file.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.02.2017  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -48,12 +41,9 @@ using namespace stw_tgl;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Constructor
+/*! \brief   Constructor
 
    Initialize class fields with defaults
-
-   \created     17.03.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_OSCProtocolDriverOsyTpCan::C_ServiceState::C_ServiceState(void) :
@@ -66,14 +56,11 @@ C_OSCProtocolDriverOsyTpCan::C_ServiceState::C_ServiceState(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   constructor
+/*! \brief   constructor
 
    Set up class
 
    \param[in]  ou16_MaxServiceQueueSize   maximum number of entries in TX/RX queue
-
-   \created     24.02.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_OSCProtocolDriverOsyTpCan::C_OSCProtocolDriverOsyTpCan(const uint16 ou16_MaxServiceQueueSize) :
@@ -84,12 +71,9 @@ C_OSCProtocolDriverOsyTpCan::C_OSCProtocolDriverOsyTpCan(const uint16 ou16_MaxSe
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   destructor
+/*! \brief   destructor
 
    clean up ...
-
-   \created     24.02.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_OSCProtocolDriverOsyTpCan::~C_OSCProtocolDriverOsyTpCan(void)
@@ -104,8 +88,7 @@ C_OSCProtocolDriverOsyTpCan::~C_OSCProtocolDriverOsyTpCan(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Handle incoming single frame
+/*! \brief   Handle incoming single frame
 
    Decode and place into RX service queue.
    We already know
@@ -121,8 +104,6 @@ C_OSCProtocolDriverOsyTpCan::~C_OSCProtocolDriverOsyTpCan(void)
    C_NO_ERR     no problems; service added to RX queue
    C_CONFIG     frame invalid (DLC does not match length in PCI byte)
    C_OVERFLOW   could not add incoming service to RX queue
-
-   \created     17.03.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingSingleFrame(const T_STWCAN_Msg_RX & orc_CanMessage)
@@ -157,8 +138,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingSingleFrame(const T_STWCAN_M
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Handle incoming single frame
+/*! \brief   Handle incoming single frame
 
    Decode and place into RX service queue.
    We already know
@@ -174,8 +154,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingSingleFrame(const T_STWCAN_M
    C_NO_ERR     no problems; service added to RX queue
    C_CONFIG     frame invalid (DLC does not match length in PCI byte)
    C_OVERFLOW   could not add incoming service to RX queue
-
-   \created     26.09.2017  STW/U.Roesch
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingOsySpecificSingleFrame(const T_STWCAN_Msg_RX & orc_CanMessage)
@@ -209,8 +187,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingOsySpecificSingleFrame(const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Handle incoming first frame
+/*! \brief   Handle incoming first frame
 
    Set up new RX state machine and send out flow control.
    Invalid frames will be ignored.
@@ -229,8 +206,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingOsySpecificSingleFrame(const
    C_NO_ERR     no problems
    C_CONFIG     frame invalid (DLC is not 8)
    C_COM        could not send out flow control
-
-   \created     17.03.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingFirstFrame(const T_STWCAN_Msg_RX & orc_CanMessage)
@@ -286,8 +261,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingFirstFrame(const T_STWCAN_Ms
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Send next consecutive frames
+/*! \brief   Send next consecutive frames
 
    Try to send as many CFs as left in the TX state machine.
    Advance the TX state machine accordingly
@@ -299,8 +273,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingFirstFrame(const T_STWCAN_Ms
    C_NO_ERR     no problems: all pending CFs sent; TX state machine set to eIDLE again
    C_COM        could not send out consecutive frame (one/some might have been sent, however)
                 TX state machine still at eMORE_CONSECUTIVE_FRAMES_TO_SEND
-
-   \created     29.06.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpCan::m_SendNextConsecutiveFrames(void)
@@ -353,8 +325,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_SendNextConsecutiveFrames(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Handle incoming flow control
+/*! \brief   Handle incoming flow control
 
    Continue sending ongoing TX transfer consecutive frames when waiting for flow control.
    Invalid and unexpected frames will be ignored.
@@ -372,8 +343,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_SendNextConsecutiveFrames(void)
    C_CONFIG     frame invalid (DLC is not 3)
    C_OVERFLOW   invalid STmin or BS (only 0 supported for each)
    C_COM        could not send out following consecutive frames
-
-   \created     17.03.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingFlowControl(const T_STWCAN_Msg_RX & orc_CanMessage)
@@ -427,8 +396,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingFlowControl(const T_STWCAN_M
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Handle incoming consecutive frame
+/*! \brief   Handle incoming consecutive frame
 
    Add received data to ongoing RX transfer.
    After full service data has been received add full service to RX service queue
@@ -450,8 +418,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingFlowControl(const T_STWCAN_M
    C_CONFIG     frame invalid (DLC is too little)
    C_RANGE      invalid sequence number
    C_OVERFLOW   could not add full service to RX queue
-
-   \created     17.03.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingConsecutiveFrame(const T_STWCAN_Msg_RX & orc_CanMessage)
@@ -522,8 +488,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingConsecutiveFrame(const T_STW
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Handle incoming special openSYDE multi frame
+/*! \brief   Handle incoming special openSYDE multi frame
 
    Set up new RX state machine and send out flow control.
    Invalid frames will be ignored.
@@ -542,8 +507,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingConsecutiveFrame(const T_STW
    C_NO_ERR     no problems
    C_CONFIG     frame invalid (DLC is not 8)
    C_OVERFLOW   RX Queue overflow. Incoming consecutive frame dumped
-
-   \created     28.05.2018  STW/U.Roesch
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingOsySpecificMultiFrame(const T_STWCAN_Msg_RX & orc_CanMessage)
@@ -635,8 +598,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingOsySpecificMultiFrame(const 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Send broadcast service EnterDiagnosticSession
+/*! \brief   Send broadcast service EnterDiagnosticSession
 
    Only sends one request and returns immediately. Results are not reported.
    Purpose: hit into the time window when the devices are started to keep the devices in flashloader.
@@ -647,8 +609,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingOsySpecificMultiFrame(const 
    C_NO_ERR   no problems
    C_COM      could not send request
    C_CONFIG   no dispatcher installed
-
-   \created     23.11.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpCan::m_BroadcastSendDiagnosticSessionControl(const uint8 ou8_Session) const
@@ -682,8 +642,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_BroadcastSendDiagnosticSessionControl(cons
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Utility: compose single frame for sending
+/*! \brief   Utility: compose single frame for sending
 
    Compose single frame from specified parameters.
    Function does not check for validity of parameters (e.g. valid service size).
@@ -692,8 +651,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_BroadcastSendDiagnosticSessionControl(cons
    \param[in]  orc_Service       service to put into frame
    \param[in]  ou32_Identifier   CAN identifier to use
    \param[out] orc_CanMessage    resulting CAN message
-
-   \created     07.07.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_OSCProtocolDriverOsyTpCan::m_ComposeSingleFrame(const C_OSCProtocolDriverOsyService & orc_Service,
@@ -714,8 +671,7 @@ void C_OSCProtocolDriverOsyTpCan::m_ComposeSingleFrame(const C_OSCProtocolDriver
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Perform cyclic communication tasks for CAN-TP
+/*! \brief   Perform cyclic communication tasks for CAN-TP
 
    Perform cyclic communication tasks for CAN-TP.
    - sending and evaluation of flow controls
@@ -730,8 +686,6 @@ void C_OSCProtocolDriverOsyTpCan::m_ComposeSingleFrame(const C_OSCProtocolDriver
    C_NO_ERR   cycle finished
    C_CONFIG   no dispatcher installed
    C_COM      communication driver reported error
-
-   \created     24.02.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpCan::Cycle(void)
@@ -948,8 +902,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::Cycle(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Make server and client identifiers known to TP.
+/*! \brief   Make server and client identifiers known to TP.
 
    * remember IDs
    * clear RX queue
@@ -962,8 +915,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::Cycle(void)
    C_NO_ERR   no problems
    C_RANGE    client and/or server identifier out of range
    C_NOACT    could not reconfigure RX filters
-
-   \created     24.02.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpCan::SetNodeIdentifiers(const C_OSCProtocolDriverOsyNode & orc_ClientIdentifier,
@@ -993,8 +944,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::SetNodeIdentifiers(const C_OSCProtocolDriver
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Configure this class for broadcasting
+/*! \brief   Configure this class for broadcasting
 
    * remember client IDs
    * clear RX queue
@@ -1007,8 +957,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::SetNodeIdentifiers(const C_OSCProtocolDriver
    C_NO_ERR   no problems
    C_RANGE    client and/or server identifier out of range
    C_NOACT    could not reconfigure RX filters
-
-   \created     07.07.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpCan::SetNodeIdentifiersForBroadcasts(
@@ -1042,15 +990,12 @@ sint32 C_OSCProtocolDriverOsyTpCan::SetNodeIdentifiersForBroadcasts(
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Calculate TX ID to send request on.
+/*! \brief   Calculate TX ID to send request on.
 
    Calculate TX ID to use depending on client and server address.
 
    \return
    CAN message ID
-
-   \created     17.03.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 uint32 C_OSCProtocolDriverOsyTpCan::m_GetTxIdentifier(void) const
@@ -1078,8 +1023,7 @@ uint32 C_OSCProtocolDriverOsyTpCan::m_GetTxIdentifier(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Calculate TX ID to send broadcasts on.
+/*! \brief   Calculate TX ID to send broadcasts on.
 
    Calculate TX ID to use for broadcasts.
    Uses the client node-id as sender and the "all nodes" address as targets.
@@ -1087,8 +1031,6 @@ uint32 C_OSCProtocolDriverOsyTpCan::m_GetTxIdentifier(void) const
 
    \return
    CAN message ID
-
-   \created     07.07.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 uint32 C_OSCProtocolDriverOsyTpCan::m_GetTxBroadcastIdentifier(void) const
@@ -1098,8 +1040,7 @@ uint32 C_OSCProtocolDriverOsyTpCan::m_GetTxBroadcastIdentifier(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Set CAN dispatcher RX filter
+/*! \brief   Set CAN dispatcher RX filter
 
    Configure CAN dispatcher RX filter to receive only TP messages that we are interested in.
 
@@ -1116,8 +1057,6 @@ uint32 C_OSCProtocolDriverOsyTpCan::m_GetTxBroadcastIdentifier(void) const
    \return
    C_NO_ERR   no problems
    C_RANGE    invalid dispatcher handle
-
-   \created     17.03.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpCan::m_SetRxFilter(const bool oq_ForBroadcast)
@@ -1163,8 +1102,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_SetRxFilter(const bool oq_ForBroadcast)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Make communication dispatcher to use known
+/*! \brief   Make communication dispatcher to use known
 
    - remember pointer
    - register us as client with RX filter matching our own address
@@ -1175,8 +1113,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_SetRxFilter(const bool oq_ForBroadcast)
    C_NO_ERR   no problems
    C_CONFIG   could not register with dispatcher
    C_NOACT    could not configure RX filter
-
-   \created     24.02.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpCan::SetDispatcher(C_CAN_Dispatcher * const opc_Dispatcher)
@@ -1216,8 +1152,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::SetDispatcher(C_CAN_Dispatcher * const opc_D
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Read serial number of all devices on local bus
+/*! \brief   Read serial number of all devices on local bus
 
    Send broadcast to read device serial number.
    Report back list of nodes that sent a response (with the sent serial number and node IDs).
@@ -1233,8 +1168,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::SetDispatcher(C_CAN_Dispatcher * const opc_D
    C_NO_ERR   no problems; zero or more responses received; data placed in orc_Responses
    C_COM      could not send request
    C_CONFIG   no dispatcher installed
-
-   \created     07.07.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
@@ -1305,8 +1238,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Request all nodes on the bus to stay in the flashloader
+/*! \brief   Request all nodes on the bus to stay in the flashloader
 
    Send broadcast to set the "stay-in-flashloader" flag.
    Report back list of nodes that sent a response (with the status and node IDs).
@@ -1321,8 +1253,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
    C_NO_ERR   no problems; zero or more responses received; data placed in orc_Results
    C_COM      could not send request
    C_CONFIG   no dispatcher installed
-
-   \created     23.11.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpCan::BroadcastRequestProgramming(
@@ -1410,8 +1340,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastRequestProgramming(
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Set node-id of node specified by serial number
+/*! \brief   Set node-id of node specified by serial number
 
    Send broadcast to set node-id by serial number.
    The function will wait for responses for the time configured with SetBroadcastTimeout().
@@ -1440,8 +1369,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastRequestProgramming(
    C_CONFIG    no dispatcher installed
    C_TIMEOUT   no response within timeout (was SetNodeIdentifiersForBroadcasts() called ?)
    C_OVERFLOW  multiple responses received
-
-   \created     07.07.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSetNodeIdBySerialNumber(const uint8 (&orau8_SerialNumber)[6],
@@ -1575,8 +1502,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSetNodeIdBySerialNumber(const uint8
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Send network reset broadcast
+/*! \brief   Send network reset broadcast
 
    Send broadcast to reset all nodes.
    There will be no response to this service.
@@ -1587,8 +1513,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSetNodeIdBySerialNumber(const uint8
    C_NO_ERR   no problems
    C_COM      could not send request
    C_CONFIG   no dispatcher installed
-
-   \created     07.07.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpCan::BroadcastEcuReset(const uint8 ou8_ResetType) const
@@ -1620,8 +1544,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastEcuReset(const uint8 ou8_ResetType)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Send broadcast service EnterDiagnosticSession(PreProgramming)
+/*! \brief   Send broadcast service EnterDiagnosticSession(PreProgramming)
 
    Only sends one request and returns immediately. Results are not reported.
    Purpose: hit into the time window when the devices are started to keep the devices in flashloader.
@@ -1632,8 +1555,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastEcuReset(const uint8 ou8_ResetType)
    C_NO_ERR   no problems
    C_COM      could not send request
    C_CONFIG   no dispatcher installed
-
-   \created     23.11.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSendEnterPreProgrammingSession(void) const
@@ -1642,8 +1563,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSendEnterPreProgrammingSession(void
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Send broadcast service EnterDiagnosticSession(Default)
+/*! \brief   Send broadcast service EnterDiagnosticSession(Default)
 
    Only sends one request and returns immediately. Results are not reported.
    Purpose: hit into the time window when the devices are started to keep the devices in flashloader.
@@ -1654,8 +1574,6 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSendEnterPreProgrammingSession(void
    C_NO_ERR   no problems
    C_COM      could not send request
    C_CONFIG   no dispatcher installed
-
-   \created     09.01.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSendEnterDefaultSession(void) const
@@ -1664,10 +1582,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSendEnterDefaultSession(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Dump all messages of receive queue of CAN dispatcher
-
-   \created     28.11.2017  STW/B.Bayer
+/*! \brief   Dump all messages of receive queue of CAN dispatcher
 */
 //-----------------------------------------------------------------------------
 void C_OSCProtocolDriverOsyTpCan::ClearDispatcherQueue(void)
@@ -1679,16 +1594,13 @@ void C_OSCProtocolDriverOsyTpCan::ClearDispatcherQueue(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Print logging text
+/*! \brief   Print logging text
 
    Add information about this class and the current server-id configuration and call logging handler function
     to perform the actual logging.
 
    \param[in]     orc_Information     text to log
    \param[in]     opcn_Function       function name
-
-   \created     17.03.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_OSCProtocolDriverOsyTpCan::m_LogWarningWithHeader(const stw_scl::C_SCLString & orc_Information,

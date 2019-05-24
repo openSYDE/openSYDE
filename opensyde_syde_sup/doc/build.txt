@@ -1,7 +1,6 @@
 ---------------------------------------------------------------------
 File:      build.txt
 Content:   How to build this project
-Author:    GS / gesa.landsgesell@sensor-technik.de
 ---------------------------------------------------------------------
 
 Used Compiler:

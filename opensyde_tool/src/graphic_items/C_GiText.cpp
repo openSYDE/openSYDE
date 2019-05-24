@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Sizeable variant of QGraphicsTextItem (implementation)
 
    It offers an editable text when double click
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     02.11.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QApplication>
@@ -30,36 +23,33 @@
 #include "gitypes.h"
 #include "C_Uti.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in]     orc_Rect     Initial size of the item
    \param[in]     oq_Editable  Flag for editing the content of the text element
    \param[in,out] opc_Parent   Optional pointer to parent
-
-   \created     27.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiText::C_GiText(const QRectF & orc_Rect, const bool oq_Editable, QGraphicsItem * const opc_Parent) :
    QGraphicsTextItem("", opc_Parent),
    C_GiBiSizeableItem(orc_Rect.width(), orc_Rect.height()),
@@ -69,97 +59,79 @@ C_GiText::C_GiText(const QRectF & orc_Rect, const bool oq_Editable, QGraphicsIte
    setTextInteractionFlags(Qt::NoTextInteraction);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     04.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiText::~C_GiText(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the type of this itme
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the type of this itme
 
    \return  ID
-
-   \created     04.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_GiText::type(void) const
 {
    return msn_GRAPHICS_ITEM_TEXT;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the drawing of the rectangle
-
-   \created     27.10.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the drawing of the rectangle
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiText::Redraw(void)
 {
    this->setTextWidth(this->f64_Width);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns an estimate of the area painted by the item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get bounding rectangle (estimate of the area painted by the item)
 
-   \created     04.11.2016  STW/B.Bayer
+   \return
+   bounding rectangle
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QRectF C_GiText::boundingRect(void) const
 {
    return QRectF(0.0, 0.0, this->f64_Width, this->f64_Height);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Setting the flag if the text element is editable
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Setting the flag if the text element is editable
 
    \param[in]     oq_Editable    Flag for editing the content of the text element
-
-   \created     10.01.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiText::SetEditable(const bool oq_Editable)
 {
    this->mq_Editable = oq_Editable;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the new text and set the new necessary size for the text
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the new text and set the new necessary size for the text
 
    \param[in]  orc_Text    New text
-
-   \created     04.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiText::SetText(const QString & orc_Text)
 {
    this->setPlainText(orc_Text);
    this->AutoAdaptSize();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the new text and set the new necessary size for the text
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the new text and set the new necessary size for the text
 
    \return
    true     Text is editable
    false    Text is not editable
-
-   \created     04.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiText::IsEditModeActive() const
 {
    bool q_Return = false;
@@ -172,13 +144,10 @@ bool C_GiText::IsEditModeActive() const
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the size of the item depends on the size of the text
-
-   \created     04.11.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the size of the item depends on the size of the text
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiText::AutoAdaptSize(void)
 {
    // the text changed probably. update the size
@@ -188,7 +157,7 @@ void C_GiText::AutoAdaptSize(void)
    Q_EMIT this->SigChangedSize();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiText::SetTextInteraction(const bool oq_On, const bool oq_SelectAll)
 {
    if ((oq_On == true) &&
@@ -227,17 +196,14 @@ void C_GiText::SetTextInteraction(const bool oq_On, const bool oq_SelectAll)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overrided key press event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overridden key press event
 
    Adjust size of item.
 
-   \param[in,out] opc_event  Pointer to key event
-
-   \created     04.11.2016  STW/B.Bayer
+   \param[in,out] opc_Event  Pointer to key event
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiText::keyPressEvent(QKeyEvent * const opc_Event)
 {
    if ((C_Uti::h_CheckKeyModifier(opc_Event->modifiers(),
@@ -255,17 +221,14 @@ void C_GiText::keyPressEvent(QKeyEvent * const opc_Event)
    this->AutoAdaptSize();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse double click event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse double click event slot
 
    Activate the editor mode
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     04.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiText::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    if (this->mq_Editable == true)
@@ -294,16 +257,16 @@ void C_GiText::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten itemChange event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten itemChange event slot
 
-   \param[in,out] opc_Change Indicator what changed
-   \param[in]     orc_Value  Value corresponding to change
+   \param[in]  oe_Change  Indicator what changed
+   \param[in]  orc_Value  Value corresponding to change
 
-   \created     04.14.2016  STW/B.Bayer
+   \return
+   new value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_GiText::itemChange(const GraphicsItemChange oe_Change, const QVariant & orc_Value)
 {
    if ((oe_Change == QGraphicsItem::ItemSelectedChange) &&

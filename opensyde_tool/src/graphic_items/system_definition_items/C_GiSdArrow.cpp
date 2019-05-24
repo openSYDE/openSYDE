@@ -1,48 +1,40 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Informational Line / Arrow for user in system definition (implementation)
 
    Informational Line / Arrow for user in system definition
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.07.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
 #include "C_GiSdArrow.h"
 #include "C_PuiSdHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -50,10 +42,8 @@ using namespace stw_opensyde_gui_logic;
    \param[in]     oru64_ID    Unique ID
    \param[in]     opc_Points  Points for line
    \param[in,out] opc_Parent  Optional pointer to parent
-
-   \created     20.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSdArrow::C_GiSdArrow(const sint32 & ors32_Index, const uint64 & oru64_ID,
                          const std::vector<QPointF> * const opc_Points, QGraphicsItem * const opc_Parent) :
    C_GiBiArrow(oru64_ID, opc_Points, opc_Parent),
@@ -73,13 +63,10 @@ C_GiSdArrow::C_GiSdArrow(const sint32 & ors32_Index, const uint64 & oru64_ID,
    m_GenerateArrows();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function for initially loading internal data
-
-   \created     10.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function for initially loading internal data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSdArrow::LoadData(void)
 {
    if ((this->ms32_Index >= 0) &&
@@ -87,15 +74,14 @@ void C_GiSdArrow::LoadData(void)
    {
       m_LoadFromData(C_PuiSdHandler::h_GetInstance()->c_Elements.c_LineArrows[this->ms32_Index]);
    }
+   //Object name for test
+   this->setObjectName(QString("Meta: Line/Arrow"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update internal data
-
-   \created     28.10.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update internal data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSdArrow::UpdateData(void)
 {
    if ((this->ms32_Index >= 0) &&
@@ -105,13 +91,10 @@ void C_GiSdArrow::UpdateData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete internal data
-
-   \created     28.10.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete internal data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSdArrow::DeleteData(void)
 {
    if ((this->ms32_Index >= 0) &&

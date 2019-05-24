@@ -1,23 +1,18 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data container for node data
 
    Data container for node data
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     02.09.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
+
+#include <map>
 
 #include "stwerrors.h"
 
@@ -26,59 +21,50 @@
 #include "TGLUtils.h"
 #include "C_OSCUtils.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     01.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNode::C_OSCNode(void)
 {
    this->Initialize();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     01.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNode::~C_OSCNode(void)
 {
    pc_DeviceDefinition = NULL;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize class content
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize class content
 
    Clean up.
-
-   \created     25.01.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNode::Initialize(void)
 {
    pc_DeviceDefinition = NULL;
@@ -89,9 +75,8 @@ void C_OSCNode::Initialize(void)
    c_ComProtocols.resize(0);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Insert data pool at specified position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Insert data pool at specified position
 
    \param[in] oru32_DataPoolIndex Data pool index
    \param[in] orc_DataPool        Data pool data
@@ -99,10 +84,8 @@ void C_OSCNode::Initialize(void)
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     11.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNode::InsertDataPool(const uint32 & oru32_DataPoolIndex, const C_OSCNodeDataPool & orc_DataPool)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -127,19 +110,16 @@ sint32 C_OSCNode::InsertDataPool(const uint32 & oru32_DataPoolIndex, const C_OSC
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete data pool at specified position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete data pool at specified position
 
    \param[in] oru32_DataPoolIndex Data pool index
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     11.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNode::DeleteDataPool(const uint32 & oru32_DataPoolIndex)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -164,9 +144,8 @@ sint32 C_OSCNode::DeleteDataPool(const uint32 & oru32_DataPoolIndex)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Move datapool in node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Move datapool in node
 
    \param[in] ou32_Start  Start index
    \param[in] ou32_Target Target index
@@ -174,10 +153,8 @@ sint32 C_OSCNode::DeleteDataPool(const uint32 & oru32_DataPoolIndex)
    \return
    C_NO_ERR OK
    C_RANGE  Something out of range
-
-   \created     17.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNode::MoveDataPool(const uint32 ou32_Start, const uint32 ou32_Target)
 {
    sint32 s32_Return = C_RANGE;
@@ -212,9 +189,8 @@ sint32 C_OSCNode::MoveDataPool(const uint32 ou32_Start, const uint32 ou32_Target
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Insert message at specified position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Insert message at specified position
 
    \param[in] ore_ComProtocol      Com protocol
    \param[in] oru32_InterfaceIndex Interface index
@@ -226,10 +202,8 @@ sint32 C_OSCNode::MoveDataPool(const uint32 ou32_Start, const uint32 ou32_Target
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     10.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNode::InsertMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol, const uint32 & oru32_InterfaceIndex,
                                 const bool & orq_MessageIsTx, const uint32 & oru32_MessageIndex,
                                 const C_OSCCanMessage & orc_Message,
@@ -299,9 +273,8 @@ sint32 C_OSCNode::InsertMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set message at specified position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set message at specified position
 
    \param[in] ore_ComProtocol      Com protocol
    \param[in] oru32_InterfaceIndex Interface index
@@ -315,10 +288,8 @@ sint32 C_OSCNode::InsertMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     10.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNode::SetMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol, const uint32 & oru32_InterfaceIndex,
                              const bool & orq_MessageIsTx, const uint32 & oru32_MessageIndex,
                              const C_OSCCanMessage & orc_Message, const bool & orq_NewMessageIsTx,
@@ -396,9 +367,8 @@ sint32 C_OSCNode::SetMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol, c
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete message at specified position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete message at specified position
 
    \param[in] ore_ComProtocol      Com protocol
    \param[in] oru32_InterfaceIndex Interface index
@@ -408,10 +378,8 @@ sint32 C_OSCNode::SetMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol, c
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     10.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNode::DeleteMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol, const uint32 & oru32_InterfaceIndex,
                                 const bool & orq_MessageIsTx, const uint32 & oru32_MessageIndex)
 {
@@ -476,9 +444,8 @@ sint32 C_OSCNode::DeleteMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Insert signal at specified position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Insert signal at specified position
 
    \param[in] ore_ComProtocol      Com protocol
    \param[in] oru32_InterfaceIndex Interface index
@@ -491,10 +458,8 @@ sint32 C_OSCNode::DeleteMessage(const C_OSCCanProtocol::E_Type & ore_ComProtocol
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     10.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNode::InsertSignal(const C_OSCCanProtocol::E_Type & ore_ComProtocol, const uint32 & oru32_InterfaceIndex,
                                const bool & orq_MessageIsTx, const uint32 & oru32_MessageIndex,
                                const uint32 & oru32_SignalIndex, const C_OSCCanSignal & orc_Signal,
@@ -569,9 +534,8 @@ sint32 C_OSCNode::InsertSignal(const C_OSCCanProtocol::E_Type & ore_ComProtocol,
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set signal at specified position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set signal at specified position
 
    \param[in] ore_ComProtocol      Com protocol
    \param[in] oru32_InterfaceIndex Interface index
@@ -584,10 +548,8 @@ sint32 C_OSCNode::InsertSignal(const C_OSCCanProtocol::E_Type & ore_ComProtocol,
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     10.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNode::SetSignal(const C_OSCCanProtocol::E_Type & ore_ComProtocol, const uint32 & oru32_InterfaceIndex,
                             const bool & orq_MessageIsTx, const uint32 & oru32_MessageIndex,
                             const uint32 & oru32_SignalIndex, const C_OSCCanSignal & orc_Signal,
@@ -645,9 +607,8 @@ sint32 C_OSCNode::SetSignal(const C_OSCCanProtocol::E_Type & ore_ComProtocol, co
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set signal at specified position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set signal at specified position
 
    \param[in] ore_ComProtocol      Com protocol
    \param[in] oru32_InterfaceIndex Interface index
@@ -659,10 +620,8 @@ sint32 C_OSCNode::SetSignal(const C_OSCCanProtocol::E_Type & ore_ComProtocol, co
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     10.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNode::SetSignalPosition(const C_OSCCanProtocol::E_Type & ore_ComProtocol,
                                     const uint32 & oru32_InterfaceIndex, const bool & orq_MessageIsTx,
                                     const uint32 & oru32_MessageIndex, const uint32 & oru32_SignalIndex,
@@ -713,9 +672,8 @@ sint32 C_OSCNode::SetSignalPosition(const C_OSCCanProtocol::E_Type & ore_ComProt
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set signal at specified position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set signal at specified position
 
    \param[in] ore_ComProtocol      Com protocol
    \param[in] oru32_InterfaceIndex Interface index
@@ -727,10 +685,8 @@ sint32 C_OSCNode::SetSignalPosition(const C_OSCCanProtocol::E_Type & ore_ComProt
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     10.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNode::SetSignalCommon(const C_OSCCanProtocol::E_Type & ore_ComProtocol, const uint32 & oru32_InterfaceIndex,
                                   const bool & orq_MessageIsTx, const uint32 & oru32_MessageIndex,
                                   const uint32 & oru32_SignalIndex, const C_OSCNodeDataPoolListElement & orc_SignalData)
@@ -782,9 +738,8 @@ sint32 C_OSCNode::SetSignalCommon(const C_OSCCanProtocol::E_Type & ore_ComProtoc
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete signal at specified position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete signal at specified position
 
    \param[in] ore_ComProtocol      Com protocol
    \param[in] oru32_InterfaceIndex Interface index
@@ -795,10 +750,8 @@ sint32 C_OSCNode::SetSignalCommon(const C_OSCCanProtocol::E_Type & ore_ComProtoc
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     10.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNode::DeleteSignal(const C_OSCCanProtocol::E_Type & ore_ComProtocol, const uint32 & oru32_InterfaceIndex,
                                const bool & orq_MessageIsTx, const uint32 & oru32_MessageIndex,
                                const uint32 & oru32_SignalIndex)
@@ -856,18 +809,15 @@ sint32 C_OSCNode::DeleteSignal(const C_OSCCanProtocol::E_Type & ore_ComProtocol,
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
    It is not endian-safe, so it should only be used on the same system it is created on.
 
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
-
-   \created     21.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNode::CalcHash(uint32 & oru32_HashValue) const
 {
    uint32 u32_Counter;
@@ -892,9 +842,8 @@ void C_OSCNode::CalcHash(uint32 & oru32_HashValue) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get datapool index by type specific datapool index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get datapool index by type specific datapool index
 
    \param[in] oe_DataPoolType          Type of datapool
    \param[in] ou32_DataPoolTypeIndex   Type specific index of datapool
@@ -902,10 +851,8 @@ void C_OSCNode::CalcHash(uint32 & oru32_HashValue) const
    \return
    if datapool is found: zero based index
    if datapool is not found: -1
-
-   \created     17.02.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_types::sint32 C_OSCNode::GetDataPoolIndex(const C_OSCNodeDataPool::E_Type oe_DataPoolType,
                                               const stw_types::uint32 ou32_DataPoolTypeIndex) const
 {
@@ -929,9 +876,8 @@ stw_types::sint32 C_OSCNode::GetDataPoolIndex(const C_OSCNodeDataPool::E_Type oe
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Compare node names for greater
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Compare node names for greater
 
    Nodes are compared by name.
    Primary sorting criteria: Name length: Shortest first
@@ -943,10 +889,8 @@ stw_types::sint32 C_OSCNode::GetDataPoolIndex(const C_OSCNodeDataPool::E_Type oe
    \return
    true:  Node 1 smaller than Node 2
    false: Else
-
-   \created     05.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCNode::h_CompareNameGreater(const C_OSCNode & orc_Node1, const C_OSCNode & orc_Node2)
 {
    bool q_Retval;
@@ -962,16 +906,13 @@ bool C_OSCNode::h_CompareNameGreater(const C_OSCNode & orc_Node1, const C_OSCNod
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get number of bytes occupied by lists in NVM data pools
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get number of bytes occupied by lists in NVM data pools
 
    \return
    Number of bytes occupied by lists in NVM data pools
-
-   \created     22.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_OSCNode::GetListsSize(void) const
 {
    uint32 u32_Retval = 0;
@@ -987,16 +928,13 @@ uint32 C_OSCNode::GetListsSize(void) const
    return u32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get number of bytes occupied by NVM data pools
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get number of bytes occupied by NVM data pools
 
    \return
    Number of bytes occupied by NVM data pools
-
-   \created     22.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_OSCNode::GetDataPoolsSize(void) const
 {
    uint32 u32_Retval = 0;
@@ -1012,18 +950,15 @@ uint32 C_OSCNode::GetDataPoolsSize(void) const
    return u32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get node data pool absolute index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get node data pool absolute index
 
    \param[in] ou32_DataPoolIndex Node data pool index
 
    \return
    Node data pool absolute index
-
-   \created     23.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_OSCNode::GetDataPoolAbsoluteAddress(const uint32 ou32_DataPoolIndex) const
 {
    uint32 u32_Retval = 0;
@@ -1040,19 +975,16 @@ uint32 C_OSCNode::GetDataPoolAbsoluteAddress(const uint32 ou32_DataPoolIndex) co
    return u32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get node data pool list absolute index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get node data pool list absolute index
 
    \param[in] ou32_DataPoolIndex Node data pool index
    \param[in] ou32_ListIndex     Node data pool list index
 
    \return
    Node data pool list absolute index
-
-   \created     23.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_OSCNode::GetListAbsoluteAddress(const uint32 ou32_DataPoolIndex, const uint32 ou32_ListIndex) const
 {
    uint32 u32_Retval = GetDataPoolAbsoluteAddress(ou32_DataPoolIndex);
@@ -1071,9 +1003,8 @@ uint32 C_OSCNode::GetListAbsoluteAddress(const uint32 ou32_DataPoolIndex, const 
    return u32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get node data pool list element absolute index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get node data pool list element absolute index
 
    \param[in] ou32_DataPoolIndex Node data pool index
    \param[in] ou32_ListIndex     Node data pool list index
@@ -1081,10 +1012,8 @@ uint32 C_OSCNode::GetListAbsoluteAddress(const uint32 ou32_DataPoolIndex, const 
 
    \return
    Node data pool list element absolute index
-
-   \created     23.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_OSCNode::GetElementAbsoluteAddress(const uint32 ou32_DataPoolIndex, const uint32 ou32_ListIndex,
                                             const uint32 ou32_ElementIndex) const
 {
@@ -1115,19 +1044,16 @@ uint32 C_OSCNode::GetElementAbsoluteAddress(const uint32 ou32_DataPoolIndex, con
    return u32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get communication data pool for specified protocol
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get communication data pool for specified protocol
 
    \param[in] ore_Protocol Communication protocol
 
    \return
    NULL No matching data pool found for communication protocol
    Else Pointer to communication data pool of node
-
-   \created     04.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_OSCNodeDataPool * C_OSCNode::GetComDataPoolConst(const C_OSCCanProtocol::E_Type & ore_Protocol) const
 {
    const C_OSCNodeDataPool * pc_Retval = NULL;
@@ -1147,19 +1073,16 @@ const C_OSCNodeDataPool * C_OSCNode::GetComDataPoolConst(const C_OSCCanProtocol:
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get communication data pool for specified protocol
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get communication data pool for specified protocol
 
    \param[in] ore_Protocol Communication protocol
 
    \return
    NULL No matching data pool found for communication protocol
    Else Pointer to communication data pool of node
-
-   \created     04.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPool * C_OSCNode::GetComDataPool(const C_OSCCanProtocol::E_Type & ore_Protocol)
 {
    C_OSCNodeDataPool * pc_Retval = NULL;
@@ -1179,19 +1102,16 @@ C_OSCNodeDataPool * C_OSCNode::GetComDataPool(const C_OSCCanProtocol::E_Type & o
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data for specified communication protocol
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data for specified communication protocol
 
    \param[in] ore_Protocol Communication protocol
 
    \return
    NULL No matching data found for communication protocol
    Else Pointer to communication data of node
-
-   \created     04.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_OSCCanProtocol * C_OSCNode::GetCANProtocolConst(const C_OSCCanProtocol::E_Type & ore_Protocol)
 const
 {
@@ -1208,19 +1128,16 @@ const
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data for specified communication protocol
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data for specified communication protocol
 
    \param[in] ore_Protocol Communication protocol
 
    \return
    NULL No matching data found for communication protocol
    Else Pointer to communication data of node
-
-   \created     04.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCCanProtocol * C_OSCNode::GetCANProtocol(const C_OSCCanProtocol::E_Type & ore_Protocol)
 {
    C_OSCCanProtocol * pc_Retval = NULL;
@@ -1236,19 +1153,16 @@ C_OSCCanProtocol * C_OSCNode::GetCANProtocol(const C_OSCCanProtocol::E_Type & or
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Find com protocol for com data pool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Find com protocol for com data pool
 
    \param[in] ou32_DataPoolIndex Data pool index
 
    \return
    NULL No matching data found for communication protocol
    Else Pointer to communication data of node
-
-   \created     11.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_OSCCanProtocol * C_OSCNode::GetRelatedCANProtocolConst(const uint32 ou32_DataPoolIndex) const
 {
    const C_OSCCanProtocol * pc_Retval = NULL;
@@ -1265,19 +1179,16 @@ const C_OSCCanProtocol * C_OSCNode::GetRelatedCANProtocolConst(const uint32 ou32
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Find com protocol for com data pool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Find com protocol for com data pool
 
    \param[in] ou32_DataPoolIndex Data pool index
 
    \return
    NULL No matching data found for communication protocol
    Else Pointer to communication data of node
-
-   \created     11.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCCanProtocol * C_OSCNode::GetRelatedCANProtocol(const uint32 ou32_DataPoolIndex)
 {
    C_OSCCanProtocol * pc_Retval = NULL;
@@ -1294,9 +1205,8 @@ C_OSCCanProtocol * C_OSCNode::GetRelatedCANProtocol(const uint32 ou32_DataPoolIn
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check error for data pool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check error for data pool
 
    \param[in]  oru32_DataPoolIndex        Data pool index
    \param[out] opq_NameConflict           Name conflict
@@ -1305,10 +1215,8 @@ C_OSCCanProtocol * C_OSCNode::GetRelatedCANProtocol(const uint32 ou32_DataPoolIn
    \param[out] opc_InvalidListIndices     Optional storage for list of invalid list indices
                                           If COMM: interface index
                                           Else: list index
-
-   \created     24.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNode::CheckErrorDataPool(const uint32 & oru32_DataPoolIndex, bool * const opq_NameConflict,
                                    bool * const opq_NameInvalid, bool * const opq_IsErrorInListOrMessage,
                                    std::vector<uint32> * const opc_InvalidListIndices) const
@@ -1355,6 +1263,7 @@ void C_OSCNode::CheckErrorDataPool(const uint32 & oru32_DataPoolIndex, bool * co
             const C_OSCCanProtocol * const pc_Protocol = this->GetRelatedCANProtocolConst(oru32_DataPoolIndex);
             if (pc_Protocol != NULL)
             {
+               static std::map<std::vector<uint32>, bool> hc_PreviousResults;
                for (uint32 u32_ItContainer = 0; u32_ItContainer < pc_Protocol->c_ComMessages.size(); ++u32_ItContainer)
                {
                   uint32 u32_TxListIndex;
@@ -1364,26 +1273,63 @@ void C_OSCNode::CheckErrorDataPool(const uint32 & oru32_DataPoolIndex, bool * co
                       (C_OSCCanProtocol::h_GetComListIndex(rc_CheckedDataPool, u32_ItContainer, false,
                                                            u32_RxListIndex) == C_NO_ERR))
                   {
-                     if ((u32_TxListIndex < rc_CheckedDataPool.c_Lists.size()) &&
-                         (u32_RxListIndex < rc_CheckedDataPool.c_Lists.size()))
+                     //Get Hash for all relevant data
+                     const uint32 u32_HashCon = this->m_GetContainerHash(oru32_DataPoolIndex, u32_ItContainer);
+                     const uint32 u32_HashTx = this->m_GetListHash(oru32_DataPoolIndex, u32_TxListIndex);
+                     const uint32 u32_HashRx = this->m_GetListHash(oru32_DataPoolIndex, u32_RxListIndex);
+                     std::vector<uint32> c_Hashes;
+                     std::map<std::vector<uint32>, bool>::const_iterator c_It;
+                     c_Hashes.push_back(u32_HashCon);
+                     c_Hashes.push_back(u32_HashTx);
+                     c_Hashes.push_back(u32_HashRx);
+                     //Check if check was already performed in the past
+                     c_It = hc_PreviousResults.find(c_Hashes);
+                     if (c_It == hc_PreviousResults.end())
                      {
-                        const C_OSCCanMessageContainer & rc_Container = pc_Protocol->c_ComMessages[u32_ItContainer];
-                        const bool q_Error = rc_Container.CheckLocalError(rc_CheckedDataPool.c_Lists[u32_TxListIndex],
-                                                                          rc_CheckedDataPool.c_Lists[u32_RxListIndex],
-                                                                          C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
-                                                                             pc_Protocol->e_Type));
-                        if (q_Error == true)
+                        if ((u32_TxListIndex < rc_CheckedDataPool.c_Lists.size()) &&
+                            (u32_RxListIndex < rc_CheckedDataPool.c_Lists.size()))
+                        {
+                           const C_OSCCanMessageContainer & rc_Container = pc_Protocol->c_ComMessages[u32_ItContainer];
+                           const bool q_Error = rc_Container.CheckLocalError(
+                              rc_CheckedDataPool.c_Lists[u32_TxListIndex],
+                              rc_CheckedDataPool.c_Lists[u32_RxListIndex],
+                              C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                                 pc_Protocol->e_Type));
+                           if (q_Error == true)
+                           {
+                              *opq_IsErrorInListOrMessage = true;
+                              if (opc_InvalidListIndices != NULL)
+                              {
+                                 opc_InvalidListIndices->push_back(u32_ItContainer);
+                              }
+                              //Append for possible reusing this result
+                              hc_PreviousResults[c_Hashes] = true;
+                           }
+                           else
+                           {
+                              //Append for possible reusing this result
+                              hc_PreviousResults[c_Hashes] = false;
+                           }
+                        }
+                        else
                         {
                            *opq_IsErrorInListOrMessage = true;
                            if (opc_InvalidListIndices != NULL)
                            {
                               opc_InvalidListIndices->push_back(u32_ItContainer);
                            }
+                           //Append for possible reusing this result
+                           hc_PreviousResults[c_Hashes] = true;
                         }
                      }
                      else
                      {
-                        *opq_IsErrorInListOrMessage = true;
+                        //Do not reset error
+                        *opq_IsErrorInListOrMessage = (*opq_IsErrorInListOrMessage) || (c_It->second);
+                        if ((opc_InvalidListIndices != NULL) && (c_It->second))
+                        {
+                           opc_InvalidListIndices->push_back(u32_ItContainer);
+                        }
                      }
                   }
                   else
@@ -1395,8 +1341,9 @@ void C_OSCNode::CheckErrorDataPool(const uint32 & oru32_DataPoolIndex, bool * co
          }
          else
          {
+            std::map<stw_scl::C_SCLString, uint32> c_PreviousNames;
+            static std::map<uint32, bool> hc_PreviousResults;
             bool q_CheckSize;
-            bool q_NameConflict;
             bool q_NameInvalid;
             bool q_UsageInvalid;
             bool q_OutOfDataPool;
@@ -1417,26 +1364,83 @@ void C_OSCNode::CheckErrorDataPool(const uint32 & oru32_DataPoolIndex, bool * co
                  ((*opq_IsErrorInListOrMessage == false) || (opc_InvalidListIndices != NULL));
                  ++u32_ItList)
             {
-               q_NameConflict = false;
-               q_NameInvalid = false;
-               q_UsageInvalid = false;
-               q_OutOfDataPool = false;
-               q_DataSetsInvalid = false;
-               q_ElementsInvalid = false;
-               rc_CheckedDataPool.CheckErrorList(u32_ItList, &q_NameConflict, &q_NameInvalid, &q_UsageInvalid,
-                                                 &q_OutOfDataPool, &q_DataSetsInvalid, &q_ElementsInvalid, NULL, NULL);
-               if (q_CheckSize == false)
-               {
-                  q_UsageInvalid = false;
-                  q_OutOfDataPool = false;
-               }
-               if ((((((q_NameConflict == true) || (q_NameInvalid == true)) || (q_UsageInvalid == true)) ||
-                     (q_ElementsInvalid == true)) || (q_OutOfDataPool == true)) || (q_DataSetsInvalid == true))
+               //Overarching checks
+               const C_OSCNodeDataPoolList & rc_List = rc_CheckedDataPool.c_Lists[u32_ItList];
+               const std::map<stw_scl::C_SCLString,
+                              uint32>::const_iterator c_ItList = c_PreviousNames.find(rc_List.c_Name.LowerCase());
+               if (c_ItList != c_PreviousNames.end())
                {
                   *opq_IsErrorInListOrMessage = true;
                   if (opc_InvalidListIndices != NULL)
                   {
+                     bool q_Added = false;
+                     //Only add element once!
+                     for (uint32 u32_It = 0UL; u32_It < opc_InvalidListIndices->size(); ++u32_It)
+                     {
+                        if ((*opc_InvalidListIndices)[u32_It] == c_ItList->second)
+                        {
+                           q_Added = true;
+                           break;
+                        }
+                     }
+                     //Add conflicting other item
+                     if (q_Added == false)
+                     {
+                        opc_InvalidListIndices->push_back(c_ItList->second);
+                     }
+                     //Add itself
                      opc_InvalidListIndices->push_back(u32_ItList);
+                  }
+               }
+               else
+               {
+                  //Get Hash for all relevant data
+                  const uint32 u32_Hash = this->m_GetListHash(oru32_DataPoolIndex, u32_ItList);
+                  //Check if check was already performed in the past
+                  const std::map<uint32, bool>::const_iterator c_ItErr = hc_PreviousResults.find(u32_Hash);
+                  //Append new name
+                  c_PreviousNames[rc_List.c_Name.LowerCase()] = u32_ItList;
+                  //Element specific checks
+                  if (c_ItErr == hc_PreviousResults.end())
+                  {
+                     q_NameInvalid = false;
+                     q_UsageInvalid = false;
+                     q_OutOfDataPool = false;
+                     q_DataSetsInvalid = false;
+                     q_ElementsInvalid = false;
+                     rc_CheckedDataPool.CheckErrorList(u32_ItList, NULL, &q_NameInvalid, &q_UsageInvalid,
+                                                       &q_OutOfDataPool, &q_DataSetsInvalid, &q_ElementsInvalid, NULL,
+                                                       NULL);
+                     if (q_CheckSize == false)
+                     {
+                        q_UsageInvalid = false;
+                        q_OutOfDataPool = false;
+                     }
+                     if (((((q_NameInvalid == true) || (q_UsageInvalid == true)) ||
+                           (q_ElementsInvalid == true)) || (q_OutOfDataPool == true)) || (q_DataSetsInvalid == true))
+                     {
+                        *opq_IsErrorInListOrMessage = true;
+                        if (opc_InvalidListIndices != NULL)
+                        {
+                           opc_InvalidListIndices->push_back(u32_ItList);
+                        }
+                        //Append for possible reusing this result
+                        hc_PreviousResults[u32_Hash] = true;
+                     }
+                     else
+                     {
+                        //Append for possible reusing this result
+                        hc_PreviousResults[u32_Hash] = false;
+                     }
+                  }
+                  else
+                  {
+                     //Do not reset error
+                     *opq_IsErrorInListOrMessage = (*opq_IsErrorInListOrMessage) || (c_ItErr->second);
+                     if ((opc_InvalidListIndices != NULL) && (c_ItErr->second))
+                     {
+                        opc_InvalidListIndices->push_back(u32_ItList);
+                     }
                   }
                }
             }
@@ -1445,9 +1449,8 @@ void C_OSCNode::CheckErrorDataPool(const uint32 & oru32_DataPoolIndex, bool * co
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if message id valid
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if message id valid
 
    \param[in]  oru32_InterfaceIndex     Interface index
    \param[in]  oru32_MessageId          Message id
@@ -1464,10 +1467,8 @@ void C_OSCNode::CheckErrorDataPool(const uint32 & oru32_DataPoolIndex, bool * co
    \param[in]  opu32_SkipMessageIndex   Optional parameter to skip one index
                                         (Only used if all other optional skip parameters are used as well)
                                         (Use-case: skip current message to avoid conflict with itself)
-
-   \created     04.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNode::CheckMessageId(const uint32 & oru32_InterfaceIndex, const uint32 & oru32_MessageId, bool & orq_Valid,
                                const C_OSCCanProtocol::E_Type * const ope_SkipComProtocol,
                                const uint32 * const opu32_SkipInterfaceIndex,
@@ -1492,9 +1493,8 @@ void C_OSCNode::CheckMessageId(const uint32 & oru32_InterfaceIndex, const uint32
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if message name valid (invalid if duplicate or invalid for use as variable)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if message name valid (invalid if duplicate or invalid for use as variable)
 
    \param[in]  oru32_InterfaceIndex     Interface index
    \param[in]  orc_MessageName          Message name
@@ -1511,10 +1511,8 @@ void C_OSCNode::CheckMessageId(const uint32 & oru32_InterfaceIndex, const uint32
    \param[in]  opu32_SkipMessageIndex   Optional parameter to skip one index
                                         (Only used if all other optional skip parameters are used as well)
                                         (Use-case: skip current message to avoid conflict with itself)
-
-   \created     04.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNode::CheckMessageName(const uint32 & oru32_InterfaceIndex, const stw_scl::C_SCLString & orc_MessageName,
                                  bool & orq_Valid, const C_OSCCanProtocol::E_Type * const ope_SkipComProtocol,
                                  const uint32 * const opu32_SkipInterfaceIndex,
@@ -1546,9 +1544,8 @@ void C_OSCNode::CheckMessageName(const uint32 & oru32_InterfaceIndex, const stw_
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check application process ID valid
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check application process ID valid
 
    \param[in]  ou32_ApplicationIndex Application index (ID)
    \param[out] orq_Valid             Valid check result (should only be used if the function returned C_NO_ERR)
@@ -1556,10 +1553,8 @@ void C_OSCNode::CheckMessageName(const uint32 & oru32_InterfaceIndex, const stw_
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     04.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNode::CheckApplicationProcessIdValid(const uint32 ou32_ApplicationIndex, bool & orq_Valid) const
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -1595,15 +1590,12 @@ sint32 C_OSCNode::CheckApplicationProcessIdValid(const uint32 ou32_ApplicationIn
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Recalculate all com protocol data pool indices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Recalculate all com protocol data pool indices
 
    Based on assumption data pools are sorted as can protocols
-
-   \created     07.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNode::ReCalcCanProtocolDataPoolIndices(void)
 {
    for (uint32 u32_ItCANProtocol = 0; u32_ItCANProtocol < this->c_ComProtocols.size();
@@ -1629,17 +1621,14 @@ void C_OSCNode::ReCalcCanProtocolDataPoolIndices(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if any interface has update support
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if any interface has update support
 
    \return
    True  Update available
    False No update available
-
-   \created     07.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCNode::IsAnyUpdateAvailable(void) const
 {
    bool q_Retval = false;
@@ -1659,13 +1648,36 @@ bool C_OSCNode::IsAnyUpdateAvailable(void) const
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Recalculate data pool addresses
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks if the node supports routing
 
-   \created     26.01.2017  STW/M.Echtler
+   Special case: Hybrid nodes can be used with openSYDE or KEFEX server,
+   but routing is available with the openSYDE server only.
+
+   \param[in]     oe_Type       Interface type
+
+   \return
+   true  Routing is available
+   false Routing is not available
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCNode::IsRoutingAvailable(const C_OSCSystemBus::E_Type oe_Type) const
+{
+   bool q_Return = false;
+
+   if ((this->pc_DeviceDefinition != NULL) &&
+       (this->c_Properties.e_DiagnosticServer == C_OSCNodeProperties::eDS_OPEN_SYDE))
+   {
+      q_Return = this->pc_DeviceDefinition->IsRoutingAvailable(oe_Type);
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Recalculate data pool addresses
+*/
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNode::RecalculateAddress(void)
 {
    uint32 u32_Offset = 0UL;
@@ -1682,9 +1694,8 @@ void C_OSCNode::RecalculateAddress(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility: get specific data pool element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility: get specific data pool element
 
    Returns pointer to specific data pool element.
    Note that the validity of the returned pointer is only guaranteed as long as the layout of the data pool is not
@@ -1696,11 +1707,8 @@ void C_OSCNode::RecalculateAddress(void)
 
    \return
    Pointer to specified data pool element; NULL if one of the parameters is out of range
-
-
-   \created     18.08.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolListElement * C_OSCNode::GetDataPoolListElement(const uint32 ou32_DataPoolIndex,
                                                                  const uint32 ou32_ListIndex,
                                                                  const uint32 ou32_ElementIndex)
@@ -1716,9 +1724,8 @@ C_OSCNodeDataPoolListElement * C_OSCNode::GetDataPoolListElement(const uint32 ou
    return pc_Element;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all messages
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all messages
 
    \param[in]  oru32_InterfaceIndex     Interface index
    \param[out] orc_Messages             Output messages
@@ -1734,10 +1741,8 @@ C_OSCNodeDataPoolListElement * C_OSCNode::GetDataPoolListElement(const uint32 ou
    \param[in]  opu32_SkipMessageIndex   Optional parameter to skip one index
                                         (Only used if all other optional skip parameters are used as well)
                                         (Use-case: skip current message to avoid conflict with itself)
-
-   \created     04.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNode::m_GetAllMessages(const uint32 & oru32_InterfaceIndex,
                                  std::vector<const C_OSCCanMessage *> & orc_Messages,
                                  const C_OSCCanProtocol::E_Type * const ope_SkipComProtocol,
@@ -1762,9 +1767,8 @@ void C_OSCNode::m_GetAllMessages(const uint32 & oru32_InterfaceIndex,
                                opu32_SkipMessageIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Append all messages for one com protocol
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Append all messages for one com protocol
 
    \param[in]  oru32_InterfaceIndex     Interface index
    \param[in]  ore_ComProtocol          Communication protocol
@@ -1784,10 +1788,8 @@ void C_OSCNode::m_GetAllMessages(const uint32 & oru32_InterfaceIndex,
                                         (Use-case: skip current message to avoid conflict with itself)
    \param[in]  orq_ExcludeRx            Flag if no rx messages should show up in result
    \param[in]  orq_ExcludeTx            Flag if no tx messages should show up in result
-
-   \created     04.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNode::m_AppendAllProtocolMessages(const uint32 & oru32_InterfaceIndex,
                                             const C_OSCCanProtocol::E_Type & ore_ComProtocol,
                                             std::vector<const C_OSCCanMessage *> & orc_Messages,
@@ -1834,4 +1836,56 @@ void C_OSCNode::m_AppendAllProtocolMessages(const uint32 & oru32_InterfaceIndex,
          }
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get hash for list
+
+   \param[in] ou32_DataPoolIndex Data pool index
+   \param[in] ou32_ListIndex     List index
+
+   \return
+   Hash for list
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_OSCNode::m_GetListHash(const uint32 ou32_DataPoolIndex, const uint32 ou32_ListIndex) const
+{
+   uint32 u32_Retval = 0xFFFFFFFFUL;
+
+   if (ou32_DataPoolIndex < this->c_DataPools.size())
+   {
+      const C_OSCNodeDataPool & rc_Dp = this->c_DataPools[ou32_DataPoolIndex];
+      if (ou32_ListIndex < rc_Dp.c_Lists.size())
+      {
+         const C_OSCNodeDataPoolList & rc_List = rc_Dp.c_Lists[ou32_ListIndex];
+         rc_List.CalcHash(u32_Retval);
+      }
+   }
+   return u32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get hash for container
+
+   \param[in] ou32_DataPoolIndex  Data pool index
+   \param[in] ou32_ContainerIndex Container index
+
+   \return
+   Hash for container
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32 C_OSCNode::m_GetContainerHash(const uint32 ou32_DataPoolIndex, const uint32 ou32_ContainerIndex) const
+{
+   uint32 u32_Retval = 0xFFFFFFFFUL;
+   const C_OSCCanProtocol * const pc_Protocol = this->GetRelatedCANProtocolConst(ou32_DataPoolIndex);
+
+   if (pc_Protocol != NULL)
+   {
+      if (ou32_ContainerIndex < pc_Protocol->c_ComMessages.size())
+      {
+         const C_OSCCanMessageContainer & rc_Container = pc_Protocol->c_ComMessages[ou32_ContainerIndex];
+         rc_Container.CalcHash(u32_Retval);
+      }
+   }
+   return u32_Retval;
 }

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Helper class to create line bounding shape (implementation)
 
    Helper class to create line bounding shape
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     12.10.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <cmath>
@@ -26,35 +19,32 @@
 #include "C_OSCUtils.h"
 #include "C_GiBiLineBounding.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Constructor for multiple points
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Constructor for multiple points
 
    \param[in] orc_Points                  Points to get bounding element for
    \param[in] orf64_Width                 Width of bounding element
    \param[in] orf64_InteractionPointWidth Interaction point width
-
-   \created     12.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiBiLineBounding::C_GiBiLineBounding(const QVector<QPointF> & orc_Points, const float64 & orf64_Width,
                                        const float64 & orf64_InteractionPointWidth) :
    mc_Points(orc_Points),
@@ -63,17 +53,14 @@ C_GiBiLineBounding::C_GiBiLineBounding(const QVector<QPointF> & orc_Points, cons
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Constructor for single line
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Constructor for single line
 
    \param[in] orc_Line                    Lines to get bounding element for
    \param[in] orf64_Width                 Width of bounding element
    \param[in] orf64_InteractionPointWidth Interaction point width
-
-   \created     12.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiBiLineBounding::C_GiBiLineBounding(const QLineF & orc_Line, const float64 & orf64_Width,
                                        const float64 & orf64_InteractionPointWidth) :
    //lint -e{155}  C++11 feature
@@ -87,16 +74,13 @@ C_GiBiLineBounding::C_GiBiLineBounding(const QLineF & orc_Line, const float64 & 
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get shape for initialized object
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get shape for initialized object
 
    \return
    Valid shape
-
-   \created     12.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QPainterPath C_GiBiLineBounding::GetShape(void)
 {
    QString c_Identity;
@@ -157,18 +141,15 @@ QPainterPath C_GiBiLineBounding::GetShape(void)
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get vector with length of 1
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get vector with length of 1
 
    \param[in] orc_P Point to evaluate
 
    \return
    Input vetor with length of 1
-
-   \created     12.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QPointF C_GiBiLineBounding::GetNorm(const QPointF & orc_P)
 {
    const float64 f64_Length = GetLength(orc_P);
@@ -186,19 +167,16 @@ QPointF C_GiBiLineBounding::GetNorm(const QPointF & orc_P)
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set input vector to length
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set input vector to length
 
    \param[in] orc_P        Point to evaluate
    \param[in] orf64_Length Length to adapt to
 
    \return
    Input vetor with length of width
-
-   \created     28.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QPointF C_GiBiLineBounding::AdaptVecToWidth(const QPointF & orc_P, const float64 & orf64_Length)
 {
    const QPointF c_Retval = GetNorm(orc_P);
@@ -206,33 +184,30 @@ QPointF C_GiBiLineBounding::AdaptVecToWidth(const QPointF & orc_P, const float64
    return QPointF(c_Retval.x() * orf64_Length, c_Retval.y() * orf64_Length);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get vector perpendicular to original
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get vector perpendicular to original
 
    \param[in] orc_P vector to get perpendicular for
 
-   \created     28.10.2016  STW/M.Echtler
+   \return
+   Perpendicular vector
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QPointF C_GiBiLineBounding::GetPerpendicular(const QPointF & orc_P)
 {
    return QPointF(-orc_P.y(), orc_P.x());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Standard cross product
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Standard cross product
 
    \param[in] orc_P1 First point
    \param[in] orc_P2 Second point
 
    \return
    Result
-
-   \created     21.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 float64 C_GiBiLineBounding::h_CrossProduct(const QPointF & orc_P1, const QPointF & orc_P2)
 {
    const float64 f64_Retval = (orc_P1.x() * orc_P2.y()) - (orc_P1.y() * orc_P2.x());
@@ -240,16 +215,13 @@ float64 C_GiBiLineBounding::h_CrossProduct(const QPointF & orc_P1, const QPointF
    return f64_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add two bounding points to line shape
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add two bounding points to line shape
 
    \param[in] ors32_IndexStart Index of line start in stored points
    \param[in] ors32_IndexEnd   Index of line end in stored points
-
-   \created     12.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiLineBounding::AppendLineBoundingPointsTop(const sint32 & ors32_IndexStart, const sint32 & ors32_IndexEnd)
 {
    if ((ors32_IndexStart < this->mc_Points.size()) && (ors32_IndexEnd < this->mc_Points.size()))
@@ -266,18 +238,15 @@ void C_GiBiLineBounding::AppendLineBoundingPointsTop(const sint32 & ors32_IndexS
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set input vector to length of width
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set input vector to length of width
 
    \param[in] orc_P Point to evaluate
 
    \return
    Input vetor with length of width
-
-   \created     12.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QPointF C_GiBiLineBounding::AdaptVecToWidth(const QPointF & orc_P) const
 {
    const float64 f64_Factor = (this->mf64_Width + this->mf64_InteractionPointWidth) / 2.0;
@@ -285,18 +254,15 @@ QPointF C_GiBiLineBounding::AdaptVecToWidth(const QPointF & orc_P) const
    return AdaptVecToWidth(orc_P, f64_Factor);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get length of vector
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get length of vector
 
    \param[in] orc_P Point to evaluate
 
    \return
    Length of input vector
-
-   \created     12.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 float64 C_GiBiLineBounding::GetLength(const QPointF & orc_P)
 {
    const float64 f64_Retval = std::sqrt((orc_P.x() * orc_P.x()) + (orc_P.y() * orc_P.y()));
@@ -304,16 +270,13 @@ float64 C_GiBiLineBounding::GetLength(const QPointF & orc_P)
    return f64_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Consolidate intersection points of line segments in specified index range
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Consolidate intersection points of line segments in specified index range
 
    \param[in] ors32_RangeIndexStart Start index of range to consolidate
    \param[in] ors32_RangeIndexEnd   Last index of range to consolidate
-
-   \created     24.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiLineBounding::m_ConsolidateLine(const sint32 & ors32_RangeIndexStart, const sint32 & ors32_RangeIndexEnd)
 {
    //Check if at least two lines are possible
@@ -357,9 +320,8 @@ void C_GiBiLineBounding::m_ConsolidateLine(const sint32 & ors32_RangeIndexStart,
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculate intersection point if possible
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculate intersection point if possible
 
    See http://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect @Gareth Rees
 
@@ -372,10 +334,8 @@ void C_GiBiLineBounding::m_ConsolidateLine(const sint32 & ors32_RangeIndexStart,
    \return
    true:  Intersection found
    false: No intersection
-
-   \created     21.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiBiLineBounding::m_CalcIntersection(const QPointF & orc_Start1, const QPointF & orc_End1,
                                             const QPointF & orc_Start2, const QPointF & orc_End2,
                                             QPointF & orc_Intersection)
@@ -429,9 +389,8 @@ bool C_GiBiLineBounding::m_CalcIntersection(const QPointF & orc_Start1, const QP
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if value within boundaries
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if value within boundaries
 
    \param[in] orf64_Eval  Point to check for boundaries
    \param[in] orf64_Start Lower boundary
@@ -440,10 +399,8 @@ bool C_GiBiLineBounding::m_CalcIntersection(const QPointF & orc_Start1, const QP
    \return
    true:  Within boundaries
    false: Outside boundaries
-
-   \created     21.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiBiLineBounding::mq_Within(const float64 & orf64_Eval, const float64 & orf64_Start, const float64 & orf64_End)
 {
    bool q_Retval;

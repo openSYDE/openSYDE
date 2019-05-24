@@ -1,18 +1,11 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Class with generic interface to handle and write a CAN log file (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.12.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -46,15 +39,12 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+/*! \brief   Default constructor
 
    \param[in]  orc_FilePath                 Path for file
    \param[in]  orc_ProtocolName             Name of current set protocol
    \param[in]  oq_HexActive                 Mode for writing CAN Id and CAN data (hexadecimal or decimal)
    \param[in]  oq_RelativeTimeStampActive   Mode for writing CAN timestamp (relative or absolute)
-
-   \created     13.12.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_OSCComMessageLoggerFileAsc::C_OSCComMessageLoggerFileAsc(const C_SCLString & orc_FilePath,
@@ -68,12 +58,9 @@ C_OSCComMessageLoggerFileAsc::C_OSCComMessageLoggerFileAsc(const C_SCLString & o
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+/*! \brief   Default destructor
 
    Writes the end line and closes the open file
-
-   \created     13.12.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_OSCComMessageLoggerFileAsc::~C_OSCComMessageLoggerFileAsc(void)
@@ -87,16 +74,13 @@ C_OSCComMessageLoggerFileAsc::~C_OSCComMessageLoggerFileAsc(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Creates, if necessary, and opens file and adds the default header of the file.
+/*! \brief   Creates, if necessary, and opens file and adds the default header of the file.
 
    An already opened file will be closed and deleted.
 
    \return
    C_NO_ERR    File successfully opened and created
    C_RD_WR     Error on creating file, folders or deleting old file
-
-   \created     14.12.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComMessageLoggerFileAsc::OpenFile(void)
@@ -136,12 +120,9 @@ sint32 C_OSCComMessageLoggerFileAsc::OpenFile(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Adding of a concrete CAN message to the log file
+/*! \brief   Adding of a concrete CAN message to the log file
 
    \param[in]     orc_MessageData      Current CAN message
-
-   \created     14.12.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCComMessageLoggerFileAsc::AddMessageToFile(const C_OSCComMessageLoggerData & orc_MessageData)
@@ -254,16 +235,13 @@ void C_OSCComMessageLoggerFileAsc::AddMessageToFile(const C_OSCComMessageLoggerD
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Writes header of asc log file
+/*! \brief   Writes header of asc log file
 
    Format:
    date <WeekDay> <Month> <Date> <Fulltime> <Year>
    base <hex|dec> timestamps <absolute|relative>
    no internal events logged
    // version 7.2.0
-
-   \created     14.12.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCComMessageLoggerFileAsc::m_WriteHeader(void)
@@ -309,13 +287,10 @@ void C_OSCComMessageLoggerFileAsc::m_WriteHeader(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the current date and time in the asc format
+/*! \brief   Returns the current date and time in the asc format
 
    \return
    Time and date in defined format
-
-   \created     17.12.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetAscTimeString(void)
@@ -349,15 +324,12 @@ C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetAscTimeString(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the weekday in the asc format
+/*! \brief   Returns the weekday in the asc format
 
    \param[in]     osn_Day        Number for weekday, starting with Sunday a 0
 
    \return
    Weekday
-
-   \created     14.12.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetDay(const sintn osn_Day)
@@ -397,15 +369,12 @@ C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetDay(const sintn osn_Day)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the weekday in the asc format
+/*! \brief   Returns the weekday in the asc format
 
    \param[in]     osn_Month       Number for month, starting with 0
 
    \return
    Weekday
-
-   \created     14.12.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetMonth(const sintn osn_Month)
@@ -460,8 +429,7 @@ C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetMonth(const sintn osn_Month)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Adapts a timestamp in a string in a format based on seconds
+/*! \brief   Adapts a timestamp in a string in a format based on seconds
 
    Examples for format:
    " 0.000001"
@@ -472,8 +440,6 @@ C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetMonth(const sintn osn_Month)
 
    \return
    Adapted string
-
-   \created     17.12.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_OSCComMessageLoggerFileAsc::mh_AdaptTimeStamp(const uint64 ou64_TimeStamp)

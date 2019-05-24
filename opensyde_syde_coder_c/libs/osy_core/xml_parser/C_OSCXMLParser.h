@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief      Wrapper class for tinyxml2
@@ -9,15 +9,9 @@
    Based on an pre-existing implementation for rapidxml.
    Documented and modfied to fit into openSYDE structure and conventions.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     07.09.2016  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCXMLPARSERH
 #define C_OSCXMLPARSERH
 

@@ -1,21 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Connects the openSYDE protocol driver to a node with GUI specific functionality
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.08.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVCOMDATADEALER_H
 #define C_SYVCOMDATADEALER_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QMap>
 #include <QList>
 
@@ -29,12 +23,12 @@
 #include "C_PuiSvDbDataElementHandler.h"
 #include "C_OSCNodeDataPoolListElementId.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SyvComDataDealer :
    public stw_opensyde_core::C_OSCDataDealerNvmSafe
@@ -74,7 +68,7 @@ private:
    QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId, QList<C_PuiSvDbDataElementHandler *> > mc_AllWidgets;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

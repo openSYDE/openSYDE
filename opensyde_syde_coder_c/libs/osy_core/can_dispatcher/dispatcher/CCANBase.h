@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Header for C_CAN base class.
 
    Header to an abstract base class for interfacing with different CAN communication driver architectures.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.05.2010  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2010 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CCANBASEH
 #define CCANBASEH
 

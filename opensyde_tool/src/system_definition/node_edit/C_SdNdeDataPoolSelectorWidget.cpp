@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for showing all datapools of a node and a specific category
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.02.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SdNdeDataPoolSelectorWidget.h"
 
 #include "constants.h"
@@ -30,33 +23,30 @@
 #include "C_SdUtil.h"
 #include "TGLUtils.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent        Optional pointer to parent
-
-   \created     01.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolSelectorWidget::C_SdNdeDataPoolSelectorWidget(QWidget * const opc_Parent) :
    C_OgeWiWithToolTip(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDataPoolSelectorWidget),
@@ -135,28 +125,22 @@ C_SdNdeDataPoolSelectorWidget::C_SdNdeDataPoolSelectorWidget(QWidget * const opc
            &C_SdNdeDataPoolSelectorWidget::m_UpdateErrorToolTip);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     01.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolSelectorWidget::~C_SdNdeDataPoolSelectorWidget()
 {
    delete mpc_Ui;
    //lint -e{1740}  no memory leak because of the parent of mpc_LabelStateImg, mpc_UsageBar and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     26.03.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorWidget::InitStaticNames(void) const
 {
    //Tool tips
@@ -164,29 +148,24 @@ void C_SdNdeDataPoolSelectorWidget::InitStaticNames(void) const
                                                          C_GtGetText::h_GetText("Add new Datapool."));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Inits the widget with all necessary information
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Inits the widget with all necessary information
 
    \param[in]     orc_Title         Title for category label
    \param[in]     orc_Description   Description for category label
    \param[in]     orc_InstanceName  Name of the instance of this class of using stylesheets
-
-   \created     06.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
-void C_SdNdeDataPoolSelectorWidget::InitWidget(const QString & orc_Title,
-                                               const QString & orc_TooltipTitle, const QString & orc_TooltipContent,
-                                               const QString & orc_InstanceName)
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDataPoolSelectorWidget::InitWidget(const QString & orc_Title, const QString & orc_TooltipTitle,
+                                               const QString & orc_TooltipContent, const QString & orc_InstanceName)
 {
    this->mc_InstanceName = orc_InstanceName;
    this->mpc_Ui->pc_LabelDpCategory->setText(orc_Title);
    this->mpc_Ui->pc_LabelDpCategory->SetToolTipInformation(orc_TooltipTitle, orc_TooltipContent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Specify associated node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Specify associated node
 
    \param[in] oe_Type                  Datapool type
    \param[in] ou32_NodeIndex           Node index
@@ -195,10 +174,8 @@ void C_SdNdeDataPoolSelectorWidget::InitWidget(const QString & orc_Title,
    \return
    true   datapool added
    false  no datapool added
-
-   \created     17.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolSelectorWidget::SetTypeAndNode(const stw_opensyde_core::C_OSCNodeDataPool::E_Type oe_Type,
                                                    const uint32 ou32_NodeIndex, const bool oq_UsageViewActive)
 {
@@ -252,16 +229,13 @@ bool C_SdNdeDataPoolSelectorWidget::SetTypeAndNode(const stw_opensyde_core::C_OS
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the conflict state of the active datapool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the conflict state of the active datapool
 
-   \param[in] oq_Active     Flag if conlfict is active or not
-
-   \created     22.02.2017  STW/B.Bayer
+   \param[in] oq_Active     Flag if conflict is active or not
 */
-//-----------------------------------------------------------------------------
-void C_SdNdeDataPoolSelectorWidget::SetActualDataPoolConflict(const bool oq_Active)
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDataPoolSelectorWidget::SetCurrentDataPoolConflict(const bool oq_Active)
 {
    const bool q_Return = this->mpc_Ui->pc_ListWidget->SetActualDataPoolConflict(oq_Active);
 
@@ -277,43 +251,34 @@ void C_SdNdeDataPoolSelectorWidget::SetActualDataPoolConflict(const bool oq_Acti
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the widgets for the actual datapool
-
-   \created     24.02.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the widgets for the actual datapool
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorWidget::UpdateActualDataPool(void) const
 {
    this->mpc_Ui->pc_ListWidget->UpdateActualDataPool();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the datapool with a specific index active
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the datapool with a specific index active
 
    \param[in]  ou32_DataPoolIndex   Real datapool index
 
    \return
    true     datapool found with this index
    false    no datapool found with this index
-
-   \created     dd.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolSelectorWidget::SetDataPoolActive(const uint32 ou32_DataPoolIndex) const
 {
    return this->mpc_Ui->pc_ListWidget->SetDataPoolActive(ou32_DataPoolIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Recheck error for all data pools
-
-   \created     11.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Recheck error for all data pools
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorWidget::ErrorCheck(void)
 {
    QString c_Heading;
@@ -337,20 +302,18 @@ void C_SdNdeDataPoolSelectorWidget::ErrorCheck(void)
                                         c_Content);
 
    this->mpc_LabelStateImg->SetToolTipInformation(c_Heading, c_Content, C_NagToolTip::eERROR);
-   this->SetActualDataPoolConflict(q_Error);
+   //Update the group label (items should have updated labels already)
+   this->mpc_LabelStateImg->setVisible(q_Error);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the widget active or inactive
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the widget active or inactive
 
    Adapts the stylesheet
 
    \param[in]     oq_Active   Is widget active or not active
-
-   \created     06.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorWidget::SetActive(const bool oq_Active)
 {
    this->mq_Active = oq_Active;
@@ -375,13 +338,10 @@ void C_SdNdeDataPoolSelectorWidget::SetActive(const bool oq_Active)
    this->m_UpdateWidget();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger check of data pool interaction availability
-
-   \created     04.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger check of data pool interaction availability
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorWidget::CheckDataPoolInteraction(void)
 {
    if (this->me_DataPoolType == stw_opensyde_core::C_OSCNodeDataPool::eCOM)
@@ -406,31 +366,25 @@ void C_SdNdeDataPoolSelectorWidget::CheckDataPoolInteraction(void)
    this->mpc_Ui->pc_ListWidget->CheckDataPoolInteraction();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Is the widget active or inactive
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Is the widget active or inactive
 
    \return
    true     widget is active
    false    widget is not active
-
-   \created     20.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolSelectorWidget::IsActive(void) const
 {
    return this->mq_Active;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the widget in maximized or minimized mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the widget in maximized or minimized mode
 
    \param[in]     oq_Maximized   Flag for maximized
-
-   \created     07.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorWidget::SetMaximized(const bool oq_Maximized)
 {
    if (this->mpc_UsageBar != NULL)
@@ -453,17 +407,14 @@ void C_SdNdeDataPoolSelectorWidget::SetMaximized(const bool oq_Maximized)
    this->mpc_Ui->pc_ListWidget->SetMaximized(oq_Maximized);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overrided paint event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overrided paint event
 
    Draws the background element
 
    \param[in,out] opc_Event  Pointer to paint event
-
-   \created     06.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorWidget::paintEvent(QPaintEvent * const opc_Event)
 {
    //draw background
@@ -472,17 +423,14 @@ void C_SdNdeDataPoolSelectorWidget::paintEvent(QPaintEvent * const opc_Event)
    QWidget::paintEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten resize event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten resize event slot
 
    Here: Resize usage widget size
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     24.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorWidget::resizeEvent(QResizeEvent * const opc_Event)
 {
    QWidget::resizeEvent(opc_Event);
@@ -493,17 +441,14 @@ void C_SdNdeDataPoolSelectorWidget::resizeEvent(QResizeEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: handle list actions
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     25.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorWidget::keyPressEvent(QKeyEvent * const opc_Event)
 {
    bool q_CallOrig = true;
@@ -536,15 +481,12 @@ void C_SdNdeDataPoolSelectorWidget::keyPressEvent(QKeyEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overrided focus in event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overrided focus in event
 
    \param[in,out] opc_Event  Pointer to paint event
-
-   \created     06.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorWidget::focusInEvent(QFocusEvent * const opc_Event)
 {
    QWidget::focusInEvent(opc_Event);
@@ -560,7 +502,7 @@ void C_SdNdeDataPoolSelectorWidget::focusInEvent(QFocusEvent * const opc_Event)
    Q_EMIT this->SigWidgetFocused(this->me_DataPoolType, this->mpc_Ui->pc_ListWidget->currentRow());
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorWidget::m_UpdateWidget(void)
 {
    if (this->mpc_Ui->pc_ListWidget->GetCountLines() > 1)
@@ -616,7 +558,7 @@ void C_SdNdeDataPoolSelectorWidget::m_UpdateWidget(void)
    this->update();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorWidget::m_DpChangedUpdateUsageView(const bool oq_InitChange)
 {
    if (oq_InitChange == false)
@@ -677,7 +619,7 @@ void C_SdNdeDataPoolSelectorWidget::m_DpChangedUpdateUsageView(const bool oq_Ini
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorWidget::m_ListFocused(const sintn osn_DataPoolWidgetIndex, const bool oq_ForceChange)
 {
    if (this->mq_Active == false)
@@ -687,33 +629,30 @@ void C_SdNdeDataPoolSelectorWidget::m_ListFocused(const sintn osn_DataPoolWidget
    Q_EMIT this->SigWidgetFocused(this->me_DataPoolType, osn_DataPoolWidgetIndex, oq_ForceChange);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorWidget::m_ButtonRightClicked(void) const
 {
    this->mpc_Ui->pc_ListWidget->SetActualLine(this->mpc_Ui->pc_ListWidget->GetActualLine() + 1);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorWidget::m_ButtonLeftClicked(void) const
 {
    this->mpc_Ui->pc_ListWidget->SetActualLine(this->mpc_Ui->pc_ListWidget->GetActualLine() - 1);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorWidget::m_OnErrorCheck(void)
 {
    Q_EMIT this->SigErrorCheck();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show custom context menu
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show custom context menu
 
    \param[in] orc_Pos Local context menu position
-
-   \created     03.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorWidget::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 {
    if (this->mq_AllowInteraction == true)
@@ -723,7 +662,7 @@ void C_SdNdeDataPoolSelectorWidget::m_OnCustomContextMenuRequested(const QPoint 
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorWidget::m_SetupContextMenu(void)
 {
    this->mpc_ContextMenu = new stw_opensyde_gui_elements::C_OgeContextMenu(this);
@@ -744,33 +683,27 @@ void C_SdNdeDataPoolSelectorWidget::m_SetupContextMenu(void)
            &C_SdNdeDataPoolSelectorWidget::m_OnCustomContextMenuRequested);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorWidget::m_AddNewDatapool(void) const
 {
    this->mpc_Ui->pc_ListWidget->setFocus();
    this->mpc_Ui->pc_ListWidget->AddNewDatapool();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle paste action
-
-   \created     03.05.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle paste action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorWidget::m_PasteDatapool(void) const
 {
    this->mpc_Ui->pc_ListWidget->setFocus();
    this->mpc_Ui->pc_ListWidget->Paste();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do live update for datapool error tool tip
-
-   \created     19.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do live update for datapool error tool tip
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorWidget::m_UpdateErrorToolTip(void)
 {
    const stw_opensyde_core::C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(

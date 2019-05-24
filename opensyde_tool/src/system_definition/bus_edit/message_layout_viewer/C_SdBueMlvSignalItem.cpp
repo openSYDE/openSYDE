@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Graphics item for signal items of message layout viewer (implementation)
 
    detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     05.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
@@ -27,28 +20,27 @@
 #include "C_SdBueMlvSignalItem.h"
 #include "C_GtGetText.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const stw_types::float64 C_SdBueMlvSignalItem::mhf64_ResizeItemHeight = 20.0;
 const stw_types::float64 C_SdBueMlvSignalItem::mhf64_ResizeItemClickOffset = 8.0;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]       orc_BackgroundColor      Background color
    \param[in]       orc_FontColor            Font color
@@ -56,10 +48,8 @@ const stw_types::float64 C_SdBueMlvSignalItem::mhf64_ResizeItemClickOffset = 8.0
    \param[in]       orc_Name                 Name of the signal
    \param[in]       of64_Space               Space configuration between signals
    \param[in,out]   opc_parent               Optional pointer to parent
-
-   \created     05.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvSignalItem::C_SdBueMlvSignalItem(const QColor & orc_BackgroundColor, const QColor & orc_FontColor,
                                            const QColor & orc_ResizeItemColor, const QString & orc_Name,
                                            const float64 of64_Space, QGraphicsItem * const opc_Parent) :
@@ -85,29 +75,23 @@ C_SdBueMlvSignalItem::C_SdBueMlvSignalItem(const QColor & orc_BackgroundColor, c
    this->setAcceptHoverEvents(true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     05.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvSignalItem::~C_SdBueMlvSignalItem()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the size and position of the item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the size and position of the item
 
    \param[in]     of64_SingleItemWidth      New item width
    \param[in]     of64_SingleItemHeight     New item height
-
-   \created     06.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalItem::Update(const float64 of64_SingleItemWidth, const float64 of64_SingleItemHeight)
 {
    const uint16 u16_Length = (this->mu16_LastBit - this->mu16_StartBit) + static_cast<uint16>(1U);
@@ -156,17 +140,14 @@ void C_SdBueMlvSignalItem::Update(const float64 of64_SingleItemWidth, const floa
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the byte/bit position of the signal item in the layout
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the byte/bit position of the signal item in the layout
 
    \param[in]     ou16_ByteRow     Actual byte row
    \param[in]     ou16_StartBit    Actual start bit
    \param[in]     ou16_LastBit     Actual last bit
-
-   \created     06.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalItem::SetBitPosition(const uint16 ou16_ByteRow, const uint16 ou16_StartBit,
                                           const uint16 ou16_LastBit)
 {
@@ -175,33 +156,27 @@ void C_SdBueMlvSignalItem::SetBitPosition(const uint16 ou16_ByteRow, const uint1
    this->mu16_LastBit = ou16_LastBit;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the flags for showing the msb and / or lsb information
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the flags for showing the msb and / or lsb information
 
    \param[in]     oq_Msb     Flag for showing the msb
    \param[in]     oq_Lsb     Flag for showing the lsb
-
-   \created     10.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalItem::SetShowSignificantBit(const bool oq_Msb, const bool oq_Lsb)
 {
    this->mq_ShowMsb = oq_Msb;
    this->mq_ShowLsb = oq_Lsb;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the flags for showing the needed resize items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the flags for showing the needed resize items
 
    \param[in]     oq_LeftResizeItem     Flag for showing the left resize item
    \param[in]     oq_RightResizeItem    Flag for showing the right resize item
    \param[in]     oq_IsResizeable       Flag if the item is really resize able
-
-   \created     10.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalItem::SetResizeItem(const bool oq_LeftResizeItem, const bool oq_RightResizeItem,
                                          const bool oq_IsResizeable)
 {
@@ -210,44 +185,35 @@ void C_SdBueMlvSignalItem::SetResizeItem(const bool oq_LeftResizeItem, const boo
    this->mq_IsResizeable = oq_IsResizeable;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the flags if the signal item shall be handled as hovered
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the flags if the signal item shall be handled as hovered
 
    \param[in]     oq_Hover     Flag if item is hovered
-
-   \created     10.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalItem::SetHovered(const bool oq_Hover)
 {
    this->mq_Hovered = oq_Hover;
    this->update();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the error state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the error state
 
    \param[in]     oq_Active     Flag if an error is active
-
-   \created     27.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalItem::SetError(const bool oq_Active)
 {
    this->mc_Font.setItalic(oq_Active);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapts the visualization to show the selection state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapts the visualization to show the selection state
 
    \param[in]     oq_Selected     input parameter description
-
-   \created     17.01.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalItem::SetSelected(const bool oq_Selected)
 {
    if (oq_Selected == true)
@@ -260,19 +226,16 @@ void C_SdBueMlvSignalItem::SetSelected(const bool oq_Selected)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checks if a specific point is inside of the item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks if a specific point is inside of the item
 
    \param[in]     orc_Pos        Searched point
 
    \return
    true     Point is inside
    false    Point is not inside
-
-   \created     11.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdBueMlvSignalItem::ContainsPoint(const QPointF & orc_Pos) const
 {
    // position and size is relevant
@@ -281,19 +244,16 @@ bool C_SdBueMlvSignalItem::ContainsPoint(const QPointF & orc_Pos) const
    return c_Rect.contains(orc_Pos);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checks if a specific point is inside of the left resize item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks if a specific point is inside of the left resize item
 
    \param[in]     orc_Pos        Searched point
 
    \return
    true     Point is inside
    false    Point is not inside
-
-   \created     11.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdBueMlvSignalItem::ContainsLeftResizeItemPoint(const QPointF & orc_Pos) const
 {
    bool q_Return = false;
@@ -308,19 +268,16 @@ bool C_SdBueMlvSignalItem::ContainsLeftResizeItemPoint(const QPointF & orc_Pos) 
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checks if a specific point is inside of the right resize item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks if a specific point is inside of the right resize item
 
    \param[in]     orc_Pos        Searched point
 
    \return
    true     Point is inside
    false    Point is not inside
-
-   \created     11.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdBueMlvSignalItem::ContainsRightResizeItemPoint(const QPointF & orc_Pos) const
 {
    bool q_Return = false;
@@ -335,17 +292,14 @@ bool C_SdBueMlvSignalItem::ContainsRightResizeItemPoint(const QPointF & orc_Pos)
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    \param[in,out] opc_Painter Painter
    \param[in,out] opc_Option  Option
    \param[in,out] opc_Widget  Widget
-
-   \created     10.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalItem::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                                  QWidget * const opc_Widget)
 {
@@ -432,15 +386,12 @@ void C_SdBueMlvSignalItem::paint(QPainter * const opc_Painter, const QStyleOptio
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse hover enter event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse hover enter event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     10.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalItem::hoverEnterEvent(QGraphicsSceneHoverEvent * const opc_Event)
 {
    Q_EMIT this->SigItemHovered(true);
@@ -448,17 +399,14 @@ void C_SdBueMlvSignalItem::hoverEnterEvent(QGraphicsSceneHoverEvent * const opc_
    C_SdBueMlvBaseItem::hoverEnterEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse hover enter event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse hover enter event slot
 
    Here: Change the cursor if over resize icon
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     10.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalItem::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_Event)
 {
    bool q_ResizeIconHover = false;
@@ -492,15 +440,12 @@ void C_SdBueMlvSignalItem::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_E
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse hover leave event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse hover leave event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     10.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalItem::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event)
 {
    Q_EMIT this->SigItemHovered(false);

@@ -1,43 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
-   \file        CCMONProtocolIVA
+   \file
    \brief       Implements textual interpretation of SHIP-IP! and STW IVA protocol messages
 
    As the IVA protocol is fully included into the SHIP-IP! protocol, and there is no ambiguity
    this class is used to interpret both protocols.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     18.12.2009  STW/A.Stangl
-   \endimplementation
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   14.12.2016        STW/AEB,DPO   SHIP-IT!: added support of new services (redmine #14436)
-   22.01.2014        STW/A.Stangl  SHIP-IT!: added support to interpret transport protocol eleven
-                                   SHIP-IP!: updated to match service definitions
-   30.11.2011        STW/A.Stangl  SHIP-IP!: updated to match service definitions
-                                    (still not neccessarily a 100% fixed state)
-   14.06.2011        STW/A.Stangl  IVA: added service "write_list_default"
-                                   IVA: changed interpretation of "check_list_checksum" response (changed specification)
-   19.05.2011        STW/A.Stangl  SHIP-IP!: removed IVA table ident (removed from protocol specification)
-   06.09.2010        STW/A.Stangl  SHIP-IP!: added decoding of headers + payload for read/write
-   31.08.2010        STW/A.Stangl  SHIP-IP!: added interpretation of memory and OD read/write
-   31.04.2010        STW/A.Stangl  IVA: fix: protocol Logoff as LOGOFF (was: LOGON)
-   21.04.2010        STW/A.Stangl  added SHIP-IP! interpretation on transport protocol layer
-   12.01.2010        STW/A.Stangl  finished implementing all services
-   18.12.2009        STW/A.Stangl  file created
-   \endhistory
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------ */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -52,7 +26,7 @@
 #include "CCMONProtocolSHIPIPIVA.h"
 #include "TGLUtils.h"
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 using namespace stw_types;
 using namespace stw_errors;
@@ -60,7 +34,7 @@ using namespace stw_cmon_protocol;
 using namespace stw_scl;
 using namespace stw_can;
 
-/* -- Defines ------------------------------------------------------------- */
+/* -- Defines ------------------------------------------------------------------------------------------------------- */
 
 //Have the protocol constants here as copies, so we can put this class into a library of its own
 // without having to add all the protocol header files.
@@ -419,22 +393,20 @@ using namespace stw_can;
 #define SIP_PSIZE_SYS_WAKEUP                                         (1U)
 #define SIP_PSIZE_SYS_TEMPERATURE                                    (2U)
 
-/* -- Types --------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ---------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables --------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 bool C_CMONProtocolSHIP_IP_IVA::hmq_ServiceTableInitialized = false;
 SCLDynamicArray<C_CMONProtocolSIPASADescription> C_CMONProtocolSHIP_IP_IVA::hmc_Services;
 
-/* -- Module Global Function Prototypes ----------------------------------- */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------ */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert CAN message to text representation.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert CAN message to text representation.
 
    Can either be:
    - in IVA protocol
@@ -446,10 +418,8 @@ SCLDynamicArray<C_CMONProtocolSIPASADescription> C_CMONProtocolSHIP_IP_IVA::hmc_
 
    \return
    Text interpretation of CAN message ("" if the message can not be interpreted)
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolSHIP_IP_IVA::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) const
 {
    if (hmq_ServiceTableInitialized == false)
@@ -459,7 +429,6 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::MessageToString(const T_STWCAN_Msg_RX & o
       hmq_ServiceTableInitialized = true;
    }
 
-
    if (orc_Msg.u8_XTD == 0U)
    {
       return m_MessageToString11Bit(orc_Msg);
@@ -467,9 +436,8 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::MessageToString(const T_STWCAN_Msg_RX & o
    return m_SIPMessageToString(orc_Msg);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert CAN message with 11bit ID to text representation.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert CAN message with 11bit ID to text representation.
 
    Convert CAN message with 11bit ID to text represenation.
    Can either be:
@@ -481,18 +449,8 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::MessageToString(const T_STWCAN_Msg_RX & o
 
    \return
    Text interpretation of CAN message ("" if the message can not be interpreted)
-
-   \created     18.12.2009  STW/A.Stangl
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   14.01.2014        STW/A.Stangl  added support for SIP11 protocol
-   12.01.2010        STW/A.Stangl  finished implementing all services
-   18.12.2009        STW/A.Stangl  function created as stub
-   \endhistory
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg_RX & orc_Msg) const
 {
    C_SCLString c_Text;
@@ -1217,7 +1175,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg
    return c_Text;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_CMONProtocolSHIP_IP_IVA::m_IVAGetErrorFromCode(const uint16 ou16_ErrorCode) const
 {
@@ -1267,7 +1225,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_IVAGetErrorFromCode(const uint16 ou16_E
    return c_Error;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_CMONProtocolSHIP_IP_IVA::m_IVAServiceIndexToString(const uint16 ou16_ServiceIndex) const
 {
@@ -1314,7 +1272,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_IVAServiceIndexToString(const uint16 ou
    return c_Index;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPMessageToString(const T_STWCAN_Msg_RX & orc_Msg) const
 {
@@ -1425,7 +1383,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPMessageToString(const T_STWCAN_Msg_R
    return c_Text;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIP11MessageToString(const T_STWCAN_Msg_RX & orc_Msg) const
 {
@@ -1521,7 +1479,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIP11MessageToString(const T_STWCAN_Msg
    return c_Text;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //\param[in]  ou8_Byte1                1st byte of service (contains AERF, ACLI, AAT)
 //\param[in]  ou8_Byte2                1st byte following AAT (if ACLI == 1: first byte of ASH
 //                                                             if ACLI == 0: ALIT)
@@ -1582,7 +1540,6 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetApplData(const uint8 ou8_Byte1, c
       u8_ASH_Byte1 = ou8_Byte2;
       pu8_ASH_Byte2 = &opu8_FollowingBytes[0];
    }
-
 
    switch (u8_AAT)
    {
@@ -1911,7 +1868,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetApplData(const uint8 ou8_Byte1, c
    return c_Text;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetAppErrorFromCode(const uint8 ou8_ErrorCode) const
 {
@@ -1961,7 +1918,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetAppErrorFromCode(const uint8 ou8_
    return c_Error;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetTPErrorFromCode(const uint8 ou8_ErrorCode) const
 {
@@ -1993,7 +1950,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetTPErrorFromCode(const uint8 ou8_E
    return c_Error;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetAccessType(const uint8 ou8_AccessType) const
 {
@@ -2040,7 +1997,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetAccessType(const uint8 ou8_Access
    return c_Type;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetMemoryRWTypeAndIndex(const uint8 ou8_MemType,
                                                                     const uint8 ou8_MemIndex) const
@@ -2085,7 +2042,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetMemoryRWTypeAndIndex(const uint8 
    return c_Help;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetODRWTypeAndIndex(const uint8 ou8_ODType,
                                                                   const uint16 ou16_VariableIndex) const
@@ -2108,22 +2065,19 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetODRWTypeAndIndex(const uint8 ou8_
    return c_Help;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get name of protocol as string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get name of protocol as string
 
    \return
    Text representation of protocol name
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolSHIP_IP_IVA::GetProtocolName(void) const
 {
    return "STW SHIP-IP!/IVA";
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_CMONProtocolSIPPayload::Set(const C_SCLString & orc_Name, const uint8 ou8_Size, const bool oq_Signed)
 {
@@ -2132,7 +2086,7 @@ void C_CMONProtocolSIPPayload::Set(const C_SCLString & orc_Name, const uint8 ou8
    u8_Size = ou8_Size;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 //checking for correct length is the job of the caller !
 C_SCLString C_CMONProtocolSIPPayload::Decode(const uint8 * const opu8_Data, const bool oq_Decimal) const
@@ -2248,7 +2202,7 @@ C_SCLString C_CMONProtocolSIPPayload::Decode(const uint8 * const opu8_Data, cons
    return c_Text;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_CMONProtocolSIPASPDescription::Set(const C_SCLString & orc_ShortName, const uint16 ou16_Length)
 {
@@ -2256,7 +2210,7 @@ void C_CMONProtocolSIPASPDescription::Set(const C_SCLString & orc_ShortName, con
    u16_Length  = ou16_Length;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_CMONProtocolSIPASNDescription::Set(const C_SCLString & orc_ShortName, const uint8 ou8_NumASPs,
                                           const C_SCLString & orc_ASPPrefix, const uint16 ou16_Length)
@@ -2267,7 +2221,7 @@ void C_CMONProtocolSIPASNDescription::Set(const C_SCLString & orc_ShortName, con
    c_ASPs.SetLength(ou8_NumASPs);
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //init service table for interpretation of SHIP-IP! services
 //Ideally this whole function will be XSLT-generated. So we don't need any manual changes when new services are defined.
 //On the other hand this implementation only needs to be done once for each service, in contrast to having to
@@ -2639,7 +2593,7 @@ void C_CMONProtocolSHIP_IP_IVA::hm_InitServiceTable(void)
    hmc_Services[SIP_ASA_ETHERNET].c_ASNs[SIP_ASN_ETH_STATE].c_Payload[3].Set("POLARITY", 1, false);
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPDecodeData(const SCLDynamicArray<C_CMONProtocolSIPPayload> & orc_Payload,
                                                          const uint8 ou8_NumBytesInPayload,
@@ -2682,7 +2636,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPDecodeData(const SCLDynamicArray<C_C
    return c_Text;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //\param[in]  ou8_ASA                  service header area
 //\param[in]  ou8_ASN                  service header name
 //\param[in]  ou8_ASP                  service header parameter
@@ -2743,5 +2697,5 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPDecodeSFFFReadWriteHeader(const uint
    return c_Text;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 

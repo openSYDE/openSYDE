@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for system view dashboards settings
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.07.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwerrors.h"
@@ -24,7 +17,7 @@
 #include "C_SyvDaDashboardSettings.h"
 #include "ui_C_SyvDaDashboardSettings.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -32,33 +25,30 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const stw_types::sintn C_SyvDaDashboardSettings::mhsn_Min = 10;
 const stw_types::sintn C_SyvDaDashboardSettings::mhsn_Max = 65000;
 const stw_types::sintn C_SyvDaDashboardSettings::mhsn_MinDistanceBetween = 10;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] orc_Parent     Reference to parent
    \param[in]     ou32_ViewIndex View index
-
-   \created     27.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaDashboardSettings::C_SyvDaDashboardSettings(C_OgePopUpDialog & orc_Parent,
                                                    const stw_types::uint32 ou32_ViewIndex) :
    QWidget(&orc_Parent),
@@ -123,27 +113,21 @@ C_SyvDaDashboardSettings::C_SyvDaDashboardSettings(C_OgePopUpDialog & orc_Parent
            &C_SyvDaDashboardSettings::m_OnSlowChanged);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     27.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaDashboardSettings::~C_SyvDaDashboardSettings(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     27.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSettings::InitStaticNames(void) const
 {
    this->mrc_Parent.SetTitle(C_GtGetText::h_GetText("Data Transmission"));
@@ -168,13 +152,10 @@ void C_SyvDaDashboardSettings::InitStaticNames(void) const
                                                         "Data elements configured using the cyclic interval \"Slow\" will use this cyclic transmission time"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle save to data
-
-   \created     27.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle save to data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSettings::Save(void) const
 {
    tgl_assert(C_PuiSvHandler::h_GetInstance()->SetViewUpdateRateFast(this->mu32_ViewIndex,
@@ -192,17 +173,14 @@ void C_SyvDaDashboardSettings::Save(void) const
               C_NO_ERR);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     02.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSettings::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
@@ -228,13 +206,10 @@ void C_SyvDaDashboardSettings::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle load from data
-
-   \created     28.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle load from data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSettings::m_Load(void) const
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
@@ -247,39 +222,30 @@ void C_SyvDaDashboardSettings::m_Load(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On ok clicked
-
-   \created     27.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On ok clicked
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSettings::m_OkClicked(void)
 {
    this->mrc_Parent.accept();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On cancel clicked
-
-   \created     27.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On cancel clicked
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSettings::m_CancelClicked(void)
 {
    this->mrc_Parent.reject();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle fast value change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle fast value change
 
    \param[in] osn_Value New value
-
-   \created     28.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSettings::m_OnFastChanged(const stw_types::sintn osn_Value) const
 {
    const sintn sn_FastValue = osn_Value;
@@ -291,15 +257,12 @@ void C_SyvDaDashboardSettings::m_OnFastChanged(const stw_types::sintn osn_Value)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle medium value change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle medium value change
 
    \param[in] osn_Value New value
-
-   \created     28.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSettings::m_OnMediumChanged(const stw_types::sintn osn_Value) const
 {
    const sintn sn_FastValue = this->mpc_Ui->pc_SpinBoxFast->value();
@@ -317,15 +280,12 @@ void C_SyvDaDashboardSettings::m_OnMediumChanged(const stw_types::sintn osn_Valu
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle slow value change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle slow value change
 
    \param[in] osn_Value New value
-
-   \created     28.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSettings::m_OnSlowChanged(const stw_types::sintn osn_Value) const
 {
    const sintn sn_MediumValue = this->mpc_Ui->pc_SpinBoxMedium->value();

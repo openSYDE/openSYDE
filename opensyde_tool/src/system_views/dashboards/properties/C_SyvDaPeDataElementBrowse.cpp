@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for system view dashboard data element selection (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     05.09.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_GtGetText.h"
@@ -22,30 +15,29 @@
 
 #include "ui_C_SyvDaPeDataElementBrowse.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const sintn C_SyvDaPeDataElementBrowse::mhsn_INDEX_DATAPOOL_ELEMENT = 0;
 const sintn C_SyvDaPeDataElementBrowse::mhsn_INDEX_BUS_SIGNAL = 1;
 stw_types::sint32 C_SyvDaPeDataElementBrowse::mhs32_LastSelectedComboBoxIndex = 0;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -56,10 +48,8 @@ stw_types::sint32 C_SyvDaPeDataElementBrowse::mhs32_LastSelectedComboBoxIndex = 
    \param[in]     oq_ShowArrayElements     Optional flag to hide all array elements (if false)
    \param[in]     oq_Show64BitValues       Optional flag to hide all 64 bit elements (if false)
    \param[in]     oq_ShowNVMLists          Optional flag to only show NVM LISTs
-
-   \created     06.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Parent, const uint32 ou32_ViewIndex,
                                                        const bool oq_MultiSelect, const bool oq_ShowOnlyWriteElements,
                                                        const bool oq_ShowArrayElements, const bool oq_Show64BitValues,
@@ -161,28 +151,22 @@ C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Pa
            &C_SyvDaPeDataElementBrowse::m_UpdateSelection);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     06.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeDataElementBrowse::~C_SyvDaPeDataElementBrowse(void)
 {
    delete mpc_Ui;
    //lint -e{1740}  no memory leak because of the parent of mpc_ContextMenu and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     05.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeDataElementBrowse::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_BushButtonOk->setText(C_GtGetText::h_GetText("OK"));
@@ -196,45 +180,36 @@ void C_SyvDaPeDataElementBrowse::InitStaticNames(void) const
                                                              "No signals defined on the connected bus."));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save the user settings
-
-   \created     19.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save the user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeDataElementBrowse::SaveUserSettings(void) const
 {
    C_SyvDaPeDataElementBrowse::mhs32_LastSelectedComboBoxIndex = this->mpc_Ui->pc_ComboBoxType->currentIndex();
    this->mpc_Ui->pc_TreeView->SaveExpandedIndices();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get selected data elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get selected data elements
 
    \return
    Current selected data elements
-
-   \created     06.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<C_PuiSvDbNodeDataPoolListElementId> C_SyvDaPeDataElementBrowse::GetSelectedDataElements(void) const
 {
    return this->mpc_Ui->pc_TreeView->GetSelectedDataElements();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     19.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeDataElementBrowse::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
@@ -260,25 +235,19 @@ void C_SyvDaPeDataElementBrowse::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Ok button click
-
-   \created     06.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Ok button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeDataElementBrowse::m_OkClicked(void)
 {
    this->mrc_ParentDialog.accept();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle view hiding / replacement
-
-   \created     28.08.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle view hiding / replacement
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeDataElementBrowse::m_HandleHiding(void) const
 {
    if (this->mpc_Ui->pc_TreeView->IsEmpty() == true)
@@ -314,40 +283,32 @@ void C_SyvDaPeDataElementBrowse::m_HandleHiding(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Cancel button
-
-   \created     06.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Cancel button
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeDataElementBrowse::m_CancelClicked(void)
 {
    this->mrc_ParentDialog.reject();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Filter for string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Filter for string
 
    \param[in] orc_Text String
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeDataElementBrowse::m_OnSearch(const QString & orc_Text) const
 {
    this->mpc_Ui->pc_TreeView->Search(orc_Text);
    if (orc_Text.isEmpty() == true)
    {
-      this->mpc_Ui->pc_TreeView->collapseAll();
       m_HandleHiding();
       this->mpc_Ui->pc_GroupBoxSearchNoElementsFound->setVisible(false);
       m_UpdateSelection(this->mpc_Ui->pc_TreeView->GetSelectedDataElements().size());
    }
    else
    {
-      this->mpc_Ui->pc_TreeView->expandAll();
       m_HandleHiding();
       if (this->mpc_Ui->pc_TreeView->IsEmpty() == true)
       {
@@ -362,15 +323,12 @@ void C_SyvDaPeDataElementBrowse::m_OnSearch(const QString & orc_Text) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Switch displayed type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Switch displayed type
 
    \param[in] osn_Index                Type index
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeDataElementBrowse::m_SwitchType(const sintn osn_Index) const
 {
    switch (osn_Index)
@@ -389,15 +347,12 @@ void C_SyvDaPeDataElementBrowse::m_SwitchType(const sintn osn_Index) const
    m_HandleHiding();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update number of selected items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update number of selected items
 
    \param[in] osn_SelectionCount Number of selected items
-
-   \created     25.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeDataElementBrowse::m_UpdateSelection(const sintn osn_SelectionCount) const
 {
    if (this->mpc_Ui->pc_TreeView->IsEmpty() == true)
@@ -426,13 +381,10 @@ void C_SyvDaPeDataElementBrowse::m_UpdateSelection(const sintn osn_SelectionCoun
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Setup context menu entries
-
-   \created     06.11.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Setup context menu entries
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeDataElementBrowse::m_SetupContextMenu(const bool & orq_MultiSelect)
 {
    this->mpc_ContextMenu = new C_OgeContextMenu(this);
@@ -459,15 +411,12 @@ void C_SyvDaPeDataElementBrowse::m_SetupContextMenu(const bool & orq_MultiSelect
            &C_SyvDaPeDataElementBrowse::m_OnCustomContextMenuRequested);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show custom context menu
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show custom context menu
 
    \param[in] orc_Pos Local context menu position
-
-   \created     06.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeDataElementBrowse::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 {
    QPoint c_PosGlobal = this->mapToGlobal(orc_Pos);

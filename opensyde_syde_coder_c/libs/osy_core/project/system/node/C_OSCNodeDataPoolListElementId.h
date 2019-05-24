@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Utility class to store all indices to identify a data element stored in a node (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     23.08.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCNODEDATAPOOLLISTELEMENTID_H
 #define C_OSCNODEDATAPOOLLISTELEMENTID_H
 
@@ -37,8 +31,8 @@ public:
    C_OSCNodeDataPoolListElementId(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex,
                                   const stw_types::uint32 ou32_ListIndex, const stw_types::uint32 ou32_ElementIndex);
 
-   virtual bool operator < (const C_OSCNodeDataPoolListId & orc_Cmp) const;
-   virtual bool operator == (const C_OSCNodeDataPoolListId & orc_Cmp) const;
+   virtual bool operator < (const C_OSCNodeDataPoolId & orc_Cmp) const;
+   virtual bool operator == (const C_OSCNodeDataPoolId & orc_Cmp) const;
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const;
 

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for showing an usage bar with multiple elements (implementation)
 
    The widget draws multiple bars for used and free space in the complete area.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.02.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
@@ -31,32 +24,29 @@
 #include "C_Uti.h"
 #include "C_GtGetText.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent           Optional pointer to parent
-
-   \created     23.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolSelectorUsageWidget::C_SdNdeDataPoolSelectorUsageWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_ToolTip(NULL),
@@ -71,22 +61,18 @@ C_SdNdeDataPoolSelectorUsageWidget::C_SdNdeDataPoolSelectorUsageWidget(QWidget *
    this->mc_Pen.setColor(Qt::transparent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     18.08.2017  STW/Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolSelectorUsageWidget::~C_SdNdeDataPoolSelectorUsageWidget(void)
 {
    delete mpc_ToolTip;
    mpc_ToolTip = NULL;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the actual percentage of the usage
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the actual percentage of the usage
 
    \param[in] ou32_Size       Maximum size
    \param[in] orc32_Used      List of used space of all relevant datapools
@@ -94,10 +80,8 @@ C_SdNdeDataPoolSelectorUsageWidget::~C_SdNdeDataPoolSelectorUsageWidget(void)
 
    \return
    Calculated percentage
-
-   \created     23.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SdNdeDataPoolSelectorUsageWidget::SetUsage(const uint32 ou32_Size, const std::vector<uint32> & orc32_VecUsed,
                                                     std::vector<QString> & orc_VecNames)
 {
@@ -194,17 +178,14 @@ uint32 C_SdNdeDataPoolSelectorUsageWidget::SetUsage(const uint32 ou32_Size, cons
    return this->mu32_TotalPercentage;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overrided paint event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overrided paint event
 
    Draws the usage bars
 
    \param[in,out] opc_Event  Pointer to paint event
-
-   \created     23.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorUsageWidget::paintEvent(QPaintEvent * const opc_Event)
 {
    QPainter c_Painter(this);
@@ -299,9 +280,8 @@ void C_SdNdeDataPoolSelectorUsageWidget::paintEvent(QPaintEvent * const opc_Even
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten default event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten default event slot
 
    Here: Handle tool tip
 
@@ -310,10 +290,8 @@ void C_SdNdeDataPoolSelectorUsageWidget::paintEvent(QPaintEvent * const opc_Even
    \return
    True  Event was recognized and processed
    False Event ignored
-
-   \created     27.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolSelectorUsageWidget::event(QEvent * const opc_Event)
 {
    if (opc_Event->type() == QEvent::ToolTip)
@@ -362,17 +340,14 @@ bool C_SdNdeDataPoolSelectorUsageWidget::event(QEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse move event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse move event slot
 
    Here: Update tooltip
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     27.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorUsageWidget::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
    QWidget::mouseMoveEvent(opc_Event);
@@ -385,7 +360,7 @@ void C_SdNdeDataPoolSelectorUsageWidget::mouseMoveEvent(QMouseEvent * const opc_
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorUsageWidget::m_UpdateTooltip(const sintn osn_MouseX)
 {
    if (this->mpc_ToolTip != NULL)

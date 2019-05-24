@@ -31,6 +31,21 @@ border-style: none;
 }
 
 /* --------------------------------------------------------------------- */
+stw_opensyde_gui--C_SdNdeDataPoolSelectorAddListWidget
+{
+border-style: solid;
+border-width: 1px;
+}
+
+/* --------------------------------------------------------------------- */
+/* padding does not work on list widget item when the border of the item is not set to 0 explicitly */
+stw_opensyde_gui--C_SdNdeDataPoolSelectorAddListWidget::item
+{
+border: 0px;
+padding-left: 5px;
+}
+
+/* --------------------------------------------------------------------- */
 stw_opensyde_gui--C_NagTopList::item
 {
 padding-left: 16px;

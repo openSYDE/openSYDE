@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Connects the openSYDE protocol driver to a node with GUI specific functionality
 
@@ -8,17 +7,11 @@
      corresponding read function from C_OSCDiagProtocolBase
    - Place the results into the defined data pool element
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.08.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwerrors.h"
@@ -27,78 +20,66 @@
 #include "C_OSCLoggingHandler.h"
 #include "C_PuiSvDbDataElementContent.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set up class
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set up class
 
    Initializes class elements
-
-   \created     22.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvComDataDealer::C_SyvComDataDealer(void) :
    C_OSCDataDealerNvmSafe()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set up class
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set up class
 
    Initializes class elements
 
    \param[in]     opc_Node          Pointer to node of data dealer
    \param[in]     ou32_NodeIndex    Index of node of data dealer
    \param[in]     opc_DiagProtocol  Pointer to used diagnostic protocol
-
-   \created     22.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvComDataDealer::C_SyvComDataDealer(C_OSCNode * const opc_Node, const uint32 ou32_NodeIndex,
                                        C_OSCDiagProtocolBase * const opc_DiagProtocol) :
    C_OSCDataDealerNvmSafe(opc_Node, ou32_NodeIndex, opc_DiagProtocol)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up class
-
-   \created     28.08.2017  STW/A.Stangl
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clean up class
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvComDataDealer::~C_SyvComDataDealer(void)
 {
    //nothing to do ...
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds a widget to inform about new datapool events
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds a widget to inform about new datapool events
 
    \param[in]     opc_Widget     Pointer to dashboard widget base
-
-   \created     23.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvComDataDealer::RegisterWidget(C_PuiSvDbDataElementHandler * const opc_Widget)
 {
    if (opc_Widget != NULL)
@@ -144,9 +125,8 @@ void C_SyvComDataDealer::RegisterWidget(C_PuiSvDbDataElementHandler * const opc_
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Read data from server's data pool and updates the associated widgets
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read data from server's data pool and updates the associated widgets
 
    Calls DataPoolRead of C_OSCDataDealer and updates the registered widgets.
 
@@ -166,10 +146,8 @@ void C_SyvComDataDealer::RegisterWidget(C_PuiSvDbDataElementHandler * const opc_
    C_RD_WR     protocol driver reported protocol violation
    C_WARN      error response reveived
    C_OVERFLOW  size of data received from server does not match size of specified data pool element
-
-   \created     24.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDataDealer::DataPoolRead(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                         const uint16 ou16_ElementIndex, uint8 * const opu8_NrCode)
 {
@@ -185,9 +163,8 @@ sint32 C_SyvComDataDealer::DataPoolRead(const uint8 ou8_DataPoolIndex, const uin
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Read data from server's NVM and updates the associated widgets
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read data from server's NVM and updates the associated widgets
 
    Calls NvmRead of C_OSCDataDealer and updates the registered widgets.
 
@@ -207,11 +184,8 @@ sint32 C_SyvComDataDealer::DataPoolRead(const uint8 ou8_DataPoolIndex, const uin
    C_RD_WR     protocol driver reported protocol violation
    C_WARN      error response received
    C_COM       expected server response not received because of communication error
-
-
-   \created     24.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDataDealer::NvmRead(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                    const uint16 ou16_ElementIndex, uint8 * const opu8_NrCode)
 {
@@ -227,9 +201,8 @@ sint32 C_SyvComDataDealer::NvmRead(const uint8 ou8_DataPoolIndex, const uint16 o
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reads a specific NVM list of ECU
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reads a specific NVM list of ECU
 
    The CRC of the list will be checked.
 
@@ -250,10 +223,8 @@ sint32 C_SyvComDataDealer::NvmRead(const uint8 ou8_DataPoolIndex, const uint16 o
    C_WARN      Error response or malformed protocol response
    C_COM       Pre-requisites not correct; e.g. driver not initialized or
                parameter out of range (checked by client side)
-
-   \created     13.10.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDataDealer::NvmReadList(const uint32 ou32_DataPoolIndex, const uint32 ou32_ListIndex,
                                        uint8 * const opu8_NrCode)
 {
@@ -278,7 +249,7 @@ sint32 C_SyvComDataDealer::NvmReadList(const uint32 ou32_DataPoolIndex, const ui
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_SyvComDataDealer::m_OnReadDataPoolEventReceived(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                                        const uint16 ou16_ElementIndex)
@@ -307,7 +278,8 @@ void C_SyvComDataDealer::m_OnReadDataPoolEventReceived(const uint8 ou8_DataPoolI
             // Update the value
             (*c_ItWidget)->InsertNewValueIntoQueue(C_PuiSvDbNodeDataPoolListElementId(c_ElementId,
                                                                                       C_PuiSvDbNodeDataPoolListElementId
-                                                                                      ::eDATAPOOL_ELEMENT), c_DbContent);
+                                                                                      ::eDATAPOOL_ELEMENT),
+                                                   c_DbContent);
          }
       }
       else
@@ -321,9 +293,8 @@ void C_SyvComDataDealer::m_OnReadDataPoolEventReceived(const uint8 ou8_DataPoolI
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handler for reception of async error response
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handler for reception of async error response
 
    Called by the DataDealer after it has received an error response for a cyclic transmission.
 
@@ -331,10 +302,8 @@ void C_SyvComDataDealer::m_OnReadDataPoolEventReceived(const uint8 ou8_DataPoolI
    \param[in]  ou16_ListIndex      list index that data was received for
    \param[in]  ou16_ElementIndex   element index that data was received for
    \param[in]  ou8_ErrorCode       received error code
-
-   \created     17.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvComDataDealer::m_OnReadDataPoolEventErrorReceived(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                                             const uint16 ou16_ElementIndex, const uint8 ou8_ErrorCode)
 {
@@ -370,7 +339,7 @@ void C_SyvComDataDealer::m_OnReadDataPoolEventErrorReceived(const uint8 ou8_Data
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_SyvComDataDealer::m_OnReadDataPoolNvmEventReceived(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
                                                           const uint16 ou16_ElementIndex)
@@ -399,7 +368,8 @@ void C_SyvComDataDealer::m_OnReadDataPoolNvmEventReceived(const uint8 ou8_DataPo
             // Update the value
             (*c_ItWidget)->AddNewNvmValueIntoQueue(C_PuiSvDbNodeDataPoolListElementId(c_ElementId,
                                                                                       C_PuiSvDbNodeDataPoolListElementId
-                                                                                      ::eDATAPOOL_ELEMENT), c_DbContent);
+                                                                                      ::eDATAPOOL_ELEMENT),
+                                                   c_DbContent);
          }
       }
       else

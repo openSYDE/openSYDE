@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       STW CAN DLL interface definitions
@@ -8,15 +8,9 @@
    Provides a standardized reception mechanism for incoming CAN messages.
    Multiple clients can register in order to receive all incoming CAN traffic.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     14.04.2010  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2010 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef STWCAN_H
 #define STWCAN_H
 
@@ -89,8 +83,6 @@ struct T_STWCAN_Status
 
 typedef T_STWCAN_Status STW_CAN_STATUS; //we use the same structure in "old" and "ext" DLL functions
 
-
-
 ///DLL info structure
 //use old prefixes to stay compatible with existing applications:
 struct T_STWCAN_DLLInfo
@@ -105,7 +97,6 @@ struct T_STWCAN_DLLInfo
    stw_types::uint8 abReserved[12];
 };
 typedef T_STWCAN_DLLInfo STW_CAN_DLL_INFO; //we use the same structure in "old" and "ext" DLL functions
-
 
 }
 

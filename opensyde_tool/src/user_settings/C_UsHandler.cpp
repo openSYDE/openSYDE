@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Handle user settings data (implementation)
 
    This class handles all actions concerning user settings.
 
-   \implementation
-   project     STW Qt user settings
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     30.06.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QFileInfo>
@@ -29,38 +22,35 @@
 #include "C_Uti.h"
 #include "constants.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_types;
 using namespace stw_errors;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const uint8 C_UsHandler::mhu8_MaxRecentProjects = 42;
 const QPoint C_UsHandler::mhc_DefaultViewPos = QPoint(0, 0);
 const stw_types::sintn C_UsHandler::mhsn_DefaultZoomLevel = 100;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 C_UsHandler * C_UsHandler::mhpc_Singleton = NULL;
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get singleton (Create if necessary)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get singleton (Create if necessary)
 
    \return
    Pointer to singleton
-
-   \created     16.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_UsHandler * C_UsHandler::h_GetInstance(void)
 {
    if (C_UsHandler::mhpc_Singleton == NULL)
@@ -70,13 +60,10 @@ C_UsHandler * C_UsHandler::h_GetInstance(void)
    return C_UsHandler::mhpc_Singleton;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up singleton
-
-   \created     16.08.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clean up singleton
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::h_Destroy(void)
 {
    if (C_UsHandler::mhpc_Singleton != NULL)
@@ -86,31 +73,25 @@ void C_UsHandler::h_Destroy(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the path of the current project
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the path of the current project
 
    \param[in]     orc_ActiveProject         Current active project
-
-   \created     16.08.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::ChangeActiveProjectName(const QString & orc_ActiveProject)
 {
    this->mc_ActualProject = orc_ActiveProject;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Loads all information of ini file for the current project
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Loads all information of ini file for the current project
 
    The common information will be loaded too.
 
    \param[in]     orc_ActiveProject         Current active project
-
-   \created     16.08.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::LoadActiveProject(const QString & orc_ActiveProject)
 {
    this->ClearMaps();
@@ -120,15 +101,12 @@ void C_UsHandler::LoadActiveProject(const QString & orc_ActiveProject)
    C_UsFiler::h_Load(*this, this->mc_IniPathAndName, mc_ActualProject);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set default values
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set default values
 
    Language = American english
-
-   \created     30.06.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetDefault(void)
 {
    mc_Lang = C_GtGetText::h_GetText("American english");
@@ -158,243 +136,195 @@ void C_UsHandler::SetDefault(void)
    this->msn_SysDefBusEditTabIndex = 0;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get language
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get language
 
    \return
    Language value
-
-   \created     30.06.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_UsHandler::GetLanguage(void) const
 {
    return this->mc_Lang;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get recent project list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get recent project list
 
    \return
    Recent project list
-
-   \created     30.06.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QStringList C_UsHandler::GetRecentProjects(void) const
 {
    return this->mc_RecentProjects;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get recent screen position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get recent screen position
 
    \return
    Recent screen position
-
-   \created     04.07.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QPoint C_UsHandler::GetScreenPos(void) const
 {
    return this->mc_ScreenPos;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get recent application size
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get recent application size
 
    \return
    Recent application size
-
-   \created     21.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QSize C_UsHandler::GetAppSize(void) const
 {
    return this->mc_AppSize;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get application maximizing flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get application maximizing flag
 
    \return
    Flag for showing application maximized
-
-   \created     22.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_UsHandler::GetAppMaximized(void) const
 {
    return this->mq_AppMaximized;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get recent screen position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get recent screen position
 
    \return
    Recent screen position
-
-   \created     04.07.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QPoint C_UsHandler::GetSdTopologyToolboxPos(void) const
 {
    return this->mc_SdTopologyToolboxPos;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get recent application size
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get recent application size
 
    \return
    Recent application size
-
-   \created     21.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QSize C_UsHandler::GetSdTopologyToolboxSize(void) const
 {
    return this->mc_SdTopologyToolboxSize;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get application maximizing flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get application maximizing flag
 
    \return
    Flag for showing application maximized
-
-   \created     22.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_UsHandler::GetSdTopologyToolboxMaximized(void) const
 {
    return this->mq_SdTopologyToolboxMaximized;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get navigation bar size
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get navigation bar size
 
    \return
    Current navigation bar size
-
-   \created     06.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_UsHandler::GetNaviBarSize(void) const
 {
    return this->ms32_NaviBarSize;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get navigation bar node section size
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get navigation bar node section size
 
    \return
    Current navigation bar node section size
-
-   \created     07.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_UsHandler::GetNaviBarNodeSectionSize(void) const
 {
    return this->ms32_NaviBarNodeSectionSize;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get node edit splitter x position value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get node edit splitter x position value
 
    \return
    Current node edit splitter x position value
-
-   \created     22.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_UsHandler::GetSdNodeEditSplitterX(void) const
 {
    return this->ms32_SdNodeEditSplitterX;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get bus edit tree splitter x position value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get bus edit tree splitter x position value
 
    \return
    Current bus edit tree splitter x position value
-
-   \created     22.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_UsHandler::GetSdBusEditTreeSplitterX(void) const
 {
    return this->ms32_SdBusEditTreeSplitterX;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get bus edit layout splitter x position value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get bus edit layout splitter x position value
 
    \return
    Current bus edit layout splitter x position value
-
-   \created     22.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_UsHandler::GetSdBusEditLayoutSplitterX(void) const
 {
    return this->ms32_SdBusEditLayoutSplitterX;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get maximum number of recent projects entries
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get maximum number of recent projects entries
 
    \return
    Maximum number of recent projects entries
-
-   \created     04.07.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_types::uint8 C_UsHandler::GetMaxRecentProjects(void)
 {
    return C_UsHandler::mhu8_MaxRecentProjects;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current save as path
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current save as path
 
    \return
    Current save as path
-
-   \created     01.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_UsHandler::GetCurrentSaveAsPath(void) const
 {
    return this->mc_CurrentSaveAsPath;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get most recent folder
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get most recent folder
 
    Extract folder of last recent projects or return default folder,
    should be valid in all cases
 
    \param[out] orc_Str Storage for most recent folder
-
-   \created     13.07.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::GetMostRecentFolder(QString & orc_Str) const
 {
    bool q_Exists;
@@ -423,18 +353,15 @@ void C_UsHandler::GetMostRecentFolder(QString & orc_Str) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all recently opened parent folders
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all recently opened parent folders
 
    Extract parent folder of recently opened projects or return default folder,
    should be valid in all cases
 
    \param[out] orc_Folders Storage for recent folders
-
-   \created     18.07.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::GetRecentFolders(QStringList & orc_Folders) const
 {
    QString c_Cur;
@@ -471,315 +398,238 @@ void C_UsHandler::GetRecentFolders(QStringList & orc_Folders) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get language list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get language list
 
    \param[out] orc_List Storage for language list
-
-   \created     30.06.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::h_GetLanguages(QStringList & orc_List)
 {
    orc_List.clear();
    orc_List.append(C_GtGetText::h_GetText("American english"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get last known project mode (SD/SC/Main)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get last known project mode (SD/SC/Main)
 
    long description of function within several lines
 
    \return
    mode (SD/SC/MAIN)
-
-   \created     25.10.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_UsHandler::GetProjLastMode() const
 {
    return this->ms32_ProjLastKnownMode;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get zoom value of view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get zoom value of view
 
    A project shall be set in the constructor to get a non default value
 
    \return
    Zoom value
-
-   \created     25.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_UsHandler::GetProjSdTopologyViewZoom(void) const
 {
    return this->msn_ProjSdTopologyViewZoom;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get pos value of viewport
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get pos value of viewport
 
    A project shall be set in the constructor to get a non default value
 
    \return
    Pos value
-
-   \created     25.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QPoint C_UsHandler::GetProjSdTopologyViewPos(void) const
 {
    return this->mc_ProjSdTopologyViewPos;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get last known TSP path
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get last known TSP path
 
    \return
    Last known TSP path
-
-   \created     04.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_UsHandler::GetProjSdTopologyLastKnownTSPPath(void) const
 {
    return this->mc_ProjSdTopologyLastKnownTSPPath;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get last known code export path
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get last known code export path
 
    \return
    Last known code export path
-
-   \created     05.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_UsHandler::GetProjSdTopologyLastKnownCodeExportPath(void) const
 {
    return this->mc_ProjSdTopologyLastKnownCodeExportPath;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get last known export path (e.g. DBC file)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get last known export path (e.g. DBC file)
 
    \return
    Full path of last known export folder
-
-   \created     04.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_UsHandler::GetProjSdTopologyLastKnownExportPath(void) const
 {
    return this->mc_ProjSdTopologyLastKnownExportPath;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get last known full path of RTF file export
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get last known full path of RTF file export
 
    \return
    Full path of last known RTF file export folder
-
-   \created     03.07.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_UsHandler::GetProjSdTopologyLastKnownRtfPath(void) const
 {
    return this->mc_ProjSdTopologyLastKnownRtfPath;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get last known company name of RTF file export
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get last known company name of RTF file export
 
    \return
    Last known company name of RTF file export
-
-   \created     03.07.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_UsHandler::GetProjSdTopologyLastKnownRtfCompanyName(void) const
 {
    return this->mc_ProjSdTopologyLastKnownRtfCompanyName;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get last known company logo path of RTF file export
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get last known company logo path of RTF file export
 
    \return
    Full path of last known company logo path of RTF file export
-
-   \created     03.07.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_UsHandler::GetProjSdTopologyLastKnownRtfCompanyLogoPath(void) const
 {
    return this->mc_ProjSdTopologyLastKnownRtfCompanyLogoPath;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get last known import path
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get last known import path
 
    \return
    Last known import path
-
-   \created     12.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_UsHandler::GetProjSdTopologyLastKnownImportPath(void) const
 {
    return this->mc_ProjSdTopologyLastKnownImportPath;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get project system definition node user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get project system definition node user settings
 
-   \param[in] orc_ViewName Project system definition node name (identifier)
+   \param[in]  orc_NodeName  Project system definition node name (identifier)
 
    \return
    Project system definition node user settings
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_UsNode C_UsHandler::GetProjSdNode(const QString & orc_NodeName) const
 {
    return this->mc_ProjSdNode.value(orc_NodeName, C_UsNode());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get project system definition bus user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get project system definition bus user settings
 
-   \param[in] orc_ViewName Project system definition bus name (identifier)
+   \param[in]  orc_BusName  Project system definition bus name (identifier)
 
    \return
    Project system definition bus user settings
-
-   \created     27.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_UsCommunication C_UsHandler::GetProjSdBus(const QString & orc_BusName) const
 {
    return this->mc_ProjSdBus.value(orc_BusName, C_UsCommunication());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get project system view user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get project system view user settings
 
    \param[in] orc_ViewName Project system view name (identifier)
 
    \return
    Project system view user settings
-
-   \created     05.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_UsSystemView C_UsHandler::GetProjSvSetupView(const QString & orc_ViewName) const
 {
    return this->mc_ProjSvSetupView.value(orc_ViewName, C_UsSystemView(C_UsHandler::mhsn_DefaultZoomLevel,
                                                                       C_UsHandler::mhc_DefaultViewPos));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get project system definition node keys internal structure
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get project system definition node keys internal structure
 
    \return
    Project system definition node keys internal structure
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const QList<QString> C_UsHandler::GetProjSdNodeKeysInternal(void) const
 {
    return this->mc_ProjSdNode.keys();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get project system definition bus keys internal structure
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get project system definition bus keys internal structure
 
    \return
    Project system definition bus keys internal structure
-
-   \created     27.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const QList<QString> C_UsHandler::GetProjSdBusKeysInternal(void) const
 {
    return this->mc_ProjSdBus.keys();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get project system view setup view keys internal structure
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get project system view setup view keys internal structure
 
    \return
    Project system view setup view keys internal structure
-
-   \created     05.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const QList<QString> C_UsHandler::GetProjSvSetupViewKeysInternal(void) const
 {
    return this->mc_ProjSvSetupView.keys();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Gets the position and size of the read only info widget of nodes
-
-   \param[in]     orc_ViewName   Project system view name (identifier)
-   \param[out]    orc_Pos        Read pos of node info widget
-   \param[out]    orc_Size       Read size of node info widget
-   \param[out]    orq_Maximized  Node info widget maximized flag
-
-   \created     22.09.2017  STW/B.Bayer
-*/
-//-----------------------------------------------------------------------------
-void C_UsHandler::GetProjSvSetupNodeInfoSizePos(const QString & orc_ViewName, QPoint & orc_Pos, QSize & orc_Size,
-                                                bool & orq_Maximized) const
-{
-   C_UsSystemView c_View = this->GetProjSvSetupView(orc_ViewName);
-
-   orc_Pos = c_View.c_NodeInfoPos;
-   orc_Size = c_View.c_NodeInfoSize;
-   orq_Maximized = c_View.q_NodeInfoMaximized;
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get project system view dashboard user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get project system view dashboard user settings
 
    \param[in] orc_ViewName      Project system view name (identifier)
    \param[in] orc_DashboardName Dashboard name (identifier)
-
-   \created     10.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_UsSystemViewDashboard C_UsHandler::GetProjSvDashboardSettings(const QString & orc_ViewName,
                                                                 const QString & orc_DashboardName) const
 {
    return GetProjSvSetupView(orc_ViewName).GetDashboardSettings(orc_DashboardName);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get the last parameters for system definition and system view screens
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get the last parameters for system definition and system view screens
 
    \param[out] ors32_SysDefSubMode    Last sub mode of system definition
    \param[out] oru32_SysDefIndex      Last index of system definition
@@ -787,10 +637,8 @@ C_UsSystemViewDashboard C_UsHandler::GetProjSvDashboardSettings(const QString & 
    \param[out] ors32_SysViewSubMode   Last sub mode of system view
    \param[out] oru32_SysViewIndex     Last index of system view
    \param[out] oru32_SysViewFlag      Last flag value of system view
-
-   \created     31.01.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::GetProjLastScreenMode(sint32 & ors32_SysDefSubMode, uint32 & oru32_SysDefIndex,
                                         uint32 & oru32_SysDefFlag, sint32 & ors32_SysViewSubMode,
                                         uint32 & oru32_SysViewIndex, uint32 & oru32_SysViewFlag) const
@@ -804,16 +652,13 @@ void C_UsHandler::GetProjLastScreenMode(sint32 & ors32_SysDefSubMode, uint32 & o
    oru32_SysViewFlag = this->mu32_SysViewFlag;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get the last indexes for system definition node and bus edit tabs
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get the last indexes for system definition node and bus edit tabs
 
    \param[out]     orsn_SysDefNodeEditTabIndex      Tab index of node edit
    \param[out]     orsn_SysDefBusEditTabIndex       Tab index of bus edit
-
-   \created     02.02.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::GetProjLastSysDefTabIndex(sintn & orsn_SysDefNodeEditTabIndex,
                                             sintn & orsn_SysDefBusEditTabIndex) const
 {
@@ -821,19 +666,16 @@ void C_UsHandler::GetProjLastSysDefTabIndex(sintn & orsn_SysDefNodeEditTabIndex,
    orsn_SysDefBusEditTabIndex = this->msn_SysDefBusEditTabIndex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set language
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set language
 
    \param[in] orc_Lang New language value
 
    \return
    C_NO_ERR: exists
    C_RANGE:  does not exist
-
-   \created     30.06.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_UsHandler::SetLanguage(const QString & orc_Lang)
 {
    sint32 s32_Retval = h_CheckLanguageExists(orc_Lang);
@@ -845,197 +687,155 @@ sint32 C_UsHandler::SetLanguage(const QString & orc_Lang)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set complete recent projects list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set complete recent projects list
 
    \param[in] orc_New New recent projects list
-
-   \created     15.07.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetRecentProjects(const QStringList & orc_New)
 {
    this->mc_RecentProjects = orc_New;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set recent screen position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set recent screen position
 
    \param[in] orc_New Updated screen position
-
-   \created     30.06.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetScreenPos(const QPoint & orc_New)
 {
    this->mc_ScreenPos = orc_New;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set recent screen position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set recent screen position
 
    \param[in] orc_New Updated screen position
-
-   \created     21.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetAppSize(const QSize & orc_New)
 {
    this->mc_AppSize = orc_New;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set application maximizing flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set application maximizing flag
 
-   \param[in] orc_New Updated application maximizing falg
-
-   \created     22.09.2016  STW/B.Bayer
+   \param[in] orq_New Updated application maximizing flag
 */
-//-----------------------------------------------------------------------------
-void C_UsHandler::SetAppMaximized(const bool & orq_New)
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetAppMaximized(const bool oq_New)
 {
-   this->mq_AppMaximized = orq_New;
+   this->mq_AppMaximized = oq_New;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set recent screen position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set recent screen position
 
    \param[in] orc_New Updated screen position
-
-   \created     18.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetSdTopologyToolboxPos(const QPoint & orc_New)
 {
    this->mc_SdTopologyToolboxPos = orc_New;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set recent screen position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set recent screen position
 
    \param[in] orc_New Updated screen position
-
-   \created     18.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetSdTopologyToolboxSize(const QSize & orc_New)
 {
    this->mc_SdTopologyToolboxSize = orc_New;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set navigation bar size
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set navigation bar size
 
    \param[in] os32_Value New navigation bar size
-
-   \created     06.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetNaviBarSize(const sint32 os32_Value)
 {
    this->ms32_NaviBarSize = os32_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set navigation bar node section size
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set navigation bar node section size
 
    \param[in] os32_Value New navigation bar node section size
-
-   \created     07.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetNaviBarNodeSectionSize(const sint32 os32_Value)
 {
    this->ms32_NaviBarNodeSectionSize = os32_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set node edit splitter x position value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node edit splitter x position value
 
    \param[in] os32_Value New node edit splitter x position value
-
-   \created     22.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetSdNodeEditSplitterX(const sint32 os32_Value)
 {
    this->ms32_SdNodeEditSplitterX = os32_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set bus edit tree splitter x position value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set bus edit tree splitter x position value
 
    \param[in] os32_Value New bus edit tree splitter x position value
-
-   \created     22.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetSdBusEditTreeSplitterX(const sint32 os32_Value)
 {
    this->ms32_SdBusEditTreeSplitterX = os32_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set bus edit layout splitter x position value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set bus edit layout splitter x position value
 
    \param[in] os32_Value New bus edit layout splitter x position value
-
-   \created     22.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetSdBusEditLayoutSplitterX(const sint32 os32_Value)
 {
    this->ms32_SdBusEditLayoutSplitterX = os32_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set application maximizing flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set application maximizing flag
 
    \param[in] orq_New Updated application maximizing falg
-
-   \created     18.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetSdTopologyToolboxMaximized(const bool & orq_New)
 {
    this->mq_SdTopologyToolboxMaximized = orq_New;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set current save as path
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set current save as path
 
    \param[in] orc_Value Current save as path
-
-   \created     01.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetCurrentSaveAsPath(const QString & orc_Value)
 {
    this->mc_CurrentSaveAsPath = orc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add path & file to recent projects list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add path & file to recent projects list
 
    \param[in] orc_Str Path and file name
-
-   \created     30.06.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::AddToRecentProjects(const QString & orc_Str)
 {
    QString c_Copy = orc_Str;
@@ -1052,188 +852,149 @@ void C_UsHandler::AddToRecentProjects(const QString & orc_Str)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Remove path & file of recent projects list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove path & file of recent projects list
 
    \param[in] orc_Str Path and file name
-
-   \created     30.06.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::RemoveOfRecentProjects(const QString & orc_Str)
 {
    this->mc_RecentProjects.removeAll(orc_Str);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clear recent project list
-
-   \created     31.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clear recent project list
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::ClearRecentProjects(void)
 {
    this->mc_RecentProjects.clear();
    this->AddToRecentProjects(this->mc_ActualProject);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set last mode of project (SD/SC/Main)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set last mode of project (SD/SC/Main)
    long description of function within several lines
 
    \param[in]     os32_New       New last mode
-
-   \created     25.10.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjLastMode(const sint32 os32_New)
 {
    this->ms32_ProjLastKnownMode = os32_New;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the project specific zoom value for the view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the project specific zoom value for the view
 
    A project shall be set in the constructor to save a value
 
    \param[in] osn_New   New zoom value
-
-   \created     25.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdTopologyViewZoom(const sintn osn_New)
 {
    this->msn_ProjSdTopologyViewZoom = osn_New;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the project specific position for the viewport
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the project specific position for the viewport
 
    A project shall be set in the constructor to save a value
 
    \param[in] orc_New   New zoom value
-
-   \created     25.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdTopologyViewPos(const QPoint & orc_New)
 {
    this->mc_ProjSdTopologyViewPos = orc_New;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set last known TSP path
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set last known TSP path
 
    \param[in] orc_New New value
-
-   \created     04.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdTopologyLastKnownTSPPath(const QString & orc_New)
 {
    this->mc_ProjSdTopologyLastKnownTSPPath = orc_New;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set last known code export path
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set last known code export path
 
    \param[in] orc_New New value
-
-   \created     05.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdTopologyLastKnownCodeExportPath(const QString & orc_New)
 {
    this->mc_ProjSdTopologyLastKnownCodeExportPath = orc_New;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set last known full path of export (e.g. DBC file)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set last known full path of export (e.g. DBC file)
 
    \param[in] orc_New         new full folder path
-
-   \created     04.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdTopologyLastKnownExportPath(const QString & orc_New)
 {
    this->mc_ProjSdTopologyLastKnownExportPath = orc_New;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set last known full path of RTF file export
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set last known full path of RTF file export
 
    \param[in] orc_New         new full folder path
-
-   \created     03.07.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdTopologyLastKnownRtfPath(const QString & orc_New)
 {
    this->mc_ProjSdTopologyLastKnownRtfPath = orc_New;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set last known company name of RTF file export
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set last known company name of RTF file export
 
    \param[in] orc_New         new company name
-
-   \created     03.07.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdTopologyLastKnownRtfCompanyName(const QString & orc_New)
 {
    this->mc_ProjSdTopologyLastKnownRtfCompanyName = orc_New;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set last known full logo path of RTF file export
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set last known full logo path of RTF file export
 
    \param[in] orc_New         new full folder path
-
-   \created     03.07.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdTopologyLastKnownRtfCompanyLogoPath(const QString & orc_New)
 {
    this->mc_ProjSdTopologyLastKnownRtfCompanyLogoPath = orc_New;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set last known import path
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set last known import path
 
    \param[in] orc_New New value
-
-   \created     12.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdTopologyLastKnownImportPath(const QString & orc_New)
 {
    this->mc_ProjSdTopologyLastKnownImportPath = orc_New;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set project system definition node selected data pool name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system definition node selected data pool name
 
    \param[in] orc_NodeName     Project system definition node name (identifier)
    \param[in] orc_DatapoolName Selected data pool name
-
-   \created     02.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdNodeSelectedDatapoolName(const QString & orc_NodeName, const QString & orc_DatapoolName)
 {
    if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
@@ -1249,17 +1010,14 @@ void C_UsHandler::SetProjSdNodeSelectedDatapoolName(const QString & orc_NodeName
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set project system definition node datapool expanded list names
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system definition node datapool expanded list names
 
    \param[in] orc_NodeName     Project system definition node name (identifier)
    \param[in] orc_DatapoolName Project system definition node datapool name (identifier)
    \param[in] orc_New          Expanded list names
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdNodeDatapoolOpenListNames(const QString & orc_NodeName, const QString & orc_DatapoolName,
                                                      const std::vector<QString> & orc_New)
 {
@@ -1276,17 +1034,14 @@ void C_UsHandler::SetProjSdNodeDatapoolOpenListNames(const QString & orc_NodeNam
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set project system definition node datapool selected list names
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system definition node datapool selected list names
 
    \param[in] orc_NodeName     Project system definition node name (identifier)
    \param[in] orc_DatapoolName Project system definition node datapool name (identifier)
    \param[in] orc_New          Selected list names
-
-   \created     24.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdNodeDatapoolSelectedListNames(const QString & orc_NodeName, const QString & orc_DatapoolName,
                                                          const std::vector<QString> & orc_New)
 {
@@ -1303,17 +1058,14 @@ void C_UsHandler::SetProjSdNodeDatapoolSelectedListNames(const QString & orc_Nod
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set project system definition node datapool selected variable names
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system definition node datapool selected variable names
 
    \param[in] orc_NodeName     Project system definition node name (identifier)
    \param[in] orc_DatapoolName Project system definition node datapool name (identifier)
    \param[in] orc_New          Selected variable names
-
-   \created     25.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdNodeDatapoolSelectedVariableNames(const QString & orc_NodeName,
                                                              const QString & orc_DatapoolName,
                                                              const std::vector<QString> & orc_New)
@@ -1331,9 +1083,8 @@ void C_UsHandler::SetProjSdNodeDatapoolSelectedVariableNames(const QString & orc
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set project system definition node datapool list selected message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system definition node datapool list selected message
 
    \param[in] orc_NodeName            Project system definition node name (identifier)
    \param[in] orc_DatapoolName        Project system definition node datapool name (identifier)
@@ -1342,10 +1093,8 @@ void C_UsHandler::SetProjSdNodeDatapoolSelectedVariableNames(const QString & orc
    \param[in] orc_SelectedMessageName Selected message name if any
    \param[in] oq_SignalSelected       Flag if signal selected
    \param[in] orc_SelectedSignalName  Selected signal name if any
-
-   \created     02.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdNodeDatapoolListSelectedMessage(const QString & orc_NodeName,
                                                            const QString & orc_DatapoolName,
                                                            const QString & orc_ListName,
@@ -1371,18 +1120,15 @@ void C_UsHandler::SetProjSdNodeDatapoolListSelectedMessage(const QString & orc_N
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set project system definition node datapool list column widths
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system definition node datapool list column widths
 
    \param[in] orc_NodeName     Project system definition node name (identifier)
    \param[in] orc_DatapoolName Project system definition node datapool name (identifier)
    \param[in] orc_ListName     Project system definition node datapool list name (identifier)
    \param[in] orc_ColumnWidths Last known column widths
-
-   \created     16.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdNodeDatapoolListColumnSizes(const QString & orc_NodeName, const QString & orc_DatapoolName,
                                                        const QString & orc_ListName,
                                                        const std::vector<sint32> & orc_ColumnWidths)
@@ -1401,9 +1147,8 @@ void C_UsHandler::SetProjSdNodeDatapoolListColumnSizes(const QString & orc_NodeN
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set project system definition bus last selected message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system definition bus last selected message
 
    \param[in] orc_BusName             Project system definition bus name (identifier)
    \param[in] oe_SelectedProtocol     Currently selected protocol
@@ -1411,10 +1156,8 @@ void C_UsHandler::SetProjSdNodeDatapoolListColumnSizes(const QString & orc_NodeN
    \param[in] orc_SelectedMessageName Selected message name if any
    \param[in] oq_SignalSelected       Flag if signal selected
    \param[in] orc_SelectedSignalName  Selected signal name if any
-
-   \created     27.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdBusSelectedMessage(const QString & orc_BusName,
                                               const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_SelectedProtocol,
                                               const bool oq_MessageSelected, const QString & orc_SelectedMessageName,
@@ -1436,15 +1179,13 @@ void C_UsHandler::SetProjSdBusSelectedMessage(const QString & orc_BusName,
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set the status for the navigation expansion state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set the status for the navigation expansion state
 
-   \param[in] oq_NavigationExpandedStatus New navigation expansion state
-
-   \created     08.08.2018  STW/M.Echtler
+   \param[in]  orc_ViewName                  Project system view name (identifier)
+   \param[in]  oq_NavigationExpandedStatus   New navigation expansion state
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSvNavigationExpandedStatus(const QString & orc_ViewName,
                                                     const bool oq_NavigationExpandedStatus)
 {
@@ -1461,16 +1202,13 @@ void C_UsHandler::SetProjSvNavigationExpandedStatus(const QString & orc_ViewName
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set project system view setup view zoom
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system view setup view zoom
 
    \param[in] orc_ViewName Project system view name (identifier)
    \param[in] osn_New      Project system view setup view zoom
-
-   \created     05.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSvSetupViewZoom(const QString & orc_ViewName, const sintn osn_New)
 {
    if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
@@ -1484,16 +1222,13 @@ void C_UsHandler::SetProjSvSetupViewZoom(const QString & orc_ViewName, const sin
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set project system view setup view position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system view setup view position
 
    \param[in] orc_ViewName Project system view name (identifier)
    \param[in] orc_New      Project system view setup view position
-
-   \created     05.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSvSetupViewPos(const QString & orc_ViewName, const QPoint & orc_New)
 {
    if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
@@ -1507,16 +1242,13 @@ void C_UsHandler::SetProjSvSetupViewPos(const QString & orc_ViewName, const QPoi
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set project system view update scene zoom level
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system view update scene zoom level
 
    \param[in] orc_ViewName Project system view name (identifier)
    \param[in] osn_New      New value
-
-   \created     09.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSvUpdateViewZoom(const QString & orc_ViewName, const sintn osn_New)
 {
    if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
@@ -1533,16 +1265,13 @@ void C_UsHandler::SetProjSvUpdateViewZoom(const QString & orc_ViewName, const si
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set project system view update scene position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system view update scene position
 
    \param[in] orc_ViewName Project system view name (identifier)
-   \param[in] osn_New      New value
-
-   \created     09.02.2018  STW/M.Echtler
+   \param[in] orc_New      New value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSvUpdateViewPos(const QString & orc_ViewName, const QPoint & orc_New)
 {
    if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
@@ -1559,16 +1288,13 @@ void C_UsHandler::SetProjSvUpdateViewPos(const QString & orc_ViewName, const QPo
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set project system view parameter export settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system view parameter export settings
 
    \param[in] orc_ViewName Project system view name (identifier)
    \param[in] orc_Path     Selected path
-
-   \created     05.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSvParamExport(const QString & orc_ViewName, const QString & orc_Path)
 {
    if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
@@ -1585,16 +1311,13 @@ void C_UsHandler::SetProjSvParamExport(const QString & orc_ViewName, const QStri
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set project system view parameter import settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system view parameter import settings
 
    \param[in] orc_ViewName Project system view name (identifier)
    \param[in] orc_Path     Selected path
-
-   \created     05.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSvParamImport(const QString & orc_ViewName, const QString & orc_Path)
 {
    if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
@@ -1611,17 +1334,14 @@ void C_UsHandler::SetProjSvParamImport(const QString & orc_ViewName, const QStri
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set project system view parameter record settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system view parameter record settings
 
    \param[in] orc_ViewName Project system view name (identifier)
    \param[in] orc_Path     Selected path
    \param[in] orc_FileName Selected file name
-
-   \created     05.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSvParamRecord(const QString & orc_ViewName, const QString & orc_Path,
                                        const QString & orc_FileName)
 {
@@ -1641,50 +1361,14 @@ void C_UsHandler::SetProjSvParamRecord(const QString & orc_ViewName, const QStri
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the position and size of the read only info widget of nodes
-
-   \param[in]     orc_ViewName   Project system view name (identifier)
-   \param[in]     orc_Pos        Actual pos of node info widget
-   \param[in]     orc_Size       Actual size of node info widget
-   \param[in]     orq_Maximized  Node info widget maximized flag
-
-   \created     22.09.2017  STW/B.Bayer
-*/
-//-----------------------------------------------------------------------------
-void C_UsHandler::SetProjSvSetupNodeInfoSizePos(const QString & orc_ViewName, const QPoint & orc_Pos,
-                                                const QSize & orc_Size, const bool & orq_Maximized)
-{
-   if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
-   {
-      //Do not insert as this will replace all currently known user settings for this item
-      C_UsSystemView & rc_View = this->mc_ProjSvSetupView.operator [](orc_ViewName);
-      rc_View.SetSetupNodeInfoPos(orc_Pos);
-      rc_View.SetSetupNodeInfoSize(orc_Size);
-      rc_View.SetSetupNodeInfoMaximized(orq_Maximized);
-   }
-   else
-   {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
-      c_View.SetSetupNodeInfoPos(orc_Pos);
-      c_View.SetSetupNodeInfoSize(orc_Size);
-      c_View.SetSetupNodeInfoMaximized(orq_Maximized);
-      this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
-   }
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add project system view update data rate
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add project system view update data rate
 
    \param[in] orc_ViewName           Project system view name (identifier)
    \param[in] ou32_Checksum          System setup checksum
    \param[in] ou64_DataRateBytesPerS Data bytes per seconds
-
-   \created     26.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::AddProjSvUpdateDataRate(const QString & orc_ViewName, const uint32 ou32_Checksum,
                                           const uint64 ou64_DataRateBytesPerS)
 {
@@ -1702,16 +1386,38 @@ void C_UsHandler::AddProjSvUpdateDataRate(const QString & orc_ViewName, const ui
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set project system view update splitter X value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add project system view update data rate per node
+
+   \param[in] orc_ViewName           Project system view name (identifier)
+   \param[in] ou32_Checksum          System setup checksum
+   \param[in] orc_DataRateBytesPerMs Data bytes per milli seconds per node
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::AddProjSvUpdateDataRatePerNode(const QString & orc_ViewName, const uint32 ou32_Checksum,
+                                                 const QMap<uint32, float64> & orc_DataRateBytesPerMs)
+{
+   if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      C_UsSystemView & rc_View = this->mc_ProjSvSetupView.operator [](orc_ViewName);
+      rc_View.AddUpdateDataRatePerNode(ou32_Checksum, orc_DataRateBytesPerMs);
+   }
+   else
+   {
+      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
+      c_View.AddUpdateDataRatePerNode(ou32_Checksum, orc_DataRateBytesPerMs);
+      this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system view update splitter X value
 
    \param[in] orc_ViewName Project system view name (identifier)
    \param[in] os32_Value   New update splitter X value
-
-   \created     28.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSvUpdateSplitterX(const QString & orc_ViewName, const sint32 os32_Value)
 {
    if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
@@ -1728,18 +1434,38 @@ void C_UsHandler::SetProjSvUpdateSplitterX(const QString & orc_ViewName, const s
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set project system view update progress log settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system view update horizontal splitter Y value
+
+   \param[in] orc_ViewName Project system view name (identifier)
+   \param[in] os32_Value   New horizontal update splitter Y value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjSvUpdateHorizontalSplitterY(const QString & orc_ViewName, const sint32 os32_Value)
+{
+   if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      C_UsSystemView & rc_View = this->mc_ProjSvSetupView.operator [](orc_ViewName);
+      rc_View.SetUpdateHorizontalSplitterY(os32_Value);
+   }
+   else
+   {
+      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
+      c_View.SetUpdateHorizontalSplitterY(os32_Value);
+      this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system view update progress log settings
 
    \param[in] orc_ViewName  Project system view name (identifier)
    \param[in] orc_Position  Progress log position
    \param[in] orc_Size      Progress log size
    \param[in] orq_Maximized Progress log maximized flag
-
-   \created     15.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSvUpdateProgressLog(const QString & orc_ViewName, const QPoint & orc_Position,
                                              const QSize & orc_Size, const bool & orq_Maximized)
 {
@@ -1761,18 +1487,86 @@ void C_UsHandler::SetProjSvUpdateProgressLog(const QString & orc_ViewName, const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set project system view dashboard toolbox settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set style type of project system view update summary widget
+
+   \param[in] orc_ViewName    Project system view name (identifier)
+   \param[in] oq_BigVisible   true: big summary widget; false: small summary widget
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjSvUpdateSummaryBig(const QString & orc_ViewName, const bool oq_BigVisible)
+{
+   if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      C_UsSystemView & rc_View = this->mc_ProjSvSetupView.operator [](orc_ViewName);
+      rc_View.SetUpdateSummaryBig(oq_BigVisible);
+   }
+   else
+   {
+      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
+      c_View.SetUpdateSummaryBig(oq_BigVisible);
+      this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set visibility of empty optional sections
+
+   \param[in] orc_ViewName    Project system view name (identifier)
+   \param[in] oq_BigVisible   true: visible; false: invisible
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjSvUpdateEmptyOptionalSectionsVisible(const QString & orc_ViewName, const bool oq_Visible)
+{
+   if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      C_UsSystemView & rc_View = this->mc_ProjSvSetupView.operator [](orc_ViewName);
+      rc_View.SetUpdateEmptyOptionalSectionsVisible(oq_Visible);
+   }
+   else
+   {
+      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
+      c_View.SetUpdateEmptyOptionalSectionsVisible(oq_Visible);
+      this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set project system view update package sections expand flags
+
+   \param[in]       orc_ViewName          Project system view name (identifier)
+   \param[in]       orc_NodeName          Node name (identifier)
+   \param[in]       orc_SectionsExpanded  New values (true: expand, false: collapse)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjSvUpdateSectionsExpandedFlags(const QString & orc_ViewName, const QString & orc_NodeName,
+                                                       const QMap<uint32, bool> & orc_SectionsExpanded)
+{
+   if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      C_UsSystemView & rc_View = this->mc_ProjSvSetupView.operator [](orc_ViewName);
+      rc_View.SetNodeSectionsExpanded(orc_NodeName, orc_SectionsExpanded);
+   }
+   else
+   {
+      C_UsSystemView c_View(C_UsHandler::mhsn_DefaultZoomLevel, C_UsHandler::mhc_DefaultViewPos);
+      c_View.SetNodeSectionsExpanded(orc_NodeName, orc_SectionsExpanded);
+      this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system view dashboard toolbox settings
 
    \param[in] orc_ViewName  Project system view name (identifier)
    \param[in] orc_Position  Toolbox position
    \param[in] orc_Size      Toolbox size
    \param[in] orq_Maximized Toolbox maximized flag
-
-   \created     03.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSvDashboardToolbox(const QString & orc_ViewName, const QPoint & orc_Position,
                                             const QSize & orc_Size, const bool & orq_Maximized)
 {
@@ -1794,16 +1588,13 @@ void C_UsHandler::SetProjSvDashboardToolbox(const QString & orc_ViewName, const 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set project system view dashboard selected tab index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system view dashboard selected tab index
 
    \param[in] orc_ViewName Project system view name (identifier)
    \param[in] os32_Index   Dashboard selected tab index
-
-   \created     22.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSvDashboardSelectedTabIndex(const QString & orc_ViewName, const sint32 os32_Index)
 {
    if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
@@ -1820,17 +1611,14 @@ void C_UsHandler::SetProjSvDashboardSelectedTabIndex(const QString & orc_ViewNam
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set project system view dashboard integrated tab index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system view dashboard integrated tab index
 
    \param[in] orc_ViewName      Project system view name (identifier)
    \param[in] orc_DashboardName Dashboard name (identifier)
    \param[in] os32_TabIndex     Current tab index
-
-   \created     10.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSvDashboardMainTab(const QString & orc_ViewName, const QString & orc_DashboardName,
                                             const sint32 os32_TabIndex)
 {
@@ -1848,9 +1636,8 @@ void C_UsHandler::SetProjSvDashboardMainTab(const QString & orc_ViewName, const 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set project system view dashboard torn off window data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system view dashboard torn off window data
 
    \param[in] orc_ViewName              Project system view name (identifier)
    \param[in] orc_DashboardName         Dashboard name (identifier)
@@ -1858,10 +1645,8 @@ void C_UsHandler::SetProjSvDashboardMainTab(const QString & orc_ViewName, const 
    \param[in] orc_Size                  Torn off window size
    \param[in] oq_TornOffWindowMinimized Torn off window minimized flag
    \param[in] oq_TornOffWindowMaximized Torn off window maximized flag
-
-   \created     10.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSvDashboardTearOffPosition(const QString & orc_ViewName, const QString & orc_DashboardName,
                                                     const QPoint & orc_Position, const QSize & orc_Size,
                                                     const bool oq_TornOffWindowMinimized,
@@ -1883,18 +1668,15 @@ void C_UsHandler::SetProjSvDashboardTearOffPosition(const QString & orc_ViewName
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set project system view dashboard scene position and zoom
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set project system view dashboard scene position and zoom
 
    \param[in] orc_ViewName      Project system view name (identifier)
    \param[in] orc_DashboardName Dashboard name (identifier)
    \param[in] orc_Position      Scene position
    \param[in] osn_Zoom          Scene zoom
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSvDashboardScenePositionAndZoom(const QString & orc_ViewName,
                                                          const QString & orc_DashboardName, const QPoint & orc_Position,
                                                          const sintn osn_Zoom)
@@ -1913,20 +1695,17 @@ void C_UsHandler::SetProjSvDashboardScenePositionAndZoom(const QString & orc_Vie
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set the last parameters for system definition and system view screens
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set the last parameters for system definition and system view screens
 
-   \param[in] ors32_SysDefSubMode    Last sub mode of system definition
-   \param[in] oru32_SysDefIndex      Last index of system definition
-   \param[in] oru32_SysDefFlag       Last flag value of system definition
-   \param[in] ors32_SysViewSubMode   Last sub mode of system view
-   \param[in] oru32_SysViewIndex     Last index of system view
-   \param[in] oru32_SysViewFlag      Last flag value of system view
-
-   \created     31.01.2018  STW/B.Bayer
+   \param[in] os32_SysDefSubMode    Last sub mode of system definition
+   \param[in] ou32_SysDefIndex      Last index of system definition
+   \param[in] ou32_SysDefFlag       Last flag value of system definition
+   \param[in] os32_SysViewSubMode   Last sub mode of system view
+   \param[in] ou32_SysViewIndex     Last index of system view
+   \param[in] ou32_SysViewFlag      Last flag value of system view
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjLastScreenMode(const sint32 os32_SysDefSubMode, const uint32 ou32_SysDefIndex,
                                         const uint32 ou32_SysDefFlag, const sint32 os32_SysViewSubMode,
                                         const uint32 ou32_SysViewIndex, const uint32 ou32_SysViewFlag)
@@ -1940,16 +1719,13 @@ void C_UsHandler::SetProjLastScreenMode(const sint32 os32_SysDefSubMode, const u
    this->mu32_SysViewFlag = ou32_SysViewFlag;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get the last indexes for system definition node and bus edit tabs
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get the last indexes for system definition node and bus edit tabs
 
    \param[out]     osn_SysDefNodeEditTabIndex      Tab index of node edit
    \param[out]     osn_SysDefBusEditTabIndex       Tab index of bus edit
-
-   \created     02.02.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjLastSysDefTabIndex(const sintn osn_SysDefNodeEditTabIndex,
                                             const sintn osn_SysDefBusEditTabIndex)
 {
@@ -1957,16 +1733,29 @@ void C_UsHandler::SetProjLastSysDefTabIndex(const sintn osn_SysDefNodeEditTabInd
    this->msn_SysDefBusEditTabIndex = osn_SysDefBusEditTabIndex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clears saved maps in case of a new project
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Copy the view user settings
+
+   \param[in] orc_SourceViewName Source view name
+   \param[in] orc_TargetViewName Target view name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::CopyProjSvSettings(const QString & orc_SourceViewName, const QString & orc_TargetViewName)
+{
+   if (this->mc_ProjSvSetupView.contains(orc_SourceViewName) == true)
+   {
+      const C_UsSystemView & rc_View = this->mc_ProjSvSetupView.operator [](orc_SourceViewName);
+      this->mc_ProjSvSetupView.insert(orc_TargetViewName, rc_View);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clears saved maps in case of a new project
 
    A new project has no views, nodes or busses
    An other project could be have a different amount of views, nodes or busses
-
-   \created     16.08.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::ClearMaps(void)
 {
    this->mc_ProjSvSetupView.clear();
@@ -1974,31 +1763,25 @@ void C_UsHandler::ClearMaps(void)
    this->mc_ProjSdBus.clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save all user setting to default ini file
-
-   \created     15.07.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save all user setting to default ini file
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::Save(void) const
 {
    C_UsFiler::h_Save(*this, mc_IniPathAndName, mc_ActualProject);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if string valid language
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if string valid language
 
    \param[in] orc_Str Language
 
    \return
    C_NO_ERR: exists
    C_RANGE:  does not exist
-
-   \created     30.06.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_UsHandler::h_CheckLanguageExists(const QString & orc_Str)
 {
    QStringList c_List;
@@ -2015,9 +1798,8 @@ sint32 C_UsHandler::h_CheckLanguageExists(const QString & orc_Str)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get parent folder of path with or without file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get parent folder of path with or without file
 
    \param[in]  orc_CompletePathWithFile     Complete path
    \param[out] orc_Parent                   Parent folder
@@ -2030,10 +1812,8 @@ sint32 C_UsHandler::h_CheckLanguageExists(const QString & orc_Str)
    C_RANGE:  Parent invalid = No parent found
              Sources: Input empty
                 Path does not exist
-
-   \created     18.07.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_UsHandler::h_GetParentFolder(const QString & orc_CompletePath, QString & orc_Parent,
                                       const bool & orq_CompletePathContainsFile)
 {
@@ -2075,15 +1855,12 @@ sint32 C_UsHandler::h_GetParentFolder(const QString & orc_CompletePath, QString 
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Constructor
 
    Load currently set values
-
-   \created     30.06.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_UsHandler::C_UsHandler(void) :
    mc_IniPathAndName(C_Uti::h_GetExePath() + "/User/user_settings.ini"),
    mc_ActualProject(""),
@@ -2097,15 +1874,12 @@ C_UsHandler::C_UsHandler(void) :
    C_UsFiler::h_Load(*this, mc_IniPathAndName, "");
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Destructor
 
    Save currently set values
-
-   \created     30.06.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_UsHandler::~C_UsHandler()
 {
    this->Save();

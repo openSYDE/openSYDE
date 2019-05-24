@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Data conversion structure
 
    The structure matches the information provided by a DBC file.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     26.10.2017  STW/U.Roesch
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_CIECONVERTERH
 #define C_CIECONVERTERH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "CSCLString.h"
 #include "CSCLStringList.h"
 #include "stwtypes.h"
@@ -26,12 +20,12 @@
 
 #include "DBC.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_CieConverter
 {
@@ -126,10 +120,11 @@ public:
    {
       C_CIESystemBus c_Bus;           ///< the all node are connected to
       std::vector<C_CIENode> c_Nodes; ///< all nodes for this bus
+      std::vector<C_CIENodeMessage> c_UnmappedMessages;
    };
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

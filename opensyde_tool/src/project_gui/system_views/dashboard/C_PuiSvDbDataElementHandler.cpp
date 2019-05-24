@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Base functions and data storing for datapool elements and its content (implementation)
 
    detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.08.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwerrors.h"
@@ -30,28 +23,27 @@
 #include "C_PuiSdHandler.h"
 #include "C_SdNdeDataPoolContentUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    long description of function within several lines
 
@@ -61,10 +53,8 @@ using namespace stw_opensyde_gui_logic;
    \param[in] ore_Type                   Type of data
    \param[in] ou32_MaximumDataElements   Maximum number of shown data elements of the widget
    \param[in] oq_ReadItem                Flag if item is a read only item and has an rail assignment
-
-   \created     24.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbDataElementHandler::C_PuiSvDbDataElementHandler(const uint32 & oru32_ViewIndex,
                                                          const uint32 & oru32_DashboardIndex,
                                                          const sint32 & ors32_DataIndex, const E_Type & ore_Type,
@@ -80,9 +70,8 @@ C_PuiSvDbDataElementHandler::C_PuiSvDbDataElementHandler(const uint32 & oru32_Vi
    this->mc_VecNvmValueReceived.resize(this->mu32_WidgetDataPoolElementCount);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds the datapool element to the shown elements of the widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds the datapool element to the shown elements of the widget
 
    This function is thread safe.
 
@@ -93,10 +82,8 @@ C_PuiSvDbDataElementHandler::C_PuiSvDbDataElementHandler(const uint32 & oru32_Vi
    C_NO_ERR    Datapool element added
    C_NOACT     Datapool element was added already. Nothing done.
    C_RANGE     No further datapool elements can be added. Nothing done.
-
-   \created     24.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvDbDataElementHandler::RegisterDataPoolElement(
    const C_PuiSvDbNodeDataPoolListElementId & orc_WidgetDataPoolElementId,
    const C_PuiSvDbDataElementScaling & orc_DataPoolElementScaling)
@@ -137,18 +124,15 @@ sint32 C_PuiSvDbDataElementHandler::RegisterDataPoolElement(
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register cyclic transmission error for specific data element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register cyclic transmission error for specific data element
 
    Info: no default handling
 
    \param[in] orc_WidgetDataPoolElementId Affected data element
    \param[in] ou8_ErrorCode               Registered error code
-
-   \created     17.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbDataElementHandler::RegisterDataPoolElementCyclicError(
    const C_PuiSvDbNodeDataPoolListElementId & orc_WidgetDataPoolElementId, const uint8 ou8_ErrorCode)
 {
@@ -156,17 +140,14 @@ void C_PuiSvDbDataElementHandler::RegisterDataPoolElementCyclicError(
    Q_UNUSED(ou8_ErrorCode)
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Removes the datapool element from the shown elements of the widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Removes the datapool element from the shown elements of the widget
 
    This function is thread safe.
 
    \param[in]     orc_WidgetDataPoolElementId         Datapool element identificator
-
-   \created     24.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbDataElementHandler::RemoveDataPoolElement(
    const C_PuiSvDbNodeDataPoolListElementId & orc_WidgetDataPoolElementId)
 {
@@ -218,15 +199,12 @@ void C_PuiSvDbDataElementHandler::RemoveDataPoolElement(
    this->mc_CriticalSection.Release();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clear the datapool elements from the shown elements of the widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clear the datapool elements from the shown elements of the widget
 
    This function is thread safe.
-
-   \created     24.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbDataElementHandler::ClearDataPoolElements(void)
 {
    this->mc_CriticalSection.Acquire();
@@ -237,13 +215,10 @@ void C_PuiSvDbDataElementHandler::ClearDataPoolElements(void)
    this->m_DataPoolElementsChanged();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle changes of transmission mode for any data element
-
-   \created     11.10.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle changes of transmission mode for any data element
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbDataElementHandler::UpdateTransmissionConfiguration(void)
 {
    const uint32 u32_Count = this->GetWidgetDataPoolElementCount();
@@ -267,24 +242,20 @@ void C_PuiSvDbDataElementHandler::UpdateTransmissionConfiguration(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the count of shown datapool elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the count of shown datapool elements
 
    \return
    Count of shown datapool elements
-
-   \created     23.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_PuiSvDbDataElementHandler::GetWidgetDataPoolElementCount(void) const
 {
    return this->mu32_WidgetDataPoolElementCount;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Gets all identification informations about the registered datapool element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Gets all identification informations about the registered datapool element
 
    \param[in]     ou32_WidgetDataPoolElementIndex       Index of shown datapool element in widget
    \param[out]    orc_DataPoolId                        Datapool element identificator
@@ -292,10 +263,8 @@ uint32 C_PuiSvDbDataElementHandler::GetWidgetDataPoolElementCount(void) const
    \return
    C_NO_ERR    Datapool element index valid and index id was filled
    C_RANGE     Datapool element index not valid. Id was not filled.
-
-   \created     23.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvDbDataElementHandler::GetDataPoolElementIndex(const uint32 ou32_WidgetDataPoolElementIndex,
                                                             C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolId) const
 {
@@ -320,9 +289,8 @@ sint32 C_PuiSvDbDataElementHandler::GetDataPoolElementIndex(const uint32 ou32_Wi
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Gets index of datapool element in widget with identification informations
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Gets index of datapool element in widget with identification informations
 
    \param[in]      orc_DataPoolId                        Datapool element identificator
    \param[out]     oru32_WidgetDataPoolElementIndex      Index of shown datapool element in widget
@@ -330,10 +298,8 @@ sint32 C_PuiSvDbDataElementHandler::GetDataPoolElementIndex(const uint32 ou32_Wi
    \return
    C_NO_ERR    Datapool element index valid and index id was filled
    C_RANGE     Datapool element index not valid. Id was not filled.
-
-   \created     10.10.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvDbDataElementHandler::GetWidgetDataPoolElementIndex(
    const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolId, uint32 & oru32_WidgetDataPoolElementIndex) const
 {
@@ -352,9 +318,8 @@ sint32 C_PuiSvDbDataElementHandler::GetWidgetDataPoolElementIndex(
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Gets all scaling informations about the registered datapool element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Gets all scaling informations about the registered datapool element
 
    \param[in]     ou32_WidgetDataPoolElementIndex       Index of shown datapool element in widget
    \param[out]    orc_DataPoolScaling                   Datapool element scaling configuration
@@ -362,10 +327,8 @@ sint32 C_PuiSvDbDataElementHandler::GetWidgetDataPoolElementIndex(
    \return
    C_NO_ERR    Datapool element index valid and index id was filled
    C_RANGE     Datapool element index not valid. Id was not filled.
-
-   \created     08.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvDbDataElementHandler::GetDataPoolElementScaling(const uint32 ou32_WidgetDataPoolElementIndex,
                                                               C_PuiSvDbDataElementScaling & orc_DataPoolScaling) const
 {
@@ -391,19 +354,16 @@ sint32 C_PuiSvDbDataElementHandler::GetDataPoolElementScaling(const uint32 ou32_
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   short description of function
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   short description of function
 
    \param[in]     orc_WidgetDataPoolElementId         Datapool element identificator
 
    \return
    true     Data element is already registered
    false    Data element is not registered
-
-   \created     08.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_PuiSvDbDataElementHandler::IsDataElementRegistered(
    const C_PuiSvDbNodeDataPoolListElementId & orc_WidgetDataPoolElementId) const
 {
@@ -422,18 +382,15 @@ bool C_PuiSvDbDataElementHandler::IsDataElementRegistered(
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Inserts a new received value to the widget queue
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Inserts a new received value to the widget queue
 
    This function is thread safe.
 
    \param[in]     orc_WidgetDataPoolElementId         Datapool element identificator
    \param[in]     orc_NewValue                        New received value
-
-   \created     23.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbDataElementHandler::InsertNewValueIntoQueue(
    const C_PuiSvDbNodeDataPoolListElementId & orc_WidgetDataPoolElementId,
    const C_PuiSvDbDataElementContent & orc_NewValue)
@@ -456,18 +413,15 @@ void C_PuiSvDbDataElementHandler::InsertNewValueIntoQueue(
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds a new received NVM value to the widget queue
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds a new received NVM value to the widget queue
 
    This function is thread safe.
 
    \param[in]     orc_WidgetDataPoolElementId         Datapool element identificator
    \param[in]     orc_NewValue                        New received value
-
-   \created     23.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbDataElementHandler::AddNewNvmValueIntoQueue(
    const C_PuiSvDbNodeDataPoolListElementId & orc_WidgetDataPoolElementId,
    const C_PuiSvDbDataElementContent & orc_NewValue)
@@ -492,9 +446,8 @@ void C_PuiSvDbDataElementHandler::AddNewNvmValueIntoQueue(
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get unscaled value as scaled string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get unscaled value as scaled string
 
    Warning: expected to be in range of min & max
 
@@ -503,10 +456,8 @@ void C_PuiSvDbDataElementHandler::AddNewNvmValueIntoQueue(
 
    \return
    Value as scaled string
-
-   \created     25.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_PuiSvDbDataElementHandler::GetUnscaledValueAsScaledString(const float64 f64_Value,
                                                                     const uint32 ou32_IndexElement) const
 {
@@ -535,9 +486,8 @@ QString C_PuiSvDbDataElementHandler::GetUnscaledValueAsScaledString(const float6
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get unscaled value (does not need to be in range of min & max) as scaled string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get unscaled value (does not need to be in range of min & max) as scaled string
 
    \param[in]     of64_Value        Unscaled value (does not need to be in range of min & max)
    \param[in]     ou32_IndexElement Optional index of element (if more than one)
@@ -545,10 +495,8 @@ QString C_PuiSvDbDataElementHandler::GetUnscaledValueAsScaledString(const float6
 
    \return
    Value as scaled string
-
-   \created     07.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_PuiSvDbDataElementHandler::GetUnscaledValueInRangeAsScaledString(const float64 of64_Value,
                                                                            const uint32 ou32_IndexElement,
                                                                            float64 * const opf64_Progress)
@@ -594,9 +542,8 @@ const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the newest registered value of a specific datapool element. It can be an array too.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the newest registered value of a specific datapool element. It can be an array too.
 
    The vector will be cleared first.
 
@@ -614,10 +561,8 @@ const
    C_NO_ERR    Value read
    C_RANGE     Index invalid
    C_NOACT     No value received
-
-   \created     24.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvDbDataElementHandler::m_GetLastValue(const uint32 ou32_WidgetDataPoolElementIndex,
                                                    std::vector<float64> & orc_Values,
                                                    std::vector<QString> * const opc_StringifiedValues,
@@ -698,9 +643,8 @@ sint32 C_PuiSvDbDataElementHandler::m_GetLastValue(const uint32 ou32_WidgetDataP
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the newest registered value of a specific datapool element as float
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the newest registered value of a specific datapool element as float
 
    This function is thread safe.
 
@@ -711,10 +655,8 @@ sint32 C_PuiSvDbDataElementHandler::m_GetLastValue(const uint32 ou32_WidgetDataP
    C_NO_ERR    Value read
    C_RANGE     Index invalid
    C_NOACT     No value received
-
-   \created     28.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvDbDataElementHandler::m_GetLastValue(const uint32 ou32_WidgetDataPoolElementIndex, float64 & orf64_Value,
                                                    const bool oq_UseScaling)
 {
@@ -773,9 +715,8 @@ sint32 C_PuiSvDbDataElementHandler::m_GetLastValue(const uint32 ou32_WidgetDataP
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns all registered values of a specific datapool element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns all registered values of a specific datapool element
 
    This function is thread safe.
 
@@ -786,10 +727,8 @@ sint32 C_PuiSvDbDataElementHandler::m_GetLastValue(const uint32 ou32_WidgetDataP
    C_NO_ERR    Value read
    C_RANGE     Index invalid
    C_NOACT     No value received
-
-   \created     24.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvDbDataElementHandler::m_GetAllValues(const uint32 ou32_WidgetDataPoolElementIndex,
                                                    QVector<float64> & orc_Values, QVector<uint32> & orc_Timestamps,
                                                    const bool oq_UseScaling)
@@ -859,9 +798,8 @@ sint32 C_PuiSvDbDataElementHandler::m_GetAllValues(const uint32 ou32_WidgetDataP
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the newest registered NVM value of a specific NVM datapool element. It can be an array too.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the newest registered NVM value of a specific NVM datapool element. It can be an array too.
 
    The vector will be cleared first.
 
@@ -872,23 +810,17 @@ sint32 C_PuiSvDbDataElementHandler::m_GetAllValues(const uint32 ou32_WidgetDataP
    This function is thread safe.
 
    \param[in]     ou32_WidgetDataPoolElementIndex       Index of shown datapool element in widget
-   \param[out]    orc_Values                            Vector with result value(s)
-   \param[out]    opc_StringifiedValues                 Optional vector with result strings
+   \param[out]    orc_Value                             Raw result value
 
    \return
    C_NO_ERR    Value read
    C_RANGE     Index invalid
-
-   \created     25.10.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvDbDataElementHandler::m_GetLastNvmValue(const uint32 ou32_WidgetDataPoolElementIndex,
-                                                      std::vector<float64> & orc_Values,
-                                                      std::vector<QString> * const opc_StringifiedValues)
+                                                      C_OSCNodeDataPoolContent & orc_Value)
 {
    sint32 s32_Return = C_RANGE;
-
-   orc_Values.clear();
 
    if ((static_cast<sintn>(ou32_WidgetDataPoolElementIndex) < this->mc_VecNvmValue.size()) &&
        (static_cast<sintn>(ou32_WidgetDataPoolElementIndex) < this->mc_VecNvmValueReceived.size()) &&
@@ -898,23 +830,8 @@ sint32 C_PuiSvDbDataElementHandler::m_GetLastNvmValue(const uint32 ou32_WidgetDa
 
       if (this->mc_VecNvmValueReceived[ou32_WidgetDataPoolElementIndex] == true)
       {
-         uint32 u32_Counter;
-         float64 f64_Temp;
-
          // Get the newest value
-         C_SdNdeDataPoolContentUtil::h_GetValuesAsFloat64(
-            this->mc_VecNvmValue[ou32_WidgetDataPoolElementIndex],
-            orc_Values);
-
-         // Scale all values
-         for (u32_Counter = 0U; u32_Counter < orc_Values.size(); ++u32_Counter)
-         {
-            f64_Temp = orc_Values[u32_Counter];
-            orc_Values[u32_Counter] = C_OSCUtils::h_GetValueScaled(
-               f64_Temp,
-               this->mc_UsedScaling[ou32_WidgetDataPoolElementIndex].f64_Factor,
-               this->mc_UsedScaling[ou32_WidgetDataPoolElementIndex].f64_Offset);
-         }
+         orc_Value = this->mc_VecNvmValue[ou32_WidgetDataPoolElementIndex];
 
          // Remove all values for the next call
          this->mc_VecNvmValueReceived[ou32_WidgetDataPoolElementIndex] = false;
@@ -928,27 +845,11 @@ sint32 C_PuiSvDbDataElementHandler::m_GetLastNvmValue(const uint32 ou32_WidgetDa
       this->mc_CriticalSection.Release();
    }
 
-   if ((opc_StringifiedValues != NULL) && (ou32_WidgetDataPoolElementIndex < this->mc_MinimumType.size()))
-   {
-      const std::vector<stw_opensyde_core::C_OSCNodeDataPoolContent::E_Type> & rc_Types = this->mc_MinimumType[
-         ou32_WidgetDataPoolElementIndex];
-      opc_StringifiedValues->reserve(orc_Values.size());
-      if (orc_Values.size() == rc_Types.size())
-      {
-         for (uint32 u32_ItValue = 0; u32_ItValue < orc_Values.size(); ++u32_ItValue)
-         {
-            opc_StringifiedValues->push_back(mh_GetStringForScaledValue(orc_Values[u32_ItValue],
-                                                                        rc_Types[u32_ItValue]));
-         }
-      }
-   }
-
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get percentage of timeout progress for specified element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get percentage of timeout progress for specified element
 
    \param[in]  ou32_DataElementIndex              Index of time stamp of last received data package
    \param[out] oru8_TimoutPercentage100           0-100 Progression of timeout
@@ -960,10 +861,8 @@ sint32 C_PuiSvDbDataElementHandler::m_GetLastNvmValue(const uint32 ou32_WidgetDa
    C_NO_ERR Valid value
    C_RANGE  Index out of range
    C_NOACT Timeout invalid
-
-   \created     31.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvDbDataElementHandler::m_GetTimoutPercentage100(const uint32 ou32_DataElementIndex,
                                                              uint8 & oru8_TimoutPercentage100) const
 {
@@ -1008,9 +907,8 @@ sint32 C_PuiSvDbDataElementHandler::m_GetTimoutPercentage100(const uint32 ou32_D
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Scales a minimum and maximum value with the active scaling configuration
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Scales a minimum and maximum value with the active scaling configuration
 
    \param[in]     ou32_WidgetDataPoolElementIndex       Index of shown datapool element in widget
    \param[in,out] orf64_Min                             Minimum value
@@ -1019,10 +917,8 @@ sint32 C_PuiSvDbDataElementHandler::m_GetTimoutPercentage100(const uint32 ou32_D
    \return
    C_NO_ERR Valid value
    C_RANGE  Index out of range
-
-   \created     28.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvDbDataElementHandler::m_ScaleMinMax(const uint32 ou32_WidgetDataPoolElementIndex, float64 & orf64_Min,
                                                   float64 & orf64_Max) const
 {
@@ -1046,13 +942,10 @@ sint32 C_PuiSvDbDataElementHandler::m_ScaleMinMax(const uint32 ou32_WidgetDataPo
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the timeout values and valid flags for all registered datapool elements
-
-   \created     20.09.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the timeout values and valid flags for all registered datapool elements
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbDataElementHandler::m_UpdateDataPoolElementTimeoutAndValidFlag(void)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
@@ -1179,38 +1072,32 @@ void C_PuiSvDbDataElementHandler::m_UpdateDataPoolElementTimeoutAndValidFlag(voi
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Event function if the datapool element configuration was changed
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Event function if the datapool element configuration was changed
 
    Base class implementation does nothing. If there are configurable properties for the dashboard element
    the derived class must reimplement this function.
-
-   \created     19.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbDataElementHandler::m_DataPoolElementsChanged(void)
 {
    // Nothing to do in the base class implementation
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get configured scaling configuration for each data element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get configured scaling configuration for each data element
 
    \return
    Current configured scaling configuration for each data element
-
-   \created     08.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & C_PuiSvDbDataElementHandler::GetMappingDpElementToDataSerie(
    void) const
 {
    return this->mc_MappingDpElementToDataSerie;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbDataElementHandler::m_SetWidgetDataPoolElementCount(const uint32 ou32_Count)
 {
    this->mu32_WidgetDataPoolElementCount = ou32_Count;
@@ -1225,7 +1112,7 @@ void C_PuiSvDbDataElementHandler::m_SetWidgetDataPoolElementCount(const uint32 o
    this->mc_MinimumType.resize(this->mu32_WidgetDataPoolElementCount);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_PuiSvDbWidgetBase * C_PuiSvDbDataElementHandler::m_GetPuiSvBase(void) const
 {
    const C_PuiSvDbWidgetBase * pc_Base = NULL;
@@ -1290,19 +1177,16 @@ const C_PuiSvDbWidgetBase * C_PuiSvDbDataElementHandler::m_GetPuiSvBase(void) co
    return pc_Base;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get string for scaled value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get string for scaled value
 
    \param[in] of64_Value Scaled value
    \param[in] oe_Type    Target type after scaling
 
    \return
    String for value
-
-   \created     09.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_PuiSvDbDataElementHandler::mh_GetStringForScaledValue(const float64 of64_Value,
                                                                 const C_OSCNodeDataPoolContent::E_Type oe_Type)
 {

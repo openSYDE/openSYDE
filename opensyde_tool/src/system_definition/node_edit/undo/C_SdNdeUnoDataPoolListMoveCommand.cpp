@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data pool list move undo command (implementation)
 
    Data pool list move undo command
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.01.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_Uti.h"
@@ -25,26 +18,25 @@
 #include "C_PuiSdHandler.h"
 #include "C_SdUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     oru32_NodeIndex             Node index
    \param[in]     oru32_DataPoolIndex         Node data pool index
@@ -52,10 +44,8 @@ using namespace stw_opensyde_gui_logic;
    \param[in]     oru32_SourceRows            Source rows
    \param[in]     oru32_TargetRows            Target rows
    \param[in,out] opc_Parent                  Optional pointer to parent
-
-   \created     25.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoDataPoolListMoveCommand::C_SdNdeUnoDataPoolListMoveCommand(const uint32 & oru32_NodeIndex,
                                                                      const uint32 & oru32_DataPoolIndex,
                                                                      stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget,
@@ -71,13 +61,10 @@ C_SdNdeUnoDataPoolListMoveCommand::C_SdNdeUnoDataPoolListMoveCommand(const uint3
    C_SdUtil::h_SortSourceDescending(this->mc_SourceRows, this->mc_TargetRows);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Redo
-
-   \created     26.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Redo
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListMoveCommand::redo(void)
 {
    this->DoMoveRows(this->mc_SourceRows, this->mc_TargetRows);
@@ -86,13 +73,10 @@ void C_SdNdeUnoDataPoolListMoveCommand::redo(void)
    C_SdNdeUnoDataPoolListBaseCommand::redo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Undo
-
-   \created     26.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Undo
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListMoveCommand::undo(void)
 {
    C_SdNdeUnoDataPoolListBaseCommand::undo();
@@ -101,9 +85,8 @@ void C_SdNdeUnoDataPoolListMoveCommand::undo(void)
    this->mpc_DataPoolListsTreeWidget->UpdateUI();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle move selected items action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle move selected items action
 
    Warning 1: only works if target indices have same contiguous property as selected indices
    i.e. if you make the selected indices contiguous by resorting the target indices should also become contiguous
@@ -114,10 +97,8 @@ void C_SdNdeUnoDataPoolListMoveCommand::undo(void)
                                   Example value:
                                    "move up" -> orc_SelectedIndices - 1
                                    "move down" -> orc_TargetIndices + 1
-
-   \created     07.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListMoveCommand::DoMoveRows(const std::vector<uint32> & orc_SelectedIndices,
                                                    const std::vector<uint32> & orc_TargetIndices)
 {
@@ -168,16 +149,13 @@ void C_SdNdeUnoDataPoolListMoveCommand::DoMoveRows(const std::vector<uint32> & o
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Move items to target index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Move items to target index
 
    \param[in] orc_ContiguousIndices Contiguous section of ascending indices
    \param[in] ou32_TargetIndex      Target index
-
-   \created     07.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListMoveCommand::m_MoveItems(const std::vector<uint32> & orc_ContiguousIndices,
                                                     const uint32 ou32_TargetIndex) const
 {
@@ -209,19 +187,16 @@ void C_SdNdeUnoDataPoolListMoveCommand::m_MoveItems(const std::vector<uint32> & 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Move specific item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Move specific item
 
    For implementation: First delete ou32_SourceIndex then insert ou32_TargetIndex
    Warning: not expected to fail
 
    \param[in] ou32_SourceIndex Source index
    \param[in] ou32_TargetIndex Target index
-
-   \created     07.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListMoveCommand::m_MoveItem(const uint32 ou32_SourceIndex, const uint32 ou32_TargetIndex) const
 {
    C_PuiSdHandler::h_GetInstance()->MoveDataPoolList(this->mu32_NodeIndex, this->mu32_DataPoolIndex, ou32_SourceIndex,

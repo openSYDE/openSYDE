@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       string list class
@@ -19,15 +19,9 @@
    - Everything associated with TObject
    - stream-based functions
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-200x
-   license     use only under terms of contract / confidential
-
-   created     18.06.2009  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CSCLSTRINGLISTH
 #define CSCLSTRINGLISTH
 

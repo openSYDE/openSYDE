@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Store node
 
    Store node (See .cpp file for full description)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     02.09.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCNODEH
 #define C_OSCNODEH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 #include "stwtypes.h"
 #include "CSCLString.h"
@@ -26,14 +20,14 @@
 #include "C_OSCNodeApplication.h"
 #include "C_OSCCanProtocol.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///container for all elements that describe one node
 class C_OSCNode
 {
@@ -121,6 +115,7 @@ public:
                                                     bool & orq_Valid) const;
    void ReCalcCanProtocolDataPoolIndices(void);
    bool IsAnyUpdateAvailable(void) const;
+   bool IsRoutingAvailable(const C_OSCSystemBus::E_Type oe_Type) const;
    void RecalculateAddress(void);
 
    C_OSCNodeDataPoolListElement * GetDataPoolListElement(const stw_types::uint32 ou32_DataPoolIndex,
@@ -153,9 +148,13 @@ private:
                                     const stw_types::uint32 * const opu32_SkipInterfaceIndex = NULL,
                                     const bool * const opq_SkipMessageIsTxFlag = NULL,
                                     const stw_types::uint32 * const opu32_SkipMessageIndex = NULL) const;
+   stw_types::uint32 m_GetListHash(const stw_types::uint32 ou32_DataPoolIndex,
+                                   const stw_types::uint32 ou32_ListIndex) const;
+   stw_types::uint32 m_GetContainerHash(const stw_types::uint32 ou32_DataPoolIndex,
+                                        const stw_types::uint32 ou32_ContainerIndex) const;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

@@ -1,35 +1,29 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Update package configuration file reader/writer (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.02.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVUPUPDATEPACKAGECONFIGFILER_H
 #define C_SYVUPUPDATEPACKAGECONFIGFILER_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 
 #include "C_SyvUpUpdatePackageConfig.h"
 
 #include "C_OSCXMLParser.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SyvUpUpdatePackageConfigFiler
 {
@@ -48,13 +42,19 @@ private:
                            const C_SyvUpUpdatePackageConfigNode & orc_NodeConfig);
    static bool mh_SaveApp(stw_opensyde_core::C_OSCXMLParser & orc_XMLParser,
                           const C_SyvUpUpdatePackageConfigNodeApp & orc_AppConfig);
+   static bool mh_SaveParamSet(stw_opensyde_core::C_OSCXMLParser & orc_XMLParser, const QString & orc_Path);
+   static bool mh_SaveFile(stw_opensyde_core::C_OSCXMLParser & orc_XMLParser, const QString & orc_Path);
 
    static bool mh_LoadNodes(stw_opensyde_core::C_OSCXMLParser & orc_XMLParser, C_SyvUpUpdatePackageConfig & orc_Config);
    static bool mh_LoadApps(stw_opensyde_core::C_OSCXMLParser & orc_XMLParser,
                            C_SyvUpUpdatePackageConfigNode & orc_NodeConfig);
+   static bool mh_LoadParamSets(stw_opensyde_core::C_OSCXMLParser & orc_XMLParser,
+                                C_SyvUpUpdatePackageConfigNode & orc_NodeConfig);
+   static bool mh_LoadFiles(stw_opensyde_core::C_OSCXMLParser & orc_XMLParser,
+                            C_SyvUpUpdatePackageConfigNode & orc_NodeConfig);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

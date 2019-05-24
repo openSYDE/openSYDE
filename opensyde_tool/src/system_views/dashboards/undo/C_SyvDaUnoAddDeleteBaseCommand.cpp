@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Add and delete base class for dashboard (implementation)
 
    Add and delete base class for dashboard
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.07.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "TGLUtils.h"
@@ -37,7 +30,7 @@
 #include "C_SyvDaDashboardScene.h"
 #include "C_SyvDaUnoAddDeleteBaseCommand.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -45,31 +38,28 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Scene               Pointer to currently active scene
    \param[in]     orc_IDs                 Affected unique IDs
    \param[in]     orc_Text                Command description
    \param[in,out] opc_Parent              Optional pointer to parent
    \param[in]     orc_InitialSnapshotData Initial snapshot data
-
-   \created     21.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaUnoAddDeleteBaseCommand::C_SyvDaUnoAddDeleteBaseCommand(QGraphicsScene * const opc_Scene,
                                                                const std::vector<uint64> & orc_IDs,
                                                                const QString & orc_Text,
@@ -80,26 +70,20 @@ C_SyvDaUnoAddDeleteBaseCommand::C_SyvDaUnoAddDeleteBaseCommand(QGraphicsScene * 
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete all relevant items and save them to internal backup
-
-   \created     23.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete all relevant items and save them to internal backup
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoAddDeleteBaseCommand::m_DeleteSave(void)
 {
    m_SaveToData();
    m_Delete();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore all items
-
-   \created     23.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore all items
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoAddDeleteBaseCommand::m_Restore(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -116,13 +100,10 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_Restore(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore all read rails (not replaced if already existing due to other not registered element changes)
-
-   \created     13.08.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore all read rails (not replaced if already existing due to other not registered element changes)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoAddDeleteBaseCommand::m_RestoreReadRailsOnly(void)
 {
    if (this->mc_SavedRailAssignments.size() > 0)
@@ -159,99 +140,80 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_RestoreReadRailsOnly(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get boundary element type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get boundary element type
 
    \return
    Boundary element type
-
-   \created     20.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDaUnoAddDeleteBaseCommand::GetBoundaryType(void) const
 {
    return static_cast<sint32>(C_PuiSvDbDataElement::eBOUNDARY);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get image element type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get image element type
 
    \return
    Image element type
-
-   \created     20.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDaUnoAddDeleteBaseCommand::GetImageType(void) const
 {
    return static_cast<sint32>(C_PuiSvDbDataElement::eIMAGE);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get line arrow element type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get line arrow element type
 
    \return
    Line arrow element type
-
-   \created     20.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDaUnoAddDeleteBaseCommand::GetLineArrowType(void) const
 {
    return static_cast<sint32>(C_PuiSvDbDataElement::eLINE_ARROW);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get text element type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get text element type
 
    \return
    Text element type
-
-   \created     20.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDaUnoAddDeleteBaseCommand::GetTextElementType(void) const
 {
    return static_cast<sint32>(C_PuiSvDbDataElement::eTEXT_ELEMENT);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get backup data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get backup data
 
    \return
    Current backup data
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDashboard C_SyvDaUnoAddDeleteBaseCommand::GetDataBackup(void) const
 {
    return this->mc_DataBackup;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get the number of stored read rails
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get the number of stored read rails
 
    \return
    The number of stored read rails
-
-   \created     13.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDaUnoAddDeleteBaseCommand::GetStoredReadRailCount(void) const
 {
    return this->mc_SavedRailAssignments.size();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add read rail config to internal storage
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add read rail config to internal storage
 
    \param[in] orc_Id    ID
    \param[in] orc_Value Value
@@ -259,10 +221,8 @@ sint32 C_SyvDaUnoAddDeleteBaseCommand::GetStoredReadRailCount(void) const
    \return
    C_NO_ERR Operation success
    C_NOACT  Already exists
-
-   \created     29.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDaUnoAddDeleteBaseCommand::AddReadRailToInternalBackup(const C_OSCNodeDataPoolListElementId & orc_Id,
                                                                    const C_PuiSvReadDataConfiguration & orc_Value)
 {
@@ -279,13 +239,10 @@ sint32 C_SyvDaUnoAddDeleteBaseCommand::AddReadRailToInternalBackup(const C_OSCNo
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save currently relevant system definition part to data
-
-   \created     22.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save currently relevant system definition part to data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -526,13 +483,10 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clear all data storage
-
-   \created     23.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clear all data storage
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoAddDeleteBaseCommand::m_Clear(void)
 {
    this->mc_MapTypeAndIndexToID.clear();
@@ -540,13 +494,10 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_Clear(void)
    this->mc_SavedRailAssignments.clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete all relevant items
-
-   \created     23.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete all relevant items
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoAddDeleteBaseCommand::m_Delete(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -609,9 +560,8 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_Delete(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get generic data storage for widget item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get generic data storage for widget item
 
    \param[in] ou32_ViewIndex      View index
    \param[in] ou32_DashboardIndex Dashboard index
@@ -620,10 +570,8 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_Delete(void)
    \return
    NULL Widget not found
    Else Valid widget
-
-   \created     14.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_PuiSvDbWidgetBase * C_SyvDaUnoAddDeleteBaseCommand::mh_GetGenericWidget(const uint32 ou32_ViewIndex,
                                                                                 const uint32 ou32_DashboardIndex,
                                                                                 const C_PuiSvDbDataElement * const opc_DataElement)

@@ -1,21 +1,14 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       C_CAN class implementation.
 
    CAN driver class providing an API interface for CAN access under
    Windows using the STW CAN DLL drivers.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     xx.xx.2002  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2002 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h" //pre-compiled headers
@@ -121,8 +114,7 @@ sint32 C_CAN::CAN_DLL_Info(STW_CAN_DLL_INFO & orc_Info) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Close CAN bus
+/*! \brief   Close CAN bus
 
    Will invoke DLL's "CAN_Exit" function.
 
@@ -162,8 +154,7 @@ sint32 C_CAN::CAN_Exit(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Reset CAN bus
+/*! \brief   Reset CAN bus
 
    Will invoke DLL's "CAN_Reset" function.
 
@@ -197,8 +188,7 @@ sint32 C_CAN::CAN_Reset(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize CAN bus
+/*! \brief   Initialize CAN bus
 
    Depending on availability the "Ext" or regular DLL functions are used ("Ext" has priority).
    Will use the DLL's "Init" function for initialization.
@@ -256,8 +246,7 @@ sint32 C_CAN::CAN_Init(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize CAN bus to specific bitrate
+/*! \brief   Initialize CAN bus to specific bitrate
 
    Depending on availability the "Ext" or regular DLL functions are used ("Ext" has priority).
    Will use the DLL's "CAN_Bitrate" function for initialization.
@@ -316,8 +305,7 @@ sint32 C_CAN::CAN_Init(const sint32 os32_BitrateKBitS)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Show DLL's configuration dialog
+/*! \brief   Show DLL's configuration dialog
 
    Depending on availability the "Ext" or regular DLL functions are used ("Ext" has priority).
    Execute's the DLL's blocking configuration dialog.
@@ -450,8 +438,7 @@ sint32 C_CAN::m_ReadMsgFromDLL(T_STWCAN_Msg_RX & orc_Message) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Send CAN message
+/*! \brief   Send CAN message
 
    Send one CAN message using the DLL functions.
    Depending on availability the "Ext" or regular DLL functions are used ("Ext" has priority).
@@ -479,8 +466,7 @@ sint32 C_CAN::CAN_Send_Msg(const T_STWCAN_Msg_TX & orc_Message)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Read CAN message
+/*! \brief   Read CAN message
 
    Read one CAN message using the DLL functions.
    Depending on availability the "Ext" or regular DLL functions are used ("Ext" has priority).
@@ -536,8 +522,7 @@ sint32 C_CAN::CAN_Read_Msg_Timeout(const uint32 ou32_MaxWaitTimeMS, T_STWCAN_Msg
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get DLL's opinion about system time
+/*! \brief   Get DLL's opinion about system time
 
    Will invoke DLL's "Get_System_Time" function.
 

@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       header for class C_XFLActions
 
    Higher level comfort layer on top of the flashloader protocol driver
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     xx.xx.200x  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2002 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CXFLActionsH
 #define CXFLActionsH
 

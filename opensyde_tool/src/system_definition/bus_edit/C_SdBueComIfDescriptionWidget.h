@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for showing and editing COM interface description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.03.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SDBUECOMIFDESCRIPTIONWIDGET_H
 #define C_SDBUECOMIFDESCRIPTIONWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <QWidget>
 
@@ -27,7 +20,7 @@
 #include "C_SdBueUnoManager.h"
 #include "C_PuiSdNodeCanMessageSyncManager.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace Ui
 {
@@ -36,9 +29,9 @@ class C_SdBueComIfDescriptionWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SdBueComIfDescriptionWidget :
    public QWidget
@@ -56,13 +49,13 @@ public:
    void Reload(void);
    void PartialReload(void);
    void SelectMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
-   void SelectMessage(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex,
-                      const stw_types::uint32 ou32_ListIndex, const stw_types::uint32 ou32_MessageIndex) const;
+   void SelectMessageSearch(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex,
+                            const stw_types::uint32 ou32_ListIndex, const stw_types::uint32 ou32_MessageIndex) const;
 
    void SelectSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                      const stw_types::uint32 & oru32_SignalIndex) const;
-   void SelectSignal(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex,
-                     const stw_types::uint32 ou32_ListIndex, const stw_types::uint32 ou32_ElementIndex) const;
+   void SelectSignalSearch(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex,
+                           const stw_types::uint32 ou32_ListIndex, const stw_types::uint32 ou32_ElementIndex) const;
 
    void AddSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                   const stw_types::uint16 ou16_StartBit) const;

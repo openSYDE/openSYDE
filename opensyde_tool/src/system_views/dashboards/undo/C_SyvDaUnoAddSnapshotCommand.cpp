@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Add new items based on snapshot information (implementation)
 
    Add new items based on snapshot information
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.07.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -27,28 +20,27 @@
 #include "C_SyvDaDashboardScene.h"
 #include "C_SyvDaUnoAddSnapshotCommand.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Scene               Pointer to currently active scene
    \param[in]     orc_InitialSnapshotData Initial snapshot data
@@ -56,10 +48,8 @@ using namespace stw_opensyde_gui_logic;
    \param[in]     orc_RestoredRails       Rails to restore if possible
    \param[in]     orc_NewPos              New position
    \param[in,out] opc_Parent              Optional pointer to parent
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaUnoAddSnapshotCommand::C_SyvDaUnoAddSnapshotCommand(QGraphicsScene * const opc_Scene,
                                                            const C_PuiSvDashboard & orc_InitialSnapshotData,
                                                            const std::vector<uint64> & orc_IDs,
@@ -80,24 +70,18 @@ C_SyvDaUnoAddSnapshotCommand::C_SyvDaUnoAddSnapshotCommand(QGraphicsScene * cons
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     24.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaUnoAddSnapshotCommand::~C_SyvDaUnoAddSnapshotCommand(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add elements without previous knowledge
-
-   \created     24.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add elements without previous knowledge
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoAddSnapshotCommand::m_AddNew(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -223,13 +207,10 @@ void C_SyvDaUnoAddSnapshotCommand::m_AddNew(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initial read rail handling
-
-   \created     29.11.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initial read rail handling
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoAddSnapshotCommand::m_InitialReadRailHandling(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2

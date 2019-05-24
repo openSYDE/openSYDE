@@ -1,51 +1,41 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Utility class for dashboard widget items (implementation)
 
    Utility class for dashboard widget items
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     11.08.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_SyvDaItUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init item font family
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init item font family
 
    \param[in,out] opc_Label Label to init font family
-
-   \created     22.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItUtil::h_InitFontFamily(QLabel * const opc_Label)
 {
    if (opc_Label != NULL)
@@ -58,17 +48,14 @@ void C_SyvDaItUtil::h_InitFontFamily(QLabel * const opc_Label)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy font size of one label to another
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy font size of one label to another
 
    \param[in]     opc_SourceLabel Source label
    \param[in,out] opc_TargetLabel Target label
    \param[in]     of32_Factor     Optional factor to apply to point size on copy action
-
-   \created     22.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItUtil::h_CopyFontSize(const QLabel * const opc_SourceLabel, QLabel * const opc_TargetLabel,
                                    const float32 of32_Factor)
 {
@@ -85,18 +72,15 @@ void C_SyvDaItUtil::h_CopyFontSize(const QLabel * const opc_SourceLabel, QLabel 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sync font for up to four labels (choose minimum supported value)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sync font for up to four labels (choose minimum supported value)
 
    \param[in,out] opc_Label1 Label 1 to sync font for
    \param[in,out] opc_Label2 Label 2 to sync font for
    \param[in,out] opc_Label3 Label 3 to sync font for
    \param[in,out] opc_Label4 Label 4 to sync font for
-
-   \created     22.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItUtil::h_SyncFontSize(QLabel * const opc_Label1, QLabel * const opc_Label2, QLabel * const opc_Label3,
                                    QLabel * const opc_Label4)
 {
@@ -144,30 +128,24 @@ void C_SyvDaItUtil::h_SyncFontSize(QLabel * const opc_Label1, QLabel * const opc
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Indent some text
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Indent some text
 
    \param[in] ou32_NumberOfTimes Number of indentations
 
    \return
    Style with indentations
-
-   \created     04.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaItUtil::mh_GetHtmlIndentStyle(const uint32 ou32_NumberOfTimes)
 {
    return QString("style=\"margin-left:%1px\"").arg(ou32_NumberOfTimes * 10);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     11.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItUtil::C_SyvDaItUtil(void)
 {
 }

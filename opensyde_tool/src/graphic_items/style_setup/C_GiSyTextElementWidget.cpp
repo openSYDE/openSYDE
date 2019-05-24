@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for boundary style setup to customize text element optics
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     28.10.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QColorDialog>
@@ -32,39 +25,36 @@
 #include "C_GiCustomFunctions.h"
 #include "C_Uti.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_types;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString mc_PATH_BACKGROUND_IMG = ":/images/graphic_items/TransparentBtnBackground.png";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in]     ou32_Mode   CAN-Bus / Ethernet-Bus or line
    \param[in]     orc_Scene   Used scene for preview
    \param[in,out] orc_Parent  Reference to parent
-
-   \created     28.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSyTextElementWidget::C_GiSyTextElementWidget(C_GiSyBaseWidget & orc_Parent) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_GiSyTextElementWidget),
@@ -98,15 +88,12 @@ C_GiSyTextElementWidget::C_GiSyTextElementWidget(C_GiSyBaseWidget & orc_Parent) 
            &C_GiSyTextElementWidget::m_FontStyleUpdated);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     28.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSyTextElementWidget::~C_GiSyTextElementWidget()
 {
    delete mpc_Ui;
@@ -114,26 +101,20 @@ C_GiSyTextElementWidget::~C_GiSyTextElementWidget()
    // and Qt management takes care of the rest
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     28.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyTextElementWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelFontColor->setText(C_GtGetText::h_GetText("Font Color"));
    this->mpc_Ui->pc_LabelFontStyle->setText(C_GtGetText::h_GetText("Font"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On Show Event
-
-   \created     19.12.2016  STW/S.Singer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On Show Event
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyTextElementWidget::showEvent(QShowEvent * const opc_Event)
 {
    //font color
@@ -143,29 +124,23 @@ void C_GiSyTextElementWidget::showEvent(QShowEvent * const opc_Event)
    QWidget::showEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get actual font style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get actual font style
 
    \return  Actual font style
-
-   \created     03.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QFont C_GiSyTextElementWidget::GetFontStyle(void) const
 {
    return this->mc_FontStyle;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set actual font style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set actual font style
 
    \param[in]  orc_Font    New font style
-
-   \created     03.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyTextElementWidget::SetFontStyle(const QFont & orc_Font)
 {
    this->mc_FontStyle = orc_Font;
@@ -174,29 +149,23 @@ void C_GiSyTextElementWidget::SetFontStyle(const QFont & orc_Font)
    this->m_UpdatePreview();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get actual color of line
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get actual color of line
 
    \return  Actual line color
-
-   \created     12.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QColor C_GiSyTextElementWidget::GetFontColor(void) const
 {
    return this->mc_FontColor;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set line color
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set line color
 
    \param[in]  orc_Value   New line color
-
-   \created     12.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyTextElementWidget::SetFontColor(const QColor & orc_Value)
 {
    QString c_Style = this->mpc_Ui->pc_BushButtonFontColor->styleSheet();
@@ -209,13 +178,10 @@ void C_GiSyTextElementWidget::SetFontColor(const QColor & orc_Value)
    this->m_UpdatePreview();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update of preview click
-
-   \created     17.08.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update of preview click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyTextElementWidget::m_UpdatePreview(void)
 {
    const QSize c_ViewSize = C_GiSyBaseWidget::h_GetSceneViewSize();
@@ -268,15 +234,12 @@ void C_GiSyTextElementWidget::m_UpdatePreview(void)
    //lint -e{429}  no memory leak because of adding the item to the scene and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of inner color button
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of inner color button
 
    Offers the possibility to choose a color for the inner line
-
-   \created     17.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyTextElementWidget::m_FontColorClicked(void)
 {
    QString c_Style = this->mpc_Ui->pc_BushButtonFontColor->styleSheet();
@@ -299,15 +262,12 @@ void C_GiSyTextElementWidget::m_FontColorClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle font change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle font change
 
    \param[in] orc_Font New font
-
-   \created     27.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyTextElementWidget::m_FontStyleUpdated(const QFont & orc_Font)
 {
    this->SetFontStyle(orc_Font);

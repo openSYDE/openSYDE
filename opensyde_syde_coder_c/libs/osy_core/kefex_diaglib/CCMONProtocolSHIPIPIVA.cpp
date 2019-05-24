@@ -1,41 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
-   \file        CCMONProtocolIVA
+   \file
    \brief       Implements textual interpretation of SHIP-IP! and STW IVA protocol messages
 
    As the IVA protocol is fully included into the SHIP-IP! protocol, and there is no ambiguity
    this class is used to interpret both protocols.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     18.12.2009  STW/A.Stangl
-   \endimplementation
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   14.12.2016        STW/AEB,DPO   SHIP-IT!: added support of new services (redmine #14436)
-   22.01.2014        STW/A.Stangl  SHIP-IT!: added support to interpret transport protocol eleven
-                                   SHIP-IP!: updated to match service definitions
-   30.11.2011        STW/A.Stangl  SHIP-IP!: updated to match service definitions
-                                    (still not neccessarily a 100% fixed state)
-   14.06.2011        STW/A.Stangl  IVA: added service "write_list_default"
-                                   IVA: changed interpretation of "check_list_checksum" response (changed specification)
-   19.05.2011        STW/A.Stangl  SHIP-IP!: removed IVA table ident (removed from protocol specification)
-   06.09.2010        STW/A.Stangl  SHIP-IP!: added decoding of headers + payload for read/write
-   31.08.2010        STW/A.Stangl  SHIP-IP!: added interpretation of memory and OD read/write
-   31.04.2010        STW/A.Stangl  IVA: fix: protocol Logoff as LOGOFF (was: LOGON)
-   21.04.2010        STW/A.Stangl  added SHIP-IP! interpretation on transport protocol layer
-   12.01.2010        STW/A.Stangl  finished implementing all services
-   18.12.2009        STW/A.Stangl  file created
-   \endhistory
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------ */
 #include "precomp_headers.h"  //pre-compiled headers
@@ -431,10 +405,8 @@ SCLDynamicArray<C_CMONProtocolSIPASADescription> C_CMONProtocolSHIP_IP_IVA::hmc_
 
 /* -- Implementation ------------------------------------------------------ */
 
-
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert CAN message to text representation.
+/*! \brief   Convert CAN message to text representation.
 
    Can either be:
    - in IVA protocol
@@ -446,8 +418,6 @@ SCLDynamicArray<C_CMONProtocolSIPASADescription> C_CMONProtocolSHIP_IP_IVA::hmc_
 
    \return
    Text interpretation of CAN message ("" if the message can not be interpreted)
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolSHIP_IP_IVA::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) const
@@ -459,7 +429,6 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::MessageToString(const T_STWCAN_Msg_RX & o
       hmq_ServiceTableInitialized = true;
    }
 
-
    if (orc_Msg.u8_XTD == 0U)
    {
       return m_MessageToString11Bit(orc_Msg);
@@ -468,8 +437,7 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::MessageToString(const T_STWCAN_Msg_RX & o
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert CAN message with 11bit ID to text representation.
+/*! \brief   Convert CAN message with 11bit ID to text representation.
 
    Convert CAN message with 11bit ID to text represenation.
    Can either be:
@@ -481,16 +449,6 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::MessageToString(const T_STWCAN_Msg_RX & o
 
    \return
    Text interpretation of CAN message ("" if the message can not be interpreted)
-
-   \created     18.12.2009  STW/A.Stangl
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   14.01.2014        STW/A.Stangl  added support for SIP11 protocol
-   12.01.2010        STW/A.Stangl  finished implementing all services
-   18.12.2009        STW/A.Stangl  function created as stub
-   \endhistory
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolSHIP_IP_IVA::m_MessageToString11Bit(const T_STWCAN_Msg_RX & orc_Msg) const
@@ -1583,7 +1541,6 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetApplData(const uint8 ou8_Byte1, c
       pu8_ASH_Byte2 = &opu8_FollowingBytes[0];
    }
 
-
    switch (u8_AAT)
    {
    case SIP_APP_AAT_READ:
@@ -2109,13 +2066,10 @@ C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPGetODRWTypeAndIndex(const uint8 ou8_
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get name of protocol as string
+/*! \brief   Get name of protocol as string
 
    \return
    Text representation of protocol name
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolSHIP_IP_IVA::GetProtocolName(void) const
@@ -2639,7 +2593,7 @@ void C_CMONProtocolSHIP_IP_IVA::hm_InitServiceTable(void)
    hmc_Services[SIP_ASA_ETHERNET].c_ASNs[SIP_ASN_ETH_STATE].c_Payload[3].Set("POLARITY", 1, false);
 }
 
-//---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
 
 C_SCLString C_CMONProtocolSHIP_IP_IVA::m_SIPDecodeData(const SCLDynamicArray<C_CMONProtocolSIPPayload> & orc_Payload,
                                                          const uint8 ou8_NumBytesInPayload,

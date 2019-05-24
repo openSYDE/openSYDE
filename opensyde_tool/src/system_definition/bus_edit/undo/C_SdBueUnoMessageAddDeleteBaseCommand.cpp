@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       short description (implementation)
 
    detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.04.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwerrors.h"
@@ -25,7 +18,7 @@
 #include "C_PuiSdHandler.h"
 #include "constants.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_errors;
 using namespace stw_tgl;
 using namespace stw_types;
@@ -33,31 +26,28 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     orc_MessageId          Message identification indices
    \param[in,out] opc_MessageSyncManager Message sync manager to perform actions on
    \param[in,out] opc_MessageTreeWidget  Message tree widget to perform actions on
    \param[in]     orc_Text               Optional command text for informational display
    \param[in,out] opc_Parent             Optional pointer to parent
-
-   \created     20.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueUnoMessageAddDeleteBaseCommand::C_SdBueUnoMessageAddDeleteBaseCommand(
    const C_OSCCanMessageIdentificationIndices & orc_MessageId,
    C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
@@ -68,13 +58,10 @@ C_SdBueUnoMessageAddDeleteBaseCommand::C_SdBueUnoMessageAddDeleteBaseCommand(
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Generic add
-
-   \created     20.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Generic add
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoMessageAddDeleteBaseCommand::Add(void)
 {
    if (this->mpc_MessageSyncManager != NULL)
@@ -165,13 +152,10 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::Add(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Generic delete
-
-   \created     20.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Generic delete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoMessageAddDeleteBaseCommand::Delete(void)
 {
    m_Store();
@@ -184,13 +168,10 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::Delete(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Store current values
-
-   \created     20.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Store current values
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoMessageAddDeleteBaseCommand::m_Store(void)
 {
    if (this->mpc_MessageSyncManager != NULL)
@@ -209,13 +190,10 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::m_Store(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Remove current message
-
-   \created     20.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove current message
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoMessageAddDeleteBaseCommand::m_Remove(void)
 {
    if (this->mpc_MessageSyncManager != NULL)
@@ -227,15 +205,12 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::m_Remove(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Debug function to check if UI part still in sync
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Debug function to check if UI part still in sync
 
    \param[in] orc_MessageId Message to check for
-
-   \created     23.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueUnoMessageAddDeleteBaseCommand::mh_CheckSync(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 {
    sint32 s32_Retval = C_NO_ERR;

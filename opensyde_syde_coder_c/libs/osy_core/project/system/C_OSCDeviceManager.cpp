@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Manager for all device descriptions (implementation)
 
    Manager for all device descriptions
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.09.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -48,8 +41,7 @@ using namespace stw_tgl;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Search for device with specified name
+/*! \brief   Search for device with specified name
 
    The returned pointer points to one of the device instances owned by this class.
    So the caller has to consider the lifetime of the used instance of this class when using
@@ -60,8 +52,6 @@ using namespace stw_tgl;
    \return
    != NULL:  pointer to device definition
    NULL:     device definition not found
-
-   \created     19.09.2016  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 const C_OSCDeviceDefinition * C_OSCDeviceManager::LookForDevice(const C_SCLString & orc_Name) const
@@ -80,13 +70,10 @@ const C_OSCDeviceDefinition * C_OSCDeviceManager::LookForDevice(const C_SCLStrin
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get all device groups
+/*! \brief   Get all device groups
 
    \return
    copy of all device groups owned by this class
-
-   \created     19.09.2016  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 std::vector<C_OSCDeviceGroup> C_OSCDeviceManager::GetDeviceGroups(void) const
@@ -95,16 +82,13 @@ std::vector<C_OSCDeviceGroup> C_OSCDeviceManager::GetDeviceGroups(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get "WasLoaded" flag
+/*! \brief   Get "WasLoaded" flag
 
    Flag will be set after loading device definitions.
    Can be used to prevent multiple loading.
 
    \return
    status of flag
-
-   \created     26.02.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool C_OSCDeviceManager::WasLoaded(void) const
@@ -113,16 +97,13 @@ bool C_OSCDeviceManager::WasLoaded(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Load all known devices
+/*! \brief   Load all known devices
 
    \param[in]   orc_File   Ini file path
 
    \return
    C_NO_ERR   all information loaded without problems
    C_RD_WR    could not load information
-
-   \created     19.09.2016  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDeviceManager::LoadFromFile(const C_SCLString & orc_File)
@@ -160,10 +141,7 @@ sint32 C_OSCDeviceManager::LoadFromFile(const C_SCLString & orc_File)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     19.09.2016  STW/M.Echtler
+/*! \brief   Default constructor
 */
 //-----------------------------------------------------------------------------
 C_OSCDeviceManager::C_OSCDeviceManager(void) :

@@ -1,32 +1,26 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Interpreted parameter set file reader/writer (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     12.10.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCPARAMSETINTERPRETEDNODEFILER_H
 #define C_OSCPARAMSETINTERPRETEDNODEFILER_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OSCParamSetFilerBase.h"
 #include "C_OSCParamSetInterpretedNode.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 ///Interpreted parameter set file reader/writer
 class C_OSCParamSetInterpretedNodeFiler :
@@ -34,7 +28,8 @@ class C_OSCParamSetInterpretedNodeFiler :
 {
 public:
    static stw_types::sint32 h_LoadInterpretedNode(C_OSCParamSetInterpretedNode & orc_Node,
-                                                  C_OSCXMLParserBase & orc_XMLParser);
+                                                  C_OSCXMLParserBase & orc_XMLParser,
+                                                  bool & orq_MissingOptionalContent);
    static void h_SaveInterpretedNode(const C_OSCParamSetInterpretedNode & orc_Node, C_OSCXMLParserBase & orc_XMLParser);
 
 private:
@@ -66,7 +61,7 @@ private:
    static void mh_SaveElement(const C_OSCParamSetInterpretedElement & orc_Element, C_OSCXMLParserBase & orc_XMLParser);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

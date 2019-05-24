@@ -1,23 +1,16 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Connection of node to bus (implementation)
 
    Class connects a node with a bus on the gui. It calculates the necessary coordinates
    if one item is moved and keeps the connection stable
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     18.08.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QGraphicsScene>
@@ -30,27 +23,26 @@
 #include "C_SebUtil.h"
 #include "C_PuiSdUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_types;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -60,10 +52,8 @@ using namespace stw_types;
    \param[in]     opc_BusItem       End of connection at bus
    \param[in]     oq_MiddleLine     Indicator if middle line is required
    \param[in,out] opc_Parent        Optional pointer to parent
-
-   \created     18.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiLiBusConnector::C_GiLiBusConnector(const uint64 & oru64_ID, const QPointF & orc_TriggerPos,
                                        C_GiNode * const opc_NodeItem, const C_GiLiBus * const opc_BusItem,
                                        const bool oq_MiddleLine, QGraphicsItem * const opc_Parent) :
@@ -74,9 +64,8 @@ C_GiLiBusConnector::C_GiLiBusConnector(const uint64 & oru64_ID, const QPointF & 
    this->m_InitConnector(opc_NodeItem, orc_TriggerPos);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -86,10 +75,8 @@ C_GiLiBusConnector::C_GiLiBusConnector(const uint64 & oru64_ID, const QPointF & 
    \param[in]     opc_BusItem           End of connection at bus
    \param[in]     oq_MiddleLine         Indicator if middle line is required
    \param[in,out] opc_Parent            Optional pointer to parent
-
-   \created     18.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiLiBusConnector::C_GiLiBusConnector(const uint64 & oru64_ID, const std::vector<QPointF> & orc_InteractionPoints,
                                        C_GiNode * const opc_NodeItem, const C_GiLiBus * const opc_BusItem,
                                        const bool oq_MiddleLine, QGraphicsItem * const opc_Parent) :
@@ -108,40 +95,31 @@ C_GiLiBusConnector::C_GiLiBusConnector(const uint64 & oru64_ID, const std::vecto
    this->m_InitConnector(opc_NodeItem, c_SaveVec[0]);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     18.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiLiBusConnector::~C_GiLiBusConnector(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the type of this item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the type of this item
 
    \return  ID
-
-   \created     01.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_GiLiBusConnector::type(void) const
 {
    return msn_GRAPHICS_ITEM_BUS_CONNECT;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Context menu entry delete connection was clicked
-
-   \created     06.09.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Context menu entry delete connection was clicked
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::DeleteConnection(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -155,15 +133,12 @@ void C_GiLiBusConnector::DeleteConnection(void)
    this->mpc_GenericSignalItem = NULL;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set new point positions
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new point positions
 
    \param[in] orc_ScenePos New point position set
-
-   \created     05.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::SetPoints(const std::vector<QPointF> & orc_ScenePos)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -189,45 +164,36 @@ void C_GiLiBusConnector::SetPoints(const std::vector<QPointF> & orc_ScenePos)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the node item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the node item
 
    \return  Node item
-
-   \created     06.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_GiNode * C_GiLiBusConnector::GetNodeItem(void) const
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    return dynamic_cast<const C_GiNode *>(mpc_GenericSignalItem);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the node item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the node item
 
    \return  Node item
-
-   \created     19.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiNode * C_GiLiBusConnector::GetNodeItem(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    return dynamic_cast<C_GiNode *>(mpc_GenericSignalItem);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Write current GUI layer connection information to connector class.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Write current GUI layer connection information to connector class.
 
    \param[in,out] opc_UIConnection Storage for GUI information
-
-   \created     13.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::UpdateData(C_PuiSdNodeConnection * const opc_UIConnection) const
 {
    if (opc_UIConnection != NULL)
@@ -253,21 +219,18 @@ void C_GiLiBusConnector::UpdateData(C_PuiSdNodeConnection * const opc_UIConnecti
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Generate hint to display
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Generate hint to display
 
    Connection to [Bus] using [Node] Interface [Interface number]
-
-   \created     22.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::GenerateHint(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    const C_GiNode * const pc_Node = dynamic_cast<const C_GiNode *>(this->mpc_GenericSignalItem);
 
-   if ((pc_Node != NULL) && (this->mpc_BusItem != NULL))
+   if ((pc_Node != NULL) && (this->GetBusItem() != NULL))
    {
       const C_PuiSdNodeConnectionId * pc_NodeConnection = this->GetConnectionData();
       const C_OSCNode * pc_NodeData;
@@ -280,7 +243,7 @@ void C_GiLiBusConnector::GenerateHint(void)
          {
             QString c_Hint;
             // In case of Ethernet an empty string comes back
-            const QString c_Bitrate = this->mpc_BusItem->GetBitrate(true);
+            const QString c_Bitrate = this->GetBusItem()->GetBitrate(true);
 
             //heading
             c_Hint = C_GtGetText::h_GetText("Bus Connection");
@@ -289,9 +252,9 @@ void C_GiLiBusConnector::GenerateHint(void)
             //content
             c_Hint = QString(C_GtGetText::h_GetText(
                                 "%1 connected to %2 (Interface: %3, Node ID: %4%5)")).arg(
-               pc_Node->GetText(),           //Node name
-               this->mpc_BusItem->GetName(), //Bus name
-               C_PuiSdUtil::h_GetInterfaceName(this->mpc_BusItem->GetType(),
+               pc_Node->GetText(),            //Node name
+               this->GetBusItem()->GetName(), //Bus name
+               C_PuiSdUtil::h_GetInterfaceName(this->GetBusItem()->GetType(),
                                                pc_NodeConnection->u8_InterfaceNumber), //Interface
                QString::number(pc_ComInterfaceData->u8_NodeID),                        //Node ID
                c_Bitrate);                                                             // CAN bitrate
@@ -301,17 +264,14 @@ void C_GiLiBusConnector::GenerateHint(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get connection item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get connection item
 
    \return
    Pointer to connection
    NULL: error = No data element found for connector
-
-   \created     22.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_PuiSdNodeConnectionId * C_GiLiBusConnector::GetConnectionData(void) const
 {
    const C_PuiSdNodeConnectionId * pc_Retval = NULL;
@@ -325,16 +285,13 @@ const C_PuiSdNodeConnectionId * C_GiLiBusConnector::GetConnectionData(void) cons
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Helper function to change bus connector interface number
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Helper function to change bus connector interface number
 
    \param[in] oru8_NewInterface New interface number
    \param[in] oru8_NodeId       New node id
-
-   \created     13.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::ChangeInterface(const uint8 & oru8_NewInterface, const uint8 & oru8_NodeId)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -346,17 +303,14 @@ void C_GiLiBusConnector::ChangeInterface(const uint8 & oru8_NewInterface, const 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Revert bus connection to last known node item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Revert bus connection to last known node item
 
    \param[in,out] opc_StartingNode Last known node this bus connection was connected to
    \param[in,out] opc_LastNode     New node this bus connection is currently connected to
    \param[in]     orc_ScenePos     Last known scene position of interaction point
-
-   \created     02.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::Revert(stw_opensyde_gui::C_GiNode * const opc_StartingNode,
                                 stw_opensyde_gui::C_GiNode * const opc_LastNode, const QPointF & orc_ScenePos)
 {
@@ -366,19 +320,16 @@ void C_GiLiBusConnector::Revert(stw_opensyde_gui::C_GiNode * const opc_StartingN
    m_Reconnect();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Connect bus connection to new node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Connect bus connection to new node
 
    \param[in,out] opc_StartingNode  Last known node this bus connection was connected to
    \param[in,out] opc_LastNode      New node to connect this bus connection to
    \param[in]     orc_ConnectionPos New connection position
    \param[in]     ors32_Interface   Interface number to use
    \param[in]     oru8_NodeId       New node id
-
-   \created     02.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::Reconnect(stw_opensyde_gui::C_GiNode * const opc_StartingNode,
                                    stw_opensyde_gui::C_GiNode * const opc_LastNode, const QPointF & orc_ConnectionPos,
                                    const stw_types::sint32 & ors32_Interface, const uint8 & oru8_NodeId)
@@ -386,11 +337,11 @@ void C_GiLiBusConnector::Reconnect(stw_opensyde_gui::C_GiNode * const opc_Starti
    this->mpc_GenericSignalItem = opc_LastNode;
    if (opc_LastNode != NULL)
    {
-      if (this->mpc_BusItem != NULL)
+      if (this->GetBusItem() != NULL)
       {
          //Update data
          C_PuiSdNodeConnectionId c_NodeConn;
-         c_NodeConn.e_InterfaceType = this->mpc_BusItem->GetType();
+         c_NodeConn.e_InterfaceType = this->GetBusItem()->GetType();
          c_NodeConn.u8_InterfaceNumber = static_cast<uint8>(ors32_Interface);
          //Node
 
@@ -401,7 +352,7 @@ void C_GiLiBusConnector::Reconnect(stw_opensyde_gui::C_GiNode * const opc_Starti
          }
          //Add connection to new node
          opc_LastNode->AddConnectionAndData(this, c_NodeConn, oru8_NodeId,
-                                            static_cast<uint32>(this->mpc_BusItem->GetIndex()));
+                                            static_cast<uint32>(this->GetBusItem()->GetIndex()));
          //Update tool tip
          Q_EMIT this->SigHintUpdate();
       }
@@ -410,38 +361,35 @@ void C_GiLiBusConnector::Reconnect(stw_opensyde_gui::C_GiNode * const opc_Starti
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Connect bus connection to new bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Connect bus connection to new bus
 
    \param[in,out] opc_StartingBus   Last known bus this bus connection was connected to
    \param[in,out] opc_LastBus       New bus to connect this bus connection to
    \param[in]     orc_ConnectionPos New connection position
    \param[in]     ors32_Interface   Interface number to use
    \param[in]     oru8_NodeId       New node id
-
-   \created     02.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::Reconnect(const stw_opensyde_gui::C_GiLiBus * const opc_StartingBus,
                                    const stw_opensyde_gui::C_GiLiBus * const opc_LastBus,
                                    const QPointF & orc_ConnectionPos, const stw_types::sint32 & ors32_Interface,
                                    const uint8 & oru8_NodeId)
 {
    Q_UNUSED(opc_StartingBus)
-   this->mpc_BusItem = opc_LastBus;
-   if (this->mpc_BusItem != NULL)
+   this->m_SetBus(opc_LastBus);
+   if (this->GetBusItem() != NULL)
    {
       //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
       C_GiNode * const pc_Node = dynamic_cast<C_GiNode *>(this->mpc_GenericSignalItem);
       //Update data
       C_PuiSdNodeConnectionId c_NodeConn;
-      c_NodeConn.e_InterfaceType = this->mpc_BusItem->GetType();
+      c_NodeConn.e_InterfaceType = this->GetBusItem()->GetType();
       c_NodeConn.u8_InterfaceNumber = static_cast<uint8>(ors32_Interface);
       //Bus
       if (pc_Node != NULL)
       {
-         pc_Node->UpdateConnection(this, c_NodeConn, oru8_NodeId, static_cast<uint32>(this->mpc_BusItem->GetIndex()));
+         pc_Node->UpdateConnection(this, c_NodeConn, oru8_NodeId, static_cast<uint32>(this->GetBusItem()->GetIndex()));
       }
       //Update tool tip
       Q_EMIT this->SigHintUpdate();
@@ -450,29 +398,23 @@ void C_GiLiBusConnector::Reconnect(const stw_opensyde_gui::C_GiLiBus * const opc
    m_Reconnect();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current connected port
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current connected port
 
    \return
    Current connected port item
-
-   \created     02.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_GiPort * C_GiLiBusConnector::GetPortItem(void) const
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    return dynamic_cast<const C_GiPort *>(mpc_GenericPositionItem);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle interaction point move
-
-   \created     18.10.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle interaction point move
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::m_OnInteractionPointMove(void)
 {
    this->mq_OnInteractionPointMoveFoundNode = false;
@@ -481,7 +423,7 @@ void C_GiLiBusConnector::m_OnInteractionPointMove(void)
    {
       //Check if active line is at border
       if ((this->msn_ActiveItemIndex == mh_GetGenericInteractionIndex()) ||
-          (this->msn_ActiveItemIndex == ms32_GetBusInteractionIndex()))
+          (this->msn_ActiveItemIndex == m_GetBusInteractionIndex()))
       {
          if (this->msn_ActiveItemIndex == mh_GetGenericInteractionIndex())
          {
@@ -549,9 +491,8 @@ void C_GiLiBusConnector::m_OnInteractionPointMove(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle generic item interaction point move item iteration
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle generic item interaction point move item iteration
 
    Active:
    * Iteration over current scene items
@@ -560,10 +501,8 @@ void C_GiLiBusConnector::m_OnInteractionPointMove(void)
    \param[in,out] opc_HighestParentItem  Highest parent of current item
    \param[in]     orc_CurPos             Current hover position
    \param[in,out] orq_RestoreMouseCursor Restore mouse cursor flag (Only write false allowed if necessary)
-
-   \created     30.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::m_OnIterationGenericInteractionPointMove(QGraphicsItem * const opc_HighestParentItem,
                                                                   const QPointF & orc_CurPos,
                                                                   bool & orq_RestoreMouseCursor)
@@ -575,11 +514,11 @@ void C_GiLiBusConnector::m_OnIterationGenericInteractionPointMove(QGraphicsItem 
    {
       if (pc_Node->isUnderMouse() == true)
       {
-         if (this->mpc_BusItem != NULL)
+         if (this->GetBusItem() != NULL)
          {
             this->mc_Points[this->msn_ActiveItemIndex]->setCursor(pc_Node->cursor());
             orq_RestoreMouseCursor = false;
-            if (pc_Node->CheckConnectionAvailable(this->mpc_BusItem->GetType()) == true)
+            if (pc_Node->CheckConnectionAvailable(this->GetBusItem()->GetType()) == true)
             {
                m_UpdateGenericItem(pc_Node);
                m_UpdatePort(orc_CurPos);
@@ -619,19 +558,16 @@ void C_GiLiBusConnector::m_OnIterationGenericInteractionPointMove(QGraphicsItem 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle generic interaction point mouse release
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle generic interaction point mouse release
 
    \param[in] orc_ScenePos Scene position
 
    \return
    True  Default
    False No revert
-
-   \created     29.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiLiBusConnector::m_OnGenericInteractionPointMouseRelease(const QPointF & orc_ScenePos)
 {
    bool q_Retval = true;
@@ -644,7 +580,7 @@ bool C_GiLiBusConnector::m_OnGenericInteractionPointMouseRelease(const QPointF &
       {
          if (pc_Node->contains(pc_Node->mapFromScene(orc_ScenePos)) == true)
          {
-            Q_EMIT this->ShowReconnectContextMenu(orc_ScenePos, pc_Node, this->mpc_BusItem, -1, this);
+            Q_EMIT this->ShowReconnectContextMenu(orc_ScenePos, pc_Node, this->GetBusItem(), -1, this);
             q_Retval = false;
          }
       }
@@ -656,15 +592,12 @@ bool C_GiLiBusConnector::m_OnGenericInteractionPointMouseRelease(const QPointF &
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle bus change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle bus change
 
    \param[in] orc_ScenePos Scene position
-
-   \created     29.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::m_OnBusChange(const QPointF & orc_ScenePos)
 {
    sint32 s32_Interface = -1;
@@ -676,19 +609,16 @@ void C_GiLiBusConnector::m_OnBusChange(const QPointF & orc_ScenePos)
    }
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    Q_EMIT this->ShowReconnectContextMenu(orc_ScenePos, dynamic_cast<C_GiNode *>(this->mpc_GenericSignalItem),
-                                         this->mpc_BusItem, s32_Interface, this);
+                                         this->GetBusItem(), s32_Interface, this);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init connector
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init connector
 
    \param[in,out] opc_NodeItem Node to connect to
    \param[in]     orc_Pos      Position on bus
-
-   \created     13.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::m_InitConnector(C_GiNode * const opc_NodeItem, const QPointF & orc_Pos)
 {
    //Node
@@ -701,18 +631,15 @@ void C_GiLiBusConnector::m_InitConnector(C_GiNode * const opc_NodeItem, const QP
    this->m_UpdateInternal();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle new port
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle new port
 
    Find and save new port at position.
    Dismiss temporary port.
 
    \param[in] orc_Pos Position to evaluate for port
-
-   \created     26.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::m_UpdatePort(const QPointF & orc_Pos)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -751,7 +678,7 @@ void C_GiLiBusConnector::m_UpdatePort(const QPointF & orc_Pos)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::m_RestoreLastValidNode(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -783,7 +710,7 @@ void C_GiLiBusConnector::m_RestoreLastValidNode(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::m_AcceptNewPort(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2

@@ -1,28 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       DiagLib string table
 
    DiagLib string table containing English language strings.
 
-   \implementation
-   project     DiagLib
-   copyright   STW (c) 1999-200x
-   license     use only under terms of contract / confidential
-
-   created     07.12.2009  STW/A.Stangl
-   \endimplementation
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   07.12.2009        STW/A.Stangl  file created
-   \endhistory
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------ */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -37,19 +24,18 @@
 #include "DLLocalize.h"  //string indexes
 #include "DLStrings.h" //strings
 
-
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 using namespace stw_types;
 using namespace stw_scl;
 
-/* -- Defines ------------------------------------------------------------- */
+/* -- Defines ------------------------------------------------------------------------------------------------------- */
 
-/* -- Types --------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ---------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables --------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
 //resource string table
 const C_SCLResourceString gac_DIAG_LIB_RESOURCE_STRINGS[] =
@@ -244,8 +230,6 @@ const C_SCLResourceString gac_DIAG_LIB_RESOURCE_STRINGS[] =
    { STR_FM_ERR_SET_DIVERT_STREAM_PARA    , STR_TEXT_FM_ERR_SET_DIVERT_STREAM_PARA },
    { STR_FM_ERR_RD_NUM_FLASH_IC           , STR_TEXT_FM_ERR_RD_NUM_FLASH_IC        },
    
-   
-
   //message boxes
    { STR_FM_COMM_RS232_WARN               , STR_TEXT_FM_COMM_RS232_WARN },
    { STR_FM_ERR_INVALID_SNR               , STR_TEXT_FM_ERR_INVALID_SNR },
@@ -269,7 +253,6 @@ const C_SCLResourceString gac_DIAG_LIB_RESOURCE_STRINGS[] =
    { STR_FM_FILE_FILTERED                 , STR_TEXT_FM_FILE_FILTERED },
    { STR_FM_SAVE_CONFIGURATION            , STR_TEXT_FM_SAVE_CONFIGURATION },
    { STR_FM_ENTER_NAME                    , STR_TEXT_FM_ENTER_NAME },
-   
    
    { STR_FM_ERR_RD_PSEC_INFO              , STR_TEXT_FM_ERR_RD_PSEC_INFO         },
    { STR_FM_ERR_RD_MEM_SIZE_IC            , STR_TEXT_FM_ERR_RD_MEM_SIZE_IC       },
@@ -308,7 +291,6 @@ const C_SCLResourceString gac_DIAG_LIB_RESOURCE_STRINGS[] =
    { STR_FM_ERR_RD_CALC_CHKSM_BLK         , STR_TEXT_FM_ERR_RD_CALC_CHKSM_BLK    },
    { STR_FM_ERR_WR_RESET_RQ               , STR_TEXT_FM_ERR_WR_RESET_RQ          },
    
-
   //other
 //  STR_FM_FOR_INTERNAL_USE      " for STW internal use only ["
    { STR_FM_ERR_ONE_FILE_ONLY             , STR_TEXT_FM_ERR_ONE_FILE_ONLY },
@@ -560,7 +542,6 @@ const C_SCLResourceString gac_DIAG_LIB_RESOURCE_STRINGS[] =
    { STR_FDL_DFM_RGSELEC_NODE_RETURN      , STR_TEXT_FDL_DFM_RGSELEC_NODE_RETURN },
    { STR_FDL_DFM_RGSELEC_NET_START        , STR_TEXT_FDL_DFM_RGSELEC_NET_START },
    
-   
    { STR_FDL_SBC_SUPPORTED                , STR_TEXT_FDL_SBC_SUPPORTED                },
    { STR_FDL_BBC_SUPPORTED                , STR_TEXT_FDL_BBC_SUPPORTED                },
    { STR_FDL_CS_DEACTIVATED               , STR_TEXT_FDL_CS_DEACTIVATED               },
@@ -636,7 +617,6 @@ const C_SCLResourceString gac_DIAG_LIB_RESOURCE_STRINGS[] =
    { STR_DFM_MENU_ABOUT                   , STR_TEXT_DFM_MENU_ABOUT },
    { STR_DFM_YES                          , STR_TEXT_DFM_YES },
    { STR_DFM_YES_ALL                      , STR_TEXT_DFM_YES_ALL },
-
 
   //DlgCANInterface
    { STR_DFM_CI_CAPTION                   , STR_TEXT_DFM_CI_CAPTION },
@@ -1003,7 +983,7 @@ const C_SCLResourceString gac_DIAG_LIB_RESOURCE_STRINGS[] =
 
 uint16 gu16_DIAGLIB_NR_RES_STRNGS = sizeof(gac_DIAG_LIB_RESOURCE_STRINGS) / sizeof(C_SCLResourceString);
 
-/* -- Module Global Function Prototypes ----------------------------------- */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------ */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 

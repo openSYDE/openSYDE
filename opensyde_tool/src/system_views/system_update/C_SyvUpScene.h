@@ -1,21 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Graphics scene for system view update (header)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.06.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVUPSCENE_H
 #define C_SYVUPSCENE_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include "stwtypes.h"
 
@@ -26,12 +20,12 @@
 #include "C_SyvUpDeviceInfo.h"
 #include "C_SyvRoRouteCalculation.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SyvUpScene :
    public C_SyvTopologyBaseScene
@@ -54,6 +48,7 @@ public:
    void SetNoResponse(const stw_types::uint32 ou32_NodeIndex) const;
    std::vector<stw_types::uint32> GetActiveNoResponseNodeIndices(void) const;
    std::vector<stw_types::uint32> GetActiveNoneThirdPartyNodeIndices(void) const;
+   void CheckUpdateDisabledState(void) const;
 
    virtual bool IsAnyItemAddable(void) const override;
    virtual bool IsItemMovable(const QGraphicsItem * const opc_Item) const override;
@@ -95,7 +90,7 @@ private:
                                                 QPolygonF & orc_Path, bool & orq_Inverse);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

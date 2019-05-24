@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       openSYDE Hex file class
 
    For details cf. documentation in .h file.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     11.09.2017  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #include "precomp_headers.h" //pre-compiled headers
 
 #include "stwtypes.h"
@@ -30,9 +23,8 @@ using namespace stw_opensyde_core;
 using namespace stw_scl;
 using namespace stw_diag_lib;
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   get address of signature block from hex file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   get address of signature block from hex file
 
    Identify address of signature block in file.
    The address of the first found block is returned.
@@ -45,10 +37,8 @@ using namespace stw_diag_lib;
    \return
    C_NO_ERR     everything OK; block found
    C_NOACT      no block found
-
-   \created     11.09.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OsyHexFile::GetSignatureBlockAddress(uint32 & oru32_Address)
 {
    sint32 s32_Return;
@@ -64,9 +54,8 @@ sint32 C_OsyHexFile::GetSignatureBlockAddress(uint32 & oru32_Address)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   extract device ID from hex-file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   extract device ID from hex-file
 
    Scan through the hex-file and try to find the "application_info" structure.
    Then extract the device ID from it and return it.
@@ -79,10 +68,8 @@ sint32 C_OsyHexFile::GetSignatureBlockAddress(uint32 & oru32_Address)
    C_NO_ERR     everything OK (device ID in orc_DeviceID)
    C_NOACT      device-ID not found
    C_CONFIG     ambiguous device-IDs in hex-file
-
-   \created     19.12.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OsyHexFile::ScanDeviceIdFromHexFile(C_SCLString & orc_DeviceID)
 {
    sint32 s32_Return;
@@ -127,24 +114,24 @@ sint32 C_OsyHexFile::ScanDeviceIdFromHexFile(C_SCLString & orc_DeviceID)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   extract device ID from hex-file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   extract device ID from hex-file
 
    Scan through the hex-file and try to find the "application_info" structure.
    Then extract the information from it and return it.
-   Multiple instances of the application_info structure are considered an error.
+   Multiple instances of the application_info structure are considered an error
+   or warning depending on the device names reported in all application blocks.
 
    \param[out]    orc_InfoBlock        application info block found in hex file
 
    \return
    C_NO_ERR     everything OK (device ID in orc_DeviceID)
+   C_WARN       multiple application blocks detected in hex file but device names match
+                  output in this case is the first found application block
    C_NOACT      no application information block detected in hex file
-   C_OVERFLOW   multiple application information blocks detected in hex file
-
-   \created     02.01.2018  STW/A.Stangl
+   C_OVERFLOW   multiple application information blocks detected in hex file and device names differ
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OsyHexFile::ScanApplicationInformationBlockFromHexFile(C_XFLECUInformation & orc_InfoBlock)
 {
    sint32 s32_Return;
@@ -159,7 +146,19 @@ sint32 C_OsyHexFile::ScanApplicationInformationBlockFromHexFile(C_XFLECUInformat
    }
    else if (c_InfoBlocks.GetLength() > 1)
    {
-      s32_Return = C_OVERFLOW;
+      for (sint32 s32_Pos = 1; s32_Pos < c_InfoBlocks.GetLength(); s32_Pos++)
+      {
+         // compare every device name with first device name, this is enough because all must be equal
+         if (c_InfoBlocks[0].GetDeviceID() != c_InfoBlocks[s32_Pos].GetDeviceID())
+         {
+            s32_Return = C_OVERFLOW;
+         }
+         else
+         {
+            orc_InfoBlock = c_InfoBlocks[0];
+            s32_Return = C_WARN;
+         }
+      }
    }
    else
    {

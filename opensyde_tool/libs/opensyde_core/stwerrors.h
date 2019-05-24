@@ -1,28 +1,22 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       STW standard error code collection
 
    A collection of error codes uses as standardized return values from functions.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     xx.07.2016  STW/STW
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef STWERRORSH
 #define STWERRORSH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 
 #ifdef __cplusplus
 
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
 //C++ style constants:
 namespace stw_errors
@@ -45,9 +39,9 @@ const stw_types::sint32 C_CONFIG      = static_cast<stw_types::sint32>(-10); ///
 const stw_types::sint32 C_CHECKSUM    = static_cast<stw_types::sint32>(-11); ///< checksum error
 const stw_types::sint32 C_TIMEOUT     = static_cast<stw_types::sint32>(-12); ///< timeout error
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 #else
 //C style defines:

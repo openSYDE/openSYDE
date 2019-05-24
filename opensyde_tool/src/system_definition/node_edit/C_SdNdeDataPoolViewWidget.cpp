@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for showing all available datapools of a node
 
@@ -9,17 +8,11 @@
    - NVM
    - COM
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.02.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SdNdeDataPoolViewWidget.h"
 
 #include "ui_C_SdNdeDataPoolViewWidget.h"
@@ -30,14 +23,14 @@
 #include "C_OSCNode.h"
 #include "C_GtGetText.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 // configuration for the showing of storage usage indicators
 const bool C_SdNdeDataPoolViewWidget::mhaq_StorageIndicatorActive[3] =
 {
@@ -46,25 +39,22 @@ const bool C_SdNdeDataPoolViewWidget::mhaq_StorageIndicatorActive[3] =
    false  // COM
 };
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent        Optional pointer to parent
-
-   \created     01.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolViewWidget::C_SdNdeDataPoolViewWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDataPoolViewWidget),
@@ -141,15 +131,12 @@ C_SdNdeDataPoolViewWidget::C_SdNdeDataPoolViewWidget(QWidget * const opc_Parent)
            &C_SdNdeDataPoolViewWidget::m_ErrorCheck);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Specify associated node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Specify associated node
 
    \param[in] ou32_NodeIndex     Node index
-
-   \created     16.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolViewWidget::SetNode(const uint32 ou32_NodeIndex)
 {
    bool q_RestoreDataPoolSelection = false;
@@ -238,13 +225,10 @@ void C_SdNdeDataPoolViewWidget::SetNode(const uint32 ou32_NodeIndex)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger check of data pool interaction availability
-
-   \created     04.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger check of data pool interaction availability
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolViewWidget::CheckDataPoolInteraction(void) const
 {
    for (sint32 s32_Counter = 0; s32_Counter < 3; ++s32_Counter)
@@ -253,41 +237,32 @@ void C_SdNdeDataPoolViewWidget::CheckDataPoolInteraction(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the conflict state of the active datapool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the conflict state of the active datapool
 
    \param[in] oq_Active     Flag if conlfict is active or not
-
-   \created     22.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolViewWidget::SetActualDataPoolConflict(const bool oq_Active) const
 {
-   this->mapc_Selectors[this->me_ActiveDataPoolType]->SetActualDataPoolConflict(oq_Active);
+   this->mapc_Selectors[this->me_ActiveDataPoolType]->SetCurrentDataPoolConflict(oq_Active);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the widgets for the actual datapool
-
-   \created     24.02.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the widgets for the actual datapool
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolViewWidget::UpdateActualDataPool(void) const
 {
    this->mapc_Selectors[this->me_ActiveDataPoolType]->UpdateActualDataPool();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Activate a concrete datapool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Activate a concrete datapool
 
    \param[in] ou32_DataPoolIndex      Datapool index
-
-   \created     16.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolViewWidget::SetActualDataPool(const uint32 ou32_DataPoolIndex) const
 {
    sint32 s32_Counter;
@@ -303,22 +278,19 @@ void C_SdNdeDataPoolViewWidget::SetActualDataPool(const uint32 ou32_DataPoolInde
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     01.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolViewWidget::~C_SdNdeDataPoolViewWidget()
 {
    m_StoreToUserSettings();
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolViewWidget::m_SubWidgetFocused(const C_OSCNodeDataPool::E_Type oe_DataPoolType,
                                                    const stw_types::sintn osn_DataPoolWidgetIndex,
                                                    const bool oq_ForceChange)
@@ -347,7 +319,7 @@ void C_SdNdeDataPoolViewWidget::m_SubWidgetFocused(const C_OSCNodeDataPool::E_Ty
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolViewWidget::m_MinMaxClicked(void)
 {
    sint32 s32_Counter;
@@ -379,7 +351,7 @@ void C_SdNdeDataPoolViewWidget::m_MinMaxClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolViewWidget::m_EmitActualDataPool(const C_OSCNodeDataPool::E_Type oe_DataPoolType,
                                                      const sintn osn_DataPoolWidgetIndex)
 {
@@ -404,7 +376,7 @@ void C_SdNdeDataPoolViewWidget::m_EmitActualDataPool(const C_OSCNodeDataPool::E_
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolViewWidget::m_NoDataPoolSelected(void)
 {
    this->msn_ActiveDataPoolWidget = -1;
@@ -412,13 +384,10 @@ void C_SdNdeDataPoolViewWidget::m_NoDataPoolSelected(void)
    Q_EMIT this->SigNoDataPoolSelected();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Recheck error for all data pools
-
-   \created     11.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Recheck error for all data pools
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolViewWidget::m_ErrorCheck(void) const
 {
    this->mpc_Ui->pc_WidgetDpCom->ErrorCheck();
@@ -427,13 +396,10 @@ void C_SdNdeDataPoolViewWidget::m_ErrorCheck(void) const
    Q_EMIT this->SigErrorChange();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Store current selection to user settings
-
-   \created     03.05.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Store current selection to user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolViewWidget::m_StoreToUserSettings(void) const
 {
    if (this->mq_IndexValid == true)

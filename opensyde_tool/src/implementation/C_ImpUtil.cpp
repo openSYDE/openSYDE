@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Class for use case implementation functionality (implementation)
 
    Class for use case implementation functionality
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     16.10.2017  STW/G.Landsgesell
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <windows.h> //tlhelp32 does not do this by itself ...
@@ -42,7 +35,7 @@
 #include "C_OSCUtils.h"
 #include "C_ImpCodeGenerationReportWidget.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_scl;
 using namespace stw_tgl;
 using namespace stw_types;
@@ -52,40 +45,34 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     16.10.2017  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_ImpUtil::C_ImpUtil(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Wrapper function to export code for all nodes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Wrapper function to export code for all nodes
 
    Errors are handled internally.
 
    \param[in]   opc_Parent    parent widget
-
-   \created     03.04.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_ImpUtil::h_ExportCodeAll(QWidget * const opc_Parent)
 {
    std::vector<uint32> c_Indices;
@@ -97,19 +84,16 @@ void C_ImpUtil::h_ExportCodeAll(QWidget * const opc_Parent)
    C_ImpUtil::h_ExportCodeNodes(c_Indices, opc_Parent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Export code for all specified nodes and specified applications
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Export code for all specified nodes and specified applications
 
    Errors are handled internally.
 
    \param[in]  orc_NodeIndices         Node indices (ID)
    \param[in]  orc_AppIndicesPerNode   Vector of vectors of application indices
    \param[in]  opc_Parent              parent widget
-
-   \created     12.10.2018  STW/G.Landsgesell (reworked from existing code)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
                              const std::vector< std::vector<uint32> > & orc_AppIndicesPerNode,
                              QWidget * const opc_Parent)
@@ -354,19 +338,16 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Export code for valid nodes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Export code for valid nodes
 
    Check given nodes for valid ones (i.e. ones with programmable applications)
    and export code for them.
 
    \param[in]     orc_NodeIndices  node indices (can be a single node too - wrapped in a 1-length-vector)
    \param[in]     opc_Parent       parent widget
-
-   \created     12.10.2018  STW/G.Landsgesell (reworked from existing code)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_ImpUtil::h_ExportCodeNodes(const std::vector<uint32> & orc_NodeIndices, QWidget * const opc_Parent)
 {
    std::vector<uint32> c_ValidNodeIndices;
@@ -422,9 +403,8 @@ void C_ImpUtil::h_ExportCodeNodes(const std::vector<uint32> & orc_NodeIndices, Q
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Export code for specified node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Export code for specified node
 
    \param[in]   ou32_NodeIndex      Node index
    \param[in ]  orc_ExportFolder    folder the files shall be written to
@@ -435,10 +415,8 @@ void C_ImpUtil::h_ExportCodeNodes(const std::vector<uint32> & orc_NodeIndices, Q
    C_NO_ERR       Operation success
    C_RANGE        Node index or application index invalid
    see C_ImpUtil::mh_ExecuteCodeGenerator for further errors
-
-   \created     16.10.2017  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_ImpUtil::mh_ExportCodeNode(const uint32 ou32_NodeIndex, const std::vector<stw_types::uint32> & orc_AppIndices,
                                     std::list<QString> & orc_ExportedFiles, const bool & orq_Erase)
 {
@@ -493,17 +471,14 @@ sint32 C_ImpUtil::mh_ExportCodeNode(const uint32 ou32_NodeIndex, const std::vect
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Open IDE
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Open IDE
 
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: cannot find IDE
-
-   \created     16.10.2017  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_ImpUtil::h_OpenIDE(const QString & orc_IdeExeCall)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -593,24 +568,20 @@ sint32 C_ImpUtil::h_OpenIDE(const QString & orc_IdeExeCall)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get location of syde coder c (standard code generator)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get location of syde coder c (standard code generator)
 
    \return
    Connectors directory location
-
-   \created     05.10.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_ImpUtil::h_GetSydeCoderCPath()
 {
    return "../connectors/syde_coder_c/osy_syde_coder_c.exe";
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get directory of generated code of application.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get directory of generated code of application.
 
    Combine paths for given application to get absolute path of directory
    at which code should get generated.
@@ -619,10 +590,8 @@ QString C_ImpUtil::h_GetSydeCoderCPath()
 
    \return
    Absolute path to location of generated code.
-
-   \created     08.10.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_ImpUtil::h_GetAbsoluteGeneratedDir(const C_OSCNodeApplication * const opc_Application,
                                              const C_SCLString & orc_NodeName)
 {
@@ -659,9 +628,8 @@ QString C_ImpUtil::h_GetAbsoluteGeneratedDir(const C_OSCNodeApplication * const 
    return c_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief Check project saving before code generation.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief Check project saving before code generation.
 
    Show error message if user wants to generate code without
    saving an empty project.
@@ -669,10 +637,8 @@ QString C_ImpUtil::h_GetAbsoluteGeneratedDir(const C_OSCNodeApplication * const 
    \return
       true     project was saved -> can continue with code generation
       false    project was not saved -> do not continue
-
-   \created     12.10.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_ImpUtil::h_CheckProjForCodeGeneration(QWidget * const opc_Parent)
 {
    bool q_Return = true;
@@ -701,18 +667,15 @@ bool C_ImpUtil::h_CheckProjForCodeGeneration(QWidget * const opc_Parent)
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Always get absolute path from path relative to openSYDE project.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Always get absolute path from path relative to openSYDE project.
 
    \param[in]     orc_Path    Absolute or relative path
 
    \return
    Absolute path
-
-   \created     17.10.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_ImpUtil::h_GetAbsolutePathFromProject(const QString & orc_Path)
 {
    QString c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath(); // always absolute or empty
@@ -726,9 +689,8 @@ QString C_ImpUtil::h_GetAbsolutePathFromProject(const QString & orc_Path)
    return C_Uti::h_ConcatPathIfNecessary(c_Folder, orc_Path);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle paths after file save dialog.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle paths after file save dialog.
 
    Check if path could be made relative and ask user if she wants to save the path
    relative or absolute.
@@ -744,11 +706,9 @@ QString C_ImpUtil::h_GetAbsolutePathFromProject(const QString & orc_Path)
    \param[in]     orc_AbsoluteReferenceDir   absolute path of reference directory
 
    \return
-   path the user wants to save
-
-   \created     08.02.2019  STW/G.Landsgesell
+   path the user wants to save or input path if relativeness is not possible
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const QString & orc_Path,
                                                const QString & orc_AbsoluteReferenceDir)
 {
@@ -779,16 +739,94 @@ QString C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const
 
    return c_Return;
 }
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get active window handle if already existing
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overloaded function that allows multiple file paths and only asks the user once.
+
+   See original for more details.
+
+   \param[in]     opc_Parent                 parent widget (for parent of message box)
+   \param[in]     orc_Paths                  relative or absolute paths of files or directories
+   \param[in]     orc_AbsoluteReferenceDir   absolute path of reference directory
+
+   \return
+   paths the user wants to save or input paths if relativeness is not possible at all
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QStringList C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const QStringList & orc_Paths,
+                                                   const QString & orc_AbsoluteReferenceDir)
+{
+   QStringList c_Return = orc_Paths;
+   QString c_PathRelative;
+   QString c_PathAbsolute;
+
+   // use original in case of one file only
+   if (orc_Paths.size() == 1)
+   {
+      c_Return[0] = C_ImpUtil::h_AskUserToSaveRelativePath(opc_Parent, orc_Paths[0], orc_AbsoluteReferenceDir);
+   }
+   else if (orc_Paths.isEmpty() == false)
+   {
+      QStringList c_PathsRelative;
+      QStringList c_PathsAbsolute;
+      QString c_Details;
+      bool q_RelativePossible = false;
+
+      // make all paths relative
+      for (sint32 s32_Pos = 0; s32_Pos < c_Return.size(); ++s32_Pos)
+      {
+         if (C_Uti::h_IsPathRelativeToDir(c_Return[s32_Pos], orc_AbsoluteReferenceDir, c_PathAbsolute,
+                                          c_PathRelative) == true)
+         {
+            q_RelativePossible = true;
+         }
+
+         c_PathsAbsolute.append(c_PathAbsolute);
+         c_PathsRelative.append(c_PathRelative);
+      }
+
+      if (q_RelativePossible == true)
+      {
+         // ask user
+         C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::eQUESTION,
+                                        C_GtGetText::h_GetText("There are paths that could be stored relative. "
+                                                               "Do you want to save the paths relative or absolute?"));
+         c_Message.SetHeading(C_GtGetText::h_GetText("Relative Path"));
+         c_Details = C_GtGetText::h_GetText("Relative paths: ");
+         c_Details += "\n   ";
+         c_Details += c_PathsRelative.join("\n   ");
+         c_Details += "\n";
+         c_Details += C_GtGetText::h_GetText("Absolute paths: ");
+         c_Details += "\n   ";
+         c_Details += c_PathsAbsolute.join("\n   ");
+         c_Message.SetDetails(c_Details);
+         c_Message.SetOKButtonText(C_GtGetText::h_GetText("Relative"));
+         c_Message.SetNOButtonText(C_GtGetText::h_GetText("Absolute"));
+
+         if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
+         {
+            c_Return = c_PathsRelative;
+         }
+         else
+         {
+            c_Return = c_PathsAbsolute;
+         }
+      }
+   }
+   else
+   {
+      // no paths provided - do nothing
+   }
+
+   return c_Return;
+}
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get active window handle if already existing
 
    \param[in]     orc_ExeName Name of executable without path (e.g. LogiCAD3.exe)
    \param[in,out] orc_Windows All found windows
-
-   \created     26.10.2017  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_ImpUtil::mh_GetExistingApplicationHandle(const std::wstring & orc_ExeName, std::vector<HWND> & orc_Windows)
 {
    PROCESSENTRY32 c_Entry;
@@ -834,9 +872,8 @@ void C_ImpUtil::mh_GetExistingApplicationHandle(const std::wstring & orc_ExeName
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Help function to get window from process ID
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Help function to get window from process ID
 
    Adopted from here: https://stackoverflow.com/questions/221730/bat-file-to-run-a-exe-at-the-command-prompt
 
@@ -845,10 +882,8 @@ void C_ImpUtil::mh_GetExistingApplicationHandle(const std::wstring & orc_ExeName
 
    \return
    TRUE, FALSE
-
-   \created     15.10.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 WINBOOL CALLBACK C_ImpUtil::mh_EnumWindowsCallback(HWND opc_Handle, const LPARAM os32_LParam)
 {
    T_HandleData & rc_Data = *reinterpret_cast<T_HandleData *>(os32_LParam);
@@ -872,9 +907,8 @@ WINBOOL CALLBACK C_ImpUtil::mh_EnumWindowsCallback(HWND opc_Handle, const LPARAM
    return FALSE;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Call external code generation tool.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Call external code generation tool.
 
    Standard code generator is osy_syde_coder_c.exe, but it is not used as default,
    so the openSYDE user must provide one.
@@ -902,10 +936,8 @@ WINBOOL CALLBACK C_ImpUtil::mh_EnumWindowsCallback(HWND opc_Handle, const LPARAM
    C_NOACT        Could not generate code for at least one application.
    C_CONFIG       Application or device for given node have wrong configuration
    C_TIMEOUT      Timeout for code generator call.
-
-   \created     06.09.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QString & orc_AppName,
                                           const QString & orc_ExportFolder, std::vector<QString> & orc_ExportedFiles,
                                           const QString & orc_CodeGenerator, const bool & orq_Erase)
@@ -919,7 +951,10 @@ sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QS
    // note: path checks are done by QProcess or by executable
 
    // use QFileInfo and QDir to get absolute paths in arguments
-   QFileInfo c_SysDefFile(C_PuiProject::h_GetInstance()->GetPath() + "_sysdef");
+   QString c_SysDefPath;
+
+   C_PuiProject::h_AdaptProjectPathToSystemDefinition(C_PuiProject::h_GetInstance()->GetPath(), c_SysDefPath);
+   QFileInfo c_SysDefFile(c_SysDefPath);
    QFileInfo c_DevicesIniFile(C_Uti::h_GetExePath() + "/../devices/devices.ini");
    QDir c_ExportFolder(orc_ExportFolder);
 

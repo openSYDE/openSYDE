@@ -1,32 +1,20 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       DiagLib configuration.
 
    Contains potentially target specific adaptations for the DiagLib library
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-200x
-   license     use only under terms of contract / confidential
-
-   created     23.07.2009  STW/A.Stangl
-   \endimplementation
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   23.07.2009        STW/A.Stangl  file created
-   \endhistory
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CDIAGLLIB_CONFIG_H
 #define CDIAGLLIB_CONFIG_H
 
-/* -- Includes ------------------------------------------------------------ */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "SCLDynamicArray.h"
 
-/* -- Defines ------------------------------------------------------------ */
+/* -- Defines ------------------------------------------------------------------------------------------------------- */
 //if the diaglib shall become part of a bigger library a keyword to export classes and functions might be required
 #ifdef __BORLANDC__
 //for VisLib: export from Borland C++ Builder packages
@@ -44,12 +32,12 @@
 //so the dependency from the CCMONProtocol classes is resolved:
 #define DIAGLIB_KEFEX_PROTOCOL_NO_LOGGING
 
-/* -- Types --------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ---------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Function Prototypes ------------------------------------------------- */
+/* -- Function Prototypes ------------------------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------ */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 #endif

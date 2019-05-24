@@ -1,33 +1,27 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Node update package list drawing delegate (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     12.02.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVUPUPDATEPACKAGELISTDELEGATE_H
 #define C_SYVUPUPDATEPACKAGELISTDELEGATE_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QStyledItemDelegate>
 
-#include "C_SyvUpUpdatePackageListNodeWidget.h"
+#include "C_SyvUpUpdatePackageNodeWidget.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SyvUpUpdatePackageListDelegate :
    public QStyledItemDelegate
@@ -42,7 +36,7 @@ public:
    //lint -restore
 
    void StartPaint(const stw_types::sint32 s32_Index,
-                   stw_opensyde_gui::C_SyvUpUpdatePackageListNodeWidget * const opc_Widget);
+                   stw_opensyde_gui::C_SyvUpUpdatePackageNodeWidget * const opc_Widget);
    void StopPaint(void);
 
 private:
@@ -50,11 +44,11 @@ private:
    C_SyvUpUpdatePackageListDelegate(const C_SyvUpUpdatePackageListDelegate &);
    C_SyvUpUpdatePackageListDelegate & operator =(const C_SyvUpUpdatePackageListDelegate &);
 
-   stw_opensyde_gui::C_SyvUpUpdatePackageListNodeWidget * mpc_ActualWidget;
+   stw_opensyde_gui::C_SyvUpUpdatePackageNodeWidget * mpc_ActualWidget;
    stw_types::sint32 ms32_IndexPaint;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

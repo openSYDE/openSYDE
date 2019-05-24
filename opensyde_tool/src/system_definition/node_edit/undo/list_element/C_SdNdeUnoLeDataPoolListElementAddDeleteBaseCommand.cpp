@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data pool list element base class for add and delete commands (implementation)
 
    Data pool list element base class for add and delete commands
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.01.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QElapsedTimer>
@@ -30,7 +23,7 @@
 #include "TGLUtils.h"
 
 #include "C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand.h"
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_tgl;
@@ -38,21 +31,20 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     oru32_NodeIndex                  Node index
    \param[in]     oru32_DataPoolIndex              Node data pool index
@@ -61,10 +53,8 @@ using namespace stw_opensyde_core;
    \param[in]     orc_Indices                      Node data pool list indices
    \param[in]     orc_Text                         Optional command text for informational display
    \param[in,out] opc_Parent                       Optional pointer to parent
-
-   \created     25.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand(
    const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex, const uint32 & oru32_DataPoolListIndex,
    C_SdNdeDataPoolListModelViewManager * const opc_DataPoolListModelViewManager,
@@ -76,13 +66,10 @@ C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::C_SdNdeUnoLeDataPoolListEle
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add from internal data
-
-   \created     27.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add from internal data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::Add(void)
 {
    QElapsedTimer c_Timer;
@@ -112,13 +99,10 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::Add(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save and delete
-
-   \created     27.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save and delete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::Delete(void)
 {
    QElapsedTimer c_Timer;
@@ -188,30 +172,24 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::Delete(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set indices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set indices
 
    \param[in] orc_Value Value
-
-   \created     27.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::SetIndices(const std::vector<stw_types::uint32> & orc_Value)
 {
    this->mc_Indices = orc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set initial data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set initial data
 
    \param[in] orc_OSCContent Initial OSC content
    \param[in] orc_UIContent  Initial UI content
-
-   \created     27.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::SetInitialData(
    const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCContent,
    const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UIContent)
@@ -228,23 +206,25 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::SetInitialData(
       for (uint32 u32_ItOSCData = 0; u32_ItOSCData < this->mc_OSCContent.size(); ++u32_ItOSCData)
       {
          C_OSCNodeDataPoolListElement & rc_OSCData = this->mc_OSCContent[u32_ItOSCData];
+         const uint32 u32_InitialDataSetSize = rc_OSCData.c_DataSetValues.size();
          rc_OSCData.c_DataSetValues.resize(u32_DataSetSize);
-         //Assign type to new data sets
-         rc_OSCData.SetType(rc_OSCData.GetType());
+         //Initialize data set content
+         for (uint32 u32_ItNewDataSet = u32_InitialDataSetSize; u32_ItNewDataSet < u32_DataSetSize; ++u32_ItNewDataSet)
+         {
+            C_OSCNodeDataPoolContent & rc_DataSetContent = rc_OSCData.c_DataSetValues[u32_ItNewDataSet];
+            rc_DataSetContent = rc_OSCData.c_MinValue;
+         }
       }
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Select the specified item ranges
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Select the specified item ranges
 
    \param[in] orc_Items       Items to select (sorted ascending!)
    \param[in] oq_ScrollToLast Optional flag to scroll to the last element
-
-   \created     07.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_ReSelect(
    const std::vector<std::vector<uint32> > & orc_Items, const bool oq_ScrollToLast)
 {
@@ -285,43 +265,34 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_ReSelect(
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sort indices descending
-
-   \created     10.02.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sort indices descending
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_SortDescending(void)
 {
    C_SdUtil::h_SortIndicesDescendingAndSync<C_OSCNodeDataPoolListElement, C_PuiSdNodeDataPoolListElement>(
       this->mc_Indices, this->mc_OSCContent, this->mc_UIContent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sort indices ascending
-
-   \created     13.02.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sort indices ascending
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_SortAscending(void)
 {
    C_SdUtil::h_SortIndicesAscendingAndSync<C_OSCNodeDataPoolListElement, C_PuiSdNodeDataPoolListElement>(
       this->mc_Indices, this->mc_OSCContent, this->mc_UIContent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if indices continuos
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if indices continuos
 
    \return
    true  Indices all continuous
    false Indices do contain holes
-
-   \created     18.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_CheckContinuous(void)
 {
    bool q_Retval = true;

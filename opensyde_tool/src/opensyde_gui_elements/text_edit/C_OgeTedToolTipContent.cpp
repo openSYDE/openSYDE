@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Text edit for displaying content of tooltips (implementation)
 
@@ -8,17 +7,11 @@
    The size is dynamically calculated in dependence of text length and resulting
    number of lines.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     11.07.2018  STW/G.Scupin
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QAbstractTextDocumentLayout>
@@ -27,34 +20,31 @@
 #include "constants.h"
 #include "C_OgeTedToolTipContent.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor.
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     11.07.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeTedToolTipContent::C_OgeTedToolTipContent(QWidget * const opc_Parent) :
    QTextEdit(opc_Parent)
 {
@@ -68,16 +58,13 @@ C_OgeTedToolTipContent::C_OgeTedToolTipContent(QWidget * const opc_Parent) :
    connect(this, &C_OgeTedToolTipContent::textChanged, this, &C_OgeTedToolTipContent::m_AdjustMinimumSize);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adjust minimum size of text edit to text length.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adjust minimum size of text edit to text length.
 
    First get convenient width (either with of longest line or a fixed maximum width)
    and calculate resulting height.
-
-   \created     11.07.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTedToolTipContent::m_AdjustMinimumSize()
 {
    QString c_Text = this->toPlainText();

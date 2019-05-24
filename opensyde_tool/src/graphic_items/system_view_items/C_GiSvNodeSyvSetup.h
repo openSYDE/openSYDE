@@ -1,35 +1,29 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Offers system view setup specific visualization and functionality of a node. (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.06.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_GINODESYVSETUP_H
 #define C_GINODESYVSETUP_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 
 #include "C_GiSvNodeSyvBase.h"
 #include "C_GiCheckBox.h"
 #include "C_GiRectPixmap.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_GiSvNodeSyvSetup :
    public C_GiSvNodeSyvBase
@@ -72,7 +66,6 @@ private:
 
    void m_InitCheckBox(void);
    void m_UpdateCheckBox(void);
-   void m_InitInteractiveIcons(const stw_types::uint32 ou32_Count);
 
    C_GiCheckBox * mpc_CheckBox;
    std::vector<C_GiRectPixmap *> mc_InteractiveIcons;
@@ -80,7 +73,7 @@ private:
    bool mq_EditMode;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

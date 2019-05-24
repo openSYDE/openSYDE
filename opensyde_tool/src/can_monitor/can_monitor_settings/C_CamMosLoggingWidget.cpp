@@ -1,24 +1,16 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for configuring file logging.
  (implementation)
 
    Widget for configuring file logging.
 
-
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     15.11.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QDir>
@@ -41,34 +33,31 @@
 #include "stwerrors.h"
 #include "C_CamUti.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_types;
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     15.11.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosLoggingWidget::C_CamMosLoggingWidget(QWidget * const opc_Parent) :
    C_OgeWiOnlyBackground(opc_Parent),
    mpc_Ui(new Ui::C_CamMosLoggingWidget),
@@ -162,40 +151,31 @@ C_CamMosLoggingWidget::C_CamMosLoggingWidget(QWidget * const opc_Parent) :
    //lint -e{429}  no memory leak because of the parent of pc_Completer & pc_ItemDelegate and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     15.11.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
-C_CamMosLoggingWidget::~C_CamMosLoggingWidget()
+//----------------------------------------------------------------------------------------------------------------------
+C_CamMosLoggingWidget::~C_CamMosLoggingWidget(void)
 {
    delete this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load all user settings.
-
-   \created     21.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load all user settings.
 */
-//-----------------------------------------------------------------------------
-void C_CamMosLoggingWidget::LoadUserSettings() const
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosLoggingWidget::LoadUserSettings(void) const
 {
    this->mpc_Ui->pc_WiHeader->SetExpanded(C_UsHandler::h_GetInstance()->GetWiLoggingExpanded());
    this->m_OnExpand(C_UsHandler::h_GetInstance()->GetWiLoggingExpanded());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Prepare widget for menu view in collapsed state resp. expanded view.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Prepare widget for menu view in collapsed state resp. expanded view.
 
    \param[in]     oq_Expand       true: prepare for expanded, false: prepare for collapsed menu
-
-   \created     14.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosLoggingWidget::PrepareForExpanded(const bool oq_Expand) const
 {
    if (oq_Expand == false)
@@ -211,30 +191,24 @@ void C_CamMosLoggingWidget::PrepareForExpanded(const bool oq_Expand) const
    this->mpc_Ui->pc_WiHeader->ShowExpandButton(oq_Expand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for communication change signal.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for communication change signal.
 
    \param[in]  oq_Online    true: communication started; false: communication stopped.
-
-   \created     17.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosLoggingWidget::OnCommunicationStarted(const bool oq_Online)
 {
    this->mq_Online = oq_Online;
    this->m_DecideStartStop();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot to forward log file add result.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot to forward log file add result.
 
    \param[in]   os32_Result   result of log file add operation
-
-   \created     17.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosLoggingWidget::OnSigLogFileAddResult(const sint32 os32_Result)
 {
    if (os32_Result != stw_errors::C_NO_ERR)
@@ -247,25 +221,19 @@ void C_CamMosLoggingWidget::OnSigLogFileAddResult(const sint32 os32_Result)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger new log file location (relative to project).
-
-   \created     05.02.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger new log file location (relative to project).
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosLoggingWidget::OnSigSavedAsNew(void) const
 {
    this->m_OnFolderEdited();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load configuration.
-
-   \created     16.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load configuration.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosLoggingWidget::m_LoadConfig(void) const
 {
    const C_CamProLoggingData c_LoggingData = C_CamProHandler::h_GetInstance()->GetLoggingData();
@@ -291,30 +259,26 @@ void C_CamMosLoggingWidget::m_LoadConfig(void) const
    this->mpc_Ui->pc_WiHeader->SetToggleState(c_LoggingData.q_Enabled);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of expand signal.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of expand signal.
 
    \param[in]  oq_Expand    true: expand; false: collapse
-
-   \created     10.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosLoggingWidget::m_OnExpand(const bool oq_Expand) const
 {
    this->mpc_Ui->pc_WiContent->setVisible(oq_Expand);
    C_UsHandler::h_GetInstance()->SetWiLoggingExpanded(oq_Expand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Enable/disable whole logging widget.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Enable/disable whole logging widget.
 
    Slot of toggle toggled.
 
-   \created     16.01.2019  STW/G.Landsgesell
+   \param[in]  oq_Enabled  enabled/disabled flag
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosLoggingWidget::m_OnToggled(const bool oq_Enabled)
 {
    // update data handling
@@ -324,13 +288,10 @@ void C_CamMosLoggingWidget::m_OnToggled(const bool oq_Enabled)
    this->m_DecideStartStop();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for folder line edit editing finished signal.
-
-   \created     16.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for folder line edit editing finished signal.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosLoggingWidget::m_OnFolderEdited(void) const
 {
    const QString c_Path = this->mpc_Ui->pc_LeFolder->GetPath();
@@ -342,28 +303,23 @@ void C_CamMosLoggingWidget::m_OnFolderEdited(void) const
    this->mpc_Ui->pc_LeFolder->SetToolTipInformation("", C_CamUti::h_GetAbsPathFromProj(c_Path));
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    brief   Slot for file name line edit editing finished signal.
-
-   \created     16.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosLoggingWidget::m_OnFileNameEdited(void) const
 {
    // update data handling
    C_CamProHandler::h_GetInstance()->SetLoggingFileName(this->mpc_Ui->pc_LeFile->text());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for file options combo box index changed.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for file options combo box index changed.
 
    \param[in]     os32_Index        new combo box index
-
-   \created     16.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosLoggingWidget::m_OnOverwriteModeSelected(const sint32 os32_Index) const
 {
    // update data handling
@@ -371,30 +327,24 @@ void C_CamMosLoggingWidget::m_OnOverwriteModeSelected(const sint32 os32_Index) c
       static_cast<C_CamProLoggingData::E_OverwriteMode>(os32_Index));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for file format combo box index changed.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for file format combo box index changed.
 
    \param[in]     os32_Index        new combo box index
-
-   \created     16.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosLoggingWidget::m_OnFormatSelected(const sint32 os32_Index) const
 {
    // update data handling
    C_CamProHandler::h_GetInstance()->SetLoggingFormat(static_cast<C_CamProLoggingData::E_Format>(os32_Index));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for browse button click.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for browse button click.
 
    Browse for directory.
-
-   \created     16.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosLoggingWidget::m_OnBrowse(void)
 {
    QString c_Path;
@@ -424,13 +374,10 @@ void C_CamMosLoggingWidget::m_OnBrowse(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Use online flag and enabled flag to decide if to start or stop logging.
-
-   \created     17.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Use online flag and enabled flag to decide if to start or stop logging.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosLoggingWidget::m_DecideStartStop()
 {
    if ((this->mq_Online == true) && (C_CamProHandler::h_GetInstance()->GetLoggingData().q_Enabled == true))
@@ -452,13 +399,10 @@ void C_CamMosLoggingWidget::m_DecideStartStop()
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check path and flags and start logging.
-
-   \created     16.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check path and flags and start logging.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosLoggingWidget::m_CheckAndStartLogging()
 {
    const C_CamProLoggingData c_LoggingData = C_CamProHandler::h_GetInstance()->GetLoggingData();

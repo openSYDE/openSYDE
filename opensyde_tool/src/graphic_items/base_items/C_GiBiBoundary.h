@@ -1,33 +1,27 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Implementation for drawing element boundary (header)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.10.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_GIBOUNDARY_H
 #define C_GIBOUNDARY_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 
 #include "C_GiBiRectBaseGroup.h"
 #include "C_GiRect.h"
 #include "C_PuiBsBoundary.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_GiBiBoundary :
    public C_GiBiRectBaseGroup
@@ -41,6 +35,7 @@ public:
 
    virtual stw_types::sintn type() const override;
    bool OpenStyleDialog(const bool oq_DarkMode);
+   virtual void CopyStyle(const QGraphicsItem * const opc_GuidelineItem);
 
    void SetBorderWidth(const stw_types::sint32 & ors32_Width);
    void SetBorderColor(const QColor & orc_Color);
@@ -68,7 +63,7 @@ private:
    C_GiBiBoundary & operator =(const C_GiBiBoundary &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

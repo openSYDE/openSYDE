@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Class for system view dashboard table item (implementation)
 
    Class for system view dashboard table item
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     29.08.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QApplication>
@@ -36,7 +29,7 @@
 #include "C_SyvDaPeDataElementBrowse.h"
 #include "C_SyvDaPeUpdateModeConfiguration.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -45,31 +38,28 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     oru32_ViewIndex        Index of system view
    \param[in]     oru32_DashboardIndex   Index of dashboard in system view
    \param[in]     ors32_DataIndex        Index of data element in dashboard in system view
    \param[in]     oru64_ID               Unique ID
    \param[in,out] opc_Parent             Optional pointer to parent
-
-   \created     29.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvDaTableBase::C_GiSvDaTableBase(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
                                      const sint32 & ors32_DataIndex, const uint64 & oru64_ID,
                                      QGraphicsItem * const opc_Parent) :
@@ -87,44 +77,35 @@ C_GiSvDaTableBase::C_GiSvDaTableBase(const uint32 & oru32_ViewIndex, const uint3
    this->mpc_Widget->SetWidget(this->mpc_TableWidget);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     29.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvDaTableBase::~C_GiSvDaTableBase(void)
 {
    //lint -e{1540} Either handled by Qt parent handling or not owned by this class in the first place
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the type of this item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the type of this item
 
    \return  ID
-
-   \created     29.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_GiSvDaTableBase::type(void) const
 {
    return msn_GRAPHICS_ITEM_DB_TABLE;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply style
 
    \param[in] oe_Style    New style type
    \param[in] oq_DarkMode Flag if dark mode is active
-
-   \created     29.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode)
 {
    C_GiSvDaRectBaseGroup::SetDisplayStyle(oe_Style, oq_DarkMode);
@@ -135,25 +116,19 @@ void C_GiSvDaTableBase::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_St
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adjust font to current size
-
-   \created     29.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adjust font to current size
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::ReInitializeSize(void)
 {
    //Required by interface
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load data from system view dashboard
-
-   \created     29.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load data from system view dashboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::LoadData(void)
 {
    tgl_assert(this->ms32_Index >= 0);
@@ -184,13 +159,10 @@ void C_GiSvDaTableBase::LoadData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update data in system view dashboard
-
-   \created     29.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update data in system view dashboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::UpdateData(void)
 {
    tgl_assert(this->ms32_Index >= 0);
@@ -226,13 +198,10 @@ void C_GiSvDaTableBase::UpdateData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the shown value of the element
-
-   \created     01.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the shown value of the element
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::UpdateShowValue(void)
 {
    tgl_assert(this->mpc_TableWidget != NULL);
@@ -244,16 +213,13 @@ void C_GiSvDaTableBase::UpdateShowValue(void)
    C_GiSvDaRectBaseGroup::UpdateShowValue();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update of the color transparence value configured by the actual timeout state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update of the color transparence value configured by the actual timeout state
 
    \param[in] ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
    \param[in] osn_Value                       Value for transparence (0..255)
-
-   \created     05.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
 {
    tgl_assert(this->mpc_TableWidget != NULL);
@@ -263,15 +229,12 @@ void C_GiSvDaTableBase::UpdateTransparence(const uint32 ou32_DataElementIndex, c
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Information about the start or stop of a connection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the start or stop of a connection
 
    \param[in] oq_Active Flag if connection is active or not active now
-
-   \created     01.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::ConnectionActiveChanged(const bool oq_Active)
 {
    if (oq_Active == true)
@@ -286,15 +249,12 @@ void C_GiSvDaTableBase::ConnectionActiveChanged(const bool oq_Active)
    C_GiSvDaRectBaseGroup::ConnectionActiveChanged(oq_Active);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Information about the start or stop of edit mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the start or stop of edit mode
 
    \param[in]  oq_Active  Flag if edit mode is active or not active now
-
-   \created     02.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::EditModeActiveChanged(const bool oq_Active)
 {
    C_GiSvDaRectBaseGroup::EditModeActiveChanged(oq_Active);
@@ -305,13 +265,10 @@ void C_GiSvDaTableBase::EditModeActiveChanged(const bool oq_Active)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Call properties for widgets
-
-   \created     10.10.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Call properties for widgets
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaTableBase::CallProperties(void)
 {
    tgl_assert(this->mpc_TableWidget != NULL);
@@ -380,9 +337,8 @@ bool C_GiSvDaTableBase::CallProperties(void)
    return true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Activates or deactivates all relevant context menu entries for this item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Activates or deactivates all relevant context menu entries for this item
 
    Context menu functions:
    - Add data element
@@ -390,10 +346,8 @@ bool C_GiSvDaTableBase::CallProperties(void)
 
    \param[in] opc_ContextMenuManager Pointer to context menu manager for registration of actions
    \param[in] oq_Active              Flag if context menu entries have to be shown or not
-
-   \created     21.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::ConfigureContextMenu(C_SyvDaContextMenuManager * const opc_ContextMenuManager,
                                              const bool oq_Active)
 {
@@ -486,9 +440,8 @@ void C_GiSvDaTableBase::ConfigureContextMenu(C_SyvDaContextMenuManager * const o
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the newest registered value of a specific datapool element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the newest registered value of a specific datapool element
 
    This function is thread safe.
 
@@ -499,10 +452,8 @@ void C_GiSvDaTableBase::ConfigureContextMenu(C_SyvDaContextMenuManager * const o
    C_NO_ERR    Value read
    C_RANGE     Index invalid
    C_NOACT     No value received
-
-   \created     01.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_GiSvDaTableBase::GetLastValueUnscaled(const uint32 ou32_WidgetDataPoolElementIndex,
                                                std::vector<float64> & orc_Values)
 {
@@ -517,17 +468,14 @@ sint32 C_GiSvDaTableBase::GetLastValueUnscaled(const uint32 ou32_WidgetDataPoolE
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get table data item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get table data item
 
    \return
    NULL Error
    Else Pointer to table data
-
-   \created     11.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_PuiSvDbTable * C_GiSvDaTableBase::GetTableItem(void) const
 {
    const C_PuiSvDbTable * pc_Retval = NULL;
@@ -544,9 +492,8 @@ const C_PuiSvDbTable * C_GiSvDaTableBase::GetTableItem(void) const
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply new table content
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply new table content
 
    WARNING: Data element changes have to trigger RegisterDataElement
 
@@ -555,10 +502,8 @@ const C_PuiSvDbTable * C_GiSvDaTableBase::GetTableItem(void) const
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     05.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_GiSvDaTableBase::SetTableItem(const C_PuiSvDbTable & orc_Content) const
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -576,19 +521,16 @@ sint32 C_GiSvDaTableBase::SetTableItem(const C_PuiSvDbTable & orc_Content) const
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check view is active
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check view is active
 
    \param[in] orc_DataPoolElementId Datapool element ID
 
    \return
    True  View active
    False View not active
-
-   \created     09.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaTableBase::GetViewActive(const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId) const
 {
    bool q_Retval = false;
@@ -652,24 +594,20 @@ bool C_GiSvDaTableBase::GetViewActive(const C_PuiSvDbNodeDataPoolListElementId &
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current view index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current view index
 
    \return
    Current view index
-
-   \created     20.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_GiSvDaTableBase::GetViewIndex(void) const
 {
    return this->mu32_ViewIndex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check item error
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check item error
 
    \param[in]  orc_DataPoolElementId   Datapool element ID
    \param[out] orc_Content             Active error description
@@ -678,10 +616,8 @@ uint32 C_GiSvDaTableBase::GetViewIndex(void) const
    \return
    True  Error active
    False Error not active
-
-   \created     09.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaTableBase::CheckItemError(const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId,
                                        QString & orc_Content, bool & orq_IsTransmissionError) const
 {
@@ -715,15 +651,12 @@ bool C_GiSvDaTableBase::CheckItemError(const C_PuiSvDbNodeDataPoolListElementId 
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update the error icon
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update the error icon
 
    Here: update table
-
-   \created     17.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::m_UpdateErrorIcon(void)
 {
    //Don't call parent to not show any error icon
@@ -733,45 +666,36 @@ void C_GiSvDaTableBase::m_UpdateErrorIcon(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if warning icon is allowed
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if warning icon is allowed
 
    \return
    True  Warning icon is allowed
    False Warning icon is not allowed
-
-   \created     09.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaTableBase::m_AllowWarningIcon(void) const
 {
    return false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get common tool tip content if no other item takes precedence over the tool tip
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get common tool tip content if no other item takes precedence over the tool tip
 
    \return
    Common tool tip content if no other item takes precedence over the tool tip
-
-   \created     20.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_GiSvDaTableBase::m_GetCommonToolTipContent(void) const
 {
    //No common tool tip!
    return "";
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add data element
-
-   \created     21.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add data element
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::m_AddNewDataElement(void)
 {
    tgl_assert(this->mpc_TableWidget != NULL);
@@ -821,13 +745,10 @@ void C_GiSvDaTableBase::m_AddNewDataElement(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Remove data element
-
-   \created     21.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove data element
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::m_RemoveDataElement(void)
 {
    tgl_assert(this->mpc_TableWidget != NULL);
@@ -858,15 +779,12 @@ void C_GiSvDaTableBase::m_RemoveDataElement(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register new data element rail assignment for new data element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register new data element rail assignment for new data element
 
    \param[in] orc_DataPoolElementId New data element ID
-
-   \created     21.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaTableBase::m_RegisterDataElementRail(const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId)
 const
 {
@@ -900,9 +818,8 @@ const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Map widget data element index to data element handler index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Map widget data element index to data element handler index
 
    \param[in]  ou32_DataElementIndex      Widget data element index
    \param[out] oru32_InternalElementIndex Data element handler index
@@ -910,10 +827,8 @@ const
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     09.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_GiSvDaTableBase::m_MapDataElementIndexToInternalElementIndex(const uint32 ou32_DataElementIndex,
                                                                       uint32 & oru32_InternalElementIndex) const
 {

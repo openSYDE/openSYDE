@@ -1,37 +1,40 @@
 <RCC>
     <qresource prefix="/">
+        <file>styles/Charts.qss</file>
+        <file>styles/CheckBox.qss</file>
+        <file>styles/Color.qss</file>
+        <file>styles/ComboBox.qss</file>
+        <file>styles/Font.qss</file>
+        <file>styles/Frame.qss</file>
+        <file>styles/GroupBox.qss</file>
+        <file>styles/Label.qss</file>
+        <file>styles/LineEdit.qss</file>
+        <file>styles/ListWidget.qss</file>
+        <file>styles/Menu.qss</file>
+        <file>styles/PlainTextEdit.qss</file>
+        <file>styles/ProgressBar.qss</file>
+        <file>styles/PushButton.qss</file>
+        <file>styles/RadioButton.qss</file>
+        <file>styles/ScrollArea.qss</file>
+        <file>styles/ScrollBar.qss</file>
+        <file>styles/Slider.qss</file>
+        <file>styles/SpinBox.qss</file>
+        <file>styles/Table.qss</file>
+        <file>styles/TabWidget.qss</file>
+        <file>styles/TextBrowser.qss</file>
+        <file>styles/TextEdit.qss</file>
+        <file>styles/TreeWidget.qss</file>
+        <file>styles/Widget.qss</file>
         <file>images/STW_Logo.png</file>
         <file>images/DrawBackground.png</file>
-        <file>styles/Menu.qss</file>
-        <file>styles/Label.qss</file>
         <file>images/GroupBoxDownArrow.png</file>
-        <file>styles/ComboBox.qss</file>
-        <file>styles/SpinBox.qss</file>
         <file>images/SpinBoxUpArrow.png</file>
-        <file>styles/CheckBox.qss</file>
-        <file>styles/RadioButton.qss</file>
         <file>images/CheckBoxActiveWithoutBackground.svg</file>
-        <file>styles/PushButton.qss</file>
         <file>images/BtnWidgetMax.png</file>
         <file>images/BtnWidgetMin.png</file>
-        <file>images/Connect.png</file>
-        <file>images/Update.png</file>
         <file>images/system_definition/Boundary.png</file>
         <file>images/system_definition/TextElement.png</file>
         <file>images/system_definition/LineArrow.png</file>
-        <file>styles/LineEdit.qss</file>
-        <file>styles/Frame.qss</file>
-        <file>styles/ScrollBar.qss</file>
-        <file>styles/TabWidget.qss</file>
-        <file>styles/Slider.qss</file>
-        <file>styles/Table.qss</file>
-        <file>styles/GroupBox.qss</file>
-        <file>styles/ListWidget.qss</file>
-        <file>styles/PlainTextEdit.qss</file>
-        <file>styles/Color.qss</file>
-        <file>styles/Font.qss</file>
-        <file>styles/Widget.qss</file>
-        <file>styles/TextEdit.qss</file>
         <file>images/graphic_items/TransparentBtnBackground.png</file>
         <file>images/graphic_items/LineStyleDash.png</file>
         <file>images/graphic_items/LineStyleDashDot.png</file>
@@ -53,34 +56,21 @@
         <file>images/graphic_items/LineArrowHeadType3Selected.png</file>
         <file>images/graphic_items/LineArrowHeadType4Selected.png</file>
         <file>images/graphic_items/LineArrowHeadType5Selected.png</file>
-        <file>styles/TreeWidget.qss</file>
         <file>images/IconArrowLeftActive.png</file>
         <file>images/IconArrowRightActive.png</file>
         <file>images/IconDataPoolSelCloseView.png</file>
         <file>images/IconDataPoolSelOpenView.png</file>
-        <file>images/SafetyIcon24px.png</file>
-        <file>images/SafetyIcon100px.png</file>
-        <file>images/system_definition/NodeEdit/ESX-3CM_transparent.png</file>
-        <file>images/CheckBoxDisabled.png</file>
-        <file>images/CheckBoxDisabledAlternative.png</file>
-        <file>images/switch-off.png</file>
-        <file>images/switch-on.png</file>
         <file>images/GroupBoxDownArrowDisabled.png</file>
         <file>images/IconArrowSmallClose.png</file>
         <file>images/IconArrowSmallOpen.png</file>
         <file>images/SpinBoxUpArrowDisabled.png</file>
         <file>images/BtnWidgetHor.png</file>
-        <file>images/tools_icons/CodeBlocks.png</file>
-        <file>images/tools_icons/EnterpriseArchitect.png</file>
-        <file>images/tools_icons/QtCreator.png</file>
         <file>images/system_views/Laptop.svg</file>
         <file>images/system_views/Rechner.svg</file>
         <file>images/IconEditActive.svg</file>
         <file>images/IconSave.svg</file>
         <file>images/system_views/IconTabClose.svg</file>
         <file>images/system_views/IconTabCloseHover.svg</file>
-        <file>images/system_views/ConnectActive.svg</file>
-        <file>images/system_views/ConnectInactive.svg</file>
         <file>images/SettingsIcon.svg</file>
         <file>images/system_views/Darkmode_Disable.svg</file>
         <file>images/system_views/Darkmode_Enable.svg</file>
@@ -169,7 +159,6 @@
         <file>images/system_views/IconTabCloseClickedDark.svg</file>
         <file>images/system_views/IconTabCloseDark.svg</file>
         <file>images/system_views/IconTabCloseHoverDark.svg</file>
-        <file>images/Bus_Update_02.gif</file>
         <file>images/system_views/dashboards/icons/SpinBoxDownBlue.png</file>
         <file>images/system_views/dashboards/icons/SpinBoxDownDarkBlue.png</file>
         <file>images/system_views/dashboards/icons/SpinBoxDownWhite.png</file>
@@ -188,13 +177,9 @@
         <file>images/system_views/dashboards/icons/ProgressBarTopPointerDarkBlue.png</file>
         <file>images/system_views/dashboards/icons/ProgressBarTopPointerGrey.png</file>
         <file>images/system_views/dashboards/icons/ProgressBarTopPointerWhite.png</file>
-        <file>images/system_views/actions/logicad_icon_orange-grau.png</file>
         <file>images/STW_Logo_Dark.png</file>
-        <file>images/system_views/Update.PNG</file>
         <file>images/openSYDE_logo.ico</file>
         <file>images/system_views/Device.svg</file>
-        <file>styles/ProgressBar.qss</file>
-        <file>styles/Charts.qss</file>
         <file>images/system_views/dashboards/icons/SpinBoxDownGreen.png</file>
         <file>images/system_views/dashboards/icons/SpinBoxDownGrey.png</file>
         <file>images/system_views/dashboards/icons/SpinBoxUpGreen.png</file>
@@ -225,9 +210,7 @@
         <file>images/system_views/IconOk.svg</file>
         <file>images/system_views/IconWarning.svg</file>
         <file>images/system_views/IconCancelBright.svg</file>
-        <file>images/system_views/IconConnectGreen.svg</file>
         <file>images/system_views/IconConnectGrey.svg</file>
-        <file>images/system_views/IconConnectRed.svg</file>
         <file>images/system_views/IconDisconnect.svg</file>
         <file>images/system_views/IconUpdateDisabled.svg</file>
         <file>images/IconScrollLeftDisabled.svg</file>
@@ -235,7 +218,6 @@
         <file>images/IconScrollRightDisabled.svg</file>
         <file>images/IconScrollRightEnabled.svg</file>
         <file>images/system_views/UpdateNoApplication.svg</file>
-        <file>images/system_views/UpdateUnknown.svg</file>
         <file>images/system_views/UpdateNoResponse.svg</file>
         <file>images/system_views/UpdateInProgress.svg</file>
         <file>images/system_views/UpdateNotUpdateable.svg</file>
@@ -267,7 +249,6 @@
         <file>images/system_views/IconExportEnabledDarkMode.svg</file>
         <file>images/system_views/IconImportEnabledDarkMode.svg</file>
         <file>images/system_views/IconConfigWarning.svg</file>
-        <file>styles/TextBrowser.qss</file>
         <file>images/Error_iconV2.svg</file>
         <file>images/IconSystemCommissioning.svg</file>
         <file>images/IconSystemDefinition.svg</file>
@@ -283,7 +264,6 @@
         <file>images/main_page_and_navi_bar/Icon_save_as.svg</file>
         <file>images/IconSystemCommissioningGray.svg</file>
         <file>images/IconSystemDefinitionGray.svg</file>
-        <file>styles/ScrollArea.qss</file>
         <file>images/main_page_and_navi_bar/Icon_new_project_disabled.svg</file>
         <file>images/main_page_and_navi_bar/Icon_open_project_disabled.svg</file>
         <file>images/main_page_and_navi_bar/Icon_save_as_disabled.svg</file>
@@ -487,5 +467,26 @@
         <file>images/RadioButtonActive.svg</file>
         <file>images/system_definition/NodeEdit/lists/IconSortDown.svg</file>
         <file>images/system_definition/NodeEdit/lists/IconSortUp.svg</file>
+        <file>images/system_definition/IconDataPoolBigShared.svg</file>
+        <file>images/system_definition/IconShare.svg</file>
+        <file>images/system_views/IconDoubleArrowDown.svg</file>
+        <file>images/system_views/IconDoubleArrowUp.svg</file>
+        <file>images/system_views/IconArrowDown.svg</file>
+        <file>images/system_views/IconArrowRight.svg</file>
+        <file>images/system_views/IconUpdateError.svg</file>
+        <file>images/system_views/IconUpdateInProgress.svg</file>
+        <file>images/system_views/IconUpdateSuccess.svg</file>
+        <file>images/system_views/IconUpdateWaiting.svg</file>
+        <file>images/system_views/IconUpdateStatusDisabled.svg</file>
+        <file>images/system_views/UpdateAnimationInProgress.gif</file>
+        <file>images/system_views/IconConnected.svg</file>
+        <file>images/system_views/IconConnecting.svg</file>
+        <file>images/system_views/IconDisconnected.svg</file>
+        <file>images/system_views/IconDisconnecting.svg</file>
+        <file>images/system_views/IconConfirm.svg</file>
+        <file>images/system_views/IconLockedGrey.svg</file>
+        <file>images/system_views/IconFileDataBlock.svg</file>
+        <file>images/system_views/IconFileParamSetImage.svg</file>
+        <file>images/DeleteSearchInput.svg</file>
     </qresource>
 </RCC>

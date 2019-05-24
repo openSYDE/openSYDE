@@ -30,69 +30,35 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeErrorFrame" name="pc_ErrorFrame">
+    <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_ErrorFrame">
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>28</height>
+       <height>33</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>28</height>
+       <height>33</height>
       </size>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0">
       <property name="leftMargin">
-       <number>17</number>
+       <number>1</number>
       </property>
       <property name="topMargin">
        <number>0</number>
       </property>
       <property name="bottomMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeLabFrameError" name="pc_ErrorLabel">
-        <property name="text">
-         <string>Error Label</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeWiEditBackground" name="pc_BackgroundWidget" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <property name="leftMargin">
-       <number>8</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>8</number>
-      </property>
-      <property name="bottomMargin">
-       <number>8</number>
-      </property>
-      <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxButtons">
+       <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxErrorContent">
         <property name="title">
          <string/>
         </property>
-        <layout class="QGridLayout" name="gridLayout">
+        <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,1">
          <property name="leftMargin">
           <number>0</number>
          </property>
@@ -105,90 +71,155 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
+         <item>
+          <widget class="stw_opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_ErrorLabelIcon">
+           <property name="minimumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Error Label</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_ErrorLabelTitle">
+           <property name="text">
+            <string>Error Label</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="stw_opensyde_gui_elements::C_OgeLabFrameError" name="pc_ErrorLabel">
+           <property name="text">
+            <string>Error Label</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="stw_opensyde_gui_elements::C_OgeWiEditBackground" name="pc_BackgroundWidget" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>2</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>2</number>
+      </property>
+      <property name="bottomMargin">
+       <number>2</number>
+      </property>
+      <item>
+       <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxButtons">
+        <property name="title">
+         <string>It has to be flat, so there are no borders</string>
+        </property>
+        <property name="flat">
+         <bool>true</bool>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
          <property name="spacing">
           <number>0</number>
          </property>
-         <item row="0" column="0">
-          <layout class="QHBoxLayout" name="pc_LayoutButtons" stretch="1,0,0,0">
-           <property name="leftMargin">
-            <number>10</number>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <spacer name="pc_HorizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
            </property>
-           <property name="topMargin">
-            <number>9</number>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
            </property>
-           <property name="bottomMargin">
-            <number>9</number>
+          </spacer>
+         </item>
+         <item>
+          <widget class="stw_opensyde_gui_elements::C_OgePubUpdate" name="pc_PbCancel">
+           <property name="minimumSize">
+            <size>
+             <width>131</width>
+             <height>40</height>
+            </size>
            </property>
-           <item>
-            <spacer name="pc_HorizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="stw_opensyde_gui_elements::C_OgePubTextWithBorderEdit" name="pc_PbCancel">
-             <property name="minimumSize">
-              <size>
-               <width>80</width>
-               <height>40</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>80</width>
-               <height>40</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>PushButton</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="pc_HorizontalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>21</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="stw_opensyde_gui_elements::C_OgePubTextWithBorderEdit" name="pc_PbConfirm">
-             <property name="minimumSize">
-              <size>
-               <width>80</width>
-               <height>40</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>80</width>
-               <height>40</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>PushButton</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
+           <property name="maximumSize">
+            <size>
+             <width>131</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>PushButton</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="stw_opensyde_gui_elements::C_OgePubSystemCommissioningEdit" name="pc_PbConfirm">
+           <property name="minimumSize">
+            <size>
+             <width>131</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>131</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>PushButton</string>
+           </property>
+          </widget>
          </item>
         </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="stw_opensyde_gui_elements::C_OgeWiEditBackground" name="pc_WidgetWhite" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>5</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>5</height>
+         </size>
+        </property>
        </widget>
       </item>
       <item>
@@ -272,21 +303,31 @@
    <header>C_OgeLabFrameError.h</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeErrorFrame</class>
-   <extends>QFrame</extends>
-   <header>C_OgeErrorFrame.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeWiEditBackground</class>
    <extends>QWidget</extends>
    <header>C_OgeWiEditBackground.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubTextWithBorderEdit</class>
+   <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabSvgOnly.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubSystemCommissioningEdit</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubTextWithBorderEdit.h</header>
+   <header>C_OgePubSystemCommissioningEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeGbxGrayedEdit</class>
+   <extends>QGroupBox</extends>
+   <header>C_OgeGbxGrayedEdit.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeWiDashboardTab</class>
@@ -295,10 +336,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxGrayedEdit</class>
-   <extends>QGroupBox</extends>
-   <header>C_OgeGbxGrayedEdit.h</header>
-   <container>1</container>
+   <class>stw_opensyde_gui_elements::C_OgePubUpdate</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubUpdate.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

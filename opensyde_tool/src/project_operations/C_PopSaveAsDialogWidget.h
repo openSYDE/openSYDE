@@ -1,28 +1,22 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for save-as dialog (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     26.07.2018  STW/G.Scupin
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_POPSAVEASDIALOGWIDGET_H
 #define C_POPSAVEASDIALOGWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 #include "C_OgePopUpDialog.h"
 #include "C_UsHandler.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
 {
 class C_PopSaveAsDialogWidget;
@@ -30,9 +24,9 @@ class C_PopSaveAsDialogWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_PopSaveAsDialogWidget :
    public QWidget
@@ -56,9 +50,11 @@ private:
    Ui::C_PopSaveAsDialogWidget * mpc_Ui;
    //lint -e{1725} Only problematic if copy or assignment is allowed
    stw_opensyde_gui_elements::C_OgePopUpDialog & mrc_ParentDialog;
+   static const stw_types::sintn mhsn_VERSION_INDEX_V2;
+   static const stw_types::sintn mhsn_VERSION_INDEX_V3;
 
    void m_InitDefaultProjectName(void) const;
-   stw_types::sint32 m_SaveToFile(const QString & orc_File) const;
+   stw_types::sint32 m_SaveToFile(const QString & orc_File, const bool oq_UseDeprecatedFileFormatV2) const;
    QString m_GetValidPath(const QString & orc_Path) const;
    void m_OnBrowse(void);
    void m_OnSave(void);
@@ -69,7 +65,7 @@ private:
    C_PopSaveAsDialogWidget & operator =(const C_PopSaveAsDialogWidget &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

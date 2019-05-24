@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       CAN message to text conversion class for the J1939 protocol
 
@@ -8,27 +7,9 @@
    the J1939 CAN protocol specification.
    Implemented version: SAE J1939/71 REV June 2006
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     05.10.2010  STW/F.Hiltensberger
-   \endimplementation
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author    Description
-   11.04.2012        STW/AST   #303: include version number in protocol name
-   14.07.2011        STW/FHI   #230: added Network Management messages (Request for Address Claimed, Address Claimed
-                               and Cannot Claim)
-   08.10.2010        STW/FHI   - reworked PGN search algorithm (binary search)
-                               - added further PGNs (SAE J1939/71 REV June 2006)
-   07.10.2010        STW/FHI   added further PGNs according to SAE J1939/71
-   05.10.2010        STW/FHI   file created
-   \endhistory
+   \copyright   Copyright 2010 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"  //pre-compiled headers
@@ -371,15 +352,12 @@ C_CMONProtocolJ1939::C_CMONProtocolJ1939(void) : C_CMONProtocolBase()
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert CAN message to text representation.
+/*! \brief   Convert CAN message to text representation.
 
    \param[in]     orc_Msg              message to convert
 
    \return
    Text interpretation of CAN message ("" if the message can not be interpreted)
-
-   \created     05.10.2010  STW/F.Hiltensberger
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolJ1939::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) const
@@ -629,13 +607,10 @@ C_SCLString C_CMONProtocolJ1939::MessageToString(const T_STWCAN_Msg_RX & orc_Msg
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get name of protocol as string
+/*! \brief   Get name of protocol as string
 
    \return
    Text representation of protocol name
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolJ1939::GetProtocolName(void) const

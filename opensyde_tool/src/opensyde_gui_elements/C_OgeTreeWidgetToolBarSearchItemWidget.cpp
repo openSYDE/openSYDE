@@ -1,50 +1,40 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget element for the QTreeWidget based C_OgeTreeWidgetToolBarSearch painted in delegate
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     16.03.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_OgeTreeWidgetToolBarSearchItemWidget.h"
 
 #include "ui_C_OgeTreeWidgetToolBarSearchItemWidget.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in] opc_Parent  Optional parent
-
-   \created     16.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeTreeWidgetToolBarSearchItemWidget::C_OgeTreeWidgetToolBarSearchItemWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_OgeTreeWidgetToolBarSearchItemWidget)
@@ -52,17 +42,14 @@ C_OgeTreeWidgetToolBarSearchItemWidget::C_OgeTreeWidgetToolBarSearchItemWidget(Q
    mpc_Ui->setupUi(this);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in] opc_Parent        Optional parent
    \param[in] orc_Title         New title
    \param[in] orc_Subtitle      New subtitle
-
-   \created     16.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeTreeWidgetToolBarSearchItemWidget::C_OgeTreeWidgetToolBarSearchItemWidget(const QString & orc_Title,
                                                                                const QString & orc_Subtitle,
                                                                                QWidget * const opc_Parent) :
@@ -84,15 +71,12 @@ C_OgeTreeWidgetToolBarSearchItemWidget::C_OgeTreeWidgetToolBarSearchItemWidget(c
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     06.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeTreeWidgetToolBarSearchItemWidget::~C_OgeTreeWidgetToolBarSearchItemWidget()
 {
    delete mpc_Ui;

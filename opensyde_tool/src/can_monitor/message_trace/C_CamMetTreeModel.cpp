@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Max performance model (implementation)
 
    Max performance model
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     28.08.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <sstream>
@@ -33,7 +26,7 @@
 #include "cam_constants.h"
 #include "constants.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_scl;
 using namespace stw_tgl;
@@ -41,34 +34,31 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const stw_types::uint32 C_CamMetTreeModel::mhu32_MAX_STORAGE = 1000;
 const QString C_CamMetTreeModel::mhc_IconMessage = ":images/IconMessageInactive.svg";
 const QString C_CamMetTreeModel::mhc_IconMessageSelected = "://images/IconMessageSelected.svg";
 const QString C_CamMetTreeModel::mhc_IconSignal = ":images/IconSignalInactive.svg";
 const QString C_CamMetTreeModel::mhc_IconSignalSelected = "://images/IconSignalSelected.svg";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     28.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMetTreeModel::C_CamMetTreeModel(QObject * const opc_Parent) :
    QAbstractItemModel(opc_Parent),
    mq_DisplayTree(false),
@@ -101,15 +91,12 @@ C_CamMetTreeModel::C_CamMetTreeModel(QObject * const opc_Parent) :
    this->mc_GrayOutTimer.start(msn_TRACE_TRANSPARENCY_REFRESH_TIME);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Continues the gray out engine
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Continues the gray out engine
 
    Calculation of an offset to all saved unique messages timestamps to compensate the pause time
-
-   \created     11.02.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::Continue(void)
 {
    // ms resolution is enough
@@ -145,13 +132,10 @@ void C_CamMetTreeModel::Continue(void)
    this->mq_GrayOutPause = false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Pauses the gray out engine
-
-   \created     11.02.2019  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Pauses the gray out engine
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::Pause(void)
 {
    this->mq_GrayOutPause = true;
@@ -162,84 +146,71 @@ void C_CamMetTreeModel::Pause(void)
    this->mu32_GrayOutPauseTimeStamp = static_cast<uint32>(TGL_GetTickCountUS() / 1000ULL);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Pauses the gray out engine
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Pauses the gray out engine
 
    Calculation of the offset is not necessary. Stop can only be followed by start
    and start resets the offset in any case.
-
-   \created     11.02.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::Stop(void)
 {
    this->mq_GrayOutPause = true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Continues the gray out engine and resets the pause offset
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Continues the gray out engine and resets the pause offset
 
    The offset is not necessary on a restart
-
-   \created     11.02.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::Start(void)
 {
    this->mq_GrayOutPause = false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function to lock up all data requests (performance)
-
-   \created     29.08.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function to lock up all data requests (performance)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::LockData(void)
 {
    this->mq_DataUnlocked = false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function to unlock up all data requests (performance)
-
-   \created     29.08.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function to unlock up all data requests (performance)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::UnlockData(void)
 {
    this->mq_DataUnlocked = true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle action: clear data
-
-   \created     24.09.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle action: clear data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::ActionClearData(void)
 {
    this->beginResetModel();
    this->mu32_OldestItemIndex = 0UL;
    this->mc_DataBase.clear();
    this->mc_UniqueMessages.clear();
+   //Every reset will clear the selection
+   this->SetSelection(-1, -1);
    this->endResetModel();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add specified strings as rows
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add specified strings as rows
 
    \param[in] orc_Data New row content
 
-   \created     28.08.2018  STW/M.Echtler
+   \return
+   Indices of added rows
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<sint32> C_CamMetTreeModel::AddRows(const std::list<C_CamMetTreeLoggerData> & orc_Data)
 {
    std::vector<sint32> c_Retval;
@@ -305,6 +276,8 @@ std::vector<sint32> C_CamMetTreeModel::AddRows(const std::list<C_CamMetTreeLogge
          //Simple model reset notification
          if (this->mq_UniqueMessageMode == false)
          {
+            //Every reset will clear the selection
+            this->SetSelection(-1, -1);
             this->endResetModel();
          }
       }
@@ -329,6 +302,8 @@ std::vector<sint32> C_CamMetTreeModel::AddRows(const std::list<C_CamMetTreeLogge
          //End queue shift
          if (this->mq_UniqueMessageMode == false)
          {
+            //Every reset will clear the selection
+            this->SetSelection(-1, -1);
             //Use reset model to avoid console output, warning: reset model does have negative side effects
             this->endResetModel();
             //this->endInsertRows();
@@ -419,7 +394,7 @@ std::vector<sint32> C_CamMetTreeModel::AddRows(const std::list<C_CamMetTreeLogge
             }
 
             // Reassign the data byte timestamps
-            for (u8_DbCounter = 0; u8_DbCounter < rc_Message.c_CanMsg.u8_DLC; ++u8_DbCounter)
+            for (u8_DbCounter = 0; u8_DbCounter < 8U; ++u8_DbCounter)
             {
                rc_Message.c_DataBytesChangedTimeStamps[u8_DbCounter] = c_DataBytesTimeStampCopy[u8_DbCounter];
             }
@@ -441,32 +416,49 @@ std::vector<sint32> C_CamMetTreeModel::AddRows(const std::list<C_CamMetTreeLogge
          }
          else
          {
-            QMap<C_SCLString, C_CamMetTreeLoggerData>::iterator c_It;
-
-            //Insert new item
-            c_It = this->mc_UniqueMessages.insert(c_ItData->c_CanIdDec, *c_ItData);
-            // New message, new data. Update the timestamp of the CAN message data and its bytes
-            c_It->u32_DataChangedTimeStamp = static_cast<uint32>(c_It->c_CanMsg.u64_TimeStamp / 1000ULL);
-            for (u8_DbCounter = 0; u8_DbCounter < c_It->c_CanMsg.u8_DLC; ++u8_DbCounter)
-            {
-               c_It->c_DataBytesChangedTimeStamps[u8_DbCounter] = c_It->u32_DataChangedTimeStamp;
-            }
+            bool q_NewRow = false;
+            QMap<C_SCLString, C_CamMetTreeLoggerData>::iterator c_NewPos;
 
             if (this->mq_UniqueMessageMode == true)
             {
-               sintn sn_Count = 0;
-
-               //As there is no implementation for operator -begin this has to be done manually
-               while (c_It != this->mc_UniqueMessages.begin())
+               //Handle begin!
+               if (this->mc_UniqueMessages.contains(c_ItData->c_CanIdDec) == false)
                {
-                  c_It -= 1;
-                  ++sn_Count;
-               }
+                  sintn sn_EstimatedPosIndex = 0;
+                  //Get first valid item after the position it should be at
+                  QMap<C_SCLString,
+                       C_CamMetTreeLoggerData>::iterator c_EstimatedPos = this->mc_UniqueMessages.upperBound(
+                     c_ItData->c_CanIdDec);
+                  //Calc estimated new position index
+                  for (QMap<C_SCLString, C_CamMetTreeLoggerData>::iterator c_ItUniqueMessages =
+                          this->mc_UniqueMessages.begin();
+                       (c_ItUniqueMessages != this->mc_UniqueMessages.end()) && (c_ItUniqueMessages != c_EstimatedPos);
+                       ++c_ItUniqueMessages)
+                  {
+                     ++sn_EstimatedPosIndex;
+                  }
 
-               //Notify the new row count, seems to work, even though the begin should be before the insert operation
-               // (conflict because count is only known after insert successful)
-               this->beginInsertRows(QModelIndex(), sn_Count, sn_Count);
-               c_Retval.push_back(sn_Count);
+                  //handle new row with known position index
+                  q_NewRow = true;
+                  c_Retval.push_back(sn_EstimatedPosIndex);
+
+                  //Notify the new row count
+                  this->beginInsertRows(QModelIndex(), sn_EstimatedPosIndex, sn_EstimatedPosIndex);
+               }
+            }
+
+            //Insert new item
+            c_NewPos = this->mc_UniqueMessages.insert(c_ItData->c_CanIdDec, *c_ItData);
+            // New message, new data. Update the timestamp of the CAN message data and its bytes
+            c_NewPos->u32_DataChangedTimeStamp = static_cast<uint32>(c_NewPos->c_CanMsg.u64_TimeStamp / 1000ULL);
+            for (u8_DbCounter = 0; u8_DbCounter < c_NewPos->c_CanMsg.u8_DLC; ++u8_DbCounter)
+            {
+               c_NewPos->c_DataBytesChangedTimeStamps[u8_DbCounter] = c_NewPos->u32_DataChangedTimeStamp;
+            }
+
+            //Check if begin was called so we properly close the insert operation
+            if (q_NewRow)
+            {
                this->endInsertRows();
             }
          }
@@ -497,16 +489,13 @@ std::vector<sint32> C_CamMetTreeModel::AddRows(const std::list<C_CamMetTreeLogge
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set current selection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set current selection
 
    \param[in] os32_SelectedParentRow Current selected parent index
    \param[in] os32_SelectedChildRow  Current selected child index
-
-   \created     27.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::SetSelection(const sint32 os32_SelectedParentRow, const sint32 os32_SelectedChildRow)
 {
    const sint32 s32_ColIDData = C_CamMetTreeModel::h_EnumToColumn(eCAN_DATA);
@@ -517,15 +506,12 @@ void C_CamMetTreeModel::SetSelection(const sint32 os32_SelectedParentRow, const 
    this->dataChanged(this->index(0, s32_ColIDData), this->index(this->rowCount() - 1, s32_ColIDData));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set display mode: display tree
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set display mode: display tree
 
    \param[in] oq_Value New value
-
-   \created     26.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::SetDisplayTree(const bool oq_Value)
 {
    //Avoid resetting the model if not necessary (avoid collapsing all items)
@@ -533,35 +519,33 @@ void C_CamMetTreeModel::SetDisplayTree(const bool oq_Value)
    {
       this->beginResetModel();
       this->mq_DisplayTree = oq_Value;
+      //Every reset will clear the selection
+      this->SetSelection(-1, -1);
       this->endResetModel();
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set display mode: display unique messages
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set display mode: display unique messages
 
    \param[in] oq_Value New value
-
-   \created     24.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::SetDisplayUniqueMessages(const bool oq_Value)
 {
    this->beginResetModel();
    this->mq_UniqueMessageMode = oq_Value;
+   //Every reset will clear the selection
+   this->SetSelection(-1, -1);
    this->endResetModel();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set display style for CAN ID and CAN data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set display style for CAN ID and CAN data
 
    \param[in] oq_Value New value
-
-   \created     05.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::SetDisplayAsHex(const bool oq_Value)
 {
    const sint32 s32_ColCanID = C_CamMetTreeModel::h_EnumToColumn(eCAN_ID);
@@ -575,15 +559,12 @@ void C_CamMetTreeModel::SetDisplayAsHex(const bool oq_Value)
    Q_EMIT this->dataChanged(this->index(0, s32_ColDataID), this->index(this->rowCount() - 1, s32_ColDataID));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set display style for timestamp
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set display style for timestamp
 
    \param[in] oq_Value New value
-
-   \created     05.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::SetDisplayTimestampRelative(const bool oq_Value)
 {
    const sint32 s32_ColID = C_CamMetTreeModel::h_EnumToColumn(eTIME_STAMP);
@@ -594,50 +575,41 @@ void C_CamMetTreeModel::SetDisplayTimestampRelative(const bool oq_Value)
    Q_EMIT this->dataChanged(this->index(0, s32_ColID), this->index(this->rowCount() - 1, s32_ColID));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns display style for CAN ID and CAN data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns display style for CAN ID and CAN data
 
    \return
    true     Displaying hex
    false    Displaying dec
-
-   \created     21.11.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_CamMetTreeModel::GetDisplayAsHex(void) const
 {
    return this->mq_DisplayAsHex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns display style for timestamp
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns display style for timestamp
 
    \return
    true     Displaying relative timestamp
    false    Displaying absolute timestamp
-
-   \created     21.11.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_CamMetTreeModel::GetDisplayTimestampRelative(void) const
 {
    return this->mq_DisplayTimestampRelative;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all messages
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all messages
 
    Intended only for protocol changes
 
    \return
    All messages
-
-   \created     26.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<C_CamMetTreeLoggerData *> C_CamMetTreeModel::GetAllMessagesForProtocolChange(void)
 {
    std::vector<C_CamMetTreeLoggerData *> c_Retval;
@@ -658,13 +630,10 @@ std::vector<C_CamMetTreeLoggerData *> C_CamMetTreeModel::GetAllMessagesForProtoc
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal a change of protocol related data
-
-   \created     26.09.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal a change of protocol related data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::SignalProtocolChange(void)
 {
    const sint32 s32_ColID = C_CamMetTreeModel::h_EnumToColumn(eCAN_DATA);
@@ -673,9 +642,8 @@ void C_CamMetTreeModel::SignalProtocolChange(void)
    Q_EMIT this->dataChanged(this->index(0, s32_ColID), this->index(this->rowCount() - 1, s32_ColID));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get header data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get header data
 
    \param[in] osn_Section    Section
    \param[in] oe_Orientation Orientation
@@ -683,10 +651,8 @@ void C_CamMetTreeModel::SignalProtocolChange(void)
 
    \return
    Header string
-
-   \created     05.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_CamMetTreeModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
                                        const sintn osn_Role) const
 {
@@ -767,9 +733,8 @@ QVariant C_CamMetTreeModel::headerData(const sintn osn_Section, const Qt::Orient
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data index
 
    \param[in] osn_Row    Row
    \param[in] osn_Column Column
@@ -777,10 +742,8 @@ QVariant C_CamMetTreeModel::headerData(const sintn osn_Section, const Qt::Orient
 
    \return
    Data index (may be invalid = invalid parameters)
-
-   \created     05.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QModelIndex C_CamMetTreeModel::index(const sintn osn_Row, const sintn osn_Column, const QModelIndex & orc_Parent) const
 {
    QModelIndex c_Retval;
@@ -801,18 +764,15 @@ QModelIndex C_CamMetTreeModel::index(const sintn osn_Row, const sintn osn_Column
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get parent index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get parent index
 
    \param[in] orc_Index Index
 
    \return
    Parent index (may be invalid = root level)
-
-   \created     05.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QModelIndex C_CamMetTreeModel::parent(const QModelIndex & orc_Index) const
 {
    QModelIndex c_Retval;
@@ -826,18 +786,15 @@ QModelIndex C_CamMetTreeModel::parent(const QModelIndex & orc_Index) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get tree column count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get tree column count
 
    \param[in] orc_Parent Parent
 
    \return
    Column count
-
-   \created     28.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_CamMetTreeModel::columnCount(const QModelIndex & orc_Parent) const
 {
    sintn sn_Retval = 0;
@@ -859,18 +816,15 @@ sintn C_CamMetTreeModel::columnCount(const QModelIndex & orc_Parent) const
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get tree row count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get tree row count
 
    \param[in] orc_Parent Parent
 
    \return
    Row count
-
-   \created     05.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_CamMetTreeModel::rowCount(const QModelIndex & orc_Parent) const
 {
    sintn sn_Retval = 0;
@@ -903,26 +857,24 @@ sintn C_CamMetTreeModel::rowCount(const QModelIndex & orc_Parent) const
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data at index
 
    \param[in] orc_Index Index
    \param[in] osn_Role  Data role
 
    \return
    Data
-
-   \created     29.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
 {
    QVariant c_Retval;
 
-   if (mq_DataUnlocked == true)
+   if ((mq_DataUnlocked == true) || (osn_Role == msn_USER_ROLE_SORT))
    {
-      if ((osn_Role == static_cast<sintn>(Qt::DisplayRole)) || (osn_Role == msn_USER_ROLE_MARKER_TEXT))
+      if (((osn_Role == static_cast<sintn>(Qt::DisplayRole)) || (osn_Role == msn_USER_ROLE_MARKER_TEXT)) ||
+          (osn_Role == msn_USER_ROLE_SORT))
       {
          if (orc_Index.parent().isValid() == false)
          {
@@ -944,13 +896,21 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
                   }
                   break;
                case eCAN_ID:
-                  if (this->mq_DisplayAsHex == true)
+                  if (osn_Role == msn_USER_ROLE_SORT)
                   {
-                     c_Retval = pc_CurMessage->c_CanIdHex.c_str();
+                     //For number the display style is irrelevant
+                     c_Retval = pc_CurMessage->c_CanIdDec.ToInt();
                   }
                   else
                   {
-                     c_Retval = pc_CurMessage->c_CanIdDec.c_str();
+                     if (this->mq_DisplayAsHex == true)
+                     {
+                        c_Retval = pc_CurMessage->c_CanIdHex.c_str();
+                     }
+                     else
+                     {
+                        c_Retval = pc_CurMessage->c_CanIdDec.c_str();
+                     }
                   }
                   break;
                case eCAN_NAME:
@@ -1006,7 +966,14 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
                   }
                   break;
                case eCAN_COUNTER:
-                  c_Retval = pc_CurMessage->c_Counter.c_str();
+                  if (osn_Role == msn_USER_ROLE_SORT)
+                  {
+                     c_Retval = pc_CurMessage->c_Counter.ToInt64();
+                  }
+                  else
+                  {
+                     c_Retval = pc_CurMessage->c_Counter.c_str();
+                  }
                   break;
                }
             }
@@ -1090,7 +1057,8 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
          {
             const C_CamMetTreeLoggerData * const pc_CurMessage = GetMessageData(orc_Index.row());
 
-            if (pc_CurMessage != NULL)
+            // if text is interpreted do not return anything
+            if ((pc_CurMessage != NULL) && (pc_CurMessage->c_ProtocolTextDec == ""))
             {
                QBitArray c_Array;
                //Should always be DLC size
@@ -1249,18 +1217,15 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Column to enum conversion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Column to enum conversion
 
    \param[in]  os32_Column Column
 
    \return
    Enum value
-
-   \created     05.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMetTreeModel::E_Columns C_CamMetTreeModel::h_ColumnToEnum(const sint32 os32_Column)
 {
    C_CamMetTreeModel::E_Columns e_Retval;
@@ -1293,19 +1258,16 @@ C_CamMetTreeModel::E_Columns C_CamMetTreeModel::h_ColumnToEnum(const sint32 os32
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Enum to column conversion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Enum to column conversion
 
    \param[in] oe_Value Enum value
 
    \return
    Column
    -1 Error
-
-   \created     05.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamMetTreeModel::h_EnumToColumn(const C_CamMetTreeModel::E_Columns oe_Value)
 {
    sint32 s32_Retval;
@@ -1341,9 +1303,8 @@ sint32 C_CamMetTreeModel::h_EnumToColumn(const C_CamMetTreeModel::E_Columns oe_V
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get message at row
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get message at row
 
    TODO: invalid index handling
 
@@ -1352,10 +1313,8 @@ sint32 C_CamMetTreeModel::h_EnumToColumn(const C_CamMetTreeModel::E_Columns oe_V
    \return
    NULL Message not found
    Else Valid message
-
-   \created     25.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_CamMetTreeLoggerData * C_CamMetTreeModel::GetMessageData(const sintn osn_Row) const
 {
    const C_CamMetTreeLoggerData * pc_Retval;
@@ -1377,13 +1336,10 @@ const C_CamMetTreeLoggerData * C_CamMetTreeModel::GetMessageData(const sintn osn
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Timer function for handling gray out engine
-
-   \created     22.11.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Timer function for handling gray out engine
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::m_GrayOutTimer(void)
 {
    if ((this->mq_GrayOutPause == false) &&
@@ -1470,18 +1426,15 @@ void C_CamMetTreeModel::m_GrayOutTimer(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Detects the necessary transparency step dependent of the difference time
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Detects the necessary transparency step dependent of the difference time
 
    \param[in]     ou32_DiffTime  Difference time
 
    \return
    Detected transparency step
-
-   \created     05.02.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_CamMetTreeModel::mh_GetTransparencyStep(const uint32 ou32_DiffTime)
 {
    sintn sn_TransparencyStep;
@@ -1510,18 +1463,15 @@ sintn C_CamMetTreeModel::mh_GetTransparencyStep(const uint32 ou32_DiffTime)
    return sn_TransparencyStep;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get list of strings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get list of strings
 
    \param[in] orc_Message Message to evaluate
 
    \return
    List of strings
-
-   \created     26.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<QStringList> C_CamMetTreeModel::mh_GetCount(const C_CamMetTreeLoggerData & orc_Message)
 {
    std::vector<QStringList> c_Retval;
@@ -1543,16 +1493,13 @@ std::vector<QStringList> C_CamMetTreeModel::mh_GetCount(const C_CamMetTreeLogger
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Resize string to the specified maximum length if the string exceeds this limit
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Resize string to the specified maximum length if the string exceeds this limit
 
    \param[in,out] orc_Str        String that will get resized if necessary
    \param[in]     os32_MaxLength Maximum length the string may not exceed after calling this function
-
-   \created     26.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::mh_ResizeIfNecessary(QString & orc_Str, const sint32 os32_MaxLength)
 {
    orc_Str.resize(std::min(orc_Str.count(), static_cast<sintn>(os32_MaxLength)));

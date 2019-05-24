@@ -1,30 +1,24 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       A datapool item widget for the list widget
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.02.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SDNDEDATAPOOLSELECTORITEMWIDGET_H
 #define C_SDNDEDATAPOOLSELECTORITEMWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include "stwtypes.h"
 
 #include "C_OgeWiWithToolTip.h"
-#include "C_OSCNodeDataPool.h"
+#include "C_OSCNodeDataPoolId.h"
 #include "C_OgeLabToolTipBase.h"
 #include "C_SdNdeDataPoolSelectorItemUsageWidget.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
 {
 class C_SdNdeDataPoolSelectorItemWidget;
@@ -32,9 +26,9 @@ class C_SdNdeDataPoolSelectorItemWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_SdNdeDataPoolSelectorItemWidget :
    public stw_opensyde_gui_elements::C_OgeWiWithToolTip
 {
@@ -48,16 +42,20 @@ public:
 
    void SetErrorToolTip(const QString & orc_Heading, const QString & orc_Content);
    void SetNumber(const stw_types::uint32 ou32_Number);
-   void SetData(const stw_opensyde_core::C_OSCNodeDataPool & orc_OSCDataPool);
+   void SetData(const stw_opensyde_core::C_OSCNodeDataPoolId & orc_OSCDataPoolId);
    void SetData(const QString & orc_DatapoolName, const QString & orc_DatapoolComment, const bool oq_Safety,
                 const stw_types::uint32 ou32_Size, const stw_types::uint32 ou32_Used,
                 const stw_types::uint32 ou32_Reserved);
+   void UpdateData(void);
    void SetActive(const bool oq_Active);
    void SetStateConflict(const bool oq_Active);
+   void SetShareDatapool(const bool oq_Shared);
+   const stw_opensyde_core::C_OSCNodeDataPoolId & GetDatapoolId(void) const;
    QString GetDatapoolName(void) const;
    QString GetDatapoolComment(void) const;
    bool GetStateSafety(void) const;
    bool GetStateConflict(void) const;
+   bool GetShareDatapool(void) const;
    void SetMaximized(const bool oq_Maximized);
    bool GetMaximized(void) const;
    bool GetActive(void) const;
@@ -92,12 +90,14 @@ private:
 
    Ui::C_SdNdeDataPoolSelectorItemWidget * mpc_Ui;
    stw_opensyde_gui_elements::C_OgeLabToolTipBase * mpc_LabelStateImg;
+   QLabel * mpc_LabelShareImg;
    C_SdNdeDataPoolSelectorItemUsageWidget * mpc_UsageBar;
-   QPixmap mc_SafetyImg;
    QPixmap mc_ConflictImg;
 
+   stw_opensyde_core::C_OSCNodeDataPoolId mc_DatapoolId;
    bool mq_StateSafety;
    bool mq_StateConflict;
+   bool mq_Shared;
    bool mq_Maximized;
    bool mq_Active;
    const bool mq_UsageViewActive;
@@ -109,5 +109,5 @@ private:
 };
 }
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 #endif // C_SDNDEDATAPOOLSELECTORITEMWIDGET_H

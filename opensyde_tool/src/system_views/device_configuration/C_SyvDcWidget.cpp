@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for handling the process of configuring all nodes.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.11.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QApplication>
@@ -37,7 +31,7 @@
 #include "C_OSCLoggingHandler.h"
 #include "C_OgeWiCustomMessage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_scl;
@@ -46,7 +40,7 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvDcWidget::mhc_REPORT_HEADLINE_HTML_TAG_START = "<h3>";
 const QString C_SyvDcWidget::mhc_REPORT_HEADLINE_HTML_TAG_END = "</h3>";
 const QString C_SyvDcWidget::mhc_REPORT_HIGHLIGHT_TAG_START = "<span style=\" font-weight: bold;\">";
@@ -54,27 +48,24 @@ const QString C_SyvDcWidget::mhc_REPORT_HIGHLIGHT_TAG_END = "</span>";
 const sint32 C_SyvDcWidget::mhs32_INDEX_CONFIGURATION_ALL_CONNECTED_INTERFACES = 1;
 const sint32 C_SyvDcWidget::mhs32_INDEX_CONFIGURATION_ONLY_USED_INTERFACES = 0;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] orc_Parent           Reference to parent
-
-   \created     27.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDcWidget::C_SyvDcWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
                              const stw_types::uint32 ou32_ViewIndex) :
    QWidget(&orc_Parent),
@@ -192,15 +183,12 @@ C_SyvDcWidget::C_SyvDcWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_P
    this->mc_Timer.setInterval(10);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     27.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDcWidget::~C_SyvDcWidget(void)
 {
    this->CleanUp();
@@ -209,15 +197,12 @@ C_SyvDcWidget::~C_SyvDcWidget(void)
    //lint -e{1740}  no memory leak because the ownership of these objects was never transferred to this class
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Close things
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Close things
 
    Can be used in case of a to late call of destructor
-
-   \created     01.08.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::CleanUp(void)
 {
    //Stop timer just in case
@@ -226,13 +211,10 @@ void C_SyvDcWidget::CleanUp(void)
    mpc_DcSequences = NULL;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initializes all visible strings on the widget
-
-   \created     06.12.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initializes all visible strings on the widget
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::InitText(void)
 {
    // set title
@@ -267,47 +249,42 @@ void C_SyvDcWidget::InitText(void)
    this->mpc_Ui->pc_LabelConfigurationMode->SetToolTipInformation(
       C_GtGetText::h_GetText("Configuration Mode"),
       C_GtGetText::h_GetText(
-         "Property to choose which interfaces will be "
-         "configured by this device configuration step.\n"
-         "Warning: Configuring all connected interfaces may lead to "
-         "inconsistent configurations on other connected "
+         "Decide which device interfaces will be configured.\n"
+         "Warning: Configuring all connected interfaces may lead to inconsistent configurations on other connected "
          "buses.\n\n"
-         "Only directly connected interfaces: "
-         "All interfaces which are connected to the bus which is used"
-         " by the current device configuration.\n"
-         "All connected interfaces: "
-         "\nAll interfaces which are connected to any bus in the SYSTEM DEFINITION.\n"));
+         "Only directly connected interfaces: \n"
+         "   All interfaces which are connected to the bus which is used by the current device configuration.\n"
+         "All connected interfaces: \n"
+         "   All interfaces which are connected to any bus in the SYSTEM DEFINITION.\n"));
+   this->mpc_Ui->pc_LabelBitRate->SetToolTipInformation(
+      C_GtGetText::h_GetText("Bitrate of Connected Devices"),
+      C_GtGetText::h_GetText("Specify current bitrate of connected devices. If you defined another bitrate in SYSTEM "
+                             "DEFINITION a successful device configuration will change the bitrate."));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    Here: draw background
    (Not automatically drawn in any QWidget derivative)
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     04.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::paintEvent(QPaintEvent * const opc_Event)
 {
    stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
    QWidget::paintEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: handle escape key
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     07.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::keyPressEvent(QKeyEvent * const opc_Event)
 {
    if (opc_Event->key() == static_cast<sintn>(Qt::Key_Escape))
@@ -329,17 +306,14 @@ void C_SyvDcWidget::keyPressEvent(QKeyEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init com driver
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init com driver
 
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     12.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcWidget::m_InitSequence(void)
 {
    QString c_Message;
@@ -422,13 +396,10 @@ sint32 C_SyvDcWidget::m_InitSequence(void)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start search
-
-   \created     12.12.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start search
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_StartSearchProper(void)
 {
    //Init com driver
@@ -460,18 +431,20 @@ void C_SyvDcWidget::m_StartSearchProper(void)
          s32_Return = this->GetBitRateValue(this->mu32_TempBitrate);
          if (s32_Return == C_NO_ERR)
          {
-            // Check if different bitrates are used
-            this->mq_SameBitrates = (this->mu32_TempBitrate == (this->mu64_BitRate / 1000U));
-
             //Set step
             if (this->me_BusType == C_OSCSystemBus::eCAN)
             {
+               // Check if different bitrates are used
+               this->mq_SameBitrates = (this->mu32_TempBitrate == (this->mu64_BitRate / 1000U));
+
                //Check scan
                this->me_Step = eSCANCANENTERFLASHLOADER;
                s32_Return = this->mpc_DcSequences->ScanCanEnterFlashloader(this->mu32_TempBitrate);
             }
             else
             {
+               this->mq_SameBitrates = true;
+
                // No concrete enter flashloader function for Ethernet
                this->me_Step = eSCANETHGETINFOFROMOPENSYDEDEVICES;
                s32_Return = this->mpc_DcSequences->ScanEthGetInfoFromOpenSydeDevices();
@@ -505,13 +478,10 @@ void C_SyvDcWidget::m_StartSearchProper(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up scan
-
-   \created     12.12.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clean up scan
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_CleanUpScan(void) const
 {
    this->mpc_Ui->pc_BushButtonCancel->setEnabled(true);
@@ -522,13 +492,10 @@ void C_SyvDcWidget::m_CleanUpScan(void) const
    QApplication::restoreOverrideCursor();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Scan finished
-
-   \created     12.12.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Scan finished
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_ScanFinished(void)
 {
    if (this->mc_FoundDevices.size() == 0)
@@ -536,19 +503,19 @@ void C_SyvDcWidget::m_ScanFinished(void)
       //Zero
       this->mpc_Ui->pc_ProgressScan->SetProgress(0, false);
       this->mpc_Ui->pc_LabelScanFoundDevicesWarning->setVisible(true);
-      this->mpc_Ui->pc_LabelScanFoundDevicesWarning->setText(C_GtGetText::h_GetText("Warning: No devices found!"));
+      this->mpc_Ui->pc_LabelScanFoundDevicesWarning->setText(C_GtGetText::h_GetText("Error: No devices found!"));
       this->mpc_Ui->pc_LabelStartScan->setText(C_GtGetText::h_GetText("No devices found."));
    }
    else if (this->mc_FoundDevices.size() < static_cast<uint32>(this->mpc_Ui->pc_ListWidgetExistingNodes->count()))
    {
       //Less
-      m_EnterScanErrorState(C_GtGetText::h_GetText("Warning: Fewer devices found than defined by the System View!"
+      m_EnterScanErrorState(C_GtGetText::h_GetText("Error: Fewer devices found than defined by the System View!"
                                                    " Check connection of connected devices and retry."));
    }
    else if (this->mc_FoundDevices.size() > static_cast<uint32>(this->mpc_Ui->pc_ListWidgetExistingNodes->count()))
    {
       //More
-      m_EnterScanErrorState(C_GtGetText::h_GetText("Warning: More devices found than defined by the System View! "
+      m_EnterScanErrorState(C_GtGetText::h_GetText("Error: More devices found than defined by the System View! "
                                                    "Connect only devices which are defined in the System View and retry."));
    }
    else
@@ -559,7 +526,7 @@ void C_SyvDcWidget::m_ScanFinished(void)
       {
          //Same serial number error
          m_EnterScanErrorState(
-            C_GtGetText::h_GetText("Warning: Devices with duplicate serial numbers found! Make sure that each device "
+            C_GtGetText::h_GetText("Error: Devices with duplicate serial numbers found! Make sure that each device "
                                    "is connected only through one interface to the device configuration and try again."));
       }
       else
@@ -579,17 +546,14 @@ void C_SyvDcWidget::m_ScanFinished(void)
    m_CleanUpScan();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if all found serial numbers are unique
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if all found serial numbers are unique
 
    \return
    True  Not unique
    False All unique
-
-   \created     24.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDcWidget::m_CheckSameSerialNumber(void)
 {
    bool q_Retval = false;
@@ -618,15 +582,12 @@ bool C_SyvDcWidget::m_CheckSameSerialNumber(void)
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Enter scan error state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Enter scan error state
 
    \param[in] orc_Text Scan error text
-
-   \created     24.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_EnterScanErrorState(const QString & orc_Text) const
 {
    this->mpc_Ui->pc_ProgressScan->SetProgress(0, false);
@@ -642,13 +603,10 @@ void C_SyvDcWidget::m_EnterScanErrorState(const QString & orc_Text) const
                                                          this->mc_FoundDevices.size()));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start configuration
-
-   \created     12.12.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start configuration
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_StartConfigProper(void)
 {
    if (this->mpc_DcSequences != NULL)
@@ -798,13 +756,10 @@ void C_SyvDcWidget::m_StartConfigProper(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Displays the configuration parameters
-
-   \created     06.12.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Displays the configuration parameters
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_ShowConfigResult(void)
 {
    const uint32 u32_DeviceMaxCount = static_cast<uint32>(this->mc_OpenSydeDeviceConfigurations.size() +
@@ -838,13 +793,10 @@ void C_SyvDcWidget::m_ShowConfigResult(void)
    this->m_UpdateReportText(c_Text);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   handle back to scan action
-
-   \created     13.12.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   handle back to scan action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_BackToScan(void)
 {
    this->mpc_Ui->pc_PbBackToScan->setEnabled(false);
@@ -859,7 +811,7 @@ void C_SyvDcWidget::m_BackToScan(void)
    m_InitScanScreen();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const C_SyvDcDeviceConfiguation & orc_Config,
                                              const uint32 ou32_DeviceMaxCount, const uint32 ou32_DeviceCounter,
                                              QString & orc_Text)
@@ -990,19 +942,16 @@ void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const C_SyvDcDeviceConfiguation & o
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Creates string with the information of a CAN interface
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Creates string with the information of a CAN interface
 
    \param[in]     orc_IntfSetting               Configuration of the current interface
    \param[in]     orc_ServerIdOnUsedBus         Server ID of the node on the for the communication used interface
    \param[in]     orc_ServerIdOnConfiguredBus   Server ID of the node on the configured interface
    \param[in]     ou32_Bitrate                  Set bitrate for the configured interface
    \param[in]     orc_Text                      Result text for the interface
-
-   \created     06.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_ShowConfigInfoOfCanInterface(const C_OSCNodeComInterfaceSettings & orc_IntfSetting,
                                                    const C_OSCProtocolDriverOsyNode & orc_ServerIdOnUsedBus,
                                                    const C_OSCProtocolDriverOsyNode & orc_ServerIdOnConfiguredBus,
@@ -1027,51 +976,52 @@ void C_SyvDcWidget::m_ShowConfigInfoOfCanInterface(const C_OSCNodeComInterfaceSe
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Creates string with the information of an Ethernet interface
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Creates string with the information of an Ethernet interface
 
    \param[in]     orc_IntfSetting               Configuration of the current interface
    \param[in]     orc_ServerIdOnUsedBus         Server ID of the node on the for the communication used interface
    \param[in]     orc_ServerIdOnConfiguredBus   Server ID of the node on the configured interface
    \param[in]     orc_IpAddress                 Set IP address for the configured interface
    \param[in]     orc_Text                      Result text for the interface
-
-   \created     06.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_ShowConfigInfoOfEthInterface(const C_OSCNodeComInterfaceSettings & orc_IntfSetting,
                                                    const C_OSCProtocolDriverOsyNode & orc_ServerIdOnUsedBus,
                                                    const C_OSCProtocolDriverOsyNode & orc_ServerIdOnConfiguredBus,
                                                    const C_OSCNodeComInterfaceSettings::C_IpAddress & orc_IpAddress,
                                                    QString & orc_Text)
 {
-   QString c_IpAddress;
-   QString c_NetMask;
-   QString c_DefaultGateway;
-
    this->m_ShowConfigInfoOfInterface(orc_IntfSetting, orc_ServerIdOnUsedBus, orc_ServerIdOnConfiguredBus, orc_Text,
                                      true, true);
 
-   c_IpAddress = C_Uti::h_IpAddressToString(orc_IpAddress.au8_IpAddress);
-   c_NetMask = C_Uti::h_IpAddressToString(orc_IpAddress.au8_NetMask);
-   c_DefaultGateway = C_Uti::h_IpAddressToString(orc_IpAddress.au8_DefaultGateway);
+   if ((this->m_AreAllInterfacesToConfigure() == true) ||
+       (orc_ServerIdOnUsedBus == orc_ServerIdOnConfiguredBus))
+   {
+      QString c_IpAddress;
+      QString c_NetMask;
+      QString c_DefaultGateway;
 
-   orc_Text += "<tr>";
-   orc_Text += "<td width=\"40%\">" + QString(C_GtGetText::h_GetText("IP: ")) + c_IpAddress +
-               QString(C_GtGetText::h_GetText(" (Sub-Net: ")) + c_NetMask +
-               QString(C_GtGetText::h_GetText(", default gateway: ")) + c_DefaultGateway + ")</td>";
-   orc_Text += "<td width=\"20%\">" + this->m_GetStateStringOfServerStep(C_SyvDcSequences::hu32_SETIPADDRESS,
-                                                                         orc_ServerIdOnConfiguredBus,
-                                                                         orc_IntfSetting.e_InterfaceType,
-                                                                         orc_IntfSetting.u8_InterfaceNumber) + "</td>";
-   orc_Text += "</tr>";
-   orc_Text += "</table>";
+      c_IpAddress = C_Uti::h_IpAddressToString(orc_IpAddress.au8_IpAddress);
+      c_NetMask = C_Uti::h_IpAddressToString(orc_IpAddress.au8_NetMask);
+      c_DefaultGateway = C_Uti::h_IpAddressToString(orc_IpAddress.au8_DefaultGateway);
+
+      orc_Text += "<tr>";
+      orc_Text += "<td width=\"40%\">" + QString(C_GtGetText::h_GetText("IP: ")) + c_IpAddress +
+                  QString(C_GtGetText::h_GetText(" (Sub-Net: ")) + c_NetMask +
+                  QString(C_GtGetText::h_GetText(", default gateway: ")) + c_DefaultGateway + ")</td>";
+      orc_Text += "<td width=\"20%\">" + this->m_GetStateStringOfServerStep(C_SyvDcSequences::hu32_SETIPADDRESS,
+                                                                            orc_ServerIdOnConfiguredBus,
+                                                                            orc_IntfSetting.e_InterfaceType,
+                                                                            orc_IntfSetting.u8_InterfaceNumber) +
+                  "</td>";
+      orc_Text += "</tr>";
+      orc_Text += "</table>";
+   }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Creates string with the generic information of an communication interface
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Creates string with the generic information of an communication interface
 
    \param[in]     orc_IntfSetting               Configuration of the current interface
    \param[in]     orc_ServerIdOnUsedBus         Server ID of the node on the for the communication used interface
@@ -1079,10 +1029,8 @@ void C_SyvDcWidget::m_ShowConfigInfoOfEthInterface(const C_OSCNodeComInterfaceSe
    \param[in]     orc_Text                      Result text for the interface
    \param[in]     q_BusConnected                Flag if the interface is connected to a bus
    \param[in]     q_Configured                  Flag if the interface was configured by the device configuration
-
-   \created     06.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_ShowConfigInfoOfInterface(const C_OSCNodeComInterfaceSettings & orc_IntfSetting,
                                                 const C_OSCProtocolDriverOsyNode & orc_ServerIdOnUsedBus,
                                                 const C_OSCProtocolDriverOsyNode & orc_ServerIdOnConfiguredBus,
@@ -1123,9 +1071,8 @@ void C_SyvDcWidget::m_ShowConfigInfoOfInterface(const C_OSCNodeComInterfaceSetti
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Resets the network dependent of the flashloader types
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Resets the network dependent of the flashloader types
 
    Procedure depends on used protocol(s):
 
@@ -1146,10 +1093,8 @@ void C_SyvDcWidget::m_ShowConfigInfoOfInterface(const C_OSCNodeComInterfaceSetti
    C_BUSY      Previously started sequence still going on
    C_COM       Error on sending reset request
    C_CONFIG    No com driver installed
-
-   \created     06.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_ResetFlashloader(const bool oq_SameBitrate)
 {
    if (this->mpc_DcSequences != NULL)
@@ -1160,7 +1105,9 @@ void C_SyvDcWidget::m_ResetFlashloader(const bool oq_SameBitrate)
       uint32 u32_NewBitrate;
       std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> c_OsyNodes;
       std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> c_StwNodes;
-      C_OgeWiCustomMessage c_ConfirmationBox(this, C_OgeWiCustomMessage::E_Type::eWARNING);
+      QString c_Details = C_GtGetText::h_GetText("Your system uses at least one node with the STW Flashloader \n"
+                                                 "and the bitrate of the CAN bus has changed. \n"
+                                                 "In this case the reset cannot be performed automatically.");
 
       if ((this->mc_StwFlashloaderDeviceConfigurations.size() > 0) &&
           (oq_SameBitrate == false))
@@ -1168,13 +1115,6 @@ void C_SyvDcWidget::m_ResetFlashloader(const bool oq_SameBitrate)
          // System with STW flashloader devices.
          // A reset of STW flashloader with changed bitrates is not reliable to get them back in flashloader
          q_Manual = true;
-         c_ConfirmationBox.SetHeading(C_GtGetText::h_GetText("Devices reset"));
-         c_ConfirmationBox.SetDetails(C_GtGetText::h_GetText(
-                                         "Your system uses at least one node with the STW Flashloader "
-                                         "\nand the bitrate of the CAN bus was changed."
-                                         "\nIn this case the reset cannot be performed automatically."));
-
-         c_ConfirmationBox.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
       }
 
       if (q_Manual == false)
@@ -1206,8 +1146,12 @@ void C_SyvDcWidget::m_ResetFlashloader(const bool oq_SameBitrate)
          // otherwise we'd have inconsistent bitrates on the CAN bus possibly resulting in bus errors
          if (q_Manual == true)
          {
+            C_OgeWiCustomMessage c_ConfirmationBox(this, C_OgeWiCustomMessage::E_Type::eWARNING);
+            c_ConfirmationBox.SetHeading(C_GtGetText::h_GetText("Devices reset"));
+            c_ConfirmationBox.SetDetails(c_Details);
+            c_ConfirmationBox.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
             c_ConfirmationBox.SetDescription(QString(C_GtGetText::h_GetText(
-                                                        "Switch off all nodes manually and press \"Continue\".")));
+                                                        "Power OFF all nodes manually and press \"Continue\".")));
             c_ConfirmationBox.Execute();
          }
 
@@ -1217,9 +1161,12 @@ void C_SyvDcWidget::m_ResetFlashloader(const bool oq_SameBitrate)
 
       if (s32_Return == C_NO_ERR)
       {
-         // Start sending the message for getting into flashloader for at least 500ms
+         // Get the minimum wait time
+         const uint32 u32_WatiTime = this->mpc_DcSequences->GetMinimumFlashloaderResetWaitTime();
+
+         // Start sending the message for getting into flashloader for at least 500ms (default value)
          // In case of a manual reset, this sequence must be executed till the next dialog will be closed by user
-         s32_Return = this->mpc_DcSequences->ScanCanSendFlashloaderRequest(500U, q_Manual);
+         s32_Return = this->mpc_DcSequences->ScanCanSendFlashloaderRequest(u32_WatiTime, q_Manual);
       }
       else
       {
@@ -1231,8 +1178,12 @@ void C_SyvDcWidget::m_ResetFlashloader(const bool oq_SameBitrate)
       {
          if (q_Manual == true)
          {
+            C_OgeWiCustomMessage c_ConfirmationBox(this, C_OgeWiCustomMessage::E_Type::eWARNING);
+            c_ConfirmationBox.SetHeading(C_GtGetText::h_GetText("Devices reset"));
+            c_ConfirmationBox.SetDetails(c_Details);
+            c_ConfirmationBox.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
             c_ConfirmationBox.SetDescription(QString(C_GtGetText::h_GetText(
-                                                        "Switch on all nodes manually and press \"Continue\".")));
+                                                        "Turn ON all nodes manually and press \"Continue\".")));
             c_ConfirmationBox.Execute();
 
             // User has finished the reset, stop the sequence
@@ -1279,9 +1230,8 @@ void C_SyvDcWidget::m_ResetFlashloader(const bool oq_SameBitrate)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the necessary bitrate which was configured in the previous step
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the necessary bitrate which was configured in the previous step
 
    \param[out]    orc_OpenSydeIds     IDs of openSYDE devices for configuration
    \param[out]    orc_StwIds          IDs of STW flashloader devices for configuration
@@ -1293,10 +1243,8 @@ void C_SyvDcWidget::m_ResetFlashloader(const bool oq_SameBitrate)
    C_BUSY      previously started sequence still going on
    C_COM       Error on reading bitrate
    C_CONFIG    No dispatcher installed
-
-   \created     07.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcWidget::m_GetRelevantConfigInfo(std::vector<C_OSCProtocolDriverOsyNode> & orc_OpenSydeIds,
                                               std::vector<C_OSCProtocolDriverOsyNode> & orc_StwIds,
                                               uint32 & oru32_Bitrate)
@@ -1385,9 +1333,8 @@ sint32 C_SyvDcWidget::m_GetRelevantConfigInfo(std::vector<C_OSCProtocolDriverOsy
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Resets the devices to application
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Resets the devices to application
 
    Resets the network dependent of the flashloader types
 
@@ -1396,10 +1343,8 @@ sint32 C_SyvDcWidget::m_GetRelevantConfigInfo(std::vector<C_OSCProtocolDriverOsy
    * openSYDE Ethernet: broadcast NetReset
    * openSYDE CAN: broadcast ECUReset
    * STW Flashloader: netreset
-
-   \created     06.12.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_ResetNetwork(const bool oq_ToFlashloader)
 {
    if (this->mpc_DcSequences != NULL)
@@ -1435,15 +1380,12 @@ void C_SyvDcWidget::m_ResetNetwork(const bool oq_ToFlashloader)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Displays the read values
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Displays the read values
 
    \param[in] os32_ActualResult Detected error state
-
-   \created     06.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_ShowReadInfo(const sint32 os32_ActualResult)
 {
    if (this->mpc_DcSequences != NULL)
@@ -1565,7 +1507,7 @@ void C_SyvDcWidget::m_ShowReadInfo(const sint32 os32_ActualResult)
             m_HandleMissingDevices(this->mc_StwFlashloaderDeviceConfigurations, c_DeviceInfos, c_Text);
             //Add missing openSYDE devices
             m_HandleMissingDevices(this->mc_OpenSydeDeviceConfigurations, c_DeviceInfos, c_Text);
-            c_Text += QString(C_GtGetText::h_GetText("For error details see "));
+            c_Text += QString(C_GtGetText::h_GetText("For more details see "));
             //Update log file
             C_OSCLoggingHandler::h_Flush();
             c_Text += QString("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>.").
@@ -1584,15 +1526,12 @@ void C_SyvDcWidget::m_ShowReadInfo(const sint32 os32_ActualResult)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for reporting the progress of the STW flashloader configuration sequence
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for reporting the progress of the STW flashloader configuration sequence
 
    \param[in]     ou32_Progress     Progress of sequence
-
-   \created     08.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_UpdateProgressOfStwFlashloaderConfig(const uint32 ou32_Progress) const
 {
    uint32 u32_ShowProgress;
@@ -1611,15 +1550,12 @@ void C_SyvDcWidget::m_UpdateProgressOfStwFlashloaderConfig(const uint32 ou32_Pro
    this->mpc_Ui->pc_ProgressConfig->SetProgress(u32_ShowProgress, (u32_ShowProgress == 100U));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for reporting the progress of the openSYDE flashloader configuration sequence
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for reporting the progress of the openSYDE flashloader configuration sequence
 
    \param[in]     ou32_Progress     Progress of sequence
-
-   \created     08.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_UpdateProgressOfOpenSydeConfig(const uint32 ou32_Progress) const
 {
    uint32 u32_ShowProgress;
@@ -1638,9 +1574,8 @@ void C_SyvDcWidget::m_UpdateProgressOfOpenSydeConfig(const uint32 ou32_Progress)
    this->mpc_Ui->pc_ProgressConfig->SetProgress(u32_ShowProgress, (u32_ShowProgress == 100U));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Saves the state of a concrete step of openSYDE configuration sequence
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Saves the state of a concrete step of openSYDE configuration sequence
 
    \param[in]     ou32_Step               Step of node configuration
                                           - hu32_SETNODEID
@@ -1649,10 +1584,8 @@ void C_SyvDcWidget::m_UpdateProgressOfOpenSydeConfig(const uint32 ou32_Progress)
    \param[in]     os32_Result             Result of service
    \param[in]     ou8_BusIdentifier       Configured bus id of server interface
    \param[in]     ou8_NodeIdentifier      Configured node id of server interface
-
-   \created     11.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_UpdateStateOfStwFlashloaderConfig(const uint32 ou32_Step, const sint32 os32_Result,
                                                         const uint8 ou8_BusIdentifier, const uint8 ou8_NodeIdentifier)
 {
@@ -1660,9 +1593,8 @@ void C_SyvDcWidget::m_UpdateStateOfStwFlashloaderConfig(const uint32 ou32_Step, 
    this->m_UpdateStateOfOpenSydeConfig(ou32_Step, os32_Result, ou8_BusIdentifier, ou8_NodeIdentifier, 0U, 0U);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Saves the state of a concrete step of openSYDE configuration sequence
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Saves the state of a concrete step of openSYDE configuration sequence
 
    \param[in]     ou32_Step               Step of node configuration
                                           - hu32_SETNODEID
@@ -1675,10 +1607,8 @@ void C_SyvDcWidget::m_UpdateStateOfStwFlashloaderConfig(const uint32 ou32_Step, 
                                           - 0 is CAN
                                           - 1 is Ethernet
    \param[in]     ou8_InterfaceNumber     Number of interface
-
-   \created     11.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_UpdateStateOfOpenSydeConfig(const uint32 ou32_Step, const sint32 os32_Result,
                                                   const uint8 ou8_BusIdentifier, const uint8 ou8_NodeIdentifier,
                                                   const uint8 ou8_InterfaceType, const uint8 ou8_InterfaceNumber)
@@ -1703,9 +1633,8 @@ void C_SyvDcWidget::m_UpdateStateOfOpenSydeConfig(const uint32 ou32_Step, const 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the string value as result of the state of a step of a concrete server
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the string value as result of the state of a step of a concrete server
 
    \param[in]     ou32_Step               Step of node configuration
                                           - hu32_SETNODEID
@@ -1720,10 +1649,8 @@ void C_SyvDcWidget::m_UpdateStateOfOpenSydeConfig(const uint32 ou32_Step, const 
    "TBD"    No state found for server and step
    "OK"     State for server found with no error
    "FAIL"   State for server found with registered state error
-
-   \created     12.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDcWidget::m_GetStateStringOfServerStep(const uint32 ou32_Step,
                                                     const C_OSCProtocolDriverOsyNode & orc_Server,
                                                     const C_OSCSystemBus::E_Type oe_InterfaceType,
@@ -1739,16 +1666,16 @@ QString C_SyvDcWidget::m_GetStateStringOfServerStep(const uint32 ou32_Step,
    if (c_ItServer != this->mc_ServerStates.end())
    {
       uint32 u32_StateCounter;
-      const std::vector<C_ServerConfStepResult> & rc_Sates = c_ItServer.value();
+      const std::vector<C_ServerConfStepResult> & rc_States = c_ItServer.value();
 
-      for (u32_StateCounter = 0U; u32_StateCounter < rc_Sates.size(); ++u32_StateCounter)
+      for (u32_StateCounter = 0U; u32_StateCounter < rc_States.size(); ++u32_StateCounter)
       {
-         if ((rc_Sates[u32_StateCounter].u32_ConfStep == ou32_Step) &&
-             (rc_Sates[u32_StateCounter].u8_InterfaceNumber == ou8_InterfaceNumber) &&
-             (rc_Sates[u32_StateCounter].u8_InterfaceType == static_cast<uint8>(oe_InterfaceType)))
+         if ((rc_States[u32_StateCounter].u32_ConfStep == ou32_Step) &&
+             (rc_States[u32_StateCounter].u8_InterfaceNumber == ou8_InterfaceNumber) &&
+             (rc_States[u32_StateCounter].u8_InterfaceType == static_cast<uint8>(oe_InterfaceType)))
          {
             // State found
-            if (rc_Sates[u32_StateCounter].s32_Result == C_NO_ERR)
+            if (rc_States[u32_StateCounter].s32_Result == C_NO_ERR)
             {
                c_Text = QString(C_GtGetText::h_GetText("OK"));
             }
@@ -1764,13 +1691,10 @@ QString C_SyvDcWidget::m_GetStateStringOfServerStep(const uint32 ou32_Step,
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Ok button click
-
-   \created     25.10.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Ok button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_OkClicked(void)
 {
    // Close only when finished
@@ -1785,13 +1709,10 @@ void C_SyvDcWidget::m_OkClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Cancel button
-
-   \created     25.10.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Cancel button
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_CancelClicked(void)
 {
    // Close only when finished
@@ -1806,13 +1727,10 @@ void C_SyvDcWidget::m_CancelClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize scan screen
-
-   \created     11.12.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize scan screen
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_InitScanScreen(void)
 {
    QString c_Heading;
@@ -1861,13 +1779,10 @@ void C_SyvDcWidget::m_InitScanScreen(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize assignment screen
-
-   \created     11.12.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize assignment screen
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_InitAssignmentScreen(void) const
 {
    QString c_Heading;
@@ -1883,13 +1798,10 @@ void C_SyvDcWidget::m_InitAssignmentScreen(void) const
    m_AssignmentUpdateProgress();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize bitrate combo box
-
-   \created     11.12.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize bitrate combo box
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_InitBitRateComboBox(void)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
@@ -1966,13 +1878,10 @@ void C_SyvDcWidget::m_InitBitRateComboBox(void)
            &C_SyvDcWidget::m_OnBitRateChanged);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize current configuration mode
-
-   \created     09.05.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize current configuration mode
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_InitModeComboBox(void)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
@@ -2006,7 +1915,7 @@ void C_SyvDcWidget::m_InitModeComboBox(void)
            &C_SyvDcWidget::m_OnDeviceConfigModeChanged);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDcWidget::m_GetComboBoxString(const uint32 ou32_Bitrate) const
 {
    const QString c_Text = QString::number(ou32_Bitrate) + QString(" KBit/s");
@@ -2014,7 +1923,7 @@ QString C_SyvDcWidget::m_GetComboBoxString(const uint32 ou32_Bitrate) const
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SyvDcWidget::m_GetBitrateFromComboBoxString(const QString & orc_Entry) const
 {
    QString c_Bitrate = orc_Entry;
@@ -2024,13 +1933,10 @@ uint32 C_SyvDcWidget::m_GetBitrateFromComboBoxString(const QString & orc_Entry) 
    return u32_Bitrate;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle bitrate change
-
-   \created     13.12.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle bitrate change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_OnBitRateChanged(void) const
 {
    uint32 u32_BitRate;
@@ -2041,13 +1947,10 @@ void C_SyvDcWidget::m_OnBitRateChanged(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle device config mode change
-
-   \created     09.05.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle device config mode change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_OnDeviceConfigModeChanged(void) const
 {
    C_PuiSvData::E_DeviceConfigurationMode e_Mode;
@@ -2063,19 +1966,16 @@ void C_SyvDcWidget::m_OnDeviceConfigModeChanged(void) const
    C_PuiSvHandler::h_GetInstance()->SetViewDeviceConfigMode(this->mu32_ViewIndex, e_Mode);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get selected bit rate
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get selected bit rate
 
    \param[out] oru32_Value Bit rate
 
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     13.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcWidget::GetBitRateValue(uint32 & oru32_Value) const
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -2090,16 +1990,13 @@ sint32 C_SyvDcWidget::GetBitRateValue(uint32 & oru32_Value) const
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do assignment for specified node and serial number
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do assignment for specified node and serial number
 
    \param[in] ou32_NodeIndex   Node index
    \param[in] orc_SerialNumber Serial number
-
-   \created     12.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_AssignmentConnect(const uint32 ou32_NodeIndex, const QString & orc_SerialNumber) const
 {
    this->mpc_Ui->pc_ListWidgetExistingNodesAssignment->ConnectSerialNumber(ou32_NodeIndex, orc_SerialNumber);
@@ -2107,16 +2004,13 @@ void C_SyvDcWidget::m_AssignmentConnect(const uint32 ou32_NodeIndex, const QStri
    m_AssignmentUpdateProgress();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Disconnect assignment for specified node and serial number
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Disconnect assignment for specified node and serial number
 
    \param[in] ou32_NodeIndex   Node index
    \param[in] orc_SerialNumber Serial number
-
-   \created     12.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_AssignmentDisconnect(const uint32 ou32_NodeIndex, const QString & orc_SerialNumber) const
 {
    this->mpc_Ui->pc_ListWidgetExistingNodesAssignment->DisconnectSerialNumber(ou32_NodeIndex, orc_SerialNumber);
@@ -2124,13 +2018,10 @@ void C_SyvDcWidget::m_AssignmentDisconnect(const uint32 ou32_NodeIndex, const QS
    m_AssignmentUpdateProgress();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update assignment progress
-
-   \created     12.12.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update assignment progress
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_AssignmentUpdateProgress(void) const
 {
    const uint32 u32_AssignedItemCount = this->mpc_Ui->pc_ListWidgetExistingNodesAssignment->GetAssignmentCount();
@@ -2151,7 +2042,7 @@ void C_SyvDcWidget::m_AssignmentUpdateProgress(void) const
    this->mpc_Ui->pc_LabelAssignmentProgress->setText(c_Text);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_Timer(void)
 {
    if (this->mpc_DcSequences != NULL)
@@ -2325,8 +2216,7 @@ void C_SyvDcWidget::m_Timer(void)
                   {
                      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
                      c_Message.SetDescription(C_GtGetText::h_GetText(
-                                                 "Error occurred during openSYDE device configuration. "
-                                                 "Check report for details."));
+                                                 "Error occurred during openSYDE device configuration."));
                      c_Message.Execute();
                   }
                }
@@ -2345,8 +2235,7 @@ void C_SyvDcWidget::m_Timer(void)
             {
                C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
                c_Message.SetDescription(C_GtGetText::h_GetText(
-                                           "Error occurred during STW Flashloader device configuration. "
-                                           "Check report for details."));
+                                           "Error occurred during STW Flashloader device configuration."));
                c_Message.Execute();
             }
             break;
@@ -2364,18 +2253,26 @@ void C_SyvDcWidget::m_Timer(void)
             }
             else
             {
-               const QString c_LogFilePath = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
                C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
+               c_Message.SetHeading("Device Configuration");
                c_Message.SetDescription(C_GtGetText::h_GetText(
-                                           "Error occurred during openSYDE device configuration. "
-                                           "Check report for details."));
+                                           "Error occurred during openSYDE device configuration."));
                c_Message.Execute();
 
                c_Text = "<br/><br/><br/>" + mhc_REPORT_HIGHLIGHT_TAG_START;
                c_Text +=  QString(C_GtGetText::h_GetText("Configuration Error!"));
-               c_Text += mhc_REPORT_HIGHLIGHT_TAG_END + "<br/>" +
-                         QString(C_GtGetText::h_GetText("See log file for details:")) +
-                         "<br/>" + c_LogFilePath + "<br/>";
+
+               c_Text += mhc_REPORT_HIGHLIGHT_TAG_END + "<br/>";
+
+               c_Text += QString(C_GtGetText::h_GetText("For more details see "));
+               //Update log file
+               C_OSCLoggingHandler::h_Flush();
+               c_Text += QString("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>.").
+                         arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
+                         arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
+                         arg(C_GtGetText::h_GetText("log file"));
+               c_Text += "<br/>";
+
                this->m_UpdateReportText(c_Text);
             }
             break;
@@ -2406,14 +2303,14 @@ void C_SyvDcWidget::m_Timer(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_ClearReportText(void)
 {
    this->mc_ReportText = "";
    this->mpc_Ui->pc_TextBrowserReport->setText("");
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_UpdateReportText(const QString & orc_NewTextPart, const QString & orc_TemporaryText)
 {
    QTextCursor c_TextCursor;
@@ -2433,13 +2330,10 @@ void C_SyvDcWidget::m_UpdateReportText(const QString & orc_NewTextPart, const QS
    this->mpc_Ui->pc_TextBrowserReport->setTextCursor(c_TextCursor);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle configuration step start
-
-   \created     16.05.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle configuration step start
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_HandleConfigurationStarted(void)
 {
    QString c_Text;
@@ -2453,13 +2347,10 @@ void C_SyvDcWidget::m_HandleConfigurationStarted(void)
    this->m_UpdateReportText(c_Text, c_Temporary);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   handle device verification step start
-
-   \created     16.05.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   handle device verification step start
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_HandleDeviceVerificationStart(void)
 {
    QString c_Text;
@@ -2473,17 +2364,14 @@ void C_SyvDcWidget::m_HandleDeviceVerificationStart(void)
    this->m_UpdateReportText(c_Text, c_Temporary);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle potentially missing device infos
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle potentially missing device infos
 
    \param[in]     orc_AllDeviceInfos   All expected device infos
    \param[in]     orc_FoundDeviceInfos All received device infos
    \param[in,out] orc_ReportText       Report text to append to
-
-   \created     16.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_HandleMissingDevices(const std::vector<C_SyvDcDeviceConfiguation> & orc_AllDeviceInfos,
                                            const std::vector<C_SyvDcDeviceInformation> & orc_FoundDeviceInfos,
                                            QString & orc_ReportText) const
@@ -2513,7 +2401,7 @@ void C_SyvDcWidget::m_HandleMissingDevices(const std::vector<C_SyvDcDeviceConfig
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDcWidget::m_AreAllInterfacesToConfigure(void) const
 {
    bool q_SetAllInterfaces = false;
@@ -2537,16 +2425,13 @@ bool C_SyvDcWidget::m_AreAllInterfacesToConfigure(void) const
    return q_SetAllInterfaces;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Disconnect from network if necessary
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Disconnect from network if necessary
 
    Info: currently this function is unused because it has to be called in the onclose event
          which this class can not implement in all cases
-
-   \created     29.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_DoCompleteDisconnect(void)
 {
    if (mq_DisconnectNecessary == true)
@@ -2572,7 +2457,7 @@ void C_SyvDcWidget::m_DoCompleteDisconnect(void)
 
             //inform user whats happening
             c_Message.SetHeading(C_GtGetText::h_GetText("Device configuration"));
-            c_Message.SetDescription(C_GtGetText::h_GetText("Disconnecting from system..."));
+            c_Message.SetDescription(C_GtGetText::h_GetText("Exiting Update Mode..."));
             c_Message.show();
 
             //Wait for the current thread to finish (if any)
@@ -2658,17 +2543,14 @@ void C_SyvDcWidget::m_DoCompleteDisconnect(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if quit is currently allowed
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if quit is currently allowed
 
    \return
    True  Exit allowed
    False Exit critical
-
-   \created     07.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDcWidget::m_CheckQuitPossible(void) const
 {
    bool q_Retval;
@@ -2686,13 +2568,10 @@ bool C_SyvDcWidget::m_CheckQuitPossible(void) const
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle higher level close ignored event
-
-   \created     07.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle higher level close ignored event
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_OnCloseIgnored(void)
 {
    if (m_CheckQuitPossible() == true)
@@ -2706,13 +2585,10 @@ void C_SyvDcWidget::m_OnCloseIgnored(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Inform user why close request were ignored
-
-   \created     07.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Inform user why close request were ignored
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_InformUserAboutAbortedClose(void) const
 {
    C_OgeWiCustomMessage c_Message(this->parentWidget(), C_OgeWiCustomMessage::E_Type::eINFORMATION);

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data pool list array edit command stack (implementation)
 
    Data pool list array edit command stack
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.01.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -27,40 +20,36 @@
 #include "C_SdNdeDataPoolListTableView.h"
 #include "C_SdNdeDataPoolListTableModel.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     25.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoAedDataPoolListManager::C_SdNdeUnoAedDataPoolListManager(void) :
    mpc_UndoCommand(NULL)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do data change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do data change
 
    \param[in]     oru32_NodeIndex         Node index
    \param[in]     oru32_DataPoolIndex     Node data pool index
@@ -71,10 +60,8 @@ C_SdNdeUnoAedDataPoolListManager::C_SdNdeUnoAedDataPoolListManager(void) :
                                           Else use data set index
    \param[in]     oru32_ArrayElementIndex Array index
    \param[in]     orc_NewData             New data
-
-   \created     09.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoAedDataPoolListManager::DoDataChangeElements(const uint32 & oru32_NodeIndex,
                                                             const uint32 & oru32_DataPoolIndex,
                                                             const uint32 & oru32_ListIndex,
@@ -96,19 +83,16 @@ void C_SdNdeUnoAedDataPoolListManager::DoDataChangeElements(const uint32 & oru32
    //lint -e{429}  no memory leak because of the parent of pc_Command and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   GetUndocommand and take ownership
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   GetUndocommand and take ownership
 
    Internal undo command is reseted
 
    \return
    NULL No changes
    Else Undocommand accumulating all changes
-
-   \created     16.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QUndoCommand * C_SdNdeUnoAedDataPoolListManager::TakeUndoCommand(void)
 {
    QUndoCommand * const pc_Retval = this->mpc_UndoCommand;
@@ -117,13 +101,10 @@ QUndoCommand * C_SdNdeUnoAedDataPoolListManager::TakeUndoCommand(void)
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init data set undo command
-
-   \created     09.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init data set undo command
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoAedDataPoolListManager::m_InitUndoCommand(void)
 {
    if (this->mpc_UndoCommand == NULL)

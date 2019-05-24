@@ -1,21 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Offers visualization and functionality of a node (header)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     04.08.2016  STW/S.Singer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_GILINODE_H
 #define C_GILINODE_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QObject>
 #include <QPainter>
 #include <QGraphicsItem>
@@ -30,12 +24,12 @@
 #include "C_PuiSdNodeConnectionId.h"
 #include "C_GiRectPixmap.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_GiLiBusConnector;
 
 class C_GiNode :
@@ -67,8 +61,6 @@ public:
                         const stw_types::uint8 & oru8_NodeId) const;
    const stw_opensyde_gui_logic::C_PuiSdNodeConnectionId * GetNodeConnectionId(
       const C_GiLiBusConnector * const opc_Connection) const;
-   void SetNodeConnectionId(const C_GiLiBusConnector * const opc_Connection,
-                            const stw_opensyde_gui_logic::C_PuiSdNodeConnectionId & orc_ConnId) const;
    virtual void LoadData(void) override;
    virtual void UpdateData(void) override;
    void RemoveConnector(const C_GiLiBusConnector * const opc_BusConnectorGraphicsItem);
@@ -107,6 +99,7 @@ protected:
    //lint -restore
 
    virtual bool m_UpdateError(void);
+   bool m_GetErrorStatus(void) const;
    virtual void m_ResizeUpdateItems(const stw_types::float64 of64_DiffWidth,
                                     const stw_types::float64 of64_DiffHeight) override;
 
@@ -153,7 +146,7 @@ private:
    static const stw_types::float64 mahf64_ScaleMinHeightNode[6];
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

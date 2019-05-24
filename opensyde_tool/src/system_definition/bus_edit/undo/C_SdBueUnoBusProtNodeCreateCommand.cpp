@@ -1,57 +1,47 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Create data pool undo command (implementation)
 
    Create data pool undo command
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     14.05.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
 #include "C_SdBueUnoBusProtNodeCreateCommand.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     ou32_NodeIndex      Node index
    \param[in]     ou32_InterfaceIndex Interface index
    \param[in]     oe_Protocol         Com protocol
    \param[in,out] opc_Widget          Widget to notify for changes
    \param[in,out] opc_Parent          Optional pointer to parent
-
-   \created     14.05.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueUnoBusProtNodeCreateCommand::C_SdBueUnoBusProtNodeCreateCommand(const uint32 ou32_NodeIndex,
                                                                        const uint32 ou32_InterfaceIndex,
                                                                        const C_OSCCanProtocol::E_Type oe_Protocol,
@@ -62,26 +52,20 @@ C_SdBueUnoBusProtNodeCreateCommand::C_SdBueUnoBusProtNodeCreateCommand(const uin
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Redo connect to protocol and create data pool
-
-   \created     14.05.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Redo connect to protocol and create data pool
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoBusProtNodeCreateCommand::redo(void)
 {
    this->m_DoAddDataPool();
    C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::redo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Undo connect to protocol and create data pool
-
-   \created     14.05.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Undo connect to protocol and create data pool
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoBusProtNodeCreateCommand::undo(void)
 {
    C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::undo();

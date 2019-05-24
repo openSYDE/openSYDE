@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for an connected node entry (implementation)
 
    Widget for an connected node entry
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.12.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OgeWiUtil.h"
 #include "C_GtGetText.h"
 #include "C_SyvDcConnectedNodeWidget.h"
@@ -24,35 +17,32 @@
 
 #include "C_Uti.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     06.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDcConnectedNodeWidget::C_SyvDcConnectedNodeWidget(QListWidgetItem * const opc_Item,
                                                        const C_SyvDcDeviceInformation & orc_Info,
                                                        QWidget * const opc_Parent) :
@@ -74,46 +64,37 @@ C_SyvDcConnectedNodeWidget::C_SyvDcConnectedNodeWidget(QListWidgetItem * const o
    this->mpc_Ui->pc_LabelIcon->setPixmap(c_Device);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     06.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDcConnectedNodeWidget::~C_SyvDcConnectedNodeWidget(void)
 {
    delete mpc_Ui;
    //lint -e{1740} Never took ownership of mpc_ListWidgetItem
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get pure serial number string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get pure serial number string
 
    \return
    Pure serial number string
-
-   \created     11.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDcConnectedNodeWidget::GetSerialNumberString(void) const
 {
    return QString(C_SyvDcDeviceInformation::h_SerialNumberToString(this->mc_Info.au8_SerialNumber).c_str());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get device name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get device name
 
    \return
    Current device name
-
-   \created     13.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDcConnectedNodeWidget::GetDeviceName(void) const
 {
    QString c_Retval = "";
@@ -125,52 +106,43 @@ QString C_SyvDcConnectedNodeWidget::GetDeviceName(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the valid state of the device name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the valid state of the device name
 
    \return
    true     Device name is valid
    false    Device name is not valid
-
-   \created     05.02.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDcConnectedNodeWidget::GetDeviceNameValid(void) const
 {
    return this->mc_Info.q_DeviceNameValid;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Compare if widget matches to serial number
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Compare if widget matches to serial number
 
    \param[in] orc_SerialNumber Serial number
 
    \return
    True  Match
    False No match
-
-   \created     12.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDcConnectedNodeWidget::CompareSerialNumber(const QString & orc_SerialNumber) const
 {
    return (orc_SerialNumber.compare(this->GetSerialNumberString()) == 0);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    Here: draw background
    (Not automatically drawn in any QWidget derivative)
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     11.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcConnectedNodeWidget::paintEvent(QPaintEvent * const opc_Event)
 {
    C_OgeWiUtil::h_DrawBackground(this);
@@ -178,13 +150,10 @@ void C_SyvDcConnectedNodeWidget::paintEvent(QPaintEvent * const opc_Event)
    QWidget::paintEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init from data
-
-   \created     08.12.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init from data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcConnectedNodeWidget::m_Init(void)
 {
    QString c_Name;

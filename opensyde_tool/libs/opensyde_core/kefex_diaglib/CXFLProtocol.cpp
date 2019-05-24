@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Encapsulate STW flashloader services.
 
    Provides functions to use STW flashloader protocol services to interact with flashloader server nodes.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     xx.xx.1999  STW/O.Kemmer
-   \endimplementation
+   \copyright   Copyright 1999 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -34,7 +27,7 @@
 #include "stw_can.h"
 #include "DLLocalize.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_diag_lib;
@@ -43,7 +36,7 @@ using namespace stw_tgl;
 using namespace stw_can;
 using namespace stw_hex_file;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
 //timeout values (sum of timeout specified in protocol + 100ms tolerance for communication delays)
 static const uint16 mu16_TIMEOUT_CHANGE_STATE_MS   =   300U;
@@ -157,15 +150,15 @@ static const uint8 mu8_XFL_CMD_NET_RESET         = 0x01U;
 //flashloader error codes
 static const uint8 mu8_COMMAND_ERR      = 0xFFU;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 C_XFLProtocolConfig::C_XFLProtocolConfig(void) :
    pc_CANDispatcher(NULL),
@@ -177,16 +170,15 @@ C_XFLProtocolConfig::C_XFLProtocolConfig(void) :
 {
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //returns offset to add to aliased address to reach physical address:
 sint64 C_XFLAliasedRange::GetOffset(void) const
 {
    return (static_cast<sint64>(this->u32_PhysicalAddress) - static_cast<sint64>(this->u32_AliasedAddress));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the aliased range the specified address resides in
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the aliased range the specified address resides in
 
    \param[in]   ou32_Address       address to check
    \param[out]  oru8_Range         index of aliased range the address resides in
@@ -194,10 +186,8 @@ sint64 C_XFLAliasedRange::GetOffset(void) const
    \return
    C_NO_ERR    no problems; oru8_AliasedRange contains aliased range index
    else        could not find address within any aliased range
-
-   \created     27.07.2015  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLAliasedRanges::GetRangeOccupiedByAddress(const uint32 ou32_Address, uint8 & oru8_Range) const
 {
    sint32 s32_Return = C_RANGE;
@@ -216,7 +206,7 @@ sint32 C_XFLAliasedRanges::GetRangeOccupiedByAddress(const uint32 ou32_Address, 
    return s32_Return;
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_XFLImplementedServices::Clear(void)
 {
@@ -286,21 +276,21 @@ void C_XFLImplementedServices::Clear(void)
    (void)memset(&aq_TargetSpecific[0], 0, sizeof(aq_TargetSpecific));
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_XFLImplementedServices::C_XFLImplementedServices(void)
 {
    this->Clear();
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_XFLFingerPrintSupportedIndexes::C_XFLFingerPrintSupportedIndexes(void)
 {
    this->Clear();
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_XFLFingerPrintSupportedIndexes::Clear(void)
 {
@@ -314,21 +304,21 @@ void C_XFLFingerPrintSupportedIndexes::Clear(void)
    (void)memset(&aq_Reserved[0], 0, sizeof(aq_Reserved));
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 uint8 C_XFLProtocol::mh_BCD2DEC(const uint8 ou8_BCDValue)
 {
    return (static_cast<uint8>(((((ou8_BCDValue) / 16U) * 10U) + ((ou8_BCDValue) % 16U))));
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 uint8 C_XFLProtocol::mh_DEC2BCD(const uint8 ou8_DECValue)
 {
    return (static_cast<uint8>(((((ou8_DECValue) / 10U) * 16U) + ((ou8_DECValue) % 10U))));
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //convert array of 4 bytes in little-endian order to uint32 value
 uint32 C_XFLProtocol::mh_AU8_2_U32_LE(const stw_types::uint8 * const opu8_Data)
 {
@@ -338,7 +328,7 @@ uint32 C_XFLProtocol::mh_AU8_2_U32_LE(const stw_types::uint8 * const opu8_Data)
            ((static_cast<uint32>(opu8_Data[3])) << 24) );
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //convert array of 2 bytes in little-endian order to uint16 value
 uint16 C_XFLProtocol::mh_AU8_2_U16_LE(const stw_types::uint8 * const opu8_Data)
 {
@@ -346,18 +336,15 @@ uint16 C_XFLProtocol::mh_AU8_2_U16_LE(const stw_types::uint8 * const opu8_Data)
              static_cast<uint16>((static_cast<uint16>(opu8_Data[1])) <<  8));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Make comm dispatcher to use known
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Make comm dispatcher to use known
 
    Set comm dispatcher driver to use.
    Will register a client with the installed driver.
    
    \param[in]   opc_CANDispatcher  comm dispatcher to use (NULL: remove installed dispatcher)
-
-   \created     ??.??.20??  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_XFLProtocol::CfgSetCommDispatcher(C_CAN_Dispatcher * const opc_CANDispatcher)
 {
    if (mc_Config.pc_CANDispatcher != NULL)
@@ -375,34 +362,28 @@ void C_XFLProtocol::CfgSetCommDispatcher(C_CAN_Dispatcher * const opc_CANDispatc
    }   
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Make used CAN bitrate known to this class
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Make used CAN bitrate known to this class
 
    The configured bitrate is used for internal bus load calculations
    
    \param[in]   ou32_Bitrate   bitrate the CAN bus runs at
-
-   \created     ??.??.20??  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_XFLProtocol::CfgSetBitrate(const uint32 ou32_Bitrate)
 {
    mc_Config.u32_Bitrate = ou32_Bitrate;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set CAN TX and RX CAN identifiers
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set CAN TX and RX CAN identifiers
 
    If the ReceiveID is set to 0xFFFFFFFF we accept all responses for compatibility with stwrs232.dll
    
    \param[in]   ou32_SendId      TX CAN ID to send requests on
    \param[in]   ou32_ReceiveId   TX CAN ID to expect responses on
-
-   \created     ??.??.20??  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_XFLProtocol::CfgSetFlashId(const uint32 ou32_SendId, uint32 const ou32_ReceiveId)
 {
    mc_Config.u32_SendID = ou32_SendId;
@@ -410,15 +391,12 @@ void C_XFLProtocol::CfgSetFlashId(const uint32 ou32_SendId, uint32 const ou32_Re
    m_UpdateDispatcherRXFilter();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Configure whether to use 11bit or 29bit CAN IDs
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Configure whether to use 11bit or 29bit CAN IDs
 
    \param[in]   oq_XtdOn     false: 11bit IDs; true: 29bit IDs
-
-   \created     ??.??.20??  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_XFLProtocol::CfgSetXtdId(const bool oq_XtdOn)
 {
    mc_Config.q_XtdID = oq_XtdOn;
@@ -426,35 +404,29 @@ void C_XFLProtocol::CfgSetXtdId(const bool oq_XtdOn)
    m_UpdateDispatcherRXFilter();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set local ID for target to communicate with
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set local ID for target to communicate with
 
    Used for all services directed at one specific node.
    
    \param[in]   ou8_LocalID   local ID of server node
-
-   \created     ??.??.20??  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_XFLProtocol::CfgSetLocalId(const uint8 ou8_LocalID)
 {
    mc_Config.u8_LocalID = ou8_LocalID;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Request net_reset
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Request net_reset
 
    Send net_reset request.
 
    \return
    C_NO_ERR    request send
    else        error
-
-   \created     xx.xx.xxxx  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::NetReset(void)
 {
    mc_CanWriteMessage.u32_ID = mc_Config.u32_SendID;
@@ -465,19 +437,16 @@ sint32 C_XFLProtocol::NetReset(void)
    return m_CANSendMessage();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Request net_start
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Request net_start
 
    Send net_start request.
 
    \return
    C_NO_ERR    request send
    else        error
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::NetStart(void)
 {
    mc_CanWriteMessage.u32_ID = mc_Config.u32_SendID;
@@ -488,7 +457,7 @@ sint32 C_XFLProtocol::NetStart(void)
    return m_CANSendMessage();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_XFLProtocol::m_SendFlashMessage(void)
 {
@@ -502,9 +471,8 @@ sint32 C_XFLProtocol::m_SendFlashMessage(void)
    return m_CANSendMessage();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Send "FLASH" requests
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Send "FLASH" requests
 
    Send the "FLASH" request for a defined period of time with a configurable interval.
    Will report progress to application via the installed progress callback.
@@ -516,10 +484,8 @@ sint32 C_XFLProtocol::m_SendFlashMessage(void)
    \return
    C_NO_ERR      finished sending "FLASH"   \n
    C_DEFAULT     aborted by user
-
-   \created     xx.xx.199x  STW/O.Kemmer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::SendFLASH(const uint32 ou32_StartTimeMs, const uint8 ou8_FLASHIntervalMs)
 {
    uint32 u32_StartTime;
@@ -555,9 +521,8 @@ sint32 C_XFLProtocol::SendFLASH(const uint32 ou32_StartTimeMs, const uint8 ou8_F
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of erase_sector service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of erase_sector service.
 
    erase_sector client implementation.
    Erases one sector of the server's flash memory.
@@ -572,10 +537,8 @@ sint32 C_XFLProtocol::SendFLASH(const uint32 ou32_StartTimeMs, const uint8 ou8_F
    C_NO_ERR     sector erased   \n
    C_NOACT      error response  \n
    C_COM        no response from server
-
-   \created     xx.xx.199x  STW/O.Kemmer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::EraseSector(const uint16 ou16_SectorNumber, const uint32 ou32_TimeOut)
 {
    uint32 u32_TimeOut;
@@ -603,9 +566,8 @@ sint32 C_XFLProtocol::EraseSector(const uint16 ou16_SectorNumber, const uint32 o
                               static_cast<uint8>(mc_CanWriteMessage.u8_DLC - 1U), NULL, mc_CanWriteMessage.u8_DLC);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   wait for a "regular" response from the server node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   wait for a "regular" response from the server node
 
    Expects an incoming message on the currently configured RX-ID.
    The first data byte must contain ou8_ExpectedLocalID.
@@ -625,10 +587,8 @@ sint32 C_XFLProtocol::EraseSector(const uint16 ou16_SectorNumber, const uint32 o
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server (code stored in m_bLastError)
-
-   \created     29.07.2009  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::m_WaitForResponse(const uint8 ou8_ExpectedLocalID, const uint32 ou32_TimeOutMS,
                                         const uint8 (&orau8_Match)[8], const uint8 ou8_NumExpectedToMatch,
                                         T_STWCAN_Msg_RX * const opc_MSG, const sint16 os16_CheckDLC)
@@ -666,8 +626,7 @@ sint32 C_XFLProtocol::m_WaitForResponse(const uint8 ou8_ExpectedLocalID, const u
    return C_COM;
 }
 
-
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // ProgFlash ;  send programming mode request
 sint32 C_XFLProtocol::ProgFlash(void)
 {
@@ -680,9 +639,8 @@ sint32 C_XFLProtocol::ProgFlash(void)
                             3);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Send one hex file line to server ECU
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Send one hex file line to server ECU
 
    Send one hex file line to the server.
    For compatibility reasons ou32_TimeOut will only be used if it is greater than TIMEOUT_FLASH.
@@ -698,10 +656,8 @@ sint32 C_XFLProtocol::ProgFlash(void)
    C_CHECKSUM              -> controller checksum different from PC checksum  \n
    C_NOACT                 -> error response                                  \n
    C_COM                   -> no response from controller or TX error
-
-   \created     25.10.2010  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::m_SendHexLine(const uint8 * const opu8_HexLine, const uint16 ou16_LineSize,
                                     const uint32 ou32_InterFrameDelayUs, const uint32 ou32_TimeOut)
 {
@@ -807,10 +763,8 @@ sint32 C_XFLProtocol::m_SendHexLine(const uint8 * const opu8_HexLine, const uint
    return C_NO_ERR;
 }
 
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Send lines of a hex file to server ECU
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Send lines of a hex file to server ECU
 
    Send hex file lines to the server.
    The line to start with is determined by the state of opc_HexFile:
@@ -830,10 +784,8 @@ sint32 C_XFLProtocol::m_SendHexLine(const uint8 * const opu8_HexLine, const uint
    C_CHECKSUM              -> controller checksum different from PC checksum  \n
    C_NOACT                 -> error response                                  \n
    C_COM                   -> no response from controller or TX error
-
-   \created     xx.xx.199x  STW/O.Kemmer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::SendMultiHexLine(uint16 & oru16_NumLines, const uint32 ou32_InterFrameDelayUs,
                                        uint32 & oru32_NumBytesSent, C_HexFile & orc_HexFile,
                                        const uint32 ou32_TimeOut)
@@ -874,10 +826,8 @@ sint32 C_XFLProtocol::SendMultiHexLine(uint16 & oru16_NumLines, const uint32 ou3
    return C_NO_ERR;
 }
 
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   perform a wakeup with serial number
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   perform a wakeup with serial number
 
    Sequence:
    - perform wakeup_snr
@@ -892,10 +842,8 @@ sint32 C_XFLProtocol::SendMultiHexLine(uint16 & oru16_NumLines, const uint32 ou3
    C_NO_ERR           no errors                                                      \n
    C_WARN             server responded with company ID different from ou8_CompanyID  \n
    C_COM              no response from server
-
-   \created     xx.xx.199x  STW/O.Kemmer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::WakeupSerialNumber(const uint8 (&orau8_SerialNumber)[6], const C_XFLCompanyID & orc_CompanyID,
                                          uint8 & oru8_LocalID, C_XFLCompanyID * const opc_CompanyIDOut)
 {
@@ -935,7 +883,7 @@ sint32 C_XFLProtocol::WakeupSerialNumber(const uint8 (&orau8_SerialNumber)[6], c
    return C_COM;
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_XFLProtocol::m_NodeFlashFunc(const uint8 ou8_SubCommand)
 {
@@ -947,29 +895,29 @@ sint32 C_XFLProtocol::m_NodeFlashFunc(const uint8 ou8_SubCommand)
    return m_WaitForResponse(mc_Config.u8_LocalID, mu16_TIMEOUT_CHANGE_STATE_MS, mc_CanWriteMessage.au8_Data, 2U, NULL);
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_XFLProtocol::NodeSleep(void)
 {
    return m_NodeFlashFunc(mu8_XFL_CMD_NODE_SLEEP);
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_XFLProtocol::NodeReturn(void)
 {
    return m_NodeFlashFunc(mu8_XFL_CMD_NODE_RETURN);
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_XFLProtocol::NodeReset(void)
 {
    return m_NodeFlashFunc(mu8_XFL_CMD_NODE_RESET);
 }
 
-//------------------------------------------------------------------------
-//   21.03.2011        STW/A.Stangl  added support for > 255 sectors
+//----------------------------------------------------------------------------------------------------------------------
+
 sint32 C_XFLProtocol::GetSectorCount(uint16 & oru16_NumSectors)
 {
    sint32 s32_Return;
@@ -1000,7 +948,7 @@ sint32 C_XFLProtocol::GetSectorCount(uint16 & oru16_NumSectors)
    return s32_Return;
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_XFLProtocol::GetLocalID(uint8 & oru8_LocalID)
 {
@@ -1041,26 +989,21 @@ sint32 C_XFLProtocol::GetLocalID(uint8 & oru8_LocalID)
 //************************************************************************
 // .FUNCTION    GetLocalIdExt
 // .GROUP
-// .AUTHOR      ASW
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .DESCRIPTION
 //  - read local_ID from all controllers controller(s) who are active
 //  - answers from more than one controller on one ID are possible
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .PARAMETERS
 // INPUT:
 //              uint8 *opu8_LocalId          Array with all received Local_Ids from CAN network
 //              uint8 oru8_NumMaxLocalId     Length of record *pbLocalID
 // OUTPUT:
 //              ou8_NumFoundECUs            number of detected ECUs
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .RETURNVALUE sint32
 // C_NO_ERR       -> no errors
 // else error
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  22.01.03    ASW         created
 //************************************************************************
 sint32 C_XFLProtocol::GetLocalIDExt(uint8 * const opu8_LocalId, const uint8 ou8_NumMaxLocalId,
                                     uint8 & oru8_NumFoundECUs)
@@ -1119,23 +1062,18 @@ sint32 C_XFLProtocol::GetLocalIDExt(uint8 * const opu8_LocalId, const uint8 ou8_
 //************************************************************************
 // .FUNCTION    NodeSleep
 // .GROUP
-// .AUTHOR      ASW
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .DESCRIPTION
 //  - execute node_sleep( LocalId ) command
 //  - answers from exact one controller on ID are possible
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .PARAMETERS
 // INPUT:
 //              uint8 ou8_LocalID    Local_Id for request
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .RETURNVALUE sint32
 // C_NO_ERR       -> no errors
 // else C_WARN, C_COM
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  22.01.03    ASW         created
 //************************************************************************
 sint32 C_XFLProtocol::NodeSleep(const uint8 ou8_LocalID)
 {
@@ -1151,7 +1089,7 @@ sint32 C_XFLProtocol::NodeSleep(const uint8 ou8_LocalID)
    return m_WaitForResponse(ou8_LocalID, mu16_TIMEOUT_WRITE_CONFIG_MS, mc_CanWriteMessage.au8_Data, 2U, NULL, 3);
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_XFLProtocol::GetSNR(uint8 (&orau8_SNR)[6])
 {
@@ -1174,21 +1112,16 @@ sint32 C_XFLProtocol::GetSNR(uint8 (&orau8_SNR)[6])
 //************************************************************************
 // .FUNCTION    SetLocalID
 // .GROUP
-// .AUTHOR      AST
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .DESCRIPTION
 //  - change the local ID of a node
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .PARAMETERS  uint8 ou8_LocalIDNew    new local ID
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .RETURNVALUE sint32
 // C_NO_ERR                -> no errors
 // C_COM                   -> no response
 // C_NOACT                 -> error response
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  23.03.99    AST         created
 //************************************************************************
 sint32 C_XFLProtocol::SetLocalID(const uint8 ou8_LocalIDNew)
 {
@@ -1229,9 +1162,8 @@ sint32 C_XFLProtocol::SetLocalID(const uint8 ou8_LocalIDNew)
    return C_COM;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Change the flash bitrate of a node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Change the flash bitrate of a node
 
    To be compatible with all existing server nodes use only 16bit bitrate.
 
@@ -1243,10 +1175,8 @@ sint32 C_XFLProtocol::SetLocalID(const uint8 ou8_LocalIDNew)
    C_NO_ERR   no errors        \n
    C_COM      no response      \n
    C_NOACT    error response
-
-   \created     23.03.1999  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::SetBitrateCAN(const uint32 ou32_Bitrate, const bool oq_32BitBitrate)
 {
    mc_CanWriteMessage.au8_Data[1] = mu8_XFL_CMD_GRP_SET_COMMAND;
@@ -1270,9 +1200,8 @@ sint32 C_XFLProtocol::SetBitrateCAN(const uint32 ou32_Bitrate, const bool oq_32B
                             static_cast<uint8>(mc_CanWriteMessage.u8_DLC - 1U), NULL, mc_CanWriteMessage.u8_DLC);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of set_comm_id service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of set_comm_id service.
 
    set_comm_id client implementation.
    Change the message ID for flashing on the server node.
@@ -1283,10 +1212,8 @@ sint32 C_XFLProtocol::SetBitrateCAN(const uint32 ou32_Bitrate, const bool oq_32B
    C_NO_ERR   no errors        \n
    C_COM      no response      \n
    C_NOACT    error response
-
-   \created     23.03.1999  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::SetCANID(const uint32 ou32_CANID)
 {
    mc_CanWriteMessage.u8_DLC = 7U;
@@ -1302,9 +1229,8 @@ sint32 C_XFLProtocol::SetCANID(const uint32 ou32_CANID)
                             7);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of set_comm_type service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of set_comm_type service.
 
    Set_comm_type client implementation.
    Configure the message type 11/29Bit for flashing on the server node.
@@ -1315,10 +1241,8 @@ sint32 C_XFLProtocol::SetCANID(const uint32 ou32_CANID)
    C_NO_ERR   no errors        \n
    C_COM      no response      \n
    C_NOACT    error response
-
-   \created     16.08.2002  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::SetCANType(const bool oq_XtdOn)
 {
    mc_CanWriteMessage.u8_DLC = 4U;
@@ -1331,9 +1255,8 @@ sint32 C_XFLProtocol::SetCANType(const bool oq_XtdOn)
                             4);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Read data from server node.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read data from server node.
 
    Read a maximum of 255 bytes from the server node's flash memory.
 
@@ -1346,10 +1269,8 @@ sint32 C_XFLProtocol::SetCANType(const bool oq_XtdOn)
    C_COM              no response                                     \n
    C_NOACT            error response or invalid response              \n
    C_CHECKSUM         received and calculated checksums do not match
-
-   \created     12.04.2000  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::ReadFlash(const uint8 ou8_NumBytes, const uint32 ou32_StartAddress, uint8 * const opu8_Data)
 {
    uint16 u16_Counter = 0U;
@@ -1459,9 +1380,8 @@ sint32 C_XFLProtocol::ReadFlash(const uint8 ou8_NumBytes, const uint32 ou32_Star
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_version_number.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_version_number.
 
    get_version_number client implementation.
    Reads flashloader implementation version number.
@@ -1482,10 +1402,8 @@ sint32 C_XFLProtocol::ReadFlash(const uint8 ou8_NumBytes, const uint32 ou32_Star
    C_COM              no response                                     \n
    C_RANGE            wrong DLC in response (must be either 4 or 8)   \n
    C_NOACT            error response
-
-   \created     20.04.2000  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetVersionNumber(uint8 (&orau8_Version)[5], uint8 & oru8_VersionSize)
 {
    sint32 s32_Return;
@@ -1516,19 +1434,14 @@ sint32 C_XFLProtocol::GetVersionNumber(uint8 (&orau8_Version)[5], uint8 & oru8_V
 //************************************************************************
 // .FUNCTION    SendSingleMessage
 // .GROUP
-// .AUTHOR      AST
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .DESCRIPTION
 //  - send out one single CAN message (e.g. for Reset-Message to controller)
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .PARAMETERS  orc_Msg   message to send
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .RETURNVALUE sint32    0    -> no errors
 //                       -1    -> error sending
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  26.05.00    AST         created
 //************************************************************************
 sint32 C_XFLProtocol::SendSingleMessage(const T_STWCAN_Msg_TX & orc_Msg)
 {
@@ -1538,26 +1451,21 @@ sint32 C_XFLProtocol::SendSingleMessage(const T_STWCAN_Msg_TX & orc_Msg)
 //************************************************************************
 // .FUNCTION    m_SendCompanyIDExt
 // .GROUP
-// .AUTHOR      AST
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .DESCRIPTION
 //  - send out the company ID to target ou8_LocalID
 //  - responses from more than one targets are possible
 //  - can handle 2 byte and 5 byte company IDs
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .PARAMETERS  ou8_LocalID     ID of the target(s) to send the company ID to
 //              orc_CompIDIn    Company ID to send
 //              oru8_NumFound   Returns the number of responses (i.e. number of controllers)
 //              opc_CompIDOut   Returns reported CompID; (for "Y*" Flashing); pass NULL if not interested
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .RETURNVALUE sint32
 // C_RANGE    -> invalid parameters
 // C_NO_ERR   -> no errors
 // C_COM      -> no response
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  15.06.00    AST         created
 //************************************************************************
 sint32 C_XFLProtocol::m_SendCompanyIDExt(const uint8 ou8_LocalID, const C_XFLCompanyID & orc_CompIDIn,
                                          uint8 & oru8_NumFound, C_XFLCompanyID * const opc_CompIDOut)
@@ -1627,9 +1535,8 @@ sint32 C_XFLProtocol::m_SendCompanyIDExt(const uint8 ou8_LocalID, const C_XFLCom
    return C_WARN;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   perform a wakeup with local ID
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   perform a wakeup with local ID
 
    Sequence:
    - perform wakeup_lid
@@ -1645,10 +1552,8 @@ sint32 C_XFLProtocol::m_SendCompanyIDExt(const uint8 ou8_LocalID, const C_XFLCom
    C_NO_ERR           no errors                                                                   \n
    C_WARN             at least one server responded with company ID different from ou8_CompanyID  \n
    C_COM              no response from server
-
-   \created     15.06.2000  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::WakeupLocalId(const C_XFLCompanyID & orc_CompanyID, uint8 * const opu8_NumFound,
                                     C_XFLCompanyID * const opc_CompanyIDOut)
 {
@@ -1694,9 +1599,8 @@ sint32 C_XFLProtocol::WakeupLocalId(const C_XFLCompanyID & orc_CompanyID, uint8 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Scan for nodes in the network.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Scan for nodes in the network.
 
    Scan for existing flashloader server nodes in the network.
    Responses from more than one controller on one ID are possible.
@@ -1711,10 +1615,8 @@ sint32 C_XFLProtocol::WakeupLocalId(const C_XFLCompanyID & orc_CompanyID, uint8 
    \return
    C_NO_ERR  no errors   \n
    -1        overflow in send queue while sending "FLASH"
-
-   \created     15.06.2000  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::SearchId(uint8 (&orau8_LocalIDs)[XFL_NUM_DIFFERENT_LOCAL_IDS], uint8 * const opu8_NumIDs,
                                const uint32 ou32_StartTime, const uint8 ou8_FLASHInterval)
 {
@@ -1780,12 +1682,11 @@ sint32 C_XFLProtocol::SearchId(uint8 (&orau8_LocalIDs)[XFL_NUM_DIFFERENT_LOCAL_I
 //************************************************************************
 // .FUNCTION    GetSNRExt
 // .GROUP
-// .AUTHOR      AST
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .DESCRIPTION
 //  - read the SNR(s) from the controller(s) specified by LokaleId
 //  - answers from more than one controller on one ID are possible
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .PARAMETERS
 // INPUT:
 //    ou8_NumMax     Maximum number of answers to record to prevent overflow in pbSNR
@@ -1795,15 +1696,11 @@ sint32 C_XFLProtocol::SearchId(uint8 (&orau8_LocalIDs)[XFL_NUM_DIFFERENT_LOCAL_I
 //                       large enough
 //                      Set to NULL if only interested in the number of responses.
 //    oru8_NumFound     number of responses ...
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .RETURNVALUE sint32
 // C_NO_ERR       -> no errors
 // C_COM          -> no response
 // XFL_ERR_GENERAL_ERR    -> error response
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  15.06.00    AST         created
 //************************************************************************
 sint32 C_XFLProtocol::GetSNRExt(uint8 * const opu8_SNR, const uint8 ou8_NumMax, uint8 & oru8_NumFound)
 {
@@ -1849,9 +1746,8 @@ sint32 C_XFLProtocol::GetSNRExt(uint8 * const opu8_SNR, const uint8 ou8_NumMax, 
    return C_COM;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_sec_crc service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_sec_crc service.
 
    get_sec_crc client implementation.
 
@@ -1863,10 +1759,8 @@ sint32 C_XFLProtocol::GetSNRExt(uint8 * const opu8_SNR, const uint8 ou8_NumMax, 
    C_NO_ERR   no errors        \n
    C_COM      no response      \n
    C_NOACT    error response
-
-   \created     xx.xx.xxxx  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetSecCRC(const uint16 ou16_Sector, uint16 & oru16_CRC, uint16 & oru16_EECRC)
 {
    sint32 s32_Return;
@@ -1894,9 +1788,8 @@ sint32 C_XFLProtocol::GetSecCRC(const uint16 ou16_Sector, uint16 & oru16_CRC, ui
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_sec_crc service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_sec_crc service.
 
    get_sec_crc client implementation.
 
@@ -1907,10 +1800,8 @@ sint32 C_XFLProtocol::GetSecCRC(const uint16 ou16_Sector, uint16 & oru16_CRC, ui
    C_NO_ERR   no errors        \n
    C_COM      no response      \n
    C_NOACT    error response
-
-   \created     xx.xx.xxxx  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::SetSecCRC(const uint16 ou16_Sector, uint16 & oru16_CRC)
 {
    sint32 s32_Return;
@@ -2036,28 +1927,23 @@ sint32 C_XFLProtocol::GetEraseCount(uint32 & oru32_EraseCount)
 //************************************************************************
 // .FUNCTION    sint32 SetDivertParameter
 // .GROUP
-// .AUTHOR      AST
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .DESCRIPTION
 //  Implementation of protocol service "set_gateway_parameter".
 //  Set parameter for divert stream. Parameters are ECU-specific and must
 //   be configured before activating divert stream.
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .PARAMETERS
 //  ou8_Device             target device (0 = CAN/ 1 = RS232)
 //  ou8_Position           target slot (e.g. 0 = CAN1/ 1 = CAN2)
 //  ou8_ParameterNumber    index of parameter
 //  orau8_Data             data to set for parameter
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .RETURNVALUE
 // C_NO_ERR       -> no errors
 // C_COM          -> no response
 // C_RANGE        -> invalid bType
 // C_NOACT        -> error response
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  28.11.05    AST         created
 //************************************************************************
 sint32 C_XFLProtocol::SetDivertParameter(const uint8 ou8_Device, const uint8 ou8_Position,
                                          const uint8 ou8_ParameterNumber, const uint8 (&orau8_Data)[2])
@@ -2079,25 +1965,20 @@ sint32 C_XFLProtocol::SetDivertParameter(const uint8 ou8_Device, const uint8 ou8
 //************************************************************************
 // .FUNCTION    SetTimeoutFactor
 // .GROUP
-// .AUTHOR      AST
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .DESCRIPTION
 //  ESX2 specific function:
 //  Set timeout factor for erase or write operations on AK4 SMM module flash
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .PARAMETERS  ou8_Type       0 -> set erase timeout factor
 //                             1 -> set write timeout factor
 //              ou8_Factor     value to set (cf. xfloader.doc)
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .RETURNVALUE sint32
 // C_NO_ERR     -> no errors
 // C_COM        -> no response
 // C_RANGE      -> invalid bType
 // C_NOACT      -> error response
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  22.08.00    AST         created
 //************************************************************************
 sint32 C_XFLProtocol::SetTimeoutFactor(const uint8 ou8_Type, const uint8 ou8_Factor)
 {
@@ -2119,25 +2000,20 @@ sint32 C_XFLProtocol::SetTimeoutFactor(const uint8 ou8_Type, const uint8 ou8_Fac
 //************************************************************************
 // .FUNCTION    GetTimeoutFactor
 // .GROUP
-// .AUTHOR      AST
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .DESCRIPTION
 //  ESX2 specific function:
 //  Get timeout factor for erase or write operations on AK4 SMM module flash.
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .PARAMETERS  ou8_Type        0 -> get erase timeout factor
 //                              1 -> get write timeout factor
 //              oru8_Factor     timeout value in controller (cf. flashloader-spec)
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .RETURNVALUE sint32
 // C_NO_ERR         -> no errors
 // C_COM            -> no response
 // C_RANGE          -> invalid bType
 // C_NOACT          -> error response
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  22.08.00    AST         created
 //************************************************************************
 sint32 C_XFLProtocol::GetTimeoutFactor(const uint8 ou8_Type, uint8 & oru8_Factor)
 {
@@ -2196,9 +2072,8 @@ sint32 C_XFLProtocol::DivertStream(const uint8 ou8_Device, const uint8 ou8_Posit
                             6);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Activate or deactivate divert stream mechanism
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Activate or deactivate divert stream mechanism
 
    Also passes the "handle" parameter in the request.
    Requires STW flashloader protocol >= V3.02r0.
@@ -2214,10 +2089,8 @@ sint32 C_XFLProtocol::DivertStream(const uint8 ou8_Device, const uint8 ou8_Posit
    C_NO_ERR     no problems     \n
    C_NOACT      error response  \n
    C_COM        no response from server
-
-   \created     10.04.2012  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::DivertStream(const uint8 ou8_Device, const uint8 ou8_Position, const uint8 ou8_State,
                                    const uint8 ou8_HopHandle)
 {
@@ -2234,25 +2107,19 @@ sint32 C_XFLProtocol::DivertStream(const uint8 ou8_Device, const uint8 ou8_Posit
                             7);
 }
 
-
 //************************************************************************
 // .FUNCTION    GetLastUser
 // .GROUP
-// .AUTHOR      AST
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .DESCRIPTION
 //  ESX2 specific function:
 //  Get signature of last flasher (only implemented on ESX-Babyboard B)
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .PARAMETERS  orau8_LastUser  signature of last flasher
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .RETURNVALUE sint32
 // C_NO_ERR            -> no errors
 // C_COM               -> no response
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  06.10.00    AST         created
 //************************************************************************
 sint32 C_XFLProtocol::GetLastUser(uint8 (&orau8_LastUser)[2])
 {
@@ -2274,9 +2141,8 @@ sint32 C_XFLProtocol::GetLastUser(uint8 (&orau8_LastUser)[2])
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_device ID service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_device ID service.
 
    reads one block of the device ID from the server
 
@@ -2288,10 +2154,8 @@ sint32 C_XFLProtocol::GetLastUser(uint8 (&orau8_LastUser)[2])
    C_COM              no response from server                    \n
    C_NOACT            error response from server                 \n
    C_WARN             OK -> this was the last frame (DLC < 8)
-
-   \created     15.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::m_GetDeviceIDBlock(const uint8 ou8_BlockIndex, charn (&oracn_Data)[4])
 {
    uint32 u32_StartTime;
@@ -2336,9 +2200,8 @@ sint32 C_XFLProtocol::m_GetDeviceIDBlock(const uint8 ou8_BlockIndex, charn (&ora
    return C_COM;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Read device-ID from server node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read device-ID from server node
 
    \param[in]      oq_LongID      true  -> use indexed protocol (up to 16 characters, requires protocol > V3.0 on server
                                   false -> use simple protocol (up to 5 characters, < protocol version V3.0)
@@ -2348,10 +2211,8 @@ sint32 C_XFLProtocol::m_GetDeviceIDBlock(const uint8 ou8_BlockIndex, charn (&ora
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     09.11.2000  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetDeviceID(const bool oq_LongID, C_SCLString & orc_DeviceID)
 {
    uint32 u32_StartTime;
@@ -2431,18 +2292,13 @@ sint32 C_XFLProtocol::GetDeviceID(const bool oq_LongID, C_SCLString & orc_Device
 //************************************************************************
 // .FUNCTION    GetLastXFLError
 // .GROUP
-// .AUTHOR      AST
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .DESCRIPTION
 //  Get last device specific error code
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .PARAMETERS
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // .RETURNVALUE uint8   last errorcode received from ECU
-//------------------------------------------------------------------------
-// .HISTORY
-//  Date        Author      Commentary
-//  22.11.01    AST         created
 //************************************************************************
 uint8 C_XFLProtocol::GetLastXFLError(void) const
 {
@@ -2479,9 +2335,8 @@ sint32 C_XFLProtocol::m_CANSendMessage(void)
    return mc_Config.pc_CANDispatcher->CAN_Send_Msg(mc_CanWriteMessage);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Receive new CAN message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Receive new CAN message
 
    Check for new incoming CAN message.
 
@@ -2495,10 +2350,8 @@ sint32 C_XFLProtocol::m_CANSendMessage(void)
    \return
    C_NO_ERR    message received     \n
    else        no new message received
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::m_CANGetResponse(T_STWCAN_Msg_RX & orc_MSG)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -2749,9 +2602,8 @@ C_XFLProtocol::~C_XFLProtocol(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_flash_information service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_flash_information service.
 
    "low-level" get_flash_information client implementation
 
@@ -2765,10 +2617,8 @@ C_XFLProtocol::~C_XFLProtocol(void)
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetFlashInformation(const uint8 ou8_Index, const uint8 ou8_NumParamsToUse,
                                           const uint8 ou8_Parameter1, const uint8 ou8_Parameter2,
                                           uint8 (&orau8_Result)[4])
@@ -2797,9 +2647,8 @@ sint32 C_XFLProtocol::GetFlashInformation(const uint8 ou8_Index, const uint8 ou8
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_flash_information number of ICs sub-service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_flash_information number of ICs sub-service.
 
    get_flash_information get-number-of-ICs client implementation
 
@@ -2809,10 +2658,8 @@ sint32 C_XFLProtocol::GetFlashInformation(const uint8 ou8_Index, const uint8 ou8
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetFlashInformationNumberOfICs(uint8 & oru8_ICCount)
 {
    sint32 s32_Return;
@@ -2825,9 +2672,8 @@ sint32 C_XFLProtocol::GetFlashInformationNumberOfICs(uint8 & oru8_ICCount)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_flash_information memory size sub-service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_flash_information memory size sub-service.
 
    get_flash_information get-total-memory-size client implementation
 
@@ -2838,10 +2684,8 @@ sint32 C_XFLProtocol::GetFlashInformationNumberOfICs(uint8 & oru8_ICCount)
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetFlashInformationTotalMemorySize(const uint8 ou8_ICIndex, uint32 & oru32_Size)
 {
    sint32 s32_Return;
@@ -2854,9 +2698,8 @@ sint32 C_XFLProtocol::GetFlashInformationTotalMemorySize(const uint8 ou8_ICIndex
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_flash_information protected sectors sub-service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_flash_information protected sectors sub-service.
 
    get_flash_information get-protected-sectors client implementation
 
@@ -2867,10 +2710,8 @@ sint32 C_XFLProtocol::GetFlashInformationTotalMemorySize(const uint8 ou8_ICIndex
    C_COM              no response from server    \n
    C_NOACT            error response from server \n
    C_CONFIG           undefined response
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetFlashInformationProtectedSectors(
                                                       SCLDynamicArray <C_XFLProtectedSectorInfo> &orc_ProtectedSectors)
 {
@@ -2926,9 +2767,8 @@ sint32 C_XFLProtocol::GetFlashInformationProtectedSectors(
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_flash_information offset sector 0 sub-service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_flash_information offset sector 0 sub-service.
 
    get_flash_information offset-sector-0 client implementation
 
@@ -2939,10 +2779,8 @@ sint32 C_XFLProtocol::GetFlashInformationProtectedSectors(
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetFlashInformationOffsetSector0(const uint8 ou8_ICIndex, uint32 & oru32_Offset)
 {
    sint32 s32_Return;
@@ -2955,9 +2793,8 @@ sint32 C_XFLProtocol::GetFlashInformationOffsetSector0(const uint8 ou8_ICIndex, 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_flash_information number of regions sub-service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_flash_information number of regions sub-service.
 
    get_flash_information number-of-regions client implementation
 
@@ -2968,10 +2805,8 @@ sint32 C_XFLProtocol::GetFlashInformationOffsetSector0(const uint8 ou8_ICIndex, 
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetFlashInformationNumberRegions(const uint8 ou8_ICIndex, uint8 & oru8_RegionCount)
 {
    sint32 s32_Return;
@@ -2984,9 +2819,8 @@ sint32 C_XFLProtocol::GetFlashInformationNumberRegions(const uint8 ou8_ICIndex, 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_flash_information region-information sub-service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_flash_information region-information sub-service.
 
    get_flash_information region-information client implementation
 
@@ -2999,10 +2833,8 @@ sint32 C_XFLProtocol::GetFlashInformationNumberRegions(const uint8 ou8_ICIndex, 
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetFlashInformationRegionInformation(const uint8 ou8_ICIndex, const uint8 ou8_RegionIndex,
                                                            uint32 & oru32_BlockSize, uint16 & oru16_BlockCount)
 {
@@ -3027,9 +2859,8 @@ sint32 C_XFLProtocol::GetFlashInformationRegionInformation(const uint8 ou8_ICInd
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_flash_information erase-time sub-service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_flash_information erase-time sub-service.
 
    get_flash_information erase-time client implementation
 
@@ -3040,10 +2871,8 @@ sint32 C_XFLProtocol::GetFlashInformationRegionInformation(const uint8 ou8_ICInd
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetFlashInformationEraseTime(const uint8 ou8_ICIndex, uint32 & oru32_EraseTime)
 {
    sint32 s32_Return;
@@ -3056,9 +2885,8 @@ sint32 C_XFLProtocol::GetFlashInformationEraseTime(const uint8 ou8_ICIndex, uint
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_flash_information erase-time sub-service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_flash_information erase-time sub-service.
 
    get_flash_information erase-time client implementation
 
@@ -3069,10 +2897,8 @@ sint32 C_XFLProtocol::GetFlashInformationEraseTime(const uint8 ou8_ICIndex, uint
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetFlashInformationWriteTime(const uint8 ou8_ICIndex, uint32 & oru32_WriteTime)
 {
    sint32 s32_Return;
@@ -3086,9 +2912,8 @@ sint32 C_XFLProtocol::GetFlashInformationWriteTime(const uint8 ou8_ICIndex, uint
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_flash_information aliasing sub-services
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_flash_information aliasing sub-services
 
    Read information about aliased memory using the corresponding protocol services.
 
@@ -3098,10 +2923,8 @@ sint32 C_XFLProtocol::GetFlashInformationWriteTime(const uint8 ou8_ICIndex, uint
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     27.07.2015  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetFlashInformationAliases(C_XFLAliasedRanges & orc_Aliases)
 {
    sint32 s32_Return;
@@ -3144,9 +2967,8 @@ sint32 C_XFLProtocol::GetFlashInformationAliases(C_XFLAliasedRanges & orc_Aliase
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_implementation_information service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_implementation_information service.
 
    "low-level" get_implementation_information client implementation
 
@@ -3157,10 +2979,8 @@ sint32 C_XFLProtocol::GetFlashInformationAliases(C_XFLAliasedRanges & orc_Aliase
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetImplementationInformation(const uint8 ou8_Index, uint8 (&orau8_Result)[4])
 {
    sint32 s32_Return;
@@ -3185,9 +3005,8 @@ sint32 C_XFLProtocol::GetImplementationInformation(const uint8 ou8_Index, uint8 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_implementation_information protocol-version sub-service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_implementation_information protocol-version sub-service.
 
    get_implementation_information protocol-version client implementation
 
@@ -3197,10 +3016,8 @@ sint32 C_XFLProtocol::GetImplementationInformation(const uint8 ou8_Index, uint8 
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetImplementationInformationProtocolVersion(uint16 & oru16_Version)
 {
    sint32 s32_Return;
@@ -3213,9 +3030,8 @@ sint32 C_XFLProtocol::GetImplementationInformationProtocolVersion(uint16 & oru16
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_implementation_information services sub-service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_implementation_information services sub-service.
 
    get_implementation_information services client implementation
 
@@ -3225,10 +3041,8 @@ sint32 C_XFLProtocol::GetImplementationInformationProtocolVersion(uint16 & oru16
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetImplementationInformationServices(C_XFLImplementedServices & orc_ImplementedServices)
 {
    sint32 s32_Return;
@@ -3441,9 +3255,8 @@ sint32 C_XFLProtocol::GetImplementationInformationServices(C_XFLImplementedServi
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_implementation_information hex-records sub-service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_implementation_information hex-records sub-service.
 
    get_implementation_information hex-records client implementation
 
@@ -3454,10 +3267,8 @@ sint32 C_XFLProtocol::GetImplementationInformationServices(C_XFLImplementedServi
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetImplementationInformationHexRecords(uint8 & oru8_MaxRecordLength, uint8 & oru8_Granularity)
 {
    sint32 s32_Return;
@@ -3471,9 +3282,8 @@ sint32 C_XFLProtocol::GetImplementationInformationHexRecords(uint8 & oru8_MaxRec
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_finger_print service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_finger_print service.
 
    "low-level" get_finger_print client implementation
 
@@ -3484,10 +3294,8 @@ sint32 C_XFLProtocol::GetImplementationInformationHexRecords(uint8 & oru8_MaxRec
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetFingerPrint(const uint8 ou8_Index, uint8 (&orau8_Result)[4])
 {
    sint32 s32_Return;
@@ -3512,9 +3320,8 @@ sint32 C_XFLProtocol::GetFingerPrint(const uint8 ou8_Index, uint8 (&orau8_Result
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_finger_print supported-indexes sub-service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_finger_print supported-indexes sub-service.
 
    get_finger_print supported-indexes client implementation
 
@@ -3524,10 +3331,8 @@ sint32 C_XFLProtocol::GetFingerPrint(const uint8 ou8_Index, uint8 (&orau8_Result
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetFingerPrintSupportedIndexes(C_XFLFingerPrintSupportedIndexes & orc_SupportedIndexes)
 {
    sint32 s32_Return;
@@ -3574,9 +3379,8 @@ sint32 C_XFLProtocol::GetFingerPrintSupportedIndexes(C_XFLFingerPrintSupportedIn
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_finger_print programming-time sub-service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_finger_print programming-time sub-service.
 
    get_finger_print programming-time client implementation
 
@@ -3588,10 +3392,8 @@ sint32 C_XFLProtocol::GetFingerPrintSupportedIndexes(C_XFLFingerPrintSupportedIn
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetFingerPrintProgrammingTime(uint8 & oru8_Hours, uint8 & oru8_Minutes, uint8 & oru8_Seconds)
 {
    sint32 s32_Return;
@@ -3607,9 +3409,8 @@ sint32 C_XFLProtocol::GetFingerPrintProgrammingTime(uint8 & oru8_Hours, uint8 & 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_finger_print programming-date sub-service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_finger_print programming-date sub-service.
 
    get_finger_print programming-date client implementation
 
@@ -3621,10 +3422,8 @@ sint32 C_XFLProtocol::GetFingerPrintProgrammingTime(uint8 & oru8_Hours, uint8 & 
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetFingerPrintProgrammingDate(uint8 & oru8_Years, uint8 & oru8_Months, uint8 & oru8_Days)
 {
    sint32 s32_Return;
@@ -3640,9 +3439,8 @@ sint32 C_XFLProtocol::GetFingerPrintProgrammingDate(uint8 & oru8_Years, uint8 & 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_finger_print checksum sub-service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_finger_print checksum sub-service.
 
    get_finger_print checksum client implementation
 
@@ -3652,10 +3450,8 @@ sint32 C_XFLProtocol::GetFingerPrintProgrammingDate(uint8 & oru8_Years, uint8 & 
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetFingerPrintChecksum(uint32 & oru32_CheckSum)
 {
    sint32 s32_Return;
@@ -3669,9 +3465,8 @@ sint32 C_XFLProtocol::GetFingerPrintChecksum(uint32 & oru32_CheckSum)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_finger_print user-name sub-service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_finger_print user-name sub-service.
 
    get_finger_print user-name client implementation
 
@@ -3681,10 +3476,8 @@ sint32 C_XFLProtocol::GetFingerPrintChecksum(uint32 & oru32_CheckSum)
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetFingerPrintUserName(C_SCLString & orc_UserName)
 {
    sint32 s32_Return;
@@ -3721,9 +3514,8 @@ sint32 C_XFLProtocol::GetFingerPrintUserName(C_SCLString & orc_UserName)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_device_info_address service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_device_info_address service.
 
    "low-level" get_device_info_address client implementation
 
@@ -3734,10 +3526,8 @@ sint32 C_XFLProtocol::GetFingerPrintUserName(C_SCLString & orc_UserName)
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::m_GetDeviceInfoAddress(const uint8 ou8_Index, uint8 (&orau8_Result)[4])
 {
    sint32 s32_Return;
@@ -3762,9 +3552,8 @@ sint32 C_XFLProtocol::m_GetDeviceInfoAddress(const uint8 ou8_Index, uint8 (&orau
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_device_info_address service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_device_info_address service.
 
    Read all available defined info addresses from server
 
@@ -3777,10 +3566,8 @@ sint32 C_XFLProtocol::m_GetDeviceInfoAddress(const uint8 ou8_Index, uint8 (&orau
    C_COM              no response from server                    \n
    C_NOACT            error response from server                 \n
    C_CONFIG           deviation from protocol specification
-
-   \created     30.07.2015  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetDeviceInfoAddresses(SCLDynamicArray<uint32> & orc_Addresses, const uint16 ou16_ProtocolVersion)
 {
    uint8 au8_Data[4];
@@ -3826,9 +3613,8 @@ sint32 C_XFLProtocol::GetDeviceInfoAddresses(SCLDynamicArray<uint32> & orc_Addre
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   read device information block from server
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   read device information block from server
 
    Read device information block from ECU and map it into a structure.
    Supports "V1" and "V2" of structure.
@@ -3841,10 +3627,8 @@ sint32 C_XFLProtocol::GetDeviceInfoAddresses(SCLDynamicArray<uint32> & orc_Addre
    C_COM              no response from server                    \n
    C_NOACT            error response from server                 \n
    C_CONFIG           no valid structure data found
-
-   \created     24.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetDeviceInfoBlock(const uint32 ou32_Address, C_XFLECUInformation & orc_Data)
 {
    sint32 s32_Return;
@@ -3977,9 +3761,8 @@ sint32 C_XFLProtocol::GetDeviceInfoBlock(const uint32 ou32_Address, C_XFLECUInfo
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_block_address service to read out information
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_block_address service to read out information
             about all available blocks.
 
    get_block_address client implementation.
@@ -3992,10 +3775,8 @@ sint32 C_XFLProtocol::GetDeviceInfoBlock(const uint32 ou32_Address, C_XFLECUInfo
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     29.07.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetBlockAddressesAll(SCLDynamicArray<C_XFLChecksumBlock> & orc_ChecksumBlocks)
 {
    sint32 s32_Return;
@@ -4033,9 +3814,8 @@ sint32 C_XFLProtocol::GetBlockAddressesAll(SCLDynamicArray<C_XFLChecksumBlock> &
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_block_address service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_block_address service.
 
    get_block_address client implementation.
    Will read both, start and end addresses of the specified block.
@@ -4053,10 +3833,8 @@ sint32 C_XFLProtocol::GetBlockAddressesAll(SCLDynamicArray<C_XFLChecksumBlock> &
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server (except for CHECKSUM_ERR)
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetBlockAddresses(const uint8 ou8_BlockNumber, C_XFLChecksumBlock & orc_ChecksumBlock)
 {
    sint32 s32_Return;
@@ -4104,9 +3882,8 @@ sint32 C_XFLProtocol::GetBlockAddresses(const uint8 ou8_BlockNumber, C_XFLChecks
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_block_checksum service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_block_checksum service.
 
    get_block_checksum client implementation.
 
@@ -4121,10 +3898,8 @@ sint32 C_XFLProtocol::GetBlockAddresses(const uint8 ou8_BlockNumber, C_XFLChecks
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetBlockChecksum(const uint8 ou8_BlockNumber, const uint8 ou8_ChecksumType,
                                        uint32 & oru32_Checksum)
 {
@@ -4148,9 +3923,8 @@ sint32 C_XFLProtocol::GetBlockChecksum(const uint8 ou8_BlockNumber, const uint8 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of set_finger_print service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of set_finger_print service.
 
    "low-level" set_finger_print client implementation.
 
@@ -4161,10 +3935,8 @@ sint32 C_XFLProtocol::GetBlockChecksum(const uint8 ou8_BlockNumber, const uint8 
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::SetFingerPrint(const uint8 ou8_Index, const uint8 (&orau8_Param)[4])
 {
    mc_CanWriteMessage.u8_DLC      = 8U;
@@ -4182,9 +3954,8 @@ sint32 C_XFLProtocol::SetFingerPrint(const uint8 ou8_Index, const uint8 (&orau8_
                             8);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of set_finger_print programming-time sub-service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of set_finger_print programming-time sub-service.
 
    set_finger_print programming-time client implementation.
 
@@ -4197,10 +3968,8 @@ sint32 C_XFLProtocol::SetFingerPrint(const uint8 ou8_Index, const uint8 (&orau8_
    C_COM              no response from server                    \n
    C_NOACT            error response from server                 \n
    C_RANGE            invalid time parameter
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::SetFingerPrintProgrammingTime(const uint8 ou8_Hour, const uint8 ou8_Minute,
                                                     const uint8 ou8_Second)
 {
@@ -4218,9 +3987,8 @@ sint32 C_XFLProtocol::SetFingerPrintProgrammingTime(const uint8 ou8_Hour, const 
    return SetFingerPrint(mu8_XFL_CMD_FINGER_PRINT_PROGRAMMING_TIME, au8_Data);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of set_finger_print programming-date sub-service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of set_finger_print programming-date sub-service.
 
    set_finger_print programming-date client implementation.
 
@@ -4233,10 +4001,8 @@ sint32 C_XFLProtocol::SetFingerPrintProgrammingTime(const uint8 ou8_Hour, const 
    C_COM              no response from server                    \n
    C_NOACT            error response from server                 \n
    C_RANGE            invalid date parameter
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::SetFingerPrintProgrammingDate(const uint8 ou8_Year, const uint8 ou8_Month, const uint8 ou8_Day)
 {
    uint8 au8_Data[4];
@@ -4253,9 +4019,8 @@ sint32 C_XFLProtocol::SetFingerPrintProgrammingDate(const uint8 ou8_Year, const 
    return SetFingerPrint(mu8_XFL_CMD_FINGER_PRINT_PROGRAMMING_DATE, au8_Data);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of set_finger_print checksum sub-service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of set_finger_print checksum sub-service.
 
    set_finger_print checksum client implementation.
 
@@ -4265,10 +4030,8 @@ sint32 C_XFLProtocol::SetFingerPrintProgrammingDate(const uint8 ou8_Year, const 
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::SetFingerPrintChecksum(const uint32 ou32_CheckSum)
 {
    uint8 au8_Data[4];
@@ -4280,9 +4043,8 @@ sint32 C_XFLProtocol::SetFingerPrintChecksum(const uint32 ou32_CheckSum)
    return SetFingerPrint(mu8_XFL_CMD_FINGER_PRINT_CHECKSUM, au8_Data);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of set_finger_print user-name sub-service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of set_finger_print user-name sub-service.
 
    set_finger_print user-name client implementation.
    If more than 16 characters are passed only the first 16 will be used.
@@ -4293,10 +4055,8 @@ sint32 C_XFLProtocol::SetFingerPrintChecksum(const uint32 ou32_CheckSum)
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::SetFingerPrintUserName(const C_SCLString & orc_UserName)
 {
    sint32 s32_Return;
@@ -4338,9 +4098,8 @@ sint32 C_XFLProtocol::SetFingerPrintUserName(const C_SCLString & orc_UserName)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of set_temp_bitrate service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of set_temp_bitrate service.
 
    set_temp_bitrate client implementation.
 
@@ -4350,10 +4109,8 @@ sint32 C_XFLProtocol::SetFingerPrintUserName(const C_SCLString & orc_UserName)
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::SetTempBitrate(const uint32 ou32_TempBitrate)
 {
    mc_CanWriteMessage.u8_DLC      = 7U;
@@ -4370,9 +4127,8 @@ sint32 C_XFLProtocol::SetTempBitrate(const uint32 ou32_TempBitrate)
                             7);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of set_block_start_address and set_block_end_address services.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of set_block_start_address and set_block_end_address services.
 
    set_block_start_address and set_block_end_address client implementation.
 
@@ -4385,10 +4141,8 @@ sint32 C_XFLProtocol::SetTempBitrate(const uint32 ou32_TempBitrate)
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::SetBlockAddresses(const uint8 ou8_BlockNumber, const uint32 ou32_StartAddress,
                                         const uint32 ou32_EndAddress, const bool oq_StartAddressOnly)
 {
@@ -4430,9 +4184,8 @@ sint32 C_XFLProtocol::SetBlockAddresses(const uint8 ou8_BlockNumber, const uint3
                             8);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of set_block_checksum services.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of set_block_checksum services.
 
    set_block_checksum client implementation.
 
@@ -4443,10 +4196,8 @@ sint32 C_XFLProtocol::SetBlockAddresses(const uint8 ou8_BlockNumber, const uint3
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     14.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::SetBlockChecksum(const uint8 ou8_BlockNumber, uint32 & oru32_CalculatedChecksum)
 {
    sint32 s32_Return;
@@ -4468,9 +4219,8 @@ sint32 C_XFLProtocol::SetBlockChecksum(const uint8 ou8_BlockNumber, uint32 & oru
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of set_xfl_exchange.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of set_xfl_exchange.
 
    set_xfl_exchange client implementation.
 
@@ -4478,10 +4228,8 @@ sint32 C_XFLProtocol::SetBlockChecksum(const uint8 ou8_BlockNumber, uint32 & oru
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     08.05.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::SetXflExchange(void)
 {
    mc_CanWriteMessage.u8_DLC      = 3U;
@@ -4494,9 +4242,8 @@ sint32 C_XFLProtocol::SetXflExchange(void)
                             3);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_control_id service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_control_id service.
 
    get_control_id client implementation.
 
@@ -4506,10 +4253,8 @@ sint32 C_XFLProtocol::SetXflExchange(void)
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     18.09.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetControlID(uint32 & oru32_ControlID)
 {
    sint32 s32_Return;
@@ -4529,9 +4274,8 @@ sint32 C_XFLProtocol::GetControlID(uint32 & oru32_ControlID)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of get_block_compare_mode service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of get_block_compare_mode service.
 
    get_block_compare_mode client implementation.
 
@@ -4543,10 +4287,8 @@ sint32 C_XFLProtocol::GetControlID(uint32 & oru32_ControlID)
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     15.04.2009  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::GetBlockCompareMode(const uint8 ou8_BlockNumber, bool & orq_CheckAtStartup,
                                           bool & orq_CheckAfterFlashing)
 {
@@ -4570,9 +4312,8 @@ sint32 C_XFLProtocol::GetBlockCompareMode(const uint8 ou8_BlockNumber, bool & or
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of set_block_compare_mode service.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of set_block_compare_mode service.
 
    set_block_compare_mode client implementation.
 
@@ -4584,10 +4325,8 @@ sint32 C_XFLProtocol::GetBlockCompareMode(const uint8 ou8_BlockNumber, bool & or
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     15.04.2009  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::SetBlockCompareMode(const uint8 ou8_BlockNumber, const bool oq_CheckAtStartup,
                                           const bool oq_CheckAfterFlashing)
 {
@@ -4603,9 +4342,8 @@ sint32 C_XFLProtocol::SetBlockCompareMode(const uint8 ou8_BlockNumber, const boo
                             5);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Report progress of activity
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Report progress of activity
 
    Called by some routines to report progress to the application.
    Override this function to adapt it to the application.
@@ -4618,7 +4356,7 @@ sint32 C_XFLProtocol::SetBlockCompareMode(const uint8 ou8_BlockNumber, const boo
    C_NO_ERR   continue operations
    else       abort operation (not necessarily honored by all calls)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLProtocol::TRG_ReportProgress(const uint16 ou16_Progress1_1000, const C_SCLString & orc_AdditionalText)
 {
    (void)orc_AdditionalText;
@@ -4626,9 +4364,8 @@ sint32 C_XFLProtocol::TRG_ReportProgress(const uint16 ou16_Progress1_1000, const
    return C_NO_ERR; //do not abort !
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Report status of activity
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Report status of activity
 
    Called by some routines to report status to the application.
    Override this function to adapt it to the application.
@@ -4637,42 +4374,36 @@ sint32 C_XFLProtocol::TRG_ReportProgress(const uint16 ou16_Progress1_1000, const
    \param[in]     orc_Text       text to report
    \param[in]     ou8_Type       type of status (see gu8_DL_REPORT_STATUS_TYPE_* constants)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_XFLProtocol::TRG_ReportStatus(const C_SCLString & orc_Text, const uint8 ou8_Type)
 {
    (void)orc_Text;
    (void)ou8_Type;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Active waiting
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Active waiting
 
    Actively wait for a number of micro seconds
 
    \param[in]     ou32_NumUs            number of micro seconds to wait
-
-   \created     27.01.2012  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_XFLProtocol::TRG_WaitMicroSeconds(const uint32 ou32_NumUs)
 {
    TGL_DelayUs(ou32_NumUs);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Perform operating system message handling
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Perform operating system message handling
 
    Prevents the application from freezing during waiting for replies from the server node.
-
-   \created     27.01.2012  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_XFLProtocol::TRG_HandleSystemMessages(void)
 {
    TGL_HandleSystemMessages();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 

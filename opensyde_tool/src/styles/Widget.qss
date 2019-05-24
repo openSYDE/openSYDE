@@ -77,3 +77,15 @@ margin-bottom: 25px;
 margin-right: 25px;
 }
 /* --------------------------------------------------------------------- */
+stw_opensyde_gui_elements--C_OgeWiEditBackground {
+border-style: none;
+border-width: 0px;
+}
+/* --------------------------------------------------------------------- */
+stw_opensyde_gui--C_NagToolBarWidget,
+stw_opensyde_gui--C_SyvDaTearOffWidget
+{
+border-style: solid;
+border-width: 0px;
+border-top-width: 1px;
+}

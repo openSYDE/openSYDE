@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Parameter tree view (implementation)
 
    Parameter tree view
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.06.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QScrollBar>
@@ -29,36 +22,33 @@
 #include "C_SyvDaItPaTreeView.h"
 #include "C_SdNdeDataPoolListTableHeaderView.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaTreeView::C_SyvDaItPaTreeView(QWidget * const opc_Parent) :
    C_OgeTreeViewToolTipBase(opc_Parent),
    mpc_DataWidget(NULL),
@@ -128,25 +118,19 @@ C_SyvDaItPaTreeView::C_SyvDaItPaTreeView(QWidget * const opc_Parent) :
    //lint -e429 Qt parent handling will take care of it
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     09.07.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaTreeView::~C_SyvDaItPaTreeView(void)
 {
    //lint -e{1540} Never took ownership
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete all elements
-
-   \created     26.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete all elements
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::DeleteAll(void)
 {
    this->mc_Model.DeleteSpecified(this->GetAllListIds());
@@ -154,13 +138,10 @@ void C_SyvDaItPaTreeView::DeleteAll(void)
    this->Init(this->mpc_DataWidget);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete selected elements
-
-   \created     27.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete selected elements
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::DeleteSelected()
 {
    this->mc_Model.DeleteSpecified(this->GetAllSelectedListIds());
@@ -168,200 +149,162 @@ void C_SyvDaItPaTreeView::DeleteSelected()
    this->Init(this->mpc_DataWidget);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if tree empty
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if tree empty
 
    \return
    True  Empty
    False Not empty
-
-   \created     26.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItPaTreeView::IsEmpty(void) const
 {
    return this->mc_Model.IsEmpty();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clear all ECU values
-
-   \created     26.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clear all ECU values
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::ClearECUValues(void)
 {
    this->mc_Model.ClearECUValues();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set set values same as device values
-
-   \created     26.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set set values same as device values
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::ApplyEcuValues(void)
 {
    this->mc_Model.ApplyEcuValues(this->GetAllListIds());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reload set data column
-
-   \created     16.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reload set data column
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::ReloadSetValues(void)
 {
    this->mc_Model.ReloadSetValues();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set selected set values same as device values
-
-   \created     27.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set selected set values same as device values
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::ApplySelectedEcuValues()
 {
    this->mc_Model.ApplyEcuValues(this->GetAllSelectedListIds());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check all Set values in range
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check all Set values in range
+
+   \param[in] orc_ListIds  Subset of lists to check range for
+   \param[in] orc_ListIds2 Additional subset of lists to check range for
 
    \return
    True  In range
    False Not in range
-
-   \created     26.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
-bool C_SyvDaItPaTreeView::CheckRange(void) const
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvDaItPaTreeView::CheckRange(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds,
+                                     const std::vector<C_OSCNodeDataPoolListId> & orc_ListIds2) const
 {
-   return this->mc_Model.CheckRange();
+   return this->mc_Model.CheckRange(orc_ListIds, orc_ListIds2);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check all lists have read values
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check all lists have read values
 
    \return
    True  Read
    False Not read
-
-   \created     26.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItPaTreeView::CheckAllListsRead(void) const
 {
    return this->mc_Model.CheckAllListsRead();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle value preparation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle value preparation
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     26.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::PrepareChangedValues(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds) const
 {
    this->mc_Model.PrepareChangedValues(orc_ListIds);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Resets the NVM changed flag for all relevant elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Resets the NVM changed flag for all relevant elements
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     31.01.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::RemoveValuesChangedFlag(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds) const
 {
    this->mc_Model.RemoveValuesChangedFlag(orc_ListIds);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set dark flag value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set dark flag value
 
    \param[in] oq_Value New dark flag value
-
-   \created     10.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::SetDark(const bool oq_Value)
 {
    this->mc_Model.SetDark(oq_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set edit mode status
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set edit mode status
 
    \param[in] oq_EditMode Edit mode active
-
-   \created     05.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::SetEditMode(const bool oq_EditMode)
 {
    this->mc_Model.SetEditMode(oq_EditMode);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set connection status
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set connection status
 
    \param[in] oq_Connected Connection active
-
-   \created     05.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::SetConnected(const bool oq_Connected)
 {
    this->mc_Model.SetConnected(oq_Connected);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set action status
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set action status
 
    \param[in] oq_Active Action active
-
-   \created     05.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::SetActionActive(const bool oq_Active)
 {
    this->mc_Model.SetActionActive(oq_Active);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get template with the type description for the current selection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get template with the type description for the current selection
 
    \return
    Template with the type description for the current selection
-
-   \created     03.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaItPaTreeView::GetSelectedItemTypeTemplate(void) const
 {
    QString c_Retval;
@@ -375,31 +318,25 @@ QString C_SyvDaItPaTreeView::GetSelectedItemTypeTemplate(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get number of selected items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get number of selected items
 
    \return
    Number of selected items
-
-   \created     26.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SyvDaItPaTreeView::GetSelectedItemCount(void) const
 {
    return this->selectedIndexes().size();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize
 
    \param[in] opc_DataWidget Data storage
    \param[in] ou32_ViewIndex View index
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::Init(stw_opensyde_gui_logic::C_PuiSvDbDataElementHandler * const opc_DataWidget)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -431,30 +368,24 @@ void C_SyvDaItPaTreeView::Init(stw_opensyde_gui_logic::C_PuiSvDbDataElementHandl
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update ECU values for specified ID
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update ECU values for specified ID
 
    \param[in] orc_ListId List ID
-
-   \created     26.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::UpdateECUValues(void)
 {
    this->mc_Model.UpdateECUValues();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current column widths
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current column widths
 
    \return
    Current column widths
-
-   \created     28.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<sint32> C_SyvDaItPaTreeView::GetCurrentColumnWidths(void) const
 {
    std::vector<sint32> c_Retval;
@@ -467,16 +398,13 @@ std::vector<sint32> C_SyvDaItPaTreeView::GetCurrentColumnWidths(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current column position indices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current column position indices
 
    \return
    Current column position indices
-
-   \created     02.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<sint32> C_SyvDaItPaTreeView::GetCurrentColumnPositionIndices(void) const
 {
    std::vector<sint32> c_Retval;
@@ -488,15 +416,12 @@ std::vector<sint32> C_SyvDaItPaTreeView::GetCurrentColumnPositionIndices(void) c
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete the specified list IDs
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete the specified list IDs
 
    \param[in] orc_ListIds List IDs to delete
-
-   \created     05.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::DeleteSpecified(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
 {
    this->mc_Model.DeleteSpecified(orc_ListIds);
@@ -504,15 +429,12 @@ void C_SyvDaItPaTreeView::DeleteSpecified(const std::vector<C_OSCNodeDataPoolLis
    this->Init(this->mpc_DataWidget);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set column position indices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set column position indices
 
    \param[in] orc_NewColPositionIndices New column position indices
-
-   \created     28.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::SetColumnPositionIndices(const std::vector<sint32> & orc_NewColPositionIndices)
 {
    this->mq_IgnoreChanges = true;
@@ -553,15 +475,12 @@ void C_SyvDaItPaTreeView::SetColumnPositionIndices(const std::vector<sint32> & o
    this->mq_IgnoreChanges = false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply new column widths
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply new column widths
 
    \param[in] orc_NewColWidths New column widths
-
-   \created     28.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::SetColumnWidth(const std::vector<sint32> & orc_NewColWidths)
 {
    std::vector<sint32> c_Copy = orc_NewColWidths;
@@ -606,34 +525,28 @@ void C_SyvDaItPaTreeView::SetColumnWidth(const std::vector<sint32> & orc_NewColW
    this->mq_IgnoreChanges = false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if all specified lists are read
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if all specified lists are read
 
    \param[in] orc_ListIds List IDs to check
 
    \return
    True  Read
    False Not read
-
-   \created     27.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItPaTreeView::CheckListsRead(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds) const
 {
    return this->mc_Model.CheckListsRead(orc_ListIds);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all expanded tree items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all expanded tree items
 
    \return
    All expanded tree items
-
-   \created     28.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<C_PuiSvDbExpandedTreeIndex> C_SyvDaItPaTreeView::GetAllExpandedTreeItems(void) const
 {
    std::vector<C_PuiSvDbExpandedTreeIndex> c_Retval;
@@ -650,15 +563,12 @@ std::vector<C_PuiSvDbExpandedTreeIndex> C_SyvDaItPaTreeView::GetAllExpandedTreeI
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set all items as expanded
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set all items as expanded
 
    \param[in] orc_Items Items to expand
-
-   \created     28.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::SetAllExpandedTreeItems(const std::vector<C_PuiSvDbExpandedTreeIndex> & orc_Items)
 {
    this->mq_IgnoreChanges = true;
@@ -675,31 +585,25 @@ void C_SyvDaItPaTreeView::SetAllExpandedTreeItems(const std::vector<C_PuiSvDbExp
    this->mq_IgnoreChanges = false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all list IDs
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all list IDs
 
    \return
    All list IDs
-
-   \created     26.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeView::GetAllListIds(void) const
 {
    return this->mc_Model.GetAllListIds();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all selected list IDs
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all selected list IDs
 
    \return
    All selected list IDs
-
-   \created     27.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeView::GetAllSelectedListIds() const
 {
    std::vector<C_OSCNodeDataPoolListElementId> c_Retval;
@@ -717,61 +621,49 @@ std::vector<C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeView::GetAllSelectedL
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all changed list IDs
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all changed list IDs
 
    \return
    All list IDs
-
-   \created     26.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeView::GetChangedListElementIds(void) const
 {
    return this->mc_Model.GetChangedListElementIds();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all invalid list IDs
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all invalid list IDs
 
    \return
    All invalid list IDs
-
-   \created     11.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<C_OSCNodeDataPoolListId> C_SyvDaItPaTreeView::GetInvalidListIds() const
 {
    return this->mc_Model.GetInvalidListIds();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update CRC status
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update CRC status
 
    \param[in] orc_ListId LIST ID
    \param[in] oq_Status  New CRC status
-
-   \created     27.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::SetCRCStatus(const C_OSCNodeDataPoolListId & orc_ListId, const bool oq_Status)
 {
    this->mc_Model.SetCRCStatus(orc_ListId, oq_Status);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get set values for specified list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get set values for specified list
 
    \param[in]  orc_ListId     List ID
    \param[out] orc_ListValues Set values
-
-   \created     26.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::GetListSetValues(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_ListId,
                                            std::vector<stw_opensyde_core::C_OSCNodeDataPoolContent> & orc_ListValues)
 const
@@ -779,17 +671,14 @@ const
    this->mc_Model.GetListSetValues(orc_ListId, orc_ListValues);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle escape manually
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     31.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::keyPressEvent(QKeyEvent * const opc_Event)
 {
    if (opc_Event->key() == static_cast<sintn>(Qt::Key_Escape))
@@ -808,9 +697,8 @@ void C_SyvDaItPaTreeView::keyPressEvent(QKeyEvent * const opc_Event)
    C_OgeTreeViewToolTipBase::keyPressEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten default event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten default event slot
 
    Here: Handle hover for cursor adaption on links
 
@@ -819,10 +707,8 @@ void C_SyvDaItPaTreeView::keyPressEvent(QKeyEvent * const opc_Event)
    \return
    True  Event was recognized and processed
    False Event ignored
-
-   \created     12.07.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItPaTreeView::event(QEvent * const opc_Event)
 {
    if (opc_Event->type() == QEvent::HoverMove)
@@ -859,13 +745,10 @@ bool C_SyvDaItPaTreeView::event(QEvent * const opc_Event)
    return C_OgeTreeViewToolTipBase::event(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle data change
-
-   \created     04.07.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle data change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::m_HandleChange(void)
 {
    if ((this->mpc_DataWidget != NULL) && (this->mq_IgnoreChanges == false))
@@ -874,19 +757,16 @@ void C_SyvDaItPaTreeView::m_HandleChange(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if columns in expected sorting order
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if columns in expected sorting order
 
    \param[in] orc_NewColPositionIndices Expected sorting order
 
    \return
    True  Sorted or error
    False Unsorted
-
-   \created     02.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItPaTreeView::m_ColumnsSortedAsExpected(const std::vector<sint32> & orc_NewColPositionIndices) const
 {
    bool q_Retval = true;
@@ -904,15 +784,12 @@ bool C_SyvDaItPaTreeView::m_ColumnsSortedAsExpected(const std::vector<sint32> & 
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle link clicked signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle link clicked signal
 
    \param[in] orc_Index Index to edit
-
-   \created     27.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::m_HandleLinkClicked(const QModelIndex & orc_Index)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -920,12 +797,14 @@ void C_SyvDaItPaTreeView::m_HandleLinkClicked(const QModelIndex & orc_Index)
 
    if (pc_ParamWidget != NULL)
    {
+      const C_PuiSvDbParam * const pc_ParamItem = pc_ParamWidget->GetParamItem();
       C_OSCNodeDataPoolListElementId c_Id;
       uint32 u32_ValidLayers;
 
       C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
-      if (u32_ValidLayers == 4UL)
+      if ((u32_ValidLayers == 4UL) && (pc_ParamItem != NULL))
       {
+         C_PuiSvDbParam c_Copy = *pc_ParamItem;
          bool q_ECU;
          QPointer<C_OgePopUpDialog> const c_Dialog = new C_OgePopUpDialog(
             pc_ParamWidget->GetPopUpParent(), pc_ParamWidget->GetPopUpParent());
@@ -946,7 +825,11 @@ void C_SyvDaItPaTreeView::m_HandleLinkClicked(const QModelIndex & orc_Index)
          Q_UNUSED(pc_ArrayEditWidget)
          //Resize
          c_Dialog->SetSize(QSize(937, 330));
-         c_Dialog->exec();
+         if (c_Dialog->exec() != static_cast<sintn>(QDialog::Accepted))
+         {
+            //Revert to last known state if not accepted
+            pc_ParamWidget->SetParamItem(c_Copy);
+         }
 
          //TODO?
          //OnErrorChangePossible();
@@ -960,16 +843,13 @@ void C_SyvDaItPaTreeView::m_HandleLinkClicked(const QModelIndex & orc_Index)
    this->setCurrentIndex(this->mc_Model.index(0, 0));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Prepare read action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Prepare read action
 
    \param[in] orc_Id           Current ID
    \param[in] ou32_ValidLayers Number of valid Layers of ID
-
-   \created     05.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::m_HandleActionRead(const C_OSCNodeDataPoolListElementId & orc_Id,
                                              const uint32 ou32_ValidLayers)
 {
@@ -982,16 +862,13 @@ void C_SyvDaItPaTreeView::m_HandleActionRead(const C_OSCNodeDataPoolListElementI
    Q_EMIT this->SigActionRead(c_ListIds);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Prepare write action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Prepare write action
 
    \param[in] orc_Id           Current ID
    \param[in] ou32_ValidLayers Number of valid Layers of ID
-
-   \created     05.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::m_HandleActionWrite(const C_OSCNodeDataPoolListElementId & orc_Id,
                                               const uint32 ou32_ValidLayers)
 {
@@ -1004,16 +881,13 @@ void C_SyvDaItPaTreeView::m_HandleActionWrite(const C_OSCNodeDataPoolListElement
    Q_EMIT this->SigActionWrite(c_ListIds);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Prepare apply action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Prepare apply action
 
    \param[in] orc_Id           Current ID
    \param[in] ou32_ValidLayers Number of valid Layers of ID
-
-   \created     05.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::m_HandleActionApply(const C_OSCNodeDataPoolListElementId & orc_Id,
                                               const uint32 ou32_ValidLayers)
 {
@@ -1026,16 +900,13 @@ void C_SyvDaItPaTreeView::m_HandleActionApply(const C_OSCNodeDataPoolListElement
    this->mc_Model.ApplyEcuValues(c_ListIds);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Prepare load action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Prepare load action
 
    \param[in] orc_Id           Current ID
    \param[in] ou32_ValidLayers Number of valid Layers of ID
-
-   \created     16.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::m_HandleActionLoad(const C_OSCNodeDataPoolListElementId & orc_Id,
                                              const uint32 ou32_ValidLayers)
 {
@@ -1049,16 +920,13 @@ void C_SyvDaItPaTreeView::m_HandleActionLoad(const C_OSCNodeDataPoolListElementI
    Q_EMIT this->SigActionLoad(c_ElementIds, orc_Id, ou32_ValidLayers);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Prepare save action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Prepare save action
 
    \param[in] orc_Id           Current ID
    \param[in] ou32_ValidLayers Number of valid Layers of ID
-
-   \created     16.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::m_HandleActionSave(const C_OSCNodeDataPoolListElementId & orc_Id,
                                              const uint32 ou32_ValidLayers)
 {
@@ -1072,16 +940,13 @@ void C_SyvDaItPaTreeView::m_HandleActionSave(const C_OSCNodeDataPoolListElementI
    Q_EMIT this->SigActionSave(c_ElementIds, orc_Id, ou32_ValidLayers);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Prepare record action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Prepare record action
 
    \param[in] orc_Id           Current ID
    \param[in] ou32_ValidLayers Number of valid Layers of ID
-
-   \created     05.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::m_HandleActionRecord(const C_OSCNodeDataPoolListElementId & orc_Id,
                                                const uint32 ou32_ValidLayers)
 {
@@ -1094,16 +959,13 @@ void C_SyvDaItPaTreeView::m_HandleActionRecord(const C_OSCNodeDataPoolListElemen
    Q_EMIT this->SigActionRecord(c_ListIds);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Prepare remove action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Prepare remove action
 
    \param[in] orc_Id           Current ID
    \param[in] ou32_ValidLayers Number of valid Layers of ID
-
-   \created     05.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::m_HandleActionRemove(const C_OSCNodeDataPoolListElementId & orc_Id,
                                                const uint32 ou32_ValidLayers)
 {
@@ -1116,7 +978,7 @@ void C_SyvDaItPaTreeView::m_HandleActionRemove(const C_OSCNodeDataPoolListElemen
    Q_EMIT this->SigActionRemove(c_ListIds);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::m_ScrollBarRangeChangedVer(const sintn osn_Min, const sintn osn_Max) const
 {
    // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar
@@ -1130,7 +992,7 @@ void C_SyvDaItPaTreeView::m_ScrollBarRangeChangedVer(const sintn osn_Min, const 
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeView::m_ScrollBarRangeChangedHor(const sintn osn_Min, const sintn osn_Max) const
 {
    // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar

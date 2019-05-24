@@ -1,21 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for showing the update package UI
 
-   \implementation
-   project     project name
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     09.02.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVUPUPDATEPACKAGEWIDGET_H
 #define C_SYVUPUPDATEPACKAGEWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <QWidget>
 #include <QTimer>
@@ -25,7 +19,7 @@
 #include "C_OSCSuSequences.h"
 #include "C_SyvUpDeviceInfo.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace Ui
 {
@@ -34,9 +28,9 @@ class C_SyvUpUpdatePackageWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SyvUpUpdatePackageWidget :
    public QWidget
@@ -90,12 +84,17 @@ private:
    void m_UpdateWidget(void);
    void m_FileCheckTimer(void);
    void m_StartCheck(const bool oq_Active);
-   void m_SetUpdatePackageStatusOk(void) const;
-   void m_SetUpdatePackageStatusLocked(void) const;
-   void m_SetUpdatePackageStatusWarning(const std::vector<QString> & orc_InvalidNodeNames) const;
+   void m_SetUpdatePackageStatusNotLocked(const QStringList & orc_MissingDataBlocks,
+                                          const QStringList & orc_MissingParamFiles,
+                                          const QStringList & orc_MissingFiles,
+                                          const QStringList & orc_FlashwareWarningsApps);
 
    Ui::C_SyvUpUpdatePackageWidget * mpc_Ui;
    QTimer mc_Timer;
+   QStringList mc_MissingDataBlocks;
+   QStringList mc_MissingParamFiles;
+   QStringList mc_MissingFiles;
+   QStringList mc_FlashwareWarningsApps;
 
    static const stw_types::uint32 mhu32_FILE_CHECK_INTERVAL = 500U;
 };

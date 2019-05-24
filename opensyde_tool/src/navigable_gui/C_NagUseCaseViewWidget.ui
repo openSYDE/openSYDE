@@ -170,7 +170,7 @@
       </spacer>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="pc_HorizontalLayout" stretch="0,0,0,0,0,0,0,1,0">
+      <layout class="QHBoxLayout" name="pc_HorizontalLayout" stretch="0,0,0,0,0,0,0,1">
        <property name="spacing">
         <number>0</number>
        </property>
@@ -413,13 +413,6 @@
          </property>
         </spacer>
        </item>
-       <item>
-        <widget class="stw_opensyde_gui_elements::C_OgePubIconOnly" name="pc_PushButtonIcon">
-         <property name="text">
-          <string>PushButton</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </item>
     </layout>
@@ -427,22 +420,6 @@
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFrameSeparator</class>
-   <extends>QFrame</extends>
-   <header>C_OgeFrameSeparator.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabHeadingWidgetSubTitle</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabHeadingWidgetSubTitle.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubIconOnly</class>
-   <extends>QPushButton</extends>
-   <header>C_OgePubIconOnly.h</header>
-  </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
    <extends>QGroupBox</extends>
@@ -453,6 +430,17 @@
    <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
    <extends>QLabel</extends>
    <header>C_OgeLabSvgOnly.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeFrameSeparator</class>
+   <extends>QFrame</extends>
+   <header>C_OgeFrameSeparator.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabHeadingWidgetSubTitle</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabHeadingWidgetSubTitle.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabHeadingWidgetTitle</class>

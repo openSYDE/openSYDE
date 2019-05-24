@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Align undo command (implementation)
 
    Align undo command
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.11.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_SebUnoAlignCommand.h"
@@ -25,37 +18,34 @@
 #include "C_SebScene.h"
 #include "C_SebUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace std;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Scene             Pointer to currently active scene
    \param[in]     orc_IDs               Affected unique IDs
    \param[in]     oru64_GuidelineItemID ID of guideline item
    \param[in]     ore_Alignment         Alignment type
    \param[in,out] opc_Parent            Optional pointer to parent
-
-   \created     21.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoAlignCommand::C_SebUnoAlignCommand(QGraphicsScene * const opc_Scene,
                                            const std::vector<stw_types::uint64> & orc_IDs,
                                            const uint64 & oru64_GuidelineItemID, const E_Alignment & ore_Alignment,
@@ -65,55 +55,43 @@ C_SebUnoAlignCommand::C_SebUnoAlignCommand(QGraphicsScene * const opc_Scene,
    m_Align(oru64_GuidelineItemID, ore_Alignment);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     21.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoAlignCommand::~C_SebUnoAlignCommand(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Empty redo
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Empty redo
 
    All actions are done using child commands
-
-   \created     21.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoAlignCommand::redo(void)
 {
    QUndoCommand::redo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Empty undo
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Empty undo
 
    All actions are done using child commands
-
-   \created     21.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoAlignCommand::undo(void)
 {
    QUndoCommand::undo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Align selected items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Align selected items
 
    \param[in] oru64_GuidelineItemID ID of guideline item
    \param[in] ore_Alignment         Alignment type
-
-   \created     07.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoAlignCommand::m_Align(const uint64 & oru64_GuidelineItemID, const E_Alignment & ore_Alignment)
 {
    QGraphicsItem * pc_GuidelineItem = this->m_GetSceneItem(oru64_GuidelineItemID);

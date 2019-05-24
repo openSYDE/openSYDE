@@ -1,18 +1,11 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Holding the necessary information about a concrete route to a specific node from the PC.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     10.07.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -36,10 +29,7 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     13.07.2017  STW/B.Bayer
+/*! \brief   Default constructor
 */
 //-----------------------------------------------------------------------------
 C_OSCRoutingRoutePoint::C_OSCRoutingRoutePoint(void) :
@@ -56,16 +46,13 @@ C_OSCRoutingRoutePoint::C_OSCRoutingRoutePoint(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check if current not equal to orc_Cmp
+/*! \brief   Check if current not equal to orc_Cmp
 
    \param[in] orc_Cmp Compared instance
 
    \return
    false     Current equal to orc_Cmp
    true      Current not equal to orc_Cmp
-
-   \created     13.07.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 bool C_OSCRoutingRoutePoint::operator !=(const C_OSCRoutingRoutePoint & orc_Cmp) const
@@ -89,16 +76,13 @@ bool C_OSCRoutingRoutePoint::operator !=(const C_OSCRoutingRoutePoint & orc_Cmp)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check if current equal to orc_Cmp
+/*! \brief   Check if current equal to orc_Cmp
 
    \param[in] orc_Cmp Compared instance
 
    \return
    true      Current equal to orc_Cmp
    false     Current not equal to orc_Cmp
-
-   \created     17.07.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 bool C_OSCRoutingRoutePoint::operator ==(const C_OSCRoutingRoutePoint & orc_Cmp) const
@@ -127,16 +111,13 @@ C_OSCRoutingRoute::C_OSCRoutingRoute(const uint32 ou32_TargetNodeIndex) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check if current equal to orc_Cmp
+/*! \brief   Check if current equal to orc_Cmp
 
    \param[in] orc_Cmp Compared instance
 
    \return
    true     Current equal to orc_Cmp
    false    Current not equal to orc_Cmp
-
-   \created     13.07.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 bool C_OSCRoutingRoute::operator ==(const C_OSCRoutingRoute & orc_Cmp) const

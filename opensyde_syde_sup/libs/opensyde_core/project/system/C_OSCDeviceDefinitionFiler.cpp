@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       File handler for device definition file data
 
    Handle device definition loading and saving
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.09.2016  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -28,28 +21,28 @@
 #include "C_OSCXMLParser.h"
 #include "C_OSCLoggingHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_scl;
 using namespace stw_tgl;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
 const uint16 C_OSCDeviceDefinitionFiler::mhu16_FILE_VERSION = 0x0001U;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_OSCDeviceDefinitionFiler::mh_ParseOpenSydeAvailability(const C_OSCXMLParser & orc_Parser,
                                                               bool & orq_ProtocolSupportedCan,
@@ -67,19 +60,16 @@ void C_OSCDeviceDefinitionFiler::mh_ParseOpenSydeAvailability(const C_OSCXMLPars
    orq_ProtocolSupportedEthernet = (q_Support && q_Ethernet);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Gets the openSYDE flashloader parameter
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Gets the openSYDE flashloader parameter
 
    The parent "opensyde" in "protocols-flashloader" must be selected
 
    \param[in]     orc_Parser                    XML Parser
    \param[out]    orc_RequestDownloadTimeout    Parameter for Request Download Timeout
    \param[out]    orc_TransferDataTimeout       Parameter for Transfer Data Timeout
-
-   \created     22.01.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCDeviceDefinitionFiler::mh_ParseOpenSydeFlashloaderParameter(const C_OSCXMLParser & orc_Parser,
                                                                       uint32 & oru32_RequestDownloadTimeout,
                                                                       uint32 & oru32_TransferDataTimeout,
@@ -111,7 +101,7 @@ void C_OSCDeviceDefinitionFiler::mh_ParseOpenSydeFlashloaderParameter(const C_OS
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_OSCDeviceDefinitionFiler::mh_ParseSTWFlashloaderAvailability(const C_OSCXMLParser & orc_Parser,
                                                                     bool & orq_ProtocolSupportedCan)
@@ -125,9 +115,8 @@ void C_OSCDeviceDefinitionFiler::mh_ParseSTWFlashloaderAvailability(const C_OSCX
    orq_ProtocolSupportedCan = (q_Support && q_Can);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load device definition
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load device definition
 
    Load data from specified file and place it in device definition instance
 
@@ -139,10 +128,8 @@ void C_OSCDeviceDefinitionFiler::mh_ParseSTWFlashloaderAvailability(const C_OSCX
    C_RANGE    specified file does not exist
    C_NOACT    specified file is invalid (invalid XML file)
    C_CONFIG   content of file is invalid or incomplete
-
-   \created     06.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefinition,
                                           const stw_scl::C_SCLString & orc_Path)
 {
@@ -328,8 +315,7 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
             c_Text = c_XML.SelectNodeChild("protocols-diagnostics");
             if (c_Text != "protocols-diagnostics")
             {
-               osc_write_log_error("Loading device definition", "XML node \"protocols-diagnostics\" not found.");
-               s32_Return = C_CONFIG;
+               //Optional: Use default values
             }
             else
             {
@@ -337,48 +323,48 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
                c_Text = c_XML.SelectNodeChild("kefex");
                if (c_Text != "kefex")
                {
-                  osc_write_log_error("Loading device definition",
-                                      "XML node \"protocols-diagnostics\".\"kefex\" not found.");
-                  s32_Return = C_CONFIG;
-               }
-            }
-         }
-         if (s32_Return == C_NO_ERR)
-         {
-            c_Attributes = c_XML.GetAttributes();
-            for (u16_Index = 0U; u16_Index < c_Attributes.size(); u16_Index++)
-            {
-               if (c_Attributes[u16_Index].c_Name == "support")
-               {
-                  orc_DeviceDefinition.q_DiagnosticProtocolKefex = (c_Attributes[u16_Index].c_Value == "1");
+                  //Optional: Use default values
                }
                else
                {
-                  //unknown attribute; nothing we can do with it
+                  c_Attributes = c_XML.GetAttributes();
+                  for (u16_Index = 0U; u16_Index < c_Attributes.size(); u16_Index++)
+                  {
+                     if (c_Attributes[u16_Index].c_Name == "support")
+                     {
+                        orc_DeviceDefinition.q_DiagnosticProtocolKefex = (c_Attributes[u16_Index].c_Value == "1");
+                     }
+                     else
+                     {
+                        //unknown attribute; nothing we can do with it
+                     }
+                  }
+                  c_Text = c_XML.SelectNodeParent(); //back to parent ...
+                  tgl_assert(c_Text == "protocols-diagnostics");
                }
-            }
-            c_XML.SelectNodeParent(); //back to parent ...
-            c_Text = c_XML.SelectNodeChild("opensyde");
-            if (c_Text != "opensyde")
-            {
-               osc_write_log_error("Loading device definition",
-                                   "XML node \"protocols-diagnostics\".\"opensyde\" not found.");
-               s32_Return = C_CONFIG;
+               c_Text = c_XML.SelectNodeChild("opensyde");
+               if (c_Text != "opensyde")
+               {
+                  //Optional: Use default values
+               }
+               else
+               {
+                  mh_ParseOpenSydeAvailability(c_XML, orc_DeviceDefinition.q_DiagnosticProtocolOpenSydeCan,
+                                               orc_DeviceDefinition.q_DiagnosticProtocolOpenSydeEthernet);
+
+                  c_Text = c_XML.SelectNodeParent(); //back to parent ...
+                  tgl_assert(c_Text == "protocols-diagnostics");
+               }
+               c_Text = c_XML.SelectNodeParent(); //back to parent of parent ...
+               tgl_assert(c_Text == "opensyde-device-definition");
             }
          }
          if (s32_Return == C_NO_ERR)
          {
-            mh_ParseOpenSydeAvailability(c_XML, orc_DeviceDefinition.q_DiagnosticProtocolOpenSydeCan,
-                                         orc_DeviceDefinition.q_DiagnosticProtocolOpenSydeEthernet);
-
-            c_XML.SelectNodeParent(); //back to parent ...
-            c_XML.SelectNodeParent(); //back to parent of parent ...
-
             c_Text = c_XML.SelectNodeChild("protocols-flashloader");
             if (c_Text != "protocols-flashloader")
             {
-               osc_write_log_error("Loading device definition", "XML node \"protocols-flashloader\" not found.");
-               s32_Return = C_CONFIG;
+               //Optional: Use default values
             }
             else
             {
@@ -386,55 +372,54 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
                c_Text = c_XML.SelectNodeChild("stw-flashloader");
                if (c_Text != "stw-flashloader")
                {
-                  osc_write_log_error("Loading device definition",
-                                      "XML node \"protocols-flashloader\".\"stw-flashloader\" not found.");
-                  s32_Return = C_CONFIG;
+                  //Optional: Use default values
                }
+               else
+               {
+                  mh_ParseSTWFlashloaderAvailability(c_XML, orc_DeviceDefinition.q_FlashloaderStwCan);
+                  c_Text = c_XML.SelectNodeParent(); //back to parent ...
+                  tgl_assert(c_Text == "protocols-flashloader");
+               }
+               c_Text = c_XML.SelectNodeChild("opensyde");
+               if (c_Text != "opensyde")
+               {
+                  //Optional: Use default values
+               }
+               else
+               {
+                  mh_ParseOpenSydeAvailability(c_XML, orc_DeviceDefinition.q_FlashloaderOpenSydeCan,
+                                               orc_DeviceDefinition.q_FlashloaderOpenSydeEthernet);
+
+                  mh_ParseOpenSydeFlashloaderParameter(c_XML,
+                                                       orc_DeviceDefinition.u32_FlashloaderOpenSydeRequestDownloadTimeout,
+                                                       orc_DeviceDefinition.u32_FlashloaderOpenSydeTransferDataTimeout,
+                                                       orc_DeviceDefinition.q_FlashloaderOpenSydeIsFileBased);
+
+                  c_Text = c_XML.SelectNodeParent(); //back to parent ...
+                  tgl_assert(c_Text == "protocols-flashloader");
+               }
+               c_Text = c_XML.SelectNodeParent(); //back to parent of parent ...
+               tgl_assert(c_Text == "opensyde-device-definition");
             }
          }
          if (s32_Return == C_NO_ERR)
          {
-            mh_ParseSTWFlashloaderAvailability(c_XML, orc_DeviceDefinition.q_FlashloaderStwCan);
-            c_XML.SelectNodeParent(); //back to parent ...
-            c_Text = c_XML.SelectNodeChild("opensyde");
-            if (c_Text != "opensyde")
-            {
-               osc_write_log_error("Loading device definition",
-                                   "XML node \"protocols-flashloader\".\"opensyde\" not found.");
-               s32_Return = C_CONFIG;
-            }
-         }
-         if (s32_Return == C_NO_ERR)
-         {
-            mh_ParseOpenSydeAvailability(c_XML, orc_DeviceDefinition.q_FlashloaderOpenSydeCan,
-                                         orc_DeviceDefinition.q_FlashloaderOpenSydeEthernet);
-
-            mh_ParseOpenSydeFlashloaderParameter(c_XML,
-                                                 orc_DeviceDefinition.u32_FlashloaderOpenSydeRequestDownloadTimeout,
-                                                 orc_DeviceDefinition.u32_FlashloaderOpenSydeTransferDataTimeout,
-                                                 orc_DeviceDefinition.q_FlashloaderOpenSydeIsFileBased);
-
-            c_XML.SelectNodeParent(); //back to parent ...
-            c_XML.SelectNodeParent(); //back to parent of parent ...
-
             c_Text = c_XML.SelectNodeChild("memory");
             if (c_Text != "memory")
             {
-               osc_write_log_error("Loading device definition", "XML node \"memory\" not found.");
-               s32_Return = C_CONFIG;
-            }
-         }
-         if (s32_Return == C_NO_ERR)
-         {
-            c_Text = c_XML.SelectNodeChild("user-eeprom");
-            if (c_Text != "user-eeprom")
-            {
-               osc_write_log_error("Loading device definition", "XML node \"memory\".\"user-eeprom\" not found.");
-               s32_Return = C_CONFIG;
+               //Optional: Use default values
             }
             else
             {
-               orc_DeviceDefinition.u32_UserEepromSizeBytes = c_XML.GetAttributeUint32("sizebytes");
+               c_Text = c_XML.SelectNodeChild("user-eeprom");
+               if (c_Text != "user-eeprom")
+               {
+                  //Optional: Use default values
+               }
+               else
+               {
+                  orc_DeviceDefinition.u32_UserEepromSizeBytes = c_XML.GetAttributeUint32("sizebytes");
+               }
             }
          }
       }
@@ -447,9 +432,8 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save device definition
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save device definition
 
    Save device definition data into specified file.
    Will overwrite the file if it already exists.
@@ -461,10 +445,8 @@ sint32 C_OSCDeviceDefinitionFiler::h_Load(C_OSCDeviceDefinition & orc_DeviceDefi
    C_NO_ERR   data written to file
    C_RD_WR    could not erase pre-existing file before saving
    C_RD_WR    could not write to file (e.g. missing write permissions; missing folder)
-
-   \created     06.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDeviceDefinitionFiler::h_Save(const C_OSCDeviceDefinition & orc_DeviceDefinition,
                                           const C_SCLString & orc_Path)
 {

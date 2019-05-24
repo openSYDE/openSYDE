@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       View for message generator signals table (implementation)
 
    View for message generator signals table
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.12.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QSpinBox>
@@ -28,33 +21,30 @@
 #include "C_UsHandler.h"
 #include "C_CamGenSigTableView.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamGenSigTableView::C_CamGenSigTableView(QWidget * const opc_Parent) :
    C_TblViewToolTipBase(opc_Parent)
 {
@@ -93,42 +83,33 @@ C_CamGenSigTableView::C_CamGenSigTableView(QWidget * const opc_Parent) :
            &C_CamGenSigTableView::SigTriggerModelUpdateCyclicMessage);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     14.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamGenSigTableView::~C_CamGenSigTableView(void)
 {
    //lint -e{1540} never took ownership of any button
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle signal reload on external trigger
-
-   \created     22.01.2019  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle signal reload on external trigger
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableView::TriggerSignalReload(void)
 {
    this->mc_Model.TriggerSignalReload();
    m_SetPersistentEditorWidgets();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set current message index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set current message index
 
    \param[in] ou32_Message Message index
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableView::SetMessage(const uint32 ou32_Message)
 {
    this->mc_Model.SetMessage(ou32_Message);
@@ -138,30 +119,24 @@ void C_CamGenSigTableView::SetMessage(const uint32 ou32_Message)
    this->mc_SortProxyModel.sort(this->mc_SortProxyModel.mapFromSource(this->mc_Model.index(0, 0)).column());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update the message DLC
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update the message DLC
 
    \param[in] ou32_MessageIndex Message index
-
-   \created     14.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableView::UpdateMessageDLC(const uint32 ou32_MessageIndex)
 {
    this->mc_Model.UpdateMessageDLC(ou32_MessageIndex);
    m_SetPersistentEditorWidgets();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore column widths
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore column widths
 
    \param[in] orc_ColumnWidths Stored column widths (Restores default values if empty)
-
-   \created     12.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableView::SetCurrentColumnWidths(const std::vector<sint32> & orc_ColumnWidths)
 {
    sint32 s32_CurColIndex;
@@ -208,16 +183,13 @@ void C_CamGenSigTableView::SetCurrentColumnWidths(const std::vector<sint32> & or
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current column widths
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current column widths
 
    \return
    Current column widths
-
-   \created     12.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<sint32> C_CamGenSigTableView::GetCurrentColumnWidths(void) const
 {
    std::vector<sint32> c_Retval;
@@ -229,57 +201,46 @@ std::vector<sint32> C_CamGenSigTableView::GetCurrentColumnWidths(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save all user settings
-
-   \created     14.12.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save all user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableView::SaveUserSettings(void) const
 {
    C_UsHandler::h_GetInstance()->SetSignalsColWidths(this->GetCurrentColumnWidths());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle user settings
-
-   \created     14.12.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableView::LoadUserSettings(void)
 {
    this->SetCurrentColumnWidths(C_UsHandler::h_GetInstance()->GetSignalsColWidths());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten show event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten show event slot
 
    Here: move scroll bar buttons
 
    \param[in,out] opc_Event Event identification and information
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableView::showEvent(QShowEvent * const opc_Event)
 {
    C_TblViewToolTipBase::showEvent(opc_Event);
    m_RepositionButtons();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Forward necessary keys
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     16.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableView::keyPressEvent(QKeyEvent * const opc_Event)
 {
    C_TblViewToolTipBase::keyPressEvent(opc_Event);
@@ -300,30 +261,24 @@ void C_CamGenSigTableView::keyPressEvent(QKeyEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten resize event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten resize event slot
 
    Here: move scroll bar buttons
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableView::resizeEvent(QResizeEvent * const opc_Event)
 {
    C_TblViewToolTipBase::resizeEvent(opc_Event);
    m_RepositionButtons();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reposition the buttons as necessary
-
-   \created     13.12.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reposition the buttons as necessary
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableView::m_RepositionButtons(void)
 {
    const QSize c_ButtonSizeUp(25, 27);
@@ -332,13 +287,10 @@ void C_CamGenSigTableView::m_RepositionButtons(void)
    this->mpc_PushButtonScrollTop->setGeometry(QRect(QPoint(0, 0), c_ButtonSizeUp));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update the persistent editor widgets
-
-   \created     21.12.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update the persistent editor widgets
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableView::m_SetPersistentEditorWidgets(void)
 {
    //Set static editor widgets

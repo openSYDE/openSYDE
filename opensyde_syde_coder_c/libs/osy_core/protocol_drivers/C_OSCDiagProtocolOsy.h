@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       openSYDE: Diagnostic protocol driver for openSYDE protocol
@@ -15,15 +15,9 @@
      - unexpected content will lead to error
    - event-driven responses will be reported via function pointers (see Cycle())
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     02.03.2017  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCDIAGPROTOCOLOSYH
 #define C_OSCDIAGPROTOCOLOSYH
 

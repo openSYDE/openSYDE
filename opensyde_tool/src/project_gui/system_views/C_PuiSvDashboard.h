@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       System view dashboard (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.06.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_PUISVDASHBOARD_H
 #define C_PUISVDASHBOARD_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 #include <QString>
 #include "C_PuiSvDbChart.h"
@@ -32,12 +26,12 @@
 #include "C_PuiSvDbDataElement.h"
 #include "C_PuiSvDbParam.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_PuiSvDashboard :
    public C_PuiBsElements
@@ -206,6 +200,7 @@ public:
    bool CheckNvmParamListUsage(const stw_opensyde_core::C_OSCNodeDataPoolListId & orc_Id) const;
 
    //Util
+   bool DiscardInvalidIndices(void);
    static C_PuiSvDbDataElement::E_Type h_GetWidgetType(const C_PuiSvDbWidgetBase * const opc_Box);
 
    //Clear
@@ -231,7 +226,7 @@ private:
    void m_SyncCleanUpParams(void);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

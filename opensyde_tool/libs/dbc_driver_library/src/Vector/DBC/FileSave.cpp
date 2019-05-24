@@ -118,12 +118,22 @@ void File::writeSignals(std::ofstream & ofs, Message & message)
         /* Unit */
         ofs << " \"" << signal.second.unit << "\" ";
 
-        /* Receivers */
+        // 2019-05-06 STW: When more than one receiver is specified, they must be separated by ',' instead of ' '.
+        //                 The original implementation generated DBC files that Vector CANdb++ Version 3.0.111 (SP15)
+        //                 could not open and that led to crash of Matlab R2019a.
+
+        /* Receivers (separated by ',')*/
         if (signal.second.receivers.empty()) {
             ofs << "Vector__XXX";
         } else {
+            bool first = true;
             for (auto receiver : signal.second.receivers) {
-                ofs << " " << receiver;
+                if (first) {
+                    first = false;
+                } else {
+                    ofs << ',';
+                }
+                ofs << receiver;
             }
         }
         ofs << endl;

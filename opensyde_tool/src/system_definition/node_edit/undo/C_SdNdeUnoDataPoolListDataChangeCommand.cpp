@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data pool list data change undo command (implementation)
 
    Data pool list data change undo command
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     10.03.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QElapsedTimer>
@@ -28,7 +21,7 @@
 #include "C_SdNdeUnoDataPoolListDataChangeCommand.h"
 #include "C_PuiSdHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_opensyde_gui;
@@ -36,21 +29,20 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 using namespace stw_errors;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     oru32_NodeIndex                Node index
    \param[in]     oru32_DataPoolIndex            Node data pool index
@@ -59,10 +51,8 @@ using namespace stw_errors;
    \param[in]     orc_NewData                    New data
    \param[in]     ore_DataChangeType             Data change type
    \param[in,out] opc_Parent                     Optional pointer to parent
-
-   \created     10.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoDataPoolListDataChangeCommand::C_SdNdeUnoDataPoolListDataChangeCommand(const uint32 & oru32_NodeIndex,
                                                                                  const uint32 & oru32_DataPoolIndex,
                                                                                  stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget, const uint32 & oru32_DataPoolListIndex, const QVariant & orc_NewData, const C_SdNdeDataPoolUtil::E_ListDataChangeType & ore_DataChangeType,
@@ -75,13 +65,10 @@ C_SdNdeUnoDataPoolListDataChangeCommand::C_SdNdeUnoDataPoolListDataChangeCommand
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Redo
-
-   \created     10.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Redo
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListDataChangeCommand::redo(void)
 {
    m_Change(this->mc_PreviousData, this->mc_NewData);
@@ -89,13 +76,10 @@ void C_SdNdeUnoDataPoolListDataChangeCommand::redo(void)
    C_SdNdeUnoDataPoolListBaseCommand::redo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Undo
-
-   \created     10.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Undo
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListDataChangeCommand::undo(void)
 {
    m_Change(this->mc_NewData, this->mc_PreviousData);
@@ -103,16 +87,13 @@ void C_SdNdeUnoDataPoolListDataChangeCommand::undo(void)
    C_SdNdeUnoDataPoolListBaseCommand::undo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Change data values and store previous value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Change data values and store previous value
 
    \param[out] orc_PreviousData Previous data value storage
    \param[in]  orc_NewData      New data value assignment
-
-   \created     13.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListDataChangeCommand::m_Change(QVariant & orc_PreviousData, const QVariant & orc_NewData)
 {
    QElapsedTimer c_Timer;
@@ -173,17 +154,14 @@ void C_SdNdeUnoDataPoolListDataChangeCommand::m_Change(QVariant & orc_PreviousDa
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert list type to generic
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert list type to generic
 
    \param[in]  orc_OSCElement OSC Element
    \param[in]  ore_Type       Type to convert
    \param[out] orc_Generic    Generic output
-
-   \created     13.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListDataChangeCommand::mh_ConvertListTypeToGeneric(const C_OSCNodeDataPoolList & orc_OSCElement,
                                                                           const C_SdNdeDataPoolUtil::E_ListDataChangeType & ore_Type,
                                                                           QVariant & orc_Generic)

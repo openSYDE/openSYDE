@@ -1,34 +1,30 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       CANopen EDS / DCF file handler
 
    see .cpp file for details
 
-   \implementation
-   project     CANopen library
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     09.04.2018  STW/A.Stangl (based on pre-existing implementation)
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCCANOPENEDSDCFH
 #define C_OSCCANOPENEDSDCFH
 
-/* -- Includes ------------------------------------------------------------ */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include "stwtypes.h"
 #include "CSCLString.h"
 #include "CSCLIniFile.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
+
+///container for on object dictionary entry
 class C_OSCCanOpenObject
 {
 private:
@@ -94,8 +90,9 @@ public:
    bool operator < (const C_OSCCanOpenObject & orc_Object) const;
 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
+///container for a CANopen object dictionary
 class C_OSCCanOpenObjectDictionary
 {
 private:
@@ -114,9 +111,9 @@ public:
    stw_scl::C_SCLString GetLastErrorText(void) const;
 };
 
-/* -- Global Variables ---------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

@@ -73,7 +73,16 @@ SOURCES += \
     ../libs/osy_core/kefex_diaglib/tgl_windows/TGLFile.cpp \
     ../libs/osy_core/kefex_diaglib/tgl_windows/TGLTasks.cpp \
     ../libs/osy_core/kefex_diaglib/tgl_windows/TGLTime.cpp \
-    ../libs/osy_core/kefex_diaglib/tgl_windows/TGLUtils.cpp
+    ../libs/osy_core/kefex_diaglib/tgl_windows/TGLUtils.cpp \
+    ../libs/osy_core/project/system/FileLoadersV2/C_OSCNodeDataPoolFilerV2.cpp \
+    ../libs/osy_core/project/system/FileLoadersV2/C_OSCNodeFilerV2.cpp \
+    ../libs/osy_core/project/system/FileLoadersV2/C_OSCSystemBusFilerV2.cpp \
+    ../libs/osy_core/project/system/FileLoadersV2/C_OSCSystemDefinitionFilerV2.cpp \
+    ../libs/osy_core/project/system/node/can/C_OSCCanUtil.cpp \
+    ../libs/osy_core/project/system/node/C_OSCNodeCommFiler.cpp \
+    ../libs/osy_core/project/system/node/C_OSCNodeDataPoolId.cpp \
+    ../libs/osy_core/project/system/C_OSCTargetSupportPackage.cpp \
+    ../libs/osy_core/project/system/C_OSCTargetSupportPackageFiler.cpp
 
 
 
@@ -143,7 +152,16 @@ HEADERS += \
     ../libs/osy_core/kefex_diaglib/tgl_windows/TGLFile.h \
     ../libs/osy_core/kefex_diaglib/tgl_windows/TGLTasks.h \
     ../libs/osy_core/kefex_diaglib/tgl_windows/TGLTime.h \
-    ../libs/osy_core/kefex_diaglib/tgl_windows/TGLUtils.h
+    ../libs/osy_core/kefex_diaglib/tgl_windows/TGLUtils.h \
+    ../libs/osy_core/project/system/FileLoadersV2/C_OSCNodeDataPoolFilerV2.h \
+    ../libs/osy_core/project/system/FileLoadersV2/C_OSCNodeFilerV2.h \
+    ../libs/osy_core/project/system/FileLoadersV2/C_OSCSystemBusFilerV2.h \
+    ../libs/osy_core/project/system/FileLoadersV2/C_OSCSystemDefinitionFilerV2.h \
+    ../libs/osy_core/project/system/node/can/C_OSCCanUtil.h \
+    ../libs/osy_core/project/system/node/C_OSCNodeCommFiler.h \
+    ../libs/osy_core/project/system/node/C_OSCNodeDataPoolId.h \
+    ../libs/osy_core/project/system/C_OSCTargetSupportPackage.h \
+    ../libs/osy_core/project/system/C_OSCTargetSupportPackageFiler.h
 
 #regular (non-library) header paths (also lists the system ones so QtCreator parser sees them)
 INCLUDEPATH += ../src \
@@ -157,6 +175,7 @@ INCLUDEPATH += ../src \
                ../libs/osy_core/project/system \
                ../libs/osy_core/project/system/node \
                ../libs/osy_core/project/system/node/can \
+               ../libs/osy_core/project/system/FileLoadersV2 \
                ../libs/osy_core/scl \
                ../libs/osy_core/stwtypes\
                ../libs/osy_core/kefex_diaglib \

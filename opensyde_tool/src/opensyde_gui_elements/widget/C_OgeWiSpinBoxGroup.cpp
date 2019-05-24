@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for spin boxes of all available types
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.08.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QKeyEvent>
@@ -23,7 +17,7 @@
 #include "ui_C_OgeWiSpinBoxGroup.h"
 #include "C_SdNdeDataPoolContentUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -31,29 +25,26 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     21.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeWiSpinBoxGroup::C_OgeWiSpinBoxGroup(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_OgeWiSpinBoxGroup),
@@ -69,30 +60,24 @@ C_OgeWiSpinBoxGroup::C_OgeWiSpinBoxGroup(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_DoubleSpinBox->setFocusProxy(this);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     21.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeWiSpinBoxGroup::~C_OgeWiSpinBoxGroup(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current text
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current text
 
    \return
    Current text
-
-   \created     21.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_OgeWiSpinBoxGroup::GetText(void) const
 {
    QString c_Retval;
@@ -108,18 +93,15 @@ QString C_OgeWiSpinBoxGroup::GetText(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize widget with valid values
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize widget with valid values
 
    \param[in] orc_Min     Unscaled minimum value
    \param[in] orc_Max     Unscaled maximum value
    \param[in] of64_Factor Scaling factor
    \param[in] of64_Offset Scaling offset
-
-   \created     13.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::Init(const C_OSCNodeDataPoolContent & orc_Min, const C_OSCNodeDataPoolContent & orc_Max,
                                const float64 of64_Factor, const float64 of64_Offset, const uint32 ou32_Index)
 {
@@ -179,30 +161,24 @@ void C_OgeWiSpinBoxGroup::Init(const C_OSCNodeDataPoolContent & orc_Min, const C
    m_InitConnections();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update suffix
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update suffix
 
    \param[in] orc_Value New suffix
-
-   \created     12.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::SetSuffix(const QString & orc_Value) const
 {
    this->mpc_Ui->pc_DoubleSpinBox->setSuffix(orc_Value);
    this->mpc_Ui->pc_SpinBox64->SetSuffix(orc_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Assign new value to spin box
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Assign new value to spin box
 
    \param[in] orc_Value New value
-
-   \created     04.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::SetValue(const QVariant & orc_Value) const
 {
    if (this->mq_DoubleMode == false)
@@ -237,16 +213,13 @@ void C_OgeWiSpinBoxGroup::SetValue(const QVariant & orc_Value) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get value
 
    \return
    Current value
-
-   \created     14.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_OgeWiSpinBoxGroup::GetValue(void) const
 {
    QVariant c_Retval;
@@ -262,13 +235,10 @@ QVariant C_OgeWiSpinBoxGroup::GetValue(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Force spin box validation
-
-   \created     21.11.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Force spin box validation
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::InterpretText(void) const
 {
    if (this->mq_DoubleMode == false)
@@ -281,13 +251,10 @@ void C_OgeWiSpinBoxGroup::InterpretText(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Select all content
-
-   \created     15.01.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Select all content
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::SelectAll(void) const
 {
    if (this->mq_DoubleMode == false)
@@ -300,17 +267,14 @@ void C_OgeWiSpinBoxGroup::SelectAll(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the strings for the tooltip
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the strings for the tooltip
 
    \param[in]     orc_Heading     String with heading
    \param[in]     orc_Content     String with content
    \param[in]     oe_Type         Optional tooltip type
-
-   \created     21.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::SetToolTipInformation(const QString & orc_Heading, const QString & orc_Content,
                                                 const stw_opensyde_gui::C_NagToolTip::E_Type oe_Type) const
 {
@@ -324,17 +288,14 @@ void C_OgeWiSpinBoxGroup::SetToolTipInformation(const QString & orc_Heading, con
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten event slot
 
    Here: Forward event to spin box (Necessary for table edit handling)
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     15.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OgeWiSpinBoxGroup::event(QEvent * const opc_Event)
 {
    switch (opc_Event->type())
@@ -366,17 +327,14 @@ bool C_OgeWiSpinBoxGroup::event(QEvent * const opc_Event)
    return QWidget::event(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Forward event to spin box (Necessary for table edit handling)
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     15.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::keyPressEvent(QKeyEvent * const opc_Event)
 {
    if (this->mq_DoubleMode == true)
@@ -389,17 +347,34 @@ void C_OgeWiSpinBoxGroup::keyPressEvent(QKeyEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key release event slot
+
+   Here: Forward event to spin box (Necessary to properly register key release)
+
+   \param[in,out] opc_Event Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeWiSpinBoxGroup::keyReleaseEvent(QKeyEvent * const opc_Event)
+{
+   if (this->mq_DoubleMode == true)
+   {
+      this->mpc_Ui->pc_DoubleSpinBox->event(opc_Event);
+   }
+   else
+   {
+      this->mpc_Ui->pc_SpinBox64->event(opc_Event);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse press event slot
 
    Here: Forward event to spin box (Necessary for table edit handling)
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     15.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::mousePressEvent(QMouseEvent * const opc_Event)
 {
    if (this->mq_DoubleMode == true)
@@ -412,17 +387,14 @@ void C_OgeWiSpinBoxGroup::mousePressEvent(QMouseEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse release event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse release event slot
 
    Here: Forward event to spin box (Necessary for table edit handling)
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     15.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::mouseReleaseEvent(QMouseEvent * const opc_Event)
 {
    if (this->mq_DoubleMode == true)
@@ -435,17 +407,14 @@ void C_OgeWiSpinBoxGroup::mouseReleaseEvent(QMouseEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten focus in event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten focus in event slot
 
    Here: Forward event to spin box (Necessary for table edit handling)
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     15.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::focusInEvent(QFocusEvent * const opc_Event)
 {
    if (this->mq_DoubleMode == true)
@@ -459,17 +428,14 @@ void C_OgeWiSpinBoxGroup::focusInEvent(QFocusEvent * const opc_Event)
    QWidget::focusInEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten focus out event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten focus out event slot
 
    Here: Forward event to spin box (Necessary for table edit handling)
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     15.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::focusOutEvent(QFocusEvent * const opc_Event)
 {
    if (this->mq_DoubleMode == true)
@@ -483,13 +449,10 @@ void C_OgeWiSpinBoxGroup::focusOutEvent(QFocusEvent * const opc_Event)
    QWidget::focusOutEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Resize to default height (30)
-
-   \created     27.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Resize to default height (30)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::m_ResizeToDefault(const stw_types::sintn osn_Height) const
 {
    this->mpc_Ui->pc_SpinBox64->setMinimumHeight(osn_Height);
@@ -498,16 +461,13 @@ void C_OgeWiSpinBoxGroup::m_ResizeToDefault(const stw_types::sintn osn_Height) c
    this->mpc_Ui->pc_DoubleSpinBox->setMaximumHeight(osn_Height);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current spin button width
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current spin button width
 
    \return
    Current spin button width
-
-   \created     12.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_OgeWiSpinBoxGroup::GetSpinButtonWidth(void) const
 {
    sintn sn_Retval;
@@ -525,13 +485,10 @@ sintn C_OgeWiSpinBoxGroup::GetSpinButtonWidth(void) const
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize default state
-
-   \created     13.11.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize default state
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::m_InitDefault(void)
 {
    //ME: do not explicitly set this visible as this will break the stylesheet for the double spin box
@@ -540,13 +497,10 @@ void C_OgeWiSpinBoxGroup::m_InitDefault(void)
    this->mq_DoubleMode = true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init changed connections
-
-   \created     17.01.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init changed connections
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::m_InitConnections(void)
 {
    if (this->mq_DoubleMode == true)
@@ -563,13 +517,10 @@ void C_OgeWiSpinBoxGroup::m_InitConnections(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Deactivate any left over connections
-
-   \created     24.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Deactivate any left over connections
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::m_DeactivateConnections(void)
 {
    if (this->mq_DoubleMode == true)

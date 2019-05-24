@@ -1,37 +1,31 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Tree view with tool tip (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     08.06.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OGETREEVIEWTOOLTIPBASE_H
 #define C_OGETREEVIEWTOOLTIPBASE_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QTreeView>
 #include "stwtypes.h"
-#include "C_OgeToolTipBase.h"
+#include "C_OgeTreeToolTipBase.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_elements
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OgeTreeViewToolTipBase :
    public QTreeView,
-   public C_OgeToolTipBase
+   public C_OgeTreeToolTipBase
 {
 public:
    C_OgeTreeViewToolTipBase(QWidget * const opc_Parent = NULL);
@@ -44,18 +38,15 @@ protected:
    virtual bool eventFilter(QObject * const opc_Object, QEvent * const opc_Event) override;
    //lint -restore
 
-private:
-   stw_types::sint32 ms32_HoveredNumberOfParents;
-   stw_types::sint32 ms32_HoveredRow;
-   stw_types::sint32 ms32_HoveredCol;
-   stw_types::sint32 ms32_HoveredHorzHeader;
-
-   void m_HideTooltip(void);
-   void m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos);
-   static stw_types::sint32 mh_CountParents(const QModelIndex & orc_Index);
+   virtual QPoint m_MapToGlobal(const QPoint & orc_LocalPos) const override;
+   virtual const QHeaderView * m_Header(void) const override;
+   virtual const QAbstractItemModel * m_Model(void) const override;
+   virtual bool m_BaseEvent(QEvent * const opc_Event) override;
+   virtual void m_SetMouseTracking(const bool oq_Active) override;
+   virtual QModelIndex m_IndexAtGlobalPos(const QPoint & orc_GlobalPos) const override;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

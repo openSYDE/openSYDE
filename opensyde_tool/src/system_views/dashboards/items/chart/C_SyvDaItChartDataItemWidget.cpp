@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for showing information and offering configuration of one chart data series
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.08.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QMouseEvent>
@@ -30,37 +24,34 @@
 #include "C_SyvUtil.h"
 #include "C_SdNdeDataPoolContentUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in]     ou32_ViewIndex             Index of system view
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     25.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItChartDataItemWidget::C_SyvDaItChartDataItemWidget(const uint32 ou32_ViewIndex, QWidget * const opc_Parent) :
    stw_opensyde_gui_elements::C_OgeWiWithToolTip(opc_Parent),
    mpc_Ui(new Ui::C_SyvDaItChartDataItemWidget),
@@ -94,23 +85,19 @@ C_SyvDaItChartDataItemWidget::C_SyvDaItChartDataItemWidget(const uint32 ou32_Vie
    this->mc_IconVariableError.load(":/images/system_definition/IconVariableError.svg");
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     25.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItChartDataItemWidget::~C_SyvDaItChartDataItemWidget()
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initializes the widget and fills all elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initializes the widget and fills all elements
 
    \param[in]     orc_DataPoolElementId               Datapool element identification
    \param[in]     orc_DisplayName                     Name to display
@@ -124,10 +111,8 @@ C_SyvDaItChartDataItemWidget::~C_SyvDaItChartDataItemWidget()
                                                       invalid data element
    \param[in]     orc_ToolTipErrorTextHeading         Heading of tool tip in case of a warning
    \param[in]     orc_ToolTipErrorText                Text of tool tip in case of a warning
-
-   \created     28.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataItemWidget::InitWidget(const uint32 ou32_DataPoolElementConfigIndex,
                                               const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId,
                                               const QString & orc_DisplayName, const bool oq_Active,
@@ -213,62 +198,52 @@ void C_SyvDaItChartDataItemWidget::InitWidget(const uint32 ou32_DataPoolElementC
            this, &C_SyvDaItChartDataItemWidget::m_DataItemToggled);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the datapool element configuration index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the datapool element configuration index
 
    \param[in]     ou32_DataPoolElementConfigIndex         Datapool element configuration index
-
-   \created     05.02.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataItemWidget::UpdateIndex(const uint32 ou32_DataPoolElementConfigIndex)
 {
    this->mu32_DataPoolElementConfigIndex = ou32_DataPoolElementConfigIndex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the shown value of the data itme
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the shown value of the data itme
 
    \param[in]     orc_Value              New value
-
-   \created     29.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataItemWidget::UpdateValue(const QString & orc_Value) const
 {
    this->mpc_Ui->pc_LabelValue->setText(orc_Value + " " + this->mc_Unit);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update of the color transparence value configured by the actual timeout state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update of the color transparence value configured by the actual timeout state
 
    \param[in] osn_Value                       Value for transparence (0..255)
-
-   \created     31.07.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataItemWidget::UpdateTransparence(const sintn osn_Value) const
 {
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelValue, "Transparency",
-                                        QString::number(osn_Value));
+                                          QString::number(osn_Value));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Error update for data element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Error update for data element
 
    \param[in] orc_ErrorText           Error description
    \param[in] orq_IsTransmissionError Flag if transmission error occurred
-
-   \created     21.08.2018  STW/B.Bayer
+   \param[in] oq_ErrorActive          Flag if error is active or should be cleared
 */
-//-----------------------------------------------------------------------------
-void C_SyvDaItChartDataItemWidget::UpdateError(const QString & orc_ErrorText, const bool oq_IsTransmissionError)
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItChartDataItemWidget::UpdateError(const QString & orc_ErrorText, const bool oq_IsTransmissionError,
+                                               const bool oq_ErrorActive)
 {
-   this->mq_Error = true;
+   this->mq_Error = oq_ErrorActive;
    this->mc_ToolTipErrorText = orc_ErrorText;
    if (oq_IsTransmissionError == true)
    {
@@ -283,13 +258,10 @@ void C_SyvDaItChartDataItemWidget::UpdateError(const QString & orc_ErrorText, co
    this->m_UpdateIcon();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Resets the error state
-
-   \created     21.08.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Resets the error state
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataItemWidget::ResetError(void)
 {
    if (this->mq_Error == true)
@@ -303,45 +275,36 @@ void C_SyvDaItChartDataItemWidget::ResetError(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the unit of the datapool element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the unit of the datapool element
 
    \return
    Element name
-
-   \created     01.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaItChartDataItemWidget::GetDataElementName(void) const
 {
    return this->mpc_Ui->pc_LabelDataSerieName->text();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the unit of the datapool element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the unit of the datapool element
 
    \return
    Element unit
-
-   \created     01.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaItChartDataItemWidget::GetDataElementUnit(void) const
 {
    return this->mc_Unit;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets a new unit
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets a new unit
 
    \param[in]     orc_Unit                Element unit
-
-   \created     06.02.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataItemWidget::SetDataElementUnit(const QString & orc_DisplayName, const QString & orc_Unit)
 {
    this->mc_Unit = orc_Unit;
@@ -349,15 +312,12 @@ void C_SyvDaItChartDataItemWidget::SetDataElementUnit(const QString & orc_Displa
    this->mpc_Ui->pc_LabelValue->setText("N/A " + this->mc_Unit);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the state of the data element widget selection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the state of the data element widget selection
 
    \param[in]     ou8_Aa         input parameter description
-
-   \created     04.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataItemWidget::SetDataElementSelected(const bool oq_Selected)
 {
    this->mq_Selected = oq_Selected;
@@ -365,9 +325,8 @@ void C_SyvDaItChartDataItemWidget::SetDataElementSelected(const bool oq_Selected
    C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this, "Selected", oq_Selected);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten default event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten default event slot
 
    Here: Handle tool tip
 
@@ -376,10 +335,8 @@ void C_SyvDaItChartDataItemWidget::SetDataElementSelected(const bool oq_Selected
    \return
    True  Event was recognized and processed
    False Event ignored
-
-   \created     20.08.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItChartDataItemWidget::event(QEvent * const opc_Event)
 {
    // Update tool tip
@@ -405,7 +362,6 @@ bool C_SyvDaItChartDataItemWidget::event(QEvent * const opc_Event)
       }
       else
       {
-
          //get element name as heading
          if (C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(this->mc_DataPoolElementId) != NULL)
          {
@@ -424,35 +380,29 @@ bool C_SyvDaItChartDataItemWidget::event(QEvent * const opc_Event)
    return C_OgeWiWithToolTip::event(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    Here: draw background
    (Not automatically drawn in any QWidget derivative)
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     04.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataItemWidget::paintEvent(QPaintEvent * const opc_Event)
 {
    stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
    QWidget::paintEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overrided mouse press event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overrided mouse press event
 
    Selecting or unselecting the widget
 
    \param[in,out] opc_event  Pointer to mouse event
-
-   \created     04.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataItemWidget::mousePressEvent(QMouseEvent * const opc_Event)
 {
    if ((this->mq_Selected == false) &&
@@ -474,19 +424,16 @@ void C_SyvDaItChartDataItemWidget::mousePressEvent(QMouseEvent * const opc_Event
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataItemWidget::m_DataItemToggled(const bool oq_Checked)
 {
    Q_EMIT this->SigDataItemToggled(this->mu32_DataPoolElementConfigIndex, oq_Checked);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapts the icon
-
-   \created     21.08.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapts the icon
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataItemWidget::m_UpdateIcon(void) const
 {
    stw_opensyde_core::C_OSCNodeDataPool::E_Type e_Type = stw_opensyde_core::C_OSCNodeDataPool::eDIAG;

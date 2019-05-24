@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for selecting and managing dashboards (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVDADASHBOARDSELECTORTABWIDGET_H
 #define C_SYVDADASHBOARDSELECTORTABWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 
 #include <QTabWidget>
@@ -30,12 +24,12 @@
 #include "C_OgeWiDashboardTab.h"
 #include "C_SyvComDriverDiag.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SyvDaDashboardSelectorTabWidget :
    public QTabWidget
@@ -74,9 +68,11 @@ Q_SIGNALS:
    void SigCancelClicked(void);
    void SigChanged(void);
    void SigErrorChange(void);
+   void SigNumberDashboardsChanged(void);
    void SigDataPoolWrite(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint8 ou8_DataPoolIndex,
                          const stw_types::uint16 ou16_ListIndex, const stw_types::uint16 ou16_ElementIndex);
    void SigDataPoolRead(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Index);
+   void SigNvmReadList(const stw_opensyde_core::C_OSCNodeDataPoolListId & orc_Id);
 
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
@@ -126,6 +122,7 @@ private:
    void m_Connect(C_SyvDaDashboardWidget * const opc_Widget);
    void m_Disconnect(C_SyvDaDashboardWidget * const opc_Widget);
    void m_SetDeleteButtonVisible(const bool oq_Visible) const;
+   void m_OnTabChanged(const stw_types::sintn osn_Index) const;
 
    stw_opensyde_gui_elements::C_OgePubIconText * mpc_PushButton;
    C_SyvDaDashboardSelectorTabBar * mpc_TabBar;
@@ -138,7 +135,7 @@ private:
    static const QString mhc_AddIconLight;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

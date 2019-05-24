@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for "About openSYDE" popup dialog. (implementation)
 
    Widget for "About openSYDE" popup dialog.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.07.2018  STW/G.Scupin
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -26,35 +19,32 @@
 #include "C_HeHandler.h"
 #include "C_Uti.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] orc_Parent Reference to parent
-
-   \created     27.07.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_NagAboutDialog::C_NagAboutDialog(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
                                    const QString oc_ProductName, const QString oc_LogoUrl,
                                    const stw_types::uint32 ou32_Margin) :
@@ -79,25 +69,19 @@ C_NagAboutDialog::C_NagAboutDialog(stw_opensyde_gui_elements::C_OgePopUpDialog &
    connect(this->mpc_Ui->pc_PushButtonOk, &QPushButton::clicked, this, &C_NagAboutDialog::m_OkClicked);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     27.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_NagAboutDialog::~C_NagAboutDialog(void)
 {
    delete this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     27.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagAboutDialog::InitStaticNames(void) const
 {
    QString c_Text;
@@ -126,26 +110,20 @@ void C_NagAboutDialog::InitStaticNames(void) const
    this->mpc_Ui->pc_PushButtonOk->setText(C_GtGetText::h_GetText("OK"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize displayed dynamic names
-
-   \created     27.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize displayed dynamic names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagAboutDialog::InitDynamicNames(void) const
 {
    //lint -e{40} Defined by project file
-   mpc_Ui->pc_LabelValOpenSYDEVersion->setText(C_Uti::h_ConvertVersionToSTWStyle(APPLICATION_VERSION));
+   mpc_Ui->pc_LabelValOpenSYDEVersion->setText(C_Uti::h_GetApplicationVersion());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize displayed logo
-
-   \created     27.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize displayed logo
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagAboutDialog::InitLogo(void) const
 {
    QPixmap c_AboutLogo;
@@ -155,13 +133,10 @@ void C_NagAboutDialog::InitLogo(void) const
    mpc_Ui->pc_LabelLogo->setPixmap(c_AboutLogo);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize widget layout
-
-   \created     09.01.2019  STW/S.Singer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize widget layout
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagAboutDialog::InitLayout(void) const
 {
    this->mpc_Ui->pc_VerticalLayout->setContentsMargins(this->mu32_Margin, this->mu32_Margin, this->mu32_Margin,
@@ -174,17 +149,14 @@ void C_NagAboutDialog::InitLayout(void) const
    this->mpc_Ui->pc_VerticalSpacerButtonsObove->changeSize(20, this->mu32_Margin);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     27.07.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagAboutDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
@@ -210,13 +182,10 @@ void C_NagAboutDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Ok button click
-
-   \created     27.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Ok button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagAboutDialog::m_OkClicked(void)
 {
    this->mrc_ParentDialog.accept();

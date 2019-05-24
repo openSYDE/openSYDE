@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data pool list element move undo command (implementation)
 
    Data pool list element move undo command
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.01.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QElapsedTimer>
@@ -28,26 +21,25 @@
 #include "C_PuiSdHandler.h"
 #include "C_SdNdeUnoUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     oru32_NodeIndex                  Node index
    \param[in]     oru32_DataPoolIndex              Node data pool index
@@ -57,10 +49,8 @@ using namespace stw_opensyde_gui_logic;
    \param[in]     orc_TargetRow                    Target rows
    \param[in]     orq_AdaptIndices                 Flag, if target rows should be adapted to source row deletion
    \param[in,out] opc_Parent                       Optional pointer to parent
-
-   \created     25.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoLeDataPoolListElementMoveCommand::C_SdNdeUnoLeDataPoolListElementMoveCommand(const uint32 & oru32_NodeIndex,
                                                                                        const uint32 & oru32_DataPoolIndex, const uint32 & oru32_DataPoolListIndex, C_SdNdeDataPoolListModelViewManager * const opc_DataPoolListModelViewManager,
                                                                                        const std::vector<uint32> & orc_SourceRow,
@@ -79,13 +69,10 @@ C_SdNdeUnoLeDataPoolListElementMoveCommand::C_SdNdeUnoLeDataPoolListElementMoveC
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Redo
-
-   \created     26.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Redo
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementMoveCommand::redo(void)
 {
    if (this->mpc_DataPoolListModelViewManager != NULL)
@@ -114,13 +101,10 @@ void C_SdNdeUnoLeDataPoolListElementMoveCommand::redo(void)
    C_SdNdeUnoLeDataPoolListElementBaseCommand::redo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Undo
-
-   \created     26.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Undo
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementMoveCommand::undo(void)
 {
    C_SdNdeUnoLeDataPoolListElementBaseCommand::undo();

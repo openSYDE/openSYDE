@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Handler class for dashboard undo command stack (implementation)
 
    Handler class for dashboard undo command stack
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_SyvDaUnoManager.h"
@@ -25,58 +18,49 @@
 #include "C_SyvDaUnoAddSnapshotCommand.h"
 #include "C_SyvDaUnoDeleteCommand.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Scene  Scene to use undo redo framework for
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     21.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaUnoManager::C_SyvDaUnoManager(QGraphicsScene * const opc_Scene, QObject * const opc_Parent) :
    C_SebUnoBaseManager(opc_Scene, opc_Parent)
 {
 }
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     21.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaUnoManager::~C_SyvDaUnoManager(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do delete
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do delete
 
    \param[in,out] orc_Items Items to delete
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoManager::DoDelete(const QList<QGraphicsItem *> & orc_Items)
 {
    if (orc_Items.size() > 0)
@@ -91,18 +75,15 @@ void C_SyvDaUnoManager::DoDelete(const QList<QGraphicsItem *> & orc_Items)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add one element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add one element
 
    \param[in] ore_Type                  Type
    \param[in] oru64_UniqueID            Unique ID
    \param[in] orc_NewPos                Position
    \param[in] orc_AdditionalInformation Additional string information
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoManager::DoAddGeneric(const C_PuiSvDbDataElement::E_Type & ore_Type, const uint64 & oru64_UniqueID,
                                      const QPointF & orc_NewPos, const bool & orq_DarkModeDefault,
                                      const QString & orc_AdditionalInformation)
@@ -116,18 +97,15 @@ void C_SyvDaUnoManager::DoAddGeneric(const C_PuiSvDbDataElement::E_Type & ore_Ty
    this->DoPush(pc_AddCommand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new data based on a snapshot and reserved IDs
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new data based on a snapshot and reserved IDs
 
    \param[in] oru64_UniqueIDs   Reserved unique IDs for snapshot data
    \param[in] orc_Snapshot      Snapshot data
    \param[in] orc_RestoredRails Rails to restore if possible
    \param[in] orc_NewPos        New position
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoManager::DoAddSnapshot(const std::vector<uint64> & oru64_UniqueIDs,
                                       const C_PuiSvDashboard & orc_Snapshot,
                                       const QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,

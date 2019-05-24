@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget base for dashboard progress bar widget
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.08.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "constants.h"
@@ -28,35 +22,32 @@
 #include "ui_C_SyvDaItDashboardProgressBarWidget.h"
 #include <QTime>
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     21.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItDashboardProgressBarWidget::C_SyvDaItDashboardProgressBarWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvDaItDashboardProgressBarWidget),
@@ -73,32 +64,26 @@ C_SyvDaItDashboardProgressBarWidget::C_SyvDaItDashboardProgressBarWidget(QWidget
                          false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     21.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItDashboardProgressBarWidget::~C_SyvDaItDashboardProgressBarWidget(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply style
 
    \param[in] oe_Style     New style type
    \param[in] oe_Type      New item type
    \param[in] oe_Alignment New item alignment
    \param[in] oq_DarkMode  Flag if dark mode is active
-
-   \created     21.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardProgressBarWidget::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style,
                                                           const C_PuiSvDbProgressBar::E_Type oe_Type,
                                                           const C_PuiSvDbProgressBar::E_Alignment oe_Alignment,
@@ -131,17 +116,14 @@ void C_SyvDaItDashboardProgressBarWidget::SetDisplayStyle(const C_PuiSvDbWidgetB
    this->update();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    Here: manual markers
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     18.01.2018  STW/
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardProgressBarWidget::paintEvent(QPaintEvent * const opc_Event)
 {
    // Karsten Anfang
@@ -821,13 +803,10 @@ void C_SyvDaItDashboardProgressBarWidget::paintEvent(QPaintEvent * const opc_Eve
    // Karsten Ende
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adjust font to current size
-
-   \created     21.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adjust font to current size
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardProgressBarWidget::AdjustFontToSize(void)
 {
    SetBarMargins();
@@ -835,16 +814,13 @@ void C_SyvDaItDashboardProgressBarWidget::AdjustFontToSize(void)
    this->update();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set value
 
    \param[in] osn_Value New value
    \param[in] orc_Value New value string
-
-   \created     24.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardProgressBarWidget::SetValue(const sintn osn_Value, const QString & orc_Value)
 {
    const sintn sn_Min = this->mpc_Ui->pc_ProgressBar->minimum();
@@ -868,16 +844,13 @@ void C_SyvDaItDashboardProgressBarWidget::SetValue(const sintn osn_Value, const 
    this->update();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set min
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set min
 
    \param[in] osn_Value New min value
    \param[in] orc_Value New min string
-
-   \created     24.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardProgressBarWidget::SetMin(const sintn osn_Value, const QString & orc_Value)
 {
    this->mc_MinValue = orc_Value;
@@ -885,16 +858,13 @@ void C_SyvDaItDashboardProgressBarWidget::SetMin(const sintn osn_Value, const QS
    SetBarMargins();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set max
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set max
 
    \param[in] osn_Value New max value
    \param[in] orc_Value New max string
-
-   \created     24.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardProgressBarWidget::SetMax(const sintn osn_Value, const QString & orc_Value)
 {
    this->mc_MaxValue = orc_Value;
@@ -902,45 +872,36 @@ void C_SyvDaItDashboardProgressBarWidget::SetMax(const sintn osn_Value, const QS
    SetBarMargins();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the flag for showing minimum and maximum
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the flag for showing minimum and maximum
 
    \param[in]     oq_Value       Flag for showing minimum and maximum
-
-   \created     13.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardProgressBarWidget::SetShowMinMax(const bool oq_Value)
 {
    this->mq_ShowMinMax = oq_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set unit
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set unit
 
    \param[in] orc_Value New unit
-
-   \created     04.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardProgressBarWidget::SetUnit(const QString & orc_Value)
 {
    mc_Unit = orc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten resize event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten resize event slot
 
    Here: Handle resize specific update
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     22.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardProgressBarWidget::resizeEvent(QResizeEvent * const opc_Event)
 {
    QWidget::resizeEvent(opc_Event);
@@ -948,13 +909,10 @@ void C_SyvDaItDashboardProgressBarWidget::resizeEvent(QResizeEvent * const opc_E
    AdjustFontToSize();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adjust sub widget sizes to overall widget size
-
-   \created     24.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adjust sub widget sizes to overall widget size
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardProgressBarWidget::m_AdjustWidgetSize(void) const
 {
    const sintn sn_VerWidthSpacing = 5;
@@ -988,15 +946,12 @@ void C_SyvDaItDashboardProgressBarWidget::m_AdjustWidgetSize(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set automated width scaling for widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set automated width scaling for widget
 
    \param[in,out] opc_Widget Widget to apply automated scaling for
-
-   \created     29.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardProgressBarWidget::mh_SetAutomatedWidthScaling(QWidget * const opc_Widget)
 {
    if (opc_Widget != NULL)
@@ -1007,15 +962,12 @@ void C_SyvDaItDashboardProgressBarWidget::mh_SetAutomatedWidthScaling(QWidget * 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set automated height scaling for widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set automated height scaling for widget
 
    \param[in,out] opc_Widget Widget to apply automated scaling for
-
-   \created     29.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardProgressBarWidget::mh_SetAutomatedHeightScaling(QWidget * const opc_Widget)
 {
    if (opc_Widget != NULL)
@@ -1026,19 +978,16 @@ void C_SyvDaItDashboardProgressBarWidget::mh_SetAutomatedHeightScaling(QWidget *
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Arrow drawing function
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Arrow drawing function
 
    \param[in,out] orc_Painter Current painter
    \param[in]     orc_P1      Arrow point 1
    \param[in]     orc_P2      Arrow point 2
    \param[in]     orc_P3      Arrow point 3
    \param[in]     orc_Pen     Arrow pen
-
-   \created     16.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardProgressBarWidget::mh_DrawArrow(QPainter & orc_Painter, const QPointF & orc_P1,
                                                        const QPointF & orc_P2, const QPointF & orc_P3,
                                                        const QPen & orc_Pen)
@@ -1093,9 +1042,8 @@ void C_SyvDaItDashboardProgressBarWidget::mh_DrawArrow(QPainter & orc_Painter, c
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get rectangle at border of current line
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get rectangle at border of current line
 
    \param[in]     orc_P1        First point
    \param[in]     orc_P2        Second point
@@ -1104,10 +1052,8 @@ void C_SyvDaItDashboardProgressBarWidget::mh_DrawArrow(QPainter & orc_Painter, c
 
    \return
    Rectangle at border of current line (output: P1,P2,P4,P3 -> look at diagram)
-
-   \created     17.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QPolygonF C_SyvDaItDashboardProgressBarWidget::mh_GetOuterRect(const QPointF & orc_P1, const QPointF & orc_P2,
                                                                const QPointF & orc_POpposite, const float64 of64_Width)
 {
@@ -1182,37 +1128,31 @@ QPolygonF C_SyvDaItDashboardProgressBarWidget::mh_GetOuterRect(const QPointF & o
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get circle around current point
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get circle around current point
 
    \param[in] orc_P1     Current point
    \param[in] of64_Width Circle radius
 
    \return
    Rectangle for circle
-
-   \created     17.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QRectF C_SyvDaItDashboardProgressBarWidget::mh_GetCircle(const QPointF & orc_P1, const float64 of64_Width)
 {
    return QRectF(orc_P1.x() - of64_Width, orc_P1.y() - of64_Width, of64_Width * 2.0, of64_Width * 2.0);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply arc
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply arc
 
    \param[in,out] orc_Path    Current path
    \param[in]     orc_PCenter Arc center
    \param[in]     orc_P2      Other triangle point 1
    \param[in]     orc_P3      Other triangle point 2
    \param[in]     of64_Radius Circle radius
-
-   \created     17.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardProgressBarWidget::mh_SetArc(QPainterPath & orc_Path, const QPointF & orc_PCenter,
                                                     const QPointF & orc_P2, const QPointF & orc_P3,
                                                     const float64 of64_Radius)
@@ -1281,19 +1221,16 @@ void C_SyvDaItDashboardProgressBarWidget::mh_SetArc(QPainterPath & orc_Path, con
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get angle between two vectors
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get angle between two vectors
 
    \param[in] orc_V1 First vector
    \param[in] orc_V2 Second vector
 
    \return
    Angle between vectors
-
-   \created     17.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 float64 C_SyvDaItDashboardProgressBarWidget::mh_GetArc(const QPointF & orc_V1, const QPointF & orc_V2)
 {
    const float64 f64_DotProduct = (orc_V1.x() * orc_V2.x()) + (orc_V1.y() * orc_V2.y());
@@ -1303,7 +1240,7 @@ float64 C_SyvDaItDashboardProgressBarWidget::mh_GetArc(const QPointF & orc_V1, c
    return f64_Angle;
 }
 
-//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // Karsten Anfang
 void C_SyvDaItDashboardProgressBarWidget::SetLabelColor(QPainter & orc_Painter, QFont & orc_TextFont,
                                                         QPen & orc_ArrowPen, QPen & orc_MinMaxPen,
@@ -1345,7 +1282,7 @@ void C_SyvDaItDashboardProgressBarWidget::SetLabelColor(QPainter & orc_Painter, 
    }
 }
 
-//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_SyvDaItDashboardProgressBarWidget::SetBarMargins()
 {
@@ -1613,26 +1550,23 @@ void C_SyvDaItDashboardProgressBarWidget::SetBarMargins()
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets of the color transparence value configured by the actual timeout state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets of the color transparence value configured by the actual timeout state
 
    \param[in]     osn_Value                           Value for transparence (0..255)
-
-   \created     18.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardProgressBarWidget::SetTransparence(const sintn osn_Value)
 {
    this->msn_Transparence = osn_Value;
 }
 
-//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 stw_opensyde_gui_logic::C_PuiSvDbProgressBar::E_Type C_SyvDaItDashboardProgressBarWidget::GetType() const
 {
    return this->me_Type;
 }
 
-//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // Karsten Ende

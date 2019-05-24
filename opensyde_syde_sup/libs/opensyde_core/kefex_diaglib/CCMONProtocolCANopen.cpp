@@ -1,13 +1,3 @@
-//28.11.08:  AST  Moved CANopen protocol specific functions to this module to render CCMONProtocol.cpp easier to
-//                 maintain
-//22.05.07:  AST  CANopen: added displaying heartbeat + guard states
-//                         added default error text display for EMCYs
-//17.07.06:  AST  fixed wrong "DLC Error" text in CANopen
-//13.07.06:  AST  added common SDO abort error code as text
-//15.05.06:  AST  added size for segmented CANopen transfers
-
-//---------------------------------------------------------------------------
-
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -98,8 +88,6 @@ static const uint32 SDO_ERROR_DYNAMIC_OD_ERROR          = 0x08000023U;
 
    \return
    Text interpretation of CAN message ("" if the message can not be interpreted)
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolCANopen::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) const
@@ -569,8 +557,6 @@ C_SCLString C_CMONProtocolCANopen::MessageToString(const T_STWCAN_Msg_RX & orc_M
 
    \return
    Text representation of protocol name
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolCANopen::GetProtocolName(void) const

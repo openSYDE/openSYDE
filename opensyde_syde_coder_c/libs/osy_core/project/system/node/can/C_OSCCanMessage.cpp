@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data class for CAN communication message related, additional information (implementation)
 
    Data class for CAN communication message related, additional information
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     31.03.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -41,10 +34,7 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     31.03.2017  STW/M.Echtler
+/*! \brief   Default constructor
 */
 //-----------------------------------------------------------------------------
 C_OSCCanMessage::C_OSCCanMessage(void) :
@@ -61,14 +51,11 @@ C_OSCCanMessage::C_OSCCanMessage(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
 
    \param[in,out] oru32_HashValue    Hash value with unit [in] value and result [out] value
-
-   \created     03.04.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCCanMessage::CalcHash(uint32 & oru32_HashValue) const
@@ -92,8 +79,7 @@ void C_OSCCanMessage::CalcHash(uint32 & oru32_HashValue) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check error for specified signal
+/*! \brief   Check error for specified signal
 
    \param[in]  opc_List                             Node data pool list containing signal data
                                                     (Optional as it is only required by some checks)
@@ -103,8 +89,6 @@ void C_OSCCanMessage::CalcHash(uint32 & oru32_HashValue) const
    \return
    True  Error
    False No error
-
-   \created     21.11.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 bool C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_List, const uint32 & oru32_SignalIndex,
@@ -170,8 +154,7 @@ bool C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_L
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check detailed error for specified signal
+/*! \brief   Check detailed error for specified signal
 
    \param[in]  opc_List                             Node data pool list containing signal data
                                                     (Optional as it is only required by some checks)
@@ -184,8 +167,6 @@ bool C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_L
    \param[out] opq_ValueBelowMin                    Init value below minimum
    \param[out] opq_ValueOverMax                     Init value over maximum
    \param[in]  ou32_CANMessageValidSignalsDLCOffset CAN message DLC offset for valid signal range check
-
-   \created     23.02.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * const opc_List,
@@ -302,16 +283,13 @@ void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * con
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get hashes for signal
+/*! \brief   Get hashes for signal
 
    \param[in]  opc_List         Node data pool list containing signal data
    \param[in] oru32_SignalIndex Signal index
 
    \return
    Hashes for signal
-
-   \created     21.11.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 std::vector<uint32> C_OSCCanMessage::m_GetSignalHashes(const C_OSCNodeDataPoolList * const opc_List,

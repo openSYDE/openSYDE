@@ -1,21 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Base class for all graphic items which are rectangle based (header)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.10.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_GIBIRECTBASEGROUP_H
 #define C_GIBIRECTBASEGROUP_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QGraphicsItemGroup>
 #include <QSizeF>
 
@@ -28,12 +22,12 @@
 #include "C_GiBiCustomMouseItem.h"
 #include "C_GiUnique.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_GiBiRectBaseGroup :
    public C_GiBiConnectableItem,
@@ -70,7 +64,8 @@ public:
    void LoadBasicData(const stw_opensyde_gui_logic::C_PuiBsBox & orc_Data);
    void UpdateBasicData(stw_opensyde_gui_logic::C_PuiBsBox & orc_Data) const;
    void ApplySizeChange(const QPointF & orc_NewPos, const QSizeF & orc_NewSize);
-   void UpdateTransform(const QTransform & orc_Transform);
+   virtual void CopyStyle(const QGraphicsItem * const opc_GuidelineItem);
+   virtual void UpdateTransform(const QTransform & orc_Transform);
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 
@@ -128,7 +123,7 @@ private:
    const QPointF mc_PosOffset;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

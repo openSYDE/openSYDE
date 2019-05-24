@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Utility class for comparison operation of sorting algorithm (implementation)
 
    Utility class for comparison operation of sorting algorithm
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.04.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_Uti.h"
@@ -26,39 +19,35 @@
 #include "C_SdBueSortHelper.h"
 #include "C_PuiSdHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     25.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueSortHelper::C_SdBueSortHelper(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Compare message 1 to 2
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Compare message 1 to 2
 
    Primary sorting criteria: alphabetical
 
@@ -68,10 +57,8 @@ C_SdBueSortHelper::C_SdBueSortHelper(void)
    \return
    true  Message 1 smaller
    false Message 1 greater or equal
-
-   \created     25.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdBueSortHelper::operator ()(const C_OSCCanMessageIdentificationIndices & orc_Message1,
                                     const C_OSCCanMessageIdentificationIndices & orc_Message2) const
 {
@@ -99,9 +86,8 @@ bool C_SdBueSortHelper::operator ()(const C_OSCCanMessageIdentificationIndices &
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Compare string 1 to 2
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Compare string 1 to 2
 
    Primary sorting criteria: alphabetical
 
@@ -111,10 +97,8 @@ bool C_SdBueSortHelper::operator ()(const C_OSCCanMessageIdentificationIndices &
    \return
    true  String 1 smaller
    false String 1 greater or equal
-
-   \created     27.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdBueSortHelper::h_CompareString(const stw_scl::C_SCLString & orc_String1,
                                         const stw_scl::C_SCLString & orc_String2)
 {
@@ -172,23 +156,19 @@ bool C_SdBueSortHelper::h_CompareString(const stw_scl::C_SCLString & orc_String1
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in] orc_Message Message identification indices
-
-   \created     27.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueSortHelperSignal::C_SdBueSortHelperSignal(const C_OSCCanMessageIdentificationIndices & orc_Message) :
    mc_Message(orc_Message)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Compare message 1 to 2
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Compare message 1 to 2
 
    Primary sorting criteria: alphabetical
 
@@ -198,10 +178,8 @@ C_SdBueSortHelperSignal::C_SdBueSortHelperSignal(const C_OSCCanMessageIdentifica
    \return
    true  Message 1 smaller
    false Message 1 greater or equal
-
-   \created     27.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdBueSortHelperSignal::operator ()(const uint32 & oru32_Signal1, const uint32 & oru32_Signal2) const
 {
    //Default: signals equal
@@ -218,9 +196,8 @@ bool C_SdBueSortHelperSignal::operator ()(const uint32 & oru32_Signal1, const ui
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sort one message vector by name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sort one message vector by name
 
    Algorithm: bubblesort
               Missing optimization: each iteration will result in the last element being at the correct position,
@@ -234,10 +211,8 @@ bool C_SdBueSortHelperSignal::operator ()(const uint32 & oru32_Signal1, const ui
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     06.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueSortHelper::h_SortOneMessageVector(std::vector<C_OSCCanMessage> & orc_OSCMessages,
                                                  std::vector<C_PuiSdNodeCanMessage> & orc_UiMessages,
                                                  C_OSCNodeDataPoolList & orc_OSCList,
@@ -270,19 +245,16 @@ sint32 C_SdBueSortHelper::h_SortOneMessageVector(std::vector<C_OSCCanMessage> & 
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if messages sorted properly by name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if messages sorted properly by name
 
    \param[in] orc_OSCMessages OSC Messages
 
    \return
    True  Messages sorted by name
    False At least one message is not sorted properly by name
-
-   \created     06.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdBueSortHelper::mh_CheckMessagesSorted(const std::vector<C_OSCCanMessage> & orc_OSCMessages)
 {
    bool q_Retval = true;
@@ -305,9 +277,8 @@ bool C_SdBueSortHelper::mh_CheckMessagesSorted(const std::vector<C_OSCCanMessage
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Swap two messages
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Swap two messages
 
    \param[in]     ou32_MessageIndex1 Message 1 index (ID in OSC Messages)
    \param[in]     ou32_MessageIndex2 Message 2 index (ID in OSC Messages)
@@ -319,10 +290,8 @@ bool C_SdBueSortHelper::mh_CheckMessagesSorted(const std::vector<C_OSCCanMessage
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     06.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueSortHelper::mh_SwapMessages(const uint32 ou32_MessageIndex1, const uint32 ou32_MessageIndex2,
                                           std::vector<C_OSCCanMessage> & orc_OSCMessages,
                                           std::vector<C_PuiSdNodeCanMessage> & orc_UiMessages,

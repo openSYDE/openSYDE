@@ -1,31 +1,16 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       CAN message to text conversion class for the STW-FF protocol
 
    Converts a CAN message structure to text. The interpretation is based on the STW-FF CAN protocol
    specification.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.04.2010  STW/A.Stangl
-   \endimplementation
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   20.04.2010        STW/A.Stangl  file created (moved code here from CCMONProtocol.cpp)
-   29.07.2009        STW/A.Stangl  Added new service "RESPONSE_READY"
-
-   \endhistory
+   \copyright   Copyright 2010 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -37,14 +22,14 @@
 #include "CCMONProtocolSTWFF.h"
 #include "CSCLString.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_cmon_protocol;
 using namespace stw_scl;
 using namespace stw_can;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 #define FF_SERVICE_DATA       0
 #define FF_SERVICE_GET_CONFIG 1
 #define FF_SERVICE_SET_CONFIG 2
@@ -55,28 +40,25 @@ using namespace stw_can;
 
 #define FF_CONFIG_SERVICE_SET_SEG_PARAMS_VERSION  0
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert CAN message to text representation.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert CAN message to text representation.
 
    \param[in]     orc_Msg              message to convert
 
    \return
    Text interpretation of CAN message ("" if the message can not be interpreted)
-
-   \created     xx.xx.20xx  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolSTWFF::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) const
 {
    C_SCLString c_Text;
@@ -281,20 +263,17 @@ C_SCLString C_CMONProtocolSTWFF::MessageToString(const T_STWCAN_Msg_RX & orc_Msg
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get name of protocol as string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get name of protocol as string
 
    \return
    Text representation of protocol name
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolSTWFF::GetProtocolName(void) const
 {
    return "STW FF";
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 

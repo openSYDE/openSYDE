@@ -1,21 +1,14 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       resource string handling class
 
    ANSI C++ resource string handling class.
    For details cf. documentation in .h file.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-200x
-   license     use only under terms of contract / confidential
-
-   created     22.07.2009  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------ */
 #include "precomp_headers.h"  //pre-compiled headers

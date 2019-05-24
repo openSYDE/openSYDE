@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Base class for openSYDE source code generation command line tools.
 
    Provides generic function for openSYDE source code generation tools.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     05.09.2018  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
@@ -55,12 +48,9 @@ using namespace stw_tgl;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*!
-   \brief   Print command line parameters
+/*! \brief   Print command line parameters
 
    Prints a list of options to the console.
-
-   \created     05.09.2018  STW/A.Stangl
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OsyCodeExportBase::m_PrintCommandLineParameters(void) const
@@ -71,26 +61,27 @@ void C_OsyCodeExportBase::m_PrintCommandLineParameters(void) const
    std::cout <<
       "====================================================================================================================\n";
    std::cout <<
-      "-s      --systemdefinition     Path to System Definition file                <none>       -s c:\\mysysdef.syde_sysdef\n";
+      "-s      --systemdefinition     Path to System Definition file                <none>            -s c:\\mysysdef.syde_sysdef\n";
    std::cout <<
-      "-d      --devicedefinition     Path to Device Definitions file (devices.ini) <none>       -d c:\\openSYDE_devices\\devices.ini\n";
+      "-d      --devicedefinition     Path to Device Definitions file (devices.ini) <none>            -d c:\\openSYDE_devices\\devices.ini\n";
    std::cout <<
-      "-o      --outputpath           Base path to generated files                  <none>       -o c:\\temp\n";
+      "-o      --outputpath           Base path to generated files                  <none>            -o c:\\temp\n";
    std::cout <<
-      "-n      --node                 Node (device) to generate code for            <all nodes>  -n MyESX3CM\n";
+      "-n      --node                 Node (device) to generate code for            <all nodes>       -n MyESX3CM\n";
    std::cout <<
-      "-a      --application          Application to generate code for              <all programmable applications>  -a MyApplication\n";
-   std::cout << "                                   (only if --node is also specified)\n";
-
-   std::cout << "-e      --erasefolder          Erase target folder and all subfolders        <don't>      -e\n";
-   std::cout << "-h      --help                 Print command line parameters\n";
+      "-a      --application          Application to generate code for              <all programmable -a MyApplication\n";
+   std::cout <<
+      "                                   (only if --node is also specified)           applications>\n";
+   std::cout <<
+      "-e      --erasefolder          Erase target directory and all subdirectories <don't>           -e\n";
+   std::cout <<
+      "-h      --help                 Print command line parameters\n";
    std::cout << "Parameters that have a \"Default\" are optional. All others are mandatory.\n";
    std::cout << "\n";
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get resource version number of a file as an C_SCLString
+/*! \brief   Get resource version number of a file as an C_SCLString
 
    Extracts the windows version number of the specified file and returns it
     in the commonly used STW format: "Vx.yyrz".
@@ -101,8 +92,6 @@ void C_OsyCodeExportBase::m_PrintCommandLineParameters(void) const
 
    \return
    string with version information ("V?.??r?" on error)
-
-   \created     20.05.2008  STW/A.Stangl
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OsyCodeExportBase::h_GetApplicationVersion(const C_SCLString & orc_FileName)
@@ -137,10 +126,7 @@ C_SCLString C_OsyCodeExportBase::h_GetApplicationVersion(const C_SCLString & orc
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*!
-   \brief   Clean up
-
-   \created     07.09.2018  STW/A.Stangl
+/*! \brief   Clean up
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OsyCodeExportBase::~C_OsyCodeExportBase(void)
@@ -148,15 +134,12 @@ C_OsyCodeExportBase::~C_OsyCodeExportBase(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*!
-   \brief   Set up generic code export engine
+/*! \brief   Set up generic code export engine
 
    Set up class elements and print application information to console
 
    \retval eRESULT_OK                      init OK
    \retval eRESULT_ERASE_FILE_LIST_ERROR   could not remove pre-existing file list file
-
-   \created     06.09.2018  STW/A.Stangl
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Init(void)
@@ -201,8 +184,7 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Init(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*!
-   \brief   Get options from command line
+/*! \brief   Get options from command line
 
    Parse command line parameters. If required parameters are not present, print a list of options to the console.
 
@@ -212,8 +194,6 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Init(void)
    \retval   eRESULT_OK                                Init OK
    \retval   eRESULT_HELPING                           Command line switch "help" detected
    \retval   eRESULT_COMMAND_LINE_INVALID_PARAMETERS   Parameter error
-
-   \created     05.09.2018  STW/A.Stangl
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::ParseCommandLine(const sintn osn_Argc,
@@ -326,16 +306,13 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::ParseCommandLine(const si
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*!
-   \brief   Load System Definition
+/*! \brief   Load System Definition
 
    Load openSYDE System Definition
 
    \return
    eRESULT_OK                                 System Definition loaded
    eRESULT_SYSTEM_DEFINITION_OPEN_ERROR       Problem loading System Definition
-
-   \created     05.09.2018  STW/A.Stangl
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::LoadSystemDefinition(void)
@@ -361,8 +338,7 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::LoadSystemDefinition(void
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*!
-   \brief   Generate source code for one node
+/*! \brief   Generate source code for one node
 
    As configured by the command line parameters.
 
@@ -374,8 +350,6 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::LoadSystemDefinition(void
    eRESULT_CODE_GENERATION_ERROR        problems creating code for at least one programmable application
    eRESULT_APPLICATION_NOT_FOUND        specified application not found
    eRESULT_APPLICATION_NOT_PROGRAMMABLE specified application is not a programmable application
-
-   \created     06.09.2018  STW/A.Stangl
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_OSCNode & orc_Node,
@@ -471,8 +445,7 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*!
-   \brief   Generate source code
+/*! \brief   Generate source code
 
    As configured by the command line parameters.
 
@@ -489,8 +462,6 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_
    eRESULT_APPLICATION_DEVICE_NOT_COMPATIBLE  device specified on command line does not support openSYDE
    eRESULT_APPLICATION_NOT_FOUND         application specified on command line does not exist
    eRESULT_APPLICATION_NOT_PROGRAMMABLE  application specified on command line is not defined as "programmable"
-
-   \created     05.09.2018  STW/A.Stangl
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::GenerateSourceCode(void)
@@ -590,14 +561,11 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::GenerateSourceCode(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*!
-   \brief   Shut down generic code export engine
+/*! \brief   Shut down generic code export engine
 
    Print result of operation to console
 
    \param[in]  oe_ResultCode   error result code of previous operations
-
-   \created     06.09.2018  STW/A.Stangl
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Exit(const E_ResultCode oe_ResultCode)

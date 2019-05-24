@@ -1,47 +1,37 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Holding the necessary information about a concrete route to a specific node from the PC.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     10.07.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_OSCRoutingRoute.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     13.07.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCRoutingRoutePoint::C_OSCRoutingRoutePoint(void) :
    u32_NodeIndex(0U),
    u32_InBusIndex(0U),
@@ -55,19 +45,16 @@ C_OSCRoutingRoutePoint::C_OSCRoutingRoutePoint(void) :
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if current not equal to orc_Cmp
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if current not equal to orc_Cmp
 
    \param[in] orc_Cmp Compared instance
 
    \return
    false     Current equal to orc_Cmp
    true      Current not equal to orc_Cmp
-
-   \created     13.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCRoutingRoutePoint::operator !=(const C_OSCRoutingRoutePoint & orc_Cmp) const
 {
    bool q_Return = false;
@@ -88,19 +75,16 @@ bool C_OSCRoutingRoutePoint::operator !=(const C_OSCRoutingRoutePoint & orc_Cmp)
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if current equal to orc_Cmp
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if current equal to orc_Cmp
 
    \param[in] orc_Cmp Compared instance
 
    \return
    true      Current equal to orc_Cmp
    false     Current not equal to orc_Cmp
-
-   \created     17.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCRoutingRoutePoint::operator ==(const C_OSCRoutingRoutePoint & orc_Cmp) const
 {
    bool q_Return = false;
@@ -126,19 +110,16 @@ C_OSCRoutingRoute::C_OSCRoutingRoute(const uint32 ou32_TargetNodeIndex) :
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if current equal to orc_Cmp
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if current equal to orc_Cmp
 
    \param[in] orc_Cmp Compared instance
 
    \return
    true     Current equal to orc_Cmp
    false    Current not equal to orc_Cmp
-
-   \created     13.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCRoutingRoute::operator ==(const C_OSCRoutingRoute & orc_Cmp) const
 {
    bool q_Return = false;

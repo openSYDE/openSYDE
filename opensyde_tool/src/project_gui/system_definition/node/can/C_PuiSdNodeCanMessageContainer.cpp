@@ -1,63 +1,50 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Storage container for all CAN message types UI part (implementation)
 
    Storage container for all CAN message types UI part
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.04.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_PuiSdNodeCanMessageContainer.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     13.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSdNodeCanMessageContainer::C_PuiSdNodeCanMessageContainer(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
 
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
-
-   \created     22.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdNodeCanMessageContainer::CalcHash(stw_types::uint32 & oru32_HashValue) const
 {
    for (stw_types::uint32 u32_ItMessage = 0; u32_ItMessage < this->c_TxMessages.size(); ++u32_ItMessage)
@@ -72,18 +59,15 @@ void C_PuiSdNodeCanMessageContainer::CalcHash(stw_types::uint32 & oru32_HashValu
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Request reference to either list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Request reference to either list
 
    \param[in] orq_IsTx Flag if tx message vector was requested (else rx message vector is output)
 
    \return
    Either tx or rx list (as requested)
-
-   \created     13.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const std::vector<C_PuiSdNodeCanMessage> & C_PuiSdNodeCanMessageContainer::GetMessagesConst(const bool & orq_IsTx) const
 {
    if (orq_IsTx == true)
@@ -96,18 +80,15 @@ const std::vector<C_PuiSdNodeCanMessage> & C_PuiSdNodeCanMessageContainer::GetMe
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Request reference to either list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Request reference to either list
 
    \param[in] orq_IsTx Flag if tx message vector was requested (else rx message vector is output)
 
    \return
    Either tx or rx list (as requested)
-
-   \created     13.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<C_PuiSdNodeCanMessage> & C_PuiSdNodeCanMessageContainer::GetMessages(const bool & orq_IsTx)
 {
    if (orq_IsTx == true)

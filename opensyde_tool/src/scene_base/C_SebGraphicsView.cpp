@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Common used graphics view (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QString>
@@ -35,13 +28,13 @@
 #include "C_OSCUtils.h"
 #include "C_OgeWiUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const stw_types::sintn msn_WHITE_EDGE_WIDTH = 100;
 //zoom parameters
 const stw_types::sintn msn_MIN_ZOOM_IN_PERCENT = 10;
@@ -51,25 +44,22 @@ const stw_types::sintn msn_ZOOM_STEP_IN_PERCENT = 5;
 const QColor C_SebGraphicsView::mhc_GradientColorLight = mc_STYLE_GUIDE_COLOR_0;
 const QColor C_SebGraphicsView::mhc_GradientColorDark = mc_STYLE_GUIDE_COLOR_52;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     20.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebGraphicsView::C_SebGraphicsView(QWidget * const opc_Parent) :
    QGraphicsView(opc_Parent),
    mq_ProxyWidgetInteractionActive(false),
@@ -124,28 +114,22 @@ C_SebGraphicsView::C_SebGraphicsView(QWidget * const opc_Parent) :
    this->installEventFilter(this);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     20.04.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebGraphicsView::~C_SebGraphicsView()
 {
    //lint -e{1540}  no memory leak because of the parent of mpc_ZoomButton and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the actual zoom value as percent
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the actual zoom value as percent
 
    \param[in] osn_Percent Percent
    \param[in] orq_Silent  Flag if user notification should be shown
-
-   \created     30.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::SetZoomValue(const sintn osn_Percent, const bool & orq_Silent)
 {
    float64 f64_TargetScale = static_cast<float64>(osn_Percent) / 100.0;
@@ -154,27 +138,21 @@ void C_SebGraphicsView::SetZoomValue(const sintn osn_Percent, const bool & orq_S
    m_ScaleBy(f64_ScaleFactor, orq_Silent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Gets the actual zoom value as percent
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Gets the actual zoom value as percent
 
    \return  Actual zoom value
-
-   \created     25.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SebGraphicsView::GetZoomValue(void) const
 {
    return this->msn_ZoomValue;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Manual update of transformation values
-
-   \created     19.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Manual update of transformation values
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::UpdateTransform(void) const
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -187,19 +165,16 @@ void C_SebGraphicsView::UpdateTransform(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the actual position of the viewport on the scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the actual position of the viewport on the scene
 
    The position will be set to the scroll bars in the scroll bar event to make sure
    the setting of the position is not to early. If it will be set to early, it
    does not work.
 
    \param[in]  orc_Pos  New positon
-
-   \created     25.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::SetViewPos(const QPoint & orc_Pos)
 {
    this->mc_ViewPortPos = orc_Pos;
@@ -208,15 +183,12 @@ void C_SebGraphicsView::SetViewPos(const QPoint & orc_Pos)
    this->mq_ViewPortPosVerSet = true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Gets the actual position of the viewport on the scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Gets the actual position of the viewport on the scene
 
    \return  Actual viewport position
-
-   \created     25.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QPoint C_SebGraphicsView::GetViewPos(void) const
 {
    QPoint c_Pos;
@@ -227,15 +199,12 @@ QPoint C_SebGraphicsView::GetViewPos(void) const
    return c_Pos;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the flag for drawing the background
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the flag for drawing the background
 
    \param[in]  oq_Active   Flag for drawing the background
-
-   \created     20.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::SetDrawingBackground(const bool oq_Active)
 {
    this->mq_DrawBackground = oq_Active;
@@ -243,33 +212,27 @@ void C_SebGraphicsView::SetDrawingBackground(const bool oq_Active)
    stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this, "STYLE_GUIDE_COLOR_12", !oq_Active);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set flag for subtle surround gradient vs strong top and left gradient
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set flag for subtle surround gradient vs strong top and left gradient
 
    \param[in] orq_SubtleSurroundGradientActive true: subtle surround gradient
                                                false: strong top and left gradient
-
-   \created     14.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::SetSubtleSurroundGradient(const bool & orq_SubtleSurroundGradientActive)
 {
    mq_SubtleSurroundGradient = orq_SubtleSurroundGradientActive;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show tool tip
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show tool tip
 
    \param[in] orc_ScenePos Scne position to show tool tip at
    \param[in] orc_Heading  Heading of tool tip
    \param[in] orc_Content  Content of tool tip
    \param[in] oq_IsError   Tool tip is error type
-
-   \created     26.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::ShowToolTip(const QPointF & orc_ScenePos, const QString & orc_Heading,
                                     const QString & orc_Content, const C_NagToolTip::E_Type oe_Type)
 {
@@ -282,46 +245,37 @@ void C_SebGraphicsView::ShowToolTip(const QPointF & orc_ScenePos, const QString 
    mc_ToolTip.DoMove(this->mapToGlobal(this->mapFromScene(c_AdaptedScenePos)));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Hide tool tip
-
-   \created     26.10.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Hide tool tip
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::HideToolTip(void)
 {
    mc_ToolTip.hide();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set dark mode state for scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set dark mode state for scene
 
    \param[in] oq_DarkMode Dark mode active flag
                           true:  Dark mode
                           false: Light mode
-
-   \created     01.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::SetDarkMode(const bool oq_DarkMode)
 {
    this->mq_DarkMode = oq_DarkMode;
    C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this, "DarkMode", oq_DarkMode);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the scene and connects with available signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the scene and connects with available signals
 
    For connecting to the signals it has to be a C_SebScene scene.
 
    \param[in,out] opc_Scene New scene
-
-   \created     04.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::SetSceneAndConnect(QGraphicsScene * const opc_Scene)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -337,15 +291,12 @@ void C_SebGraphicsView::SetSceneAndConnect(QGraphicsScene * const opc_Scene)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Scroll to scene position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Scroll to scene position
 
    \param[in] orc_ScenePosition Scene position
-
-   \created     26.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::ScrollTo(const QPointF & orc_ScenePosition, const QSizeF & orc_Size)
 {
    if ((this->horizontalScrollBar()->isVisible() == true) || (this->verticalScrollBar()->isVisible() == true))
@@ -354,18 +305,15 @@ void C_SebGraphicsView::ScrollTo(const QPointF & orc_ScenePosition, const QSizeF
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overrided background paint event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overrided background paint event
 
    Draws the background with a gradient and the background image which is defined in
    the ui file.
 
    \param[in,out] opc_event  Pointer to paint event
-
-   \created     25.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::drawBackground(QPainter * const opc_Painter, const QRectF & orc_Rect)
 {
    QGraphicsView::drawBackground(opc_Painter, orc_Rect);
@@ -455,15 +403,12 @@ void C_SebGraphicsView::drawBackground(QPainter * const opc_Painter, const QRect
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overrided resize event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overrided resize event
 
    \param[in,out] opc_event  Pointer to resize event
-
-   \created     27.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::resizeEvent(QResizeEvent * const opc_Event)
 {
    //move button to center
@@ -474,17 +419,14 @@ void C_SebGraphicsView::resizeEvent(QResizeEvent * const opc_Event)
    QGraphicsView::resizeEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overrided mouse move event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overrided mouse move event
 
    Drag and move functionality.
 
    \param[in,out] opc_event  Pointer to mouse event
-
-   \created     27.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
    if (this->mq_ProxyWidgetInteractionActive == false)
@@ -510,17 +452,14 @@ void C_SebGraphicsView::mouseMoveEvent(QMouseEvent * const opc_Event)
    }*/
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overrided mouse press event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overrided mouse press event
 
    Drag and move functionality.
 
    \param[in,out] opc_event  Pointer to mouse event
-
-   \created     27.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::mousePressEvent(QMouseEvent * const opc_Event)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -583,15 +522,12 @@ void C_SebGraphicsView::mousePressEvent(QMouseEvent * const opc_Event)
    QGraphicsView::mousePressEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overrided mouse release event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overrided mouse release event
 
    \param[in,out] opc_event  Pointer to mouse event
-
-   \created     27.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::mouseReleaseEvent(QMouseEvent * const opc_Event)
 {
    if ((this->mq_ProxyWidgetInteractionActive == false) &&
@@ -619,17 +555,14 @@ void C_SebGraphicsView::mouseReleaseEvent(QMouseEvent * const opc_Event)
    QGraphicsView::mouseReleaseEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overrided key press event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overrided key press event
 
    Zooming functionality.
 
    \param[in,out] opc_event  Pointer to key event
-
-   \created     29.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::keyPressEvent(QKeyEvent * const opc_Event)
 {
    if ((this->mq_ProxyWidgetInteractionActive == false) &&
@@ -658,17 +591,14 @@ void C_SebGraphicsView::keyPressEvent(QKeyEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overrided wheel event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overrided wheel event
 
    Zooming functionality.
 
    \param[in,out] opc_event  Pointer to wheel event
-
-   \created     29.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::wheelEvent(QWheelEvent * const opc_Event)
 {
    if (C_Uti::h_CheckKeyModifier(opc_Event->modifiers(), Qt::ControlModifier) == true)
@@ -688,17 +618,14 @@ void C_SebGraphicsView::wheelEvent(QWheelEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten drag enter event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten drag enter event slot
 
    Here: Do not accept external *.syde file here. It will be handled in NagMainWindow
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     17.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::dragEnterEvent(QDragEnterEvent * const opc_Event)
 {
    QGraphicsView::dragEnterEvent(opc_Event);
@@ -715,26 +642,22 @@ void C_SebGraphicsView::dragEnterEvent(QDragEnterEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten drop event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten drop event slot
 
    Here: Set focus back to scene
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     12.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::dropEvent(QDropEvent * const opc_Event)
 {
    this->setFocus();
    QGraphicsView::dropEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten default event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten default event slot
 
    Here: Handle tool tip
 
@@ -743,10 +666,8 @@ void C_SebGraphicsView::dropEvent(QDropEvent * const opc_Event)
    \return
    True  Event was recognized and processed
    False Event ignored
-
-   \created     26.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SebGraphicsView::event(QEvent * const opc_Event)
 {
    bool q_Retval = QGraphicsView::event(opc_Event);
@@ -767,13 +688,10 @@ bool C_SebGraphicsView::event(QEvent * const opc_Event)
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot function for zoom notification timer
-
-   \created     16.09.2016  STW/S.Singer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for zoom notification timer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::m_ZoomNotificationTimerEvent()
 {
    //hide nofitifcation
@@ -783,16 +701,13 @@ void C_SebGraphicsView::m_ZoomNotificationTimerEvent()
    this->mc_TimerZoomNotification.stop();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Scale view by scale factor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Scale view by scale factor
 
    \param[in] of64_ScaleFactor  Scale Factor
    \param[in] orq_Silent        Flag if user notification should be shown
-
-   \created     29.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::m_ScaleBy(const float64 of64_ScaleFactor, const bool & orq_Silent)
 {
    QTransform c_Tranform = this->transform();
@@ -855,39 +770,30 @@ void C_SebGraphicsView::m_ScaleBy(const float64 of64_ScaleFactor, const bool & o
    m_UpdateZoomValue(orq_Silent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Zoom step in
-
-   \created     29.08.2016  STW/S.Singer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Zoom step in
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::m_ZoomIn(void)
 {
    SetZoomValue(this->msn_ZoomValue + msn_ZOOM_STEP_IN_PERCENT);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Zoom step out
-
-   \created     29.08.2016  STW/S.Singer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Zoom step out
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::m_ZoomOut(void)
 {
    SetZoomValue(this->msn_ZoomValue - msn_ZOOM_STEP_IN_PERCENT);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   UpdateZoomValue
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   UpdateZoomValue
 
    \param[in] orq_Silent Flag if user notification should be shown
-
-   \created     30.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::m_UpdateZoomValue(const bool & orq_Silent)
 {
    msn_ZoomValue = static_cast<sintn>(round(transform().m11() * 100.0));
@@ -905,13 +811,10 @@ void C_SebGraphicsView::m_UpdateZoomValue(const bool & orq_Silent)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Implementation of drag moving
-
-   \created     27.07.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Implementation of drag moving
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::m_DragMove(const QMouseEvent * const opc_Event)
 {
    QScrollBar * pc_HorBar = this->horizontalScrollBar();
@@ -948,7 +851,7 @@ void C_SebGraphicsView::m_DragMove(const QMouseEvent * const opc_Event)
    pc_VerBar->setValue(pc_VerBar->value() - static_cast<sintn>(c_Delta.y()));
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::m_HorScrollbarChanged(const sintn osn_Min, const sintn osn_Max)
 {
    // The position of the viewport with the scrollbars can be changed only if the scrollbars are already
@@ -962,7 +865,7 @@ void C_SebGraphicsView::m_HorScrollbarChanged(const sintn osn_Min, const sintn o
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::m_VerScrollbarChanged(const sintn osn_Min, const sintn osn_Max)
 {
    // The position of the viewport with the scrollbars can be changed only if the scrollbars are already
@@ -976,15 +879,12 @@ void C_SebGraphicsView::m_VerScrollbarChanged(const sintn osn_Min, const sintn o
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set proxy widget interaction state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set proxy widget interaction state
 
    \param[in] oq_Active Proxy widget interaction state
-
-   \created     04.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::m_SetProxyWidgetInteractionActive(const bool oq_Active)
 {
    this->mq_ProxyWidgetInteractionActive = oq_Active;

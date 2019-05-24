@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Custom interaction point (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     16.09.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QFlags>
@@ -26,33 +19,30 @@
 #include "constants.h"
 #include "gitypes.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 using namespace stw_types;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent   Optional pointer to parent
-
-   \created     16.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiPointInteraction::C_GiPointInteraction(QGraphicsItem * const opc_Parent) :
    QGraphicsEllipseItem(opc_Parent)
 {
@@ -69,58 +59,46 @@ C_GiPointInteraction::C_GiPointInteraction(QGraphicsItem * const opc_Parent) :
    this->setCursor(QCursor(Qt::SizeBDiagCursor));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     25.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiPointInteraction::~C_GiPointInteraction()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the type of this item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the type of this item
 
    \return  ID
-
-   \created     16.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_GiPointInteraction::type() const
 {
    return msn_GRAPHICS_ITEM_POINTINTERACTION;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checks if the parameter position is inside the bounding rect
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks if the parameter position is inside the bounding rect
 
    The original function 'contains' use the local coordinates
 
    \param[in]  orc_Pos     Position to check
 
    \return  true if the poiont is inside the rectangle, false if not
-
-   \created     19.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiPointInteraction::IsPointInside(const QPointF & orc_Pos) const
 {
    return this->sceneBoundingRect().contains(orc_Pos);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal for update of current scaling
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal for update of current scaling
 
    \param[in] orc_Transform Current scaling
-
-   \created     16.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiPointInteraction::UpdateTransform(const QTransform & orc_Transform)
 {
    if (orc_Transform.isInvertible() == true)
@@ -130,19 +108,16 @@ void C_GiPointInteraction::UpdateTransform(const QTransform & orc_Transform)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    Here: Draw interaction point
 
    \param[in,out] opc_Painter Painter
    \param[in,out] opc_Option  Option
    \param[in,out] opc_Widget  Widget
-
-   \created     22.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiPointInteraction::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                                  QWidget * const opc_Widget)
 {

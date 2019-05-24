@@ -1,21 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for showing system view update
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.06.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVUPUPDATEWIDGET_H
 #define C_SYVUPUPDATEWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <mutex>
 
@@ -29,7 +23,7 @@
 #include "C_SyvUpSequences.h"
 #include "C_SyvUpProgressLog.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace Ui
 {
@@ -38,9 +32,9 @@ class C_SyvUpUpdateWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SyvUpUpdateWidget :
    public QWidget
@@ -95,6 +89,9 @@ private:
    void m_ReportOpenSydeFlashloaderInformationRead(void);
    void m_ReportStwFlashloaderInformationRead(void);
 
+   void m_CheckOpenSydeFlashloaderInformation(const std::vector<stw_types::uint32> & orc_OsyNodeIndexes,
+                                              const std::vector<stw_opensyde_core::C_OSCSuSequences::C_OsyDeviceInformation> & orc_OsyDeviceInformation);
+
    void m_Connect(void);
    void m_Update(void);
 
@@ -125,8 +122,10 @@ private:
    static bool mh_IsConnectionStart(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
    static bool mh_IsConnectionSuccess(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
    static bool mh_IsConnectionFailure(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
-   static bool mh_IsUpdateAppStart(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
-   static bool mh_IsUpdateAppSuccess(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
+   static bool mh_IsUpdateAppStart(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step,
+                                   bool & orq_IsParam);
+   static bool mh_IsUpdateAppSuccess(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step,
+                                     bool & orq_IsParam);
    static bool mh_IsUpdateNodeStart(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
    static bool mh_IsUpdateNodeSuccess(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
    static bool mh_IsUpdateFailure(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step);
@@ -154,6 +153,9 @@ private:
    std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> mc_NodesWithAllApplications;
    std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> mc_NodesWithAllApplicationsAndTempPath;
    std::vector<stw_types::uint32> mc_NodesOrder;
+   bool mq_NodesPreconditionError;
+   std::vector<stw_types::uint32> mc_NodesPreconditionNvmWriteError;
+   std::vector<stw_types::uint32> mc_NodesPreconditionEthToEthError;
 
    stw_types::uint32 mu32_DisconnectTime;
    stw_types::uint32 mu32_UpdateTime;

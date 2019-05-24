@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for PieChart
 
    Widget for PieChart
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.07.2016  STW/S.Singer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_OgeWiPieChart.h"
@@ -26,34 +19,31 @@
 
 #include <QPainter>
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     06.07.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeWiPieChart::C_OgeWiPieChart(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_OgeWiPieChart)
@@ -68,29 +58,23 @@ C_OgeWiPieChart::C_OgeWiPieChart(QWidget * const opc_Parent) :
            &C_OgeWiPieChart::m_OnSpinboxValuechanged);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     06.07.2016  STW/S.Singer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeWiPieChart::~C_OgeWiPieChart()
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overrided paint event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overrided paint event
 
    Draws the element
 
    \param[in,out] opc_Event  Pointer to paint event
-
-   \created     06.07.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiPieChart::paintEvent(QPaintEvent * const opc_Event)
 {
    QPainter c_Painter(this);
@@ -472,7 +456,7 @@ void C_OgeWiPieChart::paintEvent(QPaintEvent * const opc_Event)
    //Karsten Ende
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void stw_opensyde_gui::C_OgeWiPieChart::m_OnSpinboxValuechanged(const stw_types::sintn osn_Value)
 {
    mu16_ValueInPercent = static_cast<uint16>(osn_Value);
@@ -499,7 +483,7 @@ void stw_opensyde_gui::C_OgeWiPieChart::m_OnSpinboxValuechanged(const stw_types:
 
 // Karsten Anfang
 /*
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void stw_opensyde_gui::C_OgeWiPieChart::m_SetPie(QPainter & orc_Painter, QBrush oc_PieBrush,
                                                  Qt::PenCapStyle oc_CapStyle, QRect & orc_PieCircleRect,
                                                  stw_types::float32 of32_PieWidth, stw_types::float32 of32_GesamtPixel)
@@ -522,7 +506,7 @@ void stw_opensyde_gui::C_OgeWiPieChart::m_SetPie(QPainter & orc_Painter, QBrush 
    // Punkten Start mit der Länge Span innerhalb des Rechtecks
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void stw_opensyde_gui::C_OgeWiPieChart::m_SetPieDot(QPainter & orc_Painter, QColor oc_PieDotColor, QRect oc_PieRect,
                                                     stw_types::float32 of32_DotSize,
                                                     stw_types::float32 of32_GesamtPixel)
@@ -548,7 +532,7 @@ void stw_opensyde_gui::C_OgeWiPieChart::m_SetPieDot(QPainter & orc_Painter, QCol
    orc_Painter.drawEllipse(s16_DotPositionX, s16_DotPositionY, s16_DotSize, s16_DotSize);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void stw_opensyde_gui::C_OgeWiPieChart::m_SetPieRim(QPainter & orc_Painter, QBrush oc_RimBrush, QRect oc_RimCircleRect,
                                                     stw_types::float32 of32_RimSize,
                                                     stw_types::float32 of32_GesamtPixel,
@@ -565,7 +549,7 @@ void stw_opensyde_gui::C_OgeWiPieChart::m_SetPieRim(QPainter & orc_Painter, QBru
    orc_Painter.drawArc(oc_RimCircleRect, static_cast<sint16>(90 * 16), static_cast<sint16>(-360.0  * 16.0));
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void stw_opensyde_gui::C_OgeWiPieChart::m_SetInnerCircle(QPainter & orc_Painter, QBrush oc_InnerCircleBrush,
                                                          QRect oc_InnerCircleRect)
 {
@@ -575,7 +559,7 @@ void stw_opensyde_gui::C_OgeWiPieChart::m_SetInnerCircle(QPainter & orc_Painter,
    orc_Painter.drawEllipse(oc_InnerCircleRect);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void stw_opensyde_gui::C_OgeWiPieChart::m_SetPieText(QPainter & orc_Painter, QColor oc_TextColor,
                                                      QRect oc_InnerCircleRect)
 {
@@ -593,7 +577,7 @@ void stw_opensyde_gui::C_OgeWiPieChart::m_SetPieText(QPainter & orc_Painter, QCo
    orc_Painter.drawText(oc_InnerCircleRect, static_cast<sintn>(Qt::AlignCenter), m_String.c_str());
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void stw_opensyde_gui::C_OgeWiPieChart::m_SetAllPieRects(QRect & orc_InnerCircleRect, QRect & orc_RimCircleRect,
                                                          QRect & orc_PieCircleRect, stw_types::float32 of32_PieGap,
                                                          stw_types::float32 of32_PieSize,

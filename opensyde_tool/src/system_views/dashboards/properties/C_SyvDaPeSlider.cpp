@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for system view dashboard slider properties (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.09.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -25,38 +18,35 @@
 #include "C_GiSvDaSliderBase.h"
 #include "C_GtGetText.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const sintn C_SyvDaPeSlider::mhsn_INDEX_STYLE_TYPE1 = 0;
 const sintn C_SyvDaPeSlider::mhsn_INDEX_STYLE_TYPE2 = 1;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent  Optional pointer to parent
    \param[in]     oq_DarkMode Flag for dark mode
-
-   \created     13.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeSlider::C_SyvDaPeSlider(C_SyvDaPeBase & orc_Parent, const bool oq_DarkMode) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvDaPeSlider),
@@ -87,27 +77,21 @@ C_SyvDaPeSlider::C_SyvDaPeSlider(C_SyvDaPeBase & orc_Parent, const bool oq_DarkM
    connect(&this->mrc_ParentDialog, &C_SyvDaPeBase::SigRefresh, this, &C_SyvDaPeSlider::m_UpdatePreview);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     13.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeSlider::~C_SyvDaPeSlider(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     13.09.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeSlider::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelShowMinMax->setText(C_GtGetText::h_GetText("Show Min / Max"));
@@ -119,45 +103,36 @@ void C_SyvDaPeSlider::InitStaticNames(void) const
    this->mpc_Ui->pc_ComboBoxTypeHandle->addItem(C_GtGetText::h_GetText("Type 2"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get show minimum and maximum flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get show minimum and maximum flag
 
    \return
    Current show minimum and maximum flag
-
-   \created     13.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaPeSlider::GetShowMinMax(void) const
 {
    return this->mpc_Ui->pc_CheckBoxMinMax->isChecked();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set show minimum and maximum flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set show minimum and maximum flag
 
    \param[in] oq_Value New show minimum and maximum flag
-
-   \created     13.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeSlider::SetShowMinMax(const bool oq_Value) const
 {
    this->mpc_Ui->pc_CheckBoxMinMax->setChecked(oq_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get type
 
    \return
    Current type
-
-   \created     13.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbSlider::E_Type C_SyvDaPeSlider::GetType(void) const
 {
    C_PuiSvDbSlider::E_Type e_Retval;
@@ -191,15 +166,12 @@ C_PuiSvDbSlider::E_Type C_SyvDaPeSlider::GetType(void) const
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set type
 
    \param[in] oe_Type New type
-
-   \created     13.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeSlider::SetType(const C_PuiSvDbSlider::E_Type oe_Type) const
 {
    switch (oe_Type)
@@ -223,13 +195,10 @@ void C_SyvDaPeSlider::SetType(const C_PuiSvDbSlider::E_Type oe_Type) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update of preview click
-
-   \created     12.09.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update of preview click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeSlider::m_UpdatePreview(void)
 {
    const QSize c_ViewSize = C_SyvDaPeBase::h_GetSceneViewSize();

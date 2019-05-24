@@ -1,48 +1,40 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Resize rectangle undo command (implementation)
 
    Resize rectangle undo command
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.11.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_SebUnoResizeRectangleCommand.h"
 #include "C_GiBiRectBaseGroup.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace std;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Scene   Pointer to currently active scene
    \param[in]     orc_IDs     Affected unique IDs
@@ -51,10 +43,8 @@ using namespace stw_opensyde_gui;
    \param[in]     orc_NewPos  New position
    \param[in]     orc_NewSize New size
    \param[in]     opc_Parent  Optional pointer to parent
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoResizeRectangleCommand::C_SebUnoResizeRectangleCommand(QGraphicsScene * const opc_Scene,
                                                                const std::vector<stw_types::uint64> & orc_IDs,
                                                                const QPointF & orc_OldPos, const QSizeF & orc_OldSize,
@@ -68,24 +58,18 @@ C_SebUnoResizeRectangleCommand::C_SebUnoResizeRectangleCommand(QGraphicsScene * 
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     22.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoResizeRectangleCommand::~C_SebUnoResizeRectangleCommand()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Undo move
-
-   \created     22.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Undo move
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoResizeRectangleCommand::undo(void)
 {
    vector<QGraphicsItem *> c_Items = this->m_GetSceneItems();
@@ -96,13 +80,10 @@ void C_SebUnoResizeRectangleCommand::undo(void)
    QUndoCommand::undo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Redo move
-
-   \created     22.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Redo move
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoResizeRectangleCommand::redo(void)
 {
    vector<QGraphicsItem *> c_Items = this->m_GetSceneItems();
@@ -113,15 +94,12 @@ void C_SebUnoResizeRectangleCommand::redo(void)
    QUndoCommand::redo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Undo for one item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Undo for one item
 
    \param[in,out] opc_Item Item to perform action on
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoResizeRectangleCommand::m_UndoSingle(QGraphicsItem * const opc_Item) const
 {
    if (opc_Item != NULL)
@@ -137,15 +115,12 @@ void C_SebUnoResizeRectangleCommand::m_UndoSingle(QGraphicsItem * const opc_Item
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Redo for one item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Redo for one item
 
    \param[in,out] opc_Item Item to perform action on
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoResizeRectangleCommand::m_RedoSingle(QGraphicsItem * const opc_Item) const
 {
    if (opc_Item != NULL)

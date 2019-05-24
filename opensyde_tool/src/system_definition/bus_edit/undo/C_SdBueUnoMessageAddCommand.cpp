@@ -1,56 +1,46 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Message add undo command (implementation)
 
    Message add undo command
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.04.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_PuiSdHandler.h"
 #include "C_SdBueUnoMessageAddCommand.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     orc_MessageId          Message identification indices
    \param[in,out] opc_MessageSyncManager Message sync manager to perform actions on
    \param[in,out] opc_MessageTreeWidget  Message tree widget to perform actions on
    \param[in,out] opc_Parent             Optional pointer to parent
-
-   \created     20.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueUnoMessageAddCommand::C_SdBueUnoMessageAddCommand(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                          C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager, C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget,
                                                          QUndoCommand * const opc_Parent) :
@@ -59,9 +49,8 @@ C_SdBueUnoMessageAddCommand::C_SdBueUnoMessageAddCommand(const C_OSCCanMessageId
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set initial data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set initial data
 
    \param[in] orc_Message                 Message data
    \param[in] orc_OSCSignalCommons        Signals data (osc common)
@@ -70,10 +59,8 @@ C_SdBueUnoMessageAddCommand::C_SdBueUnoMessageAddCommand(const C_OSCCanMessageId
    \param[in] orc_OwnerNodeName           Owner node names
    \param[in] orc_OwnerNodeInterfaceIndex Owner node interface index
    \param[in] orc_OwnerIsTxFlag           Owner has message as TX flags
-
-   \created     20.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoMessageAddCommand::SetInitialData(const C_OSCCanMessage & orc_Message,
                                                  const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCSignalCommons,
                                                  const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons, const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals, const std::vector<QString>  & orc_OwnerNodeName, const std::vector<stw_types::uint32>  & orc_OwnerNodeInterfaceIndex,
@@ -159,43 +146,34 @@ void C_SdBueUnoMessageAddCommand::SetInitialData(const C_OSCCanMessage & orc_Mes
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get the last known value for the message index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get the last known value for the message index
 
    Warning: use this function carefully as the message index cannot be relied on
 
    \return
    Last known value for the message index
-
-   \created     19.02.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCCanMessageIdentificationIndices C_SdBueUnoMessageAddCommand::GetLastMessageId(void) const
 {
    return this->mc_LastMessageId;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Redo add
-
-   \created     20.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Redo add
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoMessageAddCommand::redo(void)
 {
    this->Add();
    C_SdBueUnoMessageAddDeleteBaseCommand::redo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Undo add
-
-   \created     20.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Undo add
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoMessageAddCommand::undo(void)
 {
    C_SdBueUnoMessageAddDeleteBaseCommand::undo();

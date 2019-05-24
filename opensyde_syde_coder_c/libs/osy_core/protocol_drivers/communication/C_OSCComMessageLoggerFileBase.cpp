@@ -1,18 +1,11 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Class with generic interface to handle and write a CAN log file (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.12.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -45,13 +38,10 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+/*! \brief   Default constructor
 
    \param[in]  orc_FilePath      Complete path with file name of logging file
    \param[in]  orc_ProtocolName  Name of current set protocol
-
-   \created     13.12.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_OSCComMessageLoggerFileBase::C_OSCComMessageLoggerFileBase(const stw_scl::C_SCLString & orc_FilePath,
@@ -62,10 +52,7 @@ C_OSCComMessageLoggerFileBase::C_OSCComMessageLoggerFileBase(const stw_scl::C_SC
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     13.12.2018  STW/B.Bayer
+/*! \brief   Default destructor
 */
 //-----------------------------------------------------------------------------
 C_OSCComMessageLoggerFileBase::~C_OSCComMessageLoggerFileBase(void)
@@ -73,16 +60,13 @@ C_OSCComMessageLoggerFileBase::~C_OSCComMessageLoggerFileBase(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Creates, if necessary, and opens file and adds the default header of the file.
+/*! \brief   Creates, if necessary, and opens file and adds the default header of the file.
 
    Base implementation only creates the folders and deletes an already existing file
 
    \return
    C_NO_ERR    No errors
    C_RD_WR     Error on creating folders or deleting old file
-
-   \created     14.12.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComMessageLoggerFileBase::OpenFile(void)
@@ -117,12 +101,9 @@ sint32 C_OSCComMessageLoggerFileBase::OpenFile(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the current protocol name
+/*! \brief   Sets the current protocol name
 
    \param[in]     orc_ProtocolName         Current protocol name
-
-   \created     18.12.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCComMessageLoggerFileBase::SetProtocolName(const C_SCLString & orc_ProtocolName)

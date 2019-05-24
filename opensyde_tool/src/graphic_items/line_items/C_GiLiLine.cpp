@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Complete line as QGraphicsPathItem for the clean visualisation of bended lines (implementation)
 
    Complete line
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     11.08.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <cmath>
@@ -31,39 +24,36 @@
 #include "C_OSCUtils.h"
 #include "C_Uti.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 using namespace stw_types;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const stw_types::uint8 C_GiLiLine::mhu8_AnimationStepCount = 60;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in]     orc_Points      Points for line
    \param[in]     orq_MiddleLine  Indicator if line(s) should have a different colored central line
    \param[in,out] opc_Parent      Optional pointer to parent
-
-   \created     11.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiLiLine::C_GiLiLine(const std::vector<QPointF> * const opc_Points, const bool & orq_MiddleLine,
                        QGraphicsItem * const opc_Parent) :
    QGraphicsPathItem(opc_Parent),
@@ -107,28 +97,22 @@ C_GiLiLine::C_GiLiLine(const std::vector<QPointF> * const opc_Points, const bool
    connect(&this->mc_Timer, &QTimer::timeout, this, &C_GiLiLine::m_UpdateAnimation);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     17.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiLiLine::~C_GiLiLine()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize class
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize class
 
    \param[in] orc_Points Initial points
-
-   \created     10.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::Init(const std::vector<QPointF> & orc_Points)
 {
    QPointF c_AdaptedScenePos;
@@ -152,29 +136,23 @@ void C_GiLiLine::Init(const std::vector<QPointF> & orc_Points)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the type of this item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the type of this item
 
    \return  ID
-
-   \created     01.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_GiLiLine::type() const
 {
    return msn_GRAPHICS_ITEM_LINE;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Helper to handle line creation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Helper to handle line creation
 
    \param[in] ors32_Index Index of creation
-
-   \created     19.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::m_AddLineAt(const stw_types::sint32 & ors32_Index)
 {
    if (ors32_Index >= 0L)
@@ -198,15 +176,12 @@ void C_GiLiLine::m_AddLineAt(const stw_types::sint32 & ors32_Index)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Helper to handle line removal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Helper to handle line removal
 
    \param[in] ors32_Index Index of line
-
-   \created     19.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::m_RemoveLineAt(const sint32 & ors32_Index)
 {
    if (ors32_Index >= 0L)
@@ -222,20 +197,17 @@ void C_GiLiLine::m_RemoveLineAt(const sint32 & ors32_Index)
             mc_Lines[s32_ItLine]->SetLineIndex(s32_ItLine);
          }
          //Signal change
-         Q_EMIT ChangedGraphic();
+         this->TriggerSigChangedGraphic();
       }
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Helper to handle line update
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Helper to handle line update
 
    \param[in] ors32_LineIndex Index of changed line
-
-   \created     12.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::m_UpdateLine(const stw_types::sint32 & ors32_LineIndex)
 {
    if (ors32_LineIndex >= 0L)
@@ -251,15 +223,12 @@ void C_GiLiLine::m_UpdateLine(const stw_types::sint32 & ors32_LineIndex)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply offset to line ends
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply offset to line ends
 
    \param[in,out] orc_Polygon Polygon to adapt
-
-   \created     28.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::m_ApplyOffset(QPolygonF & orc_Polygon) const
 {
    if (orc_Polygon.size() >= 2)
@@ -292,13 +261,10 @@ void C_GiLiLine::m_ApplyOffset(QPolygonF & orc_Polygon) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   First draft for animation steps
-
-   \created     09.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   First draft for animation steps
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::m_UpdateAnimation(void)
 {
    if (this->mc_Points.size() > 0)
@@ -312,15 +278,12 @@ void C_GiLiLine::m_UpdateAnimation(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set color
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set color
 
    \param[in] orc_Color New color
-
-   \created     17.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::m_SetColor(const QColor & orc_Color, const bool oq_SendUpdate)
 {
    QPen c_Pen = this->pen();
@@ -335,20 +298,17 @@ void C_GiLiLine::m_SetColor(const QColor & orc_Color, const bool oq_SendUpdate)
    //Signal change
    if (oq_SendUpdate == true)
    {
-      Q_EMIT ChangedGraphic();
+      this->TriggerSigChangedGraphic();
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get desired animation step count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get desired animation step count
 
    \return
    Desired animation step count
-
-   \created     02.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint8 C_GiLiLine::m_GetAnimationStepCount(void) const
 {
    uint8 u8_Retval;
@@ -364,15 +324,12 @@ uint8 C_GiLiLine::m_GetAnimationStepCount(void) const
    return u8_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set interaction point width
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set interaction point width
 
    \param[in] orf64_Value New value
-
-   \created     19.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::SetInteractionWidth(const stw_types::float64 & orf64_Value)
 {
    this->prepareGeometryChange();
@@ -388,16 +345,13 @@ void C_GiLiLine::SetInteractionWidth(const stw_types::float64 & orf64_Value)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds a new point with specific coordinates
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds a new point with specific coordinates
 
    \param[in] ors32_Index  Index of changed point
    \param[in] orc_Pos      New position of point
-
-   \created     29.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::AddPoint(const sint32 & ors32_Index, const QPointF & orc_Pos)
 {
    this->mc_Points.insert(ors32_Index, orc_Pos);
@@ -405,16 +359,13 @@ void C_GiLiLine::AddPoint(const sint32 & ors32_Index, const QPointF & orc_Pos)
    this->m_AddLineAt(ors32_Index);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update of specific point coordinates
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update of specific point coordinates
 
    \param[in] ors32_Index  Index of changed point
    \param[in] orc_Pos      New position of point
-
-   \created     28.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::UpdatePoint(const sint32 & ors32_Index, const QPointF & orc_Pos)
 {
    if (this->mc_Points.size() > ors32_Index)
@@ -436,15 +387,12 @@ void C_GiLiLine::UpdatePoint(const sint32 & ors32_Index, const QPointF & orc_Pos
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Removes a specific point
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Removes a specific point
 
    \param[in] ors32_Index  Index of point
-
-   \created     29.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::RemovePoint(const sint32 & ors32_Index)
 {
    //Only delete if there are enough points for a line left afterwards
@@ -463,15 +411,12 @@ void C_GiLiLine::RemovePoint(const sint32 & ors32_Index)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set line width
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set line width
 
    \param[in] ors32_Width New line width
-
-   \created     17.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::SetWidth(const stw_types::sint32 & ors32_Width)
 {
    QPen c_Pen = this->pen();
@@ -483,18 +428,15 @@ void C_GiLiLine::SetWidth(const stw_types::sint32 & ors32_Width)
    }
    this->setPen(c_Pen);
    //Signal change
-   Q_EMIT ChangedGraphic();
+   this->TriggerSigChangedGraphic();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set color
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set color
 
    \param[in] orc_Color New color
-
-   \created     17.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::SetColor(const QColor & orc_Color)
 {
    this->mc_LineColor = orc_Color;
@@ -502,47 +444,38 @@ void C_GiLiLine::SetColor(const QColor & orc_Color)
    this->m_SetColor(orc_Color, false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set middle line color
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set middle line color
 
    \param[in] orc_Color New color
-
-   \created     23.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::SetMiddleLineColor(const QColor & orc_Color)
 {
    this->mc_MiddleLineColor = orc_Color;
    //Signal change
-   Q_EMIT ChangedGraphic();
+   this->TriggerSigChangedGraphic();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set middle line active
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set middle line active
 
    \param[in] orq_MiddleLine New value
-
-   \created     25.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::SetMiddleLine(const bool & orq_MiddleLine)
 {
    this->mq_MiddleLine = orq_MiddleLine;
    //Signal change
-   Q_EMIT ChangedGraphic();
+   this->TriggerSigChangedGraphic();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set line style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set line style
 
    \param[in] ore_Type New line style
-
-   \created     28.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::SetLineStyle(const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType & ore_Type)
 {
    QPen c_Pen = this->pen();
@@ -568,46 +501,37 @@ void C_GiLiLine::SetLineStyle(const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_
    }
    this->setPen(c_Pen);
    //Signal change
-   Q_EMIT ChangedGraphic();
+   this->TriggerSigChangedGraphic();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set offset for line start
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set offset for line start
 
    \param[in] ors32_Offset New offset
-
-   \created     28.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::SetOffsetStart(const float64 & orf64_Offset)
 {
    this->mf64_OffsetStart = orf64_Offset;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set offset for line end
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set offset for line end
 
    \param[in] ors32_Offset New offset
-
-   \created     28.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::SetOffsetEnd(const float64 & orf64_Offset)
 {
    this->mf64_OffsetEnd = orf64_Offset;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set item disabled look flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set item disabled look flag
 
    \param[in] oq_Disabled Flag if item is disabled
-
-   \created     28.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::SetDisabledLook(const bool oq_Disabled)
 {
    if (oq_Disabled == true)
@@ -623,79 +547,61 @@ void C_GiLiLine::SetDisabledLook(const bool oq_Disabled)
    this->update();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get width
-
-   \created     18.08.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get width
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_GiLiLine::GetWidth() const
 {
    return this->pen().width();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get color
-
-   \created     18.08.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get color
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QColor C_GiLiLine::GetColor() const
 {
    return this->pen().color();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get middle line color
-
-   \created     23.08.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get middle line color
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QColor C_GiLiLine::GetMiddleLineColor() const
 {
    return this->mc_MiddleLineColor;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get lines
-
-   \created     18.08.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get lines
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVector<C_GiLiLineConnection *> C_GiLiLine::GetLines(void) const
 {
    return mc_Lines;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get middle line indicator
-
-   \created     18.08.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get middle line indicator
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiLiLine::GetMiddleLine(void) const
 {
    return mq_MiddleLine;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set animation status
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set animation status
 
    \param[in] oq_Active          Animation active flag
    \param[in] oq_Inverse         Optional flag to animate in inverse direction
    \param[in] oq_SpeedUp         Optional flag to speed up the animation
    \param[in] oc_Polygon         Optional polygon to use for animation
    \param[in] oq_ShowOrignalLine Optional flag to hide or show the original line
-
-   \created     09.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::SetAnimated(const bool oq_Active, const bool oq_Inverse, const bool oq_SpeedUp,
                              const QPolygonF oc_Polygon, const bool oq_ShowOrignalLine)
 {
@@ -726,19 +632,16 @@ void C_GiLiLine::SetAnimated(const bool oq_Active, const bool oq_Inverse, const 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    Here: Draw segmented line
 
    \param[in,out] opc_Painter Painter
    \param[in,out] opc_Option  Option
    \param[in,out] opc_Widget  Widget
-
-   \created     22.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                        QWidget * const opc_Widget)
 {
@@ -845,15 +748,12 @@ void C_GiLiLine::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsI
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Return more accurate shape
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Return more accurate shape
 
    \return  The painter path as polygon
-
-   \created     31.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QPainterPath C_GiLiLine::shape(void) const
 {
    stw_opensyde_gui_logic::C_GiBiLineBounding c_LineBounding(this->mc_Points,
@@ -862,16 +762,13 @@ QPainterPath C_GiLiLine::shape(void) const
    return c_LineBounding.GetShape();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Find closest point in shape to scene position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Find closest point in shape to scene position
 
    \param[in]  orc_ScenePoint Scene position
    \param[out] orc_Closest    Closest point in shape
-
-   \created     23.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Closest) const
 {
    float64 f64_Best = std::numeric_limits<float64>::max();

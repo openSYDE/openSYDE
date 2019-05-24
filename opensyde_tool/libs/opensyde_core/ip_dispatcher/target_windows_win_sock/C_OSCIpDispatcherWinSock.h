@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       openSYDE protocol IP driver for Windows
@@ -9,19 +9,13 @@
    Implements target specific IP routines.
    Here: for MS Windows using WinSock
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     26.04.2017  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCIPDISPATCHERWINSOCKH
 #define C_OSCIPDISPATCHERWINSOCKH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 #include <map>
 #include <list>
@@ -31,12 +25,12 @@
 #include "CSCLString.h"
 #include "TGLTasks.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCIpDispatcherWinSock :
    public C_OSCIpDispatcher
@@ -119,7 +113,7 @@ public:
    virtual stw_types::sint32 ReadUdp(std::vector<stw_types::uint8> &orc_Data, stw_types::uint8(&orau8_Ip)[4]);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

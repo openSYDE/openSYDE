@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Utility functions for project operations (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.03.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QApplication>
@@ -30,27 +23,26 @@
 #include "C_OgePopUpDialog.h"
 #include "C_PopSaveAsDialogWidget.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Asks the user if the changes shall be saved, rejected or canceled
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Asks the user if the changes shall be saved, rejected or canceled
 
    \param[in] opc_Parent                    Parent widget
    \param[in] oq_AllowContinueWithoutSaving Optional flag to block continuing without saving
@@ -58,10 +50,8 @@ using namespace stw_opensyde_gui_elements;
    \return
    true     Action can be continued
    false    Cancel the action
-
-   \created     13.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_PopUtil::h_AskUserToContinue(QWidget * const opc_Parent, const bool oq_AllowContinueWithoutSaving)
 {
    bool q_Return = false;
@@ -88,9 +78,11 @@ bool C_PopUtil::h_AskUserToContinue(QWidget * const opc_Parent, const bool oq_Al
       }
       c_Description += QString(C_GtGetText::h_GetText("Do you want to save the changes of the current project"));
 
+      //Don't set details. User expects in details something like a list of what was changed in project
       if (C_PuiProject::h_GetInstance()->IsEmptyProject() == false)
       {
-         c_MessageBox.SetDetails(C_GtGetText::h_GetText("Project path: ") + C_PuiProject::h_GetInstance()->GetPath());
+         //c_MessageBox.SetDetails(C_GtGetText::h_GetText("Project path: ") +
+         //                        C_PuiProject::h_GetInstance()->GetPath());
          c_Description += " \"" + C_PuiProject::h_GetInstance()->GetName() + "\"";
       }
       c_Description += "?";
@@ -154,13 +146,76 @@ bool C_PopUtil::h_AskUserToContinue(QWidget * const opc_Parent, const bool oq_Al
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Private constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check for critical node names and notify user if necessary
 
-   \created     13.03.2017  STW/B.Bayer
+   \param[in,out] opc_Parent                 Parent widget
+   \param[in]     oq_DisableActiveWaitCursor Optional flag to call restore of wait cursor before showing a pop up and
+                                             restoring the wait cursor after that so the caller does not need a separate
+                                             handling
+
+   \return
+   True  Naming conflict detected
+   False No naming conflict detected
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+bool C_PopUtil::h_CheckCriticalNamingConflict(QWidget * const opc_Parent, const bool oq_DisableActiveWaitCursor)
+{
+   std::vector<QString> c_CriticalNodeNames;
+   std::vector<QString> c_CriticalBusNames;
+   std::vector<QString> c_CriticalDatapoolNamespaceNames;
+   const bool q_Retval = C_PuiSdHandler::h_GetInstance()->CheckCriticalNameConflict(&c_CriticalNodeNames,
+                                                                                    &c_CriticalBusNames,
+                                                                                    &c_CriticalDatapoolNamespaceNames);
+   if (q_Retval)
+   {
+      QString c_Details;
+      C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::E_Type::eERROR);
+      c_Message.SetHeading(C_GtGetText::h_GetText("Project save"));
+      c_Message.SetDescription(C_GtGetText::h_GetText(
+                                  "The project cannot be saved with conflicting names for either nodes, buses or Datapools"));
+      if (c_CriticalNodeNames.size() > 0UL)
+      {
+         c_Details.append(C_GtGetText::h_GetText("Conflicting node names:\n"));
+         for (uint32 u32_ItName = 0UL; u32_ItName < c_CriticalNodeNames.size(); ++u32_ItName)
+         {
+            c_Details.append(QString("\"%1\"\n").arg(c_CriticalNodeNames[u32_ItName]));
+         }
+      }
+      if (c_CriticalBusNames.size() > 0UL)
+      {
+         c_Details.append(C_GtGetText::h_GetText("Conflicting bus names:\n"));
+         for (uint32 u32_ItName = 0UL; u32_ItName < c_CriticalBusNames.size(); ++u32_ItName)
+         {
+            c_Details.append(QString("\"%1\"\n").arg(c_CriticalBusNames[u32_ItName]));
+         }
+      }
+      if (c_CriticalDatapoolNamespaceNames.size() > 0UL)
+      {
+         c_Details.append(C_GtGetText::h_GetText("Conflicting datapool names:\n"));
+         for (uint32 u32_ItName = 0UL; u32_ItName < c_CriticalDatapoolNamespaceNames.size(); ++u32_ItName)
+         {
+            c_Details.append(QString("%1\n").arg(c_CriticalDatapoolNamespaceNames[u32_ItName]));
+         }
+      }
+      c_Message.SetDetails(c_Details);
+      if (oq_DisableActiveWaitCursor)
+      {
+         QApplication::restoreOverrideCursor();
+      }
+      c_Message.Execute();
+      if (oq_DisableActiveWaitCursor)
+      {
+         QApplication::setOverrideCursor(Qt::WaitCursor);
+      }
+   }
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Private constructor
+*/
+//----------------------------------------------------------------------------------------------------------------------
 C_PopUtil::C_PopUtil(void)
 {
 }

@@ -1,38 +1,34 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Class for system view dashboard parameterization table item (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.10.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_GISVDAPARAM_H
 #define C_GISVDAPARAM_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SyvDaItPaWidgetNew.h"
 #include "C_GiSvDaRectBaseGroup.h"
 
 #include "C_SyvComDriverDiag.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_GiSvDaParam :
    public C_GiSvDaRectBaseGroup
 {
+   Q_OBJECT
+
 public:
    C_GiSvDaParam(const stw_types::uint32 & oru32_ViewIndex, const stw_types::uint32 & oru32_DashboardIndex,
                  const stw_types::sint32 & ors32_DataIndex, const stw_types::uint64 & oru64_ID,
@@ -61,9 +57,7 @@ public:
    void SetSyvComDriver(stw_opensyde_gui_logic::C_SyvComDriverDiag & orc_ComDriver);
 
    stw_types::sint32 GetLastValue(const stw_types::uint32 ou32_WidgetDataPoolElementIndex,
-                                  std::vector<QString> & orc_Values);
-   stw_types::sint32 GetLastValue2(const stw_types::uint32 ou32_WidgetDataPoolElementIndex,
-                                   std::vector<stw_types::float64> & orc_Values);
+                                  stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Value);
 
    stw_types::uint32 GetViewIndex(void) const;
    const stw_opensyde_gui_logic::C_PuiSvDbParam * GetParamItem(void) const;
@@ -74,6 +68,13 @@ public:
    void HandleNewDataElement(void);
    stw_types::sint32 DeleteLists(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListId> & orc_ListIds);
    QWidget * GetPopUpParent(void) const;
+
+   //The signals keyword is necessary for Qt signal slot functionality
+   //lint -save -e1736
+
+Q_SIGNALS:
+   //lint -restore
+   void SigNvmReadList(const stw_opensyde_core::C_OSCNodeDataPoolListId & orc_Id);
 
 protected:
    virtual bool m_AllowWarningIcon(void) const override;
@@ -93,7 +94,7 @@ private:
    C_GiSvDaParam & operator =(const C_GiSvDaParam &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

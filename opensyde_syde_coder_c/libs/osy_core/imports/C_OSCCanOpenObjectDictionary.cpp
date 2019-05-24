@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       CANopen EDS / DCF file handler
 
    Provides functions to read information from CANopen EDS / DCF file.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     09.04.2018  STW/A.Stangl (simplified from pre-existing implementation)
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------ */
 #include "precomp_headers.h" //pre-compiled headers
@@ -101,8 +94,7 @@ static const C_TextAndSize mac_TextAndSizeTable[mu8_NUM_DATA_TYPES] =
 /* -- Implementation ------------------------------------------------------ */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   compare two object dictionary entries
+/*! \brief   compare two object dictionary entries
 
    Compare two object dictionary entries. The index is the sorting criterion.
 
@@ -110,8 +102,6 @@ static const C_TextAndSize mac_TextAndSizeTable[mu8_NUM_DATA_TYPES] =
 
    \return
    true   -> index of true is <  index of orc_Object
-
-   \created     25.09.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool C_OSCCanOpenObject::operator <(const C_OSCCanOpenObject & orc_Object) const
@@ -132,8 +122,7 @@ bool C_OSCCanOpenObject::operator <(const C_OSCCanOpenObject & orc_Object) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Load data from CANopen EDS file
+/*! \brief   Load data from CANopen EDS file
 
    Load CANopen EDS file and store contents in c_Objects.
    Objects in c_Objects will be sorted by index and sub-index.
@@ -145,8 +134,6 @@ bool C_OSCCanOpenObject::operator <(const C_OSCCanOpenObject & orc_Object) const
    C_RANGE     file does not exist
    C_CONFIG    could not parse file (is it a valid EDS file ?)
                 use GetLastErrorText() to get details
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCCanOpenObjectDictionary::LoadFromFile(const C_SCLString & orc_File)
@@ -195,8 +182,7 @@ sint32 C_OSCCanOpenObjectDictionary::LoadFromFile(const C_SCLString & orc_File)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get EDS/DCF data from one block
+/*! \brief   Get EDS/DCF data from one block
 
    Does not try to read invalid EDS files; this could result in some subsequent inconsistencies.
    If the function aborts with an error the data in "c_Objects" can become inconsistent.
@@ -209,8 +195,6 @@ sint32 C_OSCCanOpenObjectDictionary::LoadFromFile(const C_SCLString & orc_File)
    C_NO_ERR    data read and appended to c_Objects
    C_CONFIG    inconsistency between object list in block and stated number of entries
                invalid file contents
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCCanOpenObjectDictionary::m_AppendEDSBlock(const C_SCLString & orc_Blockname, C_SCLIniFile & orc_IniFile)
@@ -307,8 +291,7 @@ sint32 C_OSCCanOpenObjectDictionary::m_AppendEDSBlock(const C_SCLString & orc_Bl
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Utility: get information from one EDS/DCF section
+/*! \brief   Utility: get information from one EDS/DCF section
 
    \param[in]     ou16_Index         index of object
    \param[in]     ou8_SubIndex       sub-index of object
@@ -319,8 +302,6 @@ sint32 C_OSCCanOpenObjectDictionary::m_AppendEDSBlock(const C_SCLString & orc_Bl
    \return
    C_NO_ERR    data read and placed into orc_Object
    C_CONFIG    invalid data (see mc_LastError for details)
-
-   \created     11.04.2018  STW/A.Stangl (refactored from pre-existing code)
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCCanOpenObjectDictionary::m_GetObjectDescription(const uint16 ou16_Index, const uint8 ou8_SubIndex,
@@ -414,8 +395,7 @@ void C_OSCCanOpenObject::SetSize(const uint16 ou16_Size)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get name and size of object
+/*! \brief   Get name and size of object
 
    \param[out]  opc_Text    type of object in text form
    \param[out]  opu8_Size   size of object
@@ -423,8 +403,6 @@ void C_OSCCanOpenObject::SetSize(const uint16 ou16_Size)
    \return
    true:   object has access type RO, RW, RWW, RWR or CONST
    false:  object has none of those access types
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_OSCCanOpenObject::DataTypeToTextAndSize(C_SCLString * const opc_Text, uint8 * const opu8_Size) const
@@ -454,14 +432,11 @@ void C_OSCCanOpenObject::DataTypeToTextAndSize(C_SCLString * const opc_Text, uin
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check whether object may be read from
+/*! \brief   Check whether object may be read from
 
    \return
    true:   object has access type RO, RW, RWW, RWR or CONST
    false:  object has none of those access types
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool C_OSCCanOpenObject::IsReadable(void) const
@@ -472,14 +447,11 @@ bool C_OSCCanOpenObject::IsReadable(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check whether object may be written to
+/*! \brief   Check whether object may be written to
 
    \return
    true:   object has access type RW, RWW, RWR or WO
    false:  object has none of those access types
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool C_OSCCanOpenObject::IsWriteable(void) const
@@ -490,14 +462,11 @@ bool C_OSCCanOpenObject::IsWriteable(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check whether object is of signed integer type
+/*! \brief   Check whether object is of signed integer type
 
    \return
    true:   object is of signed integer type
    false:  it is not
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool C_OSCCanOpenObject::IsIntegerDataType(void) const
@@ -510,14 +479,11 @@ bool C_OSCCanOpenObject::IsIntegerDataType(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check whether object is of unsigned type
+/*! \brief   Check whether object is of unsigned type
 
    \return
    true:   object is of unsigned type
    false:  it is not
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool C_OSCCanOpenObject::IsUnsignedDataType(void) const
@@ -530,14 +496,11 @@ bool C_OSCCanOpenObject::IsUnsignedDataType(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check whether object is of REAL32 or REAL64 type
+/*! \brief   Check whether object is of REAL32 or REAL64 type
 
    \return
    true:   object is of REAL32 or REAL64 type
    false:  it is not
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool C_OSCCanOpenObject::IsFloatDataType(void) const
@@ -550,14 +513,11 @@ bool C_OSCCanOpenObject::IsFloatDataType(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check whether object is of VISIBLE_STRING or UNICODE_STRING type
+/*! \brief   Check whether object is of VISIBLE_STRING or UNICODE_STRING type
 
    \return
    true:   object is of VISIBLE_STRING or UNICODE_STRING type
    false:  it is not
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool C_OSCCanOpenObject::IsStringDataType(void) const

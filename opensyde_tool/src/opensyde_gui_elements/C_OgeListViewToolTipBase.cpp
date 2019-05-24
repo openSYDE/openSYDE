@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       List view base with tool tip (implementation)
 
    List view base with tool tip
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.08.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QEvent>
@@ -24,34 +17,31 @@
 #include "constants.h"
 #include "C_OgeListViewToolTipBase.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     01.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeListViewToolTipBase::C_OgeListViewToolTipBase(QWidget * const opc_Parent) :
    QListView(opc_Parent),
    ms32_HoveredRow(-1),
@@ -60,26 +50,22 @@ C_OgeListViewToolTipBase::C_OgeListViewToolTipBase(QWidget * const opc_Parent) :
    this->setMouseTracking(true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse move event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse move event slot
 
    Here: Handle tooltip if necessary
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     08.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeListViewToolTipBase::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
    QListView::mouseMoveEvent(opc_Event);
    m_HandleMouseMoveToolTip(opc_Event->globalPos());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten default event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten default event slot
 
    Here: Handle tool tip
 
@@ -88,10 +74,8 @@ void C_OgeListViewToolTipBase::mouseMoveEvent(QMouseEvent * const opc_Event)
    \return
    True  Event was recognized and processed
    False Event ignored
-
-   \created     08.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OgeListViewToolTipBase::event(QEvent * const opc_Event)
 {
    bool q_Return;
@@ -142,7 +126,7 @@ bool C_OgeListViewToolTipBase::event(QEvent * const opc_Event)
    else if (opc_Event->type() == QEvent::Leave)
    {
       //hide on leave
-      m_HideTooltip();
+      m_HideToolTip();
 
       this->setMouseTracking(false);
 
@@ -157,29 +141,23 @@ bool C_OgeListViewToolTipBase::event(QEvent * const opc_Event)
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Hide tooltip
-
-   \created     08.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Hide tooltip
 */
-//-----------------------------------------------------------------------------
-void C_OgeListViewToolTipBase::m_HideTooltip(void)
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeListViewToolTipBase::m_HideToolTip(void)
 {
-   this->m_HideToolTip();
+   C_OgeToolTipBase::m_HideToolTip();
    this->ms32_HoveredRow = -1;
    this->ms32_HoveredCol = -1;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle mouse move (tool tip related)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle mouse move (tool tip related)
 
    \param[in] orc_GlobalPos Global mouse pos
-
-   \created     08.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeListViewToolTipBase::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos)
 {
    if ((this->ms32_HoveredRow >= 0) && (this->ms32_HoveredCol >= 0))
@@ -190,13 +168,13 @@ void C_OgeListViewToolTipBase::m_HandleMouseMoveToolTip(const QPoint & orc_Globa
          if ((this->ms32_HoveredRow != c_Index.row()) || (this->ms32_HoveredCol != c_Index.column()))
          {
             //Hide Tooltip
-            m_HideTooltip();
+            m_HideToolTip();
          }
       }
       else
       {
          //Hide Tooltip
-         m_HideTooltip();
+         m_HideToolTip();
       }
    }
 }

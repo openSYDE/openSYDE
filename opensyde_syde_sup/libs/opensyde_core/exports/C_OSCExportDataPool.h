@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Export data pool settings of a openSYDE node.
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.08.2017  STW/U.Roesch
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCEXPORTDATAPOOLH
 #define C_OSCEXPORTDATAPOOLH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 
 #include "stwtypes.h"
@@ -25,12 +19,12 @@
 #include "CSCLStringList.h"
 #include "C_OSCNodeDataPool.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCExportDataPool
 {
@@ -71,6 +65,8 @@ private:
                            const bool oq_FileType, const bool oq_IsRemote);
    static void mh_AddGlobalVariables(stw_scl::C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
                                      const bool oq_FileType, const bool oq_IsRemote);
+   static void mh_AddFunctionPrototypes(stw_scl::C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
+                                        const stw_scl::C_SCLString & orc_ProjectId);
    static void mh_AddModuleGlobal(stw_scl::C_SCLStringList & orc_Data, const C_OSCNodeDataPool & orc_DataPool,
                                   const stw_types::uint8 ou8_ProcessId, const stw_types::uint8 ou8_DataPoolIndexRemote,
                                   const bool oq_IsRemote);
@@ -87,7 +83,7 @@ private:
                                                  const stw_types::uint32 ou32_ArraySize, const bool oq_IsArray);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

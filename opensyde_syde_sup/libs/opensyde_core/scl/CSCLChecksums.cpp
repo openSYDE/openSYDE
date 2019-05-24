@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Checksum calculation algorithms
 
    For details cf. documentation in .h file.
 
-   \implementation
-   project     Y_KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.04.2015  STW/A.Stangl (refactored from DLUtils.cpp)
-   \endimplementation
+   \copyright   Copyright 2015 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h" //pre-compiled headers
 #ifdef __BORLANDC__
 #pragma hdrstop
@@ -26,11 +19,11 @@
 #include "stwtypes.h"
 #include "CSCLChecksums.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_scl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
 //16bit CRC lookup table
 static const uint16 mau16_CRC_TABLE[] =
@@ -69,7 +62,7 @@ static const uint16 mau16_CRC_TABLE[] =
    0x6E17U, 0x7E36U, 0x4E55U, 0x5E74U, 0x2E93U, 0x3EB2U, 0x0ED1U, 0x1EF0U
 };
 
-//--------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 //32bit CRC lookup table
 static const uint32 mau32_CRC_TABLE[] =
@@ -109,19 +102,18 @@ static const uint32 mau32_CRC_TABLE[] =
    0xb3667a2eU, 0xc4614ab8U, 0x5d681b02U, 0x2a6f2b94U, 0xb40bbe37U, 0xc30c8ea1U, 0x5a05df1bU, 0x2d02ef8dU
 };
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief    Calculate 16 bit CRC STW style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Calculate 16 bit CRC STW style
 
    Calc CRC over specified area (as implemented in 16bit ESX classic ECUs)
    The start value can be influenced by setting oru16_CRC before calling the function.
@@ -132,10 +124,8 @@ static const uint32 mau32_CRC_TABLE[] =
    \param[in]     opv_Start      data to calculate checksum over
    \param[in]     ou32_NumBytes  number of bytes to calculate the CRC for
    \param[in,out] oru16_CRC      start checksum / resulting checksum
-
-   \created     03.11.2010  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SCLChecksums::CalcCRC16STW(const void * const opv_Start, const uint32 ou32_NumBytes, uint16 & oru16_CRC)
 {
    uint32 u32_Index;
@@ -148,9 +138,8 @@ void C_SCLChecksums::CalcCRC16STW(const void * const opv_Start, const uint32 ou3
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief    Calculate 16 bit CRC
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Calculate 16 bit CRC
 
    Calculates the 16-bit-CRC over ou32_NumBytes data bytes and places the result in oru16_CRC.
    The start value can be influenced by setting oru16_CRC before calling the function.
@@ -160,10 +149,8 @@ void C_SCLChecksums::CalcCRC16STW(const void * const opv_Start, const uint32 ou3
    \param[in]     opv_Start      data to calculate checksum over
    \param[in]     ou32_NumBytes  number of bytes to calculate the CRC for
    \param[in,out] oru16_CRC      start checksum / resulting checksum
-
-   \created     03.11.2010  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SCLChecksums::CalcCRC16(const void * const opv_Start, const uint32 ou32_NumBytes, uint16 & oru16_CRC)
 {
    uint32 u32_Index;
@@ -177,9 +164,8 @@ void C_SCLChecksums::CalcCRC16(const void * const opv_Start, const uint32 ou32_N
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief    Calculate 32 bit CRC
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Calculate 32 bit CRC
 
    Calculates the 32-bit-CRC over ou32_NumBytes data bytes and places the result in oru32_CRC.
    The start value can be influenced by setting oru32_CRC before calling the function.
@@ -187,10 +173,8 @@ void C_SCLChecksums::CalcCRC16(const void * const opv_Start, const uint32 ou32_N
    \param[in]     opv_Start      data to calculate checksum over
    \param[in]     ou32_NumBytes  number of bytes to calculate the CRC for
    \param[in,out] oru32_CRC      start checksum / resulting checksum
-
-   \created     22.02.2011  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SCLChecksums::CalcCRC32(const void * const opv_Start, const uint32 ou32_NumBytes, uint32 & oru32_CRC)
 {
    const uint8 * const pu8_Data = reinterpret_cast<const uint8 *>(opv_Start); //lint !e925 we need to parse byte-by-byte
@@ -202,9 +186,8 @@ void C_SCLChecksums::CalcCRC32(const void * const opv_Start, const uint32 ou32_N
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculate 32bit CRC as implemented in the TriCore Memory Checker Module
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculate 32bit CRC as implemented in the TriCore Memory Checker Module
 
    This function calculates a checksum based on the hardware implementation of the
    TriCore Memory Checker Module. It implements the data compaction algorithm based
@@ -223,10 +206,8 @@ void C_SCLChecksums::CalcCRC32(const void * const opv_Start, const uint32 ou32_N
    \return
    0          CRC calculated
    -1         ou32_NumBytes is not a multiple of 4
-
-   \created     01.04.2015  STW/A.Stangl (based on pre-existing implementation)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SCLChecksums::CalcCRC32TriCore(const void * const opv_Start, const uint32 ou32_NumBytes, uint32 & oru32_CRC)
 {
    sint32 s32_Return = 0;

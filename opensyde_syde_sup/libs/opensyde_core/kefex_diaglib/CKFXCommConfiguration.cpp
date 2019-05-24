@@ -3,17 +3,12 @@
 //--------------------------------------------------------------.D1-
 //   .FILE [ CKFXCommConfiguration.cpp ]
 //   .GROUP [ KEFEX Library ]
-//   .AUTHOR [ Stangl ]
 //--------------------------------------------------------------.F1-
 //   .DESCRIPTION
 //   Class encapsulation communication protocol parameters.
 //--------------------------------------------------------------
 //   .SPEC
 //   SWKE KEFEX
-//--------------------------------------------------------------
-//   .HISTORY
-//    Date      Author      Commentary
-//    10.08.09  A.Stangl    moved code to this module from DlgKFXProtocolSetup
 //**************************************************************.DE*
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work

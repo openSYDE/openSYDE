@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Class for system view dashboard parameterization table item (implementation)
 
    Class for system view dashboard parameterization table item
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.10.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -30,7 +23,7 @@
 #include "C_GiSvDaParam.h"
 #include "C_PuiSvHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -38,21 +31,20 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -61,10 +53,8 @@ using namespace stw_opensyde_gui_logic;
    \param[in]     ors32_DataIndex      Index of data element in dashboard in system view
    \param[in]     oru64_ID             Unique ID
    \param[in,out] opc_Parent           Optional pointer to parent
-
-   \created     25.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvDaParam::C_GiSvDaParam(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
                              const sint32 & ors32_DataIndex, const uint64 & oru64_ID,
                              QGraphicsItem * const opc_Parent) :
@@ -80,46 +70,40 @@ C_GiSvDaParam::C_GiSvDaParam(const uint32 & oru32_ViewIndex, const uint32 & oru3
    this->setHandlesChildEvents(false);
    //Handle initial edit mode
    this->EditModeActiveChanged(true);
+
+   //Connections
+   connect(this->mpc_ParamWidget, &C_SyvDaItPaWidgetNew::SigNvmReadList, this, &C_GiSvDaParam::SigNvmReadList);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     25.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvDaParam::~C_GiSvDaParam(void)
 {
    //lint -e{1540} Either handled by Qt parent handling or not owned by this class in the first place
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the type of this item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the type of this item
 
    \return  ID
-
-   \created     25.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_GiSvDaParam::type(void) const
 {
    return msn_GRAPHICS_ITEM_DB_PARAM;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply style
 
    \param[in] oe_Style    New style type
    \param[in] oq_DarkMode Flag if dark mode is active
-
-   \created     25.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaParam::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode)
 {
    C_GiSvDaRectBaseGroup::SetDisplayStyle(oe_Style, oq_DarkMode);
@@ -131,25 +115,19 @@ void C_GiSvDaParam::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style,
    C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this->mpc_ParamWidget, "DarkMode", oq_DarkMode);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adjust font to current size
-
-   \created     25.10.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adjust font to current size
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaParam::ReInitializeSize(void)
 {
    //Nothing to do, yet...
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load data from system view dashboard
-
-   \created     25.10.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load data from system view dashboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaParam::LoadData(void)
 {
    const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
@@ -180,13 +158,10 @@ void C_GiSvDaParam::LoadData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update data in system view dashboard
-
-   \created     25.10.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update data in system view dashboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaParam::UpdateData(void)
 {
    const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
@@ -214,13 +189,10 @@ void C_GiSvDaParam::UpdateData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete data in system view dashboard
-
-   \created     25.10.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete data in system view dashboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaParam::DeleteData(void)
 {
    if (this->ms32_Index >= 0)
@@ -232,39 +204,30 @@ void C_GiSvDaParam::DeleteData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle double click
-
-   \created     23.11.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle double click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaParam::CallProperties(void)
 {
    return false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the shown value of the element
-
-   \created     01.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the shown value of the element
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaParam::UpdateShowValue(void)
 {
    C_GiSvDaRectBaseGroup::UpdateShowValue();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Information about the start or stop of a connection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the start or stop of a connection
 
    \param[in]  oq_Active      Flag if connection is active or not active now
-
-   \created     06.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaParam::ConnectionActiveChanged(const bool oq_Active)
 {
    this->mq_Connected = oq_Active;
@@ -281,15 +244,12 @@ void C_GiSvDaParam::ConnectionActiveChanged(const bool oq_Active)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Information about the start or stop of edit mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the start or stop of edit mode
 
    \param[in]  oq_Active  Flag if edit mode is active or not active now
-
-   \created     05.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaParam::EditModeActiveChanged(const bool oq_Active)
 {
    this->mq_EditActive = oq_Active;
@@ -300,16 +260,13 @@ void C_GiSvDaParam::EditModeActiveChanged(const bool oq_Active)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle manual user operation finished event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle manual user operation finished event
 
    \param[in] os32_Result Operation result
    \param[in] ou8_NRC     Negative response code, if any
-
-   \created     15.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaParam::HandleManualOperationFinished(const sint32 os32_Result, const uint8 ou8_NRC)
 {
    bool q_WidgetRelevant = false;
@@ -325,16 +282,13 @@ void C_GiSvDaParam::HandleManualOperationFinished(const sint32 os32_Result, cons
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal all widgets which read rail element ID registrations failed
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal all widgets which read rail element ID registrations failed
 
    \param[in]     orc_FailedIdRegisters    Failed IDs
    \param[in,out] orc_FailedIdErrorDetails Error details for element IDs which failed registration (if any)
-
-   \created     16.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaParam::SetErrorForFailedCyclicElementIdRegistrations(
    const std::vector<C_OSCNodeDataPoolListElementId> & orc_FailedIdRegisters,
    const std::vector<QString> & orc_FailedIdErrorDetails)
@@ -344,15 +298,12 @@ void C_GiSvDaParam::SetErrorForFailedCyclicElementIdRegistrations(
    Q_UNUSED(orc_FailedIdErrorDetails)
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the com driver for parametrization functions
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the com driver for parametrization functions
 
    \param[in]  opc_ComDriver     Pointer to the com driver
-
-   \created     27.10.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaParam::SetSyvComDriver(C_SyvComDriverDiag & orc_ComDriver)
 {
    tgl_assert(this->mpc_ParamWidget != NULL);
@@ -362,55 +313,21 @@ void C_GiSvDaParam::SetSyvComDriver(C_SyvComDriverDiag & orc_ComDriver)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the newest registered value of a specific datapool element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the newest registered value of a specific datapool element
 
    This function is thread safe.
 
    \param[in]     ou32_WidgetDataPoolElementIndex       Index of shown datapool element in widget
-   \param[out]    orc_Value                             Result value
+   \param[out]    orc_Value                             Raw result value
 
    \return
    C_NO_ERR    Value read
    C_RANGE     Index invalid
    C_NOACT     No value received
-
-   \created     01.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
-sint32 C_GiSvDaParam::GetLastValue(const uint32 ou32_WidgetDataPoolElementIndex, std::vector<QString> & orc_Values)
-{
-   std::vector<float64> c_Values;
-   uint32 u32_InternalIndex;
-   sint32 s32_Retval = this->m_MapDataElementIndexToInternalElementIndex(ou32_WidgetDataPoolElementIndex,
-                                                                         u32_InternalIndex);
-
-   if (s32_Retval == C_NO_ERR)
-   {
-      s32_Retval = this->m_GetLastNvmValue(ou32_WidgetDataPoolElementIndex, c_Values, &orc_Values);
-   }
-   return s32_Retval;
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the newest registered value of a specific datapool element
-
-   This function is thread safe.
-
-   \param[in]     ou32_WidgetDataPoolElementIndex       Index of shown datapool element in widget
-   \param[out]    orc_Value                             Result value
-
-   \return
-   C_NO_ERR    Value read
-   C_RANGE     Index invalid
-   C_NOACT     No value received
-
-   \created     27.06.2018  STW/M.Echtler
-*/
-//-----------------------------------------------------------------------------
-sint32 C_GiSvDaParam::GetLastValue2(const uint32 ou32_WidgetDataPoolElementIndex, std::vector<float64> & orc_Values)
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_GiSvDaParam::GetLastValue(const uint32 ou32_WidgetDataPoolElementIndex, C_OSCNodeDataPoolContent & orc_Value)
 {
    uint32 u32_InternalIndex;
    sint32 s32_Retval = this->m_MapDataElementIndexToInternalElementIndex(ou32_WidgetDataPoolElementIndex,
@@ -418,37 +335,31 @@ sint32 C_GiSvDaParam::GetLastValue2(const uint32 ou32_WidgetDataPoolElementIndex
 
    if (s32_Retval == C_NO_ERR)
    {
-      s32_Retval = this->m_GetLastNvmValue(ou32_WidgetDataPoolElementIndex, orc_Values, NULL);
+      s32_Retval = this->m_GetLastNvmValue(ou32_WidgetDataPoolElementIndex, orc_Value);
    }
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get view index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get view index
 
    \return
    View index
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_GiSvDaParam::GetViewIndex(void) const
 {
    return this->mu32_ViewIndex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get table data item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get table data item
 
    \return
    NULL Error
    Else Pointer to table data
-
-   \created     11.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_PuiSvDbParam * C_GiSvDaParam::GetParamItem(void) const
 {
    const C_PuiSvDbParam * pc_Retval = NULL;
@@ -465,9 +376,8 @@ const C_PuiSvDbParam * C_GiSvDaParam::GetParamItem(void) const
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply new param content
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply new param content
 
    WARNING: Data element changes have to trigger HandleNewDataElement
 
@@ -476,10 +386,8 @@ const C_PuiSvDbParam * C_GiSvDaParam::GetParamItem(void) const
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     10.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_GiSvDaParam::SetParamItem(const C_PuiSvDbParam & orc_Content) const
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -497,17 +405,14 @@ sint32 C_GiSvDaParam::SetParamItem(const C_PuiSvDbParam & orc_Content) const
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   View dashboard param widget clear all data pool elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   View dashboard param widget clear all data pool elements
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     05.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_GiSvDaParam::ClearParamItemDataElement(void)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -527,9 +432,8 @@ sint32 C_GiSvDaParam::ClearParamItemDataElement(void)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   View dashboard param widget add new data pool element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   View dashboard param widget add new data pool element
 
    \param[in] orc_NewId   New ID
    \param[in] opc_Content Optional init value
@@ -537,10 +441,8 @@ sint32 C_GiSvDaParam::ClearParamItemDataElement(void)
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     21.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_GiSvDaParam::AddParamItemDataElement(const C_OSCNodeDataPoolListElementId & orc_Id,
                                               const C_OSCNodeDataPoolContent * const opc_Content)
 {
@@ -575,13 +477,10 @@ sint32 C_GiSvDaParam::AddParamItemDataElement(const C_OSCNodeDataPoolListElement
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Accept external data element changes
-
-   \created     08.11.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Accept external data element changes
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaParam::HandleNewDataElement(void)
 {
    const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
@@ -602,19 +501,16 @@ void C_GiSvDaParam::HandleNewDataElement(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete lists
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete lists
 
    \param[in] orc_ListIds Lists to delete
 
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     16.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_GiSvDaParam::DeleteLists(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListId> & orc_ListIds)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -657,11 +553,7 @@ sint32 C_GiSvDaParam::DeleteLists(const std::vector<stw_opensyde_core::C_OSCNode
                            //Update internal data (BEFORE deleting)
                            this->RemoveDataPoolElement(rc_Config.c_ElementId);
                            //Match -> delete all relevant items
-                           c_Copy.c_DataPoolElementsConfig.erase(
-                              c_Copy.c_DataPoolElementsConfig.begin() + u32_ItElement);
-                           c_Copy.c_DataSetSelectionIndices.erase(
-                              c_Copy.c_DataSetSelectionIndices.begin() + u32_ItElement);
-                           c_Copy.c_ListValues.erase(c_Copy.c_ListValues.begin() + u32_ItElement);
+                           c_Copy.RemoveElement(u32_ItElement);
                            //No iteration because new element at current index
                         }
                         else
@@ -730,16 +622,13 @@ sint32 C_GiSvDaParam::DeleteLists(const std::vector<stw_opensyde_core::C_OSCNode
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get improved parent for all pop ups
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get improved parent for all pop ups
 
    \return
    Improved parent for all pop ups
-
-   \created     18.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QWidget * C_GiSvDaParam::GetPopUpParent(void) const
 {
    QWidget * const pc_Retval = this->scene()->views().at(0);
@@ -747,57 +636,47 @@ QWidget * C_GiSvDaParam::GetPopUpParent(void) const
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if warning icon is allowed
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if warning icon is allowed
 
    \return
    True  Warning icon is allowed
    False Warning icon is not allowed
-
-   \created     20.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaParam::m_AllowWarningIcon(void) const
 {
    return false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if the refresh button is available
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if the refresh button is available
 
    \return
    True  Refresh icon will be displayed if necessary
    False Refresh icon will never be displayed
-
-   \created     14.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaParam::m_AllowRefreshButton(void) const
 {
    return false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get common tool tip content if no other item takes precedence over the tool tip
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get common tool tip content if no other item takes precedence over the tool tip
 
    \return
    Common tool tip content if no other item takes precedence over the tool tip
-
-   \created     20.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_GiSvDaParam::m_GetCommonToolTipContent(void) const
 {
    //No common tool tip!
    return "";
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Map widget data element index to data element handler index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Map widget data element index to data element handler index
 
    \param[in]  ou32_DataElementIndex      Widget data element index
    \param[out] oru32_InternalElementIndex Data element handler index
@@ -805,10 +684,8 @@ QString C_GiSvDaParam::m_GetCommonToolTipContent(void) const
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     09.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_GiSvDaParam::m_MapDataElementIndexToInternalElementIndex(const uint32 ou32_DataElementIndex,
                                                                   uint32 & oru32_InternalElementIndex) const
 {

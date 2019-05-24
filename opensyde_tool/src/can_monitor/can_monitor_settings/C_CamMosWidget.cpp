@@ -1,24 +1,16 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for showing all possible openSYDE CAN Monitor settings
  (implementation)
 
    Widget for showing all possible openSYDE CAN Monitor settings
 
-
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     15.11.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_CamMosWidget.h"
@@ -29,34 +21,31 @@
 #include "C_UsHandler.h"
 #include "C_CamMosSectionPopup.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     15.11.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosWidget::C_CamMosWidget(QWidget * const opc_Parent) :
    C_OgeWiOnlyBackground(opc_Parent),
    mpc_Ui(new Ui::C_CamMosWidget),
@@ -141,13 +130,10 @@ C_CamMosWidget::C_CamMosWidget(QWidget * const opc_Parent) :
            this, &C_CamMosWidget::SigCANDllConfigured);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     15.11.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosWidget::~C_CamMosWidget()
 {
    delete this->mpc_Ui;
@@ -157,13 +143,10 @@ C_CamMosWidget::~C_CamMosWidget()
    delete this->mpc_PopupLogging;
 }
 
-//----------------------------------------------------------------------------
-/*!
-   \brief   Load all user settings
-
-   \created     21.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load all user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosWidget::LoadUserSettings(void)
 {
    this->mpc_Ui->pc_WiDatabase->LoadUserSettings();
@@ -177,13 +160,11 @@ void C_CamMosWidget::LoadUserSettings(void)
    this->m_OnExpandSettings(C_UsHandler::h_GetInstance()->GetSettingsAreExpanded());
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
     \brief   Save all user settings
-
-   \created     31.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosWidget::SaveUserSettings(void) const
 {
    if (C_UsHandler::h_GetInstance()->GetSettingsAreExpanded() == false)
@@ -193,54 +174,49 @@ void C_CamMosWidget::SaveUserSettings(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot to forward dbc load finished signal.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot to forward dbc load finished signal.
 
-   \created     19.12.2018  STW/G.Landsgesell
+   \param[in]  os32_Result    Result of DBC file load
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosWidget::OnLoadFinishedDbc(const stw_types::sint32 os32_Result) const
 {
    this->mpc_Ui->pc_WiDatabase->OnLoadFinishedDbc(os32_Result);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot to forward openSYDE system definition load finished signal.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot to forward openSYDE system definition load finished signal.
 
-   \created     19.12.2018  STW/G.Landsgesell
+   \param[in]  os32_Result    Result of openSYDE system definition file load
+   \param[in]  orc_Busses     Buses found in system definition
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosWidget::OnLoadFinishedOsySysDef(const stw_types::sint32 os32_Result,
                                              const std::vector<stw_opensyde_core::C_OSCSystemBus> & orc_Busses) const
 {
    this->mpc_Ui->pc_WiDatabase->OnLoadFinishedOsySysDef(os32_Result, orc_Busses);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot to forward openSYDE bus selection result.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot to forward openSYDE bus selection result.
 
    \param[in]     orc_PathSystemDefinition         system definition identifier (i.e. path)
    \param[in]     os32_Result                      result of bus selection
-
-   \created     07.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosWidget::OnSigOsySysDefBusResult(const QString & orc_PathSystemDefinition,
                                              const stw_types::sint32 os32_Result) const
 {
    this->mpc_Ui->pc_WiDatabase->OnSigOsySysDefBusResult(orc_PathSystemDefinition, os32_Result);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for communication change signal.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for communication change signal.
 
-   \created     09.01.2019  STW/G.Landsgesell
+   \param[in]  oq_Online    Online/offline flag
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosWidget::OnCommunicationStarted(const bool oq_Online) const
 {
    this->mpc_Ui->pc_WiDatabase->OnCommunicationStarted(oq_Online);
@@ -248,27 +224,21 @@ void C_CamMosWidget::OnCommunicationStarted(const bool oq_Online) const
    this->mpc_Ui->pc_WiLogging->OnCommunicationStarted(oq_Online);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot to forward log file add result.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot to forward log file add result.
 
    \param[in]   os32_Result       result of log file add operation
-
-   \created     17.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosWidget::OnSigLogFileAddResult(const stw_types::sint32 os32_Result) const
 {
    this->mpc_Ui->pc_WiLogging->OnSigLogFileAddResult(os32_Result);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot to forward saved-as action.
-
-   \created     05.02.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot to forward saved-as action.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosWidget::OnSigSavedAsNew(void) const
 {
    // forward signal to all widgets including paths which may be relative
@@ -276,64 +246,52 @@ void C_CamMosWidget::OnSigSavedAsNew(void) const
    this->mpc_Ui->pc_WiLogging->OnSigSavedAsNew();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Forward database drop from main window.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Forward database drop from main window.
 
    \param[in]     orc_Path        path of database file
-
-   \created     06.02.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosWidget::OnDatabaseDropped(const QString & orc_Path) const
 {
    this->mpc_Ui->pc_WiDatabase->AddDroppedDatabase(orc_Path);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clears the current configuration
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clears the current configuration
 
    Databases and filter configuration is removed
-
-   \created     14.02.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosWidget::ClearConfiguration(void) const
 {
    this->mpc_Ui->pc_WiDatabase->Clear();
    this->mpc_Ui->pc_WiFilter->Clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Expand settings by toggling header expand collapse button
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Expand settings by toggling header expand collapse button
 
    long description of function within several lines
 
    \param[in]     oq_Expand    true: expand settings subsections
                                false: collapse settings subsections
-
-   \created     04.02.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosWidget::ExpandSettings(const bool oq_Expand) const
 {
    this->mpc_Ui->pc_WiTitle->SetOpen(oq_Expand);
    // this toggles the ">>" button and therefore emits a signal; on this signal we connect and adapt the GUI
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten move event.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten move event.
 
    Here: Handle popup move.
 
-   \param[in,out]    opc_KeyEvent   Event identification and information
-
-   \created     25.01.2019  STW/G.Landsgesell
+   \param[in,out]    opc_Event   Event identification and information
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosWidget::moveEvent(QMoveEvent * const opc_Event)
 {
    if (this->mpc_PopupDatabase->isVisible() == true)
@@ -364,16 +322,13 @@ void C_CamMosWidget::moveEvent(QMoveEvent * const opc_Event)
    C_OgeWiOnlyBackground::moveEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle expand or collapse settings for subsections.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle expand or collapse settings for subsections.
 
    \param[in]     oq_Expand        true: expand settings subsections
                                    false: collapse settings subsections
-
-   \created     11.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosWidget::m_OnExpandSettings(const bool oq_Expand)
 {
    // always show whole widget in popup state
@@ -438,13 +393,10 @@ void C_CamMosWidget::m_OnExpandSettings(const bool oq_Expand)
    Q_EMIT (this->SigExpandSettings(oq_Expand));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show database popup.
-
-   \created     15.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show database popup.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosWidget::m_ShowPopupDatabase(const bool oq_Checked)
 {
    if (oq_Checked == true)
@@ -463,13 +415,10 @@ void C_CamMosWidget::m_ShowPopupDatabase(const bool oq_Checked)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show CAN DLL configuration popup.
-
-   \created     15.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show CAN DLL configuration popup.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosWidget::m_ShowPopupDllConfig(const bool oq_Checked)
 {
    if (oq_Checked == true)
@@ -487,13 +436,10 @@ void C_CamMosWidget::m_ShowPopupDllConfig(const bool oq_Checked)
       this->mpc_PopupDllConfig->setVisible(false);
    }
 }
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show filter popup.
-
-   \created     15.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show filter popup.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosWidget::m_ShowPopupFilter(const bool oq_Checked)
 {
    if (oq_Checked == true)
@@ -511,13 +457,10 @@ void C_CamMosWidget::m_ShowPopupFilter(const bool oq_Checked)
       this->mpc_PopupFilter->setVisible(false);
    }
 }
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show logging popup.
-
-   \created     15.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show logging popup.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosWidget::m_ShowPopupLogging(const bool oq_Checked)
 {
    if (oq_Checked == true)
@@ -536,16 +479,13 @@ void C_CamMosWidget::m_ShowPopupLogging(const bool oq_Checked)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check all popups for open one.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check all popups for open one.
 
    \return
    opened popup enum or none if no popup is open
-
-   \created     31.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_UsHandler::E_SettingsSubSection C_CamMosWidget::m_GetPopOpenIdentity(void) const
 {
    C_UsHandler::E_SettingsSubSection e_Return;

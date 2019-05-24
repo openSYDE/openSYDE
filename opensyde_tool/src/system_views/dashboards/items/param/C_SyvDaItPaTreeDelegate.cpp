@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Parameter table model (implementation)
 
    Parameter table model
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     03.11.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QSvgRenderer>
@@ -28,10 +21,11 @@
 #include "C_OgeCbxParam.h"
 #include "C_PuiSdHandler.h"
 #include "C_SdNdeDataPoolUtil.h"
+#include "C_TblTreDelegateUtil.h"
 #include "C_SyvDaItPaTreeModel.h"
 #include "C_SyvDaItPaTreeDelegate.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_opensyde_gui;
@@ -39,25 +33,22 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     03.11.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaTreeDelegate::C_SyvDaItPaTreeDelegate(QObject * const opc_Parent) :
    QStyledItemDelegate(opc_Parent),
    mpc_Editor(NULL)
@@ -65,25 +56,21 @@ C_SyvDaItPaTreeDelegate::C_SyvDaItPaTreeDelegate(QObject * const opc_Parent) :
    connect(this, &C_SyvDaItPaTreeDelegate::SigNewEditor, this, &C_SyvDaItPaTreeDelegate::m_SetNewEditor);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current editor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current editor
 
    \return
    NULL Editor not found
    Else Valid editor
-
-   \created     31.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QWidget * C_SyvDaItPaTreeDelegate::GetEditor(void)
 {
    return this->mpc_Editor;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten create editor event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten create editor event slot
 
    Here: Create appropriate editor widget
 
@@ -93,10 +80,8 @@ QWidget * C_SyvDaItPaTreeDelegate::GetEditor(void)
 
    \return
    Editor widget
-
-   \created     03.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QWidget * C_SyvDaItPaTreeDelegate::createEditor(QWidget * const opc_Parent, const QStyleOptionViewItem & orc_Option,
                                                 const QModelIndex & orc_Index) const
 {
@@ -205,18 +190,15 @@ QWidget * C_SyvDaItPaTreeDelegate::createEditor(QWidget * const opc_Parent, cons
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten set editor data event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten set editor data event slot
 
    Here: Pass relevant data
 
    \param[in,out] opc_Editor Editor widget
    \param[in]     orc_Index  Correlating index
-
-   \created     03.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex & orc_Index) const
 {
    if ((opc_Editor != NULL) && (orc_Index.isValid() == true))
@@ -258,19 +240,16 @@ void C_SyvDaItPaTreeDelegate::setEditorData(QWidget * const opc_Editor, const QM
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten set model data event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten set model data event slot
 
    Here: Pass relevant data
 
    \param[in,out] opc_Editor Editor widget
    \param[in,out] opc_Model  Model object
    \param[in]     orc_Index  Correlating index
-
-   \created     03.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel * const opc_Model,
                                            const QModelIndex & orc_Index) const
 {
@@ -311,19 +290,16 @@ void C_SyvDaItPaTreeDelegate::setModelData(QWidget * const opc_Editor, QAbstract
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Size hint of each index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Size hint of each index
 
    \param[in] orc_Option Style options
    \param[in] orc_Index  Index
 
    \return
    Item size
-
-   \created     09.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QSize C_SyvDaItPaTreeDelegate::sizeHint(const QStyleOptionViewItem & orc_Option, const QModelIndex & orc_Index) const
 {
    QSize c_Retval = QStyledItemDelegate::sizeHint(orc_Option, orc_Index);
@@ -335,66 +311,40 @@ QSize C_SyvDaItPaTreeDelegate::sizeHint(const QStyleOptionViewItem & orc_Option,
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paint item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paint item
 
-   Here: special handling for boolean & deactivated cells
+   Here: handle icons
 
    \param[in,out] opc_Painter Painter
    \param[in]     orc_Option  Option
    \param[in]     orc_Index   Index
-
-   \created     17.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeDelegate::paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
                                     const QModelIndex & orc_Index) const
 {
-   const QStringList c_IconPaths = orc_Index.data(msn_USER_ROLE_ICON).toStringList();
-
    QStyledItemDelegate::paint(opc_Painter, orc_Option, orc_Index);
-   if (c_IconPaths.count() == 2)
-   {
-      const QSize c_IconSize(16, 16);
-      // center icon
-      const QRect c_Rect(orc_Option.rect.topLeft() + QPoint((orc_Option.rect.width() - c_IconSize.width()) / 2,
-                                                            (orc_Option.rect.height() - c_IconSize.height()) / 2),
-                         c_IconSize);
-      if (orc_Index.flags().testFlag(Qt::ItemIsEditable) == true)
-      {
-         QSvgRenderer c_Renderer(c_IconPaths.at(0));
-         c_Renderer.render(opc_Painter, c_Rect);
-      }
-      else
-      {
-         QSvgRenderer c_Renderer(c_IconPaths.at(1));
-         c_Renderer.render(opc_Painter, c_Rect);
-      }
-   }
+   C_TblTreDelegateUtil::h_PaintIcon(opc_Painter, orc_Option, orc_Index);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten destroy editor event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten destroy editor event slot
 
    Here: Register destruction
 
    \param[in,out] opc_Editor Editor widget
    \param[in]     orc_Index  Correlating index
-
-   \created     31.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeDelegate::destroyEditor(QWidget * const opc_Editor, const QModelIndex & orc_Index) const
 {
    QStyledItemDelegate::destroyEditor(opc_Editor, orc_Index);
    Q_EMIT this->SigNewEditor(NULL);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten event filter slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten event filter slot
 
    Here: Handle showing popup of combobox. It has a problem with the combination of a delegate in a table on a
    proxy widget in graphics scene
@@ -406,10 +356,8 @@ void C_SyvDaItPaTreeDelegate::destroyEditor(QWidget * const opc_Editor, const QM
    \return
    True  Event was recognized and processed
    False Event ignored
-
-   \created     26.10.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItPaTreeDelegate::eventFilter(QObject * const opc_Object, QEvent * const opc_Event)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -432,33 +380,27 @@ bool C_SyvDaItPaTreeDelegate::eventFilter(QObject * const opc_Object, QEvent * c
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set editor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set editor
 
    \param[in] opc_Editor New editor
-
-   \created     31.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeDelegate::m_SetNewEditor(QWidget * const opc_Editor)
 {
    this->mpc_Editor = opc_Editor;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create widget to use for editing this value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create widget to use for editing this value
 
    \param[in,out] opc_Parent Parent widget
    \param[in]     orc_Index  Correlating index
 
    \return
    Editor widget
-
-   \created     03.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QWidget * C_SyvDaItPaTreeDelegate::m_CreateEditor(QWidget * const opc_Parent, const QModelIndex & orc_Index) const
 {
    QWidget * pc_Retval = NULL;

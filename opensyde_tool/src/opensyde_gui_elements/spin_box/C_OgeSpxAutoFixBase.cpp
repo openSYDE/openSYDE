@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Spin box with auto fix to nearest raw value base functionaliy (implementation)
 
    Spin box with auto fix to nearest raw value base functionaliy
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.11.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -24,32 +17,29 @@
 #include "C_OgeSpxAutoFixBase.h"
 #include "C_SdNdeDataPoolContentUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     13.11.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeSpxAutoFixBase::C_OgeSpxAutoFixBase(void) :
    mu64_NumberOfStepsAvailable(0),
    mf64_Factor(1.0),
@@ -58,30 +48,24 @@ C_OgeSpxAutoFixBase::C_OgeSpxAutoFixBase(void) :
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     21.03.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeSpxAutoFixBase::~C_OgeSpxAutoFixBase(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize widget with valid values
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize widget with valid values
 
    \param[in] orc_Min     Unscaled minimum value
    \param[in] orc_Max     Unscaled maximum value
    \param[in] of64_Factor Scaling factor
    \param[in] of64_Offset Scaling offset
    \param[in] ou32_Index  Optional data index (used if array)
-
-   \created     13.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxAutoFixBase::Init(const C_OSCNodeDataPoolContent & orc_Min, const C_OSCNodeDataPoolContent & orc_Max,
                                const float64 of64_Factor, const float64 of64_Offset, const uint32 ou32_Index)
 {

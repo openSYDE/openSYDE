@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget with all status information labels
@@ -6,24 +6,18 @@
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     15.11.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_CAMMETSTATUSBARWIDGET_H
 #define C_CAMMETSTATUSBARWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 
 #include "stwtypes.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
 {
 class C_CamMetStatusBarWidget;
@@ -31,9 +25,9 @@ class C_CamMetStatusBarWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_CamMetStatusBarWidget :
    public QWidget
@@ -46,7 +40,7 @@ public:
 
    void InitStaticNames(void);
 
-   void SetBusLoad(const stw_types::uint8 ou8_BusLoad);
+   void SetBusLoad(const stw_types::uint8 ou8_BusLoad, const stw_types::sint32 os32_CANBitrate);
    void SetTxErrors(const stw_types::uint32 ou32_TxErrors);
    void SetFilteredMessages(const stw_types::uint32 ou32_FilteredMessages);
    void SetActiveFilters(const stw_types::uint32 ou32_ActiveFilters);
@@ -66,7 +60,7 @@ private:
    stw_types::uint32 mu32_ActiveFilters;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

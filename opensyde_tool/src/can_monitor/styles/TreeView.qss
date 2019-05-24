@@ -88,3 +88,16 @@ stw_opensyde_gui--C_CamMosDatabaseSelectionView::branch:open:has-children:has-si
 border-image: none;
 image:url(://images/IconArrowSmallClose.png);
 }
+
+/* -- Sort indicator -- */
+stw_opensyde_gui--C_CamMetTreeView QHeaderView::down-arrow {
+width: 21px;
+height: 21px;
+image: url(://images/IconMoveDown.svg) 0 0 0 0 stretch stretch;
+}
+
+stw_opensyde_gui--C_CamMetTreeView QHeaderView::up-arrow {
+width: 21px;
+height: 21px;
+image: url(://images/IconMoveUp.svg) 0 0 0 0 stretch stretch;
+}

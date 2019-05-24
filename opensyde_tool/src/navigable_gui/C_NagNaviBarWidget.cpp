@@ -1,23 +1,16 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for navigation bar
 
    Navigation bar for switching use cases.
    This widget is designed in a ui file.
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     07.07.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <iostream>
@@ -44,7 +37,7 @@
 #include "C_OSCLoggingHandler.h"
 #include "C_OgeWiCustomMessage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_tgl;
 using namespace stw_types;
@@ -53,31 +46,28 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 static const sintn msn_MAXIMIZED_WIDTH = 290;
 static const sintn msn_MINIMIZED_WIDTH = 36; //36 = min size of minimize/maximize icon
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     07.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_NagNaviBarWidget::C_NagNaviBarWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_NagNaviBarWidget),
@@ -196,15 +186,12 @@ C_NagNaviBarWidget::C_NagNaviBarWidget(QWidget * const opc_Parent) :
    this->InitText();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     06.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_NagNaviBarWidget::~C_NagNaviBarWidget()
 {
    //Store splitter position
@@ -214,13 +201,10 @@ C_NagNaviBarWidget::~C_NagNaviBarWidget()
    //lint -e{1740}  no memory leak because of the parent all elements and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize dynamic system view page
-
-   \created     11.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize dynamic system view page
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::InitSysView(void)
 {
    // system view
@@ -230,51 +214,39 @@ void C_NagNaviBarWidget::InitSysView(void)
    Q_EMIT this->SigCheckSysViews();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update all view names
-
-   \created     03.08.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update all view names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::UpdateNames(void) const
 {
    this->mpc_Ui->pc_ListViewViews->UpdateNames();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle view icons update
-
-   \created     30.07.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle view icons update
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::UpdateViewIcons(const uint32 ou32_ViewIndex) const
 {
    m_UpdateViewIcons(true, ou32_ViewIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle all views icon update
-
-   \created     22.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle all views icon update
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::UpdateAllViewsIcons(void) const
 {
    m_UpdateViewIcons(false, 0UL);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle all screens icons update
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle all screens icons update
 
    \param[in] oq_CheckAll Flag if all icons should be checked
-
-   \created     20.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::UpdateAllScreenIcons(const bool oq_CheckAll) const
 {
    if (oq_CheckAll == true)
@@ -285,9 +257,8 @@ void C_NagNaviBarWidget::UpdateAllScreenIcons(const bool oq_CheckAll) const
    this->mpc_Ui->pc_ListViewViews->UpdateDeco(false, 0UL);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets mode of navigation bar
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets mode of navigation bar
 
    The mode defines which use case is active and the submode defines which
    function of the use case is active.
@@ -295,10 +266,8 @@ void C_NagNaviBarWidget::UpdateAllScreenIcons(const bool oq_CheckAll) const
    \param[in]  os32_Mode      Index of mode
    \param[in]  os32_SubMode   Index of submode
    \param[in]  ou32_Index     Optional Index number (for example for node or bus)
-
-   \created     08.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::SetMode(const sint32 os32_Mode, const sint32 os32_SubMode, const uint32 ou32_Index)
 {
    //remember mode
@@ -329,8 +298,8 @@ void C_NagNaviBarWidget::SetMode(const sint32 os32_Mode, const sint32 os32_SubMo
 
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_PushButtonTopology, "Active", false);
 
-   this->mpc_Ui->pc_ListViewNodes->SetSelectedIndex(-1);
-   this->mpc_Ui->pc_ListViewBuses->SetSelectedIndex(-1);
+   this->mpc_Ui->pc_ListViewNodes->SetSelectedIndexAndScroll(-1);
+   this->mpc_Ui->pc_ListViewBuses->SetSelectedIndexAndScroll(-1);
 
    this->mpc_Ui->pc_GroupBoxSD->SetSpecialBackground(false);
 
@@ -348,10 +317,10 @@ void C_NagNaviBarWidget::SetMode(const sint32 os32_Mode, const sint32 os32_SubMo
          C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_PushButtonTopology, "Active", true);
          break;
       case ms32_SUBMODE_SYSDEF_NODEEDIT:
-         this->mpc_Ui->pc_ListViewNodes->SetSelectedIndex(static_cast<sint32>(this->mu32_ActiveIndex));
+         this->mpc_Ui->pc_ListViewNodes->SetSelectedIndexAndScroll(static_cast<sint32>(this->mu32_ActiveIndex));
          break;
       case ms32_SUBMODE_SYSDEF_BUSEDIT:
-         this->mpc_Ui->pc_ListViewBuses->SetSelectedIndex(static_cast<sint32>(this->mu32_ActiveIndex));
+         this->mpc_Ui->pc_ListViewBuses->SetSelectedIndexAndScroll(static_cast<sint32>(this->mu32_ActiveIndex));
          break;
       default:
          break;
@@ -376,19 +345,16 @@ void C_NagNaviBarWidget::SetMode(const sint32 os32_Mode, const sint32 os32_SubMo
    m_SysViewSizeChanged();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Marks the specific mode with a star for changed data in the mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Marks the specific mode with a star for changed data in the mode
 
    \param[in]  oq_Changed     Flag if data was changed or not
    \param[in]  oq_All         Flag if all items of a submode shall be marked or not
    \param[in]  os32_Mode      Index of mode
    \param[in]  os32_SubMode   Index of submode
    \param[in]  ou32_Index     Optional Index number (for example for node or bus)
-
-   \created     09.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::MarkModeForDataChanged(const bool oq_Changed, const bool oq_All, const sint32 os32_Mode,
                                                 const sint32 os32_SubMode, const uint32 ou32_Index) const
 {
@@ -400,13 +366,31 @@ void C_NagNaviBarWidget::MarkModeForDataChanged(const bool oq_Changed, const boo
    Q_UNUSED(ou32_Index)
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initializes all visible strings on the widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Specific function to reset any change use-case request to its original state
 
-   \created     07.10.2016  STW/S.Singer
+   \param[in] os32_Mode Use-case to revert to
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagNaviBarWidget::ResetUseCaseAfterChangeFailure(const sint32 os32_Mode) const
+{
+   //Update active mode
+   if (os32_Mode == ms32_MODE_SYSDEF)
+   {
+      this->mpc_Ui->pc_WidgetTabSd->SetActive(true);
+      this->mpc_Ui->pc_WidgetTabSc->SetActive(false);
+   }
+   else
+   {
+      this->mpc_Ui->pc_WidgetTabSd->SetActive(false);
+      this->mpc_Ui->pc_WidgetTabSc->SetActive(true);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initializes all visible strings on the widget
+*/
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::InitText(void) const
 {
    this->mpc_Ui->pc_LabelBuses->setText(C_GtGetText::h_GetText("Buses"));
@@ -426,13 +410,10 @@ void C_NagNaviBarWidget::InitText(void) const
                                                                    "Open new instance of openSYDE CAN Monitor."));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load splitter size from user settings
-
-   \created     07.08.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load splitter size from user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::LoadUserSettings(void)
 {
    this->mq_Loaded = true;
@@ -448,13 +429,10 @@ void C_NagNaviBarWidget::LoadUserSettings(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save splitter user settings
-
-   \created     07.08.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save splitter user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::SaveUserSettings(void) const
 {
    if (this->mq_Loaded == true)
@@ -475,47 +453,38 @@ void C_NagNaviBarWidget::SaveUserSettings(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten hide event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten hide event slot
 
    Here: Save splitter position
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     07.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::hideEvent(QHideEvent * const opc_Event)
 {
    SaveUserSettings();
    QWidget::hideEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten resize event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten resize event slot
 
    Here: handle the system view size
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     08.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::resizeEvent(QResizeEvent * const opc_Event)
 {
    QWidget::resizeEvent(opc_Event);
    m_SysViewSizeChanged();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handles all visible elements on minimize / maximize
-
-   \created     07.10.2016  STW/S.Singer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handles all visible elements on minimize / maximize
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::HandleElements()
 {
    if (this->mq_Maximized == true)
@@ -546,13 +515,10 @@ void C_NagNaviBarWidget::HandleElements()
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot function for button minimizing or maximizing click
-
-   \created     07.07.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for button minimizing or maximizing click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_MinmaxClicked()
 {
    this->mq_Maximized = !this->mq_Maximized;
@@ -560,25 +526,19 @@ void C_NagNaviBarWidget::m_MinmaxClicked()
    this->mc_TimerAnimation.start();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot function for button start view (main) click
-
-   \created     07.07.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for button start view (main) click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_StartViewClicked()
 {
    Q_EMIT this->SigStartViewClicked();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot function for node change
-
-   \created     06.02.2017  STW/S.Singer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for node change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_NodesChanged(void) const
 {
    uint32 u32_Index;
@@ -601,13 +561,10 @@ void C_NagNaviBarWidget::m_NodesChanged(void) const
    m_UpdateNodeErrors();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot function for busses change
-
-   \created     06.02.2017  STW/S.Singer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for busses change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_BussesChanged(void) const
 {
    uint32 u32_Index;
@@ -629,13 +586,10 @@ void C_NagNaviBarWidget::m_BussesChanged(void) const
    m_UpdateBusErrors();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle add view button click
-
-   \created     08.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle add view button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_AddViewClicked(void)
 {
    QElapsedTimer c_Timer;
@@ -653,13 +607,10 @@ void C_NagNaviBarWidget::m_AddViewClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle open CAN monitor click
-
-   \created     10.01.2019  STW/S.Singer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle open CAN monitor click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_OpenCanMonitor(void)
 {
    QString c_ExecutablePath = C_Uti::h_GetExePath() + "/CAN_Monitor/openSYDE_CAN_Monitor.exe";
@@ -685,49 +636,37 @@ void C_NagNaviBarWidget::m_OpenCanMonitor(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle rename view action
-
-   \created     11.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle rename view action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_SysViewRenameClicked(const stw_types::uint32 ou32_ViewIndex, const QString & orc_Name)
 {
    Q_EMIT this->SigRenameView(ou32_ViewIndex, orc_Name, false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle delete view action
-
-   \created     11.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle delete view action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_SysViewDeleteClicked(const stw_types::uint32 ou32_ViewIndex)
 {
    Q_EMIT this->SigDeleteView(ou32_ViewIndex, this->ms32_ActiveSubMode, this->mu32_ActiveIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle duplicate view action
-
-   \created     11.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle duplicate view action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_SysViewDuplicateClicked(const stw_types::uint32 ou32_ViewIndex)
 {
    Q_EMIT this->SigDuplicateView(ou32_ViewIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle system view size change
-
-   \created     08.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle system view size change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_SysViewSizeChanged(void) const
 {
    if (this->mpc_Ui->pc_ListViewViews->isVisible() == true)
@@ -770,45 +709,38 @@ void C_NagNaviBarWidget::m_SysViewSizeChanged(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle SC tab clicked
-
-   \created     25.07.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle SC tab clicked
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_TabScCLicked(void)
 {
-   Q_EMIT this->SigChangeUseCase(ms32_MODE_SYSVIEW, ms32_SUBMODE_SYSVIEW_SETUP);
-
-   //Update active mode
+   //Update active mode (user feedback before triggering a "long" action,
+   // and avoid setting the buttons after they were reverted by an aborted action)
    this->mpc_Ui->pc_WidgetTabSd->SetActive(false);
    this->mpc_Ui->pc_WidgetTabSc->SetActive(true);
+
+   Q_EMIT this->SigChangeUseCase(ms32_MODE_SYSVIEW, ms32_SUBMODE_SYSVIEW_SETUP);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle SD tab clicked
-
-   \created     25.07.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle SD tab clicked
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_TabSdCLicked(void)
 {
-   Q_EMIT this->SigChangeUseCase(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_TOPOLOGY);
-
-   //Update active mode
+   //Update active mode (user feedback before triggering a "long" action,
+   // and avoid setting the buttons after they were reverted by an aborted action)
    this->mpc_Ui->pc_WidgetTabSd->SetActive(true);
    this->mpc_Ui->pc_WidgetTabSc->SetActive(false);
+
+   Q_EMIT this->SigChangeUseCase(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_TOPOLOGY);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update node errors
-
-   \created     31.07.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update node errors
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_UpdateNodeErrors(void)  const
 {
    std::vector<bool> c_ErrorsNode;
@@ -820,13 +752,10 @@ void C_NagNaviBarWidget::m_UpdateNodeErrors(void)  const
    this->mpc_Ui->pc_ListViewNodes->SetError(c_ErrorsNode);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update bus errors
-
-   \created     31.07.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update bus errors
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_UpdateBusErrors(void) const
 {
    std::vector<bool> c_ErrorsBus;
@@ -838,15 +767,12 @@ void C_NagNaviBarWidget::m_UpdateBusErrors(void) const
    this->mpc_Ui->pc_ListViewBuses->SetError(c_ErrorsBus);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle bus click
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle bus click
 
    \param[in] osn_Index Selected index
-
-   \created     31.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_OnClickBus(const sintn osn_Index)
 {
    if (osn_Index >= 0)
@@ -860,15 +786,12 @@ void C_NagNaviBarWidget::m_OnClickBus(const sintn osn_Index)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle node click
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle node click
 
    \param[in] osn_Index Selected index
-
-   \created     31.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_OnClickNode(const sintn osn_Index)
 {
    if (osn_Index >= 0)
@@ -883,18 +806,15 @@ void C_NagNaviBarWidget::m_OnClickNode(const sintn osn_Index)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Select view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Select view
 
    \param[in] ou32_ViewIndex     View index
    \param[in] os32_SubMode       Sub mode
    \param[in] orc_Name           Selected view name
    \param[in] orc_SubSubItemName Selected sub sub mode name
-
-   \created     30.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_SelectView(const uint32 ou32_ViewIndex, const sint32 os32_SubMode, const QString & orc_Name,
                                       const QString & orc_SubSubItemName)
 {
@@ -903,16 +823,13 @@ void C_NagNaviBarWidget::m_SelectView(const uint32 ou32_ViewIndex, const sint32 
    Q_EMIT this->SigChangeMode(ms32_MODE_SYSVIEW, os32_SubMode, ou32_ViewIndex, orc_Name, orc_SubSubItemName);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   update all view icons (depends on current state)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   update all view icons (depends on current state)
 
    \param[in] oq_CheckOnlyThisView Flag to reduce view error check to one item (only used in view state)
    \param[in] ou32_ViewIndex       Index to specify which view changed (only used if oq_CheckOnlyThisView set)
-
-   \created     22.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_UpdateViewIcons(const bool oq_CheckOnlyThisView, const uint32 ou32_ViewIndex) const
 {
    if (this->ms32_ActiveMode == ms32_MODE_SYSVIEW)
@@ -947,13 +864,10 @@ void C_NagNaviBarWidget::m_UpdateViewIcons(const bool oq_CheckOnlyThisView, cons
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot function for animation timer
-
-   \created     07.07.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for animation timer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_AnimationTimerEvent()
 {
    QSize c_Size;
@@ -1016,13 +930,10 @@ void C_NagNaviBarWidget::m_AnimationTimerEvent()
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle push button topology click
-
-   \created     31.07.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle push button topology click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_PbTopologyClick(void)
 {
    const QString c_Name = C_GtGetText::h_GetText("Network Topology");

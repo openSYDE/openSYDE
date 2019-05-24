@@ -1,23 +1,16 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       resource string handling class
 
    ANSI C++ resource string handling class.
    For details cf. documentation in .h file.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-200x
-   license     use only under terms of contract / confidential
-
-   created     22.07.2009  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------ */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -30,17 +23,17 @@
 using namespace stw_types;
 using namespace stw_scl;
 
-/* -- Defines ------------------------------------------------------------- */
+/* -- Defines ------------------------------------------------------------------------------------------------------- */
 
-/* -- Types --------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ---------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables --------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ----------------------------------- */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------ */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 C_SCLResourceStrings::C_SCLResourceStrings(void) :
    mq_Dirty(false)
@@ -48,7 +41,7 @@ C_SCLResourceStrings::C_SCLResourceStrings(void) :
    this->Clear();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_SCLResourceStrings::Clear(void)
 {
@@ -56,7 +49,7 @@ void C_SCLResourceStrings::Clear(void)
    mq_Dirty = true;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //do a binary search in the sorted table:
 C_SCLString C_SCLResourceStrings::LoadStr(const uint16 ou16_Index)
 {
@@ -92,7 +85,7 @@ C_SCLString C_SCLResourceStrings::LoadStr(const uint16 ou16_Index)
    return ("C_SCLResourceStrings::LoadStr: String " + C_SCLString::IntToStr(ou16_Index) + "not defined !");
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_SCLResourceStrings::AddString(const uint16 ou16_Index, const C_SCLString & orc_Text)
 {
@@ -102,7 +95,7 @@ void C_SCLResourceStrings::AddString(const uint16 ou16_Index, const C_SCLString 
    mq_Dirty = true;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_SCLResourceStrings::SortByIndex(void)
 {
@@ -123,7 +116,7 @@ void C_SCLResourceStrings::SortByIndex(void)
    mq_Dirty = false;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_SCLResourceStrings::SetStringTable(const C_SCLResourceString * const opc_Strings, const uint16 ou16_NumStrings)
 {
@@ -144,4 +137,4 @@ void C_SCLResourceStrings::SetStringTable(const C_SCLResourceString * const opc_
    this->SortByIndex();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------

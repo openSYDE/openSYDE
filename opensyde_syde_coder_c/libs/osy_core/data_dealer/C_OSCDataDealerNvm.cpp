@@ -1,22 +1,11 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Encapsulates non-trivial sequences for NVM access.
 
-   Specific
-
-   detailed description
-
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.10.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -46,12 +35,9 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Set up class
+/*! \brief   Set up class
 
    Initializes class elements
-
-   \created     13.10.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_OSCDataDealerNvm::C_OSCDataDealerNvm(void) :
@@ -60,16 +46,13 @@ C_OSCDataDealerNvm::C_OSCDataDealerNvm(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Set up class
+/*! \brief   Set up class
 
    Initializes class elements
 
    \param[in]     opc_Node          Pointer to node of data dealer
    \param[in]     ou32_NodeIndex    Index of node of data dealer
    \param[in]     opc_DiagProtocol  Pointer to used diagnostic protocol
-
-   \created     13.10.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_OSCDataDealerNvm::C_OSCDataDealerNvm(C_OSCNode * const opc_Node, const uint32 ou32_NodeIndex,
@@ -79,10 +62,7 @@ C_OSCDataDealerNvm::C_OSCDataDealerNvm(C_OSCNode * const opc_Node, const uint32 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up class
-
-   \created     13.10.2017  STW/B.Bayer
+/*! \brief   Clean up class
 */
 //-----------------------------------------------------------------------------
 C_OSCDataDealerNvm::~C_OSCDataDealerNvm(void)
@@ -90,8 +70,7 @@ C_OSCDataDealerNvm::~C_OSCDataDealerNvm(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the CRC for the list
+/*! \brief   Calculates the CRC for the list
 
    The 16 bit CRC_CCITT is used with start value 0x1D0F.
 
@@ -99,8 +78,6 @@ C_OSCDataDealerNvm::~C_OSCDataDealerNvm(void)
 
    \return
    Calculated CRC
-
-   \created     17.10.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 uint16 C_OSCDataDealerNvm::NvmCalcCrc(const C_OSCNodeDataPoolList & orc_List) const
@@ -135,8 +112,7 @@ uint16 C_OSCDataDealerNvm::NvmCalcCrc(const C_OSCNodeDataPoolList & orc_List) co
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Reads a specific NVM list of ECU
+/*! \brief   Reads a specific NVM list of ECU
 
    The CRC of the list will be checked.
 
@@ -157,8 +133,6 @@ uint16 C_OSCDataDealerNvm::NvmCalcCrc(const C_OSCNodeDataPoolList & orc_List) co
    C_WARN      Error response or malformed protocol response
    C_COM       Pre-requisites not correct; e.g. driver not initialized or
                parameter out of range (checked by client side)
-
-   \created     13.10.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvm::NvmReadList(const uint32 ou32_DataPoolIndex, const uint32 ou32_ListIndex,
@@ -192,8 +166,7 @@ sint32 C_OSCDataDealerNvm::NvmReadList(const uint32 ou32_DataPoolIndex, const ui
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Notify server application about NVM data changes
+/*! \brief   Notify server application about NVM data changes
 
    \param[in]     ou8_DataPoolIndex             Node datapool index
    \param[in]     ou8_ListIndex                 Node datapool list index
@@ -210,8 +183,6 @@ sint32 C_OSCDataDealerNvm::NvmReadList(const uint32 ou32_DataPoolIndex, const ui
    C_WARN     Server sent error response
    C_RD_WR    unexpected content in server response (here: wrong data pool index)
    C_COM      communication driver reported error
-
-   \created     09.11.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvm::NvmNotifyOfChanges(const uint8 ou8_DataPoolIndex, const uint8 ou8_ListIndex,
@@ -233,8 +204,7 @@ sint32 C_OSCDataDealerNvm::NvmNotifyOfChanges(const uint8 ou8_DataPoolIndex, con
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Reads the dump of a specific NVM list of ECU
+/*! \brief   Reads the dump of a specific NVM list of ECU
 
    \param[in]      orc_List       List with read information
    \param[out]     orc_Values     List dump
@@ -249,8 +219,6 @@ sint32 C_OSCDataDealerNvm::NvmNotifyOfChanges(const uint8 ou8_DataPoolIndex, con
    C_CONFIG   Pre-requisites not correct; e.g. driver not initialized or
               parameter out of range (checked by client side)
    C_COM      expected server response not received because of communication error
-
-   \created     18.10.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvm::m_NvmReadListRaw(const C_OSCNodeDataPoolList & orc_List, std::vector<uint8> & orc_Values,
@@ -283,8 +251,7 @@ sint32 C_OSCDataDealerNvm::m_NvmReadListRaw(const C_OSCNodeDataPoolList & orc_Li
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Interprets the value and if necessary the CRC of the container orc_Values into the datapool list
+/*! \brief   Interprets the value and if necessary the CRC of the container orc_Values into the datapool list
 
    If CRC is active, the CRC will be checked and updated.
 
@@ -295,8 +262,6 @@ sint32 C_OSCDataDealerNvm::m_NvmReadListRaw(const C_OSCNodeDataPoolList & orc_Li
    C_NO_ERR    Filling of list successful
    C_RD_WR     Datapool element size configuration does not match with count of read bytes
    C_CHECKSUM  Checksum of read datapool list is invalid
-
-   \created     18.10.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvm::m_SaveDumpToList(std::vector<uint8> & orc_Values, C_OSCNodeDataPoolList & orc_List) const
@@ -343,8 +308,7 @@ sint32 C_OSCDataDealerNvm::m_SaveDumpToList(std::vector<uint8> & orc_Values, C_O
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Interprets the value of the container orc_Values into the NVM datapool list
+/*! \brief   Interprets the value of the container orc_Values into the NVM datapool list
 
    The flag q_IsValid of each successfully read element will be set to true.
    The CRC will not be checked, calculated and updated.
@@ -355,8 +319,6 @@ sint32 C_OSCDataDealerNvm::m_SaveDumpToList(std::vector<uint8> & orc_Values, C_O
    \return
    C_NO_ERR    Filling of list successful
    C_RD_WR     Datapool element size configuration does not match with count of read bytes
-
-   \created     20.10.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvm::m_SaveDumpValuesToListValues(std::vector<uint8> & orc_Values,
@@ -405,8 +367,7 @@ sint32 C_OSCDataDealerNvm::m_SaveDumpValuesToListValues(std::vector<uint8> & orc
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Adapts the return value of a diag protocol base function
+/*! \brief   Adapts the return value of a diag protocol base function
 
    \param[in]     os32_ProtReturnValue   Return value of diag protocol base function
 
@@ -418,8 +379,6 @@ sint32 C_OSCDataDealerNvm::m_SaveDumpValuesToListValues(std::vector<uint8> & orc
    C_COM      Expected server response not received because of communication error
    C_CONFIG   Pre-requisites not correct; e.g. driver not initialized or
               parameter out of range (checked by client side)
-
-   \created     16.10.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvm::m_AdaptProtocolReturnValue(const sint32 os32_ProtReturnValue) const

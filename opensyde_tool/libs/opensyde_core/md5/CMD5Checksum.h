@@ -289,15 +289,15 @@ Laboratory for Computer Science and RSA Data Security, Inc., April 1992.
 *****************************************************************************************/
 
 //Modifications by Sensor-Technik Wiedemann GmbH:
-//17.11.11  AST    ::Update: check for potential pointer underrun to prevent warning in run-time checks
-//14.05.10  AST    adapted to be used with STW class library (instead of VCL):
-//                 - CString -> C_SCLString
-//                 - CFile   -> FILE * (fopen file handle)
-//                 use stwtypes.h for all variables
-//16.07.08  AST    adapted to be used with Borland VCL:
-//                 - CString -> AnsiString
-//                 - CFile   -> int (VCL file handle)
-//                 - made input parameter pointers const for all functions
+//17.11.11  ::Update: check for potential pointer underrun to prevent warning in run-time checks
+//14.05.10  adapted to be used with STW class library (instead of VCL):
+//          - CString -> C_SCLString
+//          - CFile   -> FILE * (fopen file handle)
+//          use stwtypes.h for all variables
+//16.07.08  adapted to be used with Borland VCL:
+//          - CString -> AnsiString
+//          - CFile   -> int (VCL file handle)
+//          - made input parameter pointers const for all functions
 
 #include <stdio.h>
 #include "stwtypes.h"

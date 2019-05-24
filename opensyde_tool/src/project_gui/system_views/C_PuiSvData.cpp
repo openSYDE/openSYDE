@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       System view data element (implementation)
 
    System view data element
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.06.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QMap>
@@ -32,32 +25,29 @@
 #include "C_PuiSdHandler.h"
 #include "C_PuiProject.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     21.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSvData::C_PuiSvData(void) :
    mc_Name("NewView"),
    mu16_UpdateRateFast(100U),
@@ -69,17 +59,14 @@ C_PuiSvData::C_PuiSvData(void) :
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
 
    \param[in,out] oru32_HashValue Hash value with init [in] value and result [out] value
-
-   \created     21.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::CalcHash(uint32 & oru32_HashValue) const
 {
    stw_scl::C_SCLChecksums::CalcCRC32(this->mc_Name.toStdString().c_str(), this->mc_Name.length(), oru32_HashValue);
@@ -115,17 +102,14 @@ void C_PuiSvData::CalcHash(uint32 & oru32_HashValue) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over setup data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the hash value over setup data
 
    The hash value is a 32 bit CRC value.
 
    \param[in,out] oru32_HashValue Hash value with init [in] value and result [out] value
-
-   \created     26.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_PuiSvData::CalcSetupHash(void) const
 {
    uint32 u32_Retval = 0;
@@ -141,106 +125,85 @@ uint32 C_PuiSvData::CalcSetupHash(void) const
    return u32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get PC data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get PC data
 
    \return
    Current PC data
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_PuiSvPc & C_PuiSvData::GetPcData(void) const
 {
    return this->mc_PcData;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set PC data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set PC data
 
    \param[in] orc_Value New PC data
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::SetPcData(const C_PuiSvPc & orc_Value)
 {
    this->mc_PcData = orc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get node active flags
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get node active flags
 
    \return
    Current node active flags
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const std::vector<uint8> & C_PuiSvData::GetNodeActiveFlags(void) const
 {
    return this->mc_NodeActiveFlags;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set node active flags
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node active flags
 
    \param[in] orc_Value New node active flags
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::SetNodeActiveFlags(const std::vector<uint8> & orc_Value)
 {
    this->mc_NodeActiveFlags = orc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get node update information
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get node update information
 
    \return
    Current node update information
-
-   \created     14.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const std::vector<C_PuiSvNodeUpdate> & C_PuiSvData::GetAllNodeUpdateInformation(void) const
 {
    return this->mc_NodeUpdateInformation;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set node update information
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node update information
 
    \param[in] orc_NodeUpdateInformation New node update information
-
-   \created     14.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::SetNodeUpdateInformation(const std::vector<C_PuiSvNodeUpdate> & orc_NodeUpdateInformation)
 {
    this->mc_NodeUpdateInformation = orc_NodeUpdateInformation;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get node update information
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get node update information
 
    \param[in] ou32_Index Node index
 
    \return
    NULL Update information not found
    Else Valid update information
-
-   \created     12.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_PuiSvNodeUpdate * C_PuiSvData::GetNodeUpdateInformation(const uint32 ou32_NodeIndex) const
 {
    const C_PuiSvNodeUpdate * pc_Retval = NULL;
@@ -252,9 +215,8 @@ const C_PuiSvNodeUpdate * C_PuiSvData::GetNodeUpdateInformation(const uint32 ou3
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set node update information
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node update information
 
    \param[in] ou32_Index Node index
    \param[in] orc_NodeUpdateInformation New node update information
@@ -262,10 +224,8 @@ const C_PuiSvNodeUpdate * C_PuiSvData::GetNodeUpdateInformation(const uint32 ou3
    \return
    C_NO_ERR    No error
    C_RANGE     Node index invalid
-
-   \created     15.02.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::SetNodeUpdateInformation(const uint32 ou32_NodeIndex,
                                              const C_PuiSvNodeUpdate & orc_NodeUpdateInformation)
 {
@@ -274,68 +234,196 @@ sint32 C_PuiSvData::SetNodeUpdateInformation(const uint32 ou32_NodeIndex,
    if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
    {
       this->mc_NodeUpdateInformation[ou32_NodeIndex] = orc_NodeUpdateInformation;
+      s32_Return = C_NO_ERR;
    }
 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node update information path
+
+   \param[in] ou32_NodeIndex Node index
+   \param[in] ou32_Index     Index to access
+   \param[in] orc_Value      New path
+   \param[in] oe_Type        Selector for structure
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvData::SetNodeUpdateInformationPath(const uint32 ou32_NodeIndex, const uint32 ou32_Index,
+                                                 const QString & orc_Value,
+                                                 const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
+{
+   sint32 s32_Return = C_RANGE;
+
+   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
+   {
+      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+      s32_Return = rc_UpdateInformation.SetPath(ou32_Index, orc_Value, oe_Type);
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node update information parameter set information
+
+   \param[in] ou32_NodeIndex Node index
+   \param[in] ou32_Index     Index to access
+   \param[in] orc_Value      New path
+   \param[in] oe_Type        Selector for structure
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvData::SetNodeUpdateInformationParamInfo(const uint32 ou32_NodeIndex, const uint32 ou32_Index,
+                                                      const C_PuiSvNodeUpdateParamInfo & orc_Value)
+{
+   sint32 s32_Return = C_RANGE;
+
+   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
+   {
+      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+      s32_Return = rc_UpdateInformation.SetParamInfo(ou32_Index, orc_Value);
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node update information parameter set information
+
+   \param[in] ou32_ViewIndex    View index
+   \param[in] ou32_NodeIndex    Node index
+   \param[in] ou32_Index        Index to access
+   \param[in] orc_FilePath      New path
+   \param[in] ou32_LastKnownCrc Last known CRC for this file
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvData::SetNodeUpdateInformationParamInfoContent(const uint32 ou32_NodeIndex, const uint32 ou32_Index,
+                                                             const QString & orc_FilePath,
+                                                             const uint32 ou32_LastKnownCrc)
+{
+   sint32 s32_Return = C_RANGE;
+
+   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
+   {
+      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+      s32_Return = rc_UpdateInformation.SetParamInfoContent(ou32_Index, orc_FilePath, ou32_LastKnownCrc);
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add node update information path
+
+   \param[in] ou32_NodeIndex Node index
+   \param[in] orc_Value      New path
+   \param[in] oe_Type        Selector for structure
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvData::AddNodeUpdateInformationPath(const uint32 ou32_NodeIndex, const QString & orc_Value,
+                                                 const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
+{
+   sint32 s32_Return = C_RANGE;
+
+   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
+   {
+      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+      rc_UpdateInformation.AddPath(orc_Value, oe_Type);
+
+      s32_Return = C_NO_ERR;
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add node update information for a parameter set
+
+   \param[in] ou32_NodeIndex Node index
+   \param[in] orc_Value      New path
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvData::AddNodeUpdateInformationParamInfo(const uint32 ou32_NodeIndex,
+                                                      const C_PuiSvNodeUpdateParamInfo & orc_Value)
+{
+   sint32 s32_Return = C_RANGE;
+
+   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
+   {
+      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+      rc_UpdateInformation.AddParamInfo(orc_Value);
+
+      s32_Return = C_NO_ERR;
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get name
 
    \return
    Current name
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const QString & C_PuiSvData::GetName(void) const
 {
    return this->mc_Name;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set name
 
    \param[in] orc_Value New name
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::SetName(const QString & orc_Value)
 {
    this->mc_Name = orc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get dashboards
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get dashboards
 
    \return
    Current dashboards
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const std::vector<C_PuiSvDashboard> & C_PuiSvData::GetDashboards(void) const
 {
    return this->mc_Dashboards;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get dashboard
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get dashboard
 
    \param[in] ou32_Index Dashboard index
 
    \return
    NULL Not found
    Else Requested dashboard
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_PuiSvDashboard * C_PuiSvData::GetDashboard(const uint32 ou32_Index) const
 {
    const C_PuiSvDashboard * pc_Retval = NULL;
@@ -347,110 +435,88 @@ const C_PuiSvDashboard * C_PuiSvData::GetDashboard(const uint32 ou32_Index) cons
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set dashboards
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set dashboards
 
    \param[in] orc_Value New dashboards
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::SetDashboards(const std::vector<C_PuiSvDashboard> & orc_Value)
 {
    this->mc_Dashboards = orc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get fast update rate
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get fast update rate
 
    \return
    Current fast update rate
-
-   \created     28.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_types::uint16 C_PuiSvData::GetUpdateRateFast(void) const
 {
    return this->mu16_UpdateRateFast;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set fast update rate
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set fast update rate
 
    \param[in] ou16_Value New fast update rate
-
-   \created     28.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::SetUpdateRateFast(const uint16 ou16_Value)
 {
    this->mu16_UpdateRateFast = ou16_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get medium update rate
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get medium update rate
 
    \return
    Current medium update rate
-
-   \created     28.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_types::uint16 C_PuiSvData::GetUpdateRateMedium(void) const
 {
    return this->mu16_UpdateRateMedium;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set medium update rate
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set medium update rate
 
    \param[in] ou16_Value New medium update rate
-
-   \created     28.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::SetUpdateRateMedium(const uint16 ou16_Value)
 {
    this->mu16_UpdateRateMedium = ou16_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get slow update rate
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get slow update rate
 
    \return
    Current slow update rate
-
-   \created     28.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_types::uint16 C_PuiSvData::GetUpdateRateSlow(void) const
 {
    return this->mu16_UpdateRateSlow;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set slow update rate
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set slow update rate
 
    \param[in] ou16_Value New slow update rate
-
-   \created     28.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::SetUpdateRateSlow(const uint16 ou16_Value)
 {
    this->mu16_UpdateRateSlow = ou16_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set slow update rate
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set slow update rate
 
    \param[in]  ou8_RailIndex   Number of rail: 0: fast, 1: medium, 2: slow, else: unexpected
    \param[out] oru16_Value     Update rate of rail
@@ -458,10 +524,8 @@ void C_PuiSvData::SetUpdateRateSlow(const uint16 ou16_Value)
    \return
    C_NO_ERR    No error
    C_RANGE     Rail index invalid
-
-   \created     19.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::GetUpdateRate(const uint8 ou8_RailIndex, uint16 & oru16_Value) const
 {
    sint32 s32_Return = C_RANGE;
@@ -489,112 +553,90 @@ sint32 C_PuiSvData::GetUpdateRate(const uint8 ou8_RailIndex, uint16 & oru16_Valu
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set device config screen selected bit rate
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set device config screen selected bit rate
 
    \param[in] ou32_Value New device config screen selected bit rate in kBit/s
-
-   \created     13.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::SetDeviceConfigSelectedBitRate(const uint32 ou32_Value)
 {
    this->mu32_DeviceConfigSelectedBitRate = ou32_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get device config screen selected mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get device config screen selected mode
 
    \return
    Current device config screen selected mode
-
-   \created     13.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_PuiSvData::GetDeviceConfigSelectedBitRate(void) const
 {
    return this->mu32_DeviceConfigSelectedBitRate;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set device config screen selected mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set device config screen selected mode
 
    \param[in] oe_Value New device config screen selected mode
-
-   \created     09.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::SetDeviceConfigMode(const C_PuiSvData::E_DeviceConfigurationMode oe_Value)
 {
    this->me_DeviceConfigMode = oe_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get device config screen selected bit rate
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get device config screen selected bit rate
 
    \return
    Current device config screen selected bit rate
-
-   \created     09.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSvData::E_DeviceConfigurationMode C_PuiSvData::GetDeviceConfigMode(void) const
 {
    return this->me_DeviceConfigMode;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get dark mode active flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get dark mode active flag
 
    \return
    Current dark mode active flag
-
-   \created     02.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_PuiSvData::GetDarkModeActive(void) const
 {
    return this->mq_DarkModeActive;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set dark mode active flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set dark mode active flag
 
    \param[in] oq_Value New dark mode active flag
-
-   \created     02.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::SetDarkModeActive(const bool oq_Value)
 {
    this->mq_DarkModeActive = oq_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get read data elements rail assignments
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get read data elements rail assignments
 
    \return
    Current read data elements rail assignments
-
-   \created     06.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const QMap<C_OSCNodeDataPoolListElementId,
            C_PuiSvReadDataConfiguration> & C_PuiSvData::GetReadRailAssignments(void) const
 {
    return this->mc_ReadRailAssignments;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns a specific rail assignment
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns a specific rail assignment
 
    \param[in]  orc_Id       ID
    \param[out] orc_Config   Current read data element rail assignment of specific element
@@ -602,10 +644,8 @@ const QMap<C_OSCNodeDataPoolListElementId,
    \return
    C_NO_ERR    Config found
    C_RANGE     No config for element ID found
-
-   \created     19.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::GetReadRailAssignment(const C_OSCNodeDataPoolListElementId & orc_Id,
                                           C_PuiSvReadDataConfiguration & orc_Config) const
 {
@@ -624,24 +664,20 @@ sint32 C_PuiSvData::GetReadRailAssignment(const C_OSCNodeDataPoolListElementId &
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set read data elements rail assignments
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set read data elements rail assignments
 
    \param[in] orc_Value New read data elements rail assignments
-
-   \created     06.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::SetReadRailAssignments(const QMap<C_OSCNodeDataPoolListElementId,
                                                     C_PuiSvReadDataConfiguration> & orc_Value)
 {
    this->mc_ReadRailAssignments = orc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set read rail assignment
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set read rail assignment
 
    \param[in] orc_Id     ID
    \param[in] orc_Config Config
@@ -649,10 +685,8 @@ void C_PuiSvData::SetReadRailAssignments(const QMap<C_OSCNodeDataPoolListElement
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     12.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::SetReadRailAssignment(const C_OSCNodeDataPoolListElementId & orc_Id,
                                           const C_PuiSvReadDataConfiguration & orc_Config)
 {
@@ -666,16 +700,13 @@ sint32 C_PuiSvData::SetReadRailAssignment(const C_OSCNodeDataPoolListElementId &
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get relevant read rail assignments
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get relevant read rail assignments
 
    \param[in]  orc_Dashboard Dashboard to analyze
    \param[out] orc_Rails     Relevant rails
-
-   \created     10.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::GetRelevantReadRailAssigmentsForDashboard(const C_PuiSvDashboard & orc_Dashboard,
                                                             QMap<C_OSCNodeDataPoolListElementId,
                                                                  C_PuiSvReadDataConfiguration> & orc_Rails)
@@ -703,9 +734,8 @@ const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set dashboard name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set dashboard name
 
    \param[in] ou32_DashboardIndex Dashboard index
    \param[in] orc_Name            New dashboard name
@@ -713,10 +743,8 @@ const
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     06.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::SetDashboardName(const uint32 ou32_DashboardIndex, const QString & orc_Name)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -733,9 +761,8 @@ sint32 C_PuiSvData::SetDashboardName(const uint32 ou32_DashboardIndex, const QSt
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set dashboard comment
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set dashboard comment
 
    \param[in] ou32_DashboardIndex   Dashboard index
    \param[in] orc_Comment           New dashboard comment
@@ -743,10 +770,8 @@ sint32 C_PuiSvData::SetDashboardName(const uint32 ou32_DashboardIndex, const QSt
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     24.07.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::SetDashboardComment(const uint32 ou32_DashboardIndex, const QString & orc_Comment)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -763,9 +788,8 @@ sint32 C_PuiSvData::SetDashboardComment(const uint32 ou32_DashboardIndex, const 
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set dashboard active flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set dashboard active flag
 
    \param[in] ou32_DashboardIndex Dashboard index
    \param[in] oq_Active           New active flag
@@ -773,10 +797,8 @@ sint32 C_PuiSvData::SetDashboardComment(const uint32 ou32_DashboardIndex, const 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     07.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::SetDashboardActive(const uint32 ou32_DashboardIndex, const bool oq_Active)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -793,9 +815,8 @@ sint32 C_PuiSvData::SetDashboardActive(const uint32 ou32_DashboardIndex, const b
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set dashboard widget box
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set dashboard widget box
 
    \param[in] ou32_DashboardIndex Dashboard index
    \param[in] ou32_WidgetIndex    Widget index
@@ -805,10 +826,8 @@ sint32 C_PuiSvData::SetDashboardActive(const uint32 ou32_DashboardIndex, const b
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     19.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::SetDashboardWidget(const uint32 ou32_DashboardIndex, const uint32 ou32_WidgetIndex,
                                        const C_PuiSvDbWidgetBase * const opc_Box,
                                        const C_PuiSvDbDataElement::E_Type oe_Type)
@@ -827,9 +846,8 @@ sint32 C_PuiSvData::SetDashboardWidget(const uint32 ou32_DashboardIndex, const u
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set item
 
    \param[in] ou32_DashboardIndex Dashboard index
    \param[in] oru32_Index         Item index
@@ -838,10 +856,8 @@ sint32 C_PuiSvData::SetDashboardWidget(const uint32 ou32_DashboardIndex, const u
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     21.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::SetDashboardBoundary(const uint32 ou32_DashboardIndex, const uint32 & oru32_Index,
                                          const C_PuiBsBoundary & orc_Data)
 {
@@ -859,9 +875,8 @@ sint32 C_PuiSvData::SetDashboardBoundary(const uint32 ou32_DashboardIndex, const
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set item
 
    \param[in] ou32_DashboardIndex Dashboard index
    \param[in] oru32_Index         Item index
@@ -870,10 +885,8 @@ sint32 C_PuiSvData::SetDashboardBoundary(const uint32 ou32_DashboardIndex, const
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     21.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::SetDashboardImage(const uint32 ou32_DashboardIndex, const uint32 & oru32_Index,
                                       const C_PuiBsImage & orc_Data)
 {
@@ -891,9 +904,8 @@ sint32 C_PuiSvData::SetDashboardImage(const uint32 ou32_DashboardIndex, const ui
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set item
 
    \param[in] ou32_DashboardIndex Dashboard index
    \param[in] oru32_Index         Item index
@@ -902,10 +914,8 @@ sint32 C_PuiSvData::SetDashboardImage(const uint32 ou32_DashboardIndex, const ui
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     21.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::SetDashboardLineArrow(const uint32 ou32_DashboardIndex, const uint32 & oru32_Index,
                                           const C_PuiBsLineArrow & orc_Data)
 {
@@ -923,9 +933,8 @@ sint32 C_PuiSvData::SetDashboardLineArrow(const uint32 ou32_DashboardIndex, cons
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set item
 
    \param[in] ou32_DashboardIndex Dashboard index
    \param[in] oru32_Index         Item index
@@ -934,10 +943,8 @@ sint32 C_PuiSvData::SetDashboardLineArrow(const uint32 ou32_DashboardIndex, cons
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     21.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::SetDashboardTextElement(const uint32 ou32_DashboardIndex, const uint32 & oru32_Index,
                                             const C_PuiBsTextElement & orc_Data)
 {
@@ -955,15 +962,12 @@ sint32 C_PuiSvData::SetDashboardTextElement(const uint32 ou32_DashboardIndex, co
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sync view node indices to added node index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sync view node indices to added node index
 
    \param[in] ou32_Index Added node index
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::OnSyncNodeAdded(const uint32 ou32_Index)
 {
    QMap<C_OSCNodeDataPoolListElementId, C_PuiSvReadDataConfiguration> c_NewItems;
@@ -980,7 +984,7 @@ void C_PuiSvData::OnSyncNodeAdded(const uint32 ou32_Index)
       tgl_assert(pc_Node != NULL);
       if (pc_Node != NULL)
       {
-         C_PuiSvNodeUpdate c_NodeUpdate(pc_Node->pc_DeviceDefinition->q_FlashloaderOpenSydeIsFileBased);
+         C_PuiSvNodeUpdate c_NodeUpdate;
 
          // Search the highest node update position and add the new node to the end
          for (u32_NodeUpdateCounter = 0U; u32_NodeUpdateCounter < this->mc_NodeUpdateInformation.size();
@@ -1026,15 +1030,12 @@ void C_PuiSvData::OnSyncNodeAdded(const uint32 ou32_Index)
    this->mc_ReadRailAssignments = c_NewItems;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sync view node indices to deleted node index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sync view node indices to deleted node index
 
    \param[in] ou32_Index Deleted node index
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::OnSyncNodeAboutToBeDeleted(const uint32 ou32_Index)
 {
    QMap<C_OSCNodeDataPoolListElementId, C_PuiSvReadDataConfiguration> c_NewItems;
@@ -1069,44 +1070,35 @@ void C_PuiSvData::OnSyncNodeAboutToBeDeleted(const uint32 ou32_Index)
    this->mc_ReadRailAssignments = c_NewItems;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sync view bus index to added bus index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sync view bus index to added bus index
 
    \param[in] ou32_Index Added bus index
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::OnSyncBusAdded(const uint32 ou32_Index)
 {
    this->mc_PcData.OnSyncBusAdded(ou32_Index);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sync view bus index to deleted bus index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sync view bus index to deleted bus index
 
    \param[in] ou32_Index Deleted bus index
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::OnSyncBusDeleted(const uint32 ou32_Index)
 {
    this->mc_PcData.OnSyncBusDeleted(ou32_Index);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt to system definition change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
 
    \param[in] ou32_NodeIndex     Node index
    \param[in] ou32_DataPoolIndex Data pool index
-
-   \created     20.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::OnSyncNodeDataPoolAdded(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex)
 {
    QMap<C_OSCNodeDataPoolListElementId, C_PuiSvReadDataConfiguration> c_NewItems;
@@ -1133,17 +1125,14 @@ void C_PuiSvData::OnSyncNodeDataPoolAdded(const uint32 ou32_NodeIndex, const uin
    this->mc_ReadRailAssignments = c_NewItems;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt to system definition change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
 
    \param[in] ou32_NodeIndex           Node index
    \param[in] ou32_DataPoolSourceIndex Source data pool index
    \param[in] ou32_DataPoolTargetIndex Target data pool index
-
-   \created     20.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::OnSyncNodeDataPoolMoved(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolSourceIndex,
                                           const uint32 ou32_DataPoolTargetIndex)
 {
@@ -1172,16 +1161,13 @@ void C_PuiSvData::OnSyncNodeDataPoolMoved(const uint32 ou32_NodeIndex, const uin
    this->mc_ReadRailAssignments = c_NewItems;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt to system definition change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
 
    \param[in] ou32_NodeIndex     Node index
    \param[in] ou32_DataPoolIndex Data pool index
-
-   \created     20.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::OnSyncNodeDataPoolAboutToBeDeleted(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex)
 {
    QMap<C_OSCNodeDataPoolListElementId, C_PuiSvReadDataConfiguration> c_NewItems;
@@ -1208,16 +1194,13 @@ void C_PuiSvData::OnSyncNodeDataPoolAboutToBeDeleted(const uint32 ou32_NodeIndex
    this->mc_ReadRailAssignments = c_NewItems;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt to system definition change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
 
    \param[in] ou32_NodeIndex        Node index
    \param[in] ou32_ApplicationIndex Application index
-
-   \created     14.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::OnSyncNodeApplicationAdded(const uint32 ou32_NodeIndex, const uint32 ou32_ApplicationIndex)
 {
    if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
@@ -1227,17 +1210,14 @@ void C_PuiSvData::OnSyncNodeApplicationAdded(const uint32 ou32_NodeIndex, const 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt to system definition change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
 
    \param[in] ou32_NodeIndex              Node index
    \param[in] ou32_ApplicationSourceIndex Application source index
    \param[in] ou32_ApplicationTargetIndex Application target index
-
-   \created     14.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::OnSyncNodeApplicationMoved(const uint32 ou32_NodeIndex, const uint32 ou32_ApplicationSourceIndex,
                                              const uint32 ou32_ApplicationTargetIndex)
 {
@@ -1248,16 +1228,13 @@ void C_PuiSvData::OnSyncNodeApplicationMoved(const uint32 ou32_NodeIndex, const 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt to system definition change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
 
    \param[in] ou32_NodeIndex        Node index
    \param[in] ou32_ApplicationIndex Application index
-
-   \created     14.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::OnSyncNodeApplicationAboutToBeDeleted(const uint32 ou32_NodeIndex, const uint32 ou32_ApplicationIndex)
 {
    if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
@@ -1267,17 +1244,14 @@ void C_PuiSvData::OnSyncNodeApplicationAboutToBeDeleted(const uint32 ou32_NodeIn
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt to system definition change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
 
    \param[in] ou32_NodeIndex     Node index
    \param[in] ou32_DataPoolIndex Data pool index
    \param[in] ou32_ListIndex     List index
-
-   \created     20.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::OnSyncNodeDataPoolListAdded(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
                                               const uint32 ou32_ListIndex)
 {
@@ -1305,18 +1279,15 @@ void C_PuiSvData::OnSyncNodeDataPoolListAdded(const uint32 ou32_NodeIndex, const
    this->mc_ReadRailAssignments = c_NewItems;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt to system definition change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
 
    \param[in] ou32_NodeIndex       Node index
    \param[in] ou32_DataPoolIndex   Data pool index
    \param[in] ou32_ListSourceIndex Source list index
    \param[in] ou32_ListTargetIndex Target list index
-
-   \created     20.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::OnSyncNodeDataPoolListMoved(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
                                               const uint32 ou32_ListSourceIndex, const uint32 ou32_ListTargetIndex)
 {
@@ -1346,17 +1317,14 @@ void C_PuiSvData::OnSyncNodeDataPoolListMoved(const uint32 ou32_NodeIndex, const
    this->mc_ReadRailAssignments = c_NewItems;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt to system definition change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
 
    \param[in] ou32_NodeIndex     Node index
    \param[in] ou32_DataPoolIndex Data pool index
    \param[in] ou32_ListIndex     List index
-
-   \created     20.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::OnSyncNodeDataPoolListAboutToBeDeleted(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
                                                          const uint32 ou32_ListIndex)
 {
@@ -1385,18 +1353,15 @@ void C_PuiSvData::OnSyncNodeDataPoolListAboutToBeDeleted(const uint32 ou32_NodeI
    this->mc_ReadRailAssignments = c_NewItems;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt to system definition change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
 
    \param[in] ou32_NodeIndex     Node index
    \param[in] ou32_DataPoolIndex Data pool index
    \param[in] ou32_ListIndex     List index
    \param[in] ou32_DataSetIndex  Data set index
-
-   \created     10.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::OnSyncNodeDataPoolListDataSetAdded(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
                                                      const uint32 ou32_ListIndex, const uint32 ou32_DataSetIndex)
 {
@@ -1408,19 +1373,16 @@ void C_PuiSvData::OnSyncNodeDataPoolListDataSetAdded(const uint32 ou32_NodeIndex
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt to system definition change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
 
    \param[in] ou32_NodeIndex          Node index
    \param[in] ou32_DataPoolIndex      Data pool index
    \param[in] ou32_ListIndex          List index
    \param[in] ou32_DataSetSourceIndex Source data set index
    \param[in] ou32_DataSetTargetIndex Target data set index
-
-   \created     10.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::OnSyncNodeDataPoolListDataSetMoved(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
                                                      const uint32 ou32_ListIndex, const uint32 ou32_DataSetSourceIndex,
                                                      const uint32 ou32_DataSetTargetIndex)
@@ -1433,18 +1395,15 @@ void C_PuiSvData::OnSyncNodeDataPoolListDataSetMoved(const uint32 ou32_NodeIndex
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt to system definition change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
 
    \param[in] ou32_NodeIndex     Node index
    \param[in] ou32_DataPoolIndex Data pool index
    \param[in] ou32_ListIndex     List index
    \param[in] ou32_DataSetIndex  Data set index
-
-   \created     10.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::OnSyncNodeDataPoolListDataSetAboutToBeDeleted(const uint32 ou32_NodeIndex,
                                                                 const uint32 ou32_DataPoolIndex,
                                                                 const uint32 ou32_ListIndex,
@@ -1458,18 +1417,15 @@ void C_PuiSvData::OnSyncNodeDataPoolListDataSetAboutToBeDeleted(const uint32 ou3
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt to system definition change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
 
    \param[in] ou32_NodeIndex     Node index
    \param[in] ou32_DataPoolIndex Data pool index
    \param[in] ou32_ListIndex     List index
    \param[in] ou32_ElementIndex  Element index
-
-   \created     20.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::OnSyncNodeDataPoolListElementAdded(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
                                                      const uint32 ou32_ListIndex, const uint32 ou32_ElementIndex)
 {
@@ -1541,19 +1497,16 @@ void C_PuiSvData::OnSyncNodeDataPoolListElementAdded(const uint32 ou32_NodeIndex
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt to system definition change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
 
    \param[in] ou32_NodeIndex          Node index
    \param[in] ou32_DataPoolIndex      Data pool index
    \param[in] ou32_ListIndex          List index
    \param[in] ou32_ElementSourceIndex Source element index
    \param[in] ou32_ElementTargetIndex Target element index
-
-   \created     20.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::OnSyncNodeDataPoolListElementMoved(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
                                                      const uint32 ou32_ListIndex, const uint32 ou32_ElementSourceIndex,
                                                      const uint32 ou32_ElementTargetIndex)
@@ -1584,9 +1537,8 @@ void C_PuiSvData::OnSyncNodeDataPoolListElementMoved(const uint32 ou32_NodeIndex
    this->mc_ReadRailAssignments = c_NewItems;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt to system definition change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
 
    \param[in] ou32_NodeIndex     Node index
    \param[in] ou32_DataPoolIndex Data pool index
@@ -1595,10 +1547,8 @@ void C_PuiSvData::OnSyncNodeDataPoolListElementMoved(const uint32 ou32_NodeIndex
    \param[in] oe_Type            New element type
    \param[in] oq_IsArray         New array type
    \param[in] ou32_ArraySize     New array size
-
-   \created     28.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::OnSyncNodeDataPoolListElementArrayChanged(const uint32 ou32_NodeIndex,
                                                             const uint32 ou32_DataPoolIndex,
                                                             const uint32 ou32_ListIndex, const uint32 ou32_ElementIndex,
@@ -1653,19 +1603,16 @@ void C_PuiSvData::OnSyncNodeDataPoolListElementArrayChanged(const uint32 ou32_No
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt to system definition change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
 
    \param[in] ou32_NodeIndex     Node index
    \param[in] ou32_DataPoolIndex Data pool index
    \param[in] ou32_ListIndex     List index
    \param[in] ou32_ElementIndex  Element index
    \param[in] oe_Access          New access type
-
-   \created     12.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::OnSyncNodeDataPoolListElementAccessChanged(const uint32 ou32_NodeIndex,
                                                              const uint32 ou32_DataPoolIndex,
                                                              const uint32 ou32_ListIndex,
@@ -1680,18 +1627,15 @@ void C_PuiSvData::OnSyncNodeDataPoolListElementAccessChanged(const uint32 ou32_N
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt to system definition change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt to system definition change
 
    \param[in] ou32_NodeIndex     Node index
    \param[in] ou32_DataPoolIndex Data pool index
    \param[in] ou32_ListIndex     List index
    \param[in] ou32_ElementIndex  Element index
-
-   \created     20.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::OnSyncNodeDataPoolListElementAboutToBeDeleted(const uint32 ou32_NodeIndex,
                                                                 const uint32 ou32_DataPoolIndex,
                                                                 const uint32 ou32_ListIndex,
@@ -1723,9 +1667,8 @@ void C_PuiSvData::OnSyncNodeDataPoolListElementAboutToBeDeleted(const uint32 ou3
    this->mc_ReadRailAssignments = c_NewItems;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set checked flag for node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set checked flag for node
 
    \param[in] ou32_NodeIndex  Node index
    \param[in] ou8_Checked     Checked flag
@@ -1733,10 +1676,8 @@ void C_PuiSvData::OnSyncNodeDataPoolListElementAboutToBeDeleted(const uint32 ou3
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::SetNodeCheckedState(const uint32 ou32_NodeIndex, const uint8 ou8_Checked)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -1752,84 +1693,68 @@ sint32 C_PuiSvData::SetNodeCheckedState(const uint32 ou32_NodeIndex, const uint8
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set PC UI box
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set PC UI box
 
    \param[in] orc_Box New PC UI box
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::SetPCBox(const C_PuiBsBox & orc_Box)
 {
    this->mc_PcData.SetBox(orc_Box);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set PC connection UI data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set PC connection UI data
 
    \param[in] orc_Line New PC connection UI data
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::SetPCConnection(const C_PuiBsLineBase & orc_Line)
 {
    this->mc_PcData.SetConnectionData(orc_Line);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set connected state of pc in view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set connected state of pc in view
 
    \param[in] oq_Connected  Flag if pc is connected
    \param[in] ou32_BusIndex Bus index PC is connected to
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::SetPCConnected(const bool oq_Connected, const uint32 ou32_BusIndex)
 {
    this->mc_PcData.SetConnected(oq_Connected, ou32_BusIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set type of the CAN DLL
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set type of the CAN DLL
 
    \param[in]     oe_DllType   CAN DLL type
-
-   \created     07.02.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::SetPCCANDllType(const C_PuiSvPc::E_CANDllType oe_DllType)
 {
    this->mc_PcData.SetCANDllType(oe_DllType);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set path for the CAN DLL
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set path for the CAN DLL
 
    \param[in]     orc_DllPath   Path for the CAN DLL
-
-   \created     05.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::SetPCCANDllPath(const QString & orc_DllPath)
 {
    this->mc_PcData.SetCustomCANDllPath(orc_DllPath);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new read rail item to configuration
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new read rail item to configuration
 
    \param[in] orc_Id     ID
    \param[in] orc_Config Configuration
@@ -1837,10 +1762,8 @@ void C_PuiSvData::SetPCCANDllPath(const QString & orc_DllPath)
    \return
    C_NO_ERR Operation success
    C_NOACT  Already exists
-
-   \created     11.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::AddReadRailItem(const C_OSCNodeDataPoolListElementId & orc_Id,
                                     const C_PuiSvReadDataConfiguration & orc_Config)
 {
@@ -1857,9 +1780,8 @@ sint32 C_PuiSvData::AddReadRailItem(const C_OSCNodeDataPoolListElementId & orc_I
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add dashboard to view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add dashboard to view
 
    \param[in] orc_Dashboard Dashboard data
    \param[in] oq_AutoAdapt  Auto adapt name flag
@@ -1867,18 +1789,15 @@ sint32 C_PuiSvData::AddReadRailItem(const C_OSCNodeDataPoolListElementId & orc_I
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     06.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::AddDashboard(const C_PuiSvDashboard & orc_Dashboard, const bool oq_AutoAdapt)
 {
    tgl_assert(InsertDashboard(this->mc_Dashboards.size(), orc_Dashboard, oq_AutoAdapt) == C_NO_ERR);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Insert dashboard to view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Insert dashboard to view
 
    \param[in] ou32_Index    Dashboard index
    \param[in] orc_Dashboard Dashboard data
@@ -1887,10 +1806,8 @@ void C_PuiSvData::AddDashboard(const C_PuiSvDashboard & orc_Dashboard, const boo
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     06.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::InsertDashboard(const uint32 ou32_Index, const C_PuiSvDashboard & orc_Dashboard,
                                     const bool oq_AutoAdapt)
 {
@@ -1961,9 +1878,8 @@ sint32 C_PuiSvData::InsertDashboard(const uint32 ou32_Index, const C_PuiSvDashbo
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add widget to view dashboard
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add widget to view dashboard
 
    \param[in] ou32_DashboardIndex Dashboard index
    \param[in] opc_Box             New widget value
@@ -1972,10 +1888,8 @@ sint32 C_PuiSvData::InsertDashboard(const uint32 ou32_Index, const C_PuiSvDashbo
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     19.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::AddDashboardWidget(const uint32 ou32_DashboardIndex, const C_PuiSvDbWidgetBase * const opc_Box,
                                        const C_PuiSvDbDataElement::E_Type oe_Type)
 {
@@ -1993,9 +1907,8 @@ sint32 C_PuiSvData::AddDashboardWidget(const uint32 ou32_DashboardIndex, const C
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Insert widget to view dashboard
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Insert widget to view dashboard
 
    \param[in] ou32_DashboardIndex Dashboard index
    \param[in] ou32_WidgetIndex    Widget index
@@ -2005,10 +1918,8 @@ sint32 C_PuiSvData::AddDashboardWidget(const uint32 ou32_DashboardIndex, const C
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     19.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::InsertDashboardWidget(const uint32 ou32_DashboardIndex, const uint32 ou32_WidgetIndex,
                                           const C_PuiSvDbWidgetBase * const opc_Box,
                                           const C_PuiSvDbDataElement::E_Type oe_Type)
@@ -2027,9 +1938,8 @@ sint32 C_PuiSvData::InsertDashboardWidget(const uint32 ou32_DashboardIndex, cons
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new item
 
    \param[in] ou32_DashboardIndex Dashboard index
    \param[in] orc_Data            New value
@@ -2037,10 +1947,8 @@ sint32 C_PuiSvData::InsertDashboardWidget(const uint32 ou32_DashboardIndex, cons
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     21.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::AddDashboardBoundary(const uint32 ou32_DashboardIndex, const C_PuiBsBoundary & orc_Data)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -2057,9 +1965,8 @@ sint32 C_PuiSvData::AddDashboardBoundary(const uint32 ou32_DashboardIndex, const
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Insert new item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Insert new item
 
    \param[in] ou32_DashboardIndex Dashboard index
    \param[in] oru32_Index         Item index
@@ -2068,10 +1975,8 @@ sint32 C_PuiSvData::AddDashboardBoundary(const uint32 ou32_DashboardIndex, const
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     21.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::InsertDashboardBoundary(const uint32 ou32_DashboardIndex, const uint32 & oru32_Index,
                                             const C_PuiBsBoundary & orc_Data)
 {
@@ -2089,9 +1994,8 @@ sint32 C_PuiSvData::InsertDashboardBoundary(const uint32 ou32_DashboardIndex, co
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new item
 
    \param[in] ou32_DashboardIndex Dashboard index
    \param[in] orc_Data            New value
@@ -2099,10 +2003,8 @@ sint32 C_PuiSvData::InsertDashboardBoundary(const uint32 ou32_DashboardIndex, co
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     21.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::AddDashboardImage(const uint32 ou32_DashboardIndex, const C_PuiBsImage & orc_Data)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -2119,9 +2021,8 @@ sint32 C_PuiSvData::AddDashboardImage(const uint32 ou32_DashboardIndex, const C_
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Insert new item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Insert new item
 
    \param[in] ou32_DashboardIndex Dashboard index
    \param[in] oru32_Index         Item index
@@ -2130,10 +2031,8 @@ sint32 C_PuiSvData::AddDashboardImage(const uint32 ou32_DashboardIndex, const C_
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     21.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::InsertDashboardImage(const uint32 ou32_DashboardIndex, const uint32 & oru32_Index,
                                          const C_PuiBsImage & orc_Data)
 {
@@ -2151,9 +2050,8 @@ sint32 C_PuiSvData::InsertDashboardImage(const uint32 ou32_DashboardIndex, const
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new item
 
    \param[in] ou32_DashboardIndex Dashboard index
    \param[in] orc_Data            New value
@@ -2161,10 +2059,8 @@ sint32 C_PuiSvData::InsertDashboardImage(const uint32 ou32_DashboardIndex, const
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     21.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::AddDashboardLineArrow(const uint32 ou32_DashboardIndex, const C_PuiBsLineArrow & orc_Data)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -2181,9 +2077,8 @@ sint32 C_PuiSvData::AddDashboardLineArrow(const uint32 ou32_DashboardIndex, cons
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Insert new item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Insert new item
 
    \param[in] ou32_DashboardIndex Dashboard index
    \param[in] oru32_Index         Item index
@@ -2192,10 +2087,8 @@ sint32 C_PuiSvData::AddDashboardLineArrow(const uint32 ou32_DashboardIndex, cons
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     21.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::InsertDashboardLineArrow(const uint32 ou32_DashboardIndex, const uint32 & oru32_Index,
                                              const C_PuiBsLineArrow & orc_Data)
 {
@@ -2213,9 +2106,8 @@ sint32 C_PuiSvData::InsertDashboardLineArrow(const uint32 ou32_DashboardIndex, c
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new item
 
    \param[in] ou32_DashboardIndex Dashboard index
    \param[in] orc_Data            New value
@@ -2223,10 +2115,8 @@ sint32 C_PuiSvData::InsertDashboardLineArrow(const uint32 ou32_DashboardIndex, c
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     21.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::AddDashboardTextElement(const uint32 ou32_DashboardIndex, const C_PuiBsTextElement & orc_Data)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -2243,9 +2133,8 @@ sint32 C_PuiSvData::AddDashboardTextElement(const uint32 ou32_DashboardIndex, co
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Insert new item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Insert new item
 
    \param[in] ou32_DashboardIndex Dashboard index
    \param[in] oru32_Index         Item index
@@ -2254,10 +2143,8 @@ sint32 C_PuiSvData::AddDashboardTextElement(const uint32 ou32_DashboardIndex, co
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     21.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::InsertDashboardTextElement(const uint32 ou32_DashboardIndex, const uint32 & oru32_Index,
                                                const C_PuiBsTextElement & orc_Data)
 {
@@ -2275,9 +2162,8 @@ sint32 C_PuiSvData::InsertDashboardTextElement(const uint32 ou32_DashboardIndex,
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Dashboard param widget clear all data pool elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Dashboard param widget clear all data pool elements
 
    \param[in] ou32_DashboardIndex   Dashboard index
    \param[in] ou32_ParamWidgetIndex Param index
@@ -2285,10 +2171,8 @@ sint32 C_PuiSvData::InsertDashboardTextElement(const uint32 ou32_DashboardIndex,
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     05.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::ClearDashboardParamDataPoolElements(const uint32 ou32_DashboardIndex,
                                                         const uint32 ou32_ParamWidgetIndex)
 {
@@ -2331,9 +2215,8 @@ sint32 C_PuiSvData::ClearDashboardParamDataPoolElements(const uint32 ou32_Dashbo
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Dashboard param widget add new data pool element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Dashboard param widget add new data pool element
 
    \param[in] ou32_DashboardIndex   Dashboard index
    \param[in] ou32_ParamWidgetIndex Param index
@@ -2344,7 +2227,7 @@ sint32 C_PuiSvData::ClearDashboardParamDataPoolElements(const uint32 ou32_Dashbo
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::AddDashboardParamNewDataPoolElement(const uint32 ou32_DashboardIndex,
                                                         const uint32 ou32_ParamWidgetIndex,
                                                         const C_OSCNodeDataPoolListElementId & orc_NewId,
@@ -2391,9 +2274,8 @@ sint32 C_PuiSvData::AddDashboardParamNewDataPoolElement(const uint32 ou32_Dashbo
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Remove read rail item configuration
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove read rail item configuration
 
    WARNING: No check if still in use
 
@@ -2402,10 +2284,8 @@ sint32 C_PuiSvData::AddDashboardParamNewDataPoolElement(const uint32 ou32_Dashbo
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     11.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::RemoveReadRailItem(const C_OSCNodeDataPoolListElementId & orc_Id)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -2417,19 +2297,119 @@ sint32 C_PuiSvData::RemoveReadRailItem(const C_OSCNodeDataPoolListElementId & or
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete dashboard from view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove node update information path
+
+   \param[in] ou32_NodeIndex Node index
+   \param[in] ou32_Index     Index to remove
+   \param[in] oe_Type        Selector for structure
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvData::RemoveNodeUpdateInformationPath(const uint32 ou32_NodeIndex, const uint32 ou32_Index,
+                                                    const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
+{
+   sint32 s32_Return = C_RANGE;
+
+   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
+   {
+      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+      s32_Return = rc_UpdateInformation.RemovePath(ou32_Index, oe_Type);
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove node update information parameter set information
+
+   \param[in] ou32_NodeIndex Node index
+   \param[in] ou32_Index     Index to remove
+   \param[in] oe_Type        Selector for structure
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvData::RemoveNodeUpdateInformationParamInfo(const uint32 ou32_NodeIndex, const uint32 ou32_Index)
+{
+   sint32 s32_Return = C_RANGE;
+
+   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
+   {
+      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+      s32_Return = rc_UpdateInformation.RemoveParamInfo(ou32_Index);
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clear all node update information paths as appropriate for the type
+
+   \param[in] ou32_NodeIndex Node index
+   \param[in] oe_Type        Selector for structure
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvData::ClearNodeUpdateInformationAsAppropriate(const uint32 ou32_NodeIndex,
+                                                            const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
+{
+   sint32 s32_Return = C_RANGE;
+
+   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
+   {
+      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+      rc_UpdateInformation.ClearPathsAsAppropriate(oe_Type);
+
+      s32_Return = C_NO_ERR;
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clear all node update information parameter set paths for this node
+
+   \param[in] ou32_NodeIndex Node index
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvData::ClearNodeUpdateInformationParamPaths(const uint32 ou32_NodeIndex)
+{
+   sint32 s32_Return = C_RANGE;
+
+   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
+   {
+      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+      rc_UpdateInformation.ClearParamPaths();
+
+      s32_Return = C_NO_ERR;
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete dashboard from view
 
    \param[in] ou32_DashboardIndex Dashboard index
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     06.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::DeleteDashboard(const uint32 ou32_DashboardIndex)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -2447,9 +2427,8 @@ sint32 C_PuiSvData::DeleteDashboard(const uint32 ou32_DashboardIndex)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete widget from view dashboard
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete widget from view dashboard
 
    \param[in] ou32_DashboardIndex Dashboard index
    \param[in] ou32_WidgetIndex    Widget index
@@ -2458,10 +2437,8 @@ sint32 C_PuiSvData::DeleteDashboard(const uint32 ou32_DashboardIndex)
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     19.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::DeleteDashboardWidget(const uint32 ou32_DashboardIndex, const uint32 ou32_WidgetIndex,
                                           const C_PuiSvDbDataElement::E_Type oe_Type)
 {
@@ -2479,9 +2456,8 @@ sint32 C_PuiSvData::DeleteDashboardWidget(const uint32 ou32_DashboardIndex, cons
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete item
 
    \param[in] ou32_ViewIndex      View index
    \param[in] ou32_DashboardIndex Dashboard index
@@ -2490,10 +2466,8 @@ sint32 C_PuiSvData::DeleteDashboardWidget(const uint32 ou32_DashboardIndex, cons
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     21.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::DeleteDashboardBoundary(const uint32 ou32_DashboardIndex, const uint32 & oru32_Index)
 {
    sint32 s32_Retval;
@@ -2510,9 +2484,8 @@ sint32 C_PuiSvData::DeleteDashboardBoundary(const uint32 ou32_DashboardIndex, co
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete item
 
    \param[in] ou32_ViewIndex      View index
    \param[in] ou32_DashboardIndex Dashboard index
@@ -2521,10 +2494,8 @@ sint32 C_PuiSvData::DeleteDashboardBoundary(const uint32 ou32_DashboardIndex, co
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     21.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::DeleteDashboardImage(const uint32 ou32_DashboardIndex, const uint32 & oru32_Index)
 {
    sint32 s32_Retval;
@@ -2541,9 +2512,8 @@ sint32 C_PuiSvData::DeleteDashboardImage(const uint32 ou32_DashboardIndex, const
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete item
 
    \param[in] ou32_ViewIndex      View index
    \param[in] ou32_DashboardIndex Dashboard index
@@ -2552,10 +2522,8 @@ sint32 C_PuiSvData::DeleteDashboardImage(const uint32 ou32_DashboardIndex, const
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     21.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::DeleteDashboardLineArrow(const uint32 ou32_DashboardIndex, const uint32 & oru32_Index)
 {
    sint32 s32_Retval;
@@ -2572,9 +2540,8 @@ sint32 C_PuiSvData::DeleteDashboardLineArrow(const uint32 ou32_DashboardIndex, c
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete item
 
    \param[in] ou32_ViewIndex      View index
    \param[in] ou32_DashboardIndex Dashboard index
@@ -2583,10 +2550,8 @@ sint32 C_PuiSvData::DeleteDashboardLineArrow(const uint32 ou32_DashboardIndex, c
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     21.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::DeleteDashboardTextElement(const uint32 ou32_DashboardIndex, const uint32 & oru32_Index)
 {
    sint32 s32_Retval;
@@ -2603,19 +2568,16 @@ sint32 C_PuiSvData::DeleteDashboardTextElement(const uint32 ou32_DashboardIndex,
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Synchronise internally stored scaling information with current system definition
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Synchronise internally stored scaling information with current system definition
 
    \param[in] ou32_DashboardIndex Dashboard index
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     06.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvData::SyncDashboardScalingInformation(const uint32 ou32_DashboardIndex)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -2632,15 +2594,12 @@ sint32 C_PuiSvData::SyncDashboardScalingInformation(const uint32 ou32_DashboardI
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Fix invalid rail configurations
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Fix invalid rail configurations
 
    Hint: may be introduced by unknown issue not cleaning up rail configurations properly
-
-   \created     18.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::FixInvalidRailConfig(void)
 {
    //Test all maps
@@ -2697,13 +2656,10 @@ void C_PuiSvData::FixInvalidRailConfig(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init from current system definition state
-
-   \created     22.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init from current system definition state
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::InitFromSystemDefintion(void)
 {
    //Nodes only
@@ -2718,7 +2674,7 @@ void C_PuiSvData::InitFromSystemDefintion(void)
          if (pc_Node != NULL)
          {
             std::vector<QString> c_ApplPaths;
-            C_PuiSvNodeUpdate c_Info(pc_Node->pc_DeviceDefinition->q_FlashloaderOpenSydeIsFileBased);
+            C_PuiSvNodeUpdate c_Info;
             c_Info.u32_NodeUpdatePosition = u32_ItInfo;
             //Sync applications
             c_ApplPaths.reserve(pc_Node->c_Applications.size());
@@ -2729,7 +2685,7 @@ void C_PuiSvData::InitFromSystemDefintion(void)
                c_ApplPaths.push_back(C_Uti::h_ConcatPathIfNecessary(rc_Application.c_ProjectPath.c_str(),
                                                                     rc_Application.c_ResultPath.c_str()));
             }
-            c_Info.SetApplicationPaths(c_ApplPaths);
+            c_Info.SetPaths(c_ApplPaths, C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
 
             this->mc_NodeUpdateInformation.push_back(c_Info);
          }
@@ -2753,9 +2709,8 @@ void C_PuiSvData::InitFromSystemDefintion(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check name not used in existing dashboards
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check name not used in existing dashboards
 
    \param[in] orc_ProposedName     Proposal for item dashboard
    \param[in] opu32_DashboardIndex Optional parameter to skip one index
@@ -2764,46 +2719,38 @@ void C_PuiSvData::InitFromSystemDefintion(void)
    \return
    True  Name available
    False Name already in use
-
-   \created     06.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_PuiSvData::CheckDashboardName(const QString & orc_Proposal, const uint32 * const opu32_DashboardIndex) const
 {
    return C_PuiSdUtil::h_CheckNameAvailable(this->m_GetExistingDashboardNames(), orc_Proposal, opu32_DashboardIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get unique dashboard name based on proposal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get unique dashboard name based on proposal
 
    \param[in] oru32_NodeIndex Node index
    \param[in] orc_Proposal    Application name proposal
 
    \return
    Unique dashboard name based on proposal
-
-   \created     07.08.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_PuiSvData::GetUniqueDashboardName(const QString & orc_Proposal) const
 {
    return C_Uti::h_GetUniqueNameQ(this->m_GetExistingDashboardNamesMap(), orc_Proposal);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if data element id in use
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if data element id in use
 
    \param[in] orc_Id Data element id to search for
 
    \return
    True  In use
    False No usage
-
-   \created     14.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_PuiSvData::CheckReadUsage(const C_OSCNodeDataPoolListElementId & orc_Id) const
 {
    bool q_Retval = false;
@@ -2840,19 +2787,16 @@ bool C_PuiSvData::CheckReadUsage(const C_OSCNodeDataPoolListElementId & orc_Id) 
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if data element id in use by any non param read item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if data element id in use by any non param read item
 
    \param[in] orc_Id Data element id to search for
 
    \return
    True  In use
    False No usage
-
-   \created     23.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_PuiSvData::CheckNonParamReadUsage(const C_OSCNodeDataPoolListElementId & orc_Id) const
 {
    bool q_Retval = false;
@@ -2891,18 +2835,15 @@ bool C_PuiSvData::CheckNonParamReadUsage(const C_OSCNodeDataPoolListElementId & 
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Count number of usages for a data element id
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Count number of usages for a data element id
 
    \param[in] orc_Id Data element id to search for
 
    \return
    Number of usages
-
-   \created     06.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_PuiSvData::CountReadUsage(const C_OSCNodeDataPoolListElementId & orc_Id) const
 {
    uint32 u32_Retval = 0;
@@ -2937,18 +2878,15 @@ uint32 C_PuiSvData::CountReadUsage(const C_OSCNodeDataPoolListElementId & orc_Id
    return u32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get number of matching cyclic read transmissions
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get number of matching cyclic read transmissions
 
    \param[in] ou32_NodeIndex Node index
 
    \return
    Number of matching cyclic read transmissions
-
-   \created     11.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_PuiSvData::CountCyclicTransmissions(const uint32 ou32_NodeIndex) const
 {
    uint32 u32_Retval = 0;
@@ -2968,19 +2906,16 @@ uint32 C_PuiSvData::CountCyclicTransmissions(const uint32 ou32_NodeIndex) const
    return u32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if list already in use by param widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if list already in use by param widget
 
    \param[in] orc_Id Node data pool list ID
 
    \return
    True  Used
    False False unused
-
-   \created     20.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_PuiSvData::CheckNvmParamListUsage(const C_OSCNodeDataPoolListId & orc_Id) const
 {
    bool q_Retval = false;
@@ -2999,16 +2934,13 @@ bool C_PuiSvData::CheckNvmParamListUsage(const C_OSCNodeDataPoolListId & orc_Id)
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get pointers to all currently registered dashboard names
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get pointers to all currently registered dashboard names
 
    \return
    Vector of pointers to all currently registered dashboard names
-
-   \created     06.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<const QString *> C_PuiSvData::m_GetExistingDashboardNames(void) const
 {
    std::vector<const QString *> c_Retval;
@@ -3021,16 +2953,13 @@ std::vector<const QString *> C_PuiSvData::m_GetExistingDashboardNames(void) cons
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get pointers to all currently registered dashboard names
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get pointers to all currently registered dashboard names
 
    \return
    Vector of pointers to all currently registered dashboard names
-
-   \created     06.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::map<stw_scl::C_SCLString, bool> C_PuiSvData::m_GetExistingDashboardNamesMap(void) const
 {
    std::map<stw_scl::C_SCLString, bool> c_Retval;
@@ -3042,13 +2971,10 @@ std::map<stw_scl::C_SCLString, bool> C_PuiSvData::m_GetExistingDashboardNamesMap
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check all read rail assignments for validity
-
-   \created     06.02.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check all read rail assignments for validity
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::m_CheckAllReadRails(void)
 {
    //No step because vector size changes while deleting

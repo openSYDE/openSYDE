@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Dialog for RTF file export (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.06.2018  STW/D.Pohl (copied and adapted from data pool list import)
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -46,8 +39,9 @@
 #include "C_OgeWiCustomMessage.h"
 #include "ui_C_RtfExportWidget.h"
 #include "C_Uti.h"
+#include "C_ImpUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -57,29 +51,26 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_scl;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] orc_Parent          Reference to parent
-
-   \created     22.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_RtfExportWidget::C_RtfExportWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_RtfExportWidget),
@@ -112,37 +103,23 @@ C_RtfExportWidget::C_RtfExportWidget(stw_opensyde_gui_elements::C_OgePopUpDialog
            &C_RtfExportWidget::m_RtfPathClicked);
    connect(this->mpc_Ui->pc_PushButtonLogoPath, &QPushButton::clicked, this,
            &C_RtfExportWidget::m_LogoPathClicked);
-   connect(this->mpc_Ui->pc_EditRtfPath, &C_OgeLeFilePath::SigFocus, this,
-           &C_RtfExportWidget::m_EditRtfPathFocusOn);
-   connect(this->mpc_Ui->pc_EditLogoPath, &C_OgeLeFilePath::SigFocus, this,
-           &C_RtfExportWidget::m_EditLogoPathFocusOn);
-   connect(this->mpc_Ui->pc_EditRtfPath, &C_OgeLeFilePath::SigFocusOut, this,
-           &C_RtfExportWidget::m_EditRtfPathFocusOff);
-   connect(this->mpc_Ui->pc_EditLogoPath, &C_OgeLeFilePath::SigFocusOut, this,
-           &C_RtfExportWidget::m_EditLogoPathFocusOff);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     18.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_RtfExportWidget::~C_RtfExportWidget(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     22.06.2018  STW/D.Pohl
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_RtfExportWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelHeadingReport->setText(C_GtGetText::h_GetText("Report Settings"));
@@ -172,9 +149,8 @@ void C_RtfExportWidget::InitStaticNames(void) const
                                                         "(optional parameter)"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Getter of full RTF file path for DocuCreator.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Getter of full RTF file path for DocuCreator.
 
    Mandatory parameter.
 
@@ -187,16 +163,14 @@ void C_RtfExportWidget::InitStaticNames(void) const
    C_NOACT     invalid file format (not .rtf)
    C_WARN      file already exists
    C_CHECKSUM  file name invalid
-
-   \created     25.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_RtfExportWidget::GetRtfPath(C_SCLString & orc_RtfPath) const
 {
    sint32 s32_Return = C_CONFIG;
 
    // get full RTF path of widget Ui
-   orc_RtfPath = this->mc_RtfPath;
+   orc_RtfPath = C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_EditRtfPath->GetPath()).toStdString().c_str();
 
    // check if directory exists
    if (TGL_DirectoryExists(TGL_ExtractFilePath(orc_RtfPath)) == true)
@@ -232,9 +206,8 @@ sint32 C_RtfExportWidget::GetRtfPath(C_SCLString & orc_RtfPath) const
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Getter of customer company name for RTF DocuCreator.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Getter of customer company name for RTF DocuCreator.
 
    Optional parameter:
    e.g. Sensor-Technik Wiedemann GmbH
@@ -243,10 +216,8 @@ sint32 C_RtfExportWidget::GetRtfPath(C_SCLString & orc_RtfPath) const
 
    \return
    C_NO_ERR    in any case (all signs are allowed)
-
-   \created     25.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_RtfExportWidget::GetCompanyName(C_SCLString & orc_CompanyName) const
 {
    // get company name of widget Ui
@@ -255,31 +226,29 @@ sint32 C_RtfExportWidget::GetCompanyName(C_SCLString & orc_CompanyName) const
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Getter of full company logo path for DocuCreator.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Getter of full company logo path for DocuCreator.
 
-   Optional parameter.
-
-   \param[out]    orc_RtfPath    Company logo path for DocuCreator (empty string "" if not available)
+   \param[out]    orc_CompanyLogoPath    Company logo path for DocuCreator (empty string "" if not available)
 
    \return
    C_NO_ERR    valid RTF file path or empty string
    C_CONFIG    file does not exist
    C_NOACT     invalid file format (not .jpg or .png)
-
-   \created     25.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_RtfExportWidget::GetCompanyLogoPath(C_SCLString & orc_CompanyLogoPath) const
 {
    sint32 s32_Return = C_CONFIG;
 
-   // get full company logo path of widget Ui
-   orc_CompanyLogoPath = this->mc_CompanyLogoPath;
+   // get company logo path
+   orc_CompanyLogoPath = this->mpc_Ui->pc_EditLogoPath->GetPath().toStdString().c_str();
 
    if (orc_CompanyLogoPath != "")
    {
+      // make absolute path if necessary
+      orc_CompanyLogoPath = C_ImpUtil::h_GetAbsolutePathFromProject(orc_CompanyLogoPath.c_str()).toStdString().c_str();
+
       // check if file exists
       if (TGL_FileExists(orc_CompanyLogoPath) == true)
       {
@@ -304,73 +273,41 @@ sint32 C_RtfExportWidget::GetCompanyLogoPath(C_SCLString & orc_CompanyLogoPath) 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Setter for full RTF File Export path.
-
-   For appropriate QLineEdit the minimized path is shown.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Setter for full RTF File Export path.
 
    \param[in]     orc_RtfPath    input parameter description
-
-   \created     03.07.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
-void C_RtfExportWidget::SetRtfPath(const C_SCLString & orc_RtfPath)
+//----------------------------------------------------------------------------------------------------------------------
+void C_RtfExportWidget::SetRtfPath(const C_SCLString & orc_RtfPath) const
 {
-   this->mc_RtfPath = orc_RtfPath;
-   QFont c_Font = mc_STYLE_GUIDE_FONT_REGULAR_13;
-
-   c_Font.setPixelSize(c_Font.pointSize());
-   QString c_MinimizedPath = C_Uti::h_MinimizePath(QString(orc_RtfPath.c_str()),
-                                                   c_Font, this->mpc_Ui->pc_EditRtfPath->width(),
-                                                   14); // left and right padding of QLineEdit in LineEdit.qss plus 2px
-                                                        // offset to really fit in
-   this->mpc_Ui->pc_EditRtfPath->setText(c_MinimizedPath);
-   this->mpc_Ui->pc_EditRtfPath->SetToolTipInformation(QString(orc_RtfPath.c_str()));
+   this->mpc_Ui->pc_EditRtfPath->SetPath(orc_RtfPath.c_str(), C_PuiProject::h_GetInstance()->GetFolderPath());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Setter for company name.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Setter for company name.
 
    \param[in]     orc_CompanyName    input parameter description
-
-   \created     03.07.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_RtfExportWidget::SetCompanyName(const C_SCLString & orc_CompanyName) const
 {
    this->mpc_Ui->pc_EditCompany->setText(orc_CompanyName.c_str());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Setter for full company logo path.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Setter for company logo path.
 
-   For appropriate QLineEdit the minimized path is shown.
-
-   \param[in]     orc_CompanyLogoPath    input parameter description
-
-   \created     03.07.2018  STW/D.Pohl
+   \param[in]     orc_CompanyLogoPath    path to company logo
 */
-//-----------------------------------------------------------------------------
-void C_RtfExportWidget::SetCompanyLogoPath(const C_SCLString & orc_CompanyLogoPath)
+//----------------------------------------------------------------------------------------------------------------------
+void C_RtfExportWidget::SetCompanyLogoPath(const C_SCLString & orc_CompanyLogoPath) const
 {
-   this->mc_CompanyLogoPath = orc_CompanyLogoPath;
-   QFont c_Font = mc_STYLE_GUIDE_FONT_REGULAR_13;
-
-   c_Font.setPixelSize(c_Font.pointSize());
-   QString c_MinimizedPath = C_Uti::h_MinimizePath(QString(orc_CompanyLogoPath.c_str()),
-                                                   c_Font, this->mpc_Ui->pc_EditLogoPath->width(),
-                                                   14); // left and right padding of QLineEdit in LineEdit.qss plus 2px
-                                                        // offset to really fit in
-   this->mpc_Ui->pc_EditLogoPath->setText(c_MinimizedPath);
-   this->mpc_Ui->pc_EditLogoPath->SetToolTipInformation(QString(orc_CompanyLogoPath.c_str()));
+   this->mpc_Ui->pc_EditLogoPath->SetPath(orc_CompanyLogoPath.c_str(), C_PuiProject::h_GetInstance()->GetFolderPath());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Exports openSYDE system definition as RTF documentation file.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Exports openSYDE system definition as RTF documentation file.
 
    Assumptions:
    * RTF path and optional company logo path is valid (approved by getters of this class)
@@ -392,10 +329,8 @@ void C_RtfExportWidget::SetCompanyLogoPath(const C_SCLString & orc_CompanyLogoPa
    C_NOACT     can't find external "DocuCreator" tool
    C_BUSY      could not save 'Network Topology' screenshot to disk
    C_UNKNOWN   Execution of 'DocuCreator' tool not successful (see error message)
-
-   \created     25.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_SCLString & orc_CompanyName,
                                       const C_SCLString & orc_CompanyLogoPath, C_SdTopologyWidget * const opc_Widget,
                                       C_SCLStringList & orc_WarningMessages, C_SCLString & orc_ErrorMessage)
@@ -481,10 +416,6 @@ sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_S
       // fill up information for DocuCreator
       C_ExportXmlStructure c_ConfigXml;
 
-      QFileInfo c_FileTmp; // get project name by project file path
-      c_FileTmp.setFile(C_PuiProject::h_GetInstance()->GetPath());
-      C_SCLString c_NameTmp = c_FileTmp.baseName().toStdString().c_str();
-
       QString c_SysDefPathTmp; // get path of system definition file '.syde_sysdef'
       C_PuiProject::h_AdaptProjectPathToSystemDefinition(
          C_PuiProject::h_GetInstance()->GetPath(), c_SysDefPathTmp);
@@ -499,10 +430,10 @@ sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_S
 
       // Project
       c_ConfigXml.c_Title = "Project Documentation";
-      c_ConfigXml.c_Name = c_NameTmp;
+      c_ConfigXml.c_Name = C_PuiProject::h_GetInstance()->GetName().toStdString().c_str();
       c_ConfigXml.c_Version = C_PuiProject::h_GetInstance()->c_Version;
       c_ConfigXml.c_Created = C_SCLString(c_CurrentTime.toString("dd.MM.yyyy hh:mm").toStdString().c_str());
-      c_ConfigXml.c_Author = C_PuiProject::h_GetInstance()->c_Author;
+      c_ConfigXml.c_Author = C_PuiProject::h_GetInstance()->c_Editor;
       c_ConfigXml.c_SysDefPath = c_SysDefPathTmp.toStdString().c_str();
       c_ConfigXml.c_DevicesIniPath = c_DevIniPathTmp.toStdString().c_str();
       c_ConfigXml.c_OutputPath = orc_RtfPath;
@@ -599,9 +530,8 @@ sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_S
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Creates config.xml file as input for DocuCreator RTF File Export.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Creates config.xml file as input for DocuCreator RTF File Export.
 
    Assumption:
    * valid path (as internal function)
@@ -613,10 +543,8 @@ sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_S
    \return
    C_NO_ERR    XML file successfully created
    C_NOACT     could not write data to XML file
-
-   \created     25.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_RtfExportWidget::m_CreateConfigXml(const C_SCLString & orc_Path,
                                             const C_ExportXmlStructure & orc_ExportXmlStructure) const
 {
@@ -627,12 +555,12 @@ sint32 C_RtfExportWidget::m_CreateConfigXml(const C_SCLString & orc_Path,
    const C_SCLString c_OPENSYDE = "opensyde";
    const C_SCLString c_COMPANY = "company";
 
-   // create empty update package definition file
+   // create empty DocuCreator configuration file
    std::fstream c_File;
 
    c_File.open(orc_Path.c_str(), std::fstream::out);
 
-   // fill update package definition
+   // fill DocuCreator configuration definition
    C_OSCXMLParser c_XMLParser;
 
    //Root Node
@@ -687,23 +615,20 @@ sint32 C_RtfExportWidget::m_CreateConfigXml(const C_SCLString & orc_Path,
    //Return
    tgl_assert(c_XMLParser.SelectNodeParent() == c_ROOT_NAME);
 
-   // save update package definition file
+   // save DocuCreator configuration file
    s32_Return = c_XMLParser.SaveToFile(orc_Path);
 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     13.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_RtfExportWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
@@ -729,13 +654,10 @@ void C_RtfExportWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of OK button click
-
-   \created     18.06.2018  STW/D.Pohl
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of OK button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_RtfExportWidget::m_OkClicked(void)
 {
    if (this->m_CheckSettings() == C_NO_ERR)
@@ -744,29 +666,24 @@ void C_RtfExportWidget::m_OkClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of cancel button click
-
-   \created     28.06.2018  STW/D.Pohl
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of cancel button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_RtfExportWidget::m_CancelClicked(void)
 {
    this->mrc_ParentDialog.reject();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of RTF path button click to call file selector
-
-   \created     29.06.2018  STW/D.Pohl
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of RTF path button click to call file selector
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_RtfExportWidget::m_RtfPathClicked(void)
 {
    QString c_Folder; // for default folder
-   C_SCLString c_Tmp = this->mpc_Ui->pc_EditRtfPath->text().toStdString().c_str();
+   C_SCLString c_Tmp =
+      C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_EditRtfPath->GetPath()).toStdString().c_str();
 
    if (TGL_DirectoryExists(TGL_ExtractFilePath(c_Tmp)) == true)
    {
@@ -777,15 +694,13 @@ void C_RtfExportWidget::m_RtfPathClicked(void)
       c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath();
    }
 
-   QFileInfo c_FileTmp; // get project name by project file path
-   c_FileTmp.setFile(C_PuiProject::h_GetInstance()->GetPath());
-   QString c_DefaultFilename = c_FileTmp.baseName().toStdString().c_str();
+   QString c_DefaultFilename = C_PuiProject::h_GetInstance()->GetName();
    c_DefaultFilename += ".rtf";
 
    const QString c_FilterName = QString(C_GtGetText::h_GetText("RTF file (*.rtf)"));
-   const QString c_FullRtfFilePath = C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText(
-                                                                       "Save File for RTF Export"), c_Folder, c_FilterName, c_DefaultFilename,
-                                                                    QFileDialog::DontConfirmOverwrite);
+   const QString c_FullRtfFilePath = C_OgeWiUtil::h_GetSaveFileName(
+      this, C_GtGetText::h_GetText("Save File for RTF Export"), c_Folder, c_FilterName, c_DefaultFilename,
+      QFileDialog::DontConfirmOverwrite);
 
    if (c_FullRtfFilePath != "")
    {
@@ -793,18 +708,16 @@ void C_RtfExportWidget::m_RtfPathClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of logo path button click to call file selector
-
-   \created     29.06.2018  STW/D.Pohl
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of logo path button click to call file selector
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_RtfExportWidget::m_LogoPathClicked(void)
 {
    QString c_Folder; // for default folder
 
-   C_SCLString c_Tmp = this->mpc_Ui->pc_EditLogoPath->text().toStdString().c_str();
+   C_SCLString c_Tmp =
+      C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_EditLogoPath->GetPath()).toStdString().c_str();
 
    if (TGL_DirectoryExists(TGL_ExtractFilePath(c_Tmp)) == true)
    {
@@ -829,17 +742,14 @@ void C_RtfExportWidget::m_LogoPathClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check user input settings.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check user input settings.
 
    \return
    C_NO_ERR    settings valid
    !C_NO_ERR   invalid settings
-
-   \created     04.07.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_RtfExportWidget::m_CheckSettings(void) const
 {
    sint32 s32_Return;
@@ -945,52 +855,4 @@ sint32 C_RtfExportWidget::m_CheckSettings(void) const
    }
 
    return s32_Return;
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot to show up full file path if user wants to edit path manually.
-
-   \created     09.07.2018  STW/D.Pohl
-*/
-//-----------------------------------------------------------------------------
-void C_RtfExportWidget::m_EditRtfPathFocusOn(void) const
-{
-   this->mpc_Ui->pc_EditRtfPath->setText(QString(this->mc_RtfPath.c_str()));
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot to show up full file path if user wants to edit path manually.
-
-   \created     09.07.2018  STW/D.Pohl
-*/
-//-----------------------------------------------------------------------------
-void C_RtfExportWidget::m_EditLogoPathFocusOn(void) const
-{
-   this->mpc_Ui->pc_EditLogoPath->setText(QString(this->mc_CompanyLogoPath.c_str()));
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot to show up minimized file path if user exits from manual editing.
-
-   \created     09.07.2018  STW/D.Pohl
-*/
-//-----------------------------------------------------------------------------
-void C_RtfExportWidget::m_EditRtfPathFocusOff(void)
-{
-   this->SetRtfPath(this->mpc_Ui->pc_EditRtfPath->text().toStdString().c_str());
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot to show up minimized file path if user exits from manual editing.
-
-   \created     09.07.2018  STW/D.Pohl
-*/
-//-----------------------------------------------------------------------------
-void C_RtfExportWidget::m_EditLogoPathFocusOff(void)
-{
-   this->SetCompanyLogoPath(this->mpc_Ui->pc_EditLogoPath->text().toStdString().c_str());
 }

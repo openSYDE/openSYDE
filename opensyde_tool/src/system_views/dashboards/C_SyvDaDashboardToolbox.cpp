@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for toolbox of dashboard
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_SyvDaDashboardToolbox.h"
@@ -21,35 +15,32 @@
 #include "C_GtGetText.h"
 #include "C_SebToolboxUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_parent Optional pointer to parent
-
-   \created     20.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaDashboardToolbox::C_SyvDaDashboardToolbox(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvDaDashboardToolbox)
@@ -69,27 +60,21 @@ C_SyvDaDashboardToolbox::C_SyvDaDashboardToolbox(QWidget * const opc_Parent) :
    mpc_Ui->pc_ListWidgetDrawing->setDropIndicatorShown(false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     20.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaDashboardToolbox::~C_SyvDaDashboardToolbox()
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     03.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardToolbox::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_TabWidget->tabBar()->setTabText(0, C_GtGetText::h_GetText("Widgets"));
@@ -98,15 +83,12 @@ void C_SyvDaDashboardToolbox::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelFreeElements->setText(C_GtGetText::h_GetText("Meta Information Elements"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the dark mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the dark mode
 
    \param[in] oq_Active Dark mode active
-
-   \created     04.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardToolbox::ApplyDarkMode(const bool oq_Active)
 {
    for (uint32 u32_ItList = 0; u32_ItList < static_cast<uint32>(this->mc_ListWidgets.size()); ++u32_ItList)
@@ -119,18 +101,15 @@ void C_SyvDaDashboardToolbox::ApplyDarkMode(const bool oq_Active)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten enter event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten enter event slot
 
    To get the correct cursor back from the resizing implementation of
    C_OgeWiHover.
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     03.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardToolbox::enterEvent(QEvent * const opc_Event)
 {
    Q_UNUSED(opc_Event)
@@ -139,18 +118,15 @@ void C_SyvDaDashboardToolbox::enterEvent(QEvent * const opc_Event)
    this->parentWidget()->setMouseTracking(false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten leave event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten leave event slot
 
    To get the correct cursor back from the resizing implementation of
    C_OgeWiHover.
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     03.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardToolbox::leaveEvent(QEvent * const opc_Event)
 {
    Q_UNUSED(opc_Event)
@@ -158,13 +134,10 @@ void C_SyvDaDashboardToolbox::leaveEvent(QEvent * const opc_Event)
    this->parentWidget()->setMouseTracking(true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Fill toolbox with static content
-
-   \created     03.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Fill toolbox with static content
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardToolbox::m_FillToolboxStatic(void)
 {
    C_SdTopologyListWidget * pc_List;
@@ -197,13 +170,10 @@ void C_SyvDaDashboardToolbox::m_FillToolboxStatic(void)
    this->mpc_Ui->pc_LabelFreeElements->setMinimumHeight(C_SebToolboxUtil::hsn_LabelSize);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add widget items to toolbox
-
-   \created     23.10.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add widget items to toolbox
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardToolbox::m_AddWidgetItems(void)
 {
    //No global static variable because gettext needs to be initialized first

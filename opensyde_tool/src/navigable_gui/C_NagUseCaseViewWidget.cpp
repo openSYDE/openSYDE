@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for showing use case specific widgets based on class C_NagUseCaseWidget
 
@@ -8,17 +7,11 @@
    use case widgets.
    This widget is designed in a ui file.
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     11.07.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QSpacerItem>
@@ -31,36 +24,33 @@
 #include "constants.h"
 #include "stwtypes.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_types;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_NagUseCaseViewWidget::mhc_SVGIconPath = "://images/IconNavigationArrow.svg";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     11.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_NagUseCaseViewWidget::C_NagUseCaseViewWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_NagUseCaseViewWidget),
@@ -78,37 +68,24 @@ C_NagUseCaseViewWidget::C_NagUseCaseViewWidget(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_LabelSpace->SetSvg(C_NagUseCaseViewWidget::mhc_SVGIconPath);
    //lint -e{1938}  static const is guaranteed preinitialized before main
    this->mpc_Ui->pc_LabelSpace_2->SetSvg(C_NagUseCaseViewWidget::mhc_SVGIconPath);
-
-   this->mpc_Ui->pc_PushButtonIcon->setIconSize(mc_ICON_SIZE_24);
-   this->mpc_Ui->pc_PushButtonIcon->SetToolTipInformation(C_GtGetText::h_GetText(
-                                                             "Switch Mode"),
-                                                          C_GtGetText::h_GetText("Switch between dark and bright mode."));
-   connect(this->mpc_Ui->pc_PushButtonIcon, &QPushButton::clicked, this,
-           &C_NagUseCaseViewWidget::m_OnPushButtonIconPress);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     11.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_NagUseCaseViewWidget::~C_NagUseCaseViewWidget()
 {
    delete mpc_Ui;
    //lint -e{1740}  no memory leak because of the parent of mpc_Widget and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initializes all visible strings on the widget
-
-   \created     08.07.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initializes all visible strings on the widget
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagUseCaseViewWidget::InitText(void) const
 {
    switch (this->ms32_Mode)
@@ -119,9 +96,6 @@ void C_NagUseCaseViewWidget::InitText(void) const
 
       this->mpc_Ui->pc_LabelMode->setText(C_GtGetText::h_GetText("SYSTEM DEFINITION"));
       m_HandleSubSections();
-
-      //Generic push button visibility
-      this->mpc_Ui->pc_PushButtonIcon->setVisible(false);
       break;
 
    case ms32_MODE_SYSVIEW:
@@ -130,17 +104,6 @@ void C_NagUseCaseViewWidget::InitText(void) const
 
       this->mpc_Ui->pc_LabelMode->setText(C_GtGetText::h_GetText("SYSTEM COMMISSIONING"));
       m_HandleSubSections();
-
-      //Generic push button visibility
-      switch (this->ms32_Submode)
-      {
-      case ms32_SUBMODE_SYSVIEW_DASHBOARD:
-         this->mpc_Ui->pc_PushButtonIcon->setVisible(true);
-         break;
-      default:
-         this->mpc_Ui->pc_PushButtonIcon->setVisible(false);
-         break;
-      }
       break;
 
    default:
@@ -148,13 +111,10 @@ void C_NagUseCaseViewWidget::InitText(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init Background color
-
-   \created     08.07.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init Background color
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagUseCaseViewWidget::InitBackground()
 {
    QPalette c_Palette;
@@ -181,39 +141,25 @@ void C_NagUseCaseViewWidget::InitBackground()
    this->setPalette(c_Palette);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set icon path
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set interaction widget
 
-   \param[in] orc_IconPath Icon path
-
-   \created     02.08.2017  STW/M.Echtler
+   \param[in] opc_Widget Interaction widget
 */
-//-----------------------------------------------------------------------------
-void C_NagUseCaseViewWidget::SetPushButtonIcon(const QString & orc_IconPath) const
+//----------------------------------------------------------------------------------------------------------------------
+void C_NagUseCaseViewWidget::SetInteractionWidget(QWidget * const opc_Widget)
 {
-   this->mpc_Ui->pc_PushButtonIcon->setIcon(QIcon(orc_IconPath));
+   if (opc_Widget != NULL)
+   {
+      opc_Widget->setParent(this);
+      this->mpc_Ui->pc_HorizontalLayout->addWidget(opc_Widget);
+   }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle push button press
-
-   \created     02.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update sub sub section if necessary
 */
-//-----------------------------------------------------------------------------
-void C_NagUseCaseViewWidget::m_OnPushButtonIconPress(void)
-{
-   Q_EMIT this->SigPushButtonIconPressed();
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update sub sub section if necessary
-
-   \created     22.08.2018  STW/M.Echtler
-*/
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagUseCaseViewWidget::m_HandleSubSections(void) const
 {
    if (this->mc_ItemSubSubName.compare("") == 0)
@@ -229,9 +175,8 @@ void C_NagUseCaseViewWidget::m_HandleSubSections(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the widget which will be showed
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the widget which will be showed
 
    This functions does not delete the widget! It removes the parent.
 
@@ -240,10 +185,8 @@ void C_NagUseCaseViewWidget::m_HandleSubSections(void) const
    \param[in]   os32_SubMode       Actual sub mode
    \param[in]   orc_ItemName       Item name for showing
    \param[in]   orc_ItemSubSubName Selected sub sub mode name
-
-   \created     11.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagUseCaseViewWidget::SetUseCaseWidget(C_NagUseCaseWidget * const opc_Widget, const sint32 os32_Mode,
                                               const stw_types::sint32 os32_SubMode, const QString & orc_ItemName,
                                               const QString & orc_ItemSubSubName)
@@ -285,15 +228,12 @@ void C_NagUseCaseViewWidget::SetUseCaseWidget(C_NagUseCaseWidget * const opc_Wid
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Removes the actual setted widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Removes the actual setted widget
 
    This functions does not delete the widget! It removes the parent.
-
-   \created     11.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagUseCaseViewWidget::RemoveUseCaseWidget(void)
 {
    // remove the old widget
@@ -316,17 +256,14 @@ void C_NagUseCaseViewWidget::RemoveUseCaseWidget(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the parameters of the item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the parameters of the item
 
    \param[in]   os32_SubMode    Actual sub mode
    \param[in]   orc_ItemName    Item name for showing
    \param[in]   orc_ItemSubName Selected sub sub mode name
-
-   \created     01.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagUseCaseViewWidget::UpdateUseCaseWidget(const stw_types::sint32 os32_SubMode, const QString & orc_ItemName,
                                                  const QString & orc_ItemSubName)
 {
@@ -338,16 +275,13 @@ void C_NagUseCaseViewWidget::UpdateUseCaseWidget(const stw_types::sint32 os32_Su
    this->InitBackground();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the name of the item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the name of the item
 
    \param[in]   orc_ItemName    Item name for showing
    \param[in]   orc_ItemSubName Selected sub sub mode name
-
-   \created     18.05.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagUseCaseViewWidget::UpdateItemName(const QString & orc_ItemName, const QString & orc_ItemSubName)
 {
    this->mc_ItemName = orc_ItemName;

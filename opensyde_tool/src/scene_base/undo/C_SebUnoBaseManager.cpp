@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Handler class for scene undo command stack (implementation)
 
    Handler class for scene undo command stack
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <vector>
@@ -35,35 +28,32 @@
 #include "C_SebUnoMoveSubLineCommand.h"
 #include "TGLUtils.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace std;
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Scene  Scene to use undo redo framework for
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     21.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoBaseManager::C_SebUnoBaseManager(QGraphicsScene * const opc_Scene, QObject * const opc_Parent) :
    C_UtiUndoStack(opc_Parent),
    mpc_StyleCommand(NULL),
@@ -73,15 +63,12 @@ C_SebUnoBaseManager::C_SebUnoBaseManager(QGraphicsScene * const opc_Scene, QObje
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     21.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoBaseManager::~C_SebUnoBaseManager(void)
 {
    delete (mpc_StyleCommand);
@@ -89,13 +76,10 @@ C_SebUnoBaseManager::~C_SebUnoBaseManager(void)
    delete (mpc_LastMoveCommand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register move
-
-   \created     24.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register move
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoBaseManager::RegisterMove(void)
 {
    if (this->mpc_MoveCommandGroup != NULL)
@@ -107,16 +91,13 @@ void C_SebUnoBaseManager::RegisterMove(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do move
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do move
 
    \param[in] orc_Items              Affected items
    \param[in] orc_PositionDifference Position difference
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoBaseManager::DoMove(const QList<QGraphicsItem *> & orc_Items, const QPointF & orc_PositionDifference)
 {
    vector<uint64> c_IDs;
@@ -147,17 +128,14 @@ void C_SebUnoBaseManager::DoMove(const QList<QGraphicsItem *> & orc_Items, const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register resize
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register resize
 
    \param[in] orc_Items                Affected items
    \param[in] ors32_InteractionPointID Interaction point ID
    \param[in] orc_PositionDifference   Position difference
-
-   \created     21.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoBaseManager::RegisterResizeLine(const QList<QGraphicsItem *> & orc_Items,
                                              const sint32 & ors32_InteractionPointID,
                                              const QPointF & orc_PositionDifference)
@@ -172,19 +150,16 @@ void C_SebUnoBaseManager::RegisterResizeLine(const QList<QGraphicsItem *> & orc_
    this->DoPush(pc_ResizeCommand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register resize action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register resize action
 
    \param[in] orc_Items   Affected items
    \param[in] orc_OldPos  Old position
    \param[in] orc_OldSize Old size
    \param[in] orc_NewPos  New position
    \param[in] orc_NewSize New size
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoBaseManager::RegisterResizeRectangle(const QList<QGraphicsItem *> & orc_Items, const QPointF & orc_OldPos,
                                                   const QSizeF & orc_OldSize, const QPointF & orc_NewPos,
                                                   const QSizeF & orc_NewSize)
@@ -199,16 +174,13 @@ void C_SebUnoBaseManager::RegisterResizeRectangle(const QList<QGraphicsItem *> &
    this->DoPush(pc_ResizeCommand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register complete move step
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register complete move step
 
    \param[in] orc_Items              Affected items
    \param[in] orc_PositionDifference Position difference
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoBaseManager::RegisterCompleteMoveStep(const QList<QGraphicsItem *> & orc_Items,
                                                    const QPointF & orc_PositionDifference)
 {
@@ -222,17 +194,14 @@ void C_SebUnoBaseManager::RegisterCompleteMoveStep(const QList<QGraphicsItem *> 
    this->DoPush(pc_MoveCommand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do move sub line
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do move sub line
 
    \param[in] orc_Items              Affected items
    \param[in] orc_PositionDifference Position difference
    \param[in] ors32_SubLineID        Sub line ID
-
-   \created     25.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoBaseManager::RegisterMoveSubLine(const QList<QGraphicsItem *> & orc_Items,
                                               const QPointF & orc_PositionDifference, const sint32 & ors32_SubLineID)
 {
@@ -247,16 +216,13 @@ void C_SebUnoBaseManager::RegisterMoveSubLine(const QList<QGraphicsItem *> & orc
    this->DoPush(pc_MoveCommand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add bend point to line
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add bend point to line
 
    \param[in,out] opc_Line     Line item
    \param[in]     orc_ScenePos Scene position
-
-   \created     25.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoBaseManager::DoBendLine(const C_GiLiLineGroup * const opc_Line, const QPointF & orc_ScenePos)
 {
    vector<uint64> c_IDs;
@@ -270,16 +236,13 @@ void C_SebUnoBaseManager::DoBendLine(const C_GiLiLineGroup * const opc_Line, con
    this->DoPush(pc_AddCommand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Remove bend point of line
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove bend point of line
 
    \param[in,out] opc_Line     Line item
    \param[in]     orc_ScenePos Scene position
-
-   \created     25.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoBaseManager::DoRemoveBendLine(const C_GiLiLineGroup * const opc_Line, const QPointF & orc_ScenePos)
 {
    vector<uint64> c_IDs;
@@ -293,17 +256,14 @@ void C_SebUnoBaseManager::DoRemoveBendLine(const C_GiLiLineGroup * const opc_Lin
    this->DoPush(pc_RemoveCommand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do align
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do align
 
    \param[in,out] orc_Items     Items to align
    \param[in]     opc_AlignItem Item to align items to
    \param[in]     ore_Alignment Alignment type
-
-   \created     21.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoBaseManager::DoAlign(const QList<QGraphicsItem *> & orc_Items, const QGraphicsItem * const opc_AlignItem,
                                   const E_Alignment & ore_Alignment)
 {
@@ -317,19 +277,16 @@ void C_SebUnoBaseManager::DoAlign(const QList<QGraphicsItem *> & orc_Items, cons
    this->DoPush(pc_AlignCommand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt z order of selected items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt z order of selected items
 
    \param[in]     orc_SelectedItems All selected items
    \param[in]     orc_Items         All items
    \param[in]     of64_Diff         Difference to add to all selected items
    \param[in,out] orf64_ZOrderHigh  Reference to highest z value
    \param[in,out] orf64_ZOrderLow   Reference to lowest z value
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoBaseManager::AdaptZOrder(const QList<QGraphicsItem *> & orc_SelectedItems,
                                       const QList<QGraphicsItem *> & orc_Items, const float64 of64_Diff,
                                       float64 & orf64_ZOrderHigh, float64 & orf64_ZOrderLow)
@@ -358,16 +315,13 @@ void C_SebUnoBaseManager::AdaptZOrder(const QList<QGraphicsItem *> & orc_Selecte
    this->DoPush(pc_ZOrderCommand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save style information
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save style information
 
    \param[in,out] orc_Items   Affected items
    \param[in]     oq_DarkMode Optional flag if dark mode active
-
-   \created     06.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoBaseManager::SaveStyleInformation(const QList<QGraphicsItem *> & orc_Items, const bool oq_DarkMode)
 {
    vector<uint64> c_IDs;
@@ -382,13 +336,10 @@ void C_SebUnoBaseManager::SaveStyleInformation(const QList<QGraphicsItem *> & or
    this->mpc_StyleCommand->InitPrevious();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register a new style change
-
-   \created     06.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register a new style change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoBaseManager::RegisterStyleChange(void)
 {
    if (this->mpc_StyleCommand != NULL)
@@ -400,16 +351,13 @@ void C_SebUnoBaseManager::RegisterStyleChange(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Map items to unique IDs
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Map items to unique IDs
 
    \param[in]  orc_Items Original items
    \param[out] orc_IDs   Unique IDs
-
-   \created     21.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoBaseManager::m_MapItemToID(const QList<QGraphicsItem *> & orc_Items, vector<uint64> & orc_IDs)
 {
    vector<uint64> c_DuplicateIDs;
@@ -442,16 +390,13 @@ void C_SebUnoBaseManager::m_MapItemToID(const QList<QGraphicsItem *> & orc_Items
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Map item to unique ID
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Map item to unique ID
 
    \param[in]  opc_Item Original item
    \param[out] oru64_ID Unique ID
-
-   \created     21.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoBaseManager::m_MapItemToID(const QGraphicsItem * const opc_Item, uint64 & oru64_ID)
 {
    const C_GiUnique * pc_UniqueItem;
@@ -469,19 +414,16 @@ void C_SebUnoBaseManager::m_MapItemToID(const QGraphicsItem * const opc_Item, ui
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get new style command (Destruction has to be handled by calling function)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get new style command (Destruction has to be handled by calling function)
 
    \param[in] orc_Items   Item IDs
    \param[in] oq_DarkMode Optional flag if dark mode active
 
    \return
    Valid pointer to new style command
-
-   \created     25.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoSetupStyleCommand * C_SebUnoBaseManager::m_GetNewStyleCommand(const std::vector<uint64> & orc_Items,
                                                                       const bool oq_DarkMode)
 {

@@ -1,23 +1,16 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Double spin box with dynamic decimal input (implementation)
 
    Base class of double spin boxes, where the number of shown decimals
    dynamically changes during user input.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     30.05.2018  STW/G.Scupin
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QLineEdit>
@@ -27,51 +20,45 @@
 #include "constants.h"
 #include "C_OgeSpxDoubleDynamicDecimalsBase.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     30.05.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeSpxDoubleDynamicDecimalsBase::C_OgeSpxDoubleDynamicDecimalsBase(QWidget * const opc_Parent) :
    QDoubleSpinBox(opc_Parent)
 {
    this->setDecimals(msn_DOUBLE_SPIN_BOX_DECIMAL_COUNT);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten textFromValue method
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten textFromValue method
 
    This virtual function is used by the spin box whenever it needs to display the given value.
    Cut annoying trailing zeros and give the possibility to show 0,00000...0123.
-
-   \created     07.06.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_OgeSpxDoubleDynamicDecimalsBase::textFromValue(const float64 of64_Value) const
 {
    QString c_StringFromValue;

@@ -1,25 +1,19 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Dialog window for error, information, question and warning.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     16.04.2018  STW/G.Scupin
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OGEWICUSTOMMESSAGE_H
 #define C_OGEWICUSTOMMESSAGE_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QDialog>
 #include "stwtypes.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
 {
 class C_OgeWiCustomMessage;
@@ -27,9 +21,9 @@ class C_OgeWiCustomMessage;
 
 namespace stw_opensyde_gui_elements
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_OgeWiCustomMessage :
    public QDialog
 {
@@ -111,13 +105,12 @@ private:
    void m_OKClicked(void);
    void m_NOClicked(void);
    void m_CancelClicked(void);
-   void m_UpdateLabelSize(void);
 
    // Avoid call
    C_OgeWiCustomMessage(const C_OgeWiCustomMessage &);
    C_OgeWiCustomMessage & operator =(const C_OgeWiCustomMessage &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } // end of namespace
 #endif // C_OGEWICUSTOMMESSAGE_H

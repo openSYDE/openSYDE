@@ -1,25 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \file        CDLReportEvents.h
+   \file
    \brief       Interface class for reporting events during processes
 
    Provides an interface to reporting progress and status during potentially longer function calls and processes.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.06.2010  STW/A.Stangl
-   \endimplementation
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   22.06.2010        STW/A.Stangl  file created
-   \endhistory
+   \copyright   Copyright 2010 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CDLREPORTEVENTSH
 #define CDLREPORTEVENTSH
 

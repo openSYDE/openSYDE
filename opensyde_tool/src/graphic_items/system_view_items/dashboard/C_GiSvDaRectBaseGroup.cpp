@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Base class for all system view dashboard items which are rectangle based (implementation)
 
    Base class for all system view dashboard items which are rectangle based
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.07.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPen>
@@ -45,7 +38,7 @@
 #include "C_OSCNodeDataPoolListElement.h"
 #include "C_OgeWiCustomMessage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
@@ -53,7 +46,7 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const float64 C_GiSvDaRectBaseGroup::mhf64_ActionPointOffset = 10.0;
 const uint8 C_GiSvDaRectBaseGroup::mhu8_StartGreyTimeoutPercentage = 20U;
 const QString C_GiSvDaRectBaseGroup::mhc_ICON_READ = "://images/system_views/dashboards/icons/IconUpdateValueRead.svg";
@@ -68,19 +61,18 @@ const QString C_GiSvDaRectBaseGroup::mhc_ICON_WRITE_ABORT =
 const QString C_GiSvDaRectBaseGroup::mhc_ICON_WRITE_DISABLED =
    "://images/system_views/dashboards/icons/IconUpdateValueWriteDisabled.svg";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -100,10 +92,8 @@ const QString C_GiSvDaRectBaseGroup::mhc_ICON_WRITE_DISABLED =
    \param[in,out] opc_Parent                 Optional pointer to parent
    \param[in]     orc_PosOffset              Optional offset for the position (values must be in 0.0 <= x < 1.0)
                                              Negative value deactivates the function
-
-   \created     19.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvDaRectBaseGroup::C_GiSvDaRectBaseGroup(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
                                              const sint32 & ors32_DataIndex, const E_Type & ore_Type,
                                              const uint32 ou32_MaximumDataElements, const uint64 & oru64_ID,
@@ -128,6 +118,7 @@ C_GiSvDaRectBaseGroup::C_GiSvDaRectBaseGroup(const uint32 & oru32_ViewIndex, con
    mc_LastTransparencyValue(msn_TRANSPARENCY_START),
    mq_ConnectionActive(false),
    mq_ShowButton(false),
+   mq_AbortTriggered(false),
    mu32_NextManualActionIndex(0)
 {
    this->mpc_ProxyWidget = new C_GiWiProxyBase(of64_InitWidth, of64_InitHeight, this);
@@ -146,15 +137,12 @@ C_GiSvDaRectBaseGroup::C_GiSvDaRectBaseGroup(const uint32 & oru32_ViewIndex, con
    this->setAcceptHoverEvents(true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     19.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvDaRectBaseGroup::~C_GiSvDaRectBaseGroup(void)
 {
    this->mpc_ProxyWidget->setWidget(NULL);
@@ -164,34 +152,28 @@ C_GiSvDaRectBaseGroup::~C_GiSvDaRectBaseGroup(void)
    // management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checks if the cursor position is relevant for the proxy widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks if the cursor position is relevant for the proxy widget
 
    \param[in]     orc_ScenePos     Scene position of cursor
 
    \return
    true     Cursor is on a relevant position
    false    Cursor is not on a relevant position
-
-   \created     04.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaRectBaseGroup::IsMousePosRelevantForProxyWidgetInteraction(const QPointF & orc_ScenePos) const
 {
    return this->mpc_ProxyWidget->contains(this->mpc_ProxyWidget->mapFromScene(orc_ScenePos));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply style
 
    \param[in] oe_Style    New style type
    \param[in] oq_DarkMode Flag if dark mode is active
-
-   \created     11.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::SetDisplayStyle(const stw_opensyde_gui_logic::C_PuiSvDbWidgetBase::E_Style oe_Style,
                                             const bool oq_DarkMode)
 {
@@ -259,15 +241,12 @@ void C_GiSvDaRectBaseGroup::SetDisplayStyle(const stw_opensyde_gui_logic::C_PuiS
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load basic widget data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load basic widget data
 
    \param[in] orc_Data Basic widget data
-
-   \created     31.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::LoadSvBasicData(const C_PuiSvDbWidgetBase & orc_Data)
 {
    this->me_Style = orc_Data.e_DisplayStyle;
@@ -286,15 +265,12 @@ void C_GiSvDaRectBaseGroup::LoadSvBasicData(const C_PuiSvDbWidgetBase & orc_Data
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update basic widget data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update basic widget data
 
    \param[in,out] orc_Data Basic widget data
-
-   \created     31.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::UpdateSvBasicData(C_PuiSvDbWidgetBase & orc_Data, const bool oq_SkipDataElements) const
 {
    orc_Data.e_DisplayStyle = this->me_Style;
@@ -318,13 +294,10 @@ void C_GiSvDaRectBaseGroup::UpdateSvBasicData(C_PuiSvDbWidgetBase & orc_Data, co
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete data in system view dashboard
-
-   \created     25.08.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete data in system view dashboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::DeleteData(void)
 {
    if (this->ms32_Index >= 0)
@@ -337,16 +310,13 @@ void C_GiSvDaRectBaseGroup::DeleteData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register cyclic transmission error for specific data element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register cyclic transmission error for specific data element
 
    \param[in] orc_WidgetDataPoolElementId Affected data element
    \param[in] ou8_ErrorCode               Registered error code
-
-   \created     17.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::RegisterDataPoolElementCyclicError(
    const C_PuiSvDbNodeDataPoolListElementId & orc_WidgetDataPoolElementId, const uint8 ou8_ErrorCode)
 {
@@ -372,17 +342,14 @@ void C_GiSvDaRectBaseGroup::RegisterDataPoolElementCyclicError(
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the shown value of the element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the shown value of the element
 
    If the dashboard element is a reading element the derived class must reimplement this function and handle
    the incoming values.
    Base class implementation checks for timeout only and adapts the styling of the items.
-
-   \created     28.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::UpdateShowValue(void)
 {
    if (this->mq_ReadItem == true)
@@ -461,19 +428,16 @@ void C_GiSvDaRectBaseGroup::UpdateShowValue(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update of the color transparence value configured by the actual timeout state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update of the color transparence value configured by the actual timeout state
 
    Base class implementation does nothing. If the dashboard element has drawing elements which
    can not be adapted by stylesheets the derived class must reimplement this function.
 
    \param[in]     ou32_WidgetDataPoolElementIndex     Index of shown datapool element in widget
    \param[in]     osn_Value                           Value for transparence (0..255)
-
-   \created     18.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
 {
    // Nothing to do in the base class implementation
@@ -481,19 +445,16 @@ void C_GiSvDaRectBaseGroup::UpdateTransparence(const uint32 ou32_DataElementInde
    Q_UNUSED(osn_Value)
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Information about the start or stop of a connection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the start or stop of a connection
 
    \param[in]  oq_Active      Flag if connection is active or not active now
 
    Base class implementation resets the timeout coloring.
    If the dashboard element wants to know when the
    connections starts the derived class must reimplement this function.
-
-   \created     01.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::ConnectionActiveChanged(const bool oq_Active)
 {
    this->mq_ConnectionActive = oq_Active;
@@ -556,36 +517,30 @@ void C_GiSvDaRectBaseGroup::ConnectionActiveChanged(const bool oq_Active)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Information about the start or stop of edit mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the start or stop of edit mode
 
    Base class implementation does nothing. If the dashboard element has edit mode specific functionality,
    the derived class must reimplement this function.
 
    \param[in]  oq_Active  Flag if edit mode is active or not active now
-
-   \created     05.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::EditModeActiveChanged(const bool oq_Active)
 {
    // Nothing to do in the base class implementation
    Q_UNUSED(oq_Active)
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sends the current set value of the element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sends the current set value of the element
 
    Unscales the actual value, sets the value in the datapool and sends the signal SigDataPoolWrite for writing
    the element to the server.
    The derived class must set the actual value into mf64_WriteValue before calling
    the base class implementation.
-
-   \created     28.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::SendCurrentValue(void)
 {
    if ((this->mu32_NextManualActionIndex == 0) && (this->mpc_RefreshIcon != NULL))
@@ -663,43 +618,37 @@ void C_GiSvDaRectBaseGroup::SendCurrentValue(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Call properties for widgets
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Call properties for widgets
 
    Base class implementation does nothing. If there are configurable properties for the dashboard element
    the derived class must reimplement this function.
-
-   \created     04.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaRectBaseGroup::CallProperties(void)
 {
    // Nothing to do in the base class implementation
    return false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle manual user operation finished event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle manual user operation finished event
 
    \param[in] os32_Result Operation result
    \param[in] ou8_NRC     Negative response code, if any
-
-   \created     09.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::HandleManualOperationFinished(const sint32 os32_Result, const uint8 ou8_NRC)
 {
    if (this->mu32_NextManualActionIndex > 0)
    {
+      C_PuiSvDbNodeDataPoolListElementId c_ElementId;
+      const sint32 s32_Return = this->GetDataPoolElementIndex(this->mu32_NextManualActionIndex - 1UL, c_ElementId);
       //Response error handling
       if (os32_Result != C_NO_ERR)
       {
          QString c_Description;
          QString c_Details;
-         C_PuiSvDbNodeDataPoolListElementId c_ElementId;
-         const sint32 s32_Return = this->GetDataPoolElementIndex(this->mu32_NextManualActionIndex - 1UL, c_ElementId);
          switch (os32_Result)
          {
          case C_CONFIG:
@@ -811,6 +760,22 @@ void C_GiSvDaRectBaseGroup::HandleManualOperationFinished(const sint32 os32_Resu
             c_Message.SetDetails(c_Details);
             c_Message.Execute();
          }
+      }
+      else
+      {
+         //Clear error if successful
+         if (s32_Return == C_NO_ERR)
+         {
+            //Change icon
+            this->mc_CommmunicationErrors.remove(c_ElementId);
+            this->m_UpdateErrorIcon();
+         }
+      }
+      //Continue after error
+      //Don't continue if user abort
+      if (this->mq_AbortTriggered)
+      {
+         this->mq_AbortTriggered = false;
          this->m_ManualOperationFinished();
       }
       else
@@ -827,16 +792,13 @@ void C_GiSvDaRectBaseGroup::HandleManualOperationFinished(const sint32 os32_Resu
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal all widgets which read rail element ID registrations failed
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal all widgets which read rail element ID registrations failed
 
    \param[in]     orc_FailedIdRegisters    Failed IDs
    \param[in,out] orc_FailedIdErrorDetails Error details for element IDs which failed registration (if any)
-
-   \created     13.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::SetErrorForFailedCyclicElementIdRegistrations(
    const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_FailedIdRegisters,
    const std::vector<QString> & orc_FailedIdErrorDetails)
@@ -873,16 +835,13 @@ void C_GiSvDaRectBaseGroup::SetErrorForFailedCyclicElementIdRegistrations(
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set DLC error for specified element id
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set DLC error for specified element id
 
    \param[in] orc_ElementId Element ID
    \param[in] ou8_DLC       DLC
-
-   \created     26.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::SetErrorForInvalidDlc(const C_OSCNodeDataPoolListElementId & orc_ElementId,
                                                   const uint8 ou8_DLC)
 {
@@ -890,17 +849,25 @@ void C_GiSvDaRectBaseGroup::SetErrorForInvalidDlc(const C_OSCNodeDataPoolListEle
    m_UpdateErrorIcon();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Function to activate or deactivate drawing of performance heavy widgets
+
+   \param[in] oq_Active Flag if widgets should currently be drawn
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaRectBaseGroup::SetDrawingActive(const bool oq_Active)
+{
+   Q_UNUSED(oq_Active)
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    \param[in,out] opc_Painter Painter
    \param[in,out] opc_Option  Option
    \param[in,out] opc_Widget  Widget
-
-   \created     11.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                                   QWidget * const opc_Widget)
 {
@@ -943,19 +910,16 @@ void C_GiSvDaRectBaseGroup::paint(QPainter * const opc_Painter, const QStyleOpti
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Activates or deactivates all relevant context menu entries for this item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Activates or deactivates all relevant context menu entries for this item
 
    Base class implementation does nothing. If there are context menu actions for the dashboard element
    the derived class must reimplement this function.
 
    \param[in]     opc_ContextMenuManager  Pointer to context menu manager for registration of actions
    \param[in]     oq_Active               Flag if context menu entries have to be shown or not
-
-   \created     07.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::ConfigureContextMenu(C_SyvDaContextMenuManager * const opc_ContextMenuManager,
                                                  const bool oq_Active)
 {
@@ -965,16 +929,13 @@ void C_GiSvDaRectBaseGroup::ConfigureContextMenu(C_SyvDaContextMenuManager * con
    // Nothing to do in the base class implementation
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get display style type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get display style type
 
    \return
    Current display style type
-
-   \created     05.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbWidgetBase::E_Style C_GiSvDaRectBaseGroup::GetDisplayStyleType(void) const
 {
    C_PuiSvDbWidgetBase::E_Style e_Retval = C_PuiSvDbWidgetBase::eOPENSYDE;
@@ -998,29 +959,23 @@ C_PuiSvDbWidgetBase::E_Style C_GiSvDaRectBaseGroup::GetDisplayStyleType(void) co
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Generate hint for current widget
-
-   \created     25.05.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Generate hint for current widget
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::GenerateHint(void)
 {
    //Hint always up to date
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the pointer to the associated dashboard data class
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the pointer to the associated dashboard data class
 
    \return
    - Pointer to dashboard if valid
    - NULL
-
-   \created     11.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_PuiSvDashboard * C_GiSvDaRectBaseGroup::GetSvDashboard(void) const
 {
    const C_PuiSvDashboard * pc_Dashboard = NULL;
@@ -1041,16 +996,13 @@ const C_PuiSvDashboard * C_GiSvDaRectBaseGroup::GetSvDashboard(void) const
    return pc_Dashboard;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle resize update for children
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle resize update for children
 
    \param[in] of64_DiffWidth  Width
    \param[in] of64_DiffHeight Height
-
-   \created     19.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::m_ResizeUpdateItems(const float64 of64_DiffWidth, const float64 of64_DiffHeight)
 {
    this->mc_CurrentSize = QSizeF(this->mc_CurrentSize.width() + of64_DiffWidth,
@@ -1084,16 +1036,13 @@ void C_GiSvDaRectBaseGroup::m_ResizeUpdateItems(const float64 of64_DiffWidth, co
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle unresolved resize request
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle unresolved resize request
 
    \param[in] of64_DiffWidth  Width
    \param[in] of64_DiffHeight Height
-
-   \created     10.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::m_ForceWidgetResize(const QSizeF & orc_NewSize)
 {
    if (this->mpc_Widget != NULL)
@@ -1111,17 +1060,14 @@ void C_GiSvDaRectBaseGroup::m_ForceWidgetResize(const QSizeF & orc_NewSize)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse press event slot
 
    Here: Send event to proxy widget
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     31.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    bool q_GenericButtonClicked = false;
@@ -1137,16 +1083,7 @@ void C_GiSvDaRectBaseGroup::mousePressEvent(QGraphicsSceneMouseEvent * const opc
       // is the cursor in the area of the label
       if (c_Rect.contains(c_Pos) == true)
       {
-         //Read the read element and write the value of the write element
-         if (this->mq_ReadItem == false)
-         {
-            // Write the actual value to the server
-            this->SendCurrentValue();
-         }
-         else
-         {
-            this->m_ManualRead();
-         }
+         m_HandleGenericButtonClick();
          q_GenericButtonClicked = true;
       }
    }
@@ -1170,19 +1107,17 @@ void C_GiSvDaRectBaseGroup::mousePressEvent(QGraphicsSceneMouseEvent * const opc
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse move event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse move event slot
 
    Here: Send event to proxy widget
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     31.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
+   //Always handle the mouse move event the same way as the mouse press event was handled
    if (this->mq_ProxyWidgetInteractionActive == true)
    {
       this->mpc_ProxyWidget->TriggerMouseMoveEvent(opc_Event);
@@ -1194,20 +1129,18 @@ void C_GiSvDaRectBaseGroup::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse release event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse release event slot
 
    Here: Send event to proxy widget
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     31.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
-   if (this->IsMousePosRelevantForProxyWidgetInteraction(opc_Event->scenePos()) == true)
+   //Always handle the mouse release event the same way as the mouse press event was handled
+   if (this->mq_ProxyWidgetInteractionActive)
    {
       this->mpc_ProxyWidget->TriggerMouseReleaseEvent(opc_Event);
       opc_Event->accept();
@@ -1221,68 +1154,56 @@ void C_GiSvDaRectBaseGroup::mouseReleaseEvent(QGraphicsSceneMouseEvent * const o
    this->mq_ProxyWidgetInteractionActive = false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Send event to proxy widget
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     31.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::keyPressEvent(QKeyEvent * const opc_Event)
 {
    this->mpc_ProxyWidget->TriggerKeyPressEvent(opc_Event);
    opc_Event->accept();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key release event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key release event slot
 
    Here: Send event to proxy widget
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     31.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::keyReleaseEvent(QKeyEvent * const opc_Event)
 {
    this->mpc_ProxyWidget->TriggerKeyReleaseEvent(opc_Event);
    opc_Event->accept();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten focus out event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten focus out event slot
 
    Here: Send event to proxy widget
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     31.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::focusOutEvent(QFocusEvent * const opc_Event)
 {
    this->mpc_ProxyWidget->TriggerFocusOutEvent(opc_Event);
    C_GiBiRectBaseGroup::focusOutEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten wheel event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten wheel event slot
 
    Here: Send event to proxy widget
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     31.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::wheelEvent(QGraphicsSceneWheelEvent * const opc_Event)
 {
    if (this->mpc_ProxyWidget->hasFocus() == true)
@@ -1300,30 +1221,24 @@ void C_GiSvDaRectBaseGroup::wheelEvent(QGraphicsSceneWheelEvent * const opc_Even
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse hover enter event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse hover enter event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     11.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::hoverEnterEvent(QGraphicsSceneHoverEvent * const opc_Event)
 {
    this->mpc_ProxyWidget->TriggerHoverEnterEvent(opc_Event);
    C_GiBiRectBaseGroup::hoverEnterEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse hover move event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse hover move event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     11.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_Event)
 {
    this->mpc_ProxyWidget->TriggerHoverMoveEvent(opc_Event);
@@ -1405,26 +1320,38 @@ void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_
       const QString c_Heading = C_GtGetText::h_GetText("Configuration Warning");
       QString c_Content;
       QString c_Name;
-      if (m_CheckInvalidElements(c_Name) == true)
-      {
-         c_Content +=
-            QString(C_GtGetText::h_GetText(
-                       "- This widget and this data element (\"%1\") does not match, possible reasons:\n"
-                       "   Data element was deleted\n"
-                       "   Data element has become an array\n"
-                       "   Data element has different value range")).arg(c_Name);
-      }
-      if (m_CheckAnyRequiredNodesInactive() == true)
-      {
-         c_Content += C_GtGetText::h_GetText("- There is a data element of an inactive node");
-      }
-      if (m_CheckAnyRequiredBusesNotConnected() == true)
-      {
-         c_Content += C_GtGetText::h_GetText("- There is a signal of a inactive bus");
-      }
+      //if there are no data elements use this tooltip
       if (this->GetWidgetDataPoolElementCount() == 0U)
       {
          c_Content += C_GtGetText::h_GetText("- No data element selected");
+      }
+      else
+      {
+         if (m_CheckHasValidElements(c_Name) == false)
+         {
+            c_Content +=
+               QString(C_GtGetText::h_GetText(
+                          "- This widget and this data element (\"%1\") does not match, possible reasons:\n"
+                          "   Data element was deleted\n"
+                          "   Data element has become an array\n"
+                          "   Data element has different value range")).arg(c_Name);
+         }
+         if (m_CheckHasAnyRequiredNodesActive() == false)
+         {
+            if (c_Content.isEmpty() == false)
+            {
+               c_Content += "\n";
+            }
+            c_Content += C_GtGetText::h_GetText("- There is a data element of an inactive node");
+         }
+         if (m_CheckHasAnyRequiredBusesConnected() == false)
+         {
+            if (c_Content.isEmpty() == false)
+            {
+               c_Content += "\n";
+            }
+            c_Content += C_GtGetText::h_GetText("- There is a signal of a inactive bus");
+         }
       }
       //Check if redisplay necessary
       if (c_Content.compare(this->GetCurrentToolTipContent()) != 0)
@@ -1469,15 +1396,12 @@ void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse hover leave event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse hover leave event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     11.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event)
 {
    this->mpc_ProxyWidget->TriggerHoverLeaveEvent(opc_Event);
@@ -1486,20 +1410,17 @@ void C_GiSvDaRectBaseGroup::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc
    Q_EMIT this->SigHideToolTip();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check for any invalid elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check for any invalid elements
 
    \return
    true  Found
    false Not found
-
-   \created     16.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
-bool C_GiSvDaRectBaseGroup::m_CheckInvalidElements(QString & orc_FirstInvalidElementName) const
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvDaRectBaseGroup::m_CheckHasValidElements(QString & orc_FirstInvalidElementName) const
 {
-   bool q_InvalidElement = false;
+   bool q_ValidElement = false;
    const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->GetMappingDpElementToDataSerie();
 
    for (QMap<C_PuiSvDbNodeDataPoolListElementId, uint32>::const_iterator c_ItElement = rc_Elements.begin();
@@ -1508,27 +1429,26 @@ bool C_GiSvDaRectBaseGroup::m_CheckInvalidElements(QString & orc_FirstInvalidEle
       const C_PuiSvDbNodeDataPoolListElementId c_ElementId = c_ItElement.key();
 
       // Is the data element valid?
-      if (c_ElementId.GetIsValid() == false)
+      if (c_ElementId.GetIsValid())
       {
-         q_InvalidElement = true;
+         q_ValidElement = true;
+      }
+      else
+      {
          orc_FirstInvalidElementName = c_ElementId.GetInvalidNamePlaceholder();
-         break;
       }
    }
-   return q_InvalidElement;
+   return q_ValidElement;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check for any manual read items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check for any manual read items
 
    \return
    true  Found
    false Not found
-
-   \created     16.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaRectBaseGroup::m_CheckManualReadRequired(void) const
 {
    bool q_ManualReadElement = false;
@@ -1565,20 +1485,17 @@ bool C_GiSvDaRectBaseGroup::m_CheckManualReadRequired(void) const
    return q_ManualReadElement;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check for any required nodes inactive
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check for any required nodes inactive
 
    \return
    true  Found
    false Not found
-
-   \created     16.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
-bool C_GiSvDaRectBaseGroup::m_CheckAnyRequiredNodesInactive(void) const
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvDaRectBaseGroup::m_CheckHasAnyRequiredNodesActive(void) const
 {
-   bool q_InvalidElement = false;
+   bool q_AtLeastOneValidElement = false;
 
    const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->GetMappingDpElementToDataSerie();
 
@@ -1593,31 +1510,28 @@ bool C_GiSvDaRectBaseGroup::m_CheckAnyRequiredNodesInactive(void) const
          const std::vector<uint8> & rc_ActiveNodes = pc_View->GetNodeActiveFlags();
          //Is corresponding view active
          if ((c_ElementId.u32_NodeIndex < rc_ActiveNodes.size()) &&
-             (rc_ActiveNodes[c_ElementId.u32_NodeIndex] == false))
+             (rc_ActiveNodes[c_ElementId.u32_NodeIndex] == 1U))
          {
-            q_InvalidElement = true;
+            q_AtLeastOneValidElement = true;
             break;
          }
       }
    }
 
-   return q_InvalidElement;
+   return q_AtLeastOneValidElement;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check for any required buses not connected in view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check for any required buses not connected in view
 
    \return
    true  Found
    false Not found
-
-   \created     19.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
-bool C_GiSvDaRectBaseGroup::m_CheckAnyRequiredBusesNotConnected(void) const
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvDaRectBaseGroup::m_CheckHasAnyRequiredBusesConnected(void) const
 {
-   bool q_InvalidElement = false;
+   bool q_AtLeastOneValidElement = false;
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
    if (pc_View != NULL)
@@ -1647,50 +1561,55 @@ bool C_GiSvDaRectBaseGroup::m_CheckAnyRequiredBusesNotConnected(void) const
                      if (rc_Interface.u32_BusIndex == pc_View->GetPcData().GetBusIndex())
                      {
                         //Active
-                        q_InvalidElement = false;
+                        q_AtLeastOneValidElement = true;
+                        break;
                      }
                      else
                      {
                         //Inactive
-                        q_InvalidElement = true;
+                        q_AtLeastOneValidElement = false;
                      }
                   }
                   else
                   {
                      //Failure
-                     q_InvalidElement = true;
+                     q_AtLeastOneValidElement = false;
                   }
                }
                else
                {
                   //Failure
-                  q_InvalidElement = true;
+                  q_AtLeastOneValidElement = false;
                }
             }
             else
             {
                //Failure
-               q_InvalidElement = true;
+               q_AtLeastOneValidElement = false;
             }
+         }
+         else
+         {
+            //Allow continue as this means at least one element is not a bus element
+            //so this check can at least clarify that one element is valid
+            q_AtLeastOneValidElement = true;
+            break;
          }
       }
    }
    else
    {
       //Failure
-      q_InvalidElement = true;
+      q_AtLeastOneValidElement = false;
    }
 
-   return q_InvalidElement;
+   return q_AtLeastOneValidElement;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Event function if the datapool element configuration was changed
-
-   \created     19.09.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Event function if the datapool element configuration was changed
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::m_DataPoolElementsChanged(void)
 {
    bool q_InvalidElement;
@@ -1701,8 +1620,8 @@ void C_GiSvDaRectBaseGroup::m_DataPoolElementsChanged(void)
       QString c_Name;
       const bool q_ManualReadElement = m_CheckManualReadRequired();
 
-      q_InvalidElement = m_CheckInvalidElements(c_Name) || m_CheckAnyRequiredNodesInactive() ||
-                         m_CheckAnyRequiredBusesNotConnected();
+      q_InvalidElement = (m_CheckHasValidElements(c_Name) == false) || (m_CheckHasAnyRequiredNodesActive() == false) ||
+                         (m_CheckHasAnyRequiredBusesConnected() == false);
 
       if (((((this->me_WriteMode == C_PuiSvDbWidgetBase::eWM_MANUAL) && (this->mq_ReadItem == false)) ||
             (q_ManualReadElement == true)) &&
@@ -1741,29 +1660,23 @@ void C_GiSvDaRectBaseGroup::m_DataPoolElementsChanged(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if the refresh button is available
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if the refresh button is available
 
    \return
    True  Refresh icon will be displayed if necessary
    False Refresh icon will never be displayed
-
-   \created     14.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaRectBaseGroup::m_AllowRefreshButton(void) const
 {
    return true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update the error icon
-
-   \created     17.07.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update the error icon
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::m_UpdateErrorIcon(void)
 {
    if ((this->mpc_ConflictIcon != NULL) && (this->mpc_ButtonGroup != NULL))
@@ -1782,32 +1695,26 @@ void C_GiSvDaRectBaseGroup::m_UpdateErrorIcon(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if warning icon is allowed
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if warning icon is allowed
 
    \return
    True  Warning icon is allowed
    False Warning icon is not allowed
-
-   \created     09.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaRectBaseGroup::m_AllowWarningIcon(void) const
 {
    return true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get common tool tip content if no other item takes precedence over the tool tip
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get common tool tip content if no other item takes precedence over the tool tip
 
    \return
    Common tool tip content if no other item takes precedence over the tool tip
-
-   \created     20.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_GiSvDaRectBaseGroup::m_GetCommonToolTipContent(void) const
 {
    QString c_Retval;
@@ -1821,7 +1728,7 @@ QString C_GiSvDaRectBaseGroup::m_GetCommonToolTipContent(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::m_InitConflictIcon(void)
 {
    //Offset to have icon inside widget
@@ -1862,7 +1769,7 @@ void C_GiSvDaRectBaseGroup::m_InitConflictIcon(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::m_InitButton(void)
 {
    QRectF c_Rect;
@@ -1910,13 +1817,10 @@ void C_GiSvDaRectBaseGroup::m_InitButton(void)
    //lint -e{429}  no memory leak because of adding pc_RectItem to the group and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger next manual read operation
-
-   \created     09.10.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger next manual read operation
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::m_ManualRead(void)
 {
    if ((this->mu32_NextManualActionIndex == 0) && (this->mpc_RefreshIcon != NULL))
@@ -1953,13 +1857,38 @@ void C_GiSvDaRectBaseGroup::m_ManualRead(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update the error icon tool tip
-
-   \created     17.07.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle any click to the generic button
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaRectBaseGroup::m_HandleGenericButtonClick(void)
+{
+   this->mq_AbortTriggered = false;
+   //Read the read element and write the value of the write element
+   if (this->mq_ReadItem == false)
+   {
+      // Write the actual value to the server
+      this->SendCurrentValue();
+   }
+   else
+   {
+      //Only for read items this may be abort
+      if (this->mu32_NextManualActionIndex > 0UL)
+      {
+         //Register abort
+         this->mq_AbortTriggered = true;
+      }
+      else
+      {
+         this->m_ManualRead();
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update the error icon tool tip
+*/
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::m_UpdateErrorIconToolTip(void)
 {
    QString c_Heading = C_GtGetText::h_GetText("Transmission error");
@@ -2012,13 +1941,10 @@ void C_GiSvDaRectBaseGroup::m_UpdateErrorIconToolTip(void)
    this->SetDefaultToolTipType(C_NagToolTip::eERROR);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   First step of manual operation
-
-   \created     09.10.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   First step of manual operation
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::m_ManualOperationStarted(void)
 {
    if ((this->mpc_RefreshIcon != NULL) && (this->GetWidgetDataPoolElementCount() > 1))
@@ -2035,13 +1961,10 @@ void C_GiSvDaRectBaseGroup::m_ManualOperationStarted(void)
    QApplication::setOverrideCursor(Qt::WaitCursor);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Final step of manual operation
-
-   \created     09.10.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Final step of manual operation
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::m_ManualOperationFinished(void)
 {
    //Reset current state
@@ -2060,19 +1983,16 @@ void C_GiSvDaRectBaseGroup::m_ManualOperationFinished(void)
    QApplication::restoreOverrideCursor();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if requested node is active
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if requested node is active
 
    \param[in] ou32_NodeIndex Node index to check
 
    \return
    True  Definitely active
    False Either not active or something else is wrong
-
-   \created     17.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaRectBaseGroup::m_CheckNodeActive(const uint32 ou32_NodeIndex) const
 {
    bool q_Retval = false;

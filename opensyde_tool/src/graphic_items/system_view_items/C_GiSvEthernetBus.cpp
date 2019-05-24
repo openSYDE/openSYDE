@@ -1,48 +1,40 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       System view ethernet bus (implementation)
 
    System view ethernet bus
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     15.11.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
 #include "C_PuiSvHandler.h"
 #include "C_GiSvEthernetBus.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -52,10 +44,8 @@ using namespace stw_opensyde_gui_logic;
    \param[in]     opc_TextElementName  Pointer to text element for showing bus name
    \param[in]     opc_Points           Points for line
    \param[in,out] opc_Parent           Optional pointer to parent
-
-   \created     15.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvEthernetBus::C_GiSvEthernetBus(const uint32 ou32_ViewIndex, const sint32 & ors32_Index, const uint64 & oru64_ID,
                                      C_GiTextElementBus * const opc_TextElementName,
                                      const std::vector<QPointF> * const opc_Points, QGraphicsItem * const opc_Parent) :
@@ -64,13 +54,10 @@ C_GiSvEthernetBus::C_GiSvEthernetBus(const uint32 ou32_ViewIndex, const sint32 &
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking the bus data for errors and updates the conflict icon
-
-   \created     15.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking the bus data for errors and updates the conflict icon
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvEthernetBus::CheckBusForChanges(void)
 {
    if (this->mpc_TextElementName != NULL)

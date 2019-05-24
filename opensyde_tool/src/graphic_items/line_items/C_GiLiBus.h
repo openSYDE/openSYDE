@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Base class for bus specific lines (header)
 
    Base class for busses (note: main module description should be in .cpp file)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     18.08.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_GILIBUS_H
 #define C_GILIBUS_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <QString>
 
@@ -30,12 +24,12 @@
 #include "C_OSCSystemBus.h"
 #include "C_GiTextElementBus.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_GiLiBus :
    public C_GiLiLineGroup,
@@ -63,6 +57,7 @@ public:
    virtual void DeleteData(void);
    virtual stw_opensyde_core::C_OSCSystemBus::E_Type GetType() const = 0;
    virtual void GenerateHint(void);
+   virtual void CopyStyle(const QGraphicsItem * const opc_GuidelineItem) override;
 
    virtual void SetDisabledLook(const bool oq_Disabled) override;
    void ApplyStyle(const QColor & orc_LineColor, const stw_types::sintn osn_Width);
@@ -96,7 +91,7 @@ private:
    void m_UnregisterTextElement(void);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

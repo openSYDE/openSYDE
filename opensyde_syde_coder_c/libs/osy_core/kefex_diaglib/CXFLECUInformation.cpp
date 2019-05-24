@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       ECU information block handling
 
@@ -8,15 +7,9 @@
    - deserialize
    - extract information
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.08.2015  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2015 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h" //pre-compiled headers
@@ -115,8 +108,7 @@ uint16 C_XFLECUInformation::GetMaxSizeOnECU(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Parse ECU information payload data from BLOB
+/*! \brief   Parse ECU information payload data from BLOB
 
    Tries to parse the payload of an ECU information block.
    Supports V1, V2, V3 of the block definition.
@@ -128,8 +120,6 @@ uint16 C_XFLECUInformation::GetMaxSizeOnECU(void) const
    \return
    C_NO_ERR           no errors, information stored in class members
    else               error parsing
-
-   \created     24.11.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_XFLECUInformation::m_ParsePayload(const uint8 * const opu8_Data, const uint16 ou16_NumBytesAvailable,
@@ -261,8 +251,7 @@ sint32 C_XFLECUInformation::m_ParsePayload(const uint8 * const opu8_Data, const 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Parse ECU information data from BLOB
+/*! \brief   Parse ECU information data from BLOB
 
    Tries to parse an ECU information block.
    Supports V1, V2, V3 of the block definition.
@@ -274,8 +263,6 @@ sint32 C_XFLECUInformation::m_ParsePayload(const uint8 * const opu8_Data, const 
    \return
    C_NO_ERR           no errors, information stored in class members
    else               error parsing
-
-   \created     24.07.2015  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 stw_types::sint32 C_XFLECUInformation::ParseFromBLOB(const uint8 * const opu8_Data, const uint16 ou16_NumBytesAvailable)

@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for system view dashboard progress bar properties (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.09.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -25,13 +18,13 @@
 #include "C_GiSvDaProgressBarBase.h"
 #include "C_GtGetText.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const sintn C_SyvDaPeProgressBar::mhsn_INDEX_STYLE_TYPE1 = 0;
 const sintn C_SyvDaPeProgressBar::mhsn_INDEX_STYLE_TYPE2 = 1;
 const sintn C_SyvDaPeProgressBar::mhsn_INDEX_STYLE_TYPE3 = 2;
@@ -41,28 +34,25 @@ const sintn C_SyvDaPeProgressBar::mhsn_INDEX_ALIGNMENT_RIGHT = 1;
 const sintn C_SyvDaPeProgressBar::mhsn_INDEX_ALIGNMENT_TOP = 0;
 const sintn C_SyvDaPeProgressBar::mhsn_INDEX_ALIGNMENT_BOTTOM = 1;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent  Optional pointer to parent
    \param[in]     oq_DarkMode Flag for dark mode
-
-   \created     13.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeProgressBar::C_SyvDaPeProgressBar(C_SyvDaPeBase & orc_Parent, const bool oq_DarkMode) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvDaPeProgressBar),
@@ -93,27 +83,21 @@ C_SyvDaPeProgressBar::C_SyvDaPeProgressBar(C_SyvDaPeBase & orc_Parent, const boo
    connect(&this->mrc_ParentDialog, &C_SyvDaPeBase::SigRefresh, this, &C_SyvDaPeProgressBar::m_UpdatePreview);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     13.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeProgressBar::~C_SyvDaPeProgressBar(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     13.09.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeProgressBar::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelShowMinMax->setText(C_GtGetText::h_GetText("Show Min / Max"));
@@ -124,31 +108,25 @@ void C_SyvDaPeProgressBar::InitStaticNames(void) const
    this->mpc_Ui->pc_ComboBoxType->addItem(C_GtGetText::h_GetText("Type 3"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get show minimum and maximum flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get show minimum and maximum flag
 
    \return
    Current show minimum and maximum flag
-
-   \created     13.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaPeProgressBar::GetShowMinMax(void) const
 {
    return this->mpc_Ui->pc_CheckBoxMinMax->isChecked();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get type
 
    \return
    Current type
-
-   \created     13.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbProgressBar::E_Type C_SyvDaPeProgressBar::GetType(void) const
 {
    C_PuiSvDbProgressBar::E_Type e_Retval;
@@ -169,16 +147,13 @@ C_PuiSvDbProgressBar::E_Type C_SyvDaPeProgressBar::GetType(void) const
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get alignment
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get alignment
 
    \return
    Current alginment
-
-   \created     13.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbProgressBar::E_Alignment C_SyvDaPeProgressBar::GetAlignment(void) const
 {
    C_PuiSvDbProgressBar::E_Alignment e_Retval;
@@ -212,29 +187,23 @@ C_PuiSvDbProgressBar::E_Alignment C_SyvDaPeProgressBar::GetAlignment(void) const
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set show minimum and maximum flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set show minimum and maximum flag
 
    \param[in] oq_Value New show minimum and maximum flag
-
-   \created     13.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeProgressBar::SetShowMinMax(const bool oq_Value) const
 {
    this->mpc_Ui->pc_CheckBoxMinMax->setChecked(oq_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set type
 
    \param[in] oe_Type New type
-
-   \created     13.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeProgressBar::SetType(const C_PuiSvDbProgressBar::E_Type oe_Type)
 {
    switch (oe_Type)
@@ -253,15 +222,12 @@ void C_SyvDaPeProgressBar::SetType(const C_PuiSvDbProgressBar::E_Type oe_Type)
    this->m_TypeChanged();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set alignment
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set alignment
 
    \param[in] oe_Type New alignment
-
-   \created     13.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeProgressBar::SetAlignment(const C_PuiSvDbProgressBar::E_Alignment oe_Alignment) const
 {
    switch (oe_Alignment)
@@ -281,7 +247,7 @@ void C_SyvDaPeProgressBar::SetAlignment(const C_PuiSvDbProgressBar::E_Alignment 
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeProgressBar::m_TypeChanged(void)
 {
    // Special case: Options for alignment depends of selection of type
@@ -290,7 +256,7 @@ void C_SyvDaPeProgressBar::m_TypeChanged(void)
    this->m_UpdatePreview();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeProgressBar::m_FillAlignmentComboBox(const sintn osn_Type) const
 {
    this->mpc_Ui->pc_ComboBoxAlignment->clear();
@@ -307,13 +273,10 @@ void C_SyvDaPeProgressBar::m_FillAlignmentComboBox(const sintn osn_Type) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update of preview click
-
-   \created     12.09.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update of preview click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeProgressBar::m_UpdatePreview(void)
 {
    C_GiSvDaProgressBarBase * pc_Item = new C_GiSvDaProgressBarBase(0UL, 0UL, -1L, 0ULL, NULL);

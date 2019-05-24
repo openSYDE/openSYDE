@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Text browser with custom context menu (implementation)
 
    Text browser with custom context menu in openSYDE style.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.07.2018  STW/G.Scupin
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QScrollBar>
@@ -28,34 +21,31 @@
 #include "C_OgeTebContextMenuBase.h"
 #include "C_GtGetText.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor.
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     13.07.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeTebContextMenuBase::C_OgeTebContextMenuBase(QWidget * const opc_Parent) :
    QTextBrowser(opc_Parent),
    mpc_ContextMenu(NULL)
@@ -66,13 +56,10 @@ C_OgeTebContextMenuBase::C_OgeTebContextMenuBase(QWidget * const opc_Parent) :
    connect(this, &QTextBrowser::anchorClicked, this, &C_OgeTebContextMenuBase::m_LinkClicked);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize custom context menu functionality
-
-   \created     13.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize custom context menu functionality
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTebContextMenuBase::m_InitContextMenu(void)
 {
    this->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -85,13 +72,10 @@ void C_OgeTebContextMenuBase::m_InitContextMenu(void)
    this->horizontalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Setup context menu entries
-
-   \created     13.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Setup context menu entries
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTebContextMenuBase::m_SetupContextMenu(const QPoint & orc_Pos)
 {
    // reset to empty menu
@@ -130,15 +114,12 @@ void C_OgeTebContextMenuBase::m_SetupContextMenu(const QPoint & orc_Pos)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show custom context menu
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show custom context menu
 
    \param[in] orc_Pos Local context menu position
-
-   \created     13.07.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTebContextMenuBase::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 {
    m_SetupContextMenu(orc_Pos);
@@ -148,13 +129,10 @@ void C_OgeTebContextMenuBase::m_OnCustomContextMenuRequested(const QPoint & orc_
    this->mpc_ContextMenu->popup(c_PosGlobal);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy link location to clipboard
-
-   \created     13.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy link location to clipboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTebContextMenuBase::m_CopyHyperLink(void) const
 {
    // get link location
@@ -174,13 +152,10 @@ void C_OgeTebContextMenuBase::m_CopyHyperLink(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Open document on link click.
-
-   \created     13.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Open document on link click.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTebContextMenuBase::m_LinkClicked(const QUrl & orc_Link) const
 {
    QDesktopServices::openUrl(orc_Link);

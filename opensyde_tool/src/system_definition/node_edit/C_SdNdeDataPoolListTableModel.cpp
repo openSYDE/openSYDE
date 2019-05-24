@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Node data pool list table model (implementation)
 
    Node data pool list table model
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     08.02.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QMimeData>
@@ -35,7 +28,7 @@
 #include "C_SdNdeUnoUtil.h"
 #include "TGLUtils.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_tgl;
 using namespace stw_opensyde_gui_logic;
@@ -43,29 +36,26 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui;
 using namespace stw_errors;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     08.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListTableModel::C_SdNdeDataPoolListTableModel(QObject * const opc_Parent) :
    QAbstractTableModel(opc_Parent),
    mu32_NodeIndex(0),
@@ -76,17 +66,14 @@ C_SdNdeDataPoolListTableModel::C_SdNdeDataPoolListTableModel(QObject * const opc
            &C_SdNdeDataPoolListTableModel::m_OnErrorChange);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Specify associated list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Specify associated list
 
    \param[in] oru32_NodeIndex     Node index
    \param[in] oru32_DataPoolIndex Node data pool index
    \param[in] oru32_ListIndex     Node data pool list index
-
-   \created     07.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableModel::SetList(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
                                             const uint32 & oru32_ListIndex)
 {
@@ -98,9 +85,8 @@ void C_SdNdeDataPoolListTableModel::SetList(const uint32 & oru32_NodeIndex, cons
    this->mc_ErrorManager.Init(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if equal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if equal
 
    \param[in] oru32_NodeIndex     Node index
    \param[in] oru32_DataPoolIndex Node data pool index
@@ -109,10 +95,8 @@ void C_SdNdeDataPoolListTableModel::SetList(const uint32 & oru32_NodeIndex, cons
    \return
    True  Match
    False No match
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolListTableModel::Equals(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
                                            const uint32 & oru32_ListIndex) const
 {
@@ -130,9 +114,8 @@ bool C_SdNdeDataPoolListTableModel::Equals(const uint32 & oru32_NodeIndex, const
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get header data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get header data
 
    \param[in] osn_Section    Section
    \param[in] oe_Orientation Orientation
@@ -140,10 +123,8 @@ bool C_SdNdeDataPoolListTableModel::Equals(const uint32 & oru32_NodeIndex, const
 
    \return
    Header string
-
-   \created     09.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_SdNdeDataPoolListTableModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
                                                    const sintn osn_Role) const
 {
@@ -297,12 +278,12 @@ QVariant C_SdNdeDataPoolListTableModel::headerData(const sintn osn_Section, cons
       }
       else if (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
       {
-         QString c_PhysicalValueInfo = C_GtGetText::h_GetText("The raw value of a data element is the value as it is transmitted in the network."
-                                                              "\nThe physical value of a data element is the value of the physical quantity (e.g. speed, "
-                                                              "\nrpm, temperature, etc.) that represents the data element."
-                                                              "\nThe following conversion formula is used to transform the raw value "
-                                                              "\nto a physical value or in the reverse direction:"
-                                                              "\n\n[Physical value] = ([Raw value] * [Factor]) + [Offset]");
+         const QString c_PhysicalValueInfo = C_GtGetText::h_GetText("The raw value of a data element is the value as it is transmitted in the network."
+                                                                    "\nThe physical value of a data element is the value of the physical quantity (e.g. speed, "
+                                                                    "\nrpm, temperature, etc.) that represents the data element."
+                                                                    "\nThe following conversion formula is used to transform the raw value "
+                                                                    "\nto a physical value or in the reverse direction:"
+                                                                    "\n\n[Physical value] = ([Raw value] * [Factor]) + [Offset]");
          QString c_InfoText;
 
          switch (e_Col)
@@ -374,7 +355,8 @@ QVariant C_SdNdeDataPoolListTableModel::headerData(const sintn osn_Section, cons
                                               "is stored in non volatile memory (NVM)");
             break;
          case eEVENT_CALL:
-            c_Retval = C_GtGetText::h_GetText("Notify the application with a callback function when data elements are changed.");
+            c_Retval = C_GtGetText::h_GetText(
+               "Notify the application with a callback function when data elements are changed.");
             break;
          case eUNKNOWN:
          default:
@@ -419,18 +401,15 @@ QVariant C_SdNdeDataPoolListTableModel::headerData(const sintn osn_Section, cons
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get table row count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get table row count
 
    \param[in] orc_Parent Parent
 
    \return
    Row count
-
-   \created     09.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SdNdeDataPoolListTableModel::rowCount(const QModelIndex & orc_Parent) const
 {
    sintn sn_Retval = 0;
@@ -448,18 +427,15 @@ sintn C_SdNdeDataPoolListTableModel::rowCount(const QModelIndex & orc_Parent) co
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get table column count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get table column count
 
    \param[in] orc_Parent Parent
 
    \return
    Column count
-
-   \created     09.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SdNdeDataPoolListTableModel::columnCount(const QModelIndex & orc_Parent) const
 {
    stw_types::sintn sn_Retval = 0;
@@ -476,19 +452,16 @@ sintn C_SdNdeDataPoolListTableModel::columnCount(const QModelIndex & orc_Parent)
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data at index
 
    \param[in] orc_Index Index
    \param[in] osn_Role  Data role
 
    \return
    Data
-
-   \created     09.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_SdNdeDataPoolListTableModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
 {
    QVariant c_Retval;
@@ -1273,10 +1246,11 @@ QVariant C_SdNdeDataPoolListTableModel::data(const QModelIndex & orc_Index, cons
       {
          c_Retval = QVariant(Qt::AlignLeft | Qt::AlignVCenter);
       }
-      else if (osn_Role == static_cast<sintn>(Qt::DecorationRole))
+      else if (osn_Role == msn_USER_ROLE_ICON)
       {
          if (orc_Index.row() >= 0)
          {
+            QStringList c_Tmp;
             C_OSCNodeDataPool::E_Type e_DataPoolType;
             const C_OSCNodeDataPoolList * pc_OSCElement;
             const C_PuiSdNodeDataPoolListElement * pc_UIElement;
@@ -1303,8 +1277,9 @@ QVariant C_SdNdeDataPoolListTableModel::data(const QModelIndex & orc_Index, cons
                   if ((((q_NameConflict == true) || (q_NameInvalid == true)) || (q_MinOverMax == true)) ||
                       (q_DataSetInvalid == true))
                   {
+                     c_Tmp.push_back(QString::number(24));
                      //Show error
-                     c_Retval = C_SdUtil::h_InitStaticIconSvg("://images/Error_iconV2.svg", mc_ICON_SIZE_24);
+                     c_Tmp.push_back("://images/Error_iconV2.svg");
                   }
                }
                break;
@@ -1312,13 +1287,14 @@ QVariant C_SdNdeDataPoolListTableModel::data(const QModelIndex & orc_Index, cons
                if (C_PuiSdHandler::h_GetInstance()->GetDataPoolType(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                                     e_DataPoolType) == C_NO_ERR)
                {
+                  c_Tmp.push_back(QString::number(20));
                   if (e_DataPoolType == C_OSCNodeDataPool::E_Type::eDIAG)
                   {
-                     c_Retval = C_SdUtil::h_InitStaticIcon(":/images/system_definition/IconVariable.svg");
+                     c_Tmp.push_back(":/images/system_definition/IconVariable.svg");
                   }
                   else
                   {
-                     c_Retval = C_SdUtil::h_InitStaticIcon(":/images/system_definition/IconParameter.svg");
+                     c_Tmp.push_back(":/images/system_definition/IconParameter.svg");
                   }
                }
                break;
@@ -1343,6 +1319,7 @@ QVariant C_SdNdeDataPoolListTableModel::data(const QModelIndex & orc_Index, cons
                //No decoration
                break;
             }
+            c_Retval = c_Tmp;
          }
       }
       else
@@ -1353,9 +1330,8 @@ QVariant C_SdNdeDataPoolListTableModel::data(const QModelIndex & orc_Index, cons
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set data at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set data at index
 
    \param[in] orc_Index Index
    \param[in] orc_Value New data
@@ -1364,10 +1340,8 @@ QVariant C_SdNdeDataPoolListTableModel::data(const QModelIndex & orc_Index, cons
    \return
    true  success
    false failure
-
-   \created     09.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolListTableModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value,
                                             const sintn osn_Role)
 {
@@ -1541,24 +1515,21 @@ bool C_SdNdeDataPoolListTableModel::setData(const QModelIndex & orc_Index, const
             //Unknown data change
          }
          //lint -e{1793} Qt example
-         Q_EMIT dataChanged(orc_Index, orc_Index, QVector<stw_types::sintn>() << osn_Role);
+         Q_EMIT this->dataChanged(orc_Index, orc_Index, QVector<stw_types::sintn>() << osn_Role);
       }
    }
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get flags for item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get flags for item
 
    \param[in] orc_Index Item
 
    \return
    Flags for item
-
-   \created     09.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 Qt::ItemFlags C_SdNdeDataPoolListTableModel::flags(const QModelIndex & orc_Index) const
 {
    Qt::ItemFlags c_Retval;
@@ -1664,24 +1635,20 @@ Qt::ItemFlags C_SdNdeDataPoolListTableModel::flags(const QModelIndex & orc_Index
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get supported drop actions
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get supported drop actions
 
    \return
    Supported drop actions
-
-   \created     10.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 Qt::DropActions C_SdNdeDataPoolListTableModel::supportedDropActions(void) const
 {
    return Qt::MoveAction;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Insert rows with content
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Insert rows with content
 
    \param[in] orc_OSCInsertedElements Inserted elements OSC content
    \param[in] orc_UIInsertedElements  Inserted elements UI content
@@ -1689,10 +1656,8 @@ Qt::DropActions C_SdNdeDataPoolListTableModel::supportedDropActions(void) const
 
    \return
    Continuous sections of new elements
-
-   \created     10.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<std::vector<uint32> > C_SdNdeDataPoolListTableModel::DoInsertRows(
    const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCInsertedElements,
    const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UIInsertedElements, const std::vector<uint32> & orc_Rows)
@@ -1733,9 +1698,8 @@ std::vector<std::vector<uint32> > C_SdNdeDataPoolListTableModel::DoInsertRows(
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Insert items into model
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Insert items into model
 
    \param[in] osn_Col    Starting column
    \param[in] osn_Count  Number of inserted items
@@ -1744,10 +1708,8 @@ std::vector<std::vector<uint32> > C_SdNdeDataPoolListTableModel::DoInsertRows(
    \return
    true  success
    false failure
-
-   \created     20.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolListTableModel::insertColumns(const sintn osn_Col, const sintn osn_Count,
                                                   const QModelIndex & orc_Parent)
 {
@@ -1763,15 +1725,12 @@ bool C_SdNdeDataPoolListTableModel::insertColumns(const sintn osn_Col, const sin
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle delete items action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle delete items action
 
    \param[in] orc_Rows Row indices (Expected: unique, ascending)
-
-   \created     06.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableModel::DoRemoveRows(const std::vector<uint32> & orc_Rows)
 {
    const std::vector<std::vector<uint32> > c_ContiguousSections = C_Uti::h_GetContiguousSectionsAscending(orc_Rows);
@@ -1802,9 +1761,8 @@ void C_SdNdeDataPoolListTableModel::DoRemoveRows(const std::vector<uint32> & orc
    Q_EMIT this->SigSizeChangePossible(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Remove columns from model
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove columns from model
 
    \param[in] osn_Col    Starting column
    \param[in] osn_Count  Number of removed items
@@ -1813,10 +1771,8 @@ void C_SdNdeDataPoolListTableModel::DoRemoveRows(const std::vector<uint32> & orc
    \return
    true  success
    false failure
-
-   \created     20.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolListTableModel::removeColumns(const sintn osn_Col, const sintn osn_Count,
                                                   const QModelIndex & orc_Parent)
 {
@@ -1833,9 +1789,8 @@ bool C_SdNdeDataPoolListTableModel::removeColumns(const sintn osn_Col, const sin
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle move selected items action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle move selected items action
 
    Warning 1: only works if target indices have same contiguous property as selected indices
    i.e. if you make the selected indices contiguous by resorting the target indices should also become contiguous
@@ -1846,10 +1801,8 @@ bool C_SdNdeDataPoolListTableModel::removeColumns(const sintn osn_Col, const sin
                                   Example value:
                                    "move up" -> orc_SelectedIndices - 1
                                    "move down" -> orc_TargetIndices + 1
-
-   \created     07.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableModel::DoMoveRows(const std::vector<uint32> & orc_SelectedIndices,
                                                const std::vector<uint32> & orc_TargetIndices)
 {
@@ -1894,9 +1847,8 @@ void C_SdNdeDataPoolListTableModel::DoMoveRows(const std::vector<uint32> & orc_S
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Column to enum conversion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Column to enum conversion
 
    \param[in]  ors32_Column     Column
    \param[out] opc_DataSetIndex Optional: If column is a data set, this contains the data set index
@@ -1904,10 +1856,8 @@ void C_SdNdeDataPoolListTableModel::DoMoveRows(const std::vector<uint32> & orc_S
 
    \return
    Enum value
-
-   \created     09.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListTableModel::E_Columns C_SdNdeDataPoolListTableModel::ColumnToEnum(const sint32 & ors32_Column,
                                                                                      sint32 * const opc_DataSetIndex)
 const
@@ -1989,19 +1939,16 @@ const
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Enum to column conversion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Enum to column conversion
 
    \param[in] ore_Value Enum value
 
    \return
    Column
    -1 Error
-
-   \created     20.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdNdeDataPoolListTableModel::EnumToColumn(const C_SdNdeDataPoolListTableModel::E_Columns & ore_Value) const
 {
    sint32 s32_Retval;
@@ -2073,16 +2020,13 @@ sint32 C_SdNdeDataPoolListTableModel::EnumToColumn(const C_SdNdeDataPoolListTabl
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Mime types
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Mime types
 
    \return
    Table mime types
-
-   \created     09.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QStringList C_SdNdeDataPoolListTableModel::mimeTypes(void) const
 {
    //Append original types (Default events only accept this type)
@@ -2095,18 +2039,15 @@ QStringList C_SdNdeDataPoolListTableModel::mimeTypes(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get mime data of specified indices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get mime data of specified indices
 
    \param[in] orc_Indices Indices
 
    \return
    Mime data of specified indices
-
-   \created     09.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QMimeData * C_SdNdeDataPoolListTableModel::mimeData(const QModelIndexList & orc_Indices) const
 {
    QMimeData * pc_Retval = NULL;
@@ -2150,19 +2091,16 @@ QMimeData * C_SdNdeDataPoolListTableModel::mimeData(const QModelIndexList & orc_
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get osc node data pool list element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get osc node data pool list element
 
    \param[in] orc_Index Table index
 
    \return
    OSC node data pool list element
    Else NULL
-
-   \created     07.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_OSCNodeDataPoolListElement * C_SdNdeDataPoolListTableModel::GetOSCElement(const QModelIndex & orc_Index)
 const
 {
@@ -2171,19 +2109,16 @@ const
                                                                      static_cast<uint32>(orc_Index.row()));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get ui node data pool list element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get ui node data pool list element
 
    \param[in] orc_Index Table index
 
    \return
    UI node data pool list element
    Else NULL
-
-   \created     14.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_PuiSdNodeDataPoolListElement * C_SdNdeDataPoolListTableModel::GetUIElement(const QModelIndex & orc_Index) const
 {
    return C_PuiSdHandler::h_GetInstance()->GetUIDataPoolListElement(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
@@ -2191,16 +2126,13 @@ const C_PuiSdNodeDataPoolListElement * C_SdNdeDataPoolListTableModel::GetUIEleme
                                                                     static_cast<uint32>(orc_Index.row()));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal model update
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal model update
 
    \param[in] oru32_Row      Changed row
    \param[in] ore_ChangeType Change type
-
-   \created     10.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableModel::HandleDataChange(const uint32 & oru32_Row,
                                                      const C_SdNdeDataPoolUtil::E_ElementDataChangeType & ore_ChangeType,
                                                      const sint32 & ors32_DataSetIndex)
@@ -2270,23 +2202,20 @@ void C_SdNdeDataPoolListTableModel::HandleDataChange(const uint32 & oru32_Row,
    {
       const QModelIndex c_Index = this->index(oru32_Row, this->EnumToColumn(eINVALID));
       this->mc_ErrorManager.OnErrorChange();
-      Q_EMIT dataChanged(c_Index, c_Index);
+      Q_EMIT this->dataChanged(c_Index, c_Index);
    }
    if (s32_Column >= 0)
    {
-      Q_EMIT dataChanged(this->index(oru32_Row, s32_Column), this->index(oru32_Row, s32_Column));
+      Q_EMIT this->dataChanged(this->index(oru32_Row, s32_Column), this->index(oru32_Row, s32_Column));
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update column count after data set insertion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update column count after data set insertion
 
    \param[in] oru32_DataSetIndex Inserted data set
-
-   \created     20.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableModel::DoInsertDataSet(const uint32 & oru32_DataSetIndex)
 {
    sint32 s32_Index = this->EnumToColumn(eDATA_SET);
@@ -2298,15 +2227,12 @@ void C_SdNdeDataPoolListTableModel::DoInsertDataSet(const uint32 & oru32_DataSet
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update column count after data set deletion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update column count after data set deletion
 
    \param[in] oru32_DataSetIndex Deleted data set
-
-   \created     20.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableModel::DoDeleteDataSet(const uint32 & oru32_DataSetIndex)
 {
    sint32 s32_Index = this->EnumToColumn(eDATA_SET);
@@ -2317,15 +2243,12 @@ void C_SdNdeDataPoolListTableModel::DoDeleteDataSet(const uint32 & oru32_DataSet
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update column name after data set name edit
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update column name after data set name edit
 
    \param[in] oru32_DataSetIndex Changed data set
-
-   \created     20.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableModel::DoEditDataSetName(const uint32 & oru32_DataSetIndex)
 {
    sint32 s32_Index = this->EnumToColumn(eDATA_SET);
@@ -2333,26 +2256,22 @@ void C_SdNdeDataPoolListTableModel::DoEditDataSetName(const uint32 & oru32_DataS
    if (s32_Index >= 0)
    {
       const uint32 u32_Index = static_cast<uint32>(s32_Index) + oru32_DataSetIndex;
-      Q_EMIT headerDataChanged(Qt::Horizontal, u32_Index, u32_Index);
+      Q_EMIT this->headerDataChanged(Qt::Horizontal, u32_Index, u32_Index);
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register model data reset
-
-   \created     18.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register model data reset
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableModel::Reset(void)
 {
    this->beginResetModel();
    this->endResetModel();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check name
 
    \param[in] oru32_Index Element index
    \param[in] orc_Name    Name
@@ -2360,10 +2279,8 @@ void C_SdNdeDataPoolListTableModel::Reset(void)
    \return
    true  Available
    false Already in use
-
-   \created     07.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolListTableModel::CheckName(const uint32 & oru32_Index, const QString & orc_Name) const
 {
    return C_PuiSdHandler::h_GetInstance()->CheckNodeDataPoolListElementNameAvailable(this->mu32_NodeIndex,
@@ -2373,19 +2290,16 @@ bool C_SdNdeDataPoolListTableModel::CheckName(const uint32 & oru32_Index, const 
                                                                                      &oru32_Index);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get array size of specified element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get array size of specified element
 
    \param[in] oru32_Index Element index
 
    \return
    0    Invalid
    Else Current array size
-
-   \created     07.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SdNdeDataPoolListTableModel::GetArraySize(const uint32 & oru32_Index) const
 {
    uint32 u32_Retval = 0;
@@ -2399,19 +2313,16 @@ uint32 C_SdNdeDataPoolListTableModel::GetArraySize(const uint32 & oru32_Index) c
    return u32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if row is of type string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if row is of type string
 
    \param[in] orc_Index Model index
 
    \return
    True  Row is of type string
    False Row is of other type
-
-   \created     13.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolListTableModel::IsString(const QModelIndex & orc_Index) const
 {
    bool q_Retval;
@@ -2422,19 +2333,16 @@ bool C_SdNdeDataPoolListTableModel::IsString(const QModelIndex & orc_Index) cons
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if item needs link
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if item needs link
 
    \param[in] orc_Index Index to check for link
 
    \return
    True  Link
    False Else
-
-   \created     22.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolListTableModel::m_CheckLink(const QModelIndex & orc_Index) const
 {
    bool q_Retval = false;
@@ -2462,28 +2370,22 @@ bool C_SdNdeDataPoolListTableModel::m_CheckLink(const QModelIndex & orc_Index) c
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal error state change
-
-   \created     24.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal error state change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableModel::m_OnErrorChange(void)
 {
    Q_EMIT this->SigErrorChangePossible(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Move items to target index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Move items to target index
 
    \param[in] orc_ContiguousIndices Contiguous section of ascending indices
    \param[in] ou32_TargetIndex      Target index
-
-   \created     07.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableModel::m_MoveItems(const std::vector<uint32> & orc_ContiguousIndices,
                                                 const uint32 ou32_TargetIndex) const
 {
@@ -2515,19 +2417,16 @@ void C_SdNdeDataPoolListTableModel::m_MoveItems(const std::vector<uint32> & orc_
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Move specific item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Move specific item
 
    For implementation: First delete ou32_SourceIndex then insert ou32_TargetIndex
    Warning: not expected to fail
 
    \param[in] ou32_SourceIndex Source index
    \param[in] ou32_TargetIndex Target index
-
-   \created     07.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableModel::m_MoveItem(const uint32 ou32_SourceIndex, const uint32 ou32_TargetIndex) const
 {
    C_PuiSdHandler::h_GetInstance()->MoveDataPoolListElement(this->mu32_NodeIndex, this->mu32_DataPoolIndex,

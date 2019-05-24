@@ -1,49 +1,42 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       openSYDE Core zip/unzip utilities
 
    see header in .h file for details.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.09.2016  STW/A.Stangl (refactored from pre-existing code)
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#define MINIZ_NO_ZLIB_COMPATIBLE_NAMES //prevent namespace pollution
 #include "miniz.h"
 #include "stwtypes.h"
 #include "stwerrors.h"
 #include "C_OSCZipData.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Zip data in memory
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Zip data in memory
 
    Compresses the specified data in memory.
 
@@ -57,26 +50,23 @@ using namespace stw_opensyde_core;
    \return
    C_NO_ERR   data compressed
    C_NOACT    error (e.g. destination buffer too small)
-
-   \created     01.09.2016  STW/A.Stangl (refactored from pre-existing code)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCZipData::h_Zip(uint8 * const opu8_Destination, uint32 & oru32_DestinationLength,
                            const uint8 * const opu8_Source, const uint32 ou32_SourceLength)
 {
    sint32 s32_Return;
 
-   s32_Return = compress(opu8_Destination, &oru32_DestinationLength, opu8_Source, ou32_SourceLength);
-   if (s32_Return == Z_OK)
+   s32_Return = mz_compress(opu8_Destination, &oru32_DestinationLength, opu8_Source, ou32_SourceLength);
+   if (s32_Return == MZ_OK)
    {
       return C_NO_ERR;
    }
    return C_NOACT;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief    Unzip data in memory
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Unzip data in memory
 
    Uncompresses the specified data in memory.
 
@@ -92,26 +82,23 @@ sint32 C_OSCZipData::h_Zip(uint8 * const opu8_Destination, uint32 & oru32_Destin
    \return
    C_NO_ERR   data uncompressed
    C_NOACT    error (e.g. destination buffer too small)
-
-   \created     01.09.2016  STW/A.Stangl (refactored from pre-existing code)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCZipData::h_Unzip(uint8 * const opu8_Destination, uint32 & oru32_DestinationLength,
                              const uint8 * const opu8_Source, const uint32 ou32_SourceLength)
 {
    sint32 s32_Return;
 
-   s32_Return = uncompress(opu8_Destination, &oru32_DestinationLength, opu8_Source, ou32_SourceLength);
-   if (s32_Return == Z_OK)
+   s32_Return = mz_uncompress(opu8_Destination, &oru32_DestinationLength, opu8_Source, ou32_SourceLength);
+   if (s32_Return == MZ_OK)
    {
       return C_NO_ERR;
    }
    return C_NOACT;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get required size for compressed data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get required size for compressed data
 
    Returns maximum buffer size required for compressed data.
 
@@ -119,11 +106,9 @@ sint32 C_OSCZipData::h_Unzip(uint8 * const opu8_Destination, uint32 & oru32_Dest
 
    \return
    Maximum size required for compressed data.
-
-   \created     01.09.2016  STW/A.Stangl (refactored from pre-existing code)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_OSCZipData::h_GetRequiredBufSizeForZipping(const uint32 ou32_SourceLength)
 {
-   return compressBound(ou32_SourceLength);
+   return mz_compressBound(ou32_SourceLength);
 }

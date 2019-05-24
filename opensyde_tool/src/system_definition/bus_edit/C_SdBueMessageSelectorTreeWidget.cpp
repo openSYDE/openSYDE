@@ -1,26 +1,20 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Tree widget for bus messages (implementation)
 
    Tree widget for bus messages
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.03.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
 #include <QModelIndex>
+#include <QApplication>
 #include <QItemSelectionModel>
 #include <QStyleOptionViewItem>
 #include <QTreeWidgetItemIterator>
@@ -40,7 +34,7 @@
 #include "C_SdBueSortHelper.h"
 #include "C_SdBusMessageSelectorTreeWidgetItem.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_tgl;
@@ -48,29 +42,26 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     22.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageSelectorTreeWidget::C_SdBueMessageSelectorTreeWidget(QWidget * const opc_Parent) :
-   QTreeWidget(opc_Parent),
+   stw_opensyde_gui_elements::C_OgeTreeWidgetToolTipBase(opc_Parent),
    mpc_UndoManager(NULL),
    mpc_MessageSyncManager(NULL),
    mq_StopSigSelectionChanged(false),
@@ -107,30 +98,24 @@ C_SdBueMessageSelectorTreeWidget::C_SdBueMessageSelectorTreeWidget(QWidget * con
            &C_SdBueMessageSelectorTreeWidget::m_ScrollBarRangeChanged);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     22.03.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageSelectorTreeWidget::~C_SdBueMessageSelectorTreeWidget(void)
 {
    //lint -e{1540}  no memory leak because mpc_UndoManager and mpc_MessageSyncManager are not managed in this module
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reimplement default size hint
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reimplement default size hint
 
    \param[in] orc_Option Option
    \param[in] orc_Index  Index
-
-   \created     29.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QSize C_SdBueMessageSelectorTreeWidget::sizeHint(void) const
 {
    sintn sn_CounterTopLevelItem;
@@ -160,16 +145,13 @@ QSize C_SdBueMessageSelectorTreeWidget::sizeHint(void) const
    return QSize(QTreeWidget::sizeHint().width(), sn_Height);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set active node id
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set active node id
 
    \param[in] ou32_NodeIndex      Node index
    \param[in] ou32_InterfaceIndex Interface index
-
-   \created     24.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::SetNodeDataPool(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex)
 {
    this->mu32_NodeIndex = ou32_NodeIndex;
@@ -177,42 +159,33 @@ void C_SdBueMessageSelectorTreeWidget::SetNodeDataPool(const uint32 ou32_NodeInd
    this->mq_ModeSingleNode = true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set active bus id
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set active bus id
 
    \param[in] ou32_BusIndex Bus index
-
-   \created     24.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::SetBusId(const uint32 ou32_BusIndex)
 {
    this->mu32_BusIndex = ou32_BusIndex;
    this->mq_ModeSingleNode = false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set current com protocol
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set current com protocol
 
    \param[in] ore_Value Com protocol value
-
-   \created     24.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::SetProtocolType(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Value)
 {
    this->me_ProtocolType = ore_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Deselects all items
-
-   \created     29.03.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Deselects all items
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::DeselectAllItems(void)
 {
    sintn sn_CounterTopLevelItem;
@@ -236,54 +209,42 @@ void C_SdBueMessageSelectorTreeWidget::DeselectAllItems(void)
    this->mq_StopSigSelectionChanged = false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set undo manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set undo manager
 
    \param[in,out] opc_Value Undo manager
-
-   \created     21.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::SetUndoManager(stw_opensyde_gui_logic::C_SdBueUnoManager * const opc_Value)
 {
    this->mpc_UndoManager = opc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set message sync manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set message sync manager
 
    \param[in,out] opc_Value Message sync manager
-
-   \created     21.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::SetMessageSyncManager(
    stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value)
 {
    this->mpc_MessageSyncManager = opc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init from data
-
-   \created     21.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init from data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::InitFromData(void)
 {
    m_ReloadTree();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Action add
-
-   \created     24.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Action add
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::Add(void)
 {
    tgl_assert(this->mpc_UndoManager != NULL);
@@ -334,13 +295,10 @@ void C_SdBueMessageSelectorTreeWidget::Add(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Action add message
-
-   \created     10.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Action add message
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::AddMessage(void)
 {
    tgl_assert(this->mpc_UndoManager != NULL);
@@ -360,13 +318,10 @@ void C_SdBueMessageSelectorTreeWidget::AddMessage(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Action add signal
-
-   \created     10.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Action add signal
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::AddSignal(void)
 {
    tgl_assert(this->mpc_UndoManager != NULL);
@@ -413,16 +368,13 @@ void C_SdBueMessageSelectorTreeWidget::AddSignal(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new signal
 
    \param[in] orc_MessageId      Message identification indices
    \param[in] ou16_StartBit      Start bit for new signal
-
-   \created     06.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::AddSignalWithStartBit(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                              const uint16 ou16_StartBit)
 {
@@ -447,13 +399,10 @@ void C_SdBueMessageSelectorTreeWidget::AddSignalWithStartBit(const C_OSCCanMessa
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Action delete
-
-   \created     24.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Action delete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::Delete(void)
 {
    tgl_assert(this->mpc_UndoManager != NULL);
@@ -587,16 +536,13 @@ void C_SdBueMessageSelectorTreeWidget::Delete(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete specific signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete specific signal
 
    \param[in] orc_MessageId      Message identification indices
    \param[in] ou32_SignalIndex   Signal index
-
-   \created     06.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::DeleteSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                     const uint32 ou32_SignalIndex)
 {
@@ -615,13 +561,10 @@ void C_SdBueMessageSelectorTreeWidget::DeleteSignal(const C_OSCCanMessageIdentif
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Action copy
-
-   \created     24.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Action copy
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::Copy(void)
 {
    const QModelIndexList c_IndexList = this->selectedIndexes();
@@ -765,16 +708,13 @@ void C_SdBueMessageSelectorTreeWidget::Copy(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy specific signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy specific signal
 
    \param[in] orc_MessageId      Message identification indices
    \param[in] ou32_SignalIndex   Signal index
-
-   \created     06.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::CopySignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                   const uint32 ou32_SignalIndex) const
 {
@@ -802,13 +742,10 @@ void C_SdBueMessageSelectorTreeWidget::CopySignal(const C_OSCCanMessageIdentific
    C_SdClipBoardHelper::h_StoreSignalsToClipboard(c_Signals, c_OSCSignalCommons, c_UISignalCommons, c_UISignals);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Action cut
-
-   \created     24.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Action cut
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::Cut(void)
 {
    Copy();
@@ -816,16 +753,13 @@ void C_SdBueMessageSelectorTreeWidget::Cut(void)
    Delete();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Cut specific signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Cut specific signal
 
    \param[in] orc_MessageId      Message identification indices
    \param[in] ou32_SignalIndex   Signal index
-
-   \created     06.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::CutSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                  const uint32 ou32_SignalIndex)
 {
@@ -833,13 +767,10 @@ void C_SdBueMessageSelectorTreeWidget::CutSignal(const C_OSCCanMessageIdentifica
    this->DeleteSignal(orc_MessageId, ou32_SignalIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Action paste
-
-   \created     24.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Action paste
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::Paste(void)
 {
    tgl_assert(this->mpc_UndoManager != NULL);
@@ -964,23 +895,20 @@ void C_SdBueMessageSelectorTreeWidget::Paste(void)
                                                       c_UIMsgSignals, c_OwnerNodeName, c_OwnerNodeInterfaceIndex,
                                                       c_OwnerIsTxFlag, this->mpc_MessageSyncManager, this, c_NewIds);
                //Selection
-               this->SelectMessages(c_NewIds);
+               this->SelectMessages(c_NewIds, false);
             }
          }
       }
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paste copied signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paste copied signal
 
    \param[in] orc_MessageId      Message identification indices
    \param[in] ou16_StartBit      Start bit for new signal
-
-   \created     06.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::PasteSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                    const uint16 ou16_StartBit)
 {
@@ -1020,39 +948,30 @@ void C_SdBueMessageSelectorTreeWidget::PasteSignal(const C_OSCCanMessageIdentifi
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Collapse all messages and update geometry
-
-   \created     24.10.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Collapse all messages and update geometry
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::CollapseAll(void)
 {
    this->collapseAll();
    this->updateGeometry();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Expand all messages and update geometry
-
-   \created     24.10.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Expand all messages and update geometry
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::ExpandAll(void)
 {
    this->expandAll();
    this->updateGeometry();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Triggers the editing the name of the actual item
-
-   \created     08.06.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Triggers the editing the name of the actual item
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::EditName(void)
 {
    const QList<QTreeWidgetItem *> & rc_SelectedItems = this->selectedItems();
@@ -1063,13 +982,10 @@ void C_SdBueMessageSelectorTreeWidget::EditName(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up class after internal add message
-
-   \created     24.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clean up class after internal add message
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::InternalAddMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 {
    uint32 u32_InternalMessageIndex = 0;
@@ -1087,17 +1003,14 @@ void C_SdBueMessageSelectorTreeWidget::InternalAddMessage(const C_OSCCanMessageI
       //Signal
       Q_EMIT this->SigMessageCountChanged();
       //Otherwise there is no error update
-      Q_EMIT SigErrorChanged();
+      Q_EMIT this->SigErrorChanged();
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up class after internal delete message
-
-   \created     24.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clean up class after internal delete message
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::InternalDeleteMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 {
    uint32 u32_InternalMessageIndex = 0;
@@ -1116,7 +1029,7 @@ void C_SdBueMessageSelectorTreeWidget::InternalDeleteMessage(const C_OSCCanMessa
       //Signal
       Q_EMIT this->SigMessageCountChanged();
       //Otherwise there is no error update
-      Q_EMIT SigErrorChanged();
+      Q_EMIT this->SigErrorChanged();
       //Select near u32_InternalMessageIndex
       if (u32_InternalMessageIndex < static_cast<uint32>(this->topLevelItemCount()))
       {
@@ -1143,13 +1056,10 @@ void C_SdBueMessageSelectorTreeWidget::InternalDeleteMessage(const C_OSCCanMessa
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up class after internal add signal
-
-   \created     24.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clean up class after internal add signal
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::InternalAddSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                          const uint32 & oru32_SignalIndex)
 {
@@ -1167,26 +1077,24 @@ void C_SdBueMessageSelectorTreeWidget::InternalAddSignal(const C_OSCCanMessageId
          if (pc_Signal != NULL)
          {
             //Ui
-            m_InsertSignal(this->topLevelItem(u32_InternalMessageIndex), u32_SignalIndex, pc_Signal->c_Name.c_str());
+            m_InsertSignal(this->topLevelItem(u32_InternalMessageIndex), u32_SignalIndex,
+                           pc_Signal->c_Name.c_str());
             //Ui update trigger
             this->updateGeometry();
             //Error handling
             RecheckErrorGlobal(false);
             //Signal
             Q_EMIT this->SigSignalCountOfMessageChanged(orc_MessageId);
-            Q_EMIT SigErrorChanged();
+            Q_EMIT this->SigErrorChanged();
          }
       }
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up class after internal delete signal
-
-   \created     24.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clean up class after internal delete signal
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::InternalDeleteSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                             const uint32 & oru32_SignalIndex)
 {
@@ -1210,7 +1118,7 @@ void C_SdBueMessageSelectorTreeWidget::InternalDeleteSignal(const C_OSCCanMessag
             RecheckErrorGlobal(false);
             //Signal
             Q_EMIT this->SigSignalCountOfMessageChanged(orc_MessageId);
-            Q_EMIT SigErrorChanged();
+            Q_EMIT this->SigErrorChanged();
             //Handle selection
             if (pc_Parent->childCount() > 0)
             {
@@ -1238,25 +1146,19 @@ void C_SdBueMessageSelectorTreeWidget::InternalDeleteSignal(const C_OSCCanMessag
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Any message id is invalid
-
-   \created     25.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Any message id is invalid
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::OnMessageIdChange(void)
 {
    m_UpdateUniqueMessageIds();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   The specified message data was changed
-
-   \created     25.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   The specified message data was changed
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::OnMessageNameChange(void)
 {
    m_SaveExpand();
@@ -1267,15 +1169,12 @@ void C_SdBueMessageSelectorTreeWidget::OnMessageNameChange(void)
    m_RestoreExpand();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   The signal name has changed
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   The signal name has changed
 
    \param[in] orc_MessageId Message identification indices
-
-   \created     27.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::OnSignalNameChange(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 {
    uint32 u32_InternalMessageIndex = 0;
@@ -1308,16 +1207,13 @@ void C_SdBueMessageSelectorTreeWidget::OnSignalNameChange(const C_OSCCanMessageI
    m_RestoreSelection();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger global error check (icons only)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger global error check (icons only)
 
    \param[in] orq_HandleSelection Flag to change selection
                                    (use-case: message name change -> new position of selected item!)
-
-   \created     28.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::RecheckErrorGlobal(const bool & orq_HandleSelection)
 {
    if (orq_HandleSelection == true)
@@ -1335,16 +1231,13 @@ void C_SdBueMessageSelectorTreeWidget::RecheckErrorGlobal(const bool & orq_Handl
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger recheck of error values for tree
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger recheck of error values for tree
 
    \param[in] orc_MessageId            Message identification indices
    \param[in] orq_AllowMessageIdUpdate Flag to allow message ID changes using when using this function
-
-   \created     28.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::RecheckError(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                     const bool & orq_AllowMessageIdUpdate)
 {
@@ -1440,17 +1333,14 @@ void C_SdBueMessageSelectorTreeWidget::RecheckError(const C_OSCCanMessageIdentif
    this->updateGeometry();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if interaction possible
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if interaction possible
 
    \return
    true  At least one node connected
    false No node connected
-
-   \created     05.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdBueMessageSelectorTreeWidget::CheckIfAnyNodeConnected(void) const
 {
    bool q_Retval = false;
@@ -1490,16 +1380,13 @@ bool C_SdBueMessageSelectorTreeWidget::CheckIfAnyNodeConnected(void) const
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle single message selection change with all aspects
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle single message selection change with all aspects
 
    \param[in] orc_MessageId  Message identification indices
    \param[in] oq_BlockSignal Optional flag for blocking the signal for changed selection
-
-   \created     08.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::SelectMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                      const bool oq_BlockSignal)
 {
@@ -1521,16 +1408,13 @@ void C_SdBueMessageSelectorTreeWidget::SelectMessage(const C_OSCCanMessageIdenti
    this->mc_SelectedSignals.clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle multi message selection change with all aspects
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle multi message selection change with all aspects
 
    \param[in] orc_MessageIds Multiple message identification indices
    \param[in] oq_BlockSignal Optional flag for blocking the signal for changed selection
-
-   \created     19.02.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::SelectMessages(
    const std::vector<C_OSCCanMessageIdentificationIndices> & orc_MessageIds, const bool oq_BlockSignal)
 {
@@ -1554,17 +1438,14 @@ void C_SdBueMessageSelectorTreeWidget::SelectMessages(
    this->mc_SelectedSignals.clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle selection change with all aspects
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle selection change with all aspects
 
    \param[in] orc_MessageId     Message identification indices
    \param[in] oru32_SignalIndex Signal index
    \param[in] oq_BlockSignal    Optional flag for blocking the signal for changed selection
-
-   \created     08.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::SelectSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                     const uint32 & oru32_SignalIndex, const bool oq_BlockSignal)
 {
@@ -1587,9 +1468,8 @@ void C_SdBueMessageSelectorTreeWidget::SelectSignal(const C_OSCCanMessageIdentif
    this->mc_SelectedSignals.clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the level of the item at the position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the level of the item at the position
 
    \param[in]     orc_Pos   Position of item
 
@@ -1597,10 +1477,8 @@ void C_SdBueMessageSelectorTreeWidget::SelectSignal(const C_OSCCanMessageIdentif
    0: No level
    1: Message level
    2: Signal level
-
-   \created     07.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueMessageSelectorTreeWidget::GetLevelOfPos(const QPoint & orc_Pos) const
 {
    sint32 s32_Level = 0;
@@ -1624,17 +1502,14 @@ sint32 C_SdBueMessageSelectorTreeWidget::GetLevelOfPos(const QPoint & orc_Pos) c
    return s32_Level;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overrided paint event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overrided paint event
 
    Draws the seperator lines
 
    \param[in,out] opc_Event  Pointer to paint event
-
-   \created     23.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::paintEvent(QPaintEvent * const opc_Event)
 {
    // On a QTreeWidget can not painted directly
@@ -1703,17 +1578,14 @@ void C_SdBueMessageSelectorTreeWidget::paintEvent(QPaintEvent * const opc_Event)
    QTreeWidget::paintEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten drop event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten drop event slot
 
    Here: Move elements
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     03.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::dropEvent(QDropEvent * const opc_Event)
 {
    if (this->mpc_UndoManager != NULL)
@@ -1808,17 +1680,14 @@ void C_SdBueMessageSelectorTreeWidget::dropEvent(QDropEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten start drag event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten start drag event
 
    Here: start drag manually (for custom preview)
 
    \param[in] oc_SupportedActions Supported actions
-
-   \created     03.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::startDrag(const Qt::DropActions oc_SupportedActions)
 {
    const QList<QTreeWidgetItem *> c_SelectedItems = this->selectedItems();
@@ -1840,18 +1709,15 @@ void C_SdBueMessageSelectorTreeWidget::startDrag(const Qt::DropActions oc_Suppor
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overloaded function for stored mime data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overloaded function for stored mime data
 
    \param[in] orc_Items Current selected items
 
    \return
    Mime data for drag event
-
-   \created     03.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QMimeData * C_SdBueMessageSelectorTreeWidget::mimeData(const QList<QTreeWidgetItem *> oc_Items) const
 {
    QMimeData * pc_Retval = NULL;
@@ -1913,16 +1779,13 @@ QMimeData * C_SdBueMessageSelectorTreeWidget::mimeData(const QList<QTreeWidgetIt
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overloaded function for stored mime types
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overloaded function for stored mime types
 
    \return
    Mime types for drag event
-
-   \created     03.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QStringList C_SdBueMessageSelectorTreeWidget::mimeTypes(void) const
 {
    QStringList c_Retval = QTreeWidget::mimeTypes();
@@ -1932,7 +1795,48 @@ QStringList C_SdBueMessageSelectorTreeWidget::mimeTypes(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Do any potential last minute tooltip update actions
+
+  Last minute update necessary as there is no trigger for any change yet (might cost performance)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSelectorTreeWidget::m_LastMinuteToolTipUpdate(void)
+{
+   for (uint32 u32_ItMessage = 0UL; u32_ItMessage < this->mc_UniqueMessageIds.size(); ++u32_ItMessage)
+   {
+      uint32 u32_InternalIndex;
+      if (m_MapMessageIdToInternalMessageIndex(this->mc_UniqueMessageIds[u32_ItMessage], u32_InternalIndex) == C_NO_ERR)
+      {
+         QTreeWidgetItem * const pc_TopLevelItem = this->topLevelItem(u32_InternalIndex);
+         if (pc_TopLevelItem != NULL)
+         {
+            //Message
+            pc_TopLevelItem->setData(0, msn_USER_ROLE_TOOL_TIP_HEADING, pc_TopLevelItem->text(0));
+            pc_TopLevelItem->setData(0, msn_USER_ROLE_TOOL_TIP_CONTENT,
+                                     C_SdUtil::h_GetToolTipContentMessage(this->mc_UniqueMessageIds[u32_ItMessage]));
+            //Signals
+            for (sint32 s32_ItSignalInternal = 0; s32_ItSignalInternal < pc_TopLevelItem->childCount();
+                 ++s32_ItSignalInternal)
+            {
+               QTreeWidgetItem * const pc_SignalItem = pc_TopLevelItem->child(s32_ItSignalInternal);
+               uint32 u32_SignalDataIndex;
+               if (this->m_MapSignalInternalIndexToDataIndex(u32_InternalIndex, s32_ItSignalInternal,
+                                                             u32_SignalDataIndex) == C_NO_ERR)
+               {
+                  //Signal
+                  pc_SignalItem->setData(0, msn_USER_ROLE_TOOL_TIP_HEADING, pc_SignalItem->text(0));
+                  pc_SignalItem->setData(0, msn_USER_ROLE_TOOL_TIP_CONTENT,
+                                         C_SdUtil::h_GetToolTipContentSignal(this->mc_UniqueMessageIds[u32_ItMessage],
+                                                                             u32_SignalDataIndex));
+               }
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_ReloadTree(const bool & orq_HandleSelection)
 {
    if (this->mpc_MessageSyncManager != NULL)
@@ -1964,7 +1868,7 @@ void C_SdBueMessageSelectorTreeWidget::m_ReloadTree(const bool & orq_HandleSelec
    this->updateGeometry();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_InsertMessage(const uint32 & oru32_MessageIdIndex)
 {
    if (oru32_MessageIdIndex < this->mc_UniqueMessageIds.size())
@@ -1977,12 +1881,12 @@ void C_SdBueMessageSelectorTreeWidget::m_InsertMessage(const uint32 & oru32_Mess
 
          uint32 u32_Counter;
          uint32 u32_SignalDataIndex;
+         const QString c_Text = QString("%1 (0x%2)").arg(pc_MessageData->c_Name.c_str()).arg(
+            QString::number(pc_MessageData->u32_CanId, 16));
 
          this->insertTopLevelItem(oru32_MessageIdIndex, pc_Message);
 
-         pc_Message->setText(0,
-                             QString("%1 (0x%2)").arg(pc_MessageData->c_Name.c_str()).arg(
-                                QString::number(pc_MessageData->u32_CanId, 16)));
+         pc_Message->setText(0, c_Text);
          pc_Message->setForeground(0, mc_STYLE_GUIDE_COLOR_8);
 
          // Signals
@@ -1994,7 +1898,8 @@ void C_SdBueMessageSelectorTreeWidget::m_InsertMessage(const uint32 & oru32_Mess
                   C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(rc_MessageId, u32_SignalDataIndex);
                if (pc_SignalData != NULL)
                {
-                  this->m_InsertSignal(pc_Message, u32_Counter, pc_SignalData->c_Name.c_str());
+                  this->m_InsertSignal(pc_Message, u32_Counter,
+                                       pc_SignalData->c_Name.c_str());
                }
             }
          }
@@ -2003,7 +1908,7 @@ void C_SdBueMessageSelectorTreeWidget::m_InsertMessage(const uint32 & oru32_Mess
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_InsertSignal(QTreeWidgetItem * const pc_MessageItem,
                                                       const uint32 u32_SignalIndex,
                                                       const QString & orc_SignalName) const
@@ -2018,7 +1923,7 @@ void C_SdBueMessageSelectorTreeWidget::m_InsertSignal(QTreeWidgetItem * const pc
    //lint -e{429}  no memory leak because of the parent of pc_Signal by insertChild and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_SelectionChanged(const QItemSelection & orc_Selected,
                                                           const QItemSelection & orc_Deselected)
 {
@@ -2149,7 +2054,7 @@ void C_SdBueMessageSelectorTreeWidget::m_SelectionChanged(const QItemSelection &
    Q_EMIT this->SigSelectionChanged();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_DeselectChildren(const QTreeWidgetItem * const opc_Parent) const
 {
    sintn sn_CounterChild;
@@ -2163,14 +2068,14 @@ void C_SdBueMessageSelectorTreeWidget::m_DeselectChildren(const QTreeWidgetItem 
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_TreeSizeChanged(void)
 {
    //Added proper fix for size change handling
    this->updateGeometry();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_ScrollBarRangeChanged(const sintn osn_Min, const sintn osn_Max) const
 {
    // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar
@@ -2184,9 +2089,8 @@ void C_SdBueMessageSelectorTreeWidget::m_ScrollBarRangeChanged(const sintn osn_M
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility function to get current, first connected node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility function to get current, first connected node
 
    \param[out] oru32_NodeIndex      Node index
    \param[out] oru32_InterfaceIndex Interface index
@@ -2194,10 +2098,8 @@ void C_SdBueMessageSelectorTreeWidget::m_ScrollBarRangeChanged(const sintn osn_M
    \return
    C_NO_ERR Valid node
    C_NOACT  No node connected
-
-   \created     24.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueMessageSelectorTreeWidget::m_GetFirstConnectedNodeAndInterface(uint32 & oru32_NodeIndex,
                                                                              uint32 & oru32_InterfaceIndex) const
 {
@@ -2230,9 +2132,8 @@ sint32 C_SdBueMessageSelectorTreeWidget::m_GetFirstConnectedNodeAndInterface(uin
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Map global message indices to internal message index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Map global message indices to internal message index
 
    \param[in]  orc_MessageId              Message identification indices
    \param[out] oru32_InternalMessageIndex Internal message index
@@ -2240,10 +2141,8 @@ sint32 C_SdBueMessageSelectorTreeWidget::m_GetFirstConnectedNodeAndInterface(uin
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     24.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueMessageSelectorTreeWidget::m_MapMessageIdToInternalMessageIndex(
    const C_OSCCanMessageIdentificationIndices & orc_MessageId, uint32 & oru32_InternalMessageIndex) const
 {
@@ -2270,15 +2169,12 @@ sint32 C_SdBueMessageSelectorTreeWidget::m_MapMessageIdToInternalMessageIndex(
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get any valid message id for add operation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get any valid message id for add operation
 
    \param[out] orc_MessageId Message identification indices
-
-   \created     24.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueMessageSelectorTreeWidget::GetMessageIdForAdd(C_OSCCanMessageIdentificationIndices & orc_MessageId) const
 {
    uint32 u32_NodeIndex;
@@ -2309,13 +2205,10 @@ sint32 C_SdBueMessageSelectorTreeWidget::GetMessageIdForAdd(C_OSCCanMessageIdent
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update internal message id vector
-
-   \created     25.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update internal message id vector
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_UpdateUniqueMessageIds(void)
 {
    if (this->mpc_MessageSyncManager != NULL)
@@ -2332,13 +2225,10 @@ void C_SdBueMessageSelectorTreeWidget::m_UpdateUniqueMessageIds(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update internal message id signals vector
-
-   \created     02.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update internal message id signals vector
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_UpdateUniqueMessageIdsSignals(const uint32 & oru32_InternalMessageIndex)
 {
    if (oru32_InternalMessageIndex < this->mc_UniqueMessageIds.size())
@@ -2362,39 +2252,30 @@ void C_SdBueMessageSelectorTreeWidget::m_UpdateUniqueMessageIdsSignals(const uin
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Temporarily disable selection updates (same selection different position)
-
-   \created     02.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Temporarily disable selection updates (same selection different position)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_DisconnectSelection(void)
 {
    this->mq_NoSelectionUpdate = true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Enable selection update
-
-   \created     02.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Enable selection update
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_ReconnectSelection(void)
 {
    this->mq_NoSelectionUpdate = false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal message selection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal message selection
 
    \param[in] orc_MessageId Message identification indices
-
-   \created     02.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_SendMessageSelectionUpdate(
    const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 {
@@ -2404,16 +2285,13 @@ void C_SdBueMessageSelectorTreeWidget::m_SendMessageSelectionUpdate(
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal signal selection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal signal selection
 
    \param[in] orc_MessageId     Message identification indices
    \param[in] oru32_SignalIndex Signal index
-
-   \created     02.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_SendSignalSelectionUpdate(
    const C_OSCCanMessageIdentificationIndices & orc_MessageId, const uint32 & oru32_SignalIndex)
 {
@@ -2423,13 +2301,10 @@ void C_SdBueMessageSelectorTreeWidget::m_SendSignalSelectionUpdate(
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save current selection
-
-   \created     02.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save current selection
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_SaveSelection(void)
 {
    const QModelIndexList c_Selection = this->selectedIndexes();
@@ -2487,13 +2362,10 @@ void C_SdBueMessageSelectorTreeWidget::m_SaveSelection(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore last known selection
-
-   \created     02.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore last known selection
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_RestoreSelection(const bool oq_AlsoSetCurrent)
 {
    if (oq_AlsoSetCurrent)
@@ -2562,13 +2434,10 @@ void C_SdBueMessageSelectorTreeWidget::m_RestoreSelection(const bool oq_AlsoSetC
    m_ReconnectSelection();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save current expanded items
-
-   \created     12.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save current expanded items
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_SaveExpand(void)
 {
    this->mc_ExpandedMessageIds.clear();
@@ -2589,13 +2458,10 @@ void C_SdBueMessageSelectorTreeWidget::m_SaveExpand(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore last known expanded items
-
-   \created     12.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore last known expanded items
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::m_RestoreExpand(void)
 {
    this->collapseAll();
@@ -2620,9 +2486,8 @@ void C_SdBueMessageSelectorTreeWidget::m_RestoreExpand(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Map internal sorted signal index to global signal index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Map internal sorted signal index to global signal index
 
    \param[in]  orc_MessageId              Message identification indices
    \param[in]  oru32_InternalSignalIndex  Internal signal index
@@ -2631,10 +2496,8 @@ void C_SdBueMessageSelectorTreeWidget::m_RestoreExpand(void)
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     02.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueMessageSelectorTreeWidget::m_MapSignalInternalIndexToDataIndex(const uint32 & oru32_InternalMessageIndex,
                                                                              const uint32 & oru32_InternalSignalIndex,
                                                                              uint32 & oru32_SignalDataIndex) const
@@ -2660,9 +2523,8 @@ sint32 C_SdBueMessageSelectorTreeWidget::m_MapSignalInternalIndexToDataIndex(con
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Map global signal index to internal signal index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Map global signal index to internal signal index
 
    \param[in]  orc_MessageId             Message identification indices
    \param[in]  oru32_DataSignalIndex     Internal signal index
@@ -2671,10 +2533,8 @@ sint32 C_SdBueMessageSelectorTreeWidget::m_MapSignalInternalIndexToDataIndex(con
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     02.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueMessageSelectorTreeWidget::m_MapSignalDataIndexToInternalIndex(const uint32 & oru32_InternalMessageIndex,
                                                                              const uint32 & oru32_DataSignalIndex,
                                                                              uint32 & oru32_SignalInternalIndex) const
@@ -2696,7 +2556,7 @@ sint32 C_SdBueMessageSelectorTreeWidget::m_MapSignalDataIndexToInternalIndex(con
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint16 C_SdBueMessageSelectorTreeWidget::mh_GetStartBit(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 {
    const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(orc_MessageId);
@@ -2705,7 +2565,7 @@ uint16 C_SdBueMessageSelectorTreeWidget::mh_GetStartBit(const C_OSCCanMessageIde
                                                            stw_opensyde_core::C_OSCCanSignal::eBYTE_ORDER_INTEL);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint16 C_SdBueMessageSelectorTreeWidget::mh_GetStartBit(const C_OSCCanMessage * const opc_Message,
                                                         const uint16 ou16_SignalSize,
                                                         const C_OSCCanSignal::E_ByteOrderType oe_Type)
@@ -2794,7 +2654,7 @@ uint16 C_SdBueMessageSelectorTreeWidget::mh_GetStartBit(const C_OSCCanMessage * 
    return u16_StartBit;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorTreeWidget::mh_AdaptSignalStartBits(
    const C_OSCCanMessageIdentificationIndices & orc_MessageId, std::vector<C_OSCCanSignal> & orc_Signals)
 {
@@ -2812,19 +2672,16 @@ void C_SdBueMessageSelectorTreeWidget::mh_AdaptSignalStartBits(
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get highest selected model index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get highest selected model index
 
    \param[in,out] orc_Index Highest selected, if any
 
    \return
    true  Success / output valid
    false No selection
-
-   \created     09.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdBueMessageSelectorTreeWidget::m_GetHighestSelected(QModelIndex & orc_Index) const
 {
    bool q_Retval;

@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for Filter list items (implementation)
 
@@ -8,17 +7,11 @@
    Item here means "list entry", this may be confusing because a "filter item" also is used for
    sub-structure of a filter (which is more like a filter package). See C_CamProFilterData for more info.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.11.2018  STW/G.Landsgesell
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_CamMosFilterItemWidget.h"
@@ -29,36 +22,34 @@
 #include "C_OgeWiUtil.h"
 #include "C_GtGetText.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 using namespace stw_types;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     27.11.2018  STW/G.Landsgesell
+   \param[in]     orc_Filter  Filter data
+   \param[in,out] opc_Parent  Optional pointer to parent
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosFilterItemWidget::C_CamMosFilterItemWidget(const C_CamProFilterData & orc_Filter, QWidget * const opc_Parent) :
    stw_opensyde_gui_elements::C_OgeWiOnlyBackground(opc_Parent),
    mpc_Ui(new Ui::C_CamMosFilterItemWidget),
@@ -104,25 +95,19 @@ C_CamMosFilterItemWidget::C_CamMosFilterItemWidget(const C_CamProFilterData & or
    connect(this->mpc_Ui->pc_CheckBox, &QCheckBox::toggled, this, &C_CamMosFilterItemWidget::m_OnChxToggle);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     27.11.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosFilterItemWidget::~C_CamMosFilterItemWidget()
 {
    delete this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create tooltip from information of filter data handling.
-
-   \created     06.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create tooltip from information of filter data handling.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterItemWidget::m_CreateTooltipInformation(void)
 {
    QString c_Content = mc_Filter.c_Comment + "\n\n";
@@ -214,13 +199,10 @@ void C_CamMosFilterItemWidget::m_CreateTooltipInformation(void)
    this->SetToolTipInformation(mc_Filter.c_Name, c_Content.trimmed());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for edit button.
-
-   \created     28.11.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for edit button.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterItemWidget::m_OnEdit()
 {
    QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
@@ -262,26 +244,20 @@ void C_CamMosFilterItemWidget::m_OnEdit()
    //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for remove button.
-
-   \created     28.11.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for remove button.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterItemWidget::m_OnRemove()
 {
    // inform list about remove
    Q_EMIT (this->SigRemoveFilter(this));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for checkbox toggle.
-
-   \created     28.11.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for checkbox toggle.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterItemWidget::m_OnChxToggle(const bool & orq_Checked)
 {
    // inform list about check box toggle
@@ -291,45 +267,41 @@ void C_CamMosFilterItemWidget::m_OnChxToggle(const bool & orq_Checked)
    this->mc_Filter.q_Enabled = orq_Checked;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for pressed signal of any button
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for pressed signal of any button
 
    We need to know when a button of the item was pressed, but is not released already. The signal clicked will be
    send normally when pressed and released is sent.
    In case of an active tool tip of the button and clicking the button, the leave event C_CamMosFilterItemWidget will be
    caused before the released signal of the button and the group of the buttons will be set invisible for a short time.
    This prevents the sending of the clicked signal of the button.
-
-   \created     28.01.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterItemWidget::m_ButtonPressed(void)
 {
    this->mq_ButtonPressed = true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for released signal of any button
-
-   \created     28.01.2019  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for released signal of any button
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterItemWidget::m_ButtonReleased(void)
 {
    this->mq_ButtonPressed = false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overridden event function.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overridden event function.
 
     Here: Show or hide buttons
 
-   \created     04.12.2018  STW/G.Landsgesell
+   \param[in,out]    opc_Event   Event identification and information
+
+   \retval  True   Event was recognized and processed
+   \retval  False  Event ignored
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_CamMosFilterItemWidget::event(QEvent * const opc_Event)
 {
    if (this->isEnabled() == true)
@@ -357,17 +329,14 @@ bool C_CamMosFilterItemWidget::event(QEvent * const opc_Event)
    return C_OgeWiOnlyBackground::event(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overridden paint event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overridden paint event
 
    Here: open filter configuration dialog on double click.
 
    \param[in,out] opc_Event  Pointer to paint event
-
-   \created     28.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterItemWidget::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
 {
    C_OgeWiOnlyBackground::mouseDoubleClickEvent(opc_Event);

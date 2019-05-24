@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       DiagLib Target Glue Layer: File functions
 
@@ -8,17 +7,11 @@
 
    Here: Implementation for MS-Windows.
 
-   \implementation
-   project     DiagLib
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.07.2009  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h" //pre-compiled headers
 #ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -34,27 +27,27 @@
 #include "CSCLString.h"
 #include "CSCLDateTime.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_tgl;
 using namespace stw_scl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 static bool m_FileAgeDosTime(const C_SCLString & orc_FileName, uint16 * const opu16_Date, uint16 * const opu16_Time);
 static sint32 m_FileFind(const C_SCLString & orc_SearchPattern, SCLDynamicArray<TGL_FileSearchRecord> & orc_FoundFiles,
                          const bool oq_IncludeDirectories = false,
                          SCLDynamicArray<uint8> * const opc_IsDirectory = NULL);
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 //utility: get operating system file age
 static bool m_FileAgeDosTime(const C_SCLString & orc_FileName, uint16 * const opu16_Date, uint16 * const opu16_Time)
 {
@@ -77,9 +70,8 @@ static bool m_FileAgeDosTime(const C_SCLString & orc_FileName, uint16 * const op
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   get file age time as string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   get file age time as string
 
    Report the specified file's timestamp as a string.
    Format of returned string: "dd.mm.yyyy hh:mm:ss"
@@ -90,10 +82,8 @@ static bool m_FileAgeDosTime(const C_SCLString & orc_FileName, uint16 * const op
    \return
    true      timestamp placed in oc_String  \n
    false     error -> oc_String not valid
-
-   \created     21.07.2009 STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool stw_tgl::TGL_FileAgeString(const C_SCLString & orc_FileName, C_SCLString & orc_String)
 {
    bool q_Return;
@@ -124,9 +114,8 @@ bool stw_tgl::TGL_FileAgeString(const C_SCLString & orc_FileName, C_SCLString & 
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   get file size in bytes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   get file size in bytes
 
    Return the specified file's file size in bytes.
 
@@ -135,10 +124,8 @@ bool stw_tgl::TGL_FileAgeString(const C_SCLString & orc_FileName, C_SCLString & 
    \return
    -1        error \n                  \n
    else      size of file in bytes
-
-   \created     21.07.2009 STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 stw_tgl::TGL_FileSize(const C_SCLString & orc_FileName)
 {
    std::FILE * pt_File;
@@ -154,9 +141,8 @@ sint32 stw_tgl::TGL_FileSize(const C_SCLString & orc_FileName)
    return s32_Size;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   check whether file exists
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   check whether file exists
 
    Detects whether the specified file exists
 
@@ -165,10 +151,8 @@ sint32 stw_tgl::TGL_FileSize(const C_SCLString & orc_FileName)
    \return
    true       file exists  \n
    false      file does not exist
-
-   \created     21.07.2009 STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool stw_tgl::TGL_FileExists(const C_SCLString & orc_FileName)
 {
    bool q_Return = false;
@@ -187,9 +171,8 @@ bool stw_tgl::TGL_FileExists(const C_SCLString & orc_FileName)
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   check whether directory exists
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   check whether directory exists
 
    Detects whether the specified directory exists.
    For the Windows target this also includes simple drive names (e.g. "d:")
@@ -199,10 +182,8 @@ bool stw_tgl::TGL_FileExists(const C_SCLString & orc_FileName)
    \return
    true       directory exists  \n
    false      directory does not exist
-
-   \created     11.07.2016 STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool TGL_PACKAGE stw_tgl::TGL_DirectoryExists(const C_SCLString & orc_Path)
 {
    bool q_Return = false;
@@ -216,9 +197,8 @@ bool TGL_PACKAGE stw_tgl::TGL_DirectoryExists(const C_SCLString & orc_Path)
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   find files
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   find files
 
    Scans the file-system for files and directories matching the specified pattern.
    Files and directories with all attributes are detected.
@@ -229,10 +209,8 @@ bool TGL_PACKAGE stw_tgl::TGL_DirectoryExists(const C_SCLString & orc_Path)
    \return
    C_NO_ERR     at least one file found \n
    C_NOACT      no files found
-
-   \created     11.07.2016 STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 static sint32 m_FileFind(const C_SCLString & orc_SearchPattern, SCLDynamicArray<TGL_FileSearchRecord> & orc_FoundFiles,
                          const bool oq_IncludeDirectories, SCLDynamicArray<uint8> * const opc_IsDirectory)
 {
@@ -281,9 +259,8 @@ static sint32 m_FileFind(const C_SCLString & orc_SearchPattern, SCLDynamicArray<
    return (orc_FoundFiles.GetLength() > 0) ? C_NO_ERR : C_NOACT;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   find files
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   find files
 
    Scans the file-system for files matching the specified pattern.
    Files with all attributes are detected.
@@ -295,47 +272,45 @@ static sint32 m_FileFind(const C_SCLString & orc_SearchPattern, SCLDynamicArray<
    C_NO_ERR     at least one file found \n
    C_NOACT      no files found \n
    C_CONFIG     directory invalid
-
-   \created     20.08.2009 STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 TGL_PACKAGE stw_tgl::TGL_FileFind(const C_SCLString & orc_SearchPattern,
                                          SCLDynamicArray<TGL_FileSearchRecord> & orc_FoundFiles)
 {
    return m_FileFind(orc_SearchPattern, orc_FoundFiles);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Append trailing path delimiter
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Append trailing path delimiter
 
    Append path delimiter to path if it does not already end in one.
-   The path separator character can be target specific (e.g. backslash for Windows; slash for Linux)
+   The path separator character can be target specific.
+
+   Here:
+   Windows supports backslash and slash (at least in most scenarios).
 
    \param[in]     orc_Path       path (with or without ending delimiter)
 
    \return
    path with delimiter
-
-   \created     20.08.2009 STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString TGL_PACKAGE stw_tgl::TGL_FileIncludeTrailingDelimiter(const C_SCLString & orc_Path)
 {
    if (orc_Path.Length() == 0)
    {
       return "\\";
    }
-   if (orc_Path.operator [](orc_Path.Length()) != '\\')
+   if ((orc_Path.operator [](orc_Path.Length()) != '\\') &&
+       (orc_Path.operator [](orc_Path.Length()) != '/'))
    {
       return orc_Path + "\\";
    }
    return orc_Path;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Extract file extension
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Extract file extension
 
    Extract a file extension separated from the file name by a ".".
    If there is more than one "." in the file path the last one will be used.
@@ -345,10 +320,8 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_FileIncludeTrailingDelimiter(const C_SCLStr
 
    \return
    extension (includes the ".")
-
-   \created     03.09.2009 STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString TGL_PACKAGE stw_tgl::TGL_ExtractFileExtension(const C_SCLString & orc_Path)
 {
    C_SCLString c_Extension;
@@ -359,9 +332,8 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_ExtractFileExtension(const C_SCLString & or
    return c_Extension;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Change file extension
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Change file extension
 
    Extract a file extension separated from the file name by a ".".
    If there is more than one "." in the file path the last one will be used.
@@ -372,10 +344,8 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_ExtractFileExtension(const C_SCLString & or
 
    \return
    new file name
-
-   \created     03.09.2009 STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString TGL_PACKAGE stw_tgl::TGL_ChangeFileExtension(const C_SCLString & orc_Path,
                                                          const C_SCLString & orc_Extension)
 {
@@ -392,9 +362,8 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_ChangeFileExtension(const C_SCLString & orc
    return c_NewPath;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Extract file path from full path
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Extract file path from full path
 
    Extract file path from a full file path.
    Can handle "/" and "\" path separators.
@@ -403,10 +372,8 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_ChangeFileExtension(const C_SCLString & orc
 
    \return
    file path   (including final "\", "/" or ":")
-
-   \created     04.09.2009 STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString TGL_PACKAGE stw_tgl::TGL_ExtractFilePath(const C_SCLString & orc_Path)
 {
    C_SCLString c_Path;
@@ -418,9 +385,8 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_ExtractFilePath(const C_SCLString & orc_Pat
    return c_Path;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Extract file name from full path
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Extract file name from full path
 
    Extract file name including extension from a full file path.
    Can handle "/" and "\" path separators.
@@ -429,10 +395,8 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_ExtractFilePath(const C_SCLString & orc_Pat
 
    \return
    file name
-
-   \created     25.02.2014 STW/G.Waibel
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString TGL_PACKAGE stw_tgl::TGL_ExtractFileName(const C_SCLString & orc_Path)
 {
    C_SCLString c_FileName;
@@ -444,9 +408,8 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_ExtractFileName(const C_SCLString & orc_Pat
    return c_FileName;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create single directory
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create single directory
 
    Create a directory.
    Does not support creating directories recursively.
@@ -456,10 +419,8 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_ExtractFileName(const C_SCLString & orc_Pat
    \return
    0     directory created (or: directory already exists)
    -1    could not create directory
-
-   \created     08.07.2016 STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 TGL_PACKAGE stw_tgl::TGL_CreateDirectory(const C_SCLString & orc_Directory)
 {
    sintn sn_Return;
@@ -476,9 +437,8 @@ sint32 TGL_PACKAGE stw_tgl::TGL_CreateDirectory(const C_SCLString & orc_Director
    return s32_Result;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Remove directory with subdirectories
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove directory with subdirectories
 
    Removes the directory orc_Directory with all subdirectories.
    (Based on an implementation on codeguru.com)
@@ -490,10 +450,8 @@ sint32 TGL_PACKAGE stw_tgl::TGL_CreateDirectory(const C_SCLString & orc_Director
    \return
    0     directory removed
    -1    could not remove directory
-
-   \created     11.07.2016 STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 TGL_PACKAGE stw_tgl::TGL_RemoveDirectory(const C_SCLString & orc_Directory,
                                                 const bool oq_ContentOnly)
 {
@@ -574,9 +532,8 @@ sint32 TGL_PACKAGE stw_tgl::TGL_RemoveDirectory(const C_SCLString & orc_Director
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert relative file path to absolute path
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert relative file path to absolute path
 
    Caution:
    Depending on the implementation this function might temporarily modify the current directory.
@@ -586,10 +543,8 @@ sint32 TGL_PACKAGE stw_tgl::TGL_RemoveDirectory(const C_SCLString & orc_Director
 
    \return
    Absolute path; empty string on error
-
-   \created     19.01.2018 STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString TGL_PACKAGE stw_tgl::TGL_ExpandFileName(const C_SCLString & orc_RelativePath,
                                                     const C_SCLString & orc_BasePath)
 {

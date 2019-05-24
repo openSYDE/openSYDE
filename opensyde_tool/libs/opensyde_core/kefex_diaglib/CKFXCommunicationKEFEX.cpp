@@ -1,12 +1,3 @@
-//28.08.17   AST    Added option to "Sleep" when polling for responses (default: do not Sleep, as before)
-//22.07.10   AST    Moved C_KFXCommunicationKEFEX code to a module of its own (was in CKFXComm.cpp)
-//19.07.10   AST    Added explicit calls to C_KFX_Protocol::Cycle (cf. KEFEX Trac Ticket #146)
-//11.05.09   AST    All index parameters are uint32 in preparation for upcoming protocols (e.g. CANopen)
-//20.02.09   AST    read/write numeric: added check for size > 4 in order to be able to transfer numeric variables
-//                   > 32bit
-//25.03.08   AST    UpdateTimer is only called if no other communication is going on
-//                  segmented read/write: will return C_BUSY if another transmission is already active
-
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -150,14 +141,6 @@ void C_KFXCommunicationKEFEX::m_Unlock(const uint8 ou8_Index)
    C_RD_WR        -> could not send request                    \n
    C_COM          -> no response                               \n
    C_WARN         -> error response
-
-   \created     xx.xx.200x  STW/A.Stangl
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   19.01.2011        STW/A.Stangl  documented
-   \endhistory
 */
 //-----------------------------------------------------------------------------
 sint32 C_KFXCommunicationKEFEX::Logon(const uint64 ou64_ProjectChecksum, const uint16 ou16_DataVersion,
@@ -208,14 +191,6 @@ sint32 C_KFXCommunicationKEFEX::Logon(const uint64 ou64_ProjectChecksum, const u
    C_RD_WR        -> could not send request                    \n
    C_COM          -> no response                               \n
    C_WARN         -> error response
-
-   \created     xx.xx.200x  STW/A.Stangl
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   19.01.2011        STW/A.Stangl  documented
-   \endhistory
 */
 //-----------------------------------------------------------------------------
 sint32 C_KFXCommunicationKEFEX::Logoff(const bool oq_WaitForHandshake)
@@ -494,8 +469,6 @@ sint32 C_KFXCommunicationKEFEX::WriteEEPROM(const uint32 ou32_Address, const uin
    C_COM     no response
    C_WARN    error response or inconsistent response
    C_RANGE   ou32_DesiredWriteSize out of range
-
-   \created     29.10.2014  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_KFXCommunicationKEFEX::WriteEEPROMSSLStart(const uint32 ou32_DesiredWriteSize)
@@ -563,8 +536,6 @@ sint32 C_KFXCommunicationKEFEX::WriteEEPROMSSLStart(const uint32 ou32_DesiredWri
    C_RD_WR     could not send request
    C_COM       no response
    C_WARN      error response or inconsistent response
-
-   \created     29.10.2014  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_KFXCommunicationKEFEX::WriteEEPROMSSLEnd(void)
@@ -603,7 +574,7 @@ sint32 C_KFXCommunicationKEFEX::WriteEEPROMSSLEnd(void)
 }
 
 //---------------------------------------------------------------------------
-//20.02.09  AST   added check for size > 4 in order to be able to transfer numeric variables > 32bit
+
 sint32 C_KFXCommunicationKEFEX::ReadNumericVariable(const uint32 ou32_Index, const uint8 ou8_NumBytes,
                                                     sint64 & ors64_Value)
 {
@@ -651,7 +622,7 @@ sint32 C_KFXCommunicationKEFEX::ReadNumericVariable(const uint32 ou32_Index, con
 }
 
 //---------------------------------------------------------------------------
-//20.02.09  AST   added check for size > 4 in order to be able to transfer numeric variables > 32bit
+
 sint32 C_KFXCommunicationKEFEX::WriteNumericVariable(const uint32 ou32_Index, const uint8 ou8_NumBytes,
                                                      const sint64 os64_Value)
 {
@@ -793,7 +764,7 @@ sint32 C_KFXCommunicationKEFEX::RequestTimeTriggeredTransmission(const uint32 ou
 }
 
 //---------------------------------------------------------------------------
-//04.03.09  AST  interpret C_WARN as OK
+
 sint32 C_KFXCommunicationKEFEX::RequestChangeTriggeredTransmission(const uint32 ou32_Index,
                                                                    const uint32 ou32_MaxTimeout,
                                                                    const uint32 ou32_UpperHysteresis,

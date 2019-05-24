@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Dashboard pie chart item (implementation)
 
    Dashboard pie chart item
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     28.08.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <cmath>
@@ -24,37 +17,34 @@
 #include "constants.h"
 #include "C_OgeWiDashboardPieChart.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QColor C_OgeWiDashboardPieChart::mhc_Transparent = QColor(Qt::transparent);
 const float32 C_OgeWiDashboardPieChart::mhf32_Pi = static_cast<float32>(std::acos(-1));
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     28.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeWiDashboardPieChart::C_OgeWiDashboardPieChart(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mq_ValueCircle(false),
@@ -73,18 +63,15 @@ C_OgeWiDashboardPieChart::C_OgeWiDashboardPieChart(QWidget * const opc_Parent) :
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply style
 
    \param[in] oe_Style       New style type
    \param[in] oq_DarkMode    Flag if dark mode is active
    \param[in] oq_ShowUnit    Show unit flag
    \param[in] oq_ShowValue   Show value flag
-
-   \created     28.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardPieChart::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode,
                                                const bool oq_ShowUnit, const bool oq_ShowValue)
 {
@@ -128,13 +115,10 @@ void C_OgeWiDashboardPieChart::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Styl
    this->update();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reinitialize size based parameters
-
-   \created     29.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reinitialize size based parameters
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardPieChart::ReInitSize(void)
 {
    sintn sn_PixelSize;
@@ -157,78 +141,63 @@ void C_OgeWiDashboardPieChart::ReInitSize(void)
    this->msn_BorderWidth = static_cast<sintn>(f32_Temp);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update pie chart value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update pie chart value
 
    \param[in] orc_Value            Displayed value
    \param[in] os32_Progress2000000 Value in percent (only 0-2000000 supported)
-
-   \created     04.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardPieChart::SetValue(const QString & orc_Value, const sint32 os32_Progress2000000)
 {
    this->mc_Value = orc_Value;
    this->ms32_Value = os32_Progress2000000;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update unit
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update unit
 
    \param[in] orc_Value New value
-
-   \created     04.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardPieChart::SetUnit(const QString & orc_Value)
 {
    this->mc_Unit = orc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets of the color transparence value configured by the actual timeout state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets of the color transparence value configured by the actual timeout state
 
    \param[in]     osn_Value                           Value for transparence (0..255)
-
-   \created     18.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardPieChart::SetTransparence(const sintn osn_Value)
 {
    this->msn_Transparence = osn_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten resize event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten resize event slot
 
    Here: Update font size
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     29.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardPieChart::resizeEvent(QResizeEvent * const opc_Event)
 {
    QWidget::resizeEvent(opc_Event);
    ReInitSize();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    Here: Draw custom widget
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     28.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
 {
    //Progress of value
@@ -585,7 +554,7 @@ void C_OgeWiDashboardPieChart::paintEvent(QPaintEvent * const opc_Event)
 }
 
 // Karsten Anfang
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardPieChart::m_SetPie(QPainter & orc_Painter, QBrush oc_PieBrush, const Qt::PenCapStyle oe_CapStyle,
                                         const QRect & orc_PieCircleRect, const stw_types::float32 of32_PieWidth,
                                         const stw_types::float32 of32_GesamtPixel,
@@ -608,7 +577,7 @@ void C_OgeWiDashboardPieChart::m_SetPie(QPainter & orc_Painter, QBrush oc_PieBru
    orc_Painter.drawArc(orc_PieCircleRect, sn_PieStartAngle, static_cast<stw_types::sintn>(f32_PieSpanAngle));
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardPieChart::m_SetPieDot(QPainter & orc_Painter, const QColor & orc_PieDotColor,
                                            const QRect & orc_PieRect, const stw_types::float32 of32_DotSize,
                                            const stw_types::float32 of32_GesamtPixel,
@@ -647,7 +616,7 @@ void C_OgeWiDashboardPieChart::m_SetPieDot(QPainter & orc_Painter, const QColor 
                            static_cast<sintn>(f32_DotSize), static_cast<sintn>(f32_DotSize));
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardPieChart::m_SetPieRim(QPainter & orc_Painter, QBrush oc_RimBrush, const QRect & orc_RimCircleRect,
                                            const stw_types::float32 of32_RimSize,
                                            const stw_types::float32 of32_GesamtPixel,
@@ -660,8 +629,8 @@ void C_OgeWiDashboardPieChart::m_SetPieRim(QPainter & orc_Painter, QBrush oc_Rim
    c_RandArc.setBrush(oc_RimBrush); // Color
    // ReductionFactor to close or open gaps between the circles
    c_RandArc.setWidth(static_cast<stw_types::sintn>(std::ceil((f32_WidthHeightMin *
-                                                                (of32_RimSize - of32_ReductionFactor)) /
-                                                               of32_GesamtPixel)));
+                                                               (of32_RimSize - of32_ReductionFactor)) /
+                                                              of32_GesamtPixel)));
    c_RandArc.setCapStyle(Qt::FlatCap);
    orc_Painter.setPen(c_RandArc);
    // Arc with complete turn
@@ -669,7 +638,7 @@ void C_OgeWiDashboardPieChart::m_SetPieRim(QPainter & orc_Painter, QBrush oc_Rim
                        static_cast<stw_types::sint16>(-360.0  * 16.0));
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardPieChart::m_SetInnerCircle(QPainter & orc_Painter, QBrush oc_InnerCircleBrush,
                                                 const QRect & orc_InnerCircleRect) const
 {
@@ -679,7 +648,7 @@ void C_OgeWiDashboardPieChart::m_SetInnerCircle(QPainter & orc_Painter, QBrush o
    orc_Painter.drawEllipse(orc_InnerCircleRect);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardPieChart::m_SetPieText(QPainter & orc_Painter, const QColor & orc_TextColor,
                                             const QRect & orc_InnerCircleRect, QString oc_DisplayString) const
 {
@@ -701,7 +670,7 @@ void C_OgeWiDashboardPieChart::m_SetPieText(QPainter & orc_Painter, const QColor
    orc_Painter.drawText(orc_InnerCircleRect, static_cast<sintn>(Qt::AlignCenter), oc_DisplayString);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardPieChart::m_SetAllPieRects(QRect & orc_InnerCircleRect, QRect & orc_RimCircleRect,
                                                 QRect & orc_PieCircleRect, const stw_types::float32 of32_PieGap,
                                                 const stw_types::float32 of32_PieSize,

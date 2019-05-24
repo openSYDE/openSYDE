@@ -1,76 +1,60 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data class for general node properties (implementation)
 
    Data class for general node properties
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.12.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_OSCNodeProperties.h"
 
 #include "CSCLChecksums.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_core;
 using namespace stw_types;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     22.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeProperties::C_OSCNodeProperties(void)
 {
    this->Initialize();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     09.01.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
-C_OSCNodeProperties::~C_OSCNodeProperties()
+//----------------------------------------------------------------------------------------------------------------------
+C_OSCNodeProperties::~C_OSCNodeProperties(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize class content
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize class content
 
    Clean up.
-
-   \created     25.01.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeProperties::Initialize(void)
 {
    c_Name = "Default Node name";
@@ -82,18 +66,15 @@ void C_OSCNodeProperties::Initialize(void)
    c_STWFlashloaderSettings.Initialize();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
    It is not endian-safe, so it should only be used on the same system it is created on.
 
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
-
-   \created     21.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeProperties::CalcHash(uint32 & oru32_HashValue) const
 {
    uint32 u32_Counter;
@@ -112,9 +93,8 @@ void C_OSCNodeProperties::CalcHash(uint32 & oru32_HashValue) const
    this->c_STWFlashloaderSettings.CalcHash(oru32_HashValue);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get interface matching the specification
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get interface matching the specification
 
    \param[in] oe_InterfaceType    Interface type
    \param[in] ou8_InterfaceNumber Interface number
@@ -122,10 +102,8 @@ void C_OSCNodeProperties::CalcHash(uint32 & oru32_HashValue) const
    \return
    Match for requested interface
    Else NULL
-
-   \created     12.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_OSCNodeComInterfaceSettings * C_OSCNodeProperties::GetComInterface(
    const C_OSCSystemBus::E_Type oe_InterfaceType, const stw_types::uint8 ou8_InterfaceNumber) const
 {
@@ -144,15 +122,12 @@ const C_OSCNodeComInterfaceSettings * C_OSCNodeProperties::GetComInterface(
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set com interface
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set com interface
 
    \param[in] orc_ComInterface  Com interface replacement
-
-   \created     07.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeProperties::SetComInterface(const C_OSCNodeComInterfaceSettings & orc_ComInterface)
 {
    for (uint32 u32_Index = 0; u32_Index < this->c_ComInterfaces.size(); ++u32_Index)
@@ -167,16 +142,13 @@ void C_OSCNodeProperties::SetComInterface(const C_OSCNodeComInterfaceSettings & 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Disconnect bus of specified interface
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Disconnect bus of specified interface
 
    \param[in] oe_InterfaceType    Interface type
    \param[in] ou8_InterfaceNumber Interface number
-
-   \created     12.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeProperties::DisconnectComInterface(const C_OSCSystemBus::E_Type oe_InterfaceType,
                                                  const uint8 ou8_InterfaceNumber)
 {
@@ -191,15 +163,12 @@ void C_OSCNodeProperties::DisconnectComInterface(const C_OSCSystemBus::E_Type oe
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize com interfaces using the specified device definition
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize com interfaces using the specified device definition
 
    \param[in] orc_Device Device definition to use as base for com interfaces
-
-   \created     12.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeProperties::CreateComInterfaces(const C_OSCDeviceDefinition & orc_Device)
 {
    bool q_Found;

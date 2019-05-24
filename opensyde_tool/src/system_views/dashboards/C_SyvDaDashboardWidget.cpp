@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for showing a concrete dashboard
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -25,26 +19,25 @@
 #include "C_PuiSvHandler.h"
 #include "C_OgeWiUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -53,10 +46,8 @@ using namespace stw_opensyde_gui_logic;
    \param[in]     orc_Name       Name of dashboard
    \param[in]     oq_Window      Flag if widget will be showed in a seperate window
    \param[in,out] opc_Parent     Optional pointer to parent
-
-   \created     20.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaDashboardWidget::C_SyvDaDashboardWidget(const uint32 ou32_ViewIndex, const uint32 ou32_DataIndex,
                                                const QString & orc_Name, const bool oq_Window,
                                                QWidget * const opc_Parent) :
@@ -105,6 +96,7 @@ C_SyvDaDashboardWidget::C_SyvDaDashboardWidget(const uint32 ou32_ViewIndex, cons
    // Manual datapool element handling
    connect(this->mpc_Scene, &C_SyvDaDashboardScene::SigDataPoolWrite, this, &C_SyvDaDashboardWidget::SigDataPoolWrite);
    connect(this->mpc_Scene, &C_SyvDaDashboardScene::SigDataPoolRead, this, &C_SyvDaDashboardWidget::SigDataPoolRead);
+   connect(this->mpc_Scene, &C_SyvDaDashboardScene::SigNvmReadList, this, &C_SyvDaDashboardWidget::SigNvmReadList);
 
    //Update all items with initial zoom & pos value
    if (pc_View != NULL)
@@ -124,90 +116,72 @@ C_SyvDaDashboardWidget::C_SyvDaDashboardWidget(const uint32 ou32_ViewIndex, cons
                                                 c_DashboardName).c_ScenePos);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     20.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaDashboardWidget::~C_SyvDaDashboardWidget(void)
 {
    delete this->mpc_Ui;
    delete this->mpc_Scene;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the index of the view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the index of the view
 
    \return
    Index of the view
-
-   \created     07.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SyvDaDashboardWidget::GetViewIndex(void) const
 {
    return this->mu32_ViewIndex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the index of the dashboard
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the index of the dashboard
 
    \return
    Index of the dashboard
-
-   \created     27.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SyvDaDashboardWidget::GetDataIndex(void) const
 {
    return this->mu32_DataIndex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set data index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set data index
 
    \param[in] ou32_Value New data index
-
-   \created     06.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::SetDataIndex(const uint32 ou32_Value)
 {
    this->mu32_DataIndex = ou32_Value;
    this->mpc_Scene->SetDashboardIndex(this->mu32_DataIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the name of the dashboard
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the name of the dashboard
 
    \return
    Name of the dashboard
-
-   \created     25.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaDashboardWidget::GetName(void) const
 {
    return this->mc_Name;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the edit mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the edit mode
 
    \param[in]     oq_Active      Flag for edit mode
-
-   \created     03.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::SetEditMode(const bool oq_Active)
 {
    if (this->mpc_Scene != NULL)
@@ -219,15 +193,12 @@ void C_SyvDaDashboardWidget::SetEditMode(const bool oq_Active)
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_DrawFrame, "NoBorder", true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the dark mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the dark mode
 
    \param[in] oq_Active Dark mode active
-
-   \created     02.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::SetDarkMode(const bool oq_Active)
 {
    if (this->mpc_Scene != NULL)
@@ -238,13 +209,24 @@ void C_SyvDaDashboardWidget::SetDarkMode(const bool oq_Active)
    this->mpc_Ui->pc_GraphicsView->SetDarkMode(oq_Active);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Function to activate or deactivate drawing of performance heavy widgets
 
-   \created     26.07.2017  STW/M.Echtler
+   \param[in] oq_Active Flag if widgets should currently be drawn
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardWidget::SetDrawingActive(const bool oq_Active) const
+{
+   if (this->mpc_Scene != NULL)
+   {
+      this->mpc_Scene->SetDrawingActive(oq_Active);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save data
+*/
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::Save(void) const
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
@@ -267,15 +249,12 @@ void C_SyvDaDashboardWidget::Save(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Registers all relevant dashboard widgets at the associated data dealer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Registers all relevant dashboard widgets at the associated data dealer
 
    \param[in]     orc_AllDataDealer    Reference to vector with all data dealer
-
-   \created     29.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::RegisterWidgets(C_SyvComDriverDiag & orc_ComDriver) const
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
@@ -293,15 +272,12 @@ void C_SyvDaDashboardWidget::RegisterWidgets(C_SyvComDriverDiag & orc_ComDriver)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Information about the start or stop of a connection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the start or stop of a connection
 
    \param[in]  oq_Active      Flag if connection is active or not active now
-
-   \created     01.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::ConnectionActiveChanged(const bool oq_Active) const
 {
    if (this->mpc_Scene != NULL)
@@ -310,13 +286,10 @@ void C_SyvDaDashboardWidget::ConnectionActiveChanged(const bool oq_Active) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates all values of all dashboard widgets
-
-   \created     29.08.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates all values of all dashboard widgets
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::UpdateShowValues(void) const
 {
    if (this->mpc_Scene != NULL)
@@ -326,13 +299,10 @@ void C_SyvDaDashboardWidget::UpdateShowValues(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle changes of transmission mode for any data element
-
-   \created     11.10.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle changes of transmission mode for any data element
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::UpdateTransmissionConfiguration(void) const
 {
    if (this->mpc_Scene != NULL)
@@ -341,16 +311,13 @@ void C_SyvDaDashboardWidget::UpdateTransmissionConfiguration(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle manual user operation finished event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle manual user operation finished event
 
    \param[in] os32_Result Operation result
    \param[in] ou8_NRC     Negative response code, if any
-
-   \created     09.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::HandleManualOperationFinished(const sint32 os32_Result, const uint8 ou8_NRC) const
 {
    if (this->mpc_Scene != NULL)
@@ -359,16 +326,13 @@ void C_SyvDaDashboardWidget::HandleManualOperationFinished(const sint32 os32_Res
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal all widgets which read rail element ID registrations failed
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal all widgets which read rail element ID registrations failed
 
    \param[in]     orc_FailedIdRegisters    Failed IDs
    \param[in,out] orc_FailedIdErrorDetails Error details for element IDs which failed registration (if any)
-
-   \created     13.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::SetErrorForFailedCyclicElementIdRegistrations(
    const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_FailedIdRegisters,
    const std::vector<QString> & orc_FailedIdErrorDetails) const
@@ -379,13 +343,10 @@ void C_SyvDaDashboardWidget::SetErrorForFailedCyclicElementIdRegistrations(
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set focus to scene
-
-   \created     18.01.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set focus to scene
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardWidget::SetSceneFocus(void) const
 {
    this->mpc_Ui->pc_GraphicsView->setFocus();

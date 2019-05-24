@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Table model for system view dashboard data element update mode (implementation)
 
    Table model for system view dashboard data element update mode
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     08.09.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -31,7 +24,7 @@
 #include "C_SdNdeDataPoolContentUtil.h"
 #include "C_SyvDaPeUpdateModeTableModel.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -39,31 +32,28 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in]     ou32_ViewIndex View index
    \param[in]     ou32_NodeIndex Node index
    \param[in,out] opc_Parent     Optional pointer to parent
-
-   \created     08.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeUpdateModeTableModel::C_SyvDaPeUpdateModeTableModel(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex,
                                                              QObject * const opc_Parent) :
    QAbstractTableModel(opc_Parent),
@@ -73,13 +63,10 @@ C_SyvDaPeUpdateModeTableModel::C_SyvDaPeUpdateModeTableModel(const uint32 ou32_V
    m_Init(ou32_NodeIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply data from internal storage to global storage
-
-   \created     12.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply data from internal storage to global storage
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeTableModel::ApplyData(void) const
 {
    tgl_assert(this->mc_UniqueDataElementIds.size() == this->mc_DataElementConfigurations.size());
@@ -95,9 +82,8 @@ void C_SyvDaPeUpdateModeTableModel::ApplyData(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get header data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get header data
 
    \param[in] osn_Section    Section
    \param[in] oe_Orientation Orientation
@@ -105,10 +91,8 @@ void C_SyvDaPeUpdateModeTableModel::ApplyData(void) const
 
    \return
    Header string
-
-   \created     08.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_SyvDaPeUpdateModeTableModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
                                                    const sintn osn_Role) const
 {
@@ -249,18 +233,15 @@ QVariant C_SyvDaPeUpdateModeTableModel::headerData(const sintn osn_Section, cons
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get table row count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get table row count
 
    \param[in] orc_Parent Parent
 
    \return
    Row count
-
-   \created     08.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SyvDaPeUpdateModeTableModel::rowCount(const QModelIndex & orc_Parent) const
 {
    sintn sn_Retval = 0;
@@ -274,18 +255,15 @@ sintn C_SyvDaPeUpdateModeTableModel::rowCount(const QModelIndex & orc_Parent) co
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get table column count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get table column count
 
    \param[in] orc_Parent Parent
 
    \return
    Column count
-
-   \created     08.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SyvDaPeUpdateModeTableModel::columnCount(const QModelIndex & orc_Parent) const
 {
    sintn sn_Retval = 0;
@@ -298,19 +276,16 @@ sintn C_SyvDaPeUpdateModeTableModel::columnCount(const QModelIndex & orc_Parent)
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data at index
 
    \param[in] orc_Index Index
    \param[in] osn_Role  Data role
 
    \return
    Data
-
-   \created     08.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
 {
    QVariant c_Retval;
@@ -464,8 +439,9 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
                   break;
                }
             }
-            else if (osn_Role == static_cast<sintn>(Qt::DecorationRole))
+            else if (osn_Role == msn_USER_ROLE_ICON)
             {
+               QStringList c_Tmp;
                C_OSCNodeDataPool::E_Type e_DataPoolType;
                switch (e_Col)
                {
@@ -474,14 +450,16 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
                                                                        rc_CurId.u32_DataPoolIndex,
                                                                        e_DataPoolType) == C_NO_ERR)
                   {
+                     c_Tmp.push_back(QString::number(20));
                      if (e_DataPoolType == C_OSCNodeDataPool::E_Type::eDIAG)
                      {
-                        c_Retval = C_SdUtil::h_InitStaticIcon(":/images/system_definition/IconVariable.svg");
+                        c_Tmp.push_back(":/images/system_definition/IconVariable.svg");
                      }
                      else
                      {
-                        c_Retval = C_SdUtil::h_InitStaticIcon(":/images/system_definition/IconParameter.svg");
+                        c_Tmp.push_back(":/images/system_definition/IconParameter.svg");
                      }
+                     c_Retval = c_Tmp;
                   }
                   break;
                default:
@@ -580,9 +558,8 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set data at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set data at index
 
    \param[in] orc_Index Index
    \param[in] orc_Value New data
@@ -591,10 +568,8 @@ QVariant C_SyvDaPeUpdateModeTableModel::data(const QModelIndex & orc_Index, cons
    \return
    True  Success
    False Failure
-
-   \created     08.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaPeUpdateModeTableModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value,
                                             const sintn osn_Role)
 {
@@ -641,7 +616,7 @@ bool C_SyvDaPeUpdateModeTableModel::setData(const QModelIndex & orc_Index, const
                   break;
                }
                c_Roles << osn_Role;
-               Q_EMIT dataChanged(orc_Index, orc_Index, c_Roles);
+               Q_EMIT this->dataChanged(orc_Index, orc_Index, c_Roles);
                q_Retval = true;
             }
          }
@@ -650,18 +625,15 @@ bool C_SyvDaPeUpdateModeTableModel::setData(const QModelIndex & orc_Index, const
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get item flags
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get item flags
 
    \param[in] orc_Index Index
 
    \return
    Item flags
-
-   \created     08.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 Qt::ItemFlags C_SyvDaPeUpdateModeTableModel::flags(const QModelIndex & orc_Index) const
 {
    Qt::ItemFlags c_Retval = Qt::NoItemFlags;
@@ -731,18 +703,15 @@ Qt::ItemFlags C_SyvDaPeUpdateModeTableModel::flags(const QModelIndex & orc_Index
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Column to enum conversion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Column to enum conversion
 
    \param[in]  os32_Column Column
 
    \return
    Enum value
-
-   \created     08.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeUpdateModeTableModel::E_Columns C_SyvDaPeUpdateModeTableModel::h_ColumnToEnum(const sint32 os32_Column)
 {
    C_SyvDaPeUpdateModeTableModel::E_Columns e_Retval = eICON;
@@ -785,19 +754,16 @@ C_SyvDaPeUpdateModeTableModel::E_Columns C_SyvDaPeUpdateModeTableModel::h_Column
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Enum to column conversion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Enum to column conversion
 
    \param[in] oe_Value Enum value
 
    \return
    Column
    -1 Error
-
-   \created     08.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDaPeUpdateModeTableModel::h_EnumToColumn(const E_Columns oe_Value)
 {
    sint32 s32_Retval;
@@ -842,20 +808,16 @@ sint32 C_SyvDaPeUpdateModeTableModel::h_EnumToColumn(const E_Columns oe_Value)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get index
 
    \param[in] os32_Index Index
 
    \return
    NULL Element not found
    Else Valid element
-
-
-   \created     11.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_OSCNodeDataPoolListElementId * C_SyvDaPeUpdateModeTableModel::GetIndex(const sint32 os32_Index) const
 {
    const C_OSCNodeDataPoolListElementId * pc_Retval = NULL;
@@ -871,16 +833,13 @@ const C_OSCNodeDataPoolListElementId * C_SyvDaPeUpdateModeTableModel::GetIndex(c
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init
 
    \param[in] ou32_ViewIndex View index
    \param[in] ou32_NodeIndex Node index
-
-   \created     08.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeTableModel::m_Init(const uint32 ou32_NodeIndex)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
@@ -971,18 +930,15 @@ void C_SyvDaPeUpdateModeTableModel::m_Init(const uint32 ou32_NodeIndex)
    this->endResetModel();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get transmission mode as string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get transmission mode as string
 
    \param[in] oe_TransmissionMode Transmission mode
 
    \return
    Readable string
-
-   \created     11.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaPeUpdateModeTableModel::mh_TransmissionModeToString(
    const C_PuiSvReadDataConfiguration::E_TransmissionMode oe_TransmissionMode)
 {
@@ -1003,18 +959,15 @@ QString C_SyvDaPeUpdateModeTableModel::mh_TransmissionModeToString(
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get rail index as string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get rail index as string
 
    \param[in] u8_RailIndex Rail index
 
    \return
    Readable string
-
-   \created     11.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaPeUpdateModeTableModel::m_RailIndexToString(const uint8 ou8_RailIndex) const
 {
    QString c_Retval;
@@ -1043,18 +996,15 @@ QString C_SyvDaPeUpdateModeTableModel::m_RailIndexToString(const uint8 ou8_RailI
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get index for specified transmission mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get index for specified transmission mode
 
    \param[in] oe_TransmissionMode Transmission mode
 
    \return
    Transmission mode index (Combo box)
-
-   \created     11.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SyvDaPeUpdateModeTableModel::mh_TransmissionModeToIndex(
    const C_PuiSvReadDataConfiguration::E_TransmissionMode oe_TransmissionMode)
 {
@@ -1077,18 +1027,15 @@ sintn C_SyvDaPeUpdateModeTableModel::mh_TransmissionModeToIndex(
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get transmission mode for specified index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get transmission mode for specified index
 
    \param[in] osn_Index Transmission mode index (Combo box)
 
    \return
    Transmission mode
-
-   \created     11.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSvReadDataConfiguration::E_TransmissionMode C_SyvDaPeUpdateModeTableModel::mh_IndexToTransmissionMode(
    const sintn osn_Index)
 {

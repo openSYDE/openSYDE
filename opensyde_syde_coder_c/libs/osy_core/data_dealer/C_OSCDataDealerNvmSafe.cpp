@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Encapsulates safety relevant sequences for NVM access. (implementation)
 
@@ -15,15 +14,9 @@
    - list the read back values from all nodes for the user to confirm
    - update the CRCs of all nodes
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.10.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -61,12 +54,9 @@ stw_scl::C_SCLString C_OSCDataDealerNvmSafe::mhc_ParameterSetFilePath = "";
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Set up class
+/*! \brief   Set up class
 
    Initializes class elements
-
-   \created     13.10.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_OSCDataDealerNvmSafe::C_OSCDataDealerNvmSafe(void) :
@@ -76,16 +66,13 @@ C_OSCDataDealerNvmSafe::C_OSCDataDealerNvmSafe(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Set up class
+/*! \brief   Set up class
 
    Initializes class elements
 
    \param[in]     opc_Node          Pointer to node of data dealer
    \param[in]     ou32_NodeIndex    Index of node of data dealer
    \param[in]     opc_DiagProtocol  Pointer to used diagnostic protocol
-
-   \created     13.10.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_OSCDataDealerNvmSafe::C_OSCDataDealerNvmSafe(C_OSCNode * const opc_Node, const uint32 ou32_NodeIndex,
@@ -96,10 +83,7 @@ C_OSCDataDealerNvmSafe::C_OSCDataDealerNvmSafe(C_OSCNode * const opc_Node, const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up class
-
-   \created     13.10.2017  STW/B.Bayer
+/*! \brief   Clean up class
 */
 //-----------------------------------------------------------------------------
 C_OSCDataDealerNvmSafe::~C_OSCDataDealerNvmSafe(void)
@@ -107,8 +91,7 @@ C_OSCDataDealerNvmSafe::~C_OSCDataDealerNvmSafe(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Checking all CRCs of "NVM" datapool lists of one node
+/*! \brief   Checking all CRCs of "NVM" datapool lists of one node
 
    The function calculates and checks the CRCs over all datapool lists with the flag q_NvMCRCActive is set to true
    of all datapools of type "NVM".
@@ -121,8 +104,6 @@ C_OSCDataDealerNvmSafe::~C_OSCDataDealerNvmSafe(void)
    C_RANGE     At least one datapool has the flag q_IsSafety set to true and
                at least one of its list has the flag q_NvMCRCActive set to false
    C_CONFIG    No diagnostic protocol are known (was this class properly Initialize()d ?)
-
-   \created     19.10.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvmSafe::NvmSafeCheckCrcs(const C_OSCNode & orc_Node) const
@@ -187,8 +168,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeCheckCrcs(const C_OSCNode & orc_Node) cons
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Writing of changed NVM values
+/*! \brief   Writing of changed NVM values
 
    The function writes all values of all datapool elements of all lists of all datapools of
    the original node of the "C_OSCDataDealer" marked as "changed" to the ECU NVM without updating the CRC(s).
@@ -212,8 +192,6 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeCheckCrcs(const C_OSCNode & orc_Node) cons
    C_WARN      server sent error response
    C_RD_WR     unexpected content in server response
    C_COM       expected server response not received because of communication error
-
-   \created     18.10.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteChangedValues(
@@ -411,8 +389,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteChangedValues(
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Reads values of all changed lists of ECU
+/*! \brief   Reads values of all changed lists of ECU
 
    The function reads the values of all datapool elements of all datapool lists that
    contain datapool elements that were written by the preceding call to
@@ -436,8 +413,6 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteChangedValues(
    C_NOACT     Could not send request (e.g. TX buffer full)
    C_WARN      Server sent error response
    C_COM       expected server response not received because of communication error
-
-   \created     19.10.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvmSafe::NvmSafeReadValues(const C_OSCNode * (&orpc_NodeCopy), uint8 * const opu8_NrCode)
@@ -520,8 +495,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadValues(const C_OSCNode * (&orpc_NodeCo
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the CRCs of changed lists and writes them to the ECU
+/*! \brief   Calculates the CRCs of changed lists and writes them to the ECU
 
    The function calculates the CRCs over all datapool lists read by the preceding call to
    "NvmSafeReadValues" and writes them to the ECU NVM.
@@ -546,8 +520,6 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadValues(const C_OSCNode * (&orpc_NodeCo
    C_WARN      Server sent error response
    C_RD_WR     unexpected content in server response
    C_COM       expected server response not received because of communication error
-
-   \created     20.10.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteCrcs(uint8 * const opu8_NrCode)
@@ -717,14 +689,11 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteCrcs(uint8 * const opu8_NrCode)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Clear internally stored content
+/*! \brief   Clear internally stored content
 
    Note: this function handles a file step and there is only one parameter set file for each parametrization process,
          so this function needs to only be called once,
          so all participating data dealers can continue with the next step (if there is any)
-
-   \created     24.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCDataDealerNvmSafe::h_NvmSafeClearInternalContent(void)
@@ -735,8 +704,7 @@ void C_OSCDataDealerNvmSafe::h_NvmSafeClearInternalContent(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Create parameter set file based on current ECU values
+/*! \brief   Create parameter set file based on current ECU values
 
    Note: Not set CRCs are supported
 
@@ -754,8 +722,6 @@ void C_OSCDataDealerNvmSafe::h_NvmSafeClearInternalContent(void)
    C_TIMEOUT  Server communication protocol service has timed out
    C_WARN     Server communication protocol service error response was received
    C_COM      expected server response not received because of communication error
-
-   \created     17.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvmSafe::NvmSafeReadParameterValues(const std::vector<C_OSCNodeDataPoolListId> & orc_ListIds,
@@ -936,9 +902,9 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadParameterValues(const std::vector<C_OS
                   //Write data
                   if (s32_Retval == C_NO_ERR)
                   {
-                     if (C_OSCParamSetHandler::h_GetInstance().SetRawDataForNode(c_RawNode) == C_NO_ERR)
+                     if (C_OSCParamSetHandler::h_GetInstance().AddRawDataForNode(c_RawNode) == C_NO_ERR)
                      {
-                        if (C_OSCParamSetHandler::h_GetInstance().SetInterpretedDataForNode(c_InterpretedNode) ==
+                        if (C_OSCParamSetHandler::h_GetInstance().AddInterpretedDataForNode(c_InterpretedNode) ==
                             C_NO_ERR)
                         {
                            //Finished
@@ -977,14 +943,14 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadParameterValues(const std::vector<C_OS
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Create clean file from internally stored content without adding a CRC
+/*! \brief   Create clean file from internally stored content without adding a CRC
 
    Note: this function handles a file step and there is only one parameter set file for each parametrization process,
          so this function needs to only be called once,
          so all participating data dealers can continue with the next step (if there is any)
 
-   \param[in] orc_Path    Parameter set file path
+   \param[in] orc_Path     Parameter set file path
+   \param[in] orc_FileInfo Optional general file information
 
    \return
    C_NO_ERR   data saved
@@ -992,11 +958,10 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeReadParameterValues(const std::vector<C_OS
    C_CONFIG   Internal data invalid
    C_BUSY     file already exists
    C_RD_WR    could not write to file (e.g. missing write permissions; missing folder)
-
-   \created     24.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
-sint32 C_OSCDataDealerNvmSafe::h_NvmSafeCreateCleanFileWithoutCRC(const C_SCLString & orc_Path)
+sint32 C_OSCDataDealerNvmSafe::h_NvmSafeCreateCleanFileWithoutCRC(const C_SCLString & orc_Path,
+                                                                  const C_OSCParamSetInterpretedFileInfoData & orc_FileInfo)
 {
    sint32 s32_Retval;
 
@@ -1004,6 +969,7 @@ sint32 C_OSCDataDealerNvmSafe::h_NvmSafeCreateCleanFileWithoutCRC(const C_SCLStr
    {
       if (C_OSCDataDealerNvmSafe::mhe_ParameterSetFileState == C_OSCDataDealerNvmSafe::ePSFS_DATA_RESET)
       {
+         C_OSCParamSetHandler::h_GetInstance().AddInterpretedFileData(orc_FileInfo);
          s32_Retval = C_OSCParamSetHandler::h_GetInstance().CreateCleanFileWithoutCRC(orc_Path);
          if (s32_Retval == C_NO_ERR)
          {
@@ -1026,8 +992,7 @@ sint32 C_OSCDataDealerNvmSafe::h_NvmSafeCreateCleanFileWithoutCRC(const C_SCLStr
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Read file and update internally stored content (cleared at start)
+/*! \brief   Read file and update internally stored content (cleared at start)
 
    Warning: CRC is not checked
 
@@ -1044,8 +1009,6 @@ sint32 C_OSCDataDealerNvmSafe::h_NvmSafeCreateCleanFileWithoutCRC(const C_SCLStr
    C_RD_WR    specified file does not exist
               specified file is present but structure is invalid (e.g. invalid XML file)
    C_CONFIG   file does not contain essential information
-
-   \created     24.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvmSafe::h_NvmSafeReadFileWithoutCRC(const C_SCLString & orc_Path)
@@ -1076,8 +1039,7 @@ sint32 C_OSCDataDealerNvmSafe::h_NvmSafeReadFileWithoutCRC(const C_SCLString & o
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   The function reads the contents of a parameter set file without checking the file CRC
+/*! \brief   The function reads the contents of a parameter set file without checking the file CRC
 
    \param[in]  orc_Path          File path
    \param[out] orc_DataPoolLists Loaded data pool lists (Always cleared at start)
@@ -1088,8 +1050,6 @@ sint32 C_OSCDataDealerNvmSafe::h_NvmSafeReadFileWithoutCRC(const C_SCLString & o
    C_RANGE    Path does not match the path of the preceding function calls
    C_CONFIG   Mismatch of data with current node
                or no valid pointer to the original instance of "C_OSCNode" is set in "C_OSCDataDealer"
-
-   \created     18.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvmSafe::NvmSafeCheckParameterFileContents(const C_SCLString & orc_Path,
@@ -1229,8 +1189,7 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeCheckParameterFileContents(const C_SCLStri
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Update/add CRC for provided file
+/*! \brief   Update/add CRC for provided file
 
    Note: this function handles a file step and there is only one parameter set file for each parametrization process,
          so this function needs to only be called once,
@@ -1244,8 +1203,6 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeCheckParameterFileContents(const C_SCLStri
    C_RANGE    Path does not match the path of the preceding function calls
    C_RD_WR    specified file does not exist
               specified file is present but structure is invalid (e.g. invalid XML file)
-
-   \created     24.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvmSafe::h_NvmSafeUpdateCRCForFile(const C_SCLString & orc_Path)
@@ -1280,8 +1237,7 @@ sint32 C_OSCDataDealerNvmSafe::h_NvmSafeUpdateCRCForFile(const C_SCLString & orc
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Read file and update internally stored content (cleared at start)
+/*! \brief   Read file and update internally stored content (cleared at start)
 
    \param[in] orc_Path   Parameter set file path
 
@@ -1290,8 +1246,6 @@ sint32 C_OSCDataDealerNvmSafe::h_NvmSafeUpdateCRCForFile(const C_SCLString & orc
    C_RD_WR    specified file does not exist
               specified file is present but structure is invalid (e.g. invalid XML file)
    C_CHECKSUM specified file is present but checksum is invalid
-
-   \created     24.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvmSafe::h_NvmSafeReadFileWithCRC(const C_SCLString & orc_Path)
@@ -1315,8 +1269,7 @@ sint32 C_OSCDataDealerNvmSafe::h_NvmSafeReadFileWithCRC(const C_SCLString & orc_
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   The function reads a parameter set file and writes the contained values and CRCs to the ECU's NVM
+/*! \brief   The function reads a parameter set file and writes the contained values and CRCs to the ECU's NVM
 
    \param[in]  orc_Path           File path
    \param[out] ors32_ResultDetail Result detail
@@ -1343,8 +1296,6 @@ sint32 C_OSCDataDealerNvmSafe::h_NvmSafeReadFileWithCRC(const C_SCLString & orc_
    C_NOACT    1            Communication protocol service could not be requested
    C_TIMEOUT  1            Communication protocol service has timed out
    C_WARN     1            Communication protocol service error response was received
-
-   \created     18.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteParameterSetFile(const C_SCLString & orc_Path, sint32 & ors32_ResultDetail)
@@ -1481,13 +1432,10 @@ sint32 C_OSCDataDealerNvmSafe::NvmSafeWriteParameterSetFile(const C_SCLString & 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Create interpreted list
+/*! \brief   Create interpreted list
 
    \param[in]  orc_List            List data
    \param[out] orc_InterpretedList New interpreted list
-
-   \created     17.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCDataDealerNvmSafe::mh_CreateInterpretedList(const C_OSCNodeDataPoolList & orc_List,
@@ -1506,15 +1454,12 @@ void C_OSCDataDealerNvmSafe::mh_CreateInterpretedList(const C_OSCNodeDataPoolLis
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Copy bytes from source vector and append them to the target vector
+/*! \brief   Copy bytes from source vector and append them to the target vector
 
    Info: Performance not considered
 
    \param[in]     orc_Source Source storage
    \param[in,out] orc_Target Target storage
-
-   \created     17.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCDataDealerNvmSafe::mh_AppendBytes(const std::vector<uint8> & orc_Source, std::vector<uint8> & orc_Target)
@@ -1526,8 +1471,7 @@ void C_OSCDataDealerNvmSafe::mh_AppendBytes(const std::vector<uint8> & orc_Sourc
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check if raw node parameters match internal node
+/*! \brief   Check if raw node parameters match internal node
 
    \param[in] orc_Node Raw node parameters to check
 
@@ -1538,8 +1482,6 @@ void C_OSCDataDealerNvmSafe::mh_AppendBytes(const std::vector<uint8> & orc_Sourc
    C_TIMEOUT  Data pool not found
    C_CHECKSUM Data pool CRC mismatch
    C_RD_WR    Data pool version mismatch
-
-   \created     18.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvmSafe::m_CheckParameterFileContent(const C_OSCParamSetRawNode & orc_Node)
@@ -1604,8 +1546,7 @@ sint32 C_OSCDataDealerNvmSafe::m_CheckParameterFileContent(const C_OSCParamSetRa
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Create raw entry for list and write bytes to interpreted data
+/*! \brief   Create raw entry for list and write bytes to interpreted data
 
    \param[in]  orc_List    List to set raw entry from
    \param[out] orc_Entry   Raw entry from list
@@ -1623,9 +1564,6 @@ sint32 C_OSCDataDealerNvmSafe::m_CheckParameterFileContent(const C_OSCParamSetRa
    C_RD_WR    Datapool element size configuration does not match with count of read bytes
    C_CHECKSUM Checksum of read datapool list is invalid
    C_COM      expected server response not received because of communication error
-
-
-   \created     19.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDataDealerNvmSafe::m_CreateRawEntryAndPrepareInterpretedData(C_OSCNodeDataPoolList & orc_List,

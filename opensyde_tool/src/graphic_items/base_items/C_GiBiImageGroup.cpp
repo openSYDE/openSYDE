@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Implementation for drawing element image (implementation)
 
    detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.10.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -25,36 +18,33 @@
 #include "C_PuiBsImage.h"
 #include "gitypes.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in]       oru64_ID             Unique ID
    \param[in]       orc_ImagePath        File path of image
    \param[in,out]   opc_Parent           Optional pointer to parent
-
-   \created     27.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiBiImageGroup::C_GiBiImageGroup(const uint64 & oru64_ID, const QString & orc_ImagePath,
                                    QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
@@ -62,22 +52,19 @@ C_GiBiImageGroup::C_GiBiImageGroup(const uint64 & oru64_ID, const QString & orc_
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in]       oru64_ID             Unique ID
    \param[in]       orc_Image            Image
    \param[in]       orf64_Width          Width of image view
-   \param[in]       orf64_Height          Height of image view
-   \param[in]       orc_ImagePath        Filepath to the image
+   \param[in]       orf64_Height         Height of image view
+   \param[in]       orc_ImagePath        File path to the image
    \param[in,out]   opc_Parent           Optional pointer to parent
-
-   \created     27.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiBiImageGroup::C_GiBiImageGroup(const uint64 & oru64_ID, const float64 of64_Width, const float64 of64_Height,
                                    const QPixmap & orc_Image, QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
@@ -86,27 +73,23 @@ C_GiBiImageGroup::C_GiBiImageGroup(const uint64 & oru64_ID, const float64 of64_W
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the type of this itme
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the type of this item
 
    \return  ID
-
-   \created     01.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_GiBiImageGroup::type(void) const
 {
    return msn_GRAPHICS_ITEM_IMAGE;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update internal data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update internal data
 
-   \created     21.07.2017  STW/M.Echtler
+   \param[in]  orc_Data       Image data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiImageGroup::m_UpdateData(C_PuiBsImage & orc_Data) const
 {
    this->UpdateBasicData(orc_Data);

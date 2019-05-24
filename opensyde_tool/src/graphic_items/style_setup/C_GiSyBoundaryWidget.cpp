@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for boundary style setup to customize boundary optics
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     28.10.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QColorDialog>
@@ -29,39 +22,36 @@
 #include "C_GiBiBoundary.h"
 #include "C_SdTopologyScene.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_types;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString mc_PATH_BACKGROUND_IMG = ":/images/graphic_items/TransparentBtnBackground.png";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in]     ou32_Mode   CAN-Bus / Ethernet-Bus or line
    \param[in]     orc_Scene   Used scene for preview
    \param[in,out] orc_Parent  Reference to parent
-
-   \created     28.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSyBoundaryWidget::C_GiSyBoundaryWidget(C_GiSyBaseWidget & orc_Parent) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_GiSyBoundaryWidget),
@@ -113,15 +103,12 @@ C_GiSyBoundaryWidget::C_GiSyBoundaryWidget(C_GiSyBaseWidget & orc_Parent) :
    //lint -e{429}  no memory leak because of the parent of pc_Label-Background / Border and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     28.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSyBoundaryWidget::~C_GiSyBoundaryWidget()
 {
    delete mpc_Ui;
@@ -129,13 +116,10 @@ C_GiSyBoundaryWidget::~C_GiSyBoundaryWidget()
    // and Qt management takes care of the rest
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     28.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyBoundaryWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelWidth->setText(C_GtGetText::h_GetText("Border Width"));
@@ -143,13 +127,10 @@ void C_GiSyBoundaryWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelBackgroundColor->setText(C_GtGetText::h_GetText("Background Color"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On Show Event
-
-   \created     19.12.2016  STW/S.Singer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On Show Event
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyBoundaryWidget::showEvent(QShowEvent * const opc_Event)
 {
    //border
@@ -163,57 +144,45 @@ void C_GiSyBoundaryWidget::showEvent(QShowEvent * const opc_Event)
    QWidget::showEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get actual line width
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get actual line width
 
    \return  Actual line width
-
-   \created     12.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_types::sintn C_GiSyBoundaryWidget::GetBorderWidth(void) const
 {
    return this->mpc_Ui->pc_SpinBoxWidth->value();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set line width
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set line width
 
    \param[in]  orc_Value   New line width
-
-   \created     12.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyBoundaryWidget::SetBorderWidth(const stw_types::sintn osn_Value) const
 {
    this->mpc_Ui->pc_SpinBoxWidth->setValue(osn_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get actual color of line
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get actual color of line
 
    \return  Actual line color
-
-   \created     12.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QColor C_GiSyBoundaryWidget::GetBorderColor(void) const
 {
    return this->mc_BorderColor;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set line color
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set line color
 
    \param[in]  orc_Value   New line color
-
-   \created     12.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyBoundaryWidget::SetBorderColor(const QColor & orc_Value)
 {
    QString c_Style = this->mpc_Ui->pc_BushButtonBorderColor->styleSheet();
@@ -226,29 +195,23 @@ void C_GiSyBoundaryWidget::SetBorderColor(const QColor & orc_Value)
    this->m_UpdatePreview();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   GetInnerlineColor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   GetInnerlineColor
 
    \return  Actual color of inner line
-
-   \created     12.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QColor C_GiSyBoundaryWidget::GetBackgroundColor(void) const
 {
    return this->mc_BackgroundColor;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set inner line color
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set inner line color
 
    \param[in]  orc_Value   New inner line color
-
-   \created     12.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyBoundaryWidget::SetBackgroundColor(const QColor & orc_Value)
 {
    QString c_Style = this->mpc_Ui->pc_BushButtonBackgroundColor->styleSheet();
@@ -261,13 +224,10 @@ void C_GiSyBoundaryWidget::SetBackgroundColor(const QColor & orc_Value)
    m_UpdatePreview();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update of preview click
-
-   \created     17.08.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update of preview click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyBoundaryWidget::m_UpdatePreview(void)
 {
    const QSize c_ViewSize = C_GiSyBaseWidget::h_GetSceneViewSize();
@@ -291,15 +251,12 @@ void C_GiSyBoundaryWidget::m_UpdatePreview(void)
    //lint -e{429}  no memory leak because of the parent of pc_Item, the call of addItem and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Color button
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Color button
 
    Offers the possibility to choose a color for the line
-
-   \created     17.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyBoundaryWidget::m_BorderColorClicked(void)
 {
    QString c_Style = this->mpc_Ui->pc_BushButtonBorderColor->styleSheet();
@@ -322,15 +279,12 @@ void C_GiSyBoundaryWidget::m_BorderColorClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of inner color button
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of inner color button
 
    Offers the possibility to choose a color for the inner line
-
-   \created     17.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyBoundaryWidget::m_BackgroundColorClicked(void)
 {
    QString c_Style = this->mpc_Ui->pc_BushButtonBackgroundColor->styleSheet();
@@ -353,13 +307,10 @@ void C_GiSyBoundaryWidget::m_BackgroundColorClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of spin box changed
-
-   \created     17.08.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of spin box changed
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyBoundaryWidget::m_WidthChanged(void)
 {
    this->m_UpdatePreview();

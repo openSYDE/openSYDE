@@ -1,21 +1,14 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Date and time class
 
    ANSI C++ date and time class.
    For details cf. documentation in .h file.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-200x
-   license     use only under terms of contract / confidential
-
-   created     22.07.2009  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h" //pre-compiled headers
@@ -50,13 +43,10 @@ using namespace stw_scl;
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Constructor
+/*! \brief   Constructor
 
    Init with default values:
     1.1.1900  00:00:00
-
-   \created     04.10.2016  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLDateTime::C_SCLDateTime(void) :
@@ -70,15 +60,12 @@ C_SCLDateTime::C_SCLDateTime(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get current time and date
+/*! \brief   Get current time and date
 
    Return the current time and date
 
    \return
    current time and data
-
-   \created     22.07.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLDateTime C_SCLDateTime::Now(void)
@@ -100,15 +87,12 @@ C_SCLDateTime C_SCLDateTime::Now(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Return object data time as string
+/*! \brief   Return object data time as string
 
    Returns the time in the format "hh:mm:ss".
 
    \return
    time as string
-
-   \created     22.07.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLDateTime::TimeToString(void) const
@@ -120,15 +104,12 @@ C_SCLString C_SCLDateTime::TimeToString(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Return object data date as string
+/*! \brief   Return object data date as string
 
    Returns the date in the format "dd.mm.yyyy".
 
    \return
    date as string
-
-   \created     22.07.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLDateTime::DateToString(void) const
@@ -140,15 +121,12 @@ C_SCLString C_SCLDateTime::DateToString(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Return object data date and time as string
+/*! \brief   Return object data date and time as string
 
    Returns the date and time in the format "dd.mm.yyyy hh:mm:ss".
 
    \return
    date as string
-
-   \created     22.07.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLDateTime::DateTimeToString(void) const

@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Header for C_CAN_DLL class.
@@ -6,19 +6,13 @@
    Header to class implementing an interface to communication driver DLLs in the STW-CAN-DLL
    format.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-200x
-   license     use only under terms of contract / confidential
-
-   created     20.10.2008  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2008 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CCANDLLH
 #define CCANDLLH
 
-/* -- Includes ------------------------------------------------------------ */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <windows.h>
 #include "stwtypes.h"   //!<STW typedefs
 #include "stw_can.h"    //!<STW CAN DLL types
@@ -26,7 +20,7 @@
 namespace stw_can
 {
 
-/* -- Defines ------------------------------------------------------------- */
+/* -- Defines ------------------------------------------------------------------------------------------------------- */
 #ifndef STWCAN_PACKAGE
 #ifdef __BORLANDC__
 //maybe we want this module to be put into a VCL package ...
@@ -36,7 +30,7 @@ namespace stw_can
 #endif
 #endif
 
-/* -- Types --------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 //function pointer types:
 typedef stw_types::sint32 (WINAPI *PR_CAN_INIT)(void);
 typedef stw_types::sint32 (WINAPI *PR_CAN_EXIT)(void);
@@ -93,7 +87,6 @@ typedef stw_types::sint32 (WINAPI * PR_CANext_Get_Num_Supported_Bitrates)
 typedef stw_types::sint32 (WINAPI * PR_CANext_Get_Supported_Bitrate)(const stw_types::uint16 ou16_BitrateIndex,
                                                                      stw_types::uint32 * const opu32_Bitrate);
 
-
 // special functions for stw_tcp.dll:
 typedef stw_types::sint32 (WINAPI * PR_CANtcp_Read_Device_List_From_Server)(const stw_types::uint8 ou8_Channel,
                                                                            stw_types::uint32 * const opu32_NoOfDevices,
@@ -102,11 +95,11 @@ typedef stw_types::sint32 (WINAPI * PR_CANtcp_Get_Device_Name)(const stw_types::
                                                                const stw_types::uint32 ou32_Index,
                                                                stw_types::charn * const opcn_DeviceName);
 
-/* -- Global Variables ---------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Function Prototypes ------------------------------------------------- */
+/* -- Function Prototypes ------------------------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------ */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //lint -sem(stw_can::C_CAN_DLL::m_Init,initializer)
 //lint -sem(stw_can::C_CAN_DLL::m_Exit,cleanup)

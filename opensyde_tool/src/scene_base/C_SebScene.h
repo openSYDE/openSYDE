@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Common graphics scene with basic functionality (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SEBSCENE_H
 #define C_SEBSCENE_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QGraphicsScene>
 #include <QRectF>
 #include <QImage>
@@ -40,12 +34,12 @@
 #include "C_GiBiTextElement.h"
 #include "C_PuiBsTemporaryDataID.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SebScene :
    public QGraphicsScene
@@ -178,6 +172,8 @@ protected:
 
    //Setup style
    virtual bool m_CallSetupStyle(QGraphicsItem * const opc_Item) const;
+   virtual void m_ApplySetupStyleMultiple(const QList<QGraphicsItem *> & orc_SelectedItems,
+                                          const QGraphicsItem * const opc_GuidelineItem) const;
 
    //Unique ID
    stw_types::uint64 m_GetNewUniqueID(const QMap<
@@ -246,7 +242,7 @@ private:
    static const stw_types::float64 mhf64_MovingRange;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

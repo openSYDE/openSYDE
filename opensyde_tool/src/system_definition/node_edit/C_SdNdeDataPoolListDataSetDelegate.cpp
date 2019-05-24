@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Node data pool list data set drawing delegate (implementation)
 
    Node data pool list data set drawing delegate
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     08.02.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -28,36 +21,33 @@
 #include "C_OgeLeTable.h"
 #include "C_OgeWiUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     08.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListDataSetDelegate::C_SdNdeDataPoolListDataSetDelegate(QObject * const opc_Parent) :
    QStyledItemDelegate(opc_Parent),
    mpc_Model(NULL),
@@ -66,9 +56,8 @@ C_SdNdeDataPoolListDataSetDelegate::C_SdNdeDataPoolListDataSetDelegate(QObject *
    connect(this, &C_SdNdeDataPoolListDataSetDelegate::SigStore, this, &C_SdNdeDataPoolListDataSetDelegate::m_Store);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten create editor event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten create editor event slot
 
    Here: Create appropiate editor widget
 
@@ -78,10 +67,8 @@ C_SdNdeDataPoolListDataSetDelegate::C_SdNdeDataPoolListDataSetDelegate(QObject *
 
    \return
    Editor widget
-
-   \created     14.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QWidget * C_SdNdeDataPoolListDataSetDelegate::createEditor(QWidget * const opc_Parent,
                                                            const QStyleOptionViewItem & orc_Option,
                                                            const QModelIndex & orc_Index) const
@@ -115,18 +102,15 @@ QWidget * C_SdNdeDataPoolListDataSetDelegate::createEditor(QWidget * const opc_P
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten set editor data event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten set editor data event slot
 
    Here: Pass relevant data
 
    \param[in,out] opc_Editor Editor widget
    \param[in]     orc_Index  Correlating index
-
-   \created     14.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListDataSetDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex & orc_Index) const
 {
    if ((opc_Editor != NULL) && (orc_Index.isValid() == true))
@@ -157,19 +141,16 @@ void C_SdNdeDataPoolListDataSetDelegate::setEditorData(QWidget * const opc_Edito
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten set model data event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten set model data event slot
 
    Here: Pass relevant data
 
    \param[in,out] opc_Editor Editor widget
    \param[in,out] opc_Model  Model object
    \param[in]     orc_Index  Correlating index
-
-   \created     14.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListDataSetDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel * const opc_Model,
                                                       const QModelIndex & orc_Index) const
 {
@@ -201,38 +182,32 @@ void C_SdNdeDataPoolListDataSetDelegate::setModelData(QWidget * const opc_Editor
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paint item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paint item
 
    Here: special handling for boolean & deactivated cells
 
    \param[in,out] opc_Painter Painter
    \param[in]     orc_Option  Option
    \param[in]     orc_Index   Index
-
-   \created     17.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListDataSetDelegate::paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
                                                const QModelIndex & orc_Index) const
 {
    QStyledItemDelegate::paint(opc_Painter, orc_Option, orc_Index);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set hovered row index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set hovered row index
 
    \param[in] orc_Value New hovered row index
 
    \return
    true  Change
    false No change
-
-   \created     22.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolListDataSetDelegate::SetHoveredCol(const stw_types::sint32 & ors32_Value)
 {
    bool q_Retval;
@@ -249,43 +224,34 @@ bool C_SdNdeDataPoolListDataSetDelegate::SetHoveredCol(const stw_types::sint32 &
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set model for column look up
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set model for column look up
 
    \param[in] opc_Model  Model for column look up
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListDataSetDelegate::SetModel(const C_SdNdeDataPoolListDataSetModel * const opc_Value)
 {
    this->mpc_Model = opc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Store current index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Store current index
 
    \param[in] orc_Index Index
-
-   \created     07.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListDataSetDelegate::m_Store(const QModelIndex & orc_Index)
 {
    this->mc_Edit = orc_Index;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register name change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register name change
 
    \param[in] orc_Text New text
-
-   \created     07.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListDataSetDelegate::m_OnNameChange(const QString & orc_Text) const
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2

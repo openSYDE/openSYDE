@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       resource string handling class
@@ -13,19 +13,13 @@
 
    Loading string tables from file is not implemented yet but can easily be added.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-200x
-   license     use only under terms of contract / confidential
-
-   created     22.07.2009  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CSCLResourceStringsH
 #define CSCLResourceStringsH
 
-/* -- Includes ------------------------------------------------------------ */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <string>
 #include "SCLDynamicArray.h"
@@ -35,7 +29,7 @@
 namespace stw_scl
 {
 
-/* -- Defines ------------------------------------------------------------- */
+/* -- Defines ------------------------------------------------------------------------------------------------------- */
 //maybe this will be a part of a Borland library:
 #ifndef SCL_PACKAGE
 #ifdef __BORLANDC__
@@ -45,7 +39,7 @@ namespace stw_scl
 #endif
 #endif
 
-/* -- Types --------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 ///resource string with index
 class SCL_PACKAGE C_SCLResourceString
@@ -79,15 +73,13 @@ public:
    void SortByIndex(void);
 };
 
-/* -- Global Variables ---------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Function Prototypes ------------------------------------------------- */
+/* -- Function Prototypes ------------------------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------ */
-
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 }
 
 #endif
-
 

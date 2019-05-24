@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       short description (implementation)
 
    detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     07.12.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "constants.h"
@@ -24,52 +17,46 @@
 #include "C_PuiSdHandler.h"
 #include "C_SdNdeSfoResetMessageTableModel.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const sintn C_SdNdeSfoResetMessageTableModel::mhsn_INDEX_STANDARD = 0;
 const sintn C_SdNdeSfoResetMessageTableModel::mhsn_INDEX_EXTENDED = 1;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     07.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeSfoResetMessageTableModel::C_SdNdeSfoResetMessageTableModel(QObject * const opc_Parent) :
    QAbstractTableModel(opc_Parent),
    mu32_NodeIndex(0)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Specify associated node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Specify associated node
 
    \param[in] ou32_NodeIndex Node index
-
-   \created     07.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeSfoResetMessageTableModel::SetIndex(const uint32 ou32_NodeIndex)
 {
    beginResetModel();
@@ -77,9 +64,8 @@ void C_SdNdeSfoResetMessageTableModel::SetIndex(const uint32 ou32_NodeIndex)
    endResetModel();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get header data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get header data
 
    \param[in] osn_Section    Section
    \param[in] oe_Orientation Orientation
@@ -87,10 +73,8 @@ void C_SdNdeSfoResetMessageTableModel::SetIndex(const uint32 ou32_NodeIndex)
 
    \return
    Header string
-
-   \created     07.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_SdNdeSfoResetMessageTableModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
                                                       const sintn osn_Role) const
 {
@@ -164,18 +148,15 @@ QVariant C_SdNdeSfoResetMessageTableModel::headerData(const sintn osn_Section, c
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get table row count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get table row count
 
    \param[in] orc_Parent Parent
 
    \return
    Row count
-
-   \created     07.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SdNdeSfoResetMessageTableModel::rowCount(const QModelIndex & orc_Parent) const
 {
    sintn sn_Retval = 0;
@@ -187,18 +168,15 @@ sintn C_SdNdeSfoResetMessageTableModel::rowCount(const QModelIndex & orc_Parent)
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get table column count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get table column count
 
    \param[in] orc_Parent Parent
 
    \return
    Column count
-
-   \created     07.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SdNdeSfoResetMessageTableModel::columnCount(const QModelIndex & orc_Parent) const
 {
    stw_types::sintn sn_Retval = 0;
@@ -210,19 +188,16 @@ sintn C_SdNdeSfoResetMessageTableModel::columnCount(const QModelIndex & orc_Pare
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data at index
 
    \param[in] orc_Index Index
    \param[in] osn_Role  Data role
 
    \return
    Data
-
-   \created     07.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
 {
    QVariant c_Retval;
@@ -647,9 +622,8 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set data at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set data at index
 
    \param[in] orc_Index Index
    \param[in] orc_Value New data
@@ -658,10 +632,8 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
    \return
    true  success
    false failure
-
-   \created     07.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeSfoResetMessageTableModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value,
                                                const sintn osn_Role)
 {
@@ -758,25 +730,22 @@ bool C_SdNdeSfoResetMessageTableModel::setData(const QModelIndex & orc_Index, co
             C_PuiSdHandler::h_GetInstance()->SetStwFlashloaderSettings(this->mu32_NodeIndex, c_Settings);
 
             //lint -e{1793} Qt example
-            Q_EMIT dataChanged(orc_Index, orc_Index, QVector<stw_types::sintn>() << osn_Role);
+            Q_EMIT this->dataChanged(orc_Index, orc_Index, QVector<stw_types::sintn>() << osn_Role);
          }
       }
    }
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get flags for item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get flags for item
 
    \param[in] orc_Index Item
 
    \return
    Flags for item
-
-   \created     07.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 Qt::ItemFlags C_SdNdeSfoResetMessageTableModel::flags(const QModelIndex & orc_Index) const
 {
    Qt::ItemFlags c_Retval;
@@ -862,18 +831,15 @@ Qt::ItemFlags C_SdNdeSfoResetMessageTableModel::flags(const QModelIndex & orc_In
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Column to enum conversion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Column to enum conversion
 
    \param[in]  ors32_Column Column
 
    \return
    Enum value
-
-   \created     07.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeSfoResetMessageTableModel::E_Columns C_SdNdeSfoResetMessageTableModel::h_ColumnToEnum(const sint32 & ors32_Column)
 {
    C_SdNdeSfoResetMessageTableModel::E_Columns e_Retval;
@@ -920,19 +886,16 @@ C_SdNdeSfoResetMessageTableModel::E_Columns C_SdNdeSfoResetMessageTableModel::h_
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Enum to column conversion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Enum to column conversion
 
    \param[in] ore_Value Enum value
 
    \return
    Column
    -1 Error
-
-   \created     07.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdNdeSfoResetMessageTableModel::h_EnumToColumn(const C_SdNdeSfoResetMessageTableModel::E_Columns & ore_Value)
 {
    sint32 s32_Retval;

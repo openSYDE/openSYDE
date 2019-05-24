@@ -1,60 +1,50 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       SYDEsup integration class for system update sequences (implementation)
 
    This class is made for reimplementing the report methods for better console output.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     29.08.2018  STW/G.Landsgesell
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
 #include "C_SUPSuSequences.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_SYDEsup.h"
+#include "stwerrors.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_scl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor.
-
-   \created     29.08.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor.
 */
-//-----------------------------------------------------------------------------
-C_SUPSuSequences::C_SUPSuSequences()
+//----------------------------------------------------------------------------------------------------------------------
+C_SUPSuSequences::C_SUPSuSequences(void)
 {
    mq_Quiet = false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set quiet parameter.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set quiet parameter.
 
    quiet == true: print to console
    quiet == false: do not print to console
@@ -62,18 +52,15 @@ C_SUPSuSequences::C_SUPSuSequences()
    Log file should always contain everything.
 
    \param[in]     orq_Quiet      true: quiet, false: not quiet
-
-   \created     31.08.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SUPSuSequences::SetQuiet(const bool & orq_Quiet)
 {
    this->mq_Quiet = orq_Quiet;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reports some information about the current sequence
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reports some information about the current sequence
 
    Override method.
    Here: Give information to logging engine.
@@ -95,10 +82,8 @@ void C_SUPSuSequences::SetQuiet(const bool & orq_Quiet)
    Flag for aborting sequence
    - true   abort sequence
    - false  continue sequence
-
-   \created     29.08.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SUPSuSequences::m_ReportProgress(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step,
                                         const sint32 os32_Result, const uint8 ou8_Progress,
                                         const stw_scl::C_SCLString & orc_Information)
@@ -123,9 +108,8 @@ bool C_SUPSuSequences::m_ReportProgress(const stw_opensyde_core::C_OSCSuSequence
    return false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reports some information about the current sequence for a specific server
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reports some information about the current sequence for a specific server
 
    Override method.
    Here: Give information to logging engine.
@@ -142,10 +126,8 @@ bool C_SUPSuSequences::m_ReportProgress(const stw_opensyde_core::C_OSCSuSequence
    Flag for aborting sequence
    - true   abort sequence
    - false  continue sequence
-
-   \created     29.08.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SUPSuSequences::m_ReportProgress(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step,
                                         const sint32 os32_Result, const uint8 ou8_Progress,
                                         const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_Server,
@@ -153,11 +135,9 @@ bool C_SUPSuSequences::m_ReportProgress(const stw_opensyde_core::C_OSCSuSequence
 {
    (void) ou8_Progress; // progress numbers not interesting for console application
    bool q_PrintLine = true;
-   const bool q_Error = m_CheckErrorCase(oe_Step);
 
    // suppress often occurring lines
-   // Step: 74 Result: 0 Progress: * Bus Id: * Node Id: * Info: Information: Sending FLASH request ...
-   if ((static_cast<uint32>(oe_Step) == 74) && (os32_Result == 0))
+   if ((oe_Step == C_OSCSuSequences::eXFL_PROGRESS) && (os32_Result == static_cast<sint32>(stw_errors::C_NO_ERR)))
    {
       if ((orc_Information == "Information: Sending FLASH request ...") ||
           (orc_Information == "Information: <<<CLRALL") ||
@@ -170,6 +150,7 @@ bool C_SUPSuSequences::m_ReportProgress(const stw_opensyde_core::C_OSCSuSequence
 
    if (q_PrintLine == true)
    {
+      const bool q_Error = m_CheckErrorCase(oe_Step);
       C_SCLString c_Text = "";
 
       c_Text += m_GetStepName(oe_Step) + ":  ";
@@ -191,9 +172,8 @@ bool C_SUPSuSequences::m_ReportProgress(const stw_opensyde_core::C_OSCSuSequence
    return false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reports information read from openSYDE server node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reports information read from openSYDE server node
 
    Override method.
    Here: Give information to logging engine.
@@ -202,10 +182,8 @@ bool C_SUPSuSequences::m_ReportProgress(const stw_opensyde_core::C_OSCSuSequence
 
    \param[in]     orc_Info         Information read from node
    \param[in]     ou32_NodeIndex   Index of node within mpc_SystemDefinition
-
-   \created     03.09.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SUPSuSequences::m_ReportOpenSydeFlashloaderInformationRead(
    const stw_opensyde_core::C_OSCSuSequences::C_OsyDeviceInformation & orc_Info, const uint32 ou32_NodeIndex)
 {
@@ -222,9 +200,8 @@ void C_SUPSuSequences::m_ReportOpenSydeFlashloaderInformationRead(
    this->m_WriteLog(c_Message);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reports information read from STW flashloader server node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reports information read from STW flashloader server node
 
    Override method.
    Here: Give information to logging engine.
@@ -233,10 +210,8 @@ void C_SUPSuSequences::m_ReportOpenSydeFlashloaderInformationRead(
 
    \param[in]     orc_Info         Information read from node
    \param[in]     ou32_NodeIndex   Index of node within mpc_SystemDefinition
-
-   \created     03.09.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SUPSuSequences::m_ReportStwFlashloaderInformationRead(
    const stw_opensyde_core::C_OSCSuSequences::C_XflDeviceInformation & orc_Info, const uint32 ou32_NodeIndex)
 {
@@ -253,9 +228,8 @@ void C_SUPSuSequences::m_ReportStwFlashloaderInformationRead(
    this->m_WriteLog(c_Message);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if step belongs to an error case.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if step belongs to an error case.
 
    Check step to differentiate between error and information.
 
@@ -265,10 +239,8 @@ void C_SUPSuSequences::m_ReportStwFlashloaderInformationRead(
    \return
    true: is error
    false: is no error (i.e. information)
-
-   \created     29.08.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SUPSuSequences::m_CheckErrorCase(const C_OSCSuSequences::E_ProgressStep oe_Step) const
 {
    bool q_Return = false;
@@ -276,35 +248,49 @@ bool C_SUPSuSequences::m_CheckErrorCase(const C_OSCSuSequences::E_ProgressStep o
    // Decide if error or info
    switch (oe_Step)
    {
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_REQUEST_PROGRAMMING_ERROR:   // Is an error too
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_ECU_RESET_ERROR:             // Is an error too
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_ENTER_PRE_PROGRAMMING_ERROR: // Is an error too
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERRROR:               // Is an error too
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_SET_SESSION_ERROR:              // Is an error too
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_ECU_RESET_ERROR:                // Is an error too
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_BC_FLASH_ERROR:                 // Is an error too
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_WAKEUP_ERROR:                   // Is an error too
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_ROUTING_ERROR:                      // Is an error too
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_SET_SESSION_ERROR:                  // Is an error too
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_DEVICE_NAME_ERROR:                  // Is an error too
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_SECURITY_ERROR:        // Is an error too
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_ERROR:                 // Is an error too
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR:             // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_ERROR:                   // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_SIGNATURE_ERROR:              // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_COMM_ERROR:     // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_FILE_ERROR:     // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_MATCH_ERROR:    // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_SESSION_ERROR:       // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_FILE_ERROR:          // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_NAME_NOT_READABLE:    // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_ERROR:                // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_ERASE_ERRROR:      // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_ERROR:    // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_ERROR:        // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_ERRROR:        // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_ERROR:        // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_ERROR:            // Is an error too
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_REQUEST_PROGRAMMING_ERROR:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_ECU_RESET_ERROR:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_ECU_RESET_ERROR:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_ENTER_PRE_PROGRAMMING_ERROR:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_BC_FLASH_ERROR:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERROR:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_SET_SESSION_ERROR:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_WAKEUP_ERROR:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_ROUTING_ERROR:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_RECONNECT_ERROR:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_SET_SESSION_ERROR:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_DEVICE_NAME_ERROR:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_SECURITY_ERROR:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_ERROR:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_WAKEUP_ERROR:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_READING_INFORMATION_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_SIGNATURE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_RECONNECT_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_COMM_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_FILE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_MATCH_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_SESSION_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_FILE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_NOT_OK:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_NAME_NOT_READABLE:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_ERASE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_RECONNECT_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_READ_FEATURE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_SESSION_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_MAX_SIZE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_ERROR:
+   case C_OSCSuSequences::eRESET_SYSTEM_OSY_NODE_ERROR:
       q_Return = true;
       break;
    default:
@@ -314,18 +300,15 @@ bool C_SUPSuSequences::m_CheckErrorCase(const C_OSCSuSequences::E_ProgressStep o
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the name of the current step
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the name of the current step
 
    \param[in]     oe_Step         Step of node configuration
 
    \return
    Name of the specific step
-
-   \created     19.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SUPSuSequences::m_GetStepName(const E_ProgressStep oe_Step) const
 {
    C_SCLString c_Text;
@@ -362,7 +345,7 @@ C_SCLString C_SUPSuSequences::m_GetStepName(const E_ProgressStep oe_Step) const
    case eACTIVATE_FLASHLOADER_OSY_XFL_BC_PING_START:
       c_Text = "Activate Flashloader - Ping devices start";
       break;
-   case eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERRROR:
+   case eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERROR:
       c_Text = "Activate Flashloader - Reconnect error";
       break;
    case eACTIVATE_FLASHLOADER_OSY_SET_SESSION_ERROR:
@@ -383,7 +366,7 @@ C_SCLString C_SUPSuSequences::m_GetStepName(const E_ProgressStep oe_Step) const
    case eREAD_DEVICE_INFO_START:
       c_Text = "Read Device Information - Start";
       break;
-   case eREAD_DEVICE_INFO_OSY_RECONNECT_ERRROR:
+   case eREAD_DEVICE_INFO_OSY_RECONNECT_ERROR:
       c_Text = "Read Device Information - Error on reconnecting";
       break;
    case eREAD_DEVICE_INFO_OSY_SET_SESSION_START:
@@ -498,7 +481,7 @@ C_SCLString C_SUPSuSequences::m_GetStepName(const E_ProgressStep oe_Step) const
    case eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_START:
       c_Text = "Update System - Node flash area of HEX file start";
       break;
-   case eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_ERASE_ERRROR:
+   case eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_ERASE_ERROR:
       c_Text = "Update System - Node flash area of HEX file erase error";
       break;
    case eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_START:
@@ -525,7 +508,7 @@ C_SCLString C_SUPSuSequences::m_GetStepName(const E_ProgressStep oe_Step) const
    case eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_START:
       c_Text = "Update System - Preparation of Node flash area of file system file start";
       break;
-   case eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_ERRROR:
+   case eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_ERROR:
       c_Text = "Update System - Preparation of Node flash area of file system file erase error";
       break;
    case eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_START:
@@ -542,6 +525,42 @@ C_SCLString C_SUPSuSequences::m_GetStepName(const E_ProgressStep oe_Step) const
       break;
    case eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_FINISHED:
       c_Text = "Update System - Node flash of file system file finished";
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_START:
+      c_Text = "Update System - Node NVM write start";
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_RECONNECT_ERROR:
+      c_Text = "Update System - Node NVM write reconnect to server error";
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_READ_FEATURE_ERROR:
+      c_Text = "Update System - Node NVM write read of available features error";
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR:
+      c_Text = "Update System - Node NVM write available feature error";
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_SESSION_ERROR:
+      c_Text = "Update System - Node NVM write session error";
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_MAX_SIZE_ERROR:
+      c_Text = "Update System - Node NVM write read back of maximum block length error";
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_START:
+      c_Text = "Update System - Node NVM write read back of parameter set image file start";
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_ERROR:
+      c_Text = "Update System - Node NVM write read back of parameter set image file error";
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_START:
+      c_Text = "Update System - Node NVM write write of parameter set image file start";
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_ERROR:
+      c_Text = "Update System - Node NVM write write of parameter set image file error";
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FILE_FINISHED:
+      c_Text = "Update System - Node NVM write of parameter set image file finished";
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FINISHED:
+      c_Text = "Update System - Node NVM write of parameter set image files finished";
       break;
    case eUPDATE_SYSTEM_ABORTED:
       c_Text = "Update System - Aborted";
@@ -581,19 +600,16 @@ C_SCLString C_SUPSuSequences::m_GetStepName(const E_ProgressStep oe_Step) const
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Write to log file and print to console.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Write to log file and print to console.
 
    Write detailed information with logging engine to log file but
    only print concise details to console.
 
    \param[in]     orc_Text        Information text
    \param[in]     orq_Error       True: log as error; false: log as information
-
-   \created     31.08.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SUPSuSequences::m_WriteLog(const C_SCLString & orc_Text, const bool & orq_IsError) const
 {
    C_SYDEsup::h_WriteLog("Report Progress", orc_Text, orq_IsError, mq_Quiet);

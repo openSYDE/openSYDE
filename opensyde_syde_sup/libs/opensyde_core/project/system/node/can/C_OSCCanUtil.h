@@ -1,32 +1,26 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Utility class for CAN specific operations (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     12.09.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCCANUTIL_H
 #define C_OSCCANUTIL_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_OSCNodeDataPoolContent.h"
 #include "C_OSCCanSignal.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCCanUtil
 {
@@ -43,9 +37,13 @@ public:
    static void h_GetSignalValue(const stw_types::uint8(&orau8_CanDb)[8],
                                 const stw_opensyde_core::C_OSCCanSignal & orc_Signal,
                                 C_OSCNodeDataPoolContent & orc_Value);
+
+   static void h_SetSignalValue(stw_types::uint8(&orau8_CanDb)[8],
+                                const stw_opensyde_core::C_OSCCanSignal & orc_Signal,
+                                const C_OSCNodeDataPoolContent &orc_Value);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

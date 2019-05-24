@@ -1,24 +1,16 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for title, about and help elements
  (implementation)
 
    Widget for title, about and help elements
 
-
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     15.11.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPixmap>
@@ -42,7 +34,7 @@
 
 #include "ui_C_CamTitleBarWidget.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
@@ -50,32 +42,29 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 //C_GtGetText does not work here (executed before main)
 const QString C_CamTitleBarWidget::mhc_FILTER = QString("openSYDE Parameter Set File (*%1)").arg(".syde_cam");
 const QString C_CamTitleBarWidget::mhc_NORECENTPROJECT = "No recent project found. Click here to browse.";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     15.11.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamTitleBarWidget::C_CamTitleBarWidget(QWidget * const opc_Parent) :
    C_OgeWiOnlyBackground(opc_Parent),
    mpc_Ui(new Ui::C_CamTitleBarWidget),
@@ -135,26 +124,20 @@ C_CamTitleBarWidget::C_CamTitleBarWidget(QWidget * const opc_Parent) :
    connect(this->mpc_Ui->pc_ToolButtonLoad, &QToolButton::clicked, this, &C_CamTitleBarWidget::m_OnOpenProjectClicked);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     15.11.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamTitleBarWidget::~C_CamTitleBarWidget()
 {
    delete this->mpc_Ui;
    delete this->mpc_Menu;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     23.11.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_PushButtonAbout->setText(C_GtGetText::h_GetText("About"));
@@ -181,16 +164,13 @@ void C_CamTitleBarWidget::InitStaticNames(void) const
                                                                "Choose name and location to save the project."));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update recent projects menu and window title.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update recent projects menu and window title.
 
    Clear recent projects menu and add all known recent projects again.
    Furthermore set window title to new opened project
-
-   \created     18.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::UpdateRecentProjectsAndWindowTitle(void)
 {
    QString c_NewTitle;
@@ -225,17 +205,14 @@ void C_CamTitleBarWidget::UpdateRecentProjectsAndWindowTitle(void)
    Q_EMIT (this->windowTitleChanged(c_NewTitle));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle project comparison
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle project comparison
 
    \return
    True  Continue
    False Abort
-
-   \created     26.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_CamTitleBarWidget::HandleProjectComparison(void)
 {
    bool q_Continue = true;
@@ -269,13 +246,10 @@ bool C_CamTitleBarWidget::HandleProjectComparison(void)
    return q_Continue;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle save configuration action
-
-   \created     26.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle save configuration action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::SaveConfig(void)
 {
    const QString c_FilePath = C_CamProHandler::h_GetInstance()->GetCurrentFilePath();
@@ -291,13 +265,10 @@ void C_CamTitleBarWidget::SaveConfig(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle save configuration as action
-
-   \created     26.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle save configuration as action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::SaveAsConfig(void)
 {
    QString c_PreviousDir = C_CamProHandler::h_GetInstance()->GetCurrentProjDir();
@@ -322,18 +293,15 @@ void C_CamTitleBarWidget::SaveAsConfig(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle load configuration action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle load configuration action
 
    \param[in]  orc_FilePath   path of project file to load
 
    \return
    see C_CamProHandler::LoadFromFile for return values
-
-   \created     26.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamTitleBarWidget::LoadConfig(const QString & orc_FilePath)
 {
    sint32 s32_Return;
@@ -364,13 +332,10 @@ sint32 C_CamTitleBarWidget::LoadConfig(const QString & orc_FilePath)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show about screen
-
-   \created     02.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show about screen
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::m_ShowAbout(void)
 {
    QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
@@ -388,26 +353,20 @@ void C_CamTitleBarWidget::m_ShowAbout(void)
    //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger help
-
-   \created     04.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger help
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::m_TriggerHelp(void)
 {
    //lint -e{10,48,64,746,1013,1055} Will be defined via moc compiler, PC lint unable to handle this construct
    stw_opensyde_gui_logic::C_HeHandler::GetInstance().CallSpecificHelpPage(this->metaObject()->className());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle new configuration action
-
-   \created     26.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle new configuration action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::m_NewConfig(void)
 {
    if (HandleProjectComparison())
@@ -425,15 +384,12 @@ void C_CamTitleBarWidget::m_NewConfig(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle save to file action with valid file path
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle save to file action with valid file path
 
    \param[in] orc_File Selected file path
-
-   \created     27.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::m_DoSaveToFileAction(const QString & orc_File)
 {
    sint32 s32_Return;
@@ -462,15 +418,12 @@ void C_CamTitleBarWidget::m_DoSaveToFileAction(const QString & orc_File)
    this->UpdateRecentProjectsAndWindowTitle();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of open project button.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of open project button.
 
    Do unsaved changes check, open file dialog and trigger load.
-
-   \created     18.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::m_OnOpenProjectClicked(void)
 {
    if (HandleProjectComparison() == true)
@@ -494,15 +447,12 @@ void C_CamTitleBarWidget::m_OnOpenProjectClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of action triggered in recent-projects-menu.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of action triggered in recent-projects-menu.
 
    \param[in]     opc_Action         selected action in menu
-
-   \created     18.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::m_OnRecentProjectSelected(const QAction * const opc_Action)
 {
    const QString c_Path = opc_Action->text(); // remember path before project comparison
@@ -527,9 +477,8 @@ void C_CamTitleBarWidget::m_OnRecentProjectSelected(const QAction * const opc_Ac
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Remap database paths to new location.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remap database paths to new location.
 
    Following convention is used:
    prior path was        relative                               absolute
@@ -541,10 +490,8 @@ void C_CamTitleBarWidget::m_OnRecentProjectSelected(const QAction * const opc_Ac
    make new path        relative          absolute             absolute
 
    \param[in]  orc_NewFileName   new save as path
-
-   \created     12.02.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::m_RemapOnSaveAs(const QString & orc_NewFileName) const
 {
    // iterate over all databases
@@ -567,28 +514,22 @@ void C_CamTitleBarWidget::m_RemapOnSaveAs(const QString & orc_NewFileName) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Change color of left side of tool button on menu show.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Change color of left side of tool button on menu show.
 
    We need a style sheet property here, because only the menu button can have an own ":open" style;
    the rest of the button ignores this flag and uses pressed color.
-
-   \created     01.02.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::m_OnAboutToShow(void) const
 {
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_ToolButtonLoad, "MenuOpen", true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Change color of left side of tool button on menu hide.
-
-   \created     01.02.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Change color of left side of tool button on menu hide.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::m_OnAboutToHide(void) const
 {
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_ToolButtonLoad, "MenuOpen", false);

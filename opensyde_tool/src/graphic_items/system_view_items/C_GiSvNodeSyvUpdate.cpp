@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Offers system view update specific visualization and functionality of a node. (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.06.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QFileInfo>
@@ -34,7 +27,7 @@
 #include "TGLUtils.h"
 #include "C_ImpUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
@@ -42,21 +35,20 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -66,10 +58,8 @@ using namespace stw_opensyde_gui_elements;
    \param[in]       orf64_Width          Width of node
    \param[in]       orf64_Height         Height of node
    \param[in,out]   opc_Parent           Optional pointer to parent
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvNodeSyvUpdate::C_GiSvNodeSyvUpdate(const uint32 ou32_ViewIndex, const sint32 & ors32_NodeIndex,
                                          const uint64 & oru64_ID, const float64 & orf64_Width,
                                          const float64 & orf64_Height, QGraphicsItem * const opc_Parent) :
@@ -80,6 +70,8 @@ C_GiSvNodeSyvUpdate::C_GiSvNodeSyvUpdate(const uint32 ou32_ViewIndex, const sint
    me_InitialStatus(C_SyvUtil::eI_UNKNOWN),
    me_UpdateStatus(eU_UNKNOWN),
    mq_UpdateFailed(false),
+   mq_UpdateSuccess(false),
+   mq_ValidStatus(false),
    mu32_FailedApplicationIndex(0),
    mpc_STWDevice(NULL),
    mpc_OSYDevice(NULL),
@@ -91,15 +83,12 @@ C_GiSvNodeSyvUpdate::C_GiSvNodeSyvUpdate(const uint32 ou32_ViewIndex, const sint
    CheckThirdParty();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvNodeSyvUpdate::~C_GiSvNodeSyvUpdate()
 {
    if (this->mpc_IconTopLeft != NULL)
@@ -124,45 +113,30 @@ C_GiSvNodeSyvUpdate::~C_GiSvNodeSyvUpdate()
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the node connected state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the node connected state
 
    \param[in]     oq_Connected   Flag if connected or not
-
-   \created     27.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvUpdate::SetViewConnected(const bool oq_Connected)
 {
    C_GiSvNodeSyvBase::SetViewConnected(oq_Connected);
-   if ((oq_Connected == true) && (this->me_InitialStatus == C_SyvUtil::eI_UPDATE_DISABLED))
-   {
-      this->mpc_IconBottom->setVisible(true);
-      m_UpdateIcons();
-   }
+   UpdateIcons();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set connection change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set connection change
 
    \param[in] oq_Active Flag if connected
-
-   \created     13.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvUpdate::SetConnected(const bool oq_Active)
 {
    if (this->mq_ViewConnected == true)
    {
       this->mq_UpdateConnected = oq_Active;
-      this->mpc_IconTopLeft->setVisible(oq_Active);
       CheckThirdParty();
-      if (this->me_InitialStatus == C_SyvUtil::eI_UPDATE_DISABLED)
-      {
-         this->mpc_IconBottom->setVisible(true);
-      }
       //Reset status
       if (oq_Active == false)
       {
@@ -175,6 +149,9 @@ void C_GiSvNodeSyvUpdate::SetConnected(const bool oq_Active)
             this->me_UpdateStatus = eU_UNKNOWN;
          }
          //Discard info
+         this->mc_HexFileInfos.clear();
+         this->mc_HexAppInfoAmiguous.clear();
+         this->mc_ParamFileInfos.clear();
          this->mc_FileInfos.clear();
          if (this->mpc_STWDevice != NULL)
          {
@@ -187,30 +164,30 @@ void C_GiSvNodeSyvUpdate::SetConnected(const bool oq_Active)
             this->mpc_OSYDevice = NULL;
          }
       }
-      m_UpdateIcons();
+      UpdateIcons();
+      //Always reset known status information flag
+      this->mq_ValidStatus = false;
+      this->mq_UpdateSuccess = false;
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal if update in progress
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal if update in progress
 
    \param[in] oq_Active Flag if update in progress
-
-   \created     13.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvUpdate::SetUpdating(const bool oq_Active)
 {
    if (this->mq_ViewConnected == true)
    {
       this->mq_UpdateInProgress = oq_Active;
-      if ((this->me_InitialStatus != C_SyvUtil::eI_UPDATE_DISABLED) &&
+      if ((this->m_CheckAlwaysUpdate()) &&
           (this->me_InitialStatus != C_SyvUtil::eI_NO_RESPONSE))
       {
          //Update status
          if ((this->me_UpdateStatus == eU_UPDATE_SUCCESS) &&
-             (this->me_InitialStatus != C_SyvUtil::eI_NO_INFO_SUPPORTED))
+             (this->m_CheckAlwaysUpdate() == false))
          {
             //Set last updated node to success
             if (oq_Active == false)
@@ -219,21 +196,15 @@ void C_GiSvNodeSyvUpdate::SetUpdating(const bool oq_Active)
             }
             this->me_UpdateStatus = eU_UP_TO_DATE;
             //Update dialog if necessary
-            if (this->mpc_InfoDialog != NULL)
-            {
-               this->mpc_InfoDialog->SetStatus(this->me_InitialStatus, &this->mc_FileInfos, this->mpc_STWDevice,
-                                               this->mpc_OSYDevice);
-            }
+            this->m_RefreshDialog();
          }
-         this->mpc_IconBottom->setVisible(oq_Active);
       }
-      m_UpdateIcons();
+      UpdateIcons();
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set update waiting state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set update waiting state
 
    False: Waiting
    True: In progress
@@ -242,16 +213,15 @@ void C_GiSvNodeSyvUpdate::SetUpdating(const bool oq_Active)
    \param[in] oq_Active                   Flag if update in progress
    \param[in] oq_Aborted                  Flag if action was aborted
    \param[in] ou32_FailedApplicationIndex If aborted and currently updating this is the currently updated application
-
-   \created     13.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvUpdate::SetNodeUpdateInProgress(const bool oq_Active, const bool oq_Aborted,
                                                   const uint32 ou32_FailedApplicationIndex)
 {
    if (oq_Active == true)
    {
       this->mq_UpdateFailed = false;
+      this->mq_UpdateSuccess = false;
       this->me_UpdateStatus = eU_UPDATING;
    }
    else
@@ -262,7 +232,8 @@ void C_GiSvNodeSyvUpdate::SetNodeUpdateInProgress(const bool oq_Active, const bo
          this->me_UpdateStatus = eU_WAITING;
          break;
       case eU_UPDATING:
-         if (this->me_InitialStatus != C_SyvUtil::eI_NO_INFO_SUPPORTED)
+         this->mq_UpdateSuccess = true;
+         if (this->m_CheckAlwaysUpdate() == false)
          {
             //If user aborted we assume the application has to be updated, else the application should be finished
             if (oq_Aborted == false)
@@ -270,11 +241,7 @@ void C_GiSvNodeSyvUpdate::SetNodeUpdateInProgress(const bool oq_Active, const bo
                this->me_InitialStatus = C_SyvUtil::eI_APPLICATION_MATCH;
                this->me_UpdateStatus = eU_UPDATE_SUCCESS;
                //Update dialog if necessary
-               if (this->mpc_InfoDialog != NULL)
-               {
-                  this->mpc_InfoDialog->SetStatus(this->me_InitialStatus, &this->mc_FileInfos, this->mpc_STWDevice,
-                                                  this->mpc_OSYDevice);
-               }
+               this->m_RefreshDialog();
             }
             else
             {
@@ -288,6 +255,8 @@ void C_GiSvNodeSyvUpdate::SetNodeUpdateInProgress(const bool oq_Active, const bo
          {
             //For file based devices we never change the status
             this->me_UpdateStatus = eU_UNKNOWN;
+            //Update dialog if necessary
+            this->m_RefreshDialog();
          }
          break;
       default:
@@ -295,16 +264,13 @@ void C_GiSvNodeSyvUpdate::SetNodeUpdateInProgress(const bool oq_Active, const bo
          break;
       }
    }
-   m_UpdateIcons();
+   UpdateIcons();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check third party node
-
-   \created     12.02.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check third party node
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvUpdate::CheckThirdParty(void)
 {
    if (this->ms32_Index >= 0)
@@ -313,75 +279,65 @@ void C_GiSvNodeSyvUpdate::CheckThirdParty(void)
          C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(static_cast<uint32>(this->ms32_Index));
       if (pc_Node != NULL)
       {
-         if (pc_Node->c_Applications.size() == 0)
+         const C_OSCDeviceDefinition * const pc_Device = pc_Node->pc_DeviceDefinition;
+         tgl_assert(pc_Device != NULL);
+         if (pc_Device != NULL)
          {
-            this->me_InitialStatus = C_SyvUtil::eI_UPDATE_DISABLED;
-            this->me_UpdateStatus = eU_UPDATE_DISABLED;
-         }
-         else
-         {
-            const C_OSCDeviceDefinition * const pc_Device = pc_Node->pc_DeviceDefinition;
-            tgl_assert(pc_Device != NULL);
-            if (pc_Device != NULL)
+            if (((pc_Device->q_FlashloaderStwCan == false) && (pc_Device->q_FlashloaderOpenSydeCan == false)) &&
+                (pc_Device->q_FlashloaderOpenSydeEthernet == false))
             {
-               if (((pc_Device->q_FlashloaderStwCan == false) && (pc_Device->q_FlashloaderOpenSydeCan == false)) &&
-                   (pc_Device->q_FlashloaderOpenSydeEthernet == false))
-               {
-                  this->me_InitialStatus = C_SyvUtil::eI_UPDATE_DISABLED;
-                  this->me_UpdateStatus = eU_UPDATE_DISABLED;
-               }
-               else
-               {
-                  //Check file based
-                  if (pc_Device->q_FlashloaderOpenSydeIsFileBased == true)
-                  {
-                     this->me_InitialStatus = C_SyvUtil::eI_NO_INFO_SUPPORTED;
-                  }
-               }
+               this->me_InitialStatus = C_SyvUtil::eI_UPDATE_DISABLED;
+               this->me_UpdateStatus = eU_UPDATE_DISABLED;
+            }
+            //Check if update is necessary
+            else if ((pc_Node->c_Applications.size() > 0) ||
+                     (this->m_CheckAlwaysUpdate() == true))
+            {
+               this->me_InitialStatus = C_SyvUtil::eI_TO_BE_UPDATED;
+            }
+            else
+            {
+               this->me_InitialStatus = C_SyvUtil::eI_UPDATE_DISABLED;
+               this->me_UpdateStatus = eU_UPDATE_DISABLED;
             }
          }
       }
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply no response state
-
-   \created     12.02.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply no response state
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvUpdate::SetNoResponse(void)
 {
+   //Validate current status
+   this->mq_ValidStatus = true;
    this->me_InitialStatus = C_SyvUtil::eI_NO_RESPONSE;
-   this->mpc_IconBottom->setVisible(true);
-   m_UpdateIcons();
+   UpdateIcons();
+   //Update dialog if necessary
+   this->m_RefreshDialog();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show info
-
-   \created     19.02.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show info
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvUpdate::ShowInfo(void)
 {
    //Open if active in view, valid node index, updateable, connected in update screen, and not while updating
-   if (((((this->mq_ViewConnected == true) && (this->ms32_Index >= 0)) &&
-         (this->me_InitialStatus != C_SyvUtil::eI_UPDATE_DISABLED)) &&
+   if ((((((this->mq_ViewConnected == true) && (this->ms32_Index >= 0)) &&
+          (this->m_CheckUpdateDisabledState() == false)) &&
+         (this->IsStwDevice())) &&
         (this->mq_UpdateConnected == true)) && (this->mq_UpdateInProgress == false))
    {
       QGraphicsView * const pc_View = this->scene()->views().at(0);
       QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View, pc_View);
       this->mpc_InfoDialog = new C_SyvUpNodePropertiesDialog(*c_New, static_cast<uint32>(this->ms32_Index),
                                                              this->mq_UpdateFailed, this->mu32_FailedApplicationIndex);
-
-      this->mpc_InfoDialog->SetStatus(this->me_InitialStatus, &this->mc_FileInfos, this->mpc_STWDevice,
-                                      this->mpc_OSYDevice);
-
+      this->m_RefreshDialog();
       //Resize
-      c_New->SetSize(QSize(1000, 795));
+      c_New->SetSize(QSize(1000, 820));
 
       if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
       {
@@ -390,11 +346,11 @@ void C_GiSvNodeSyvUpdate::ShowInfo(void)
 
       //Signal
       //Check if valid infos
-      if (this->mc_FileInfos.size() > 0UL)
+      if (this->mc_HexFileInfos.size() > 0UL)
       {
          if (this->mpc_InfoDialog->GetDiscardedStatus() == true)
          {
-            Q_EMIT this->SigDiscardInfo(static_cast<uint32>(this->ms32_Index));
+            Q_EMIT (this->SigDiscardInfo(static_cast<uint32>(this->ms32_Index)));
          }
       }
 
@@ -403,8 +359,14 @@ void C_GiSvNodeSyvUpdate::ShowInfo(void)
       this->mpc_STWDevice = this->mpc_InfoDialog->GetSTWDevice();
       this->mpc_OSYDevice = this->mpc_InfoDialog->GetOSYDevice();
 
+      //Update update status as this is the one used for the current displayed state
+      if (this->me_InitialStatus == C_SyvUtil::eI_TO_BE_UPDATED)
+      {
+         this->me_UpdateStatus = eU_WAITING;
+      }
+
       //Trigger icon update if necessary
-      m_UpdateIcons();
+      UpdateIcons();
 
       this->mpc_InfoDialog = NULL;
       if (c_New != NULL)
@@ -414,21 +376,24 @@ void C_GiSvNodeSyvUpdate::ShowInfo(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update package status
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update package status
 
    \param[in] orc_DeviceApplicationInfos Device application information
-
-   \created     12.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvUpdate::UpdateInitialPackageStatus(const C_SyvUpDeviceInfo & orc_DeviceApplicationInfos)
 {
-   if (this->me_InitialStatus != C_SyvUtil::eI_UPDATE_DISABLED)
+   //Validate current status
+   this->mq_ValidStatus = true;
+   if (this->m_CheckUpdateDisabledState() == false)
 
    {
+      const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
       //Clean up current info
+      this->mc_HexFileInfos.clear();
+      this->mc_HexAppInfoAmiguous.clear();
+      this->mc_ParamFileInfos.clear();
       this->mc_FileInfos.clear();
       if (this->mpc_STWDevice != NULL)
       {
@@ -456,23 +421,27 @@ void C_GiSvNodeSyvUpdate::UpdateInitialPackageStatus(const C_SyvUpDeviceInfo & o
       {
          //Unexpected
       }
-      if (this->me_InitialStatus != C_SyvUtil::eI_NO_INFO_SUPPORTED)
+
+      this->me_InitialStatus = C_SyvUtil::eI_UNKNOWN;
+      if ((pc_View != NULL) && (this->ms32_Index >= 0))
       {
-         const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+         const C_OSCNode * const pc_Node =
+            C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(static_cast<uint32>(this->ms32_Index));
+         const C_PuiSvNodeUpdate * const pc_UpdateInformation =
+            pc_View->GetNodeUpdateInformation(static_cast<uint32>(this->ms32_Index));
+         if (((pc_UpdateInformation != NULL) && (pc_Node != NULL)) &&
+             (pc_Node->c_Applications.size() ==
+              pc_UpdateInformation->GetPaths(C_PuiSvNodeUpdate::eFTP_DATA_BLOCK).size()))
 
-         this->me_InitialStatus = C_SyvUtil::eI_UNKNOWN;
-         if ((pc_View != NULL) && (this->ms32_Index >= 0))
          {
-            const C_OSCNode * const pc_Node =
-               C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(static_cast<uint32>(this->ms32_Index));
-            const C_PuiSvNodeUpdate * const pc_UpdateInformation =
-               pc_View->GetNodeUpdateInformation(static_cast<uint32>(this->ms32_Index));
-            if (((pc_UpdateInformation != NULL) && (pc_Node != NULL)) &&
-                (pc_Node->c_Applications.size() == pc_UpdateInformation->GetApplicationPaths().size()))
-
+            const std::vector<C_PuiSvNodeUpdateParamInfo> & rc_ParamInfo = pc_UpdateInformation->GetParamInfos();
+            const std::vector<QString> & rc_Files =
+               pc_UpdateInformation->GetPaths(C_PuiSvNodeUpdate::eFTP_FILE_BASED);
+            if (pc_Node->pc_DeviceDefinition->q_FlashloaderOpenSydeIsFileBased == false)
             {
                std::vector<QString> c_FinalApplicationPaths;
-               const std::vector<QString> & rc_ApplicationPaths = pc_UpdateInformation->GetApplicationPaths();
+               const std::vector<QString> & rc_ApplicationPaths = pc_UpdateInformation->GetPaths(
+                  C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
                c_FinalApplicationPaths.reserve(pc_Node->c_Applications.size());
                //Parse all application paths
                for (uint32 u32_ItApplication = 0; u32_ItApplication < rc_ApplicationPaths.size(); ++u32_ItApplication)
@@ -493,7 +462,8 @@ void C_GiSvNodeSyvUpdate::UpdateInitialPackageStatus(const C_SyvUpDeviceInfo & o
                }
 
                //Read all applications
-               this->mc_FileInfos.reserve(pc_Node->c_Applications.size());
+               this->mc_HexFileInfos.reserve(pc_Node->c_Applications.size());
+               this->mc_HexAppInfoAmiguous.reserve(pc_Node->c_Applications.size());
                for (uint32 u32_ItFile = 0; u32_ItFile < pc_Node->c_Applications.size(); ++u32_ItFile)
                {
                   const QString & rc_ApplicationPath = c_FinalApplicationPaths[u32_ItFile];
@@ -516,9 +486,12 @@ void C_GiSvNodeSyvUpdate::UpdateInitialPackageStatus(const C_SyvUpDeviceInfo & o
                   if (u32_Result == stw_hex_file::NO_ERR)
                   {
                      stw_diag_lib::C_XFLECUInformation c_FileApplicationInfo;
-                     if (c_HexFile.ScanApplicationInformationBlockFromHexFile(c_FileApplicationInfo) == C_NO_ERR)
+                     const sint32 s32_Result = c_HexFile.ScanApplicationInformationBlockFromHexFile(
+                        c_FileApplicationInfo);
+                     if ((s32_Result == C_NO_ERR) || (s32_Result == C_WARN))
                      {
-                        this->mc_FileInfos.push_back(c_FileApplicationInfo);
+                        this->mc_HexFileInfos.push_back(c_FileApplicationInfo);
+                        this->mc_HexAppInfoAmiguous.push_back(s32_Result == C_WARN);
                      }
                   }
                   else
@@ -529,57 +502,95 @@ void C_GiSvNodeSyvUpdate::UpdateInitialPackageStatus(const C_SyvUpDeviceInfo & o
                      osc_write_log_error("Preparing Flashloader Information", c_Text);
                   }
                }
+            }
 
-               if ((pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_OPEN_SYDE) &&
-                   (orc_DeviceApplicationInfos.pc_OSYDevice != NULL))
+            //Handle param files
+            this->mc_ParamFileInfos.reserve(rc_ParamInfo.size());
+            for (uint32 u32_ItParamFile = 0; u32_ItParamFile < rc_ParamInfo.size(); ++u32_ItParamFile)
+            {
+               const C_PuiSvNodeUpdateParamInfo & rc_CurParamInfo = rc_ParamInfo[u32_ItParamFile];
+               this->mc_ParamFileInfos.push_back(rc_CurParamInfo.GetPath());
+            }
+
+            //Handle files
+            this->mc_FileInfos.reserve(rc_Files.size());
+            for (uint32 u32_ItFile = 0; u32_ItFile < rc_Files.size(); ++u32_ItFile)
+            {
+               this->mc_FileInfos.push_back(rc_Files[u32_ItFile]);
+            }
+
+            if ((pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_OPEN_SYDE) &&
+                (orc_DeviceApplicationInfos.pc_OSYDevice != NULL))
+            {
+               //Always update if there is at least one parameter file
+               if (this->m_CheckAlwaysUpdate())
+               {
+                  this->me_InitialStatus = C_SyvUtil::eI_TO_BE_UPDATED;
+                  this->me_UpdateStatus = eU_WAITING;
+               }
+               else
                {
                   bool q_AllApplicationsMatch = true;
-                  for (uint32 u32_ItFile = 0; u32_ItFile < this->mc_FileInfos.size(); ++u32_ItFile)
+                  for (uint32 u32_ItFile = 0; u32_ItFile < this->mc_HexFileInfos.size(); ++u32_ItFile)
                   {
                      bool q_Found = false;
-                     const stw_diag_lib::C_XFLECUInformation & rc_FileInfo = this->mc_FileInfos[u32_ItFile];
-                     //Skip first application because this is the flashloader (OSY ONLY!)
-                     for (uint32 u32_ItApplication = 1;
-                          u32_ItApplication < orc_DeviceApplicationInfos.pc_OSYDevice->c_Applications.size();
-                          ++u32_ItApplication)
+
+                     // only search if application information is not ambiguous
+                     if (this->mc_HexAppInfoAmiguous[u32_ItFile] == false)
                      {
-                        const C_OSCProtocolDriverOsy::C_FlashBlockInfo & rc_OsyDeviceInfo =
-                           orc_DeviceApplicationInfos.pc_OSYDevice->c_Applications[u32_ItApplication];
-                        //Search for match
-                        if (((rc_OsyDeviceInfo.c_ApplicationName == rc_FileInfo.acn_ProjectName) &&
-                             (rc_OsyDeviceInfo.c_ApplicationVersion == rc_FileInfo.acn_ProjectVersion)) &&
-                            ((rc_OsyDeviceInfo.c_BuildDate + rc_OsyDeviceInfo.c_BuildTime) ==
-                             (QString(rc_FileInfo.acn_Date) + rc_FileInfo.acn_Time).toStdString().c_str()))
+                        const stw_diag_lib::C_XFLECUInformation & rc_FileInfo = this->mc_HexFileInfos[u32_ItFile];
+
+                        //Skip first application because this is the flashloader (OSY ONLY!)
+                        for (uint32 u32_ItApplication = 1;
+                             u32_ItApplication < orc_DeviceApplicationInfos.pc_OSYDevice->c_Applications.size();
+                             ++u32_ItApplication)
                         {
-                           if (rc_OsyDeviceInfo.u8_SignatureValid == 0U) //0 == valid
+                           const C_OSCProtocolDriverOsy::C_FlashBlockInfo & rc_OsyDeviceInfo =
+                              orc_DeviceApplicationInfos.pc_OSYDevice->c_Applications[u32_ItApplication];
+                           //Search for match
+                           if (((rc_OsyDeviceInfo.c_ApplicationName == rc_FileInfo.acn_ProjectName) &&
+                                (rc_OsyDeviceInfo.c_ApplicationVersion == rc_FileInfo.acn_ProjectVersion)) &&
+                               ((rc_OsyDeviceInfo.c_BuildDate + rc_OsyDeviceInfo.c_BuildTime) ==
+                                (QString(rc_FileInfo.acn_Date) + rc_FileInfo.acn_Time).toStdString().c_str()))
                            {
-                              q_Found = true;
-                              break;
+                              if (rc_OsyDeviceInfo.u8_SignatureValid == 0U) //0 == valid
+                              {
+                                 q_Found = true;
+                                 break;
+                              }
                            }
                         }
                      }
+
                      if (q_Found == false)
                      {
                         q_AllApplicationsMatch = false;
+                        break;
                      }
                   }
                   if (q_AllApplicationsMatch == true)
                   {
                      this->me_InitialStatus = C_SyvUtil::eI_APPLICATION_MATCH;
+                     this->me_UpdateStatus = eU_UP_TO_DATE;
                   }
                   else
                   {
                      this->me_InitialStatus = C_SyvUtil::eI_TO_BE_UPDATED;
+                     this->me_UpdateStatus = eU_WAITING;
                   }
                }
-               else if ((pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_STW) &&
-                        (orc_DeviceApplicationInfos.pc_STWDevice != NULL))
+            }
+            else if ((pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_STW) &&
+                     (orc_DeviceApplicationInfos.pc_STWDevice != NULL))
+            {
+               bool q_AllApplicationsMatch = true;
+               for (uint32 u32_ItFile = 0; u32_ItFile < this->mc_HexFileInfos.size(); ++u32_ItFile)
                {
-                  bool q_AllApplicationsMatch = true;
-                  for (uint32 u32_ItFile = 0; u32_ItFile < this->mc_FileInfos.size(); ++u32_ItFile)
+                  bool q_Found = false;
+                  // only search if application information is not ambiguous
+                  if (this->mc_HexAppInfoAmiguous[u32_ItFile] == false)
                   {
-                     bool q_Found = false;
-                     const stw_diag_lib::C_XFLECUInformation & rc_FileInfo = this->mc_FileInfos[u32_ItFile];
+                     const stw_diag_lib::C_XFLECUInformation & rc_FileInfo = this->mc_HexFileInfos[u32_ItFile];
                      for (sint32 s32_ItDeviceInfoBlock = 0;
                           s32_ItDeviceInfoBlock <
                           orc_DeviceApplicationInfos.pc_STWDevice->c_BasicInformation.c_DeviceInfoBlocks.GetLength();
@@ -597,51 +608,49 @@ void C_GiSvNodeSyvUpdate::UpdateInitialPackageStatus(const C_SyvUpDeviceInfo & o
                                                                            rc_FileInfo.acn_Time)) == 0))
                         {
                            q_Found = true;
+                           break;
                         }
                      }
-                     if (q_Found == false)
-                     {
-                        q_AllApplicationsMatch = false;
-                     }
                   }
-                  if (q_AllApplicationsMatch == true)
+                  if (q_Found == false)
                   {
-                     this->me_InitialStatus = C_SyvUtil::eI_APPLICATION_MATCH;
+                     q_AllApplicationsMatch = false;
+                     break;
                   }
-                  else
-                  {
-                     this->me_InitialStatus = C_SyvUtil::eI_TO_BE_UPDATED;
-                  }
+               }
+               if (q_AllApplicationsMatch == true)
+               {
+                  this->me_InitialStatus = C_SyvUtil::eI_APPLICATION_MATCH;
+                  this->me_UpdateStatus = eU_UP_TO_DATE;
                }
                else
                {
-                  //Should not happen
                   this->me_InitialStatus = C_SyvUtil::eI_TO_BE_UPDATED;
+                  this->me_UpdateStatus = eU_WAITING;
                }
+            }
+            else
+            {
+               //Should not happen
+               this->me_InitialStatus = C_SyvUtil::eI_TO_BE_UPDATED;
+               this->me_UpdateStatus = eU_WAITING;
             }
          }
       }
    }
-   m_UpdateIcons();
+   UpdateIcons();
    //Update dialog if necessary
-   if (this->mpc_InfoDialog != NULL)
-   {
-      this->mpc_InfoDialog->SetStatus(this->me_InitialStatus, &this->mc_FileInfos, this->mpc_STWDevice,
-                                      this->mpc_OSYDevice);
-   }
+   this->m_RefreshDialog();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if in state no response and active
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if in state no response and active
 
    \return
    True  No response
    False Any other state
-
-   \created     21.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvNodeSyvUpdate::HasNoResponseAndIsActive(void) const
 {
    bool q_Retval;
@@ -657,32 +666,34 @@ bool C_GiSvNodeSyvUpdate::HasNoResponseAndIsActive(void) const
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if STW device and active
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if node is active in view
 
-   Warning: requires previous third party check
-
-   \return
-   True  STW device
-   False Third party
-
-   \created     21.03.2018  STW/M.Echtler
+   \retval   True    Node is active check result
+   \retval   False   Node is active check result
 */
-//-----------------------------------------------------------------------------
-bool C_GiSvNodeSyvUpdate::IsStwDeviceAndActive(void) const
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvNodeSyvUpdate::IsActiveInView(void) const
 {
    bool q_Retval;
 
-   if (this->mq_ViewConnected == true)
+   if (this->ms32_Index >= 0)
    {
-      if ((this->me_InitialStatus == C_SyvUtil::eI_UPDATE_DISABLED) || (this->me_UpdateStatus == eU_UPDATE_DISABLED))
+      const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+      if (pc_View != NULL)
       {
-         q_Retval = false;
+         if (static_cast<uint32>(this->ms32_Index) < pc_View->GetNodeActiveFlags().size())
+         {
+            q_Retval = pc_View->GetNodeActiveFlags()[static_cast<uint32>(this->ms32_Index)] == 1U;
+         }
+         else
+         {
+            q_Retval = false;
+         }
       }
       else
       {
-         q_Retval = true;
+         q_Retval = false;
       }
    }
    else
@@ -692,13 +703,154 @@ bool C_GiSvNodeSyvUpdate::IsStwDeviceAndActive(void) const
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Generate hint
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if STW device and active
 
-   \created     14.02.2018  STW/M.Echtler
+   Warning: requires previous third party check
+
+   \return
+   True  STW device
+   False Third party
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvNodeSyvUpdate::IsStwDevice(void) const
+{
+   bool q_Retval;
+
+   if (this->ms32_Index >= 0)
+   {
+      const C_OSCNode * const pc_Node =
+         C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(static_cast<uint32>(this->ms32_Index));
+      if (pc_Node != NULL)
+      {
+         const C_OSCDeviceDefinition * const pc_Device = pc_Node->pc_DeviceDefinition;
+         tgl_assert(pc_Device != NULL);
+         if (pc_Device != NULL)
+         {
+            if (((pc_Device->q_FlashloaderStwCan == false) && (pc_Device->q_FlashloaderOpenSydeCan == false)) &&
+                (pc_Device->q_FlashloaderOpenSydeEthernet == false))
+            {
+               q_Retval = false;
+            }
+            else
+            {
+               q_Retval = true;
+            }
+         }
+         else
+         {
+            q_Retval = false;
+         }
+      }
+      else
+      {
+         q_Retval = false;
+      }
+   }
+   else
+   {
+      q_Retval = false;
+   }
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update icons
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvNodeSyvUpdate::UpdateIcons(void)
+{
+   bool q_TopLeftVisible;
+
+   if (this->mq_ViewConnected)
+   {
+      //Should not happen while connected
+      if (this->me_InitialStatus != C_SyvUtil::eI_NO_RESPONSE)
+      {
+         if (this->m_CheckAlwaysUpdate())
+         {
+            if (this->me_UpdateStatus == eU_UPDATING)
+            {
+               this->mpc_IconTopLeft->SetGif("://images/system_views/UpdateAnimationInProgress.gif");
+            }
+            else
+            {
+               this->mpc_IconTopLeft->SetSvg("://images/system_views/IconUpdateWaiting.svg");
+            }
+            q_TopLeftVisible = this->mq_UpdateConnected;
+         }
+         else
+         {
+            if (this->m_CheckUpdateDisabledState())
+            {
+               this->mpc_IconTopLeft->SetSvg("://images/system_views/IconUpdateStatusDisabled.svg");
+               q_TopLeftVisible = true;
+            }
+            else
+            {
+               switch (this->me_UpdateStatus)
+               {
+               case eU_UP_TO_DATE:
+                  this->mpc_IconTopLeft->SetSvg("://images/system_views/IconUpdateSuccess.svg");
+                  break;
+               case eU_UPDATE_SUCCESS:
+                  this->mpc_IconTopLeft->SetSvg("://images/system_views/IconUpdateSuccess.svg");
+                  break;
+               case eU_UPDATE_DISABLED:
+                  this->mpc_IconTopLeft->SetSvg("://images/system_views/IconUpdateStatusDisabled.svg");
+                  break;
+               case eU_UPDATING:
+                  this->mpc_IconTopLeft->SetGif("://images/system_views/UpdateAnimationInProgress.gif");
+                  break;
+               case eU_WAITING:
+                  this->mpc_IconTopLeft->SetSvg("://images/system_views/IconUpdateWaiting.svg");
+                  break;
+               default:
+                  this->mpc_IconTopLeft->SetSvg("");
+                  break;
+               }
+               q_TopLeftVisible = this->mq_UpdateConnected;
+            }
+         }
+         this->mpc_IconBottom->setVisible(false);
+      }
+      else
+      {
+         this->mpc_IconBottom->SetText(C_GtGetText::h_GetText("No response"));
+         this->mpc_IconBottom->SetSvg("://images/system_views/UpdateNoResponse.svg");
+         this->mpc_IconTopLeft->SetSvg("");
+
+         this->mpc_IconBottom->SetBackgroundColor(mc_STYLE_GUIDE_COLOR_24);
+         this->mpc_IconBottom->SetTextColor(Qt::white, static_cast<sint32>(Qt::AlignCenter));
+         this->mpc_IconBottom->setVisible(true);
+         q_TopLeftVisible = false;
+      }
+   }
+   else
+   {
+      //No icons for inactive nodes
+      q_TopLeftVisible = false;
+      this->mpc_IconBottom->setVisible(false);
+   }
+   //Only allow top left status if no error
+   q_TopLeftVisible = q_TopLeftVisible && (this->m_GetErrorStatus() == false);
+   //Apply
+   this->mpc_IconTopLeft->setVisible(q_TopLeftVisible);
+   //Update
+   if (this->mpc_IconBottom->isVisible())
+   {
+      this->mpc_IconBottom->update();
+   }
+   if (this->mpc_IconTopLeft->isVisible())
+   {
+      this->mpc_IconTopLeft->update();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Generate hint
+*/
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvUpdate::GenerateHint(void)
 {
    if (this->mq_ErrorIconHovered == true)
@@ -722,12 +874,11 @@ void C_GiSvNodeSyvUpdate::GenerateHint(void)
       }
       if (this->mq_ViewConnected == true)
       {
-         if (this->me_InitialStatus == C_SyvUtil::eI_UPDATE_DISABLED)
+         QString c_TooltipText;
+         if ((this->m_CheckUpdateDisabledState(&c_TooltipText)) &&
+             (this->me_InitialStatus != C_SyvUtil::eI_NO_RESPONSE))
          {
-            this->SetDefaultToolTipContent(C_GtGetText::h_GetText("Node update disabled."
-                                                                  "\nPossible reasons: "
-                                                                  "\n- There are no active Data Blocks declared"
-                                                                  "\n- Update setting is disabled on connected node interface"));
+            this->SetDefaultToolTipContent(c_TooltipText);
          }
          else
          {
@@ -741,11 +892,15 @@ void C_GiSvNodeSyvUpdate::GenerateHint(void)
                   case C_SyvUtil::eI_APPLICATION_MATCH:
                      c_Text = C_GtGetText::h_GetText("Node is up to date.");
                      break;
-                  case C_SyvUtil::eI_NO_INFO_SUPPORTED:
-                     c_Text = C_GtGetText::h_GetText("Status request not supported. Update required.");
-                     break;
                   case C_SyvUtil::eI_TO_BE_UPDATED:
-                     c_Text = C_GtGetText::h_GetText("There are deviations. Update required.");
+                     if (this->mq_ValidStatus)
+                     {
+                        c_Text = C_GtGetText::h_GetText("Update required.");
+                     }
+                     else
+                     {
+                        c_Text = C_GtGetText::h_GetText("Requesting info ...");
+                     }
                      break;
                   case C_SyvUtil::eI_NO_RESPONSE:
                      c_Text = C_GtGetText::h_GetText("Node not found. Check connection!");
@@ -761,11 +916,8 @@ void C_GiSvNodeSyvUpdate::GenerateHint(void)
                   case C_SyvUtil::eI_APPLICATION_MATCH:
                      c_Text = C_GtGetText::h_GetText("Node is up to date.");
                      break;
-                  case C_SyvUtil::eI_NO_INFO_SUPPORTED:
-                     c_Text = C_GtGetText::h_GetText("Status request not supported.");
-                     break;
                   case C_SyvUtil::eI_TO_BE_UPDATED:
-                     c_Text = C_GtGetText::h_GetText("There are deviations.");
+                     c_Text = C_GtGetText::h_GetText("Update required.");
                      break;
                   case C_SyvUtil::eI_NO_RESPONSE:
                      c_Text = C_GtGetText::h_GetText("Node not found. Check connection!");
@@ -806,13 +958,25 @@ void C_GiSvNodeSyvUpdate::GenerateHint(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Prepare icons
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal for update of current scaling
 
-   \created     13.02.2018  STW/M.Echtler
+   \param[in] orc_Transform Current scaling
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvNodeSyvUpdate::UpdateTransform(const QTransform & orc_Transform)
+{
+   C_GiSvNodeSyvBase::UpdateTransform(orc_Transform);
+   if (this->mpc_IconTopLeft != NULL)
+   {
+      this->mpc_IconTopLeft->UpdateTransform(orc_Transform);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Prepare icons
+*/
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvUpdate::m_InitIcons(void)
 {
    const uint32 u32_ScaleCategory = m_GetScaleCategory();
@@ -870,15 +1034,24 @@ void C_GiSvNodeSyvUpdate::m_InitIcons(void)
    }
 
    //Icons
-   this->mpc_IconTopLeft->SetIconSize(s32_IconSize);
+   if (this->mpc_IconTopLeft != NULL)
+   {
+      this->mpc_IconTopLeft->SetIconSize(s32_IconSize);
+   }
    this->mpc_IconBottom->SetIconSize(s32_IconSize);
 
    //Defaults
-   this->mpc_IconTopLeft->setZValue(mf64_ZORDER_INIT_NODE + 1.0);
+   if (this->mpc_IconTopLeft != NULL)
+   {
+      this->mpc_IconTopLeft->setZValue(mf64_ZORDER_INIT_NODE + 1.0);
+   }
    this->mpc_IconBottom->setZValue(mf64_ZORDER_INIT_NODE + 1.0);
 
    //Initial disable
-   this->mpc_IconTopLeft->setVisible(false);
+   if (this->mpc_IconTopLeft != NULL)
+   {
+      this->mpc_IconTopLeft->setVisible(false);
+   }
    this->mpc_IconBottom->setVisible(false);
 
    //Add
@@ -886,72 +1059,155 @@ void C_GiSvNodeSyvUpdate::m_InitIcons(void)
    this->addToGroup(this->mpc_IconTopLeft);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update icons
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if this node always needs an update
 
-   \created     13.02.2018  STW/M.Echtler
+   \retval true  Node always requires update
+   \retval false Node might not need update
 */
-//-----------------------------------------------------------------------------
-void C_GiSvNodeSyvUpdate::m_UpdateIcons(void)
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvNodeSyvUpdate::m_CheckAlwaysUpdate(void) const
 {
-   switch (this->me_InitialStatus)
-   {
-   case C_SyvUtil::eI_APPLICATION_MATCH:
-      this->mpc_IconTopLeft->SetSvg("://images/system_views/IconOk.svg");
-      break;
-   case C_SyvUtil::eI_TO_BE_UPDATED:
-      this->mpc_IconTopLeft->SetSvg("://images/system_views/IconWarning.svg");
-      break;
-   case C_SyvUtil::eI_NO_INFO_SUPPORTED:
-      this->mpc_IconTopLeft->SetSvg("://images/system_views/UpdateUnknown.svg");
-      break;
-   default:
-      this->mpc_IconTopLeft->SetSvg("");
-      break;
-   }
-   this->mpc_IconTopLeft->update();
+   bool q_Retval;
+   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+   const C_OSCNode * const pc_Node =
+      C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(static_cast<uint32>(this->ms32_Index));
 
-   //Should not happen while connected
-   if (this->me_InitialStatus != C_SyvUtil::eI_NO_RESPONSE)
+   if ((((pc_View != NULL) && (this->ms32_Index >= 0)) && (pc_Node != NULL)) && (pc_Node->pc_DeviceDefinition != NULL))
    {
-      switch (this->me_UpdateStatus)
+      const C_PuiSvNodeUpdate * const pc_UpdateInformation =
+         pc_View->GetNodeUpdateInformation(static_cast<uint32>(this->ms32_Index));
+      if (((pc_UpdateInformation->GetParamInfos().size() == 0UL) &&
+           (pc_UpdateInformation->GetPaths(C_PuiSvNodeUpdate::eFTP_FILE_BASED).size() == 0UL)) &&
+          (pc_Node->pc_DeviceDefinition->q_FlashloaderOpenSydeIsFileBased == false))
       {
-      case eU_UP_TO_DATE:
-         this->mpc_IconBottom->SetText(C_GtGetText::h_GetText("Up to date"));
-         this->mpc_IconBottom->SetSvg("://images/system_views/UpdateUpToDate.svg");
-         break;
-      case eU_UPDATE_SUCCESS:
-         this->mpc_IconBottom->SetText(C_GtGetText::h_GetText("Successfully updated"));
-         this->mpc_IconBottom->SetSvg("://images/system_views/UpdateUpToDate.svg");
-         break;
-      case eU_UPDATE_DISABLED:
-         this->mpc_IconBottom->SetText(C_GtGetText::h_GetText("Update disabled"));
-         this->mpc_IconBottom->SetSvg("://images/system_views/UpdateNotUpdateable.svg");
-         break;
-      case eU_UPDATING:
-         this->mpc_IconBottom->SetText(C_GtGetText::h_GetText("Updating..."));
-         this->mpc_IconBottom->SetSvg("://images/system_views/UpdateInProgress.svg");
-         break;
-      case eU_WAITING:
-         this->mpc_IconBottom->SetText(C_GtGetText::h_GetText("Waiting..."));
-         this->mpc_IconBottom->SetSvg("://images/system_views/UpdateWaiting.svg");
-         break;
-      default:
-         this->mpc_IconBottom->SetText("");
-         this->mpc_IconBottom->SetSvg("");
-         break;
+         q_Retval = false;
       }
-      this->mpc_IconBottom->SetBackgroundColor(Qt::transparent);
-      this->mpc_IconBottom->SetTextColor(mc_STYLE_GUIDE_COLOR_8, static_cast<sint32>(Qt::AlignLeft));
+      else
+      {
+         q_Retval = true;
+      }
    }
    else
    {
-      this->mpc_IconBottom->SetText(C_GtGetText::h_GetText("No response"));
-      this->mpc_IconBottom->SetSvg("://images/system_views/UpdateNoResponse.svg");
-
-      this->mpc_IconBottom->SetBackgroundColor(mc_STYLE_GUIDE_COLOR_24);
-      this->mpc_IconBottom->SetTextColor(Qt::white, static_cast<sint32>(Qt::AlignCenter));
+      //Error
+      q_Retval = true;
    }
-   this->mpc_IconBottom->update();
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if node should be in connected but update disabled state
+
+   \param[in] opc_TooltipText Tooltip text
+
+   \retval   True    Update disabled check result
+   \retval   False   Update disabled check result
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvNodeSyvUpdate::m_CheckUpdateDisabledState(QString * const opc_TooltipText) const
+{
+   bool q_Retval = this->IsStwDevice();
+
+   //Default message
+   if (opc_TooltipText != NULL)
+   {
+      *opc_TooltipText = C_GtGetText::h_GetText("Node update disabled."
+                                                "\nPossible reasons: "
+                                                "\n- There are no active Data Blocks declared (SYSTEM DEFINITION / Node / Properties)"
+                                                "\n- Update setting is disabled on connected node interface (SYSTEM DEFINITION / Node / Properties)"
+                                                "\n- Node has no protocol support.");
+   }
+
+   if ((q_Retval) && (this->ms32_Index >= 0))
+   {
+      const C_OSCNode * const pc_Node =
+         C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(static_cast<uint32>(this->ms32_Index));
+      if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL))
+      {
+         if (pc_Node->IsAnyUpdateAvailable() == false)
+         {
+            //Update via all interfaces disabled
+            q_Retval = true;
+         }
+         else
+         {
+            if (pc_Node->c_Applications.size() > 0UL)
+            {
+               q_Retval = false;
+            }
+            else
+            {
+               if (pc_Node->pc_DeviceDefinition->q_FlashloaderStwCan == true)
+               {
+                  //STW flashloader with no data block
+                  q_Retval = true;
+               }
+               else
+               {
+                  const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+                  if (pc_View != NULL)
+                  {
+                     const C_PuiSvNodeUpdate * const pc_UpdateInfo =
+                        pc_View->GetNodeUpdateInformation(static_cast<uint32>(this->ms32_Index));
+                     if (pc_UpdateInfo != NULL)
+                     {
+                        if ((pc_UpdateInfo->GetParamInfos().size() == 0UL) &&
+                            (pc_UpdateInfo->GetPaths(C_PuiSvNodeUpdate::eFTP_FILE_BASED).size() == 0UL))
+                        {
+                           //No file associated
+                           q_Retval = true;
+                           if (opc_TooltipText != NULL)
+                           {
+                              *opc_TooltipText = C_GtGetText::h_GetText("Node update disabled."
+                                                                        "\nUpdate Package doesn't contain any files for this node");
+                           }
+                        }
+                        else
+                        {
+                           //Any file assoziated
+                           q_Retval = false;
+                        }
+                     }
+                     else
+                     {
+                        //Unexpected
+                        q_Retval = false;
+                     }
+                  }
+                  else
+                  {
+                     //Unexpected
+                     q_Retval = false;
+                  }
+               }
+            }
+         }
+      }
+      else
+      {
+         //Unexpected
+         q_Retval = false;
+      }
+   }
+   else
+   {
+      //Not STW device
+      q_Retval = true;
+   }
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Update dialog if necessary
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvNodeSyvUpdate::m_RefreshDialog()
+{
+   if (this->mpc_InfoDialog != NULL)
+   {
+      this->mpc_InfoDialog->SetStatus(this->me_InitialStatus, &this->mc_HexFileInfos, &this->mc_HexAppInfoAmiguous,
+                                      &this->mc_ParamFileInfos, &this->mc_FileInfos, this->mpc_STWDevice,
+                                      this->mpc_OSYDevice, this->mq_UpdateSuccess, this->mq_ValidStatus);
+   }
 }

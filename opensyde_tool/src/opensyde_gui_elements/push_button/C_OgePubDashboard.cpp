@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Push button part of push button item (implementation)
 
@@ -9,17 +8,11 @@
    but needs to exist, to have a unique group,
    to apply a specific stylesheet for.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     28.08.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
@@ -27,33 +20,30 @@
 #include "stwtypes.h"
 #include "C_OgePubDashboard.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     28.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgePubDashboard::C_OgePubDashboard(QWidget * const opc_Parent) :
    QPushButton(opc_Parent),
    mpc_RendererActivated(NULL),
@@ -62,31 +52,25 @@ C_OgePubDashboard::C_OgePubDashboard(QWidget * const opc_Parent) :
    this->setCheckable(true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     21.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgePubDashboard::~C_OgePubDashboard(void)
 {
    delete this->mpc_RendererActivated;
    delete this->mpc_RendererDeactivated;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set SVG paths
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set SVG paths
 
    \param[in] orc_SvgActivated   Activated SVG path
    \param[in] orc_SvgDeactivated Deactivated SVG path
-
-   \created     21.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgePubDashboard::SetFiles(const QString & orc_SvgActivated, const QString & orc_SvgDeactivated)
 {
    delete this->mpc_RendererActivated;
@@ -109,17 +93,14 @@ void C_OgePubDashboard::SetFiles(const QString & orc_SvgActivated, const QString
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    Here: paint svgs
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     21.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgePubDashboard::paintEvent(QPaintEvent * const opc_Event)
 {
    Q_UNUSED(opc_Event)
@@ -141,19 +122,16 @@ void C_OgePubDashboard::paintEvent(QPaintEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt rect to aspect ratio of other rect
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt rect to aspect ratio of other rect
 
    \param[in] orc_Target Target aspect ratio
    \param[in] orc_Rect   Rect to adapt
 
    \return
    Adapted rect with new aspect ratio
-
-   \created     21.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QRectF C_OgePubDashboard::mh_AdaptToAspcetRatio(const QRect & orc_Target, const QRect & orc_Rect)
 {
    QRectF c_Retval = orc_Rect;

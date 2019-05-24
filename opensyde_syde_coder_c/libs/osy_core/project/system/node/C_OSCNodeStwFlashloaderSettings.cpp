@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       short description (implementation)
 
    detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     07.12.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -40,10 +33,7 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     07.12.2017  STW/M.Echtler
+/*! \brief   Default constructor
 */
 //-----------------------------------------------------------------------------
 C_OSCNodeStwFlashloaderSettings::C_OSCNodeStwFlashloaderSettings(void)
@@ -52,12 +42,9 @@ C_OSCNodeStwFlashloaderSettings::C_OSCNodeStwFlashloaderSettings(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize class content
+/*! \brief   Initialize class content
 
    Clean up.
-
-   \created     25.01.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_OSCNodeStwFlashloaderSettings::Initialize(void)
@@ -70,14 +57,11 @@ void C_OSCNodeStwFlashloaderSettings::Initialize(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
 
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
-
-   \created     11.12.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCNodeStwFlashloaderSettings::CalcHash(uint32 & oru32_HashValue) const

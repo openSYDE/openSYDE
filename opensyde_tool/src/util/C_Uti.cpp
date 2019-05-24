@@ -1,29 +1,22 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       OpenSYDE utility functions (implementation)
 
    OpenSYDE utility functions
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.02.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <cmath>
 #include <sstream>
 #include <limits>
 
-#include <QCoreApplication>
+#include <QApplication>
 #include <QFileInfo>
 #include <QStorageInfo>
 
@@ -36,7 +29,7 @@
 #include "C_OSCLoggingHandler.h"
 #include "C_UtiFindNameHelper.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_scl;
 using namespace stw_tgl;
 using namespace stw_types;
@@ -45,29 +38,26 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Ensure vector contains each element only once
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Ensure vector contains each element only once
 
    Sort vector ascending by value and remove duplicate entries.
 
    \param[in] orc_Indices Input to uniqueify
-
-   \created     13.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_Uti::h_Uniqueify(std::vector<uint32> & orc_Indices)
 {
    std::vector<uint32>::const_iterator c_Last;
@@ -80,9 +70,8 @@ void C_Uti::h_Uniqueify(std::vector<uint32> & orc_Indices)
    orc_Indices.erase(c_Last, orc_Indices.end());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Split input into contiguous sections
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Split input into contiguous sections
 
    Also: sorted ascending
 
@@ -90,10 +79,8 @@ void C_Uti::h_Uniqueify(std::vector<uint32> & orc_Indices)
 
    \return
    Input as contiguous sections
-
-   \created     27.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<std::vector<uint32> > C_Uti::h_GetContiguousSectionsAscending(const std::vector<uint32> & orc_Indices)
 {
    std::vector<std::vector<uint32> > c_Retval;
@@ -131,19 +118,16 @@ std::vector<std::vector<uint32> > C_Uti::h_GetContiguousSectionsAscending(const 
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if floating point value does contain a fraction part
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if floating point value does contain a fraction part
 
    \param[in] of64_Value Value to check
 
    \return
    True  Value does not have fraction part
    False Fraction part exists
-
-   \created     25.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_Uti::h_CheckFloatHasNoFractionPart(const float64 of64_Value)
 {
    bool q_Retval;
@@ -159,19 +143,16 @@ bool C_Uti::h_CheckFloatHasNoFractionPart(const float64 of64_Value)
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get number of decimals for floating point value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get number of decimals for floating point value
 
    \param[in] of64_Value Value to check
 
    \return
    -1   Decimals could not be determined
    Else Detected number of decimals (Restricted to maximum msn_DOUBLE_SPIN_BOX_DECIMAL_COUNT)
-
-   \created     25.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_Uti::h_GetNumberOfDecimals(const float64 of64_Value)
 {
    sint32 s32_Retval = -1;
@@ -209,9 +190,8 @@ sint32 C_Uti::h_GetNumberOfDecimals(const float64 of64_Value)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get a string from a double with reasonable decimals.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get a string from a double with reasonable decimals.
 
    Cut annoying trailing zeros but show many leading zeros if necessary.
    Maximum number of decimals is msn_DOUBLE_SPIN_BOX_DECIMAL_COUNT.
@@ -225,10 +205,8 @@ sint32 C_Uti::h_GetNumberOfDecimals(const float64 of64_Value)
 
    \return
    Obtained QString.
-
-   \created     08.06.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_Uti::h_GetStringFromDouble(const float64 of64_Value)
 {
    QString c_StringFromValue;
@@ -311,9 +289,8 @@ QString C_Uti::h_GetStringFromDouble(const float64 of64_Value)
    return c_StringFromValue;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Uniquify & sort ascending
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Uniquify & sort ascending
 
    Sort vector ascending by value and remove duplicate entries.
 
@@ -321,10 +298,8 @@ QString C_Uti::h_GetStringFromDouble(const float64 of64_Value)
 
    \return
    Items uniquified and sorted ascending
-
-   \created     27.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint32> C_Uti::h_UniquifyAndSortAscending(const std::vector<uint32> & orc_Items)
 {
    std::vector<uint32> c_Retval = orc_Items;
@@ -332,9 +307,8 @@ std::vector<uint32> C_Uti::h_UniquifyAndSortAscending(const std::vector<uint32> 
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Uniquify & sort descending
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Uniquify & sort descending
 
    Sort vector ascending by value and remove duplicate entries.
 
@@ -342,10 +316,8 @@ std::vector<uint32> C_Uti::h_UniquifyAndSortAscending(const std::vector<uint32> 
 
    \return
    Items uniquified and sorted descending
-
-   \created     21.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint32> C_Uti::h_UniquifyAndSortDescending(const std::vector<uint32> & orc_Items)
 {
    std::vector<uint32> c_Retval;
@@ -361,9 +333,8 @@ std::vector<uint32> C_Uti::h_UniquifyAndSortDescending(const std::vector<uint32>
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Scales the color
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Scales the color
 
    The functions adapts the color by calculating the percentage of the difference to the maximum 255
    of all three colors.
@@ -373,10 +344,8 @@ std::vector<uint32> C_Uti::h_UniquifyAndSortDescending(const std::vector<uint32>
 
    \return
    Adapted color
-
-   \created     23.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QColor C_Uti::h_ScaleColor(const QColor & orc_Color, const uint32 ou32_Percentage)
 {
    QColor c_AdaptedColor;
@@ -433,18 +402,15 @@ QColor C_Uti::h_ScaleColor(const QColor & orc_Color, const uint32 ou32_Percentag
    return c_AdaptedColor;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility function to calculate disabled look for current color
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility function to calculate disabled look for current color
 
    \param[in] orc_DefaultColorLook Default color look
 
    \return
    Disabled look for orc_DefaultColorLook
-
-   \created     28.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QColor C_Uti::h_GetDisabledColorLook(const QColor & orc_DefaultColorLook)
 {
    const sintn sn_Red = orc_DefaultColorLook.red() + ((255 - orc_DefaultColorLook.red()) / 2);
@@ -455,56 +421,47 @@ QColor C_Uti::h_GetDisabledColorLook(const QColor & orc_DefaultColorLook)
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapts the string with three dots at the end if not enough space is available
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapts the string with three dots at the end if not enough space is available
 
    \param[in] orc_FontMetrics Used font configuration
    \param[in] osn_Width       Available space
 
    \return
    Adapted string
-
-   \created     10.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_Uti::h_AdaptStringToSize(const QString & orc_String, const QFontMetrics & orc_FontMetrics,
                                    const sintn osn_Width)
 {
    return orc_FontMetrics.elidedText(orc_String, Qt::ElideRight, osn_Width);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapts the string with three dots at the end if not enough space is available
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapts the string with three dots at the end if not enough space is available
 
    \param[in] orc_FontMetrics Used font configuration
    \param[in] of64_Width      Available space
 
    \return
    Adapted string
-
-   \created     10.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_Uti::h_AdaptStringToSize(const QString & orc_String, const QFontMetrics & orc_FontMetrics,
                                    const float64 of64_Width)
 {
    return C_Uti::h_AdaptStringToSize(orc_String, orc_FontMetrics, static_cast<sintn>(of64_Width));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Prepare byte count as string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Prepare byte count as string
 
    \param[in] ou32_ByteCount   Byte count
 
    \return
    String: 1 Byte or ou32_ByteCount Bytes
-
-   \created     19.05.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_Uti::h_GetByteCountAsString(const stw_types::uint32 ou32_ByteCount)
 {
    QString c_Text = QString::number(ou32_ByteCount);
@@ -521,9 +478,8 @@ QString C_Uti::h_GetByteCountAsString(const stw_types::uint32 ou32_ByteCount)
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check for specific key modifier
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check for specific key modifier
 
    \param[in] orc_ActiveKeyModifiers Active key modifiers
    \param[in] ore_CheckKeyModifier   Key modifier to check for
@@ -531,19 +487,16 @@ QString C_Uti::h_GetByteCountAsString(const stw_types::uint32 ou32_ByteCount)
    \return
    true  Modifier active
    false Modifier inactive
-
-   \created     09.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_Uti::h_CheckKeyModifier(const Qt::KeyboardModifiers & orc_ActiveKeyModifiers,
                                const Qt::KeyboardModifier & ore_CheckKeyModifier)
 {
    return (orc_ActiveKeyModifiers.testFlag(ore_CheckKeyModifier) == true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check for specific style state modifier
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check for specific style state modifier
 
    \param[in] orc_ActiveState Active states
    \param[in] ore_CheckState  State to check for
@@ -551,39 +504,87 @@ bool C_Uti::h_CheckKeyModifier(const Qt::KeyboardModifiers & orc_ActiveKeyModifi
    \return
    true  State active
    false State inactive
-
-   \created     09.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_Uti::h_CheckStyleState(const QStyle::State & orc_ActiveState, const QStyle::StateFlag & ore_CheckState)
 {
    return (orc_ActiveState.testFlag(ore_CheckState) == true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current executable path (No slash at end)
-
-   \created     16.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current executable path (No slash at end)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_Uti::h_GetExePath(void)
 {
    return QCoreApplication::applicationDirPath();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check default path and replace by exe path if necessary
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get resource version number of a file as an QString
+
+   Extracts the windows version number of the specified file and returns it
+    in the commonly used STW format: "Vx.yyrz".
+   This function is Windows specific and needs to be replaced by another solution
+    when porting to a non-Windows system
+
+   \param[in] oq_UseSTWFormat Optional flag to output STW format
+
+   \return
+   string with version information ("V?.??r?" on error)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_Uti::h_GetApplicationVersion(const bool oq_UseSTWFormat)
+{
+   const QFileInfo c_FileInfo(QApplication::applicationFilePath());
+   const QString c_FileName = c_FileInfo.fileName();
+   VS_FIXEDFILEINFO * pt_Info;
+   uintn un_ValSize;
+   sint32 s32_InfoSize;
+   uint8 * pu8_Buffer;
+   C_SCLString c_Version;
+
+   c_Version = "V?.\?\?r?";
+
+   s32_InfoSize = GetFileVersionInfoSizeA(c_FileName.toStdString().c_str(), NULL);
+   if (s32_InfoSize != 0)
+   {
+      pu8_Buffer = new uint8[static_cast<uintn>(s32_InfoSize)];
+      if (GetFileVersionInfoA(c_FileName.toStdString().c_str(), 0, s32_InfoSize, pu8_Buffer) != FALSE)
+      {
+         //reinterpret_cast required due to function interface
+         if (VerQueryValueA(pu8_Buffer, "\\",
+                            reinterpret_cast<PVOID *>(&pt_Info), //lint !e929
+                            &un_ValSize) != FALSE)
+         {
+            if (oq_UseSTWFormat)
+            {
+               c_Version.PrintFormatted("V%d.%02dr%d", (pt_Info->dwFileVersionMS >> 16),
+                                        pt_Info->dwFileVersionMS & 0x0000FFFFUL,
+                                        (pt_Info->dwFileVersionLS >> 16));
+            }
+            else
+            {
+               c_Version.PrintFormatted("%d.%02d.%d", (pt_Info->dwFileVersionMS >> 16),
+                                        pt_Info->dwFileVersionMS & 0x0000FFFFUL,
+                                        (pt_Info->dwFileVersionLS >> 16));
+            }
+         }
+      }
+      delete[] pu8_Buffer;
+   }
+   return c_Version.c_str();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check default path and replace by exe path if necessary
 
    \param[in] orc_Path Default path to choose if set
 
    \return
    Always contains some path
-
-   \created     05.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_Uti::h_CheckAndReplaceWithExePathIfNecessary(const QString & orc_Path)
 {
    QString c_Retval;
@@ -599,9 +600,8 @@ QString C_Uti::h_CheckAndReplaceWithExePathIfNecessary(const QString & orc_Path)
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert text to styled link
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert text to styled link
 
    \param[in] orc_DisplayedText Text displayed by link
    \param[in] orc_Color         Link color
@@ -609,10 +609,8 @@ QString C_Uti::h_CheckAndReplaceWithExePathIfNecessary(const QString & orc_Path)
 
    \return
    Styled link text
-
-   \created     23.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_Uti::h_GetLink(const QString & orc_DisplayedText, const QColor & orc_Color, const QString & orc_HyperLink)
 {
    const QString c_Retval = QString(
@@ -625,9 +623,8 @@ QString C_Uti::h_GetLink(const QString & orc_DisplayedText, const QColor & orc_C
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get absolute log file path and location
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get absolute log file path and location
 
    Warning: only for onetime usage
 
@@ -635,10 +632,8 @@ QString C_Uti::h_GetLink(const QString & orc_DisplayedText, const QColor & orc_C
 
    \return
    Absolute log file path and location
-
-   \created     15.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_Uti::h_GetCompleteLogFileLocation(const QString & orc_Extension)
 {
    QString c_Retval;
@@ -665,18 +660,15 @@ QString C_Uti::h_GetCompleteLogFileLocation(const QString & orc_Extension)
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get readable stw error
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get readable stw error
 
    \param[in] os32_Error STW error value
 
    \return
    STW error string
-
-   \created     20.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_Uti::h_StwError(const sint32 os32_Error)
 {
    const QString c_Retval = C_OSCLoggingHandler::h_StwError(os32_Error).c_str();
@@ -684,9 +676,8 @@ QString C_Uti::h_StwError(const sint32 os32_Error)
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Minimize full paths to fit in GUI edit fields.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Minimize full paths to fit in GUI edit fields.
 
    The given width of an edit field for example is optimally used, so that a user can
    expect a full file path. The drive name, the file name and as many subfolders as possible
@@ -717,10 +708,8 @@ QString C_Uti::h_StwError(const sint32 os32_Error)
 
    \return
    minimized file path
-
-   \created     04.07.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_Uti::h_MinimizePath(const QString & orc_Path, const QFont & orc_Font, const uint32 ou32_Width,
                               const uint32 ou32_Buffer)
 {
@@ -808,9 +797,8 @@ QString C_Uti::h_MinimizePath(const QString & orc_Path, const QFont & orc_Font, 
    return c_MinimizedPath;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Converts an IP address to readable string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Converts an IP address to readable string
 
    4 byte array to x.x.x.x
 
@@ -818,10 +806,8 @@ QString C_Uti::h_MinimizePath(const QString & orc_Path, const QFont & orc_Font, 
 
    \return
    String with IP address
-
-   \created     02.08.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_Uti::h_IpAddressToString(const uint8 (&orau8_IpAddress)[4])
 {
    QString c_Result;
@@ -835,18 +821,15 @@ QString C_Uti::h_IpAddressToString(const uint8 (&orau8_IpAddress)[4])
    return c_Result;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert font from point size into pixel size
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert font from point size into pixel size
 
    \param[in] orc_Font Font to convert
 
    \return
    Font with previous point size as new pixel size
-
-   \created     27.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QFont C_Uti::h_GetFontPixel(const QFont & orc_Font)
 {
    QFont c_Retval = orc_Font;
@@ -855,9 +838,35 @@ QFont C_Uti::h_GetFontPixel(const QFont & orc_Font)
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility function to convert relative path to absolute path if necessary
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert version in format 1.00.0 to STW format V1.00r0
+
+   \param[in]     orc_Version    version in format 1.00.0 (e.g. APPLICATION_VERSION)
+
+   \return
+   version
+      in format V1.00r0 if orc_Version is in format 1.00.0
+      else orc_Version as it is
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_Uti::h_ConvertVersionToSTWStyle(const QString & orc_Version)
+{
+   QString c_Return = orc_Version;
+   QStringList c_Temp;
+
+   c_Temp = c_Return.split(".");
+
+   // APPLICATION_VERSION should be in format 1.00.0, i.e. 3 parts
+   if (c_Temp.size() == 3)
+   {
+      c_Return = "V" + c_Temp.at(0) + "." + c_Temp.at(1) + "r" + c_Temp.at(2);
+   }
+
+   return c_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility function to convert relative path to absolute path if necessary
 
    Warning: assuming orc_AbsoluteBaseDir is not an empty string and no file.
 
@@ -866,10 +875,8 @@ QFont C_Uti::h_GetFontPixel(const QFont & orc_Font)
 
    \return
    Absolute file path if input fulfills assumptions
-
-   \created     09.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_Uti::h_ConcatPathIfNecessary(const QString & orc_BaseDir, const QString & orc_RelativeOrAbsolutePath)
 {
    QString c_Retval;
@@ -888,51 +895,20 @@ QString C_Uti::h_ConcatPathIfNecessary(const QString & orc_BaseDir, const QStrin
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert version in format 1.00.0 to STW format V1.00r0
-
-   \param[in]     orc_Version    version in format 1.00.0 (e.g. APPLICATION_VERSION)
-
-   \return
-   version
-      in format V1.00r0 if orc_Version is in format 1.00.0
-      else orc_Version as it is
-
-   \created     23.10.2018  STW/G.Landsgesell
-*/
-//-----------------------------------------------------------------------------
-QString C_Uti::h_ConvertVersionToSTWStyle(const QString & orc_Version)
-{
-   QString c_Return = orc_Version;
-   QStringList c_Temp;
-
-   c_Temp = c_Return.split(".");
-
-   // APPLICATION_VERSION should be in format 1.00.0, i.e. 3 parts
-   if (c_Temp.size() == 3)
-   {
-      c_Return = "V" + c_Temp.at(0) + "." + c_Temp.at(1) + "r" + c_Temp.at(2);
-   }
-
-   return c_Return;
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get unique item name based on proposal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get unique item name based on proposal
 
    \param[in] orc_ExistingStrings Existing item names
    \param[in] orc_ProposedName    Proposal for item name
+   \param[in] orc_SkipName        Optional name to block any adaptations for
 
    \return
    Unique node name
-
-   \created     26.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_scl::C_SCLString C_Uti::h_GetUniqueName(const std::map<C_SCLString, bool> & orc_ExistingStrings,
-                                            const stw_scl::C_SCLString & orc_ProposedName)
+                                            const stw_scl::C_SCLString & orc_ProposedName,
+                                            const stw_scl::C_SCLString & orc_SkipName)
 {
    C_SCLString c_Retval = orc_ProposedName;
    bool q_Conflict;
@@ -947,8 +923,30 @@ stw_scl::C_SCLString C_Uti::h_GetUniqueName(const std::map<C_SCLString, bool> & 
       c_ItString = orc_ExistingStrings.find(c_Retval);
       if (c_ItString != orc_ExistingStrings.end())
       {
+         const C_SCLString & rc_ConflictingValue = c_ItString->first;
+         //Search for the SkipName if the skip name is a valid string
+         const uint32 u32_Pos = orc_SkipName.IsEmpty() ? 0UL : rc_ConflictingValue.LastPos(orc_SkipName);
          q_Conflict = true;
-         h_GetNumberAtStringEnd(c_ItString->first, c_BaseStr, s32_MaxDeviation);
+         if (u32_Pos == 0UL)
+         {
+            //Continue examining the complete string
+            h_GetNumberAtStringEnd(rc_ConflictingValue, c_BaseStr, s32_MaxDeviation);
+         }
+         else
+         {
+            //Hint: SubString and LastPos start counting at 1
+            const uint32 u32_ZeroBasedpos = u32_Pos - 1UL;
+            //Extract the part of the string that may be adapted
+            const C_SCLString c_StringAfterSkip = rc_ConflictingValue.SubString(
+               (u32_ZeroBasedpos + orc_SkipName.Length()) + 1UL,
+               (rc_ConflictingValue.Length() - orc_SkipName.Length()) - u32_ZeroBasedpos);
+            const C_SCLString c_SkippedPart =
+               rc_ConflictingValue.SubString(1UL, u32_ZeroBasedpos + orc_SkipName.Length());
+            //Search remaining part for any number
+            h_GetNumberAtStringEnd(c_StringAfterSkip, c_BaseStr, s32_MaxDeviation);
+            //Add skipped part to base string again
+            c_BaseStr = c_SkippedPart + c_BaseStr;
+         }
          //Do not use 0 and 1 for name adaptation
          if (s32_MaxDeviation <= 0)
          {
@@ -961,19 +959,16 @@ stw_scl::C_SCLString C_Uti::h_GetUniqueName(const std::map<C_SCLString, bool> & 
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get unique item name based on proposal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get unique item name based on proposal
 
    \param[in] orc_ExistingStrings Existing item names
    \param[in] orc_ProposedName    Proposal for item name
 
    \return
    Unique node name
-
-   \created     10.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_Uti::h_GetUniqueNameQ(const std::map<C_SCLString, bool> & orc_ExistingStrings,
                                 const QString & orc_ProposedName)
 {
@@ -982,17 +977,14 @@ QString C_Uti::h_GetUniqueNameQ(const std::map<C_SCLString, bool> & orc_Existing
    return c_Result.c_str();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get number at string end
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get number at string end
 
    \param[in]  orc_ProposedName Proposal for name
    \param[out] orc_CutString    String without number
    \param[out] ors32_Number     Number at end (else -1)
-
-   \created     26.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_Uti::h_GetNumberAtStringEnd(const C_SCLString & orc_ProposedName, C_SCLString & orc_CutString,
                                    sint32 & ors32_Number)
 {
@@ -1037,9 +1029,8 @@ void C_Uti::h_GetNumberAtStringEnd(const C_SCLString & orc_ProposedName, C_SCLSt
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create ascending sorted index map for input vector
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create ascending sorted index map for input vector
 
    Another attempt to explain this:
    this class actually looks at the value stored in the vector
@@ -1065,10 +1056,8 @@ void C_Uti::h_GetNumberAtStringEnd(const C_SCLString & orc_ProposedName, C_SCLSt
 
    \return
    Ascending sorted index map
-
-   \created     13.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<sint32> C_Uti::h_CreateAscendingIndexMap(const std::vector<uint32> & orc_UnsortedIndices)
 {
    std::vector<sint32> c_IndexMap;
@@ -1085,19 +1074,16 @@ std::vector<sint32> C_Uti::h_CreateAscendingIndexMap(const std::vector<uint32> &
    return c_IndexMap;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if input vector is sorted ascending
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if input vector is sorted ascending
 
    \param[in] orc_Indices Input vector to evaluate
 
    \return
    true:  Sorted
    false: Unsorted
-
-   \created     13.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_Uti::h_CheckSortedAscending(const std::vector<uint32> & orc_Indices)
 {
    bool q_Retval = true;
@@ -1121,18 +1107,15 @@ bool C_Uti::h_CheckSortedAscending(const std::vector<uint32> & orc_Indices)
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Always get absolute path from path relative to executable.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Always get absolute path from path relative to executable.
 
    \param[in] orc_Path Absolute or relative path
 
    \return
    Absolute path
-
-   \created     07.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_Uti::h_GetAbsolutePathFromExe(const QString & orc_Path)
 {
    QString c_Folder = C_Uti::h_GetExePath(); // always absolute
@@ -1140,9 +1123,8 @@ QString C_Uti::h_GetAbsolutePathFromExe(const QString & orc_Path)
    return C_Uti::h_ConcatPathIfNecessary(c_Folder, orc_Path);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle paths after file save dialog.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle paths after file save dialog.
 
    Check if path could be made relative.
 
@@ -1160,10 +1142,8 @@ QString C_Uti::h_GetAbsolutePathFromExe(const QString & orc_Path)
    \return
    true  path can be represented relative to directory
    false path can not be represented relative to directory
-
-   \created     08.02.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_Uti::h_IsPathRelativeToDir(const QString & orc_PathIn, const QString & orc_AbsoluteReferenceDir,
                                   QString & orc_PathAbsolute, QString & orc_PathRelative)
 {
@@ -1192,16 +1172,13 @@ bool C_Uti::h_IsPathRelativeToDir(const QString & orc_PathIn, const QString & or
    return oq_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sort indices ascending ( Sorting steps are done for the content vectors in sync)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sort indices ascending ( Sorting steps are done for the content vectors in sync)
 
    \param[in,out] orc_IndicesTmp  Unsorted indices
    \param[in,out] orc_SyncContent Unsorted content to sync
-
-   \created     13.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 template <typename T>
 void C_Uti::h_SortIndicesAscendingAndSync(std::vector<uint32> & orc_IndicesTmp, std::vector<T> & orc_SyncContent)
 {
@@ -1239,13 +1216,10 @@ template
 void C_Uti::h_SortIndicesAscendingAndSync<stw_types::uint32>(std::vector<stw_types::uint32> & orc_IndicesTmp,
                                                              std::vector<uint32> & orc_SyncContent);
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     20.02.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_Uti::C_Uti(void)
 {
 }

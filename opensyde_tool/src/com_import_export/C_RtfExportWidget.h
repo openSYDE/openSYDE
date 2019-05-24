@@ -1,17 +1,11 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Dialog for RTF file export (header)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.06.2018  STW/D.Pohl (copied and adapted from data pool list import)
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_RTFEXPORTWIDGET_H
 #define C_RTFEXPORTWIDGET_H
 
@@ -26,12 +20,12 @@ namespace Ui
 {
 class C_RtfExportWidget;
 }
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_RtfExportWidget :
    public QWidget
 {
@@ -45,9 +39,9 @@ public:
    stw_types::sint32 GetCompanyName(stw_scl::C_SCLString & orc_CompanyName) const;
    stw_types::sint32 GetCompanyLogoPath(stw_scl::C_SCLString & orc_CompanyLogoPath) const;
 
-   void SetRtfPath(const stw_scl::C_SCLString & orc_RtfPath);
+   void SetRtfPath(const stw_scl::C_SCLString & orc_RtfPath) const;
    void SetCompanyName(const stw_scl::C_SCLString & orc_CompanyName) const;
-   void SetCompanyLogoPath(const stw_scl::C_SCLString & orc_CompanyLogoPath);
+   void SetCompanyLogoPath(const stw_scl::C_SCLString & orc_CompanyLogoPath) const;
 
    stw_types::sint32 ExportToRtf(const stw_scl::C_SCLString & orc_RtfPath, const stw_scl::C_SCLString & orc_CompanyName,
                                  const stw_scl::C_SCLString & orc_CompanyLogoPath,
@@ -92,17 +86,10 @@ private:
    stw_scl::C_SCLStringList mc_Warnings;
    stw_scl::C_SCLString mc_Error;
 
-   stw_scl::C_SCLString mc_RtfPath;
-   stw_scl::C_SCLString mc_CompanyLogoPath;
-
    void m_OkClicked(void);
    void m_CancelClicked(void);
    void m_RtfPathClicked(void);
    void m_LogoPathClicked(void);
-   void m_EditRtfPathFocusOn(void) const;
-   void m_EditLogoPathFocusOn(void) const;
-   void m_EditRtfPathFocusOff(void);
-   void m_EditLogoPathFocusOff(void);
 
    stw_types::sint32 m_CreateConfigXml(const stw_scl::C_SCLString & orc_Path,
                                        const C_ExportXmlStructure & orc_ExportXmlStructure) const;
@@ -112,7 +99,7 @@ private:
    C_RtfExportWidget & operator =(const C_RtfExportWidget &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

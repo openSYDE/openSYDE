@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for selecting a node of a DBC file import (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     09.04.2018 STW/D.Pohl
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <vector>
@@ -31,7 +24,7 @@
 #include "C_OSCLoggingHandler.h"
 #include "C_CieConverter.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
@@ -40,28 +33,25 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_scl;
 using namespace std;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
-   \param[in,out] opc_Parent            Optional pointer to parent
+   \param[in,out] orc_Parent            Reference to parent
    \param[in]     orc_CIECommDefinition dbc comm definition to read node information of node
-
-   \created     09.04.2018 STW/D.Pohl (copied from C_SdNdeApplicationsViewWidget)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CieDataPoolComListDBCImportWidget::C_CieDataPoolComListDBCImportWidget(
    stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
    C_CieConverter::C_CIECommDefinition & orc_CIECommDefinition) :
@@ -100,27 +90,21 @@ C_CieDataPoolComListDBCImportWidget::C_CieDataPoolComListDBCImportWidget(
            this, &C_CieDataPoolComListDBCImportWidget::m_DisplayNodeInfo);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     09.04.2018 STW/D.Pohl (copied from C_SdNdeApplicationsViewWidget)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CieDataPoolComListDBCImportWidget::~C_CieDataPoolComListDBCImportWidget(void)
 {
    delete this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     09.04.2018  STW/D.Pohl (copied from C_SdNdeApplicationsViewWidget)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolComListDBCImportWidget::InitStaticNames(void)
 {
    // window title
@@ -138,25 +122,21 @@ void C_CieDataPoolComListDBCImportWidget::InitStaticNames(void)
    this->mpc_Ui->pc_PushButtonOK->setText(C_GtGetText::h_GetText("Continue"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get user selected node.
-
-   \created     10.04.2018  STW/D.Pohl
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get user selected node.
+ *
+ * \return index of selected node
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieDataPoolComListDBCImportWidget::GetNodeSelection(void) const
 {
    return ms32_NodeIndex; // selected node of pc_ComboBoxDBCNode
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Shows TX/RX messages and signals of a node.
-
-   \created     10.04.2018  STW/D.Pohl
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Shows TX/RX messages and signals of a node.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolComListDBCImportWidget::m_DisplayNodeInfo(void)
 {
    this->ms32_NodeIndex = this->mpc_Ui->pc_ComboBoxDBCNode->currentIndex();
@@ -193,37 +173,28 @@ void C_CieDataPoolComListDBCImportWidget::m_DisplayNodeInfo(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   User clicked on ok button.
-
-   \created     10.04.2018  STW/D.Pohl
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   User clicked on ok button.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolComListDBCImportWidget::m_OkClicked(void) const
 {
    this->mrc_ParentDialog.accept();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   User clicked on cancel button.
-
-   \created     10.04.2018  STW/D.Pohl
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   User clicked on cancel button.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolComListDBCImportWidget::m_CancelClicked(void) const
 {
    this->mrc_ParentDialog.reject();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize ComboBox for node selection.
-
-   \created     10.04.2018  STW/D.Pohl
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize ComboBox for node selection.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolComListDBCImportWidget::m_FillUpComboBox(void)
 {
    // cleanup

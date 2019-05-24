@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for new project import/creation (implementation)
 
    Widget for new project import/creation
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     02.10.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QDir>
@@ -38,7 +31,7 @@
 #include "ui_C_SdNdeDbAddNewProject.h"
 #include "C_OSCTargetSupportPackageFiler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -47,32 +40,29 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SdNdeDbAddNewProject::mhc_StartTD = "<td style=\"padding: 0 9px 0 0;\">";
 const QString C_SdNdeDbAddNewProject::mhc_ContinueTD = "<td style=\"padding: 0 9px 0 9px;\">";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in]     ou32_NodeIndex        Node index
    \param[in,out] orc_Parent            Reference to parent
-
-   \created     02.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDbAddNewProject::C_SdNdeDbAddNewProject(const uint32 ou32_NodeIndex,
                                                stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
    QWidget(&orc_Parent),
@@ -96,32 +86,23 @@ C_SdNdeDbAddNewProject::C_SdNdeDbAddNewProject(const uint32 ou32_NodeIndex,
            &C_SdNdeDbAddNewProject::m_TSPButtonClicked);
    connect(this->mpc_Ui->pc_PushButtonCreateIn, &QPushButton::clicked, this,
            &C_SdNdeDbAddNewProject::m_CreateInButtonClicked);
-   connect(this->mpc_Ui->pc_LineEditTSP, &C_OgeLeFilePath::editingFinished, this, &C_SdNdeDbAddNewProject::m_OnLoadTSP);
-   connect(this->mpc_Ui->pc_LineEditTSP, &C_OgeLeFilePath::SigFocus, this,
-           &C_SdNdeDbAddNewProject::m_EditTSPPathFocusOn);
-   connect(this->mpc_Ui->pc_LineEditTSP, &C_OgeLeFilePath::SigFocusOut, this,
-           &C_SdNdeDbAddNewProject::m_EditTSPPathFocusOff);
+   connect(this->mpc_Ui->pc_LineEditTSP, &C_OgeLeFilePath::editingFinished,
+           this, &C_SdNdeDbAddNewProject::m_OnLoadTSP);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     02.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDbAddNewProject::~C_SdNdeDbAddNewProject(void)
 {
    delete this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     02.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAddNewProject::InitStaticNames(void) const
 {
    this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("Add Data Blocks"));
@@ -145,64 +126,52 @@ void C_SdNdeDbAddNewProject::InitStaticNames(void) const
                                                             "be extracted at."));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current TSP path
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current TSP path
 
    \return
    Current TSP path
-
-   \created     04.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SdNdeDbAddNewProject::GetTSPPath(void) const
 {
-   return this->mc_TSPPath;
+   return C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditTSP->GetPath());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Setter for full TSP path.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Setter for full TSP path.
 
    For appropriate QLineEdit the minimized path is shown.
    Also loads the TSP if possible
 
    \param[in] orc_New New value
-
-   \created     04.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAddNewProject::SetTSPPath(const QString & orc_New)
 {
-   m_SetTSPPath(orc_New);
-   m_OnLoadTSP();
+   this->mpc_Ui->pc_LineEditTSP->SetPath(orc_New, C_PuiProject::h_GetInstance()->GetFolderPath());
+   this->m_OnLoadTSP();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get number of applications in current TSP
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get number of applications in current TSP
 
    \return
    Number of applications in current TSP
-
-   \created     05.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SdNdeDbAddNewProject::GetTSPApplicationCount(void) const
 {
    return this->mc_Package.c_Applications.size();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add selected project to application
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add selected project to application
 
    \param[in]     ou32_TSPIndex   Application index in TSP
    \param[in,out] orc_Application Application to apply new properties to
-
-   \created     02.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAddNewProject::AddSelectedProject(const uint32 ou32_TSPIndex,
                                                 C_OSCNodeApplication & orc_Application) const
 {
@@ -217,7 +186,7 @@ void C_SdNdeDbAddNewProject::AddSelectedProject(const uint32 ou32_TSPIndex,
       orc_Application.u8_ProcessId = rc_SelectedApp.u8_ProcessId;
       // do not concatenate project path with syde-file path because we support relative paths here
       orc_Application.c_ProjectPath =
-         C_Uti::h_ConcatPathIfNecessary(this->mpc_Ui->pc_LineEditCreateIn->GetCompletePath(),
+         C_Uti::h_ConcatPathIfNecessary(this->mpc_Ui->pc_LineEditCreateIn->GetPath(),
                                         rc_SelectedApp.c_ProjectFolder.c_str()).toStdString().c_str();
       orc_Application.c_IDECall = rc_SelectedApp.c_IdeCall;
 
@@ -244,13 +213,10 @@ void C_SdNdeDbAddNewProject::AddSelectedProject(const uint32 ou32_TSPIndex,
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle code gen config
-
-   \created     09.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle code gen config
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAddNewProject::HandleCodeGenerationConfig(void) const
 {
    C_OSCNodeOpenSYDEServerSettings c_Settings;
@@ -263,17 +229,14 @@ void C_SdNdeDbAddNewProject::HandleCodeGenerationConfig(void) const
    C_PuiSdHandler::h_GetInstance()->SetNodeOpenSYDEServerSettings(this->mu32_NodeIndex, c_Settings);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     02.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAddNewProject::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
@@ -299,13 +262,10 @@ void C_SdNdeDbAddNewProject::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Ok button click
-
-   \created     02.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Ok button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAddNewProject::m_OkClicked(void)
 {
    bool q_Continue = false;
@@ -339,10 +299,10 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
    else
    {
       QDir c_CreateInFolder(
-         C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->GetCompletePath()));
+         C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->GetPath()));
       const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
 
-      if (this->mc_TSPPath.isEmpty() == true)
+      if (this->mpc_Ui->pc_LineEditTSP->GetPath() == "")
       {
          C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
          c_Message.SetHeading(C_GtGetText::h_GetText("Add Data Blocks"));
@@ -361,7 +321,7 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
             arg(pc_Node->c_DeviceType.c_str()));
          c_Message.Execute();
       }
-      else if (this->mpc_Ui->pc_LineEditCreateIn->GetCompletePath().isEmpty() == true)
+      else if (this->mpc_Ui->pc_LineEditCreateIn->GetPath().isEmpty() == true)
       {
          C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
          c_Message.SetHeading(C_GtGetText::h_GetText("Add Data Blocks"));
@@ -397,7 +357,7 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
                c_Message2.SetHeading(C_GtGetText::h_GetText("Add Data Blocks"));
                c_Message2.SetDescription(
                   QString(C_GtGetText::h_GetText("Could not clear directory \"%1\".")).
-                  arg(C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->GetCompletePath())));
+                  arg(C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->GetPath())));
                QApplication::restoreOverrideCursor();
                c_Message2.Execute();
             }
@@ -417,14 +377,14 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
    }
    if (q_Continue == true)
    {
-      const QFileInfo c_TSPFileInfo(this->mc_TSPPath);
+      const QFileInfo c_TSPFileInfo(C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditTSP->GetPath()));
       stw_scl::C_SCLString c_ErrorText;
       const QString c_Path =
          QDir::cleanPath(c_TSPFileInfo.absoluteDir().absoluteFilePath(this->mc_Package.c_TemplatePath.c_str()));
       QApplication::setOverrideCursor(Qt::WaitCursor);
       if (C_OSCZipFile::h_UnpackZipFile(c_Path.toStdString().c_str(),
                                         C_ImpUtil::h_GetAbsolutePathFromProject(
-                                           this->mpc_Ui->pc_LineEditCreateIn->GetCompletePath()).toStdString().c_str(),
+                                           this->mpc_Ui->pc_LineEditCreateIn->GetPath()).toStdString().c_str(),
                                         &c_ErrorText) == C_NO_ERR)
       {
          this->mrc_ParentDialog.accept();
@@ -437,7 +397,7 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
          c_Message.SetDescription(QString(C_GtGetText::h_GetText("Could not extract openSYDE Target Support Package "
                                                                  "from file \"%1\" to directory \"%2\".")).arg(c_Path).
                                   arg(C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->
-                                                                              GetCompletePath())));
+                                                                              GetPath())));
          c_Message.SetCustomMinWidth(800);
          c_Message.SetDetails(c_ErrorText.c_str());
          QApplication::restoreOverrideCursor();
@@ -446,31 +406,25 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Cancel button click
-
-   \created     02.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Cancel button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAddNewProject::m_CancelClicked(void)
 {
    this->mrc_ParentDialog.reject();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle TSP path button click
-
-   \created     02.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle TSP path button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAddNewProject::m_TSPButtonClicked(void)
 {
    QString c_FolderName; // for default folder
    QString c_FilePath = "";
    const QString c_Suffix = "syde_tsp";
-   const QFileInfo c_File(this->mc_TSPPath);
+   const QFileInfo c_File(C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditTSP->GetPath()));
    const QString c_FilterName = QString(C_GtGetText::h_GetText("openSYDE Target Support Package file")) +
                                 " (*." + c_Suffix + ")";
 
@@ -496,22 +450,18 @@ void C_SdNdeDbAddNewProject::m_TSPButtonClicked(void)
    if (c_FilePath != "")
    {
       this->SetTSPPath(c_FilePath);
-      m_OnLoadTSP();
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle create in path button click
-
-   \created     02.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle create in path button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAddNewProject::m_CreateInButtonClicked(void)
 {
    QString c_FolderName; // for default folder
 
-   const QDir c_Folder(C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->GetCompletePath()));
+   const QDir c_Folder(C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->GetPath()));
 
    if (c_Folder.exists() == true)
    {
@@ -534,22 +484,15 @@ void C_SdNdeDbAddNewProject::m_CreateInButtonClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle loading TSP
-
-   \created     02.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle loading TSP
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAddNewProject::m_OnLoadTSP(void)
 {
-   if (this->mpc_Ui->pc_LineEditTSP->hasFocus() == true)
-   {
-      this->mc_TSPPath = this->mpc_Ui->pc_LineEditTSP->text();
-   }
-
-   this->ms32_TSPReadResult = C_OSCTargetSupportPackageFiler::h_Load(this->mc_Package,
-                                                                     this->mc_TSPPath.toStdString().c_str());
+   this->ms32_TSPReadResult = C_OSCTargetSupportPackageFiler::h_Load(
+      this->mc_Package,
+      C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditTSP->GetPath()).toStdString().c_str());
 
    if (this->ms32_TSPReadResult == C_NO_ERR)
    {
@@ -566,15 +509,12 @@ void C_SdNdeDbAddNewProject::m_OnLoadTSP(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle top section of TSP description
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle top section of TSP description
 
    \param[in,out] orc_Content Text to append to
-
-   \created     05.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAddNewProject::m_AddTopSection(QString & orc_Content) const
 {
    orc_Content += "<h4>" + QString(C_GtGetText::h_GetText("openSYDE Target Support Package")) + "</h4>";
@@ -598,15 +538,12 @@ void C_SdNdeDbAddNewProject::m_AddTopSection(QString & orc_Content) const
    orc_Content += "</table>";
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle template section of TSP description
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle template section of TSP description
 
    \param[in,out] orc_Content Text to append to
-
-   \created     05.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAddNewProject::m_AddTemplateSection(QString & orc_Content) const
 {
    for (uint32 u32_ItTemplate = 0UL; u32_ItTemplate < this->mc_Package.c_Applications.size(); ++u32_ItTemplate)
@@ -634,15 +571,12 @@ void C_SdNdeDbAddNewProject::m_AddTemplateSection(QString & orc_Content) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init based on specified application
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init based on specified application
 
    \param[in] ou32_NodeIndex        Node index
-
-   \created     02.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAddNewProject::m_Init(const uint32 ou32_NodeIndex) const
 {
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
@@ -653,50 +587,4 @@ void C_SdNdeDbAddNewProject::m_Init(const uint32 ou32_NodeIndex) const
       const QString c_NodePath = C_OSCUtils::h_NiceifyStringForFileName(pc_Node->c_Properties.c_Name).c_str();
       this->mpc_Ui->pc_LineEditCreateIn->SetPath(c_NodePath, C_PuiProject::h_GetInstance()->GetFolderPath());
    }
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot to show up full file path if user wants to edit path manually.
-
-   \created     04.10.2018  STW/M.Echtler
-*/
-//-----------------------------------------------------------------------------
-void C_SdNdeDbAddNewProject::m_EditTSPPathFocusOn(void) const
-{
-   this->mpc_Ui->pc_LineEditTSP->setText(QString(this->mc_TSPPath));
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot to show up minimized file path if user exits from manual editing.
-
-   \created     04.10.2018  STW/M.Echtler
-*/
-//-----------------------------------------------------------------------------
-void C_SdNdeDbAddNewProject::m_EditTSPPathFocusOff(void)
-{
-   this->SetTSPPath(this->mpc_Ui->pc_LineEditTSP->text().toStdString().c_str());
-}
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Setter for full TSP path.
-
-   For appropriate QLineEdit the minimized path is shown.
-
-   \param[in] orc_New New value
-
-   \created     04.10.2018  STW/M.Echtler
-*/
-//-----------------------------------------------------------------------------
-void C_SdNdeDbAddNewProject::m_SetTSPPath(const QString & orc_New)
-{
-   const QFont c_Font = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_13);
-   const QString c_MinimizedPath = C_Uti::h_MinimizePath(orc_New, c_Font, this->mpc_Ui->pc_LineEditTSP->width(),
-                                                         12); // left and right padding of QLineEdit in LineEdit.qss
-
-   this->mc_TSPPath = orc_New;
-   this->mpc_Ui->pc_LineEditTSP->setText(c_MinimizedPath);
-   this->mpc_Ui->pc_LineEditTSP->SetToolTipInformation(orc_New);
 }

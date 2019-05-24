@@ -1,33 +1,27 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Handler class for DBC data (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     17.01.2019  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_CAMDBDBC_H
 #define C_CAMDBDBC_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QMap>
 #include "C_CieConverter.h"
 #include "C_CamDbDbcMessageId.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_CamDbDbc
 {
@@ -42,17 +36,18 @@ public:
    stw_types::sint32 FindMessage(const QString & orc_Message);
 
    bool GetActive(void) const;
-   const QMap<QString, C_CamDbDbcMessageId> & GetFoundMessages(void) const;
+   const std::vector<QString> GetFoundMessages(void) const;
    const C_CieConverter::C_CIECanMessage * GetDBCMessage(const QString & orc_Message) const;
 
 private:
    bool mq_Active;
    bool mq_FoundAll;
    C_CieConverter::C_CIECommDefinition mc_Data;
-   QMap<QString, C_CamDbDbcMessageId> mc_FoundMessages;
+   QMap<QString, C_CamDbDbcMessageId> mc_FoundMessagesNodes;
+   QMap<QString, stw_types::uint32> mc_FoundMessagesUnmapped;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

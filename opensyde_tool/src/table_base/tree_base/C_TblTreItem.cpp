@@ -1,49 +1,39 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Class for data element tree structure (implementation)
 
    Class for data element tree structure
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     07.09.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_TblTreItem.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     07.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_TblTreItem::C_TblTreItem(void) :
    u32_Index(0),
    q_Enabled(true),
@@ -52,15 +42,12 @@ C_TblTreItem::C_TblTreItem(void) :
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_TblTreItem::~C_TblTreItem(void)
 {
    for (std::vector<C_TblTreItem *>::const_iterator c_It = this->c_Children.begin();
@@ -72,15 +59,12 @@ C_TblTreItem::~C_TblTreItem(void)
    pc_Parent = NULL;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add child and take ownership
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add child and take ownership
 
    \param[in,out] opc_Child Child to add & store
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreItem::AddChild(C_TblTreItem * const opc_Child)
 {
    if (opc_Child != NULL)
@@ -90,32 +74,26 @@ void C_TblTreItem::AddChild(C_TblTreItem * const opc_Child)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle children space reservation (performance)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle children space reservation (performance)
 
    \param[in] ou32_Space Number of items to reserve for
-
-   \created     05.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreItem::ReserveChildrenSpace(const uint32 ou32_Space)
 {
    this->c_Children.reserve(ou32_Space);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set child and take ownership
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set child and take ownership
 
    Warning: this will delete the previous item at this position
 
    \param[in]     ou32_Index Position to access
    \param[in,out] opc_Child  Child to set & store
-
-   \created     05.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreItem::SetChild(const uint32 ou32_Index, C_TblTreItem * const opc_Child)
 {
    if (opc_Child != NULL)
@@ -126,16 +104,13 @@ void C_TblTreItem::SetChild(const uint32 ou32_Index, C_TblTreItem * const opc_Ch
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get index of this item in parent item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get index of this item in parent item
 
    \return
    Index of this item in parent item
-
-   \created     29.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_TblTreItem::GetIndexInParentNumber(void)
 {
    sint32 s32_Retval = -1;
@@ -148,9 +123,8 @@ sint32 C_TblTreItem::GetIndexInParentNumber(void)
    //lint -e{1762} This function cannot be const, I  tried (probably changes in interface from qt 5.6 to qt 5.7)
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get index of item in vector
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get index of item in vector
 
    \param[in] orc_Vector Vector
    \param[in] opc_Item   Item
@@ -158,10 +132,8 @@ sint32 C_TblTreItem::GetIndexInParentNumber(void)
    \return
    -1   Not found
    Else Valid index
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_TblTreItem::h_GetIndex(const std::vector<C_TblTreItem *> & orc_Vector, const C_TblTreItem * const opc_Item)
 {
    sint32 s32_Retval = -1;
@@ -185,9 +157,8 @@ sint32 C_TblTreItem::h_GetIndex(const std::vector<C_TblTreItem *> & orc_Vector, 
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Search for index in child items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Search for index in child items
 
    Info: this function only searches for this index in the first layer
 
@@ -196,10 +167,8 @@ sint32 C_TblTreItem::h_GetIndex(const std::vector<C_TblTreItem *> & orc_Vector, 
    \return
    NULL Index not found
    Else Valid item
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_TblTreItem * C_TblTreItem::GetItem(const uint32 ou32_Index)
 {
    C_TblTreItem * pc_Retval = NULL;

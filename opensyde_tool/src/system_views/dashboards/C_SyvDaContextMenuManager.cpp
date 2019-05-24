@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Context menu manager of dashboard scene (implementation)
 
    Context menu manager of dashboard scene
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "gitypes.h"
@@ -24,29 +17,26 @@
 #include "C_GiLiLineGroup.h"
 #include "C_SyvDaContextMenuManager.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     21.04.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaContextMenuManager::C_SyvDaContextMenuManager()
 {
    // add all actions
@@ -63,32 +53,26 @@ C_SyvDaContextMenuManager::C_SyvDaContextMenuManager()
            &C_SyvDaContextMenuManager::m_HideRegisteredActions);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     21.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaContextMenuManager::~C_SyvDaContextMenuManager()
 {
    //lint -e{1540}  no memory leak because of the parent of all mpc_Action* and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds an action to the context menu and returns its pointer (at front)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds an action to the context menu and returns its pointer (at front)
 
    \param[in]     orc_Text       Shown text of action
 
    \return
    Pointer to action
-
-   \created     07.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QAction * C_SyvDaContextMenuManager::RegisterAction(const QString & orc_Text)
 {
    QAction * const pc_Retval = this->mc_ContextMenu.addAction(orc_Text);
@@ -97,16 +81,13 @@ QAction * C_SyvDaContextMenuManager::RegisterAction(const QString & orc_Text)
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds a separator to the context menu and returns its pointer (at front)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds a separator to the context menu and returns its pointer (at front)
 
    \return
    Pointer to action
-
-   \created     07.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QAction * C_SyvDaContextMenuManager::RegisterSeperator(void)
 {
    QAction * const pc_Retval = this->mc_ContextMenu.addSeparator();
@@ -115,38 +96,32 @@ QAction * C_SyvDaContextMenuManager::RegisterSeperator(void)
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the action visible and registers it for hiding after closing the context menu
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the action visible and registers it for hiding after closing the context menu
 
    \param[in]     opc_Action       Pointer to action
 
    \return
    Pointer to action
-
-   \created     21.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaContextMenuManager::SetVisibleWithAutoHide(QAction * const opc_Action)
 {
    opc_Action->setVisible(true);
    this->mc_ListVisibleRegisterdActions.push_back(opc_Action);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Hide all actions
-
-   \created     04.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Hide all actions
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaContextMenuManager::m_SetActionsInvisible(void)
 {
    C_SebBaseContextMenuManager::m_SetActionsInvisible();
    this->mpc_ActionEdit->setVisible(false);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaContextMenuManager::m_ActivateSpecificActions(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -209,6 +184,12 @@ bool C_SyvDaContextMenuManager::m_ActivateSpecificActions(void)
       break;
    }
 
+   //Setup style
+   if (m_ItemTypeHasSetupStyle(this->mpc_ActiveItem->type()))
+   {
+      this->mpc_ActionSetupStyle->setVisible(true);
+   }
+
    if (pc_LineGroup != NULL)
    {
       // Special case: Points can be removed if there are more than 2 points
@@ -238,19 +219,42 @@ bool C_SyvDaContextMenuManager::m_ActivateSpecificActions(void)
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Emit edit signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if the input item type requires a setup style in the context menu
 
-   \created     04.09.2017  STW/M.Echtler
+   \param[in] osn_ItemType Item type to check
+
+   \retval   True    Setup style menu is required
+   \retval   False   Setup style menu should stay hidden
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvDaContextMenuManager::m_ItemTypeHasSetupStyle(const stw_types::sintn osn_ItemType)
+{
+   bool q_Retval;
+
+   switch (osn_ItemType)
+   {
+   case msn_GRAPHICS_ITEM_LINE_ARROW:
+   case msn_GRAPHICS_ITEM_BOUNDARY:
+   case msn_GRAPHICS_ITEM_TEXTELEMENT:
+      q_Retval = true;
+      break;
+   default:
+      q_Retval = false;
+   }
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Emit edit signal
+*/
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaContextMenuManager::m_Edit(void)
 {
    Q_EMIT this->SigEditProperties(this->mpc_ActiveItem);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaContextMenuManager::m_HideRegisteredActions(void)
 {
    QList<QAction *>::const_iterator c_ItItem;

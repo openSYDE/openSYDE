@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       View for database message selection (implementation)
 
    View for database message selection
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.01.2019  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QScrollBar>
@@ -24,35 +17,32 @@
 #include "stwtypes.h"
 #include "C_CamMosDatabaseSelectionView.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 std::vector<QString> C_CamMosDatabaseSelectionView::mhc_LastKnownExpandedTopLevelItems;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     21.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosDatabaseSelectionView::C_CamMosDatabaseSelectionView(QWidget * const opc_Parent) :
    C_OgeTreeViewToolTipBase(opc_Parent)
 {
@@ -68,24 +58,18 @@ C_CamMosDatabaseSelectionView::C_CamMosDatabaseSelectionView(QWidget * const opc
    this->horizontalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     21.01.2019  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosDatabaseSelectionView::~C_CamMosDatabaseSelectionView(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize tree structure
-
-   \created     21.01.2019  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize tree structure
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionView::Init(void)
 {
    this->mc_Model.Init();
@@ -93,23 +77,19 @@ void C_CamMosDatabaseSelectionView::Init(void)
    m_RestoreExpandedIndices();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Filter for string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Filter for string
 
    \param[in] orc_Text String
-
-   \created     21.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionView::Search(const QString & orc_Text)
 {
    this->mc_SortModel.SetFilter(orc_Text);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get selected data elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get selected data elements
 
    array:
    0: database name
@@ -117,10 +97,8 @@ void C_CamMosDatabaseSelectionView::Search(const QString & orc_Text)
 
    \return
    Current selected data elements
-
-   \created     21.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<std::array<QString, 2> > C_CamMosDatabaseSelectionView::GetSelectedDataElements(void) const
 {
    std::vector< std::array<QString, 2> > c_Retval;
@@ -139,29 +117,23 @@ std::vector<std::array<QString, 2> > C_CamMosDatabaseSelectionView::GetSelectedD
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if view empty
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if view empty
 
    \return
    True  Empty
    False Not empty
-
-   \created     21.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_CamMosDatabaseSelectionView::IsEmpty(void) const
 {
    return this->mc_SortModel.rowCount() == 0;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle expanded index save
-
-   \created     21.01.2019  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle expanded index save
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionView::SaveExpandedIndices(void)
 {
    std::vector<QString> c_FoundItems;
@@ -172,17 +144,14 @@ void C_CamMosDatabaseSelectionView::SaveExpandedIndices(void)
    C_CamMosDatabaseSelectionView::mhc_LastKnownExpandedTopLevelItems = c_FoundItems;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse double click event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse double click event slot
 
    Here: Add dialog exit if valid selection
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     21.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionView::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
 {
    const QModelIndex c_Index = this->indexAt(this->viewport()->mapFromGlobal(opc_Event->globalPos()));
@@ -197,17 +166,15 @@ void C_CamMosDatabaseSelectionView::mouseDoubleClickEvent(QMouseEvent * const op
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten selection changed event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten selection changed event slot
 
    Here: Emit signal with new number of selected items
 
-   \param[in,out] opc_Event Event identification and information
-
-   \created     21.01.2019  STW/M.Echtler
+   \param[in]  orc_Selected      new selected items
+   \param[in]  orc_Deselected    previous selected items
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionView::selectionChanged(const QItemSelection & orc_Selected,
                                                      const QItemSelection & orc_Deselected)
 {
@@ -215,15 +182,12 @@ void C_CamMosDatabaseSelectionView::selectionChanged(const QItemSelection & orc_
    Q_EMIT this->SigSelectionChanged(this->selectedIndexes().size());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Append all expanded indices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Append all expanded indices
 
    \param[in,out] orc_FoundItems All expanded items
-
-   \created     21.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionView::m_AppendExpandedIndices(std::vector<QString> & orc_FoundItems)
 {
    orc_FoundItems.clear();
@@ -237,13 +201,10 @@ void C_CamMosDatabaseSelectionView::m_AppendExpandedIndices(std::vector<QString>
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle expanded index restoration
-
-   \created     21.01.2019  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle expanded index restoration
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionView::m_RestoreExpandedIndices(void)
 {
    if (C_CamMosDatabaseSelectionView::mhc_LastKnownExpandedTopLevelItems.size() > 0UL)
@@ -267,9 +228,8 @@ void C_CamMosDatabaseSelectionView::m_RestoreExpandedIndices(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Map source model index to sort model index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Map source model index to sort model index
 
    Hint: This function is probably only necessary because the mapFromSource seems to not work in some cases
    -> Problematic case: if there is no parent this functions seems to return an invalid internalPointer
@@ -278,10 +238,8 @@ void C_CamMosDatabaseSelectionView::m_RestoreExpandedIndices(void)
 
    \return
    Sort model index
-
-   \created     21.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QModelIndex C_CamMosDatabaseSelectionView::m_ManualMapFromSource(const QModelIndex & orc_Index) const
 {
    QModelIndex c_Retval;

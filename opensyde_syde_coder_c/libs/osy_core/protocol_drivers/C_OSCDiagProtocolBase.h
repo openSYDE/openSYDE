@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       openSYDE: Diagnostic protocol driver abstract base class definition
@@ -10,15 +10,9 @@
    - defines interface to specific protocol drivers
    - provides functionality common to all protocol drivers
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     02.03.2017  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCDIAGPROTOCOLBASEH
 #define C_OSCDIAGPROTOCOLBASEH
 
@@ -113,8 +107,6 @@ public:
       \return
       C_NO_ERR   finished cycle
       C_CONFIG   pre-requisites not correct; e.g. driver not initialized
-
-      \created     15.03.2017  STW/A.Stangl
    */
    //-----------------------------------------------------------------------------
    virtual stw_types::sint32 Cycle(void) = 0;

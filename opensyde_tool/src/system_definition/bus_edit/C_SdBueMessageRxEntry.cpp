@@ -1,57 +1,47 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       One message receiver edit entry (implementation)
 
    One message receiver edit entry
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.03.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SdUtil.h"
 #include "C_GtGetText.h"
 #include "C_SdBueMessageRxEntry.h"
 #include "ui_C_SdBueMessageRxEntry.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const stw_types::sint32 C_SdBueMessageRxEntry::mhs32_IndexAuto = 0;
 const stw_types::sint32 C_SdBueMessageRxEntry::mhs32_IndexCustom = 1;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     22.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageRxEntry::C_SdBueMessageRxEntry(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueMessageRxEntry),
@@ -84,27 +74,21 @@ C_SdBueMessageRxEntry::C_SdBueMessageRxEntry(QWidget * const opc_Parent) :
            &C_SdBueMessageRxEntry::m_OnReceiveTimeoutChanged);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     22.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageRxEntry::~C_SdBueMessageRxEntry(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     22.03.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxEntry::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelTimeoutModeDescription->setText(C_GtGetText::h_GetText("Timeout Mode"));
@@ -130,19 +114,16 @@ void C_SdBueMessageRxEntry::InitStaticNames(void) const
                                                                            "(implemented on device) will report an error."));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init
 
    \param[in] orc_EntryName                 Entry name
    \param[in] orc_NodeIndex                 Node index (ID)
    \param[in] orc_InterfaceIndex            Interface Index (ID)
    \param[in] orc_UseAutoReceiveTimeoutFlag Flag whether to use auto receive timeout or custom
    \param[in] orc_ReceiveTimeoutValue       Receive timeout value
-
-   \created     22.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxEntry::Init(const QString & orc_EntryName, const uint32 ou32_NodeIndex,
                                  const uint32 ou32_InterfaceIndex, const bool oq_UseAutoReceiveTimeoutFlag,
                                  const uint32 ou32_ReceiveTimeoutValue)
@@ -161,15 +142,12 @@ void C_SdBueMessageRxEntry::Init(const QString & orc_EntryName, const uint32 ou3
    this->mpc_Ui->pc_SpinBoxTimeout->setValue(ou32_ReceiveTimeoutValue);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update last known cycle time value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update last known cycle time value
 
    \param[in] ou32_Value Last known cycle time value
-
-   \created     22.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxEntry::SetLastKnownCycleTimeValue(const uint32 ou32_Value)
 {
    this->mu32_LastKnownCycleTimeValue = ou32_Value;
@@ -177,24 +155,20 @@ void C_SdBueMessageRxEntry::SetLastKnownCycleTimeValue(const uint32 ou32_Value)
    m_UpdateAutoReceiveTimeoutValue();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set flag to always hide timeout section
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set flag to always hide timeout section
 
    \param[in] oq_Hide Flag to always hide timeout section
-
-   \created     23.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxEntry::SetAlwaysHideTimeout(const bool oq_Hide)
 {
    this->mq_AlwaysHide = oq_Hide;
    m_HandleInactiveStates();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if match
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if match
 
    \param[in] ou32_NodeIndex      Node index (ID)
    \param[in] ou32_InterfaceIndex Interface Index (ID)
@@ -202,10 +176,8 @@ void C_SdBueMessageRxEntry::SetAlwaysHideTimeout(const bool oq_Hide)
    \return
    True  Match
    False No match
-
-   \created     22.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdBueMessageRxEntry::DoesMatch(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex) const
 {
    bool q_Retval;
@@ -221,28 +193,22 @@ bool C_SdBueMessageRxEntry::DoesMatch(const uint32 ou32_NodeIndex, const uint32 
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set checked state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set checked state
 
    \param[in] oq_Checked new state
-
-   \created     22.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxEntry::SetChecked(const bool oq_Checked) const
 {
    this->mpc_Ui->pc_CheckBoxActive->setChecked(oq_Checked);
    m_HandleInactiveStates();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle check box toggle
-
-   \created     22.03.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle check box toggle
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxEntry::m_OnCheckBoxToggled(void)
 {
    if (this->mpc_Ui->pc_CheckBoxActive->isChecked() == true)
@@ -258,50 +224,47 @@ void C_SdBueMessageRxEntry::m_OnCheckBoxToggled(void)
                                this->mpc_Ui->pc_CheckBoxActive->isChecked());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle combo box change
-
-   \created     22.03.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle combo box change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxEntry::m_OnUseReceiveTimeoutChanged(void)
 {
-   bool q_Value;
+   if (this->mpc_Ui->pc_CheckBoxActive->isChecked())
+   {
+      bool q_Value;
 
-   if (this->mpc_Ui->pc_ComboBoxTimeoutActive->currentIndex() == C_SdBueMessageRxEntry::mhs32_IndexAuto)
-   {
-      q_Value = true;
-      m_UpdateAutoReceiveTimeoutValue();
+      if (this->mpc_Ui->pc_ComboBoxTimeoutActive->currentIndex() == C_SdBueMessageRxEntry::mhs32_IndexAuto)
+      {
+         q_Value = true;
+         m_UpdateAutoReceiveTimeoutValue();
+      }
+      else
+      {
+         q_Value = false;
+      }
+      m_HandleInactiveStates();
+      Q_EMIT this->SigNodeUseAutoReceiveTimeout(this->mu32_NodeIndex, this->mu32_InterfaceIndex, q_Value);
    }
-   else
-   {
-      q_Value = false;
-   }
-   m_HandleInactiveStates();
-   Q_EMIT this->SigNodeUseAutoReceiveTimeout(this->mu32_NodeIndex, this->mu32_InterfaceIndex, q_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle spin box change
-
-   \created     22.03.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle spin box change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxEntry::m_OnReceiveTimeoutChanged(void)
 {
-   Q_EMIT this->SigNodeReceiveTimeout(this->mu32_NodeIndex, this->mu32_InterfaceIndex,
-                                      static_cast<uint32>(this->mpc_Ui->pc_SpinBoxTimeout->value()));
+   if (this->mpc_Ui->pc_CheckBoxActive->isChecked())
+   {
+      Q_EMIT this->SigNodeReceiveTimeout(this->mu32_NodeIndex, this->mu32_InterfaceIndex,
+                                         static_cast<uint32>(this->mpc_Ui->pc_SpinBoxTimeout->value()));
+   }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle the inactive states
-
-   \created     22.03.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle the inactive states
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxEntry::m_HandleInactiveStates(void) const
 {
    if ((this->mpc_Ui->pc_CheckBoxActive->isChecked()) && (this->mq_AlwaysHide == false))
@@ -330,13 +293,10 @@ void C_SdBueMessageRxEntry::m_HandleInactiveStates(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update automatic receive timeout value
-
-   \created     22.03.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update automatic receive timeout value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxEntry::m_UpdateAutoReceiveTimeoutValue(void) const
 {
    if (this->mpc_Ui->pc_ComboBoxTimeoutActive->currentIndex() == C_SdBueMessageRxEntry::mhs32_IndexAuto)

@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Header for C_CAN_DLL class.
@@ -6,15 +6,9 @@
    Header to class implementing an interface to communication driver DLLs in the STW-CAN-DLL
    format.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-200x
-   license     use only under terms of contract / confidential
-
-   created     20.10.2008  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2008 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CCANDLLH
 #define CCANDLLH
 
@@ -92,7 +86,6 @@ typedef stw_types::sint32 (WINAPI * PR_CANext_Get_Num_Supported_Bitrates)
                                                                (stw_types::uint32 * const opu32_MultiplicationFactor);
 typedef stw_types::sint32 (WINAPI * PR_CANext_Get_Supported_Bitrate)(const stw_types::uint16 ou16_BitrateIndex,
                                                                      stw_types::uint32 * const opu32_Bitrate);
-
 
 // special functions for stw_tcp.dll:
 typedef stw_types::sint32 (WINAPI * PR_CANtcp_Read_Device_List_From_Server)(const stw_types::uint8 ou8_Channel,

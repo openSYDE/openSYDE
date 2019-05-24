@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for dashboard tabs (implementation)
 
    Widget for dashboard tabs.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     23.06.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QFontMetrics>
@@ -26,36 +19,33 @@
 #include "C_OgeWiUtil.h"
 #include "C_GtGetText.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent    Optional pointer to parent
    \param[in]     oq_ShowUndock Optional flag to show/hide undock option
-
-   \created     23.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeWiDashboardTab::C_OgeWiDashboardTab(QWidget * const opc_Parent, const bool oq_ShowUndock) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_OgeWiDashboardTab),
@@ -86,30 +76,24 @@ C_OgeWiDashboardTab::C_OgeWiDashboardTab(QWidget * const opc_Parent, const bool 
    connect(this->mpc_Ui->pc_PushButtonClose, &QPushButton::clicked, this, &C_OgeWiDashboardTab::m_DeleteAction);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     23.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeWiDashboardTab::~C_OgeWiDashboardTab(void)
 {
    delete mpc_Ui;
    //lint -e{1740} Action pointers do not take ownership of qt items
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set text
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set text
 
    \param[in] orc_Text Tab text
-
-   \created     23.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::SetText(const QString & orc_Text)
 {
    const sintn sn_Offset = 24 + 30 + 6;
@@ -123,18 +107,15 @@ void C_OgeWiDashboardTab::SetText(const QString & orc_Text)
    this->resize(c_FontMetrics.width(orc_Text) + sn_Offset, this->height());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set tooltip of tab label.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set tooltip of tab label.
 
    long description of function within several lines
 
    \param[in]     orc_Heading    tooltip heading
    \param[in]     orc_Content    tooltip content
-
-   \created     24.07.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::SetToolTip(const QString & orc_Heading, const QString & orc_Content) const
 {
    // show tooltip only if there is any content
@@ -144,18 +125,15 @@ void C_OgeWiDashboardTab::SetToolTip(const QString & orc_Heading, const QString 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    Here: draw background
    (Not automatically drawn in any QWidget derivative)
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     26.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::paintEvent(QPaintEvent * const opc_Event)
 {
    stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
@@ -163,17 +141,14 @@ void C_OgeWiDashboardTab::paintEvent(QPaintEvent * const opc_Event)
    QWidget::paintEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse double click event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse double click event slot
 
    Here: Enter edit mode
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     18.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
 {
    QWidget::mouseDoubleClickEvent(opc_Event);
@@ -183,43 +158,34 @@ void C_OgeWiDashboardTab::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set active flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set active flag
 
    \param[in] oq_Value New flag value
-
-   \created     26.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::SetActive(const bool oq_Value)
 {
    this->mq_Active = oq_Value;
    m_HandleMode();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set close button visibility
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set close button visibility
 
    \param[in] oq_Visibility Close button visibility
-
-   \created     07.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::SetCloseButtonVisibility(const bool oq_Visibility)
 {
    this->mpc_Ui->pc_PushButtonClose->setVisible(oq_Visibility && this->mq_Interactive);
    this->mq_CloseButtonVisible = oq_Visibility;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Deactivate additional actions
-
-   \created     26.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Deactivate additional actions
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::DeactivateAdditionalActions(void)
 {
    if (this->mpc_ActionCut != NULL)
@@ -240,30 +206,24 @@ void C_OgeWiDashboardTab::DeactivateAdditionalActions(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set dark mode active
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set dark mode active
 
    \param[in] oq_Active Dark mode active
-
-   \created     02.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::SetDarkMode(const bool oq_Active)
 {
    C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this, "DarkMode", oq_Active);
    this->mpc_Ui->pc_PushButtonClose->SetDarkMode(oq_Active);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function activate or deactivate interaction
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function activate or deactivate interaction
 
    \param[in] oq_Active Flag if interaction available
-
-   \created     11.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::SetInteractive(const bool oq_Active)
 {
    this->mq_Interactive = oq_Active;
@@ -278,43 +238,34 @@ void C_OgeWiDashboardTab::SetInteractive(const bool oq_Active)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set current flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set current flag
 
    \param[in] oq_Value New flag value
-
-   \created     26.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::SetCurrent(const bool oq_Value)
 {
    this->mq_Current = oq_Value;
    m_HandleMode();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set pinned flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set pinned flag
 
    \param[in] oq_Value New flag value
-
-   \created     26.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::SetPinned(const bool oq_Value)
 {
    this->mq_Pinned = oq_Value;
    m_HandleMode();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle mode change
-
-   \created     26.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle mode change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::m_HandleMode(void)
 {
    if (this->mq_Current == true)
@@ -343,13 +294,10 @@ void C_OgeWiDashboardTab::m_HandleMode(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init context menu entries
-
-   \created     26.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init context menu entries
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::m_InitContextMenu(void)
 {
    // add all actions
@@ -390,13 +338,10 @@ void C_OgeWiDashboardTab::m_InitContextMenu(void)
            &C_OgeWiDashboardTab::m_OnCustomContextMenuRequested);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Toggle active state
-
-   \created     26.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Toggle active state
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::m_ToggleActive(void)
 {
    const bool q_Active = !this->mq_Active;
@@ -404,99 +349,75 @@ void C_OgeWiDashboardTab::m_ToggleActive(void)
    this->SetActive(q_Active);
    Q_EMIT this->SigActiveChanged(this, q_Active);
 }
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show custom context menu
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show custom context menu
 
    \param[in] orc_Pos Local context menu position
-
-   \created     26.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 {
    this->mc_ContextMenu.popup(this->mapToGlobal(orc_Pos));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal add action
-
-   \created     25.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal add action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::m_EditProperties(void)
 {
    Q_EMIT this->SigEditPropertiesAction(this);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal copy action
-
-   \created     25.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal copy action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::m_CopyAction(void)
 {
    Q_EMIT this->SigCopyAction(this);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal cut action
-
-   \created     25.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal cut action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::m_CutAction(void)
 {
    Q_EMIT this->SigCutAction(this);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal paste action
-
-   \created     25.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal paste action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::m_PasteAction(void)
 {
    Q_EMIT this->SigPasteAction();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal delete action
-
-   \created     26.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal delete action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::m_DeleteAction(void)
 {
    Q_EMIT this->SigDeleteAction(this);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal close action
-
-   \created     26.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal close action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::m_CloseAction(void)
 {
    Q_EMIT this->SigCloseAction(this);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal undock action
-
-   \created     21.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal undock action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::m_UndockAction(void)
 {
    Q_EMIT this->SigUndockAction(this);

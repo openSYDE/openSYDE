@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Utility for configuration clipboard actions (implementation)
 
    Utility for configuration clipboard actions
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.11.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -24,33 +17,30 @@
 #include "C_CamProHandlerFiler.h"
 #include "C_CamProClipBoardHelper.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save messages
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save messages
 
    \param[in]     orc_Messages  Data
-
-   \created     27.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamProClipBoardHelper::h_SaveMessages(const std::vector<C_CamProMessageData> & orc_Messages)
 {
    C_OSCXMLParserString c_Parser;
@@ -60,19 +50,16 @@ void C_CamProClipBoardHelper::h_SaveMessages(const std::vector<C_CamProMessageDa
    m_StoreParserInClipBoard(c_Parser);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load messages
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load messages
 
    \param[out]    orc_Messages  Data
 
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     27.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamProClipBoardHelper::h_LoadMessages(std::vector<C_CamProMessageData> & orc_Messages)
 {
    sint32 s32_Retval;
@@ -86,40 +73,31 @@ sint32 C_CamProClipBoardHelper::h_LoadMessages(std::vector<C_CamProMessageData> 
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     27.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamProClipBoardHelper::C_CamProClipBoardHelper(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create fresh clipboard root for can monitor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create fresh clipboard root for can monitor
 
    \param[out] orc_XMLParser XML parser
-
-   \created     27.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamProClipBoardHelper::m_GetNewParser(C_OSCXMLParserString & orc_XMLParser)
 {
    orc_XMLParser.CreateAndSelectNodeChild("opensyde-can-monitor-configuration-clip-board");
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set current xml content as clipboard content
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set current xml content as clipboard content
 
    \param[in] orc_XMLParser XML parser
-
-   \created     28.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamProClipBoardHelper::m_StoreParserInClipBoard(const C_OSCXMLParserString & orc_XMLParser)
 {
    stw_scl::C_SCLString c_String;
@@ -127,19 +105,16 @@ void C_CamProClipBoardHelper::m_StoreParserInClipBoard(const C_OSCXMLParserStrin
    C_CamProClipBoardHelper::mh_SetClipBoard(c_String.c_str());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get xml parser from clipboard if possible
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get xml parser from clipboard if possible
 
    \param[out] orc_XMLParser XML parser
 
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     27.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamProClipBoardHelper::m_GetParserFromClipBoard(C_OSCXMLParserString & orc_XMLParser)
 {
    sint32 s32_Retval = C_CONFIG;

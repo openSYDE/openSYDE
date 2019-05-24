@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Group of device descriptions (implementation)
 
    Group of device descriptions
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.09.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -47,10 +40,7 @@ using namespace stw_tgl;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     19.09.2016  STW/M.Echtler
+/*! \brief   Default constructor
 */
 //-----------------------------------------------------------------------------
 C_OSCDeviceGroup::C_OSCDeviceGroup(void)
@@ -58,8 +48,7 @@ C_OSCDeviceGroup::C_OSCDeviceGroup(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Search for device with specified name
+/*! \brief   Search for device with specified name
 
    The returned pointer points to one of the device instances owned by this class.
    So the caller has to consider the lifetime of the used instance of this class when using
@@ -70,8 +59,6 @@ C_OSCDeviceGroup::C_OSCDeviceGroup(void)
    \return
    != NULL:   pointer to found device
    NULL:      define not found
-
-   \created     19.09.2016  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 const C_OSCDeviceDefinition * C_OSCDeviceGroup::LookForDevice(const C_SCLString & orc_Name) const
@@ -90,8 +77,7 @@ const C_OSCDeviceDefinition * C_OSCDeviceGroup::LookForDevice(const C_SCLString 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Load group listed in ini file
+/*! \brief   Load group listed in ini file
 
    Requires:
    Valid base path
@@ -103,8 +89,6 @@ const C_OSCDeviceDefinition * C_OSCDeviceGroup::LookForDevice(const C_SCLString 
    \return
    C_NO_ERR   group loaded
    C_RD_WR    could not load information
-
-   \created     19.09.2016  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDeviceGroup::LoadGroup(C_SCLIniFile & orc_Ini, const C_SCLString & orc_BasePath)
@@ -152,12 +136,9 @@ sint32 C_OSCDeviceGroup::LoadGroup(C_SCLIniFile & orc_Ini, const C_SCLString & o
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Set group name
+/*! \brief   Set group name
 
    \param[in]   orc_GroupName   New value
-
-   \created     19.09.2016  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCDeviceGroup::SetGroupName(const C_SCLString & orc_GroupName)
@@ -166,13 +147,10 @@ void C_OSCDeviceGroup::SetGroupName(const C_SCLString & orc_GroupName)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get group name
+/*! \brief   Get group name
 
    \return
    group name
-
-   \created     19.09.2016  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_OSCDeviceGroup::GetGroupName(void) const
@@ -181,13 +159,10 @@ C_SCLString C_OSCDeviceGroup::GetGroupName(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get all devices
+/*! \brief   Get all devices
 
    \return
    copy of device definitions owned by this class
-
-   \created     19.09.2016  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 std::vector<stw_opensyde_core::C_OSCDeviceDefinition> C_OSCDeviceGroup::GetDevices(void) const

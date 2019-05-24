@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Handle project save and load
 
    Handle project save and load
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     14.07.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -49,8 +42,7 @@ using namespace stw_tgl;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Save project
+/*! \brief   Save project
 
    Save project data to XML file.
    The target path must exists.
@@ -69,8 +61,6 @@ using namespace stw_tgl;
    C_RD_WR    problems accessing file system (could not erase pre-existing file before saving;
                no write access to file)
    C_RANGE    orc_Path is empty
-
-   \created     05.07.2016  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProjectFiler::h_Save(C_OSCProject & orc_Project, const C_SCLString & orc_Path,
@@ -115,8 +105,7 @@ sint32 C_OSCProjectFiler::h_Save(C_OSCProject & orc_Project, const C_SCLString &
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Load project
+/*! \brief   Load project
 
    Load project data from XML file.
 
@@ -128,8 +117,6 @@ sint32 C_OSCProjectFiler::h_Save(C_OSCProject & orc_Project, const C_SCLString &
    C_RANGE    specified file does not exist
    C_NOACT    specified file is present but structure is invalid (e.g. invalid XML file)
    C_CONFIG   content of file is invalid or incomplete
-
-   \created     05.07.2016  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProjectFiler::h_Load(C_OSCProject & orc_Project, const C_SCLString & orc_Path)
@@ -147,12 +134,20 @@ sint32 C_OSCProjectFiler::h_Load(C_OSCProject & orc_Project, const C_SCLString &
          //Check if file and root node exists
          if (c_XML.SelectRoot() == "Project")
          {
+            //Author & Editor
             c_Tmp = c_XML.GetAttributeString("author");
             if (c_Tmp == "")
             {
                stw_tgl::TGL_GetSystemUserName(c_Tmp);
             }
             orc_Project.c_Author = c_Tmp;
+            c_Tmp = c_XML.GetAttributeString("editor");
+            if (c_Tmp == "")
+            {
+               // use author if last editor is empty (reason: prior openSYDE versions handled author as editor)
+               c_Tmp = orc_Project.c_Author;
+            }
+            orc_Project.c_Editor = c_Tmp;
             //Time
             {
                orc_Project.c_CreationTime =
@@ -197,13 +192,12 @@ sint32 C_OSCProjectFiler::h_Load(C_OSCProject & orc_Project, const C_SCLString &
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Save project
+/*! \brief   Save project
 
    Warning: no error handling (job of caller)
 
    Before saving the:
-   - Author will be overwritten with the name of the user logged into the PC system
+   - Editor will be overwritten with the name of the user logged into the PC system
    - ModificationTime will be overwritten with the current time
 
    \param[in,out]  orc_Project         Project data to save (Author and ModificationTime will be updated)
@@ -214,8 +208,6 @@ sint32 C_OSCProjectFiler::h_Load(C_OSCProject & orc_Project, const C_SCLString &
    \return
    C_NO_ERR   data was written
    C_NOACT    could not write to file
-
-   \created     06.07.2016  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCProjectFiler::m_SaveInternal(C_OSCProject & orc_Project, const C_SCLString & orc_Path,
@@ -231,9 +223,17 @@ sint32 C_OSCProjectFiler::m_SaveInternal(C_OSCProject & orc_Project, const C_SCL
    c_XML.SelectRoot();
 
    //author
+   if (oq_New == true)
+   {
+      stw_tgl::TGL_GetSystemUserName(c_Tmp);
+      orc_Project.c_Author = c_Tmp;
+   }
+   c_XML.SetAttributeString("author", orc_Project.c_Author);
+
+   //editor
    stw_tgl::TGL_GetSystemUserName(c_Tmp);
-   c_XML.SetAttributeString("author", c_Tmp);
-   orc_Project.c_Author = c_Tmp;
+   orc_Project.c_Editor = c_Tmp;
+   c_XML.SetAttributeString("editor", orc_Project.c_Editor);
 
    //Creation
    if (oq_New == true)
@@ -241,6 +241,7 @@ sint32 C_OSCProjectFiler::m_SaveInternal(C_OSCProject & orc_Project, const C_SCL
       orc_Project.c_CreationTime = C_SCLDateTime::Now();
    }
    c_XML.SetAttributeString("creation_time", C_OSCProject::h_GetTimeFormatted(orc_Project.c_CreationTime));
+
    //modification
    orc_Project.c_ModificationTime = C_SCLDateTime::Now();
    c_XML.SetAttributeString("modification_time", C_OSCProject::h_GetTimeFormatted(orc_Project.c_ModificationTime));
@@ -248,6 +249,7 @@ sint32 C_OSCProjectFiler::m_SaveInternal(C_OSCProject & orc_Project, const C_SCL
    //openSYDE version
    orc_Project.c_OpenSYDEVersion = orc_OpenSYDEVersion;
    c_XML.SetAttributeString("openSYDE_version", orc_Project.c_OpenSYDEVersion);
+
    //Template
    c_XML.SetAttributeString("template", orc_Project.c_Template);
 

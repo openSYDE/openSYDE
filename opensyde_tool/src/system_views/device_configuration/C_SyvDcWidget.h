@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for handling the process of configuring all nodes. (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.11.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVDCWIDGET_H
 #define C_SYVDCWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <QWidget>
 #include <QTimer>
@@ -26,7 +20,7 @@
 #include "C_SyvDcSequences.h"
 #include "C_OSCSystemBus.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace Ui
 {
@@ -35,9 +29,9 @@ class C_SyvDcWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_SyvDcWidget :
    public QWidget
 {
@@ -118,9 +112,9 @@ private:
                                     const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerIdOnConfiguredBus,
                                     QString & orc_Text, const bool q_BusConnected, const bool q_Configured);
    void m_ResetFlashloader(const bool oq_SameBitrate);
-   stw_types::sint32 m_GetRelevantConfigInfo(std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> & orc_OpenSydeIds,
-                                     std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> & orc_StwIds,
-                                     stw_types::uint32 & oru32_Bitrate);
+   stw_types::sint32 m_GetRelevantConfigInfo(
+      std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> & orc_OpenSydeIds,
+      std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> & orc_StwIds, stw_types::uint32 & oru32_Bitrate);
    void m_ResetNetwork(const bool oq_ToFlashloader);
    void m_ShowReadInfo(const stw_types::sint32 os32_ActualResult);
 
@@ -209,7 +203,7 @@ private:
    static const stw_types::sint32 mhs32_INDEX_CONFIGURATION_ONLY_USED_INTERFACES;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

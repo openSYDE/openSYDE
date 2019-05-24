@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for showing information and offering configuration of all chart data series
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.08.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 #include <QScrollBar>
 #include "stwerrors.h"
@@ -23,35 +17,32 @@
 
 #include "C_OgeWiUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent                 Optional pointer to parent
-
-   \created     25.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItChartDataSelectorWidget::C_SyvDaItChartDataSelectorWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvDaItChartDataSelectorWidget),
@@ -66,40 +57,33 @@ C_SyvDaItChartDataSelectorWidget::C_SyvDaItChartDataSelectorWidget(QWidget * con
    this->mpc_Ui->pc_ScrollAreaChart->horizontalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     25.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItChartDataSelectorWidget::~C_SyvDaItChartDataSelectorWidget()
 {
    delete mpc_Ui;
    //lint -e{1740}  no memory leak because of the parent of mpc_Spacer and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the index of the current view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the index of the current view
 
    Must be set first
 
    \param[in]     ou32_ViewIndex             Index of system view
-
-   \created     20.08.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataSelectorWidget::SetView(const uint32 ou32_ViewIndex)
 {
    this->mu32_ViewIndex = ou32_ViewIndex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds a specific data serie
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds a specific data serie
 
    \param[in]     ou32_DataPoolElementConfigIndex         Datapool element configuration index
    \param[in]     orc_DataPoolElementId                   Datapool element identification
@@ -114,10 +98,8 @@ void C_SyvDaItChartDataSelectorWidget::SetView(const uint32 ou32_ViewIndex)
                                                           invalid data element
    \param[in]     orc_ToolTipErrorTextHeading             Heading of tool tip in case of a warning
    \param[in]     orc_ToolTipErrorText                    Text of tool tip in case of a warning
-
-   \created     28.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataSelectorWidget::AddDataSerie(const stw_types::uint32 ou32_DataPoolElementConfigIndex,
                                                     const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId,
                                                     const QString & orc_DisplayName, const bool oq_Active,
@@ -163,19 +145,16 @@ void C_SyvDaItChartDataSelectorWidget::AddDataSerie(const stw_types::uint32 ou32
    //lint -e{429}  no memory leak because of the parent of pc_DataSerieItem and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Removes the current data serie
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Removes the current data serie
 
    \param[in]     orc_DataPoolElementId   Datapool element identification
 
    \return
    true     data element removed
    false    nothing removed
-
-   \created     07.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItChartDataSelectorWidget::RemoveDataSerie(const uint32 ou32_DataPoolElementConfigIndex)
 {
    bool q_Return = false;
@@ -210,16 +189,13 @@ bool C_SyvDaItChartDataSelectorWidget::RemoveDataSerie(const uint32 ou32_DataPoo
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the shown value of a concrete data serie
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the shown value of a concrete data serie
 
    \param[in]     ou32_DataPoolElementConfigIndex         Datapool element configuration index
    \param[in]     orc_Value                               New value
-
-   \created     29.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataSelectorWidget::UpdateDataSerieValue(const uint32 ou32_DataPoolElementConfigIndex,
                                                             const QString & orc_Value) const
 {
@@ -229,34 +205,30 @@ void C_SyvDaItChartDataSelectorWidget::UpdateDataSerieValue(const uint32 ou32_Da
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Error update for data element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Error update for data element
 
    \param[in] ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
    \param[in] orc_ErrorText                   Error description
    \param[in] orq_IsTransmissionError         Flag if transmission error occurred
-
-   \created     21.08.2018  STW/B.Bayer
+   \param[in] oq_ErrorActive                  Flag if error is active or should be cleared
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataSelectorWidget::UpdateError(const uint32 ou32_DataElementIndex, const QString & orc_ErrorText,
-                                                   const bool oq_IsTransmissionError) const
+                                                   const bool oq_IsTransmissionError, const bool oq_ErrorActive) const
 {
    if (ou32_DataElementIndex < this->mc_DataPoolElementsDataItemWidgets.size())
    {
       this->mc_DataPoolElementsDataItemWidgets[ou32_DataElementIndex]->UpdateError(orc_ErrorText,
-                                                                                   oq_IsTransmissionError);
+                                                                                   oq_IsTransmissionError,
+                                                                                   oq_ErrorActive);
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Resets the error state
-
-   \created     21.08.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Resets the error state
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataSelectorWidget::ResetError(void) const
 {
    uint32 u32_Index;
@@ -267,16 +239,13 @@ void C_SyvDaItChartDataSelectorWidget::ResetError(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update of the color transparence value configured by the actual timeout state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update of the color transparence value configured by the actual timeout state
 
    \param[in] ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
    \param[in] osn_Value                       Value for transparence (0..255)
-
-   \created     31.07.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataSelectorWidget::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
 {
    if (ou32_DataElementIndex < this->mc_DataPoolElementsDataItemWidgets.size())
@@ -285,18 +254,15 @@ void C_SyvDaItChartDataSelectorWidget::UpdateTransparence(const uint32 ou32_Data
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the unit of the datapool element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the unit of the datapool element
 
    \param[in]     orc_DataPoolElementId   Datapool element identification
 
    \return
    Element name
-
-   \created     01.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaItChartDataSelectorWidget::GetDataElementName(const uint32 ou32_DataPoolElementConfigIndex)
 {
    QString c_Return = "";
@@ -309,18 +275,15 @@ QString C_SyvDaItChartDataSelectorWidget::GetDataElementName(const uint32 ou32_D
    return c_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the unit of the datapool element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the unit of the datapool element
 
    \param[in]     orc_DataPoolElementId   Datapool element identification
 
    \return
    Element unit
-
-   \created     01.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaItChartDataSelectorWidget::GetDataElementUnit(const uint32 ou32_DataPoolElementConfigIndex)
 {
    QString c_Return = "";
@@ -333,19 +296,16 @@ QString C_SyvDaItChartDataSelectorWidget::GetDataElementUnit(const uint32 ou32_D
    return c_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets a new unit
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets a new unit
 
    long description of function within several lines
 
    \param[in]     orc_DataPoolElementId   Datapool element identification
    \param[in]     orc_DisplayName         Datapool element display name
    \param[in]     orc_Unit                Element unit
-
-   \created     06.02.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataSelectorWidget::SetDataElementUnit(const uint32 ou32_DataPoolElementConfigIndex,
                                                           const QString & orc_DisplayName, const QString & orc_Unit)
 {
@@ -356,19 +316,16 @@ void C_SyvDaItChartDataSelectorWidget::SetDataElementUnit(const uint32 ou32_Data
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the current id of the selected data element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the current id of the selected data element
 
    \param[out]   orc_DataPoolElementId     Current data serie id
 
    \return
    true     data element exists
    false    data element does not exist
-
-   \created     07.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItChartDataSelectorWidget::GetCurrentDataSerie(uint32 & oru32_DataPoolElementConfigIndex) const
 {
    bool q_Return = false;
@@ -382,27 +339,24 @@ bool C_SyvDaItChartDataSelectorWidget::GetCurrentDataSerie(uint32 & oru32_DataPo
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Selects the concrete datapool element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Selects the concrete datapool element
 
    \param[in]   orc_DataPoolElementId     Current data serie id
-
-   \created     10.10.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataSelectorWidget::SelectDataSerie(const uint32 ou32_DataPoolElementConfigIndex)
 {
    this->m_DataItemSelected(ou32_DataPoolElementConfigIndex, false);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataSelectorWidget::m_DataItemSelectedSlot(const stw_types::uint32 ou32_DataPoolElementConfigIndex)
 {
    this->m_DataItemSelected(ou32_DataPoolElementConfigIndex, true);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartDataSelectorWidget::m_DataItemSelected(const uint32 ou32_DataPoolElementConfigIndex,
                                                           const bool oq_SendSignal)
 {

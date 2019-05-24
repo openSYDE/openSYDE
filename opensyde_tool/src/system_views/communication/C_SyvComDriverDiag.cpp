@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       GUI communication driver for diagnostics (implementation)
 
@@ -8,17 +7,11 @@
    * drivers for accessing data pool elements ("DataDealers")
    * diagnostic protocols via openSYDE or KEFEX protocols
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.11.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwerrors.h"
@@ -35,7 +28,7 @@
 #include "C_SyvComDriverUtil.h"
 #include "C_OSCCanUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_can;
@@ -43,29 +36,26 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Initialize all members based on view
 
    \param[in] ou32_ViewIndex View index
-
-   \created     21.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvComDriverDiag::C_SyvComDriverDiag(const uint32 ou32_ViewIndex) :
    C_OSCComDriverProtocol(),
    mu32_ViewIndex(ou32_ViewIndex),
@@ -78,15 +68,12 @@ C_SyvComDriverDiag::C_SyvComDriverDiag(const uint32 ou32_ViewIndex) :
            &C_SyvComDriverDiag::m_HandlePollingFinished);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     21.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvComDriverDiag::~C_SyvComDriverDiag(void)
 {
    if (mpc_AsyncThread->isRunning() == true)
@@ -136,9 +123,8 @@ C_SyvComDriverDiag::~C_SyvComDriverDiag(void)
    //lint -e{1579}  no memory leak because mpc_AsyncThread is deleted here which is not detected by lint
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all members
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all members
 
    \return
    C_NO_ERR      Operation success
@@ -151,10 +137,8 @@ C_SyvComDriverDiag::~C_SyvComDriverDiag(void)
    C_CHECKSUM    Internal buffer overflow detected
    C_RD_WR       Active bus index invalid
    C_RANGE       Routing configuration failed
-
-   \created     28.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::InitDiag(void)
 {
    sint32 s32_Return;
@@ -203,9 +187,8 @@ sint32 C_SyvComDriverDiag::InitDiag(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets all node into diagnostic mode with necessary security access
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets all node into diagnostic mode with necessary security access
 
    Steps:
    * set up required routing
@@ -223,10 +206,8 @@ sint32 C_SyvComDriverDiag::InitDiag(void)
    C_RD_WR     malformed protocol response
    C_WARN      error response
    C_BUSY      Connection to at least one server failed
-
-   \created     02.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::SetDiagnosticMode(QString & orc_ErrorDetails)
 {
    sint32 s32_Return;
@@ -249,9 +230,17 @@ sint32 C_SyvComDriverDiag::SetDiagnosticMode(QString & orc_ErrorDetails)
                                              this->mc_DefectNodeIndices);
       if (s32_Return == C_NO_ERR)
       {
-         s32_Return = this->m_SetNodesSecurityAccess(1U);
+         s32_Return = this->m_SetNodesSecurityAccess(1U, this->mc_DefectNodeIndices);
+         if (s32_Return != C_NO_ERR)
+         {
+            osc_write_log_error("Initializing diagnostic protocol", "Could not get security access");
+         }
       }
       else
+      {
+         osc_write_log_error("Initializing diagnostic protocol", "Could not activate extended diagnostic session");
+      }
+      if (s32_Return != C_NO_ERR)
       {
          std::set<uint32>::const_iterator c_ItDefectNode;
          for (c_ItDefectNode = this->mc_DefectNodeIndices.begin(); c_ItDefectNode != this->mc_DefectNodeIndices.end();
@@ -261,7 +250,6 @@ sint32 C_SyvComDriverDiag::SetDiagnosticMode(QString & orc_ErrorDetails)
                                 mh_GetNodeNameForActiveNodeIndex(this->mu32_ViewIndex,
                                                                  *c_ItDefectNode) + "\n";
          }
-         osc_write_log_error("Initializing diagnostic protocol", "Could not activate extended diagnostic session");
       }
    }
 
@@ -274,9 +262,8 @@ sint32 C_SyvComDriverDiag::SetDiagnosticMode(QString & orc_ErrorDetails)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Request all cyclic transmissions based on the view configuration
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Request all cyclic transmissions based on the view configuration
 
    Steps:
    * configure rails for all nodes
@@ -298,10 +285,8 @@ sint32 C_SyvComDriverDiag::SetDiagnosticMode(QString & orc_ErrorDetails)
               InitDiag() was not performed
    C_COM      Communication error
    C_NO_ERR   transmissions initialized
-
-   \created     24.08.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
                                                     std::vector<C_OSCNodeDataPoolListElementId> & orc_FailedIdRegisters,
                                                     std::vector<QString> & orc_FailedIdErrorDetails, std::map<uint32,
@@ -516,9 +501,8 @@ sint32 C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Stop cyclic transmissions for all nodes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Stop cyclic transmissions for all nodes
 
     Even if one of the nodes reports an error this function will continue and try to stop
      communication for the rest.
@@ -528,10 +512,8 @@ sint32 C_SyvComDriverDiag::SetUpCyclicTransmissions(QString & orc_ErrorDetails,
               InitDiag() was not performed
    C_COM      Communication error (at least one of the nodes did not confirm the stop)
    C_NO_ERR   requested to stop transmissions
-
-   \created     29.08.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::StopCyclicTransmissions(void)
 {
    uint16 u16_Node;
@@ -551,14 +533,9 @@ sint32 C_SyvComDriverDiag::StopCyclicTransmissions(void)
          if (s32_Return2 != C_NO_ERR)
          {
             osc_write_log_warning("Asynchronous communication",
-                                  QString("Node \"%1\" - DataPoolStopEventDriven - error: %2\n"
-                                          "C_TIMEOUT  expected response not received within timeout\n"
-                                          "C_NOACT    could not send request (e.g. TX buffer full)\n"
-                                          "C_CONFIG   pre-requisites not correct; e.g. driver not initialized\n"
-                                          "C_WARN     error response\n"
-                                          "C_RD_WR    malformed protocol response\n").arg(QString(m_GetActiveNodeName(
-                                                                                                     u16_Node).c_str())).arg(
-                                     C_Uti::h_StwError(s32_Return2)).toStdString().c_str());
+                                  QString("Node \"%1\" - DataPoolStopEventDriven - warning: %2\n").
+                                  arg(QString(m_GetActiveNodeName(u16_Node).c_str())).
+                                  arg(C_Uti::h_StwError(s32_Return2)).toStdString().c_str());
             s32_Return = C_COM;
          }
       }
@@ -567,9 +544,8 @@ sint32 C_SyvComDriverDiag::StopCyclicTransmissions(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Close the com driver
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Close the com driver
 
    All KEFEX servers will be logged off and if used the routing to KEFEX servers will be closed and deactivated.
    The openSYDE protocol server will not be closed. The session timeout is used to close all connections.
@@ -580,10 +556,8 @@ sint32 C_SyvComDriverDiag::StopCyclicTransmissions(void)
    C_NOACT    could not send protocol request
    C_WARN     error response
    C_CONFIG   CAN dispatcher not installed
-
-   \created     09.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::StopDiagnosisServer(void)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -612,6 +586,11 @@ sint32 C_SyvComDriverDiag::StopDiagnosisServer(void)
          }
       }
 
+      // Stop cyclic transmissions due to problems when closing TCP sockets.
+      // If a socket was closed by client and a cyclic transmission was sent by server before the close was processed
+      // a socket reset will occur
+      this->StopCyclicTransmissions();
+
       this->m_StopRoutingOfActiveNodes();
 
       this->mq_Initialized = false;
@@ -620,17 +599,14 @@ sint32 C_SyvComDriverDiag::StopDiagnosisServer(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Starts the thread for async communication
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Starts the thread for async communication
 
    \return
    C_NO_ERR    Thread started with cyclic communication
    C_CONFIG    InitDiag function was not called or not successful or protocol was not initialized properly.
-
-   \created     21.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::StartCycling(void)
 {
    sint32 s32_Return = C_CONFIG;
@@ -644,13 +620,10 @@ sint32 C_SyvComDriverDiag::StartCycling(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Stops the thread for async communication
-
-   \created     21.08.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Stops the thread for async communication
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvComDriverDiag::StopCycling(void)
 {
    tgl_assert(this->mpc_AsyncThread != NULL);
@@ -665,26 +638,22 @@ void C_SyvComDriverDiag::StopCycling(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sends the tester present message to all active and reached nodes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sends the tester present message to all active and reached nodes
 
    \return
    C_NO_ERR    All nodes set to session successfully
    C_CONFIG    Init function was not called or not successful or protocol was not initialized properly.
    C_COM       Error of service
-
-   \created     29.10.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::SendTesterPresentWithoutDefectNodes(void)
 {
    return this->SendTesterPresent(&this->mc_DefectNodeIndices);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start thread for polled reading from data pool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start thread for polled reading from data pool
 
    \param[in]   ou32_NodeIndex       node index to read from
    \param[in]   ou8_DataPoolIndex    data pool to read from
@@ -694,10 +663,8 @@ sint32 C_SyvComDriverDiag::SendTesterPresentWithoutDefectNodes(void)
    \return
    C_RANGE   node index out of range
    C_BUSY    polling thread already busy (only one polled function possible in parallel)
-
-   \created     24.08.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::PollDataPoolRead(const uint32 ou32_NodeIndex, const uint8 ou8_DataPoolIndex,
                                             const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex)
 {
@@ -716,9 +683,8 @@ sint32 C_SyvComDriverDiag::PollDataPoolRead(const uint32 ou32_NodeIndex, const u
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start thread for polled writing to data pool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start thread for polled writing to data pool
 
    \param[in]   ou32_NodeIndex       node index to write from
    \param[in]   ou8_DataPoolIndex    data pool to write from
@@ -728,10 +694,8 @@ sint32 C_SyvComDriverDiag::PollDataPoolRead(const uint32 ou32_NodeIndex, const u
    \return
    C_RANGE   node index out of range
    C_BUSY    polling thread already busy (only one polled function possible in parallel)
-
-   \created     29.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::PollDataPoolWrite(const uint32 ou32_NodeIndex, const uint8 ou8_DataPoolIndex,
                                              const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex)
 {
@@ -750,9 +714,8 @@ sint32 C_SyvComDriverDiag::PollDataPoolWrite(const uint32 ou32_NodeIndex, const 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start thread for polled reading from data pool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start thread for polled reading from data pool
 
    \param[in]   ou32_NodeIndex       node index to read from
    \param[in]   ou8_DataPoolIndex    data pool to read from
@@ -762,10 +725,8 @@ sint32 C_SyvComDriverDiag::PollDataPoolWrite(const uint32 ou32_NodeIndex, const 
    \return
    C_RANGE   node index out of range
    C_BUSY    polling thread already busy (only one polled function possible in parallel)
-
-   \created     24.08.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::PollNvmRead(const uint32 ou32_NodeIndex, const uint8 ou8_DataPoolIndex,
                                        const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex)
 {
@@ -784,9 +745,8 @@ sint32 C_SyvComDriverDiag::PollNvmRead(const uint32 ou32_NodeIndex, const uint8 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start thread for polled writing to data pool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start thread for polled writing to data pool
 
    \param[in]   ou32_NodeIndex       node index to write from
    \param[in]   ou8_DataPoolIndex    data pool to write from
@@ -796,10 +756,8 @@ sint32 C_SyvComDriverDiag::PollNvmRead(const uint32 ou32_NodeIndex, const uint8 
    \return
    C_RANGE   node index out of range
    C_BUSY    polling thread already busy (only one polled function possible in parallel)
-
-   \created     29.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::PollNvmWrite(const uint32 ou32_NodeIndex, const uint8 ou8_DataPoolIndex,
                                         const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex)
 {
@@ -818,9 +776,8 @@ sint32 C_SyvComDriverDiag::PollNvmWrite(const uint32 ou32_NodeIndex, const uint8
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start thread for polled reading a list from data pool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start thread for polled reading a list from data pool
 
    \param[in]   ou32_NodeIndex       node index to read from
    \param[in]   ou8_DataPoolIndex    data pool to read from
@@ -829,10 +786,8 @@ sint32 C_SyvComDriverDiag::PollNvmWrite(const uint32 ou32_NodeIndex, const uint8
    \return
    C_RANGE   node index out of range
    C_BUSY    polling thread already busy (only one polled function possible in parallel)
-
-   \created     24.08.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::PollNvmReadList(const uint32 ou32_NodeIndex, const uint8 ou8_DataPoolIndex,
                                            const uint16 ou16_ListIndex)
 {
@@ -852,9 +807,8 @@ sint32 C_SyvComDriverDiag::PollNvmReadList(const uint32 ou32_NodeIndex, const ui
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start thread for polled writing changed NVM elements to data pool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start thread for polled writing changed NVM elements to data pool
 
    \param[in] ou32_NodeIndex Node index to write to
    \param[in] orc_ListIds    Lists to update CRC only
@@ -862,10 +816,8 @@ sint32 C_SyvComDriverDiag::PollNvmReadList(const uint32 ou32_NodeIndex, const ui
    \return
    C_RANGE   node index out of range
    C_BUSY    polling thread already busy (only one polled function possible in parallel)
-
-   \created     06.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::PollSafeNvmWriteChangedElements(const uint32 ou32_NodeIndex,
                                                            const std::vector<C_OSCNodeDataPoolListId> & orc_ListIds)
 {
@@ -883,27 +835,23 @@ sint32 C_SyvComDriverDiag::PollSafeNvmWriteChangedElements(const uint32 ou32_Nod
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Gets the output of PollSafeNvmWriteChangedElements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Gets the output of PollSafeNvmWriteChangedElements
 
    \param[out]    orc_ChangedElements       All changed elements
 
    \return
    C_BUSY    polling thread already busy (only one polled function possible in parallel)
-
-   \created     07.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::GetPollSafeNvmWriteChangedElementsOutput(
    std::vector<C_OSCNodeDataPoolListElementId> & orc_ChangedElements) const
 {
    return this->mc_PollingThread.GetNvmSafeWriteChangedValuesOutput(orc_ChangedElements);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start thread for polled reading of NVM values
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start thread for polled reading of NVM values
 
    PollSafeNvmWriteChangedElements must be called before calling PollSafeNvmReadValues
 
@@ -912,10 +860,8 @@ sint32 C_SyvComDriverDiag::GetPollSafeNvmWriteChangedElementsOutput(
    \return
    C_RANGE   node index out of range
    C_BUSY    polling thread already busy (only one polled function possible in parallel)
-
-   \created     06.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::PollSafeNvmReadValues(const uint32 ou32_NodeIndex)
 {
    sint32 s32_Return;
@@ -932,9 +878,8 @@ sint32 C_SyvComDriverDiag::PollSafeNvmReadValues(const uint32 ou32_NodeIndex)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the output of the function NvmSafeReadValues
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the output of the function NvmSafeReadValues
 
    Must be called after the thread was finished after calling NvmSafeReadValues
 
@@ -943,18 +888,15 @@ sint32 C_SyvComDriverDiag::PollSafeNvmReadValues(const uint32 ou32_NodeIndex)
    \return
    C_NO_ERR   result returned
    C_BUSY     previously started polled communication still going on
-
-   \created     24.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::GetPollNvmSafeReadValuesOutput(const C_OSCNode * & orpc_ParamNodeValues) const
 {
    return this->mc_PollingThread.GetNvmSafeReadValuesOutput(orpc_ParamNodeValues);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start thread for polled reading of NVM values
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start thread for polled reading of NVM values
 
    PollSafeNvmWriteChangedElements must be called before calling PollSafeNvmReadValues
 
@@ -963,10 +905,8 @@ sint32 C_SyvComDriverDiag::GetPollNvmSafeReadValuesOutput(const C_OSCNode * & or
    \return
    C_RANGE   node index out of range
    C_BUSY    polling thread already busy (only one polled function possible in parallel)
-
-   \created     06.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::PollSafeNvmSafeWriteCrcs(const uint32 ou32_NodeIndex)
 {
    sint32 s32_Return;
@@ -983,9 +923,8 @@ sint32 C_SyvComDriverDiag::PollSafeNvmSafeWriteCrcs(const uint32 ou32_NodeIndex)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start thread for polled reading of NVM values
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start thread for polled reading of NVM values
 
    PollSafeNvmWriteChangedElements must be called before calling PollSafeNvmReadValues
 
@@ -996,10 +935,8 @@ sint32 C_SyvComDriverDiag::PollSafeNvmSafeWriteCrcs(const uint32 ou32_NodeIndex)
    \return
    C_RANGE   node index out of range
    C_BUSY    polling thread already busy (only one polled function possible in parallel)
-
-   \created     09.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::PollNvmNotifyOfChanges(const uint32 ou32_NodeIndex, const uint8 ou8_DataPoolIndex,
                                                   const uint16 ou16_ListIndex)
 {
@@ -1018,27 +955,23 @@ sint32 C_SyvComDriverDiag::PollNvmNotifyOfChanges(const uint32 ou32_NodeIndex, c
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Gets the output of PollSafeNvmWriteChangedElements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Gets the output of PollSafeNvmWriteChangedElements
 
    \param[out] orq_ApplicationAcknowledge  true: positive acknowledge from server
                                            false: negative acknowledge from server
 
    \return
    C_BUSY    polling thread already busy (only one polled function possible in parallel)
-
-   \created     07.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::GetPollNvmNotifyOfChangesOutput(bool & orq_ApplicationAcknowledge) const
 {
    return this->mc_PollingThread.GetNvmNotifyOfChangesOutput(orq_ApplicationAcknowledge);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Wrap polling results
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Wrap polling results
 
    Can be used to extract the results of one service execution after it has finished.
 
@@ -1048,18 +981,15 @@ sint32 C_SyvComDriverDiag::GetPollNvmNotifyOfChangesOutput(bool & orq_Applicatio
    \return
    C_NO_ERR   result code read
    C_BUSY     previously started polled communication still going on
-
-   \created     05.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::GetPollResults(sint32 & ors32_Result) const
 {
    return this->mc_PollingThread.GetResults(ors32_Result);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get result of previously started service execution
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get result of previously started service execution
 
    Can be used to extract the results of one service execution after it has finished.
 
@@ -1069,30 +999,50 @@ sint32 C_SyvComDriverDiag::GetPollResults(sint32 & ors32_Result) const
    \return
    C_NO_ERR       result code read
    C_BUSY         previously started polled communication still going on
-
-   \created     17.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::GetPollResultNRC(uint8 & oru8_NRC) const
 {
    return this->mc_PollingThread.GetNegativeResponseCode(oru8_NRC);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Wrapping call of h_NvmSafeClearInternalContent
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Wrapping call of h_NvmSafeClearInternalContent
 
-   \created     13.11.2017  STW/B.Bayer
+   \param[in] ou32_NodeIndex     Index of node
+
+   \return
+   C_NO_ERR  started polling
+   C_RANGE   node index out of range
 */
-//-----------------------------------------------------------------------------
-void C_SyvComDriverDiag::NvmSafeClearInternalContent(void) const
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_SyvComDriverDiag::NvmSafeClearInternalContent(const uint32 ou32_NodeIndex) const
 {
-   C_OSCDataDealerNvmSafe::h_NvmSafeClearInternalContent();
+   sint32 s32_Return;
+   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
+
+   if (u32_ActiveIndex >= mc_DataDealers.size())
+   {
+      s32_Return = C_RANGE;
+   }
+   else
+   {
+      C_SyvComDataDealer * const pc_DataDealer = mc_DataDealers[u32_ActiveIndex];
+      if (pc_DataDealer != NULL)
+      {
+         s32_Return = C_NO_ERR;
+         pc_DataDealer->NvmSafeClearInternalContent();
+      }
+      else
+      {
+         s32_Return = C_RANGE;
+      }
+   }
+   return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start thread for polled reading of NVM values for creating parameter set file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start thread for polled reading of NVM values for creating parameter set file
 
    \param[in] ou32_NodeIndex     Index of node
    \param[in] orc_ListIds        Container will relevant list IDs
@@ -1101,10 +1051,8 @@ void C_SyvComDriverDiag::NvmSafeClearInternalContent(void) const
    C_NO_ERR  started polling
    C_RANGE   node index out of range
    C_BUSY    polling thread already busy (only one polled function possible in parallel)
-
-   \created     13.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::PollNvmSafeReadParameterValues(const uint32 ou32_NodeIndex,
                                                           const std::vector<C_OSCNodeDataPoolListId> & orc_ListIds)
 {
@@ -1123,11 +1071,12 @@ sint32 C_SyvComDriverDiag::PollNvmSafeReadParameterValues(const uint32 ou32_Node
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Wrapping call of h_NvmSafeCreateCleanFileWithoutCRC
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Wrapping call of h_NvmSafeCreateCleanFileWithoutCRC
 
-   \param[in] orc_FilePath Parameter file path
+   \param[in] ou32_NodeIndex Node index to work with
+   \param[in] orc_FilePath   Parameter file path
+   \param[in] orc_FileInfo   Optional general file information
 
    \return
    C_NO_ERR   data saved
@@ -1135,24 +1084,43 @@ sint32 C_SyvComDriverDiag::PollNvmSafeReadParameterValues(const uint32 ou32_Node
    C_CONFIG   Internal data invalid
    C_BUSY     file already exists
    C_RD_WR    could not write to file (e.g. missing write permissions; missing folder)
-
-   \created     13.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
-sint32 C_SyvComDriverDiag::NvmSafeCreateCleanFileWithoutCRC(const QString & orc_Path) const
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_SyvComDriverDiag::NvmSafeCreateCleanFileWithoutCRC(const uint32 ou32_NodeIndex, const QString & orc_Path,
+                                                            const C_OSCParamSetInterpretedFileInfoData & orc_FileInfo)
+const
 {
-   const stw_scl::C_SCLString c_Path = orc_Path.toStdString().c_str();
+   sint32 s32_Return;
+   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
 
-   return C_OSCDataDealerNvmSafe::h_NvmSafeCreateCleanFileWithoutCRC(c_Path);
+   if (u32_ActiveIndex >= mc_DataDealers.size())
+   {
+      s32_Return = C_RANGE;
+   }
+   else
+   {
+      const stw_scl::C_SCLString c_Path = orc_Path.toStdString().c_str();
+      C_SyvComDataDealer * const pc_DataDealer = mc_DataDealers[u32_ActiveIndex];
+      if (pc_DataDealer != NULL)
+      {
+         s32_Return = C_NO_ERR;
+         pc_DataDealer->NvmSafeCreateCleanFileWithoutCRC(c_Path, orc_FileInfo);
+      }
+      else
+      {
+         s32_Return = C_RANGE;
+      }
+   }
+   return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Wrapping call of h_NvmSafeReadFileWithoutCRC
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Wrapping call of h_NvmSafeReadFileWithoutCRC
 
    Warning: CRC is not checked
 
-   \param[in] orc_FilePath Parameter file path
+   \param[in] ou32_NodeIndex Node index to work with
+   \param[in] orc_FilePath   Parameter file path
 
    \return
    C_NO_ERR   data read
@@ -1160,20 +1128,36 @@ sint32 C_SyvComDriverDiag::NvmSafeCreateCleanFileWithoutCRC(const QString & orc_
    C_RANGE    Path does not match the path of the preceding function calls
    C_RD_WR    specified file does not exist
               specified file is present but structure is invalid (e.g. invalid XML file)
-
-   \created     13.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
-sint32 C_SyvComDriverDiag::NvmSafeReadFileWithoutCRC(const QString & orc_Path) const
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_SyvComDriverDiag::NvmSafeReadFileWithoutCRC(const uint32 ou32_NodeIndex, const QString & orc_Path) const
 {
-   const stw_scl::C_SCLString c_Path = orc_Path.toStdString().c_str();
+   sint32 s32_Return;
+   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
 
-   return C_OSCDataDealerNvmSafe::h_NvmSafeReadFileWithoutCRC(c_Path);
+   if (u32_ActiveIndex >= mc_DataDealers.size())
+   {
+      s32_Return = C_RANGE;
+   }
+   else
+   {
+      const stw_scl::C_SCLString c_Path = orc_Path.toStdString().c_str();
+      C_SyvComDataDealer * const pc_DataDealer = mc_DataDealers[u32_ActiveIndex];
+      if (pc_DataDealer != NULL)
+      {
+         s32_Return = C_NO_ERR;
+         pc_DataDealer->NvmSafeReadFileWithoutCRC(c_Path);
+      }
+      else
+      {
+         s32_Return = C_RANGE;
+      }
+   }
+   return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Wrapping call of NvmSafeCheckParameterFileContents
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Wrapping call of NvmSafeCheckParameterFileContents
 
    \param[in]  ou32_NodeIndex    node index to read from
    \param[in]  orc_Path          File path
@@ -1186,10 +1170,8 @@ sint32 C_SyvComDriverDiag::NvmSafeReadFileWithoutCRC(const QString & orc_Path) c
               Node index out of range
    C_CONFIG   Mismatch of data with current node
                or no valid pointer to the original instance of "C_OSCNode" is set in "C_OSCDataDealer"
-
-   \created     13.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::NvmSafeCheckParameterFileContents(const uint32 ou32_NodeIndex, const QString & orc_Path,
                                                              std::vector<C_OSCNodeDataPoolListId> & orc_DataPoolLists)
 {
@@ -1209,11 +1191,11 @@ sint32 C_SyvComDriverDiag::NvmSafeCheckParameterFileContents(const uint32 ou32_N
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Wrapping call of h_NvmSafeUpdateCRCForFile
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Wrapping call of h_NvmSafeUpdateCRCForFile
 
-   \param[in] orc_FilePath Parameter file path
+   \param[in] ou32_NodeIndex Node index to work with
+   \param[in] orc_FilePath   Parameter file path
 
    \return
    C_NO_ERR   CRC updated
@@ -1221,41 +1203,52 @@ sint32 C_SyvComDriverDiag::NvmSafeCheckParameterFileContents(const uint32 ou32_N
    C_RANGE    Path does not match the path of the preceding function calls
    C_RD_WR    specified file does not exist
               specified file is present but structure is invalid (e.g. invalid XML file)
-
-   \created     13.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
-sint32 C_SyvComDriverDiag::NvmSafeUpdateCRCForFile(const QString & orc_Path) const
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_SyvComDriverDiag::NvmSafeUpdateCRCForFile(const uint32 ou32_NodeIndex, const QString & orc_Path) const
 {
-   const stw_scl::C_SCLString c_Path = orc_Path.toStdString().c_str();
+   sint32 s32_Return;
+   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
 
-   return C_OSCDataDealerNvmSafe::h_NvmSafeUpdateCRCForFile(c_Path);
+   if (u32_ActiveIndex >= mc_DataDealers.size())
+   {
+      s32_Return = C_RANGE;
+   }
+   else
+   {
+      const stw_scl::C_SCLString c_Path = orc_Path.toStdString().c_str();
+      C_SyvComDataDealer * const pc_DataDealer = mc_DataDealers[u32_ActiveIndex];
+      if (pc_DataDealer != NULL)
+      {
+         s32_Return = C_NO_ERR;
+         pc_DataDealer->NvmSafeUpdateCRCForFile(c_Path);
+      }
+      else
+      {
+         s32_Return = C_RANGE;
+      }
+   }
+   return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns a reference to all data dealer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns a reference to all data dealer
 
    \return
    Reference to vector with all data dealer
-
-   \created     29.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const std::vector<C_SyvComDataDealer *> & C_SyvComDriverDiag::GetAllDataDealer(void) const
 {
    return this->mc_DataDealers;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds a widget to inform about new datapool com signal events
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds a widget to inform about new datapool com signal events
 
    \param[in]     opc_Widget     Pointer to dashboard widget base
-
-   \created     11.09.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvComDriverDiag::RegisterWidget(C_PuiSvDbDataElementHandler * const opc_Widget)
 {
    if (opc_Widget != NULL)
@@ -1330,19 +1323,16 @@ void C_SyvComDriverDiag::RegisterWidget(C_PuiSvDbDataElementHandler * const opc_
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the information about the routing configuration
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the information about the routing configuration
 
    \param[out]    ore_Mode       Needed routing mode
 
    \return
    true     Routing is necessary
    false    Routing is not necessary
-
-   \created     21.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvComDriverDiag::m_GetRoutingMode(C_OSCRoutingCalculation::E_Mode & ore_Mode) const
 {
    ore_Mode = C_OSCRoutingCalculation::eDIAGNOSTIC;
@@ -1350,34 +1340,28 @@ bool C_SyvComDriverDiag::m_GetRoutingMode(C_OSCRoutingCalculation::E_Mode & ore_
    return true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns needed session ID for the current routing mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns needed session ID for the current routing mode
 
    \return
    Session ID for flashloader
-
-   \created     01.03.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint8 C_SyvComDriverDiag::m_GetRoutingSessionId(void) const
 {
    return C_OSCProtocolDriverOsy::hu8_DIAGNOSTIC_SESSION_EXTENDED_DIAGNOSIS;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checks if the routing for a not openSYDE server is necessary
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks if the routing for a not openSYDE server is necessary
 
    \param[in]     orc_Node                             Current node
 
    \return
    true    Specific server and legacy routing necessary
    false   No specific server and legacy routing necessary
-
-   \created     28.06.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvComDriverDiag::m_IsRoutingSpecificNecessary(const C_OSCNode & orc_Node) const
 {
    bool q_Return = false;
@@ -1390,9 +1374,8 @@ bool C_SyvComDriverDiag::m_IsRoutingSpecificNecessary(const C_OSCNode & orc_Node
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Prepares the routing for a KEFEX server
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Prepares the routing for a KEFEX server
 
    \param[in]     ou32_ActiveNode                      Active node index of vector mc_ActiveNodes
    \param[in]     opc_Node                             Pointer to current node
@@ -1405,10 +1388,8 @@ bool C_SyvComDriverDiag::m_IsRoutingSpecificNecessary(const C_OSCNode & orc_Node
    C_NOACT     No specific server necessary
    C_CONFIG    opc_ProtocolOsyOfLastNodeOfRouting is NULL
                Diagnose protocol is NULL
-
-   \created     27.02.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::m_StartRoutingSpecific(const uint32 ou32_ActiveNode, const C_OSCNode * const opc_Node,
                                                   const C_OSCRoutingRoutePoint & orc_LastNodeOfRouting,
                                                   C_OSCProtocolDriverOsy * const opc_ProtocolOsyOfLastNodeOfRouting,
@@ -1445,15 +1426,12 @@ sint32 C_SyvComDriverDiag::m_StartRoutingSpecific(const uint32 ou32_ActiveNode, 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Stops the specific routing configuration for one specific node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Stops the specific routing configuration for one specific node
 
    \param[in]     ou32_ActiveNode                      Active node index of vector mc_ActiveNodes
-
-   \created     23.04.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvComDriverDiag::m_StopRoutingSpecific(const uint32 ou32_ActiveNode)
 {
    if ((this->mc_ActiveNodesIndexes[ou32_ActiveNode] < this->mpc_SysDef->c_Nodes.size()) &&
@@ -1474,9 +1452,8 @@ void C_SyvComDriverDiag::m_StopRoutingSpecific(const uint32 ou32_ActiveNode)
    C_OSCComDriverProtocol::m_StopRoutingSpecific(ou32_ActiveNode);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checks if the interface has relevant functions activated
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks if the interface has relevant functions activated
 
    In this case diagnostic and update functionality
 
@@ -1485,10 +1462,8 @@ void C_SyvComDriverDiag::m_StopRoutingSpecific(const uint32 ou32_ActiveNode)
    \return
    true     Interface has relevant functions activated and is connected
    false    Interface has no relevant functions activated or is not connected
-
-   \created     09.03.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvComDriverDiag::m_CheckInterfaceForFunctions(const C_OSCNodeComInterfaceSettings & orc_ComItfSettings) const
 {
    bool q_Return = false;
@@ -1503,16 +1478,13 @@ bool C_SyvComDriverDiag::m_CheckInterfaceForFunctions(const C_OSCNodeComInterfac
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Distributes the CAN message to all registered C_OSCDataDealer for all relevant datapool comm signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Distributes the CAN message to all registered C_OSCDataDealer for all relevant datapool comm signals
 
    \param[in]     orc_Msg        Current CAN message
    \param[in]     oq_IsTx        Message was sent by C_OSCComDriverBase itself
-
-   \created     07.09.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvComDriverDiag::m_HandleCanMessage(const T_STWCAN_Msg_RX & orc_Msg, const bool oq_IsTx)
 {
    C_OSCComDriverBase::m_HandleCanMessage(orc_Msg, oq_IsTx);
@@ -1561,17 +1533,14 @@ void C_SyvComDriverDiag::m_HandleCanMessage(const T_STWCAN_Msg_RX & orc_Msg, con
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Initialize all members based on view
 
    \param[in] ou32_ViewIndex View index
-
-   \created     12.09.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvComDriverDiag::C_SyvComDriverDiagWidgetRegistration::C_SyvComDriverDiagWidgetRegistration(void) :
    pc_Handler(NULL),
    u16_Dlc(0),
@@ -1579,19 +1548,16 @@ C_SyvComDriverDiag::C_SyvComDriverDiagWidgetRegistration::C_SyvComDriverDiagWidg
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if current equal to orc_Cmp
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if current equal to orc_Cmp
 
    \param[in] orc_Cmp Compared instance
 
    \return
    Current equal to orc_Cmp
    Else false
-
-   \created     12.09.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvComDriverDiag::C_SyvComDriverDiagWidgetRegistration::operator ==(
    const C_SyvComDriverDiagWidgetRegistration & orc_Cmp) const
 {
@@ -1608,19 +1574,16 @@ bool C_SyvComDriverDiag::C_SyvComDriverDiagWidgetRegistration::operator ==(
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Detects all nodes which are used in current dashboard
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Detects all nodes which are used in current dashboard
 
    The nodes which which has used datapool elements will be saved in an addition vector
 
    \return
    C_NO_ERR      No error
    C_CONFIG      Invalid system definition/view configuration
-
-   \created     16.07.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::m_InitDiagNodes(void)
 {
    sint32 s32_Return = C_CONFIG;
@@ -1645,7 +1608,7 @@ sint32 C_SyvComDriverDiag::m_InitDiagNodes(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvComDriverDiag::m_InitDiagProtocolKfx(C_OSCDiagProtocolKfx * const opc_DiagProtocolKefex) const
 {
    stw_diag_lib::C_KFXCommConfiguration c_CommConfig;
@@ -1662,9 +1625,8 @@ void C_SyvComDriverDiag::m_InitDiagProtocolKfx(C_OSCDiagProtocolKfx * const opc_
    opc_DiagProtocolKefex->SetCommunicationParameters(c_CommConfig);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize diagnostic protocols
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize diagnostic protocols
 
    The functions fills the vector mc_OsyProtocols of the base class too.
 
@@ -1672,10 +1634,8 @@ void C_SyvComDriverDiag::m_InitDiagProtocolKfx(C_OSCDiagProtocolKfx * const opc_
    C_NO_ERR   Operation success
    C_CONFIG   Invalid initialization
    C_OVERFLOW Unknown diagnostic server for at least one node or invalid node identifier was set in diagnostic protocol
-
-   \created     31.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::m_InitDiagProtocol(void)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -1759,17 +1719,14 @@ sint32 C_SyvComDriverDiag::m_InitDiagProtocol(void)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize data dealers
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize data dealers
 
    \return
    C_NO_ERR Operation success
    C_CONFIG Invalid initialization
-
-   \created     31.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::m_InitDataDealer(void)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -1813,9 +1770,8 @@ sint32 C_SyvComDriverDiag::m_InitDataDealer(void)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize the necessary routing configuration to start the routing for diagnosis
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize the necessary routing configuration to start the routing for diagnosis
 
    Prepares all active nodes with its routing configurations if necessary
    Three different types of routing:
@@ -1829,11 +1785,14 @@ sint32 C_SyvComDriverDiag::m_InitDataDealer(void)
    \return
    C_NO_ERR Operation success
    C_CONFIG Invalid initialization
-   C_BUSY   Connection to at least one server failed
-
-   \created     04.08.2017  STW/B.Bayer
+   C_WARN      Error response
+   C_BUSY      Connection to at least one server failed
+   C_COM       Communication problem
+   C_TIMEOUT   Expected response not received within timeout
+   C_RD_WR     Unexpected content in response
+   C_NOACT     At least one node does not support Ethernet to Ethernet routing
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::m_StartRoutingDiag(QString & orc_ErrorDetails, std::set<uint32> & orc_ErrorActiveNodes)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -1901,9 +1860,8 @@ sint32 C_SyvComDriverDiag::m_StartRoutingDiag(QString & orc_ErrorDetails, std::s
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Starts the diagnose servers
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Starts the diagnose servers
 
    Calling the verify function to start all diag servers.
 
@@ -1917,10 +1875,8 @@ sint32 C_SyvComDriverDiag::m_StartRoutingDiag(QString & orc_ErrorDetails, std::s
    C_WARN     error response
    C_RD_WR    malformed protocol response
    C_CHECKSUM checksum of datapool does not match
-
-   \created     10.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::m_StartDiagServers(QString & orc_ErrorDetails)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -2056,16 +2012,13 @@ sint32 C_SyvComDriverDiag::m_StartDiagServers(QString & orc_ErrorDetails)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calls the cycle functions of all protocols
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calls the cycle functions of all protocols
 
    \return
    C_NO_ERR    no problems
-
-   \created     03.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverDiag::m_Cycle(void)
 {
    for (uint32 u32_Counter = 0U; u32_Counter < this->mc_DiagProtocols.size(); ++u32_Counter)
@@ -2081,13 +2034,10 @@ sint32 C_SyvComDriverDiag::m_Cycle(void)
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function for continuous calling by thread.
-
-   \created     03.08.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function for continuous calling by thread.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvComDriverDiag::mh_ThreadFunc(void * const opv_Instance)
 {
    //lint -e{925}  This class is the only one which registers itself at the caller of this function. It must match.
@@ -2100,13 +2050,10 @@ void C_SyvComDriverDiag::mh_ThreadFunc(void * const opv_Instance)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function for continuous calling by thread.
-
-   \created     03.08.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function for continuous calling by thread.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvComDriverDiag::m_ThreadFunc(void)
 {
    static uint32 hu32_LastSentTesterPresent = 0U;
@@ -2147,13 +2094,10 @@ void C_SyvComDriverDiag::m_ThreadFunc(void)
    stw_tgl::TGL_Sleep(1);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle polling finished event
-
-   \created     09.10.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle polling finished event
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvComDriverDiag::m_HandlePollingFinished(void)
 {
    sint32 s32_Result;
@@ -2166,19 +2110,16 @@ void C_SyvComDriverDiag::m_HandlePollingFinished(void)
    Q_EMIT this->SigPollingFinished(s32_Result, u8_NRC);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get node name for active node index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get node name for active node index
 
    \param[in] ou32_ViewIndex       View index (identifier)
    \param[in] ou32_ActiveNodeIndex Active node index (depending on number of active nodes)
 
    \return
    Node name if any found
-
-   \created     09.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvComDriverDiag::mh_GetNodeNameForActiveNodeIndex(const uint32 ou32_ViewIndex,
                                                              const uint32 ou32_ActiveNodeIndex)
 {

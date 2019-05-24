@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Calculation of all potential routes to a specific node in a specific view. (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     10.07.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <set>
@@ -25,28 +18,27 @@
 #include "C_OSCRoutingCalculation.h"
 #include "C_OSCLoggingHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace std;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_scl;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Use local only! (uses reference on nodes)
 
@@ -55,10 +47,8 @@ using namespace stw_opensyde_core;
    \param[in]     ou32_StartBusIndex   Start bus for the routing
    \param[in]     ou32_TargetNodeIndex Target node at the end of the routing
    \param[in]     oe_Mode              Decision for update or diagnostic routing
-
-   \created     10.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCRoutingCalculation::C_OSCRoutingCalculation(const vector<C_OSCNode> & orc_AllNodes,
                                                  const vector<uint8> & orc_ActiveNodes, const uint32 ou32_StartBusIndex,
                                                  const uint32 ou32_TargetNodeIndex, const E_Mode oe_Mode) :
@@ -73,46 +63,37 @@ C_OSCRoutingCalculation::C_OSCRoutingCalculation(const vector<C_OSCNode> & orc_A
    this->m_SearchRoute();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     13.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCRoutingCalculation::~C_OSCRoutingCalculation()
 {
    this->mc_AllOpenRoutes.clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns all found routes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns all found routes
 
    \return
    Vector with all found routes
-
-   \created     10.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const vector<C_OSCRoutingRoute> * C_OSCRoutingCalculation::GetRoutes(void) const
 {
    return &this->mc_RoutesToTarget;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the best route
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the best route
 
    \return
    Valid Pointer:    Best route to target
    NULL:             No route found
-
-   \created     17.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_OSCRoutingRoute * C_OSCRoutingCalculation::GetBestRoute(void) const
 {
    const C_OSCRoutingRoute * pc_Result = NULL;
@@ -164,25 +145,22 @@ const C_OSCRoutingRoute * C_OSCRoutingCalculation::GetBestRoute(void) const
    return pc_Result;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the result state of the calculation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the result state of the calculation
 
    \return
    C_NO_ERR    Routes were found
    C_RANGE     Target node does not exist
    C_COM       No routes were found
    C_NOACT     Target function (update or diagnostic) deactivated on all connected bus. No routing necessary.
-
-   \created     14.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCRoutingCalculation::GetState(void) const
 {
    return this->ms32_ResultState;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCRoutingCalculation::CheckItfNumberForRouting(const stw_types::uint32 ou32_TargetNodeIndex,
                                                        const C_OSCNodeComInterfaceSettings & orc_ComItfSettings) const
 {
@@ -237,7 +215,7 @@ bool C_OSCRoutingCalculation::CheckItfNumberForRouting(const stw_types::uint32 o
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCRoutingCalculation::m_SearchRoute(void)
 {
    // maximum number of buses
@@ -285,18 +263,15 @@ void C_OSCRoutingCalculation::m_SearchRoute(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checks the target node configuration for a routable setting
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks the target node configuration for a routable setting
 
    \return
    C_NO_ERR    Node is configured for correct routing
    C_NOACT     Target node must not be routed, because the relevant function is deactivated on all connected buses
    C_COM       No bus is connected to minimum one activated relevant function
-
-   \created     14.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCRoutingCalculation::m_CheckTargetNodeConfig(void) const
 {
    // Check if the target node must be routable
@@ -366,7 +341,7 @@ sint32 C_OSCRoutingCalculation::m_CheckTargetNodeConfig(void) const
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_OSCRoutingCalculation::m_SearchRoutePointsOnBus(const uint32 ou32_BusIndex)
 {
@@ -425,7 +400,7 @@ void C_OSCRoutingCalculation::m_SearchRoutePointsOnBus(const uint32 ou32_BusInde
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 vector<uint32> C_OSCRoutingCalculation::m_GetAllRoutePointsOfNodeOnOneInput(const C_OSCRoutingRoutePoint & orc_InPoint,
                                                                             const uint32 ou32_InItfNumber)
 {
@@ -497,7 +472,7 @@ vector<uint32> C_OSCRoutingCalculation::m_GetAllRoutePointsOfNodeOnOneInput(cons
    return c_VecBussesToSearch;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_OSCRoutingCalculation::m_AddOneRoutePoint(const C_OSCRoutingRoutePoint & orc_Point)
 {
@@ -519,7 +494,7 @@ void C_OSCRoutingCalculation::m_AddOneRoutePoint(const C_OSCRoutingRoutePoint & 
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_OSCRoutingCalculation::m_CalculateRoutes(const uint32 ou32_BusIndex)
 {
@@ -631,7 +606,7 @@ void C_OSCRoutingCalculation::m_CalculateRoutes(const uint32 ou32_BusIndex)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_OSCRoutingCalculation::m_AddOneOpenRoute(const C_OSCRoutingRoute & orc_Route)
 {
@@ -653,7 +628,7 @@ void C_OSCRoutingCalculation::m_AddOneOpenRoute(const C_OSCRoutingRoute & orc_Ro
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCRoutingCalculation::m_AddOneRouteToTarget(const C_OSCRoutingRoute & orc_Route)
 {
    // add the route only if it is not already in the vector

@@ -1,21 +1,14 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       string list class
 
    ANSI C++ string list class.
    For details cf. documentation in .h file.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     18.06.2009  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h" //pre-compiled headers
@@ -49,8 +42,7 @@ using namespace stw_scl;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Append one string
+/*! \brief   Append one string
 
    Append one string at the end of the list
 
@@ -58,8 +50,6 @@ using namespace stw_scl;
 
    \return
    index of new string
-
-   \created     18.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 uint32 C_SCLStringList::Add(const C_SCLString & orc_String)
@@ -70,15 +60,12 @@ uint32 C_SCLStringList::Add(const C_SCLString & orc_String)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Append one string
+/*! \brief   Append one string
 
    Append one string at the end of the list.
    Functionally identical to C_SCLStringList::Add but without the return value.
 
    \param[in]  orc_String   string to append
-
-   \created     18.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_SCLStringList::Append(const C_SCLString & orc_String)
@@ -87,12 +74,9 @@ void C_SCLStringList::Append(const C_SCLString & orc_String)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Clear all strings
+/*! \brief   Clear all strings
 
    Empty the string list.
-
-   \created     18.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_SCLStringList::Clear(void)
@@ -101,15 +85,12 @@ void C_SCLStringList::Clear(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Delete one string
+/*! \brief   Delete one string
 
    Delete one string from the string list.
    Will throw if the index is invalid.
 
    \param[in]  ou32_Index   index of string to remove (0 = first string)
-
-   \created     18.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_SCLStringList::Delete(const uint32 ou32_Index)
@@ -118,8 +99,7 @@ void C_SCLStringList::Delete(const uint32 ou32_Index)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Swap the contents of two strings
+/*! \brief   Swap the contents of two strings
 
    Swap the tests of two strings.
    Will throw if the index is invalid.
@@ -127,8 +107,6 @@ void C_SCLStringList::Delete(const uint32 ou32_Index)
 
    \param[in]  ou32_Index1   index of first string to swap (0 = first string in list)
    \param[in]  ou32_Index2   index of second string to swap (0 = first string in list)
-
-   \created     18.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_SCLStringList::Exchange(const uint32 ou32_Index1, const uint32 ou32_Index2)
@@ -141,15 +119,12 @@ void C_SCLStringList::Exchange(const uint32 ou32_Index1, const uint32 ou32_Index
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Insert string into list
+/*! \brief   Insert string into list
 
    Insert one string into the string list at a defined position.
 
    \param[in]  ou32_Index   index before which to insert the new string (0 = first string in list)
    \param[in]  orc_String   string to insert
-
-   \created     18.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_SCLStringList::Insert(const uint32 ou32_Index, const C_SCLString & orc_String)
@@ -158,8 +133,7 @@ void C_SCLStringList::Insert(const uint32 ou32_Index, const C_SCLString & orc_St
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Find index of string within list
+/*! \brief   Find index of string within list
 
    Returns the index of a specified string within the string list.
    The comparison ignores upper/lower case.
@@ -167,8 +141,6 @@ void C_SCLStringList::Insert(const uint32 ou32_Index, const C_SCLString & orc_St
    \param[in]  orc_String   string to find
 
    \return  ou32_Index   index of string (0 = first string in list; -1 = string not found)
-
-   \created     18.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_SCLStringList::IndexOf(const C_SCLString & orc_String)
@@ -186,15 +158,12 @@ sint32 C_SCLStringList::IndexOf(const C_SCLString & orc_String)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Return all strings as one concatenated string
+/*! \brief   Return all strings as one concatenated string
 
    Adds all strings to one single string.
    "\r\n" is inserted after each string (also after the last string).
 
    \return  concatenated string
-
-   \created     18.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLStringList::GetText(void) const
@@ -210,14 +179,11 @@ C_SCLString C_SCLStringList::GetText(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get number of string in list
+/*! \brief   Get number of string in list
 
    Return number of strings contained in string list.
 
    \return  number of strings
-
-   \created     18.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 uint32 C_SCLStringList::GetCount(void) const
@@ -226,8 +192,7 @@ uint32 C_SCLStringList::GetCount(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Load strings from file
+/*! \brief   Load strings from file
 
    Load strings from an ASCII file.
    Will replace any existing strings.
@@ -238,8 +203,6 @@ uint32 C_SCLStringList::GetCount(void) const
    - the file cannot be read from
 
    \param[in]     orc_FileName     path to file
-
-   \created     21.08.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_SCLStringList::LoadFromFile(const C_SCLString & orc_FileName)
@@ -340,8 +303,7 @@ void C_SCLStringList::LoadFromFile(const C_SCLString & orc_FileName)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Save strings to file
+/*! \brief   Save strings to file
 
    Save the contents of the string list to a file.
    An existing file will be overwritten.
@@ -352,8 +314,6 @@ void C_SCLStringList::LoadFromFile(const C_SCLString & orc_FileName)
    - the file cannot be written to
 
    \param[in]     orc_FileName     path to file
-
-   \created     21.08.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_SCLStringList::SaveToFile(const C_SCLString & orc_FileName)
@@ -388,8 +348,7 @@ void C_SCLStringList::SaveToFile(const C_SCLString & orc_FileName)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the value of one key=value pair
+/*! \brief   Returns the value of one key=value pair
 
    Tries to find a specified "key=" at the beginning of a string contained in the list.
    Then returns the rest of the line after the "=".
@@ -404,8 +363,6 @@ void C_SCLStringList::SaveToFile(const C_SCLString & orc_FileName)
    \return
    if "key=" is found:  "value" after the "="
    else:                empty string
-
-   \created     18.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLStringList::Values(const C_SCLString & orc_Key) const
@@ -430,8 +387,7 @@ C_SCLString C_SCLStringList::Values(const C_SCLString & orc_Key) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Finds the first line containg a name + "="
+/*! \brief   Finds the first line containg a name + "="
 
    Returns the index of the first line containing a specified name with an added equals character.
    The comparison is done independent of upper/lower case.
@@ -442,8 +398,6 @@ C_SCLString C_SCLStringList::Values(const C_SCLString & orc_Key) const
    \return
    if "name=" is found:  index of string (0 = first string in list)
    else:                 -1
-
-   \created     18.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_SCLStringList::IndexOfName(const C_SCLString & orc_Name) const
@@ -477,8 +431,7 @@ sint32 C_SCLStringList::IndexOfName(const C_SCLString & orc_Name) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the part of a string after a "="
+/*! \brief   Returns the part of a string after a "="
 
    Returns the part of one string after the equels ("=") chraracter.
 
@@ -487,8 +440,6 @@ sint32 C_SCLStringList::IndexOfName(const C_SCLString & orc_Name) const
    \return
    if the string contains "=":  part of string after "="
    else:                        empty string
-
-   \created     18.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLStringList::ValueFromIndex(const uint32 ou32_Index) const
@@ -509,14 +460,11 @@ C_SCLString C_SCLStringList::ValueFromIndex(const uint32 ou32_Index) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Add multiple strings to string list
+/*! \brief   Add multiple strings to string list
 
    Adds then content of another string list to this string list.
 
    \param[in]     opc_Strings   string list to add (pointer is not checked for validity)
-
-   \created     18.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_SCLStringList::AddStrings(const C_SCLStringList * const opc_Strings)
@@ -533,12 +481,9 @@ void C_SCLStringList::AddStrings(const C_SCLStringList * const opc_Strings)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Sort strings in list
+/*! \brief   Sort strings in list
 
    Sorts by ASCII values of the individual characters.
-
-   \created     01.11.2010  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_SCLStringList::Sort(void)

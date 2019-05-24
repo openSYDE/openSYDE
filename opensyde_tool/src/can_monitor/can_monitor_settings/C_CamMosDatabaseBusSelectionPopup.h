@@ -1,29 +1,23 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Widget for bus selection in for database type openSYDE system definition. (header)
+   \brief       Widget for bus selection for database type openSYDE system definition. (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.12.2018  STW/G.Landsgesell
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_CAMMOSDATABASEBUSSELECTIONPOPUP_H
 #define C_CAMMOSDATABASEBUSSELECTIONPOPUP_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 #include "C_OgePopUpDialog.h"
 #include "C_OSCSystemBus.h"
 #include "C_CamProDatabaseData.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
 {
 class C_CamMosDatabaseBusSelectionPopup;
@@ -31,9 +25,9 @@ class C_CamMosDatabaseBusSelectionPopup;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_CamMosDatabaseBusSelectionPopup :
    public QWidget
@@ -79,7 +73,7 @@ private:
    C_CamMosDatabaseBusSelectionPopup & operator =(const C_CamMosDatabaseBusSelectionPopup &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

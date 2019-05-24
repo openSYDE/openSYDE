@@ -252,7 +252,7 @@
     <number>0</number>
    </property>
    <property name="bottomMargin">
-    <number>32</number>
+    <number>30</number>
    </property>
    <item>
     <layout class="QVBoxLayout" name="pc_VerticalLayout" stretch="0,0,0,1000,1,0,0">
@@ -968,7 +968,7 @@
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>34</width>
+                 <width>30</width>
                  <height>20</height>
                 </size>
                </property>

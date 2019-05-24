@@ -1,19 +1,3 @@
-//11.04.12:  AST  added "handle" parameter for divert stream (introduced in protocol V3.02r0)
-//21.03.11:  AST  added support for interpretation of flash sectors > 255
-//17.12.09:  AST  added displaying of 3 and 5 character company IDs
-//15.04.09:  AST  added set/get_block_compare_mode
-//30.03.09:  AST  fixed eep_read reponse format
-//                fixed eep_write for DLC != 8
-//28.11.08:  AST  Moved XFL protocol specific functions to this module to render CCMONProtocol.cpp easier to
-//                 maintain
-//07.08.08:  AST  XFL protocol: fixed exception at set_temp_bitrate request
-//31.07.08:  AST  XFL protocol: added block based checksums
-//16.04.08:  AST  added XFL protocol V3.00r0 services
-//07.05.07:  AST  fixed XFL -> Read_Flash command display
-//14.10.05:  AST  XFL protocol: modified get_device_id
-//23.09.04:  AST  XFL protocol: fixed ee_read and ee_read_word
-//17.01.03:  AST  added XFL protocol
-
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -189,8 +173,6 @@ void C_CMONProtocolXFL::SetSendID(const uint32 ou32_Send)
    \return
    C_NO_ERR  -> data added to INI file
    C_RD_WR   -> error writing data
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_CMONProtocolXFL::SaveParamsToIni(C_SCLIniFile & orc_IniFile, const C_SCLString & orc_Section)
@@ -219,8 +201,6 @@ sint32 C_CMONProtocolXFL::SaveParamsToIni(C_SCLIniFile & orc_IniFile, const C_SC
    \return
    C_NO_ERR  -> data read from INI file
    C_RD_WR   -> error reading data
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_CMONProtocolXFL::LoadParamsFromIni(C_SCLIniFile & orc_IniFile, const C_SCLString & orc_Section)
@@ -238,8 +218,6 @@ sint32 C_CMONProtocolXFL::LoadParamsFromIni(C_SCLIniFile & orc_IniFile, const C_
 
    \return
    Text interpretation of CAN message ("" if the message can not be interpreted)
-
-   \created     xx.xx.20xx  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) const
@@ -1806,8 +1784,6 @@ C_SCLString C_CMONProtocolXFL::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
 
    \return
    Text representation of protocol name
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolXFL::GetProtocolName(void) const

@@ -1,21 +1,14 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Core communication driver base class (implementation)
 
    Offers a interface to deliver CAN messages to all registered C_OSCMessageLogger instances.
    Distributes all received messages to the registered C_OSCMessageLogger instances.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     03.09.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -49,10 +42,7 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     21.12.2018  STW/B.Bayer
+/*! \brief   Default constructor
 */
 //-----------------------------------------------------------------------------
 C_OSCComDriverBaseCanMessage::C_OSCComDriverBaseCanMessage(void) :
@@ -68,16 +58,13 @@ C_OSCComDriverBaseCanMessage::C_OSCComDriverBaseCanMessage(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check if current equal to orc_Cmp
+/*! \brief   Check if current equal to orc_Cmp
 
    \param[in] orc_Cmp Compared instance
 
    \return
    Current equal to orc_Cmp
    Else false
-
-   \created     07.01.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 bool C_OSCComDriverBaseCanMessage::operator ==(const C_OSCComDriverBaseCanMessage & orc_Cmp) const
@@ -109,10 +96,7 @@ bool C_OSCComDriverBaseCanMessage::operator ==(const C_OSCComDriverBaseCanMessag
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     03.09.2018  STW/B.Bayer
+/*! \brief   Default constructor
 */
 //-----------------------------------------------------------------------------
 C_OSCComDriverBase::C_OSCComDriverBase(void) :
@@ -127,12 +111,9 @@ C_OSCComDriverBase::C_OSCComDriverBase(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     03.09.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_OSCComDriverBase::~C_OSCComDriverBase(void)
@@ -143,16 +124,13 @@ C_OSCComDriverBase::~C_OSCComDriverBase(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all members
+/*! \brief   Initialize all members
 
    \param[in]  opc_CanDispatcher       Pointer to concrete CAN dispatcher
 
    \return
    C_NO_ERR      Operation success
    C_COM         CAN initialization failed
-
-   \created     04.09.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverBase::InitBase(C_CAN_Dispatcher * const opc_CanDispatcher)
@@ -175,14 +153,11 @@ sint32 C_OSCComDriverBase::InitBase(C_CAN_Dispatcher * const opc_CanDispatcher)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Registers a instance of C_OSCComMessageLogger
+/*! \brief   Registers a instance of C_OSCComMessageLogger
 
    The instance will be delivered with all received CAN messages.
 
    \param[in]     opc_Logger         Pointer to CAN message logger
-
-   \created     03.09.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCComDriverBase::RegisterLogger(C_OSCComMessageLogger * const opc_Logger)
@@ -191,8 +166,7 @@ void C_OSCComDriverBase::RegisterLogger(C_OSCComMessageLogger * const opc_Logger
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Starts the logging
+/*! \brief   Starts the logging
 
    The CAN dispatcher must be set and initialized already
 
@@ -201,8 +175,6 @@ void C_OSCComDriverBase::RegisterLogger(C_OSCComMessageLogger * const opc_Logger
    \return
    C_NO_ERR                          CAN initialized and logging started
    C_CONFIG                          CAN dispatcher is not set
-
-   \created     25.09.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverBase::StartLogging(const stw_types::sint32 os32_Bitrate)
@@ -231,10 +203,7 @@ sint32 C_OSCComDriverBase::StartLogging(const stw_types::sint32 os32_Bitrate)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Stops the logging
-
-   \created     25.09.2018  STW/B.Bayer
+/*! \brief   Stops the logging
 */
 //-----------------------------------------------------------------------------
 void C_OSCComDriverBase::StopLogging(void)
@@ -252,38 +221,61 @@ void C_OSCComDriverBase::StopLogging(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Continues the paused the logging
+/*! \brief   Continues the paused the logging
 
    Continues the logging.
    All active logger will log again.
-
-   \created     05.09.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCComDriverBase::ContinueLogging(void)
 {
+   uintn un_Counter;
    this->mq_Paused = false;
+
+   // Inform all logger about the continue
+   for (un_Counter = 0U; un_Counter < this->mc_Logger.size(); ++un_Counter)
+   {
+      this->mc_Logger[un_Counter]->Continue();
+   }
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Pauses the logging.
+/*! \brief   Pauses the logging.
 
    Pauses the logging of the entire logging.
    No registered logger will log.
-
-   \created     05.09.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCComDriverBase::PauseLogging(void)
 {
+   uintn un_Counter;
    this->mq_Paused = true;
+
+   // Inform all logger about the pause
+   for (un_Counter = 0U; un_Counter < this->mc_Logger.size(); ++un_Counter)
+   {
+      this->mc_Logger[un_Counter]->Pause();
+   }
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Distributes the CAN message to all registered C_OSCMessageLogger instances.
+/*! \brief   Update the bitrate to adapt the calculation for the bus load
+
+   \param[in]  os32_Bitrate          CAN bitrate in kBit/s. Is used for the bus load calculation not the initialization
+*/
+//-----------------------------------------------------------------------------
+void C_OSCComDriverBase::UpdateBitrate(const sint32 os32_Bitrate)
+{
+   if (os32_Bitrate != this->ms32_CanBitrate)
+   {
+      this->ms32_CanBitrate = os32_Bitrate;
+      // Reset the counter
+      this->mu32_CanMessageBits = 0U;
+   }
+}
+
+//-----------------------------------------------------------------------------
+/*! \brief   Distributes the CAN message to all registered C_OSCMessageLogger instances.
 
    Gets all received CAN messages and informs all logger about the received messages.
    This function must be called cyclic to have a continuous logging.
@@ -292,8 +284,6 @@ void C_OSCComDriverBase::PauseLogging(void)
 
    When making DistributeMessages and SendCanMessageQueued thread safe by overwriting to use sending CAN messages
    by separated threads.
-
-   \created     03.09.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCComDriverBase::DistributeMessages(void)
@@ -367,8 +357,7 @@ void C_OSCComDriverBase::DistributeMessages(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Sending a CAN message by putting it into the queue
+/*! \brief   Sending a CAN message by putting it into the queue
 
    The CAN messages will be handled by calling DistributeMessages
 
@@ -376,8 +365,6 @@ void C_OSCComDriverBase::DistributeMessages(void)
    by separated threads.
 
    \param[in]     orc_Msg        CAN message to send
-
-   \created     08.10.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCComDriverBase::SendCanMessageQueued(const T_STWCAN_Msg_TX & orc_Msg)
@@ -386,8 +373,7 @@ void C_OSCComDriverBase::SendCanMessageQueued(const T_STWCAN_Msg_TX & orc_Msg)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Sending a CAN message directly
+/*! \brief   Sending a CAN message directly
 
    \param[in]     orc_Msg        CAN message to send
 
@@ -395,8 +381,6 @@ void C_OSCComDriverBase::SendCanMessageQueued(const T_STWCAN_Msg_TX & orc_Msg)
    C_NO_ERR    CAN message sent
    C_CONFIG    CAN dispatcher not initialized
    C_COM       Error on sending CAN message
-
-   \created     08.10.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCComDriverBase::SendCanMessageDirect(const T_STWCAN_Msg_TX & orc_Msg)
@@ -445,15 +429,12 @@ sint32 C_OSCComDriverBase::SendCanMessageDirect(const T_STWCAN_Msg_TX & orc_Msg)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Sends a CAN message with a specific configuration
+/*! \brief   Sends a CAN message with a specific configuration
 
    Interval is ignored and set to 0.
    Use AddCyclicCanMessage for registration of a cyclic CAN message.
 
    \param[in]     orc_MsgCfg         CAN message configuration
-
-   \created     21.12.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCComDriverBase::SendCanMessage(const C_OSCComDriverBaseCanMessage & orc_MsgCfg)
@@ -463,12 +444,9 @@ void C_OSCComDriverBase::SendCanMessage(const C_OSCComDriverBaseCanMessage & orc
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Registers a cyclic CAN message with a specific configuration
+/*! \brief   Registers a cyclic CAN message with a specific configuration
 
    \param[in]     orc_MsgCfg         CAN message configuration
-
-   \created     21.12.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCComDriverBase::AddCyclicCanMessage(const C_OSCComDriverBaseCanMessage & orc_MsgCfg)
@@ -481,12 +459,9 @@ void C_OSCComDriverBase::AddCyclicCanMessage(const C_OSCComDriverBaseCanMessage 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Removes a cyclic CAN message with a specific configuration
+/*! \brief   Removes a cyclic CAN message with a specific configuration
 
    \param[in]     orc_MsgCfg         CAN message configuration
-
-   \created     21.12.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCComDriverBase::RemoveCyclicCanMessage(const C_OSCComDriverBaseCanMessage & orc_MsgCfg)
@@ -502,7 +477,7 @@ void C_OSCComDriverBase::RemoveCyclicCanMessage(const C_OSCComDriverBaseCanMessa
 
    for (c_ItConfig = this->mc_CanMessageConfigs.begin(); c_ItConfig != this->mc_CanMessageConfigs.end(); ++c_ItConfig)
    {
-      if (*c_ItConfig == orc_MsgCfg)
+      if (*c_ItConfig == c_MsgCfg)
       {
          this->mc_CanMessageConfigs.erase(c_ItConfig);
          break;
@@ -511,10 +486,7 @@ void C_OSCComDriverBase::RemoveCyclicCanMessage(const C_OSCComDriverBaseCanMessa
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Removes all cyclic CAN messages
-
-   \created     21.12.2018  STW/B.Bayer
+/*! \brief   Removes all cyclic CAN messages
 */
 //-----------------------------------------------------------------------------
 void C_OSCComDriverBase::RemoveAllCyclicCanMessages(void)
@@ -523,12 +495,9 @@ void C_OSCComDriverBase::RemoveAllCyclicCanMessages(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Prepare for shutting down class
+/*! \brief   Prepare for shutting down class
 
    To be called by child classes on shutdown, before they destroy all owned class instances
-
-   \created     04.09.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCComDriverBase::PrepareForDestruction(void)
@@ -540,13 +509,10 @@ void C_OSCComDriverBase::PrepareForDestruction(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Distributes the CAN message to all registered C_OSCMessageLogger instances.
+/*! \brief   Distributes the CAN message to all registered C_OSCMessageLogger instances.
 
    \param[in]     orc_Msg        Current CAN message
    \param[in]     oq_IsTx        Message was sent by C_OSCComDriverBase itself
-
-   \created     07.09.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCComDriverBase::m_HandleCanMessage(const T_STWCAN_Msg_RX & orc_Msg, const bool oq_IsTx)
@@ -566,10 +532,7 @@ void C_OSCComDriverBase::m_HandleCanMessage(const T_STWCAN_Msg_RX & orc_Msg, con
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Sending all CAN messages which are queued or registered for cyclic transmission
-
-   \created     07.01.2019  STW/B.Bayer
+/*! \brief   Sending all CAN messages which are queued or registered for cyclic transmission
 */
 //-----------------------------------------------------------------------------
 void C_OSCComDriverBase::m_HandleCanMessagesForSending(void)
@@ -616,8 +579,7 @@ void C_OSCComDriverBase::m_HandleCanMessagesForSending(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the CAN message size
+/*! \brief   Calculates the CAN message size
 
    Assume average number of stuff bits
    Count in message even if it is filtered out
@@ -660,8 +622,6 @@ void C_OSCComDriverBase::m_HandleCanMessagesForSending(void)
 
    \return
    CAN message size bits
-
-   \created     16.11.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 uint32 C_OSCComDriverBase::mh_GetCanMessageSizeInBits(const T_STWCAN_Msg_RX & orc_Msg)

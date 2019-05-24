@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Collection of utility function for message signals (implementation)
 
    Collection of utility function for message signals
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     18.01.2019  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -24,36 +17,33 @@
 #include "C_OSCCanUtil.h"
 #include "C_CamGenSigUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert message data array to vector
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert message data array to vector
 
    \param[in] orc_Message message data
 
    \return
    Converted message data of DLC length
-
-   \created     14.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint8> C_CamGenSigUtil::h_ConvertRawDataFormat(const C_CamProMessageData & orc_Message)
 {
    std::vector<uint8> c_Retval;
@@ -66,9 +56,8 @@ std::vector<uint8> C_CamGenSigUtil::h_ConvertRawDataFormat(const C_CamProMessage
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Decode raw value into C_OSCNodeDataPoolContent
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Decode raw value into C_OSCNodeDataPoolContent
 
    Based on: openSYDE structure
 
@@ -78,10 +67,8 @@ std::vector<uint8> C_CamGenSigUtil::h_ConvertRawDataFormat(const C_CamProMessage
 
    \return
    Value as C_OSCNodeDataPoolContent
-
-   \created     21.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolContent C_CamGenSigUtil::h_DecodeRawToContentSignal(const std::vector<uint8> & orc_Raw,
                                                                      const C_OSCCanSignal & orc_Signal,
                                                                      const C_OSCNodeDataPoolContent & orc_SignalMin)
@@ -107,17 +94,14 @@ C_OSCNodeDataPoolContent C_CamGenSigUtil::h_DecodeRawToContentSignal(const std::
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Decode signal value to raw
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Decode signal value to raw
 
    \param[in,out] orc_Raw    Raw CAN message values
    \param[in]     orc_Signal Signal description
    \param[in]     orc_Value  Signal value
-
-   \created     16.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigUtil::h_DecodeSignalValueToRaw(std::vector<uint8> & orc_Raw, const C_OSCCanSignal & orc_Signal,
                                                const C_OSCNodeDataPoolContent & orc_Value)
 {
@@ -151,9 +135,8 @@ void C_CamGenSigUtil::h_DecodeSignalValueToRaw(std::vector<uint8> & orc_Raw, con
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert DBC to opensyde signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert DBC to opensyde signal
 
    Warning: u32_ComDataElementIndex is invalid
 
@@ -161,10 +144,8 @@ void C_CamGenSigUtil::h_DecodeSignalValueToRaw(std::vector<uint8> & orc_Raw, con
 
    \return
    opensyde signal
-
-   \created     16.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCCanSignal C_CamGenSigUtil::h_ConvertDBCToOSY(const C_CieConverter::C_CIECanSignal & orc_Input)
 {
    C_OSCCanSignal c_Retval;
@@ -176,9 +157,8 @@ C_OSCCanSignal C_CamGenSigUtil::h_ConvertDBCToOSY(const C_CieConverter::C_CIECan
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert DBC to opensyde signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert DBC to opensyde signal
 
    Warning: e_Access & q_DiagEventCall & q_NvMValueChanged & q_IsValid & u32_NvMStartAddress are invalid
 
@@ -186,10 +166,8 @@ C_OSCCanSignal C_CamGenSigUtil::h_ConvertDBCToOSY(const C_CieConverter::C_CIECan
 
    \return
    opensyde signal
-
-   \created     21.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolListElement C_CamGenSigUtil::h_ConvertDBCToOSY(const C_CieConverter::C_CIEDataPoolElement & orc_Input)
 {
    C_OSCNodeDataPoolListElement c_Retval;
@@ -207,9 +185,8 @@ C_OSCNodeDataPoolListElement C_CamGenSigUtil::h_ConvertDBCToOSY(const C_CieConve
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert DBC to opensyde message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert DBC to opensyde message
 
    Warning: u32_TimeoutMs & u16_DelayTimeMs & signals are all not filled in
 
@@ -217,10 +194,8 @@ C_OSCNodeDataPoolListElement C_CamGenSigUtil::h_ConvertDBCToOSY(const C_CieConve
 
    \return
    opensyde message
-
-   \created     21.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCCanMessage C_CamGenSigUtil::h_ConvertDBCToOSY(const C_CieConverter::C_CIECanMessage & orc_Input)
 {
    C_OSCCanMessage c_Retval;
@@ -238,19 +213,16 @@ C_OSCCanMessage C_CamGenSigUtil::h_ConvertDBCToOSY(const C_CieConverter::C_CIECa
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get a single bit from the input byte vector
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get a single bit from the input byte vector
 
    \param[in] ou32_BitPos Bit position
    \param[in] orc_Bytes   Bytes to use as data
 
    \return
    Bit value
-
-   \created     16.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_CamGenSigUtil::h_GetBit(const uint32 ou32_BitPos, const std::vector<uint8> & orc_Bytes)
 {
    bool q_Retval = false;
@@ -271,17 +243,14 @@ bool C_CamGenSigUtil::h_GetBit(const uint32 ou32_BitPos, const std::vector<uint8
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set a single bit in the output byte vector
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set a single bit in the output byte vector
 
    \param[in]     ou32_BitPos Bit position
    \param[in,out] orc_Bytes   Bytes to change
    \param[in]     oq_Value    Bit value
-
-   \created     16.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigUtil::h_SetBit(const uint32 ou32_BitPos, std::vector<uint8> & orc_Bytes, const bool oq_Value)
 {
    tgl_assert(ou32_BitPos < 64UL);
@@ -308,13 +277,10 @@ void C_CamGenSigUtil::h_SetBit(const uint32 ou32_BitPos, std::vector<uint8> & or
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     18.01.2019  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamGenSigUtil::C_CamGenSigUtil(void)
 {
 }

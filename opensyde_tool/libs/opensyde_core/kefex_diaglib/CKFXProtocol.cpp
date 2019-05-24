@@ -3,7 +3,6 @@
 //--------------------------------------------------------------.D1-
 //   .FILE [ KFXProtocol.cpp ]
 //   .GROUP [ KEFEX Library ]
-//   .AUTHOR [ Stangl ]
 //--------------------------------------------------------------.F1-
 //   .DESCRIPTION
 //   Class definition encapsulating KEFEX protocol functions.
@@ -12,38 +11,6 @@
 //--------------------------------------------------------------
 //   .SPEC
 //   SWKE KEFEX
-//--------------------------------------------------------------
-//   .HISTORY
-//    Date      Author      Commentary
-//    28.08.17  AST         Added option to "Sleep" when polling for responses (default: do not Sleep, as before)
-//    15.11.10  AST         Receiving responses: Fixed random erroneous C_NO_ERR returns when there are no responses
-//                           (depending on stack content).
-//    26.08.10  AST         Standardized timestamp format of protocol file
-//              AST         Fixed RX-filter for block transfers
-//    21.06.10  AST         Harmonized the return values of segmented transfer functions with non-segmented functions
-//    31.05.10  AST         Removed support for "parameter" for indexed services (never used or documented)
-//    07.05.10  AST         Reception: Reworked to use CANDispatcher instead of messed up callback mechanism
-//    02.04.09  AST         Logon: highest nibble of data-version can be used
-//    22.08.07  AST         Removed Execute service (was for internal use only)
-//    27.10.06  AST         When polling with timeout = 0 we always read in
-//                           as long as there are messages to prevent the RX-buffer from
-//                           overflowing with non-KEFEX messages and thus blocking
-//                           reception of the messages we really want
-//    22.03.06  AST         fixed CKFXProtocol::ProtocolSetup
-//    05.10.05  AST         Added ::ProtocolSetup
-//    15.11.04  AST         Reworked Lockout Mechanism
-//                          - Each confirmed service has it's own CriticalSection
-//                          -> No problem when calling one service more than one time from different Threads
-//                            (locking for our own Thread is not required as CKFXProtocol does not call ProcessMessages
-//                            -> no way for the application to preemptively interrupt)
-//    13.09.04  AST         Lock will be released as often as aquired (caused problems when called in thread)
-//          04  AST         Added handling of segmented blocks
-//    17.11.03  AST         Added Execute service
-//    15.04.03  AST         Added evaluation of StartupIndication
-//    28.02.03  AST         Added ServiceRead/ServiceWrite
-//    14.01.03  AST         Only one logon type
-//    23.07.02  AST         Low/High bytes of ECRR hysteresis were exchanged
-//         .01  AST         Created
 //**************************************************************.DE*
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
@@ -242,17 +209,10 @@ C_KFXProtocol::~C_KFXProtocol()
 //**************************************************************.FA*
 //   .FUNCTION [ C_KFXProtocol::ConfigChanged ]
 //   .GROUP [ C_KFXProtocol public functions ]
-//   .AUTHOR [ Filser ]
 //--------------------------------------------------------------.F1-
 //   .DESCRIPTION
 //    Someone lets us know that protocol parameters have been changed.
 //    -> Reconsider all local parameters
-//--------------------------------------------------------------
-//   .HISTORY
-//    Date       Author      Commentary
-//    26.08.10   A.Stangl    fixed RX-filter for block transfers
-//    09.02.10   A.Stangl    fixed check for valid ou8_BaseID
-//    23.01.08   A.Stangl    created
 //**************************************************************.FE*
 sint32 C_KFXProtocol::ConfigChanged(void)
 {
@@ -389,7 +349,7 @@ sint32 C_KFXProtocol::m_SendSRRRequest(const uint16 ou16_VariableIndex)
 }
 
 //---------------------------------------------------------------------------
-//23.07.02   AST         Low/High bytes of hysteresis were exchanged
+
 sint32 C_KFXProtocol::SendECRRRequest(const uint16 ou16_VariableIndex, const uint16 ou16_MaxWaitTime,
                                       const uint8 ou8_UpperHysteresis,
                                       const uint8 ou8_LowerHysteresis, const uint8 ou8_HysteresisBase)
@@ -655,8 +615,6 @@ sint32 C_KFXProtocol::SendUpdateTaskRequest (const uint16 ou16_TaskIndex, const 
    C_NO_ERR  request sent
    C_NOACT   no dispatcher installed
    else      could not send request
-
-   \created     29.10.2014  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_KFXProtocol::SendWriteEepromSslStartRequest(const uint16 ou16_NumFollowingWriteServices)
@@ -697,8 +655,6 @@ sint32 C_KFXProtocol::SendWriteEepromSslStartRequest(const uint16 ou16_NumFollow
    C_NO_ERR  request sent
    C_NOACT   no dispatcher installed
    else      could not send request
-
-   \created     29.10.2014  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_KFXProtocol::SendWriteEepromSslEndRequest(const uint16 ou16_NumRequestedWriteServices,
@@ -727,7 +683,6 @@ sint32 C_KFXProtocol::SendWriteEepromSslEndRequest(const uint16 ou16_NumRequeste
 //**************************************************************.FA*
 //   .FUNCTION [ C_KFXProtocol::m_CalcHysteresis ]
 //   .GROUP [ C_KFXProtocol private functions ]
-//   .AUTHOR [ Stangl ]
 //--------------------------------------------------------------.F1-
 //   .DESCRIPTION
 //    Adapt an absolute hysteresis value to the format supported
@@ -744,9 +699,6 @@ sint32 C_KFXProtocol::SendWriteEepromSslEndRequest(const uint16 ou16_NumRequeste
 //   .RETURNVALUE
 //   sint32   C_NO_ERR  no errors
 //            C_RANGE   dwAbsoluteValue out of range
-//--------------------------------------------------------------
-//   .HISTORY
-//    Date       Author      Commentary
 //**************************************************************.FE*
 sint32 C_KFXProtocol::m_CalcHysteresis(const uint32 ou32_AbsoluteValue, uint8 * const opu8_Base,
                                        uint8 * const opu8_Value, const bool oq_ForceBase) const
@@ -792,7 +744,6 @@ sint32 C_KFXProtocol::m_CalcHysteresis(const uint32 ou32_AbsoluteValue, uint8 * 
 //**************************************************************.FA*
 //   .FUNCTION [ C_KFXProtocol::SendECRRRequestAbsolute ]
 //   .GROUP [ C_KFXProtocol public functions ]
-//   .AUTHOR [ Stangl ]
 //--------------------------------------------------------------.F1-
 //   .DESCRIPTION
 //   Send an ECRR request. In contrast to SendECRRRequest the hysteresis
@@ -809,10 +760,6 @@ sint32 C_KFXProtocol::m_CalcHysteresis(const uint32 ou32_AbsoluteValue, uint8 * 
 //   sint32   C_NO_ERR  no errors
 //            C_WARN    upper and lower hysteresis require different value bases
 //                      but have been forced to use the one of the greater number
-//--------------------------------------------------------------
-//   .HISTORY
-//    Date       Author      Commentary
-//    23.07.02   AST         Low/High bytes of hysteresis were exchanged
 //**************************************************************.FE*
 sint32 C_KFXProtocol::SendECRRRequestAbsolute(const uint16 ou16_VariableIndex, const uint16 ou16_MaxWaitTime,
                                               const uint32 ou32_UpperHysteresis, const uint32 ou32_LowerHysteresis)
@@ -927,12 +874,6 @@ void C_KFXProtocol::m_GetLastResponse(C_KFXProcotolResponse & orc_Response)
 }
 
 //--------------------------------------------------------------
-//    15.11.2010  AST         Preset q_SomeResponse to false. Fixes random erroneous C_NO_ERR returns when there are
-//                             no responses (depending on stack content).
-//    07.05.2010  AST         Reworked to use CANDispatcher instead of messed up callback mechanism
-//    15.11.2004  AST         Another Lockfix ...
-//    13.09.2004  AST         Lock will be released as often as aquired
-//                             (caused problems when called in thread)
 //return value:
 // C_NO_ERR -> expected message received (or: at least one message received if oq_CheckExpectedService == false)
 // C_WARN   -> expected message not received (or: no new messages if oq_CheckExpectedService == false)
@@ -1210,14 +1151,6 @@ bool C_KFXProtocol::m_MessageReceived(const T_STWCAN_Msg_RX & orc_MSG)
    C_COM          no response                                    \n
    C_RD_WR        TX communication error or unexpected response  \n
    C_CONFIG       BSmax is 0
-
-   \created     xx.xx.20xx  STW/A.Stangl
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   xx.xx.20xx        STW/A.Stangl  function created
-   \endhistory
 */
 //-----------------------------------------------------------------------------
 sint32 C_KFXProtocol::SegmentedSRRTransfer(const uint16 ou16_Index, const uint32 ou32_NumBytesExpected,

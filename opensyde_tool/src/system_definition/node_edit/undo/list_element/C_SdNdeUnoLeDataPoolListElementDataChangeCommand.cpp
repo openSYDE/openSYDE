@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data pool list element data change undo command (implementation)
 
    Data pool list element data change undo command
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     09.03.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -28,28 +21,27 @@
 #include "TGLUtils.h"
 #include "C_SdNdeDataPoolContentUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_tgl;
 using namespace stw_errors;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     oru32_NodeIndex                  Node index
    \param[in]     oru32_DataPoolIndex              Node data pool index
@@ -61,10 +53,8 @@ using namespace stw_opensyde_core;
    \param[in]     oru32_ArrayIndex                 Optional array index
    \param[in]     ors32_DataSetIndex               Optional data set index
    \param[in,out] opc_Parent                       Optional pointer to parent
-
-   \created     09.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoLeDataPoolListElementDataChangeCommand::C_SdNdeUnoLeDataPoolListElementDataChangeCommand(
    const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex, const uint32 & oru32_DataPoolListIndex,
    C_SdNdeDataPoolListModelViewManager * const opc_DataPoolListModelViewManager,
@@ -84,13 +74,10 @@ C_SdNdeUnoLeDataPoolListElementDataChangeCommand::C_SdNdeUnoLeDataPoolListElemen
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Redo
-
-   \created     09.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Redo
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::redo(void)
 {
    m_Change(this->mc_PreviousData, this->mc_NewData);
@@ -98,13 +85,10 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::redo(void)
    C_SdNdeUnoLeDataPoolListElementBaseCommand::redo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Undo
-
-   \created     09.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Undo
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::undo(void)
 {
    m_Change(this->mc_NewData, this->mc_PreviousData);
@@ -112,16 +96,13 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::undo(void)
    C_SdNdeUnoLeDataPoolListElementBaseCommand::undo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Change data values and store previous value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Change data values and store previous value
 
    \param[out] orc_PreviousData Previous data value storage
    \param[in]  orc_NewData      New data value assignment
-
-   \created     09.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_PreviousData,
                                                                 const QVariant & orc_NewData)
 {
@@ -456,13 +437,10 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_P
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply auto min
-
-   \created     06.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply auto min
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_ApplyAutoMin(void)
 {
    const C_OSCNodeDataPoolListElement * const pc_OSCElement =
@@ -504,13 +482,10 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_ApplyAutoMin(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply auto max
-
-   \created     06.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply auto max
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_ApplyAutoMax(void)
 {
    const C_OSCNodeDataPoolListElement * const pc_OSCElement =
@@ -552,16 +527,13 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_ApplyAutoMax(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current minimum value in generic format
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current minimum value in generic format
 
    \return
    Current minimum value in generic format
-
-   \created     22.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolContent C_SdNdeUnoLeDataPoolListElementDataChangeCommand::GetCurrentTypeMinGeneric(void) const
 {
    C_OSCNodeDataPoolContent c_Retval;
@@ -625,16 +597,13 @@ C_OSCNodeDataPoolContent C_SdNdeUnoLeDataPoolListElementDataChangeCommand::GetCu
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current maximum value in generic format
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current maximum value in generic format
 
    \return
    Current maximum value in generic format
-
-   \created     22.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolContent C_SdNdeUnoLeDataPoolListElementDataChangeCommand::GetCurrentTypeMaxGeneric(void) const
 {
    C_OSCNodeDataPoolContent c_Retval;
@@ -688,17 +657,14 @@ C_OSCNodeDataPoolContent C_SdNdeUnoLeDataPoolListElementDataChangeCommand::GetCu
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy one single value element to one array index value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy one single value element to one array index value
 
    \param[in]  orc_Single       Single value source element
    \param[in]  oru32_ArrayIndex Target array index
    \param[out] orc_Output       Target element
-
-   \created     22.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_CopySingleValueToArrayIndex(
    const C_OSCNodeDataPoolContent & orc_Single, const uint32 & oru32_ArrayIndex,
    C_OSCNodeDataPoolContent & orc_Output) const

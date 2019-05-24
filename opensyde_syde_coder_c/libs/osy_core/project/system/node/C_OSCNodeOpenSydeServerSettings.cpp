@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data class for openSYDE server specific settings(implementation)
 
    Data class for openSYDE server specific settings
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.12.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -40,10 +33,7 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     22.12.2016  STW/M.Echtler
+/*! \brief   Default constructor
 */
 //-----------------------------------------------------------------------------
 C_OSCNodeOpenSYDEServerSettings::C_OSCNodeOpenSYDEServerSettings(void)
@@ -52,32 +42,26 @@ C_OSCNodeOpenSYDEServerSettings::C_OSCNodeOpenSYDEServerSettings(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize class content
+/*! \brief   Initialize class content
 
    Clean up.
-
-   \created     25.01.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_OSCNodeOpenSYDEServerSettings::Initialize(void)
 {
    u8_MaxClients = 1U;
-   u8_MaxParallelTransmissions = 16U;
+   u8_MaxParallelTransmissions = 64U;
    s16_DPDDataBlockIndex = -1;
    u16_MaxMessageBufferTx = 585U;
    u16_MaxRoutingMessageBufferRx = 585U;
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
 
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
-
-   \created     21.03.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCNodeOpenSYDEServerSettings::CalcHash(uint32 & oru32_HashValue) const

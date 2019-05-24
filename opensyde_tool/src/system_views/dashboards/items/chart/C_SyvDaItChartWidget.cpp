@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for showing a chart with its data configuration and data selection.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.08.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPen>
@@ -37,7 +31,7 @@
 #include "C_PuiSvHandler.h"
 #include "C_PuiSvData.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
@@ -46,7 +40,7 @@ using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_core;
 using namespace QtCharts;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QColor C_SyvDaItChartWidget::mhac_DataColors[10] =
 {
    QColor(192, 0, 0),
@@ -61,29 +55,26 @@ const QColor C_SyvDaItChartWidget::mhac_DataColors[10] =
    QColor(112, 48, 160)
 };
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in]     ou32_ViewIndex             Index of system view
    \param[in]     ou32_MaximumDataElements   Maximum number of shown data elements of the widget
    \param[in,out] opc_Parent                 Optional pointer to parent
-
-   \created     25.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItChartWidget::C_SyvDaItChartWidget(const uint32 ou32_ViewIndex, const uint32 ou32_MaximumDataElements,
                                            QWidget * const opc_Parent) :
    QWidget(opc_Parent),
@@ -99,7 +90,8 @@ C_SyvDaItChartWidget::C_SyvDaItChartWidget(const uint32 ou32_ViewIndex, const ui
    mu32_TimeStampOfStart(0U),
    mf64_DefaultTimeSlot(60000.0),
    // 60 seconds as default value
-   mf64_CurrentTimeSlot(this->mf64_DefaultTimeSlot)
+   mf64_CurrentTimeSlot(this->mf64_DefaultTimeSlot),
+   mq_DrawingActive(true)
 {
    QPen c_Pen;
    QFont c_Font;
@@ -167,30 +159,24 @@ C_SyvDaItChartWidget::C_SyvDaItChartWidget(const uint32 ou32_ViewIndex, const ui
    this->SetWidthOfDataSeriesSelector(330);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     25.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItChartWidget::~C_SyvDaItChartWidget()
 {
    delete mpc_Ui;
    //lint -e{1740}  no memory leak because of the parent of the elements and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the chart data as initialize configuration
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the chart data as initialize configuration
 
    \param[in]     orc_Data       Chart data with configured data elements
-
-   \created     05.02.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartWidget::SetData(const C_PuiSvDbChart & orc_Data)
 {
    this->mc_Data = orc_Data;
@@ -266,31 +252,69 @@ void C_SyvDaItChartWidget::SetData(const C_PuiSvDbChart & orc_Data)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the chart data with the element configuration
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the chart data with the element configuration
 
    \return
    Chart data
-
-   \created     05.02.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbChart & C_SyvDaItChartWidget::GetData(void)
 {
    return this->mc_Data;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Function to activate or deactivate drawing of performance heavy widgets
+
+   \param[in] oq_Active Flag if widgets should currently be drawn
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItChartWidget::SetDrawingActive(const bool oq_Active)
+{
+   this->mq_DrawingActive = oq_Active;
+
+   //Painting
+   this->update();
+   if (this->mpc_Chart != NULL)
+   {
+      this->mpc_Chart->SetDrawingActive(oq_Active);
+      this->mpc_Chart->update();
+   }
+   if (this->mpc_ChartView != NULL)
+   {
+      this->mpc_ChartView->SetDrawingActive(oq_Active);
+      this->mpc_ChartView->update();
+   }
+
+   //Axis
+   this->mpc_AxisTime->setVisible(oq_Active);
+   this->mpc_AxisValue->setVisible(oq_Active);
+   this->UpdateTimeAxis();
+   this->UpdateValueAxis();
+
+   //Line series
+   for (uint32 u32_ConfigCounter = 0U; u32_ConfigCounter < this->mc_Data.c_DataPoolElementsConfig.size();
+        ++u32_ConfigCounter)
+   {
+      if (u32_ConfigCounter < this->mc_DataPoolElementsDataSeries.size())
+      {
+         QLineSeries * const pc_LineSerie = this->mc_DataPoolElementsDataSeries[u32_ConfigCounter];
+         if (pc_LineSerie != NULL)
+         {
+            pc_LineSerie->setVisible(oq_Active);
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply style
 
    \param[in] oe_Style     New style type
    \param[in] oq_DarkMode  Flag if dark mode is active
-
-   \created     31.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartWidget::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode)
 {
    if (this->mpc_Chart != NULL)
@@ -452,30 +476,24 @@ void C_SyvDaItChartWidget::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the width of the data series selector widget left of the splitter
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the width of the data series selector widget left of the splitter
 
    \param[in]     osn_Width       Width of the selector widget
-
-   \created     05.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartWidget::SetWidthOfDataSeriesSelector(const sintn osn_Width) const
 {
    this->mpc_Ui->pc_Splitter->SetFirstSegment(osn_Width);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the width of the data series selector widget left of the splitter
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the width of the data series selector widget left of the splitter
 
    \return
    Width of the selector widget
-
-   \created     05.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SyvDaItChartWidget::GetWidthOfDataSeriesSelector(void) const
 {
    sintn sn_Width = 250;
@@ -489,33 +507,27 @@ sintn C_SyvDaItChartWidget::GetWidthOfDataSeriesSelector(void) const
    return sn_Width;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the current id of the selected data element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the current id of the selected data element
 
    \param[out]     oru32_DataPoolElementConfigIndex         Datapool element configuration index
 
    \return
    true     data element exists
    false    data element does not exist
-
-   \created     07.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItChartWidget::GetCurrentDataSerie(stw_types::uint32 & oru32_DataPoolElementConfigIndex) const
 {
    return this->mpc_Ui->pc_ChartSelectorWidget->GetCurrentDataSerie(oru32_DataPoolElementConfigIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Information about the start or stop of a connection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the start or stop of a connection
 
    \param[in]  oq_Active      Flag if connection is active or not active now
-
-   \created     01.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartWidget::ConnectionActiveChanged(const bool oq_Active)
 {
    if (oq_Active == true)
@@ -530,9 +542,8 @@ void C_SyvDaItChartWidget::ConnectionActiveChanged(const bool oq_Active)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds a specific data serie
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds a specific data serie
 
    \param[in]     orc_DataPoolElementId   Datapool element identification
    \param[in]     orc_ElementScaling      Datapool element scaling configuration
@@ -541,10 +552,8 @@ void C_SyvDaItChartWidget::ConnectionActiveChanged(const bool oq_Active)
    C_NO_ERR OK
    C_RANGE  Something out of range
    C_CONFIG Chart not initialized
-
-   \created     05.02.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDaItChartWidget::AddNewDataSerie(const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId,
                                              const C_PuiSvDbDataElementScaling & orc_ElementScaling)
 {
@@ -591,19 +600,16 @@ sint32 C_SyvDaItChartWidget::AddNewDataSerie(const C_PuiSvDbNodeDataPoolListElem
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Removes the current data serie
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Removes the current data serie
 
    \param[out]    orc_ElementId     Data element id of removed data serie
 
    \return
    true     data element removed
    false    nothing removed or a multiple registration of an element id was removed
-
-   \created     07.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItChartWidget::RemoveDataSerie(C_PuiSvDbNodeDataPoolListElementId & orc_ElementId)
 {
    bool q_Return;
@@ -671,10 +677,7 @@ bool C_SyvDaItChartWidget::RemoveDataSerie(C_PuiSvDbNodeDataPoolListElementId & 
          }
 
          // Remove configuration itself
-         this->mc_Data.c_DataPoolElementsConfig.erase(
-            this->mc_Data.c_DataPoolElementsConfig.begin() + u32_DataPoolElementConfigIndex);
-         this->mc_Data.c_DataPoolElementsActive.erase(
-            this->mc_Data.c_DataPoolElementsActive.begin() + u32_DataPoolElementConfigIndex);
+         tgl_assert(this->mc_Data.RemoveElement(u32_DataPoolElementConfigIndex) == C_NO_ERR);
          this->mc_DataPoolElementContentMin.erase(
             this->mc_DataPoolElementContentMin.begin() + u32_DataPoolElementConfigIndex);
       }
@@ -683,18 +686,15 @@ bool C_SyvDaItChartWidget::RemoveDataSerie(C_PuiSvDbNodeDataPoolListElementId & 
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Selects and shows the axix for the specific datapool element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Selects and shows the axix for the specific datapool element
 
    \param[in]     orc_DataPoolElementId   Datapool element identification
 
    \return
    possible return value(s) and description
-
-   \created     28.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartWidget::SelectDataSeriesAxis(const uint32 ou32_DataPoolElementConfigIndex)
 {
    if ((ou32_DataPoolElementConfigIndex < this->mc_DataPoolElementsDataSeries.size()) &&
@@ -752,17 +752,14 @@ void C_SyvDaItChartWidget::SelectDataSeriesAxis(const uint32 ou32_DataPoolElemen
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds the newest values of datapool elements to its associated data series of the chart
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds the newest values of datapool elements to its associated data series of the chart
 
    \param[in]     orc_DataPoolElementId   Datapool element identification
    \param[in]     orc_Values              List with all read elements
    \param[in]     orc_Timestamps          List with all timestamps for each element
-
-   \created     28.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartWidget::AddDataSerieContent(const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId,
                                                const QVector<float64> & orc_Values,
                                                const QVector<uint32> & orc_Timestamps)
@@ -812,36 +809,16 @@ void C_SyvDaItChartWidget::AddDataSerieContent(const C_PuiSvDbNodeDataPoolListEl
                      this->mc_Data.c_DataPoolElementsConfig[u32_ConfigCounter].c_ElementScaling.f64_Factor,
                      this->mc_Data.c_DataPoolElementsConfig[u32_ConfigCounter].c_ElementScaling.f64_Offset);
 
-                  // Adapt range for time
-                  if (this->mf64_MaxTime < f64_Timestamp)
-                  {
-                     const float64 f64_Diff = f64_Timestamp - this->mf64_MaxTime;
-
-                     // Save the new maximum
-                     this->mf64_MaxTime = f64_Timestamp;
-
-                     // Do not use the new maximum for the axis. In case of zooming, we need an dynamic adaption
-                     this->mpc_AxisTime->setMax(this->mpc_AxisTime->max() + f64_Diff);
-
-                     // Adapt minimum
-                     this->mpc_AxisTime->setMin(this->mpc_AxisTime->min() + f64_Diff);
-                  }
-
                   // Adapt range for value
                   if (this->mf64_MaxValue < f64_Value)
                   {
                      // Add a little free space to the maximum
                      this->mf64_MaxValue = f64_Value * 1.01;
-                     this->mpc_AxisValue->setMax(this->mf64_MaxValue);
-                     this->mpc_AxisValueInvisible->setMax(this->mf64_MaxValue);
                   }
                   if (this->mf64_MinValue > f64_Value)
                   {
                      this->mf64_MinValue = f64_Value;
-                     this->mpc_AxisValue->setMin(this->mf64_MinValue);
-                     this->mpc_AxisValueInvisible->setMin(this->mf64_MinValue);
                   }
-
                   pc_LineSerie->append(f64_Timestamp, f64_Value);
                }
 
@@ -856,17 +833,14 @@ void C_SyvDaItChartWidget::AddDataSerieContent(const C_PuiSvDbNodeDataPoolListEl
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets a scaling configuration for a specific datapool element configuration
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets a scaling configuration for a specific datapool element configuration
 
    \param[in]     ou32_DataPoolElementConfigIndex         Datapool element configuration index
    \param[in]     orc_DisplayName                         Datapool element display name
    \param[in]     orc_ElementScaling                      Datapool element scaling configuration
-
-   \created     06.02.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartWidget::SetScaling(const uint32 ou32_DataPoolElementConfigIndex, const QString & orc_DisplayName,
                                       const C_PuiSvDbDataElementScaling & orc_ElementScaling)
 {
@@ -879,81 +853,101 @@ void C_SyvDaItChartWidget::SetScaling(const uint32 ou32_DataPoolElementConfigInd
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the count of registered data series
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the count of registered data series
 
    \return
    Count of registered data series
-
-   \created     07.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SyvDaItChartWidget::GetCountDataSeries(void) const
 {
    return this->mc_DataPoolElementsDataSeries.size();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapts and updates the time axis if necessary
-
-   \created     15.09.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapts and updates the time axis if necessary
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartWidget::UpdateTimeAxis(void)
 {
-   const uint32 u32_CurrentTimeStamp = stw_tgl::TGL_GetTickCount() - this->mu32_TimeStampOfStart;
-   const uint32 u32_NextTimeStamp = u32_CurrentTimeStamp + static_cast<uint32>(msn_TIMER_GUI_REFRESH);
-
-   if (this->mf64_MaxTime < (static_cast<float64>(u32_NextTimeStamp)))
+   if (this->mq_DrawingActive)
    {
-      const float64 f64_Diff = static_cast<float64>(u32_NextTimeStamp) - this->mf64_MaxTime;
+      const uint32 u32_CurrentTimeStamp = stw_tgl::TGL_GetTickCount() - this->mu32_TimeStampOfStart;
+      const uint32 u32_NextTimeStamp = u32_CurrentTimeStamp + static_cast<uint32>(msn_TIMER_GUI_REFRESH);
 
-      // Save the new maximum
-      this->mf64_MaxTime = static_cast<float64>(u32_NextTimeStamp);
+      if (this->mf64_MaxTime < (static_cast<float64>(u32_NextTimeStamp)))
+      {
+         const float64 f64_Diff = static_cast<float64>(u32_NextTimeStamp) - this->mf64_MaxTime;
 
-      // Do not use the new maximum for the axis. In case of zooming, we need an dynamic adaption
-      this->mpc_AxisTime->setMax(this->mpc_AxisTime->max() + f64_Diff);
+         // Save the new maximum
+         this->mf64_MaxTime = static_cast<float64>(u32_NextTimeStamp);
 
-      // Adapt minimum
-      this->mpc_AxisTime->setMin(this->mpc_AxisTime->min() + f64_Diff);
+         // Do not use the new maximum for the axis. In case of zooming, we need an dynamic adaption
+         this->mpc_AxisTime->setMax(this->mpc_AxisTime->max() + f64_Diff);
+
+         // Adapt minimum
+         this->mpc_AxisTime->setMin(this->mpc_AxisTime->min() + f64_Diff);
+      }
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Error update for data element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapts and updates the value axis if necessary
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItChartWidget::UpdateValueAxis()
+{
+   if (this->mq_DrawingActive)
+   {
+      if (this->mpc_AxisValue->max() < this->mf64_MaxValue)
+      {
+         this->mpc_AxisValue->setMax(this->mf64_MaxValue);
+      }
+      if (this->mpc_AxisValueInvisible->max() < this->mf64_MaxValue)
+      {
+         this->mpc_AxisValueInvisible->setMax(this->mf64_MaxValue);
+      }
+      if (this->mpc_AxisValue->min() > this->mf64_MinValue)
+      {
+         this->mpc_AxisValue->setMin(this->mf64_MinValue);
+      }
+      if (this->mpc_AxisValueInvisible->min() > this->mf64_MinValue)
+      {
+         this->mpc_AxisValueInvisible->setMin(this->mf64_MinValue);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Error update for data element
 
    \param[in] ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
    \param[in] orc_ErrorText                   Error description
    \param[in] orq_IsTransmissionError         Flag if transmission error occurred
-
-   \created     21.08.2018  STW/B.Bayer
+   \param[in] oq_ErrorActive                  Flag if error is active or should be cleared
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartWidget::UpdateError(const uint32 ou32_DataElementIndex, const QString & orc_ErrorText,
-                                       const bool oq_IsTransmissionError) const
+                                       const bool oq_IsTransmissionError, const bool oq_ErrorActive) const
 {
    std::map<stw_types::uint32, stw_types::uint32>::const_iterator c_It =
       this->mc_ElementHandlerRegIndexToDataElementIndex.find(ou32_DataElementIndex);
 
    if (c_It != this->mc_ElementHandlerRegIndexToDataElementIndex.end())
    {
-      this->mpc_Ui->pc_ChartSelectorWidget->UpdateError(c_It->second, orc_ErrorText, oq_IsTransmissionError);
+      this->mpc_Ui->pc_ChartSelectorWidget->UpdateError(c_It->second, orc_ErrorText, oq_IsTransmissionError,
+                                                        oq_ErrorActive);
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update of the color transparence value configured by the actual timeout state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update of the color transparence value configured by the actual timeout state
 
    \param[in] ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
    \param[in] osn_Value                       Value for transparence (0..255)
-
-   \created     31.07.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartWidget::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value) const
 {
    std::map<stw_types::uint32, stw_types::uint32>::const_iterator c_It =
@@ -965,27 +959,26 @@ void C_SyvDaItChartWidget::UpdateTransparence(const uint32 ou32_DataElementIndex
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    Here: draw background
    (Not automatically drawn in any QWidget derivative)
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     28.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartWidget::paintEvent(QPaintEvent * const opc_Event)
 {
-   stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
-   QWidget::paintEvent(opc_Event);
+   if (this->mq_DrawingActive)
+   {
+      stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
+      QWidget::paintEvent(opc_Event);
+   }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds a specific data serie
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds a specific data serie
 
    \param[in]     orc_DataPoolElementId               Datapool element identification
    \param[in]     oq_Warning                          Flag if a warning for this data element was detected
@@ -996,10 +989,8 @@ void C_SyvDaItChartWidget::paintEvent(QPaintEvent * const opc_Event)
                                                       invalid data element
    \param[in]     orc_ToolTipErrorTextHeading         Heading of tool tip in case of a warning
    \param[in]     orc_ToolTipErrorText                Text of tool tip in case of a warning
-
-   \created     28.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartWidget::m_AddDataSerie(const stw_types::uint32 ou32_DataPoolElementConfigIndex,
                                           const bool oq_Warning, const bool oq_Invalid,
                                           const QString & orc_InvalidPlaceholderName,
@@ -1055,7 +1046,7 @@ void C_SyvDaItChartWidget::m_AddDataSerie(const stw_types::uint32 ou32_DataPoolE
    //lint -e{429}  no memory leak because of the parent of pc_Series and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartWidget::m_ResetChart(void)
 {
    uint32 u32_CounterItem;
@@ -1080,7 +1071,7 @@ void C_SyvDaItChartWidget::m_ResetChart(void)
    this->mpc_AxisTime->setMin(0.0);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QColor C_SyvDaItChartWidget::m_GetColor(void)
 {
    uint32 u32_Counter;
@@ -1104,7 +1095,7 @@ QColor C_SyvDaItChartWidget::m_GetColor(void)
    return c_Color;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartWidget::m_DataItemToggled(const stw_types::uint32 ou32_DataPoolElementConfigIndex,
                                              const bool oq_Checked)
 {
@@ -1120,7 +1111,7 @@ void C_SyvDaItChartWidget::m_DataItemToggled(const stw_types::uint32 ou32_DataPo
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItChartWidget::m_DataItemSelected(const uint32 ou32_DataPoolElementConfigIndex)
 {
    this->SelectDataSeriesAxis(ou32_DataPoolElementConfigIndex);

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Tree model for data elements (implementation)
 
    Tree model for data elements
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     07.09.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QElapsedTimer>
@@ -32,7 +25,7 @@
 #include "C_TblTreDataElementModel.h"
 #include "C_SdUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -40,7 +33,7 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_TblTreDataElementModel::mhc_IconNode = ":/images/system_definition/IconNode.svg";
 const QString C_TblTreDataElementModel::mhc_IconDatapool = ":/images/system_definition/IconDataPoolSmall.svg";
 const QString C_TblTreDataElementModel::mhc_IconList = ":/images/system_definition/IconDatapoolList.svg";
@@ -55,11 +48,11 @@ const QString C_TblTreDataElementModel::mhc_AdditionalWriteOnlyInfo = " (Not sup
 const QString C_TblTreDataElementModel::mhc_AdditionalArrayInfo = " (Not supported, array or string type)";
 const QString C_TblTreDataElementModel::mhc_Additional64BitInfo = " (Not supported, 64 bit value)";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 QMap<std::vector<stw_types::uint32>,
      C_TblTreDataElementModel::C_TblTreDataElementModelState> C_TblTreDataElementModel::mhc_ViewSetupsNL;
 QMap<std::vector<stw_types::uint32>,
@@ -67,52 +60,43 @@ QMap<std::vector<stw_types::uint32>,
 QMap<std::vector<stw_types::uint32>,
      C_TblTreDataElementModel::C_TblTreDataElementModelState> C_TblTreDataElementModel::mhc_ViewSetupsBS;
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_TblTreDataElementModel::C_TblTreDataElementModel(QObject * const opc_Parent) :
    C_TblTreModel(opc_Parent),
    me_Mode(eDATAPOOL_ELEMENT)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     06.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_TblTreDataElementModel::~C_TblTreDataElementModel(void)
 {
    m_CleanUpLastModel();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set the active node index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set the active node index
 
    \param[in] ou32_NodeIndex               Active node index
    \param[in] os32_SkipApplicationIndex    Application index to not display as used
    \param[in] orc_UsedDataPoolIndicesIndex Data pools to always display as used
-
-   \created     01.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::InitSD(const uint32 ou32_NodeIndex, const sint32 os32_SkipApplicationIndex,
                                       const std::vector<uint32> & orc_UsedDataPoolIndicesIndex)
 {
@@ -258,19 +242,16 @@ void C_TblTreDataElementModel::InitSD(const uint32 ou32_NodeIndex, const sint32 
    this->endResetModel();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize tree structure
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize tree structure
 
    \param[in] ou32_ViewIndex           View index
    \param[in] oe_Mode                  Item mode
    \param[in] oq_ShowOnlyWriteElements Optional flag to show only writable elements
    \param[in] oq_ShowArrayElements     Optional flag to hide all array elements (if false)
    \param[in] oq_Show64BitValues       Optional flag to hide all 64 bit elements (if false)
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::InitSV(const uint32 ou32_ViewIndex, const E_Mode oe_Mode,
                                       const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
                                       const bool oq_Show64BitValues)
@@ -395,18 +376,15 @@ void C_TblTreDataElementModel::InitSV(const uint32 ou32_ViewIndex, const E_Mode 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data elements
 
    \param[in] orc_Index Index
 
    \return
    Data elements
-
-   \created     06.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<C_PuiSvDbNodeDataPoolListElementId> C_TblTreDataElementModel::GetDataElements(const QModelIndex & orc_Index)
 const
 {
@@ -432,13 +410,10 @@ const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Preparation for final clean up
-
-   \created     06.12.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Preparation for final clean up
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::h_CleanUp(void)
 {
    mh_CleanUp(C_TblTreDataElementModel::mhc_ViewSetupsBS);
@@ -449,36 +424,30 @@ void C_TblTreDataElementModel::h_CleanUp(void)
    C_TblTreDataElementModel::mhc_ViewSetupsNL.clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get tree column count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get tree column count
 
    \param[in] orc_Parent Parent
 
    \return
    Column count
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_TblTreDataElementModel::columnCount(const QModelIndex & orc_Parent) const
 {
    Q_UNUSED(orc_Parent)
    return 1;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert generic item representation to model index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert generic item representation to model index
 
    \param[in] orc_ItemIndices Generic item representation
 
    \return
    Model index
-
-   \created     19.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QModelIndex C_TblTreDataElementModel::GetIndexForItem(const std::vector<uint32> & orc_ItemIndices) const
 {
    QModelIndex c_Retval;
@@ -521,18 +490,15 @@ QModelIndex C_TblTreDataElementModel::GetIndexForItem(const std::vector<uint32> 
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert model index to generic item representation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert model index to generic item representation
 
    \param[in] orc_ItemIndex Model index
 
    \return
    Generic item representation
-
-   \created     19.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint32> C_TblTreDataElementModel::GetGenericRepresentationForIndex(const QModelIndex & orc_ItemIndex)
 const
 {
@@ -555,16 +521,13 @@ const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Tree         Tree layout to remember
    \param[in]     orc_SyncManagers Sync managers to store
-
-   \created     06.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_TblTreDataElementModel::C_TblTreDataElementModelState::C_TblTreDataElementModelState(C_TblTreItem * const opc_Tree,
                                                                                        const std::vector<C_PuiSdNodeCanMessageSyncManager *> & orc_SyncManagers)
    :
@@ -573,13 +536,10 @@ C_TblTreDataElementModel::C_TblTreDataElementModelState::C_TblTreDataElementMode
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Preparation for final clean up
-
-   \created     06.12.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Preparation for final clean up
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::C_TblTreDataElementModelState::CleanUp(void)
 {
    delete (this->pc_Tree);
@@ -591,13 +551,10 @@ void C_TblTreDataElementModel::C_TblTreDataElementModelState::CleanUp(void)
    this->c_SyncManagers.clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up all current sync managers
-
-   \created     05.12.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clean up all current sync managers
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::m_ClearSyncManagers(void)
 {
    for (uint32 u32_It = 0UL; u32_It < this->mc_MessageSyncManagers.size(); ++u32_It)
@@ -607,15 +564,12 @@ void C_TblTreDataElementModel::m_ClearSyncManagers(void)
    this->mc_MessageSyncManagers.clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up current model
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clean up current model
 
    Warning: pointer might be invalid after call of this function
-
-   \created     06.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::m_CleanUpLastModel(void)
 {
    if (this->mpc_InvisibleRootItem != NULL)
@@ -636,18 +590,15 @@ void C_TblTreDataElementModel::m_CleanUpLastModel(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Translate signal index to data pool index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Translate signal index to data pool index
 
    WARNING: Only works if message contains at least one signal
 
    \param[in] orc_Indices      Message identification indices
    \param[in] ou32_SignalIndex Signal index
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbNodeDataPoolListElementId C_TblTreDataElementModel::mh_Translate(
    const C_OSCCanMessageIdentificationIndices & orc_Indices, const uint32 ou32_SignalIndex)
 {
@@ -683,18 +634,15 @@ C_PuiSvDbNodeDataPoolListElementId C_TblTreDataElementModel::mh_Translate(
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize tree structure for bus signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize tree structure for bus signals
 
    \param[in] ou32_ViewIndex           View index
    \param[in] oq_ShowOnlyWriteElements Optional flag to show only writable elements
    \param[in] oq_ShowArrayElements     Optional flag to hide all array elements (if false)
    \param[in] oq_Show64BitValues       Optional flag to hide all 64 bit elements (if false)
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::m_InitBusSignal(const uint32 ou32_ViewIndex, const bool oq_ShowOnlyWriteElements,
                                                const bool oq_ShowArrayElements, const bool oq_Show64BitValues)
 {
@@ -762,7 +710,7 @@ void C_TblTreDataElementModel::m_InitBusSignal(const uint32 ou32_ViewIndex, cons
                   break;
                case 2U:
                   e_Type = C_OSCCanProtocol::eCAN_OPEN_SAFETY;
-                  pc_ProtocolItem->c_Name = "CAN_OPEN_SAFETY protocol";
+                  pc_ProtocolItem->c_Name = "ECOS protocol";
                   pc_ProtocolItem->c_ToolTipHeading = pc_ProtocolItem->c_Name;
                   break;
                default:
@@ -893,18 +841,15 @@ void C_TblTreDataElementModel::m_InitBusSignal(const uint32 ou32_ViewIndex, cons
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize tree structure for data pool elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize tree structure for data pool elements
 
    \param[in] ou32_ViewIndex           View index
    \param[in] oq_ShowOnlyWriteElements Optional flag to show only writable elements
    \param[in] oq_ShowArrayElements     Optional flag to hide all array elements (if false)
    \param[in] oq_Show64BitValues       Optional flag to hide all 64 bit elements (if false)
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::m_InitDatapoolElement(const uint32 ou32_ViewIndex, const bool oq_ShowOnlyWriteElements,
                                                      const bool oq_ShowArrayElements, const bool oq_Show64BitValues)
 {
@@ -1114,17 +1059,14 @@ void C_TblTreDataElementModel::m_InitDatapoolElement(const uint32 ou32_ViewIndex
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapts the properties of already existing tree structure for data pool elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapts the properties of already existing tree structure for data pool elements
 
    \param[in] oq_ShowOnlyWriteElements Optional flag to show only writable elements
    \param[in] oq_ShowArrayElements     Optional flag to hide all array elements (if false)
    \param[in] oq_Show64BitValues       Optional flag to hide all 64 bit elements (if false)
-
-   \created     15.02.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::m_UpdateDatapoolElement(const bool oq_ShowOnlyWriteElements,
                                                        const bool oq_ShowArrayElements, const bool oq_Show64BitValues)
 {
@@ -1214,9 +1156,8 @@ void C_TblTreDataElementModel::m_UpdateDatapoolElement(const bool oq_ShowOnlyWri
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapts the properties of the tree item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapts the properties of the tree item
 
    Sets the enabled and selectable flag dependent of the paramters oq_ShowOnlyWriteElements, oq_ShowArrayElements and
    oq_Show64BitValues
@@ -1226,10 +1167,8 @@ void C_TblTreDataElementModel::m_UpdateDatapoolElement(const bool oq_ShowOnlyWri
    \param[in]     oq_Show64BitValues       Optional flag to hide all 64 bit elements (if false)
    \param[in]     orc_Element              Datapool element of tree item
    \param[in]     opc_ElementItem          Tree item for datapool element
-
-   \created     15.02.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::mh_ConfigureDatapoolElement(const bool oq_ShowOnlyWriteElements,
                                                            const bool oq_ShowArrayElements,
                                                            const bool oq_Show64BitValues,
@@ -1282,15 +1221,12 @@ void C_TblTreDataElementModel::mh_ConfigureDatapoolElement(const bool oq_ShowOnl
    //lint -e{429}  no memory leak because of no ownership of the element opc_ElementItem here
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize tree structure for data pool lists
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize tree structure for data pool lists
 
    \param[in] ou32_ViewIndex View index
-
-   \created     08.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::m_InitNvmList(const uint32 ou32_ViewIndex)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
@@ -1476,18 +1412,15 @@ void C_TblTreDataElementModel::m_InitNvmList(const uint32 ou32_ViewIndex)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get bus signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get bus signals
 
    \param[in] orc_Index Index
 
    \return
    Bus signals
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<C_PuiSvDbNodeDataPoolListElementId> C_TblTreDataElementModel::m_GetBusSignals(const QModelIndex & orc_Index)
 const
 {
@@ -1568,18 +1501,15 @@ const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data pools
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data pools
 
    \param[in] orc_Index Index
 
    \return
    Data pools
-
-   \created     01.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<C_PuiSvDbNodeDataPoolListElementId> C_TblTreDataElementModel::m_GetDatapools(const QModelIndex & orc_Index)
 const
 {
@@ -1633,18 +1563,15 @@ const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data pool elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data pool elements
 
    \param[in] orc_Index Index
 
    \return
    Data pool elements
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<C_PuiSvDbNodeDataPoolListElementId> C_TblTreDataElementModel::m_GetDatapoolElements(
    const QModelIndex & orc_Index) const
 {
@@ -1727,18 +1654,15 @@ std::vector<C_PuiSvDbNodeDataPoolListElementId> C_TblTreDataElementModel::m_GetD
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data pool elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data pool elements
 
    \param[in] orc_Index Index
 
    \return
    Data pool elements
-
-   \created     08.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<C_PuiSvDbNodeDataPoolListElementId> C_TblTreDataElementModel::m_GetNvmList(const QModelIndex & orc_Index)
 const
 {
@@ -1823,15 +1747,12 @@ const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up map
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clean up map
 
    \param[in] orc_Map Map to clean up
-
-   \created     06.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementModel::mh_CleanUp(QMap<std::vector<uint32>, C_TblTreDataElementModelState> & orc_Map)
 {
    for (QMap<std::vector<uint32>, C_TblTreDataElementModelState>::iterator c_It = orc_Map.begin();
@@ -1841,9 +1762,8 @@ void C_TblTreDataElementModel::mh_CleanUp(QMap<std::vector<uint32>, C_TblTreData
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if item in map
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if item in map
 
    \param[in] orc_Map  Map to look in
    \param[in] opc_Item Item to look for
@@ -1851,10 +1771,8 @@ void C_TblTreDataElementModel::mh_CleanUp(QMap<std::vector<uint32>, C_TblTreData
    \return
    True  Found
    False Not found
-
-   \created     06.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_TblTreDataElementModel::mh_Contains(const QMap<std::vector<uint32>, C_TblTreDataElementModelState> & orc_Map,
                                            const C_TblTreItem * const opc_Item)
 {
@@ -1872,18 +1790,15 @@ bool C_TblTreDataElementModel::mh_Contains(const QMap<std::vector<uint32>, C_Tbl
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get view and system definition hash in combination
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get view and system definition hash in combination
 
    \param[in] ou32_ViewIndex View index
 
    \return
    View and system definition hash in combination
-
-   \created     06.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint32> C_TblTreDataElementModel::mh_GetViewSdHash(const uint32 ou32_ViewIndex)
 {
    std::vector<uint32> c_Retval;
@@ -1917,9 +1832,8 @@ std::vector<uint32> C_TblTreDataElementModel::mh_GetViewSdHash(const uint32 ou32
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if diagnostic mode activated
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if diagnostic mode activated
 
    \param[in] ou32_ViewIndex View index
    \param[in] ou32_NodeIndex Node index
@@ -1927,10 +1841,8 @@ std::vector<uint32> C_TblTreDataElementModel::mh_GetViewSdHash(const uint32 ou32
    \return
    True  Diagnostic mode activated
    False No diagnostic mode activated
-
-   \created     07.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_TblTreDataElementModel::mh_CheckNodeDiagnostic(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex)
 {
    bool q_Retval = false;

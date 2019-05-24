@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Export communication stack settings of a openSYDE node.
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     16.10.2017  STW/U.Roesch
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCEXPORTCOMMUNICATIONSTACKH
 #define C_OSCEXPORTCOMMUNICATIONSTACKH
 
@@ -70,6 +64,9 @@ private:
    static void mh_AddDefines(stw_scl::C_SCLStringList & orc_Data, const C_OSCCanMessageContainer & orc_ComMessage,
                              const stw_types::uint8 ou8_InterfaceIndex, const C_OSCCanProtocol::E_Type & ore_Protocol,
                              const stw_scl::C_SCLString & orc_ProjectId, const bool oq_FileType);
+   static void mh_AddFunctionPrototypes(stw_scl::C_SCLStringList & orc_Data, const stw_types::uint8 ou8_InterfaceIndex,
+                                        const C_OSCCanProtocol::E_Type & ore_Protocol,
+                                        const stw_scl::C_SCLString & orc_ProjectId);
    static void mh_AddCModuleGlobal(stw_scl::C_SCLStringList & orc_Data, const bool oq_SafeData,
                                    const C_OSCCanMessageContainer & orc_ComMessage,
                                    const stw_types::uint8 ou8_InterfaceIndex,

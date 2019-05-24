@@ -1,29 +1,23 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for new project import/creation (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     02.10.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SDNDEDBADDNEWPROJECT_H
 #define C_SDNDEDBADDNEWPROJECT_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 #include "C_OgePopUpDialog.h"
 #include "C_OSCNodeApplication.h"
 #include "C_OSCTargetSupportPackage.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
 {
 class C_SdNdeDbAddNewProject;
@@ -31,9 +25,9 @@ class C_SdNdeDbAddNewProject;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SdNdeDbAddNewProject :
    public QWidget
@@ -62,7 +56,6 @@ protected:
 private:
    Ui::C_SdNdeDbAddNewProject * mpc_Ui;
    stw_types::sint32 ms32_TSPReadResult;
-   QString mc_TSPPath;
    const stw_types::uint32 mu32_NodeIndex;
    stw_opensyde_core::C_OSCTargetSupportPackage mc_Package;
    //lint -e{1725} Only problematic if copy or assignment is allowed
@@ -79,16 +72,12 @@ private:
    void m_AddTemplateSection(QString & orc_Content) const;
    void m_Init(const stw_types::uint32 ou32_NodeIndex) const;
 
-   void m_EditTSPPathFocusOn(void) const;
-   void m_EditTSPPathFocusOff(void);
-   void m_SetTSPPath(const QString & orc_New);
-
    //Avoid call
    C_SdNdeDbAddNewProject(const C_SdNdeDbAddNewProject &);
    C_SdNdeDbAddNewProject & operator =(const C_SdNdeDbAddNewProject &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

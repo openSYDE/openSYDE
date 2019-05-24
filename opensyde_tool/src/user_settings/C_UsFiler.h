@@ -1,34 +1,28 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Handle save'n load for user settings (header)
 
    Handle save'n load for user settings (note: main module description should be in .cpp file)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     15.07.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_USFILER_H
 #define C_USFILER_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include "C_UsHandler.h"
 #include "stwtypes.h"
 #include "CSCLIniFile.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_UsFiler
 {
@@ -57,6 +51,11 @@ private:
                            const C_UsSystemView & orc_View);
    static void mh_SaveDataRates(stw_scl::C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
                                 const QString & orc_DataRateIdBase, const C_UsSystemView & orc_View);
+   static void mh_SaveDataRatesPerNode(stw_scl::C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
+                                       const QString & orc_DataRatePerNodeIdBase, const C_UsSystemView & orc_View);
+   static void mh_SaveViewNode(stw_scl::C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
+                               const QString & orc_ViewNodeIdBase, const QString & orc_NodeName,
+                               const C_UsSystemViewNode & orc_ViewNode);
    static void mh_SaveDashboard(stw_scl::C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
                                 const QString & orc_DashboardIdBase, const QString & orc_DashboardName,
                                 const C_UsSystemViewDashboard & orc_Dashboard);
@@ -83,6 +82,12 @@ private:
    static void mh_LoadDataRates(stw_scl::C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
                                 const QString & orc_DataRateIdBase, const QString & orc_ViewName,
                                 C_UsHandler & orc_UserSettings);
+   static void mh_LoadDataRatesPerNode(stw_scl::C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
+                                       const QString & orc_DataRatePerNodeIdBase, const QString & orc_ViewName,
+                                       C_UsHandler & orc_UserSettings);
+   static void mh_LoadViewNode(stw_scl::C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
+                               const QString & orc_ViewNodeIdBase, const QString & orc_ViewName,
+                               C_UsHandler & orc_UserSettings);
    static void mh_LoadDashboard(stw_scl::C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
                                 const QString & orc_DashboardIdBase, const QString & orc_ViewName,
                                 C_UsHandler & orc_UserSettings);
@@ -93,7 +98,7 @@ private:
                                               const QString & orc_ActiveProject);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

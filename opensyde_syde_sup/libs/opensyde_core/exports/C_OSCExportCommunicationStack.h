@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Export communication stack settings of a openSYDE node.
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     16.10.2017  STW/U.Roesch
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCEXPORTCOMMUNICATIONSTACKH
 #define C_OSCEXPORTCOMMUNICATIONSTACKH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 
 #include "stwtypes.h"
@@ -25,12 +19,12 @@
 #include "CSCLStringList.h"
 #include "C_OSCNode.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCExportCommunicationStack
 {
@@ -38,8 +32,10 @@ public:
    C_OSCExportCommunicationStack(void);
    virtual ~C_OSCExportCommunicationStack(void);
 
-   static void h_GetFileName(const stw_types::uint8 ou8_InterfaceIndex, const C_OSCCanProtocol::E_Type & ore_Protocol,
-                             stw_scl::C_SCLString & orc_FileName);
+   static stw_scl::C_SCLString h_GetFileName(const stw_types::uint8 ou8_InterfaceIndex,
+                                             const C_OSCCanProtocol::E_Type & ore_ProtocolType);
+   static stw_scl::C_SCLString h_GetConfigurationName(const stw_types::uint8 ou8_InterfaceIndex,
+                                                      const C_OSCCanProtocol::E_Type & ore_ProtocolType);
    static stw_types::sint32 h_CreateSourceCode(const stw_scl::C_SCLString & orc_Path, const C_OSCNode & orc_Node,
                                                const stw_types::uint8 ou8_InterfaceIndex,
                                                const C_OSCCanProtocol::E_Type & ore_Protocol);
@@ -68,6 +64,9 @@ private:
    static void mh_AddDefines(stw_scl::C_SCLStringList & orc_Data, const C_OSCCanMessageContainer & orc_ComMessage,
                              const stw_types::uint8 ou8_InterfaceIndex, const C_OSCCanProtocol::E_Type & ore_Protocol,
                              const stw_scl::C_SCLString & orc_ProjectId, const bool oq_FileType);
+   static void mh_AddFunctionPrototypes(stw_scl::C_SCLStringList & orc_Data, const stw_types::uint8 ou8_InterfaceIndex,
+                                        const C_OSCCanProtocol::E_Type & ore_Protocol,
+                                        const stw_scl::C_SCLString & orc_ProjectId);
    static void mh_AddCModuleGlobal(stw_scl::C_SCLStringList & orc_Data, const bool oq_SafeData,
                                    const C_OSCCanMessageContainer & orc_ComMessage,
                                    const stw_types::uint8 ou8_InterfaceIndex,
@@ -84,12 +83,12 @@ private:
    static stw_types::sint32 mh_SaveToFile(stw_scl::C_SCLStringList & orc_Data, const stw_scl::C_SCLString & orc_Path,
                                           const stw_types::uint8 ou8_InterfaceIndex,
                                           const C_OSCCanProtocol::E_Type & ore_Protocol, const bool oq_FileType);
-   static void mh_AddSignalDefinitions(const stw_types::uint32 u32_SignalListIndex,
+   static void mh_AddSignalDefinitions(const stw_types::uint32 ou32_SignalListIndex,
                                        const std::vector<C_OSCCanMessage> & orc_Messages,
                                        stw_scl::C_SCLStringList & orc_Data);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

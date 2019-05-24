@@ -1,24 +1,16 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget with all configuration and controlling elements for the trace
  (implementation)
 
    Widget with all configuration and controlling elements for the trace
 
-
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     15.11.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_CamMetControlBarWidget.h"
@@ -27,34 +19,31 @@
 #include "C_UsHandler.h"
 #include "C_GtGetText.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     15.11.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMetControlBarWidget::C_CamMetControlBarWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_CamMetControlBarWidget)
@@ -117,13 +106,10 @@ C_CamMetControlBarWidget::C_CamMetControlBarWidget(QWidget * const opc_Parent) :
            this, &C_CamMetControlBarWidget::SigDisplayTimestampRelative);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     15.11.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMetControlBarWidget::~C_CamMetControlBarWidget()
 {
    // save position
@@ -132,13 +118,10 @@ C_CamMetControlBarWidget::~C_CamMetControlBarWidget()
    delete this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     26.09.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetControlBarWidget::InitStaticNames() const
 {
    //Protocols
@@ -148,6 +131,7 @@ void C_CamMetControlBarWidget::InitStaticNames() const
    this->mpc_Ui->pc_ComboBoxProtocol->addItem("L7-Protocol: CANopen");
    this->mpc_Ui->pc_ComboBoxProtocol->addItem("L7-Protocol: STW KEFEX");
    this->mpc_Ui->pc_ComboBoxProtocol->addItem("L7-Protocol: STW Flashloader");
+   this->mpc_Ui->pc_ComboBoxProtocol->addItem("L7-Protocol: STW SHIP-IP!/IVA");
    this->mpc_Ui->pc_ComboBoxProtocol->addItem("L7-Protocol: SAE J1939 06/2006");
 
    this->mpc_Ui->pc_PushButtonTogglePlay->SetToolTipInformation(
@@ -186,13 +170,10 @@ void C_CamMetControlBarWidget::InitStaticNames() const
       C_GtGetText::h_GetText("Clear trace window content."));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load all user settings
-
-   \created     28.09.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load all user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetControlBarWidget::LoadUserSettings(void) const
 {
    //Buttons
@@ -203,13 +184,10 @@ void C_CamMetControlBarWidget::LoadUserSettings(void) const
    this->mpc_Ui->pc_ComboBoxProtocol->setCurrentIndex(C_UsHandler::h_GetInstance()->GetSelectedProtocolIndex());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save all user settings
-
-   \created     28.09.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save all user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetControlBarWidget::SaveUserSettings(void) const
 {
    //Buttons
@@ -219,27 +197,21 @@ void C_CamMetControlBarWidget::SaveUserSettings(void) const
    C_UsHandler::h_GetInstance()->SetSelectedProtocolIndex(this->mpc_Ui->pc_ComboBoxProtocol->currentIndex());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Stopping logging in case of an error
-
-   \created     30.11.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Stopping logging in case of an error
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetControlBarWidget::StopLogging(void)
 {
    this->m_HandleStop();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle toggle of action playing state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle toggle of action playing state
 
    \param[in] oq_Playing Is playing flag
-
-   \created     25.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetControlBarWidget::m_HandleTogglePlay(const bool oq_Playing)
 {
    if (oq_Playing == false)
@@ -269,13 +241,10 @@ void C_CamMetControlBarWidget::m_HandleTogglePlay(const bool oq_Playing)
    m_HandleTreeVisibility();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle stop button press
-
-   \created     25.09.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle stop button press
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetControlBarWidget::m_HandleStop(void)
 {
    //Signal state: not active
@@ -286,32 +255,26 @@ void C_CamMetControlBarWidget::m_HandleStop(void)
    Q_EMIT (this->SigStopLogging());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle selected protocol change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle selected protocol change
 
    \param[in] osn_Index Selected protocol index
-
-   \created     26.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetControlBarWidget::m_OnProtocolIndexChange(const sintn osn_Index)
 {
    Q_EMIT this->SigChangeProtocol(C_CamMetControlBarWidget::mh_GetProtocolFromIndex(osn_Index));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the protocol type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the protocol type
 
    \param[in]     os32_Protocol         Index of protocol
 
    \return
    Protocol type as enum
-
-   \created     26.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_cmon_protocol::e_CMONL7Protocols C_CamMetControlBarWidget::mh_GetProtocolFromIndex(const sint32 os32_Protocol)
 {
    stw_cmon_protocol::e_CMONL7Protocols e_Retval;
@@ -331,6 +294,9 @@ stw_cmon_protocol::e_CMONL7Protocols C_CamMetControlBarWidget::mh_GetProtocolFro
       e_Retval = stw_cmon_protocol::CMONL7ProtocolXFL;
       break;
    case 5:
+      e_Retval = stw_cmon_protocol::CMONL7Protocol_SHIP_IP_IVA;
+      break;
+   case 6:
       e_Retval = stw_cmon_protocol::CMONL7ProtocolJ1939;
       break;
    default:
@@ -340,13 +306,10 @@ stw_cmon_protocol::e_CMONL7Protocols C_CamMetControlBarWidget::mh_GetProtocolFro
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle the tree visibility
-
-   \created     26.09.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle the tree visibility
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetControlBarWidget::m_HandleTreeVisibility(void)
 {
    //Either if currently no communication traced or if the display mode is static
@@ -363,15 +326,12 @@ void C_CamMetControlBarWidget::m_HandleTreeVisibility(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set display mode: display unique messages
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set display mode: display unique messages
 
    \param[in] oq_Value New value
-
-   \created     26.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetControlBarWidget::m_HandleToggleDisplayMode(const bool oq_Active)
 {
    Q_EMIT this->SigDisplayUniqueMessages(oq_Active);

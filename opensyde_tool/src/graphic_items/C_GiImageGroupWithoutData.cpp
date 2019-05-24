@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Implementation for drawing element image without data (implementation)
 
    Implementation for drawing element image without data
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     28.06.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -28,30 +21,29 @@
 
 #include <QFileInfo>
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const float64 C_GiImageGroupWithoutData::mhf64_ActionPointOffsetImage = 8.0;
 
 const float64 C_GiImageGroupWithoutData::mhf64_MinWidthImage = 10.0;
 const float64 C_GiImageGroupWithoutData::mhf64_MinHeightImage = 10.0;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -60,10 +52,8 @@ const float64 C_GiImageGroupWithoutData::mhf64_MinHeightImage = 10.0;
    \param[in]       oe_Type              Item type
    \param[in]       oq_RequestLateInit   Flag if initialization should be postponed
    \param[in,out]   opc_Parent           Optional pointer to parent
-
-   \created     27.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiImageGroupWithoutData::C_GiImageGroupWithoutData(const uint64 & oru64_ID, const QString & orc_ImagePath,
                                                      const bool oq_RequestLateImageInit,
                                                      QGraphicsItem * const opc_Parent) :
@@ -80,9 +70,8 @@ C_GiImageGroupWithoutData::C_GiImageGroupWithoutData(const uint64 & oru64_ID, co
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -93,10 +82,8 @@ C_GiImageGroupWithoutData::C_GiImageGroupWithoutData(const uint64 & oru64_ID, co
    \param[in]       orc_ImagePath        Filepath to the image
    \param[in]       oe_Type              Item type
    \param[in,out]   opc_Parent           Optional pointer to parent
-
-   \created     27.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiImageGroupWithoutData::C_GiImageGroupWithoutData(const uint64 & oru64_ID, const float64 of64_Width,
                                                      const float64 of64_Height, const QPixmap & orc_Image,
                                                      QGraphicsItem * const opc_Parent) :
@@ -112,15 +99,12 @@ C_GiImageGroupWithoutData::C_GiImageGroupWithoutData(const uint64 & oru64_ID, co
    this->m_Init();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     25.10.2016  STW/B.Bayer
 */
-//--------------------------------------------- --------------------------------
+//--------------------------------------------- ------------------------------------------------------------------------
 C_GiImageGroupWithoutData::~C_GiImageGroupWithoutData()
 {
    //Deleted via Qt parent mechanism
@@ -128,15 +112,12 @@ C_GiImageGroupWithoutData::~C_GiImageGroupWithoutData()
    //lint -e{1740}  no memory leak because of the parent of mpc_Image and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the image
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the image
 
    \return  Actual image
-
-   \created     08.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QPixmap C_GiImageGroupWithoutData::GetImage(void) const
 {
    QPixmap c_Retval;
@@ -148,15 +129,12 @@ QPixmap C_GiImageGroupWithoutData::GetImage(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Late image initialization
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Late image initialization
 
    \param[in] orc_ImagePath File path of image
-
-   \created     28.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiImageGroupWithoutData::LateImageInit(const QString & orc_ImagePath)
 {
    QFileInfo c_File;
@@ -182,7 +160,7 @@ void C_GiImageGroupWithoutData::LateImageInit(const QString & orc_ImagePath)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiImageGroupWithoutData::m_ResizeUpdateItems(const float64 of64_DiffWidth, const float64 of64_DiffHeight)
 {
    Q_UNUSED(of64_DiffWidth)
@@ -207,7 +185,7 @@ void C_GiImageGroupWithoutData::m_ResizeUpdateItems(const float64 of64_DiffWidth
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiImageGroupWithoutData::m_Init(void)
 {
    if (this->mpc_Image != NULL)
@@ -222,7 +200,7 @@ void C_GiImageGroupWithoutData::m_Init(void)
    this->setZValue(mf64_ZORDER_INIT_IMAGE);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiImageGroupWithoutData::m_InitSvg(void)
 {
    if (this->mpc_SvgGraphicsItem != NULL)

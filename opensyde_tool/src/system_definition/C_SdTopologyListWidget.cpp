@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       List widget for the toolbox (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     10.08.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QDrag>
@@ -26,37 +19,34 @@
 #include "constants.h"
 #include "C_SdTopologyListWidget.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 static const sintn msn_GRID_HEIGHT = 70;
 static const sintn msn_GRID_WIDTH = 90;
 static const sintn msn_ICON_HEIGHT = 48;
 static const sintn msn_ICON_WIDTH = 48;
 const QString C_SdTopologyListWidget::hc_GroupName = "application/stw/opensyde/system/element";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent        Optional pointer to parent
-
-   \created     10.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdTopologyListWidget::C_SdTopologyListWidget(QWidget * const opc_Parent) :
    C_OgeListWidgetToolTipBase(opc_Parent),
    mq_AdaptMaximumHeight(true)
@@ -90,42 +80,33 @@ C_SdTopologyListWidget::C_SdTopologyListWidget(QWidget * const opc_Parent) :
    this->setFocusPolicy(Qt::NoFocus);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     10.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdTopologyListWidget::~C_SdTopologyListWidget()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Activates or deactivates the adaption of the maximum height if the size changes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Activates or deactivates the adaption of the maximum height if the size changes
 
    \param[in]     oq_Active      Flag if adaption is active
-
-   \created     17.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyListWidget::SetMaximumHeightAdaption(const bool oq_Active)
 {
    this->mq_AdaptMaximumHeight = oq_Active;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the dark mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the dark mode
 
    \param[in] oq_Active Dark mode active
-
-   \created     04.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyListWidget::ApplyDarkMode(const bool oq_Active) const
 {
    for (sintn sn_ItItem = 0; sn_ItItem < this->count(); ++sn_ItItem)
@@ -153,29 +134,23 @@ void C_SdTopologyListWidget::ApplyDarkMode(const bool oq_Active) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set group name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set group name
 
    \param[in] orc_Name Group name
-
-   \created     07.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyListWidget::SetGroupName(const QString & orc_Name)
 {
    this->mc_Name = orc_Name;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten start drag event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten start drag event
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     10.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyListWidget::startDrag(const Qt::DropActions oc_SupportedActions)
 {
    QList<QListWidgetItem *> c_SelectedItems = this->selectedItems();
@@ -205,17 +180,14 @@ void C_SdTopologyListWidget::startDrag(const Qt::DropActions oc_SupportedActions
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten resize event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten resize event
 
    Automatic adapting the minimum height.
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     12.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyListWidget::resizeEvent(QResizeEvent * const opc_Event)
 {
    // Items on each row

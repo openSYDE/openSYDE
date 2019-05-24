@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Utility class for stylesheets (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     15.09.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QTextDocument>
@@ -24,12 +17,12 @@
 
 #include "C_UtiStyleSheets.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 // Configuration for dynamic transparency color configuration of elements
 //lint -e{36,155}  c++11 feature
 const std::vector<QString> C_UtiStyleSheets::mhc_ScrollAreaElements(
@@ -76,7 +69,8 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollAreaElements(
    "stw_opensyde_gui--C_SdBueMlvGraphicsView",
    "stw_opensyde_gui_elements--C_OgeDarkScrollArea",
    "stw_opensyde_gui_logic--C_PopFileTableView",
-   "stw_opensyde_gui_elements--C_OgeSaNaviBar"
+   "stw_opensyde_gui_elements--C_OgeSaNaviBar",
+   "stw_opensyde_gui--C_SdNdeDataPoolSelectorAddListWidget"
 }
    );
 //lint -e{36,155}  c++11 feature
@@ -198,7 +192,8 @@ const std::vector<QString> C_UtiStyleSheets::mhc_ScrollBarElementsBright(
    "stw_opensyde_gui_elements--C_OgeDarkScrollArea QScrollBar[DarkMode=\"false\"]",
    "stw_opensyde_gui_elements--C_OgeTransparentScrollArea QScrollBar",
    "stw_opensyde_gui--C_SyvDcExistingNodeList QScrollBar",
-   "stw_opensyde_gui--C_SyvDcConnectedNodeList QScrollBar"
+   "stw_opensyde_gui--C_SyvDcConnectedNodeList QScrollBar",
+   "stw_opensyde_gui--C_SdNdeDataPoolSelectorAddListWidget QScrollBar"
 }
    );
 //lint -e{36,155}  c++11 feature
@@ -280,25 +275,22 @@ const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets
 }
    );
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Combine all available stylesheets
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Combine all available stylesheets
 
    \param[out]   orc_Stylesheet   QSS file
-
-   \created     26.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_UtiStyleSheets::h_GetStylesheet(void)
 {
    QString c_Stylesheet;
@@ -338,15 +330,12 @@ QString C_UtiStyleSheets::h_GetStylesheet(void)
    return c_Stylesheet;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply stylesheet for html
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply stylesheet for html
 
    \param[in] orc_Html Text in html
-
-   \created     26.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_UtiStyleSheets::h_ToStyledHtml(const QString & orc_Html)
 {
    QTextDocument c_Converter;
@@ -356,9 +345,8 @@ QString C_UtiStyleSheets::h_ToStyledHtml(const QString & orc_Html)
    return c_Converter.toHtml();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Gets the background color of a styleshett
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Gets the background color of a styleshett
 
    Necessary format: "background-color: #0070c0;"
 
@@ -366,10 +354,8 @@ QString C_UtiStyleSheets::h_ToStyledHtml(const QString & orc_Html)
    \param[in]     oq_AlphaCh Flag if the alpha channel shall be read out
 
    \return        Background color
-
-   \created     17.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QColor C_UtiStyleSheets::h_GetStyleSheetColor(const QString & orc_Style)
 {
    const QString c_Category = "background-color: ";
@@ -381,42 +367,33 @@ QColor C_UtiStyleSheets::h_GetStyleSheetColor(const QString & orc_Style)
    return c_Color;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapts the background color of a styleshett
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapts the background color of a styleshett
 
    \param[in,out] orc_Style  Stylesheet string to adapt
    \param[in]     orc_Color  New background color
-
-   \created     17.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UtiStyleSheets::h_SetStyleSheetBackgroundColor(QString & orc_Style, const QColor & orc_Color)
 {
    mh_SetStyleSheetColor("background-color", orc_Style, orc_Color);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     15.09.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_UtiStyleSheets::C_UtiStyleSheets(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Append stylesheet of file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Append stylesheet of file
 
    \param[in]     orc_File       QSS file
    \param[in,out] orc_Stylesheet Stylesheet
-
-   \created     26.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UtiStyleSheets::mh_AppendStylesheet(const QString & orc_File, QString & orc_Stylesheet)
 {
    QFile c_File(orc_File);
@@ -425,33 +402,27 @@ void C_UtiStyleSheets::mh_AppendStylesheet(const QString & orc_File, QString & o
    orc_Stylesheet += QLatin1String(c_File.readAll());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Append dynamic created stylesheet
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Append dynamic created stylesheet
 
    \param[in,out] orc_Stylesheet Stylesheet
-
-   \created     15.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UtiStyleSheets::mh_AppendDynamicStylesheet(QString & orc_Stylesheet)
 {
    mh_AppendTransparentColorSteps(orc_Stylesheet);
    mh_AppendScrollBarStyleSheets(orc_Stylesheet);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Append dynamic created color with transparent steps from 255 to 127
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Append dynamic created color with transparent steps from 255 to 127
 
    The stylesheet can be used with the property Transparency with the number of the
    transparency value itself.
 
    \param[in,out] orc_Stylesheet Stylesheet
-
-   \created     15.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UtiStyleSheets::mh_AppendTransparentColorSteps(QString & orc_Stylesheet)
 {
    uint32 u32_Counter;
@@ -493,15 +464,12 @@ void C_UtiStyleSheets::mh_AppendTransparentColorSteps(QString & orc_Stylesheet)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply stylesheets for scroll bars
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply stylesheets for scroll bars
 
    \param[in,out] orc_Stylesheet Dynamic stylesheet document
-
-   \created     13.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UtiStyleSheets::mh_AppendScrollBarStyleSheets(QString & orc_Stylesheet)
 {
    mh_AppendScrollBarStyleSheet(C_UtiStyleSheets::mhc_ScrollBarElementsDark,
@@ -512,17 +480,14 @@ void C_UtiStyleSheets::mh_AppendScrollBarStyleSheets(QString & orc_Stylesheet)
                                 C_UtiStyleSheets::mhc_ScrollBarPropertiesMainNavi, orc_Stylesheet);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply stylesheets for scroll bar
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply stylesheets for scroll bar
 
    \param[in]     orc_ScrollBarElements   Which elements to apply the stylesheets for
    \param[in]     orc_ScrollBarProperties Which stylesheets should be applied for these elements
    \param[in,out] orc_Stylesheet          Dynamic stylesheet document
-
-   \created     13.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UtiStyleSheets::mh_AppendScrollBarStyleSheet(const std::vector<QString> & orc_ScrollBarElements,
                                                     const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> & orc_ScrollBarProperties,
                                                     QString & orc_Stylesheet)
@@ -561,7 +526,7 @@ void C_UtiStyleSheets::mh_AppendScrollBarStyleSheet(const std::vector<QString> &
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UtiStyleSheets::mh_SetStyleSheetColor(const QString & orc_ColorType, QString & orc_Style,
                                              const QColor & orc_Color)
 {

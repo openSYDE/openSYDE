@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Z order undo command (implementation)
 
    Z order undo command
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.11.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -24,35 +17,32 @@
 #include "C_SebUnoZOrderCommand.h"
 #include "C_SebScene.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace std;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Scene  Pointer to currently active scene
    \param[in]     orc_IDs    Affected unique IDs
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     21.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoZOrderCommand::C_SebUnoZOrderCommand(QGraphicsScene * const opc_Scene, const vector<uint64> & orc_IDs,
                                              const vector<float64> & orc_NewZValues, QUndoCommand * const opc_Parent) :
    C_SebUnoBaseCommand(opc_Scene, orc_IDs, "Reorder drawing element(s)", opc_Parent),
@@ -69,24 +59,18 @@ C_SebUnoZOrderCommand::C_SebUnoZOrderCommand(QGraphicsScene * const opc_Scene, c
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     21.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoZOrderCommand::~C_SebUnoZOrderCommand()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Redo z order
-
-   \created     21.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Redo z order
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoZOrderCommand::undo(void)
 {
    vector<QGraphicsItem *> c_AffectedItems = this->m_GetSceneItems();
@@ -100,13 +84,10 @@ void C_SebUnoZOrderCommand::undo(void)
    QUndoCommand::undo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Redo z order
-
-   \created     21.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Redo z order
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoZOrderCommand::redo(void)
 {
    vector<QGraphicsItem *> c_AffectedItems = this->m_GetSceneItems();
@@ -120,19 +101,16 @@ void C_SebUnoZOrderCommand::redo(void)
    QUndoCommand::redo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt z order of selected items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt z order of selected items
 
    \param[in]     orc_SelectedItems All selected items
    \param[in]     of64_Diff         Difference to add to all selected items
    \param[in,out] orf64_ZOrderHigh  Reference to highest z value
    \param[in,out] orf64_ZOrderLow   Reference to lowest z value
    \param[in,out] orc_NewZValues    Storage for a map of all new z values
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoZOrderCommand::h_AdaptZOrder(QGraphicsScene * const opc_Scene,
                                           const QList<QGraphicsItem *> & orc_SelectedItems, const float64 of64_Diff,
                                           float64 & orf64_ZOrderHigh, float64 & orf64_ZOrderLow, QMap<QGraphicsItem *,

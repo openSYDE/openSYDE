@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       openSYDE C source code generation application
 
    Console application to generate C source code from an openSYDE System Definition
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     05.09.2018  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
@@ -65,8 +58,7 @@ public:
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
-/*!
-   \brief   Generate source code for one application of one node
+/*! \brief   Generate source code for one application of one node
 
    Here: create C and H files
    The caller guarantees ou16_ApplicationIndex to be within valid range and the application to be a
@@ -80,8 +72,6 @@ public:
    \return
    eRESULT_OK                        code created for all programmable application
    eRESULT_CODE_GENERATION_ERROR     problems creating code
-
-   \created     05.09.2018  STW/A.Stangl
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OsyCodeExportBase::E_ResultCode C_CExport::m_CreateApplicationCode(const C_OSCNode & orc_Node,
@@ -96,12 +86,9 @@ C_OsyCodeExportBase::E_ResultCode C_CExport::m_CreateApplicationCode(const C_OSC
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*!
-   \brief   Print banner of application to console
+/*! \brief   Print banner of application to console
 
    Print banner and name of application to console.
-
-   \created     06.09.2018  STW/A.Stangl
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CExport::m_PrintBanner(void)
@@ -117,8 +104,7 @@ void C_CExport::m_PrintBanner(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*!
-   \brief   main
+/*! \brief   main
 
    \param[in]   osn_Argc     Number of command line arguments
    \param[in]   oapcn_Argv   Command line arguments
@@ -126,8 +112,6 @@ void C_CExport::m_PrintBanner(void)
    \retval
    0     no problems
    else  trouble (see definition of C_CExport::E_ResultCode constants)
-
-   \created     05.09.2018  STW/A.Stangl
 */
 //----------------------------------------------------------------------------------------------------------------------
 sintn main(const sintn osn_Argc, charn * const oapcn_Argv[])

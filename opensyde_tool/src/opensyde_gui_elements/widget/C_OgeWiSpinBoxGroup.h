@@ -1,28 +1,22 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for spin boxes of all available types (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.08.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OGEWISPINBOXGROUP_H
 #define C_OGEWISPINBOXGROUP_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 #include "C_NagToolTip.h"
 #include "C_OSCNodeDataPoolContent.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
 {
 class C_OgeWiSpinBoxGroup;
@@ -30,9 +24,9 @@ class C_OgeWiSpinBoxGroup;
 
 namespace stw_opensyde_gui_elements
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_OgeWiSpinBoxGroup :
    public QWidget
 {
@@ -64,6 +58,7 @@ Q_SIGNALS:
 protected:
    virtual bool event(QEvent * const opc_Event) override;
    virtual void keyPressEvent(QKeyEvent * const opc_Event) override;
+   virtual void keyReleaseEvent(QKeyEvent * const opc_Event) override;
    virtual void mousePressEvent(QMouseEvent * const opc_Event) override;
    virtual void mouseReleaseEvent(QMouseEvent * const opc_Event) override;
    virtual void focusInEvent(QFocusEvent * const opc_Event) override;
@@ -85,7 +80,7 @@ private:
    C_OgeWiSpinBoxGroup & operator =(const C_OgeWiSpinBoxGroup &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

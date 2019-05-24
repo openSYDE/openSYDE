@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Topology specific Z order undo command (implementation)
 
    Z order undo command
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.11.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -24,35 +17,32 @@
 #include "C_SdManUnoTopologyZOrderCommand.h"
 #include "C_SebScene.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace std;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Scene  Pointer to currently active scene
    \param[in]     orc_IDs    Affected unique IDs
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     21.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyZOrderCommand::C_SdManUnoTopologyZOrderCommand(QGraphicsScene * const opc_Scene,
                                                                  const vector<uint64> & orc_IDs,
                                                                  const vector<float64> & orc_NewZValues,
@@ -61,18 +51,15 @@ C_SdManUnoTopologyZOrderCommand::C_SdManUnoTopologyZOrderCommand(QGraphicsScene 
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     21.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyZOrderCommand::~C_SdManUnoTopologyZOrderCommand()
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyZOrderCommand::h_CheckZOrderPriority(const QList<QGraphicsItem *> & orc_SelectedItems,
                                                             const QList<QGraphicsItem *> & orc_Items,
                                                             QMap<QGraphicsItem *,
@@ -129,7 +116,7 @@ void C_SdManUnoTopologyZOrderCommand::h_CheckZOrderPriority(const QList<QGraphic
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyZOrderCommand::mh_CheckZOrderOfBusConnectors(C_GiLiBusConnector * const opc_Item,
                                                                     QMap<QGraphicsItem *,
                                                                          float64> & orc_NewZValues)
@@ -150,17 +137,14 @@ void C_SdManUnoTopologyZOrderCommand::mh_CheckZOrderOfBusConnectors(C_GiLiBusCon
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Search map for key and replace by minimum
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Search map for key and replace by minimum
 
    \param[in,out] orc_Map     Map containing all relevant values
    \param[in,out] opc_Key     Key to replace
    \param[in]     orf64_Value New value
-
-   \created     21.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyZOrderCommand::mh_InsertOrReplaceByMinimum(QMap<QGraphicsItem *, float64> & orc_Map,
                                                                   QGraphicsItem * const opc_Key,
                                                                   const float64 & orf64_Value)

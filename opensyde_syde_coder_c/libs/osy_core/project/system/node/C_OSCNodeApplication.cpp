@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data class for application related information (implementation)
 
    Data class for application related information
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.12.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -45,10 +38,7 @@ using namespace stw_scl;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     22.12.2016  STW/M.Echtler
+/*! \brief   Default constructor
 */
 //-----------------------------------------------------------------------------
 C_OSCNodeApplication::C_OSCNodeApplication(void) :
@@ -66,15 +56,12 @@ C_OSCNodeApplication::C_OSCNodeApplication(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
    It is not endian-safe, so it should only be used on the same system it is created on.
 
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
-
-   \created     21.03.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCNodeApplication::CalcHash(uint32 & oru32_HashValue) const
@@ -93,15 +80,12 @@ void C_OSCNodeApplication::CalcHash(uint32 & oru32_HashValue) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Transform application type to string
+/*! \brief   Transform application type to string
 
    \param[in] ore_Application Application type
 
    \return
    Stringified application type
-
-   \created     10.01.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_OSCNodeApplication::h_ApplicationToString(const C_OSCNodeApplication::E_Type & ore_Application)
@@ -110,9 +94,6 @@ C_SCLString C_OSCNodeApplication::h_ApplicationToString(const C_OSCNodeApplicati
 
    switch (ore_Application)
    {
-   case C_OSCNodeApplication::eFILE_CONTAINER:
-      c_Retval = "file_container";
-      break;
    case C_OSCNodeApplication::eBINARY:
       c_Retval = "binary";
       break;
@@ -127,16 +108,13 @@ C_SCLString C_OSCNodeApplication::h_ApplicationToString(const C_OSCNodeApplicati
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Transform string to application type
+/*! \brief   Transform string to application type
 
    \param[in]  orc_String String to interpret
    \param[out] ore_Type   Application type
 
    \return
    C_NO_ERR   no error
-
-   \created     10.01.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCNodeApplication::h_StringToApplication(const C_SCLString & orc_String,
@@ -144,11 +122,7 @@ sint32 C_OSCNodeApplication::h_StringToApplication(const C_SCLString & orc_Strin
 {
    sint32 s32_Retval = C_NO_ERR;
 
-   if (orc_String == "file_container")
-   {
-      ore_Type = C_OSCNodeApplication::eFILE_CONTAINER;
-   }
-   else if (orc_String == "binary")
+   if (orc_String == "binary")
    {
       ore_Type = C_OSCNodeApplication::eBINARY;
    }

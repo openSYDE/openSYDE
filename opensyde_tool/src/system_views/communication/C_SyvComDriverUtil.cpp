@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Utility class for C_OSCComDriver (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     14.12.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QFile>
@@ -24,27 +17,26 @@
 #include "C_SyvComDriverUtil.h"
 #include "C_PuiSdHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Fills all parameter for C_OSCComDriverProtocol based on specific view and prepares the CAN dispatcher
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Fills all parameter for C_OSCComDriverProtocol based on specific view and prepares the CAN dispatcher
 
    \param[in]   ou32_ViewIndex          Index of current used view
    \param[out]  ou32_ActiveBusIndex     Bus index of bus in system definition where we are connected to
@@ -60,10 +52,8 @@ using namespace stw_opensyde_core;
    C_BUSY      System view error detected
    C_COM       Initialization of CAN Dispatcher failed
    C_RD_WR     Invalid CAN-DLL path
-
-   \created     14.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComDriverUtil::h_GetOSCComDriverParamFromView(const uint32 ou32_ViewIndex, uint32 & oru32_ActiveBusIndex,
                                                           std::vector<uint8> & orc_ActiveNodes,
                                                           stw_can::C_CAN ** const oppc_CanDispatcher,

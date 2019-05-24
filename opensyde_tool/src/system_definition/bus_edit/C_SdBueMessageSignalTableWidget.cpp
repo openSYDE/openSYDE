@@ -1,54 +1,44 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for showing messages or signals in a table
 
    Widget for showing messages or signals in a table
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.03.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 #include "C_SdBueMessageSignalTableWidget.h"
 #include "ui_C_SdBueMessageSignalTableWidget.h"
 #include "C_GtGetText.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     24.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageSignalTableWidget::C_SdBueMessageSignalTableWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueMessageSignalTableWidget),
@@ -77,29 +67,23 @@ C_SdBueMessageSignalTableWidget::C_SdBueMessageSignalTableWidget(QWidget * const
            &C_SdBueMessageSignalTableWidget::m_OnSignalSelected);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     24.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageSignalTableWidget::~C_SdBueMessageSignalTableWidget(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set message sync manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set message sync manager
 
    \param[in,out] opc_Value Message sync manager
-
-   \created     03.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalTableWidget::SetMessageSyncManager(
    stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value) const
 {
@@ -107,13 +91,10 @@ void C_SdBueMessageSignalTableWidget::SetMessageSyncManager(
    this->mpc_Ui->pc_TableViewSignals->SetMessageSyncManager(opc_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal data changes to table
-
-   \created     03.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal data changes to table
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalTableWidget::UpdateData(void)
 {
    this->mpc_Ui->pc_TableViewMessages->UpdateData();
@@ -122,13 +103,10 @@ void C_SdBueMessageSignalTableWidget::UpdateData(void)
    this->m_UpdateUi();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     03.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalTableWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_RadioButtonMessages->setText(C_GtGetText::h_GetText("Message View"));
@@ -138,15 +116,12 @@ void C_SdBueMessageSignalTableWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelNoSignals->setText(C_GtGetText::h_GetText("No signals declared"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle messages radio button toggle
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle messages radio button toggle
 
    \param[in] orq_Checked Radio button state
-
-   \created     04.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalTableWidget::m_OnMessagesToggle(const bool & orq_Checked)
 {
    this->mq_Messages = orq_Checked;
@@ -154,45 +129,36 @@ void C_SdBueMessageSignalTableWidget::m_OnMessagesToggle(const bool & orq_Checke
    this->m_UpdateUi();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle signals radio button toggle
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle signals radio button toggle
 
    \param[in] orq_Checked Radio button state
-
-   \created     04.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalTableWidget::m_OnSignalsToggle(const bool & orq_Checked)
 {
    m_OnMessagesToggle(orq_Checked == false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle message selection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle message selection
 
    \param[in] orc_MessageId Message identification indices
-
-   \created     05.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalTableWidget::m_OnMessageSelected(
    const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId)
 {
    Q_EMIT this->SigMessageSelected(orc_MessageId);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle signal selection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle signal selection
 
    \param[in] orc_MessageId     Message identification indices
    \param[in] oru32_SignalIndex Signal index
-
-   \created     05.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalTableWidget::m_OnSignalSelected(
    const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
    const stw_types::uint32 & oru32_SignalIndex)
@@ -200,7 +166,7 @@ void C_SdBueMessageSignalTableWidget::m_OnSignalSelected(
    Q_EMIT this->SigSignalSelected(orc_MessageId, oru32_SignalIndex);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalTableWidget::m_UpdateUi(void)
 {
    if (this->mq_Messages == true)

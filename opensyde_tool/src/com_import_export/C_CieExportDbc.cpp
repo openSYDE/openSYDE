@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Export data to Vector DBC file (implementation)
 
@@ -14,17 +13,11 @@
 
    The DBC file can be read by Vector tool CANdb++ editor.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.04.2018  STW/D.Pohl
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -40,7 +33,7 @@
 #include "C_SdNdeDataPoolContentUtil.h"
 #include "C_OSCLoggingHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui_logic;
@@ -48,14 +41,14 @@ using namespace stw_opensyde_core;
 using namespace stw_tgl;
 using namespace stw_scl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const std::string C_CieExportDbc::mhc_SigInitialValue = "GenSigStartValue";
 const std::string C_CieExportDbc::mhc_MsgCycleTime = "GenMsgCycleTime";
 const std::string C_CieExportDbc::mhc_MsgSendType = "GenMsgSendType";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 stw_scl::C_SCLStringList C_CieExportDbc::mhc_WarningMessages;          // global warnings e.g. why some messages could
                                                                        // not be exported
 stw_scl::C_SCLString C_CieExportDbc::mhc_ErrorMessage;                 // description of error which caused the export
@@ -66,15 +59,14 @@ bool C_CieExportDbc::mhq_ValidDbcExport = false;                       // for pu
 C_CieExportDbc::C_ExportStatistic C_CieExportDbc::mhc_ExportStatistic; // for public getter function of export
                                                                        // statistics
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   short description of function
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   short description of function
 
    Assumptions:
    * DBC network must have at least one node
@@ -95,10 +87,8 @@ C_CieExportDbc::C_ExportStatistic C_CieExportDbc::mhc_ExportStatistic; // for pu
                    no node in network for DBC file export
    C_UNKNOWN_ERR   general error when writing to DBC file, no more details
    C_BUSY          error on writing to DBC file
-
-   \created     27.04.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieExportDbc::h_ExportNetwork(const stw_scl::C_SCLString & orc_File,
                                        const C_CieConverter::C_CIECommDefinition & orc_Definition,
                                        stw_scl::C_SCLStringList & orc_WarningMessages,
@@ -155,9 +145,6 @@ sint32 C_CieExportDbc::h_ExportNetwork(const stw_scl::C_SCLString & orc_File,
       c_Message = "Inserting nodes for network ...";
       osc_write_log_info("DBC file export", c_Message);
       s32_Return = mh_SetNodes(orc_Definition.c_Nodes, c_DbcNetwork.nodes);
-
-      // strange if assert fails -> this should not happen (see assumptions)
-      tgl_assert(s32_Return == C_NO_ERR);
    }
 
    // set messages
@@ -196,9 +183,8 @@ sint32 C_CieExportDbc::h_ExportNetwork(const stw_scl::C_SCLString & orc_File,
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Getter for the node mapping for DBC file export.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Getter for the node mapping for DBC file export.
 
    DBC symbol names does not contain any special characters
    (see C_CieExportDbc::mh_NiceifyStringForDbcSymbol).
@@ -209,10 +195,8 @@ sint32 C_CieExportDbc::h_ExportNetwork(const stw_scl::C_SCLString & orc_File,
    \return
    C_NO_ERR     mapping valid
    C_NOACT      no valid export to DBC file executed
-
-   \created     15.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieExportDbc::h_GetNodeMapping(std::map<C_SCLString, C_SCLString> & orc_NodeMapping)
 {
    sint32 s32_Return = C_NOACT;
@@ -226,9 +210,8 @@ sint32 C_CieExportDbc::h_GetNodeMapping(std::map<C_SCLString, C_SCLString> & orc
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Getter for the export statistics.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Getter for the export statistics.
 
    E.g.: Number of Tx/Rx messages and signals.
 
@@ -237,10 +220,8 @@ sint32 C_CieExportDbc::h_GetNodeMapping(std::map<C_SCLString, C_SCLString> & orc
    \return
    C_NO_ERR     export statistic valid
    C_NOACT      no valid export to DBC file executed
-
-   \created     18.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieExportDbc::h_GetExportStatistic(C_ExportStatistic & orc_ExportStatistic)
 {
    sint32 s32_Return = C_NOACT;
@@ -254,9 +235,8 @@ sint32 C_CieExportDbc::h_GetExportStatistic(C_ExportStatistic & orc_ExportStatis
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Fill up nodes of DBC network.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Fill up nodes of DBC network.
 
    Node names have to be "niceified" for DBC file export because they are
    instead of messages and signals not C-compliant.
@@ -267,10 +247,8 @@ sint32 C_CieExportDbc::h_GetExportStatistic(C_ExportStatistic & orc_ExportStatis
    \return
    C_NO_ERR    all nodes successfully set
    C_CONFIG    no node in network
-
-   \created     07.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieExportDbc::mh_SetNodes(const std::vector<C_CieConverter::C_CIENode> & orc_CIENodes, std::map<std::string,
                                                                                                          Vector::DBC::Node> & orc_DBCNodes)
 {
@@ -305,9 +283,8 @@ sint32 C_CieExportDbc::mh_SetNodes(const std::vector<C_CieConverter::C_CIENode> 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Fill up messages with signals.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Fill up messages with signals.
 
    \param[in]     orc_CIENodes      input message data structure to export
    \param[out]    orc_DBCMessages   message data structure for DBC file export
@@ -316,10 +293,8 @@ sint32 C_CieExportDbc::mh_SetNodes(const std::vector<C_CieConverter::C_CIENode> 
    C_NO_ERR    all messages and signals successfully set
    C_WARN      cycle time is negative, perhaps uint32 value does not fit in integer
    C_WARN      value type not supported
-
-   \created     07.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieExportDbc::mh_SetMessages(const std::vector<C_CieConverter::C_CIENode> & orc_CIENodes, std::map<uintn,
                                                                                                             Vector::DBC::Message> & orc_DBCMessages)
 {
@@ -424,9 +399,8 @@ sint32 C_CieExportDbc::mh_SetMessages(const std::vector<C_CieConverter::C_CIENod
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Fills up signals for one message of a node.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Fills up signals for one message of a node.
 
    Assumptions:
    * there is no consistency check for signals (must be secured by openSYDE GUI)
@@ -438,10 +412,8 @@ sint32 C_CieExportDbc::mh_SetMessages(const std::vector<C_CieConverter::C_CIENod
    \return
    C_NO_ERR    all messages and signals successfully set
    C_WARN      value type of signal not supported
-
-   \created     07.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieExportDbc::mh_SetSignals(const std::vector<C_CieConverter::C_CIECanSignal> & orc_CIESignals,
                                      const std::vector<C_CieConverter::C_CIENode> & orc_CIENodes,
                                      Vector::DBC::Message & orc_DBCMessage)
@@ -505,9 +477,8 @@ sint32 C_CieExportDbc::mh_SetSignals(const std::vector<C_CieConverter::C_CIECanS
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Fills up the content values of a signal.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Fills up the content values of a signal.
 
    Assumptions:
    * there is no consistency check for signal values (must be secured by openSYDE GUI)
@@ -518,10 +489,8 @@ sint32 C_CieExportDbc::mh_SetSignals(const std::vector<C_CieConverter::C_CIECanS
    \return
    C_NO_ERR    all messages and signals successfully set
    C_WARN      value type not supported
-
-   \created     08.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieExportDbc::mh_SetSignalValues(const C_CieConverter::C_CIEDataPoolElement & orc_Element,
                                           Vector::DBC::Signal & orc_DbcSignal)
 {
@@ -622,9 +591,8 @@ sint32 C_CieExportDbc::mh_SetSignalValues(const C_CieConverter::C_CIEDataPoolEle
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function sets transmission type for message.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function sets transmission type for message.
 
    Hint: openSYDE only has the two transmission types 'Cyclic' and 'OnEvent'.
 
@@ -634,10 +602,8 @@ sint32 C_CieExportDbc::mh_SetSignalValues(const C_CieConverter::C_CIEDataPoolEle
    \return
    C_NO_ERR    transmission type of message successfully set
    C_WARN      cycle time is negative, perhaps uint32 value does not fit in integer
-
-   \created     08.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieExportDbc::mh_SetTransmission(const C_CieConverter::C_CIENodeMessage & orc_Message,
                                           Vector::DBC::Message & orc_DbcMessage)
 {
@@ -692,9 +658,8 @@ sint32 C_CieExportDbc::mh_SetTransmission(const C_CieConverter::C_CIENodeMessage
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Interprets status of Vector DBC library.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Interprets status of Vector DBC library.
 
    If any warning or error, then global warning list or error string is filled.
 
@@ -705,10 +670,8 @@ sint32 C_CieExportDbc::mh_SetTransmission(const C_CieConverter::C_CIENodeMessage
    C_UNKNOWN_ERR   general error, no more details
    C_BUSY          error on writing to file
    C_WARN          see global warning list
-
-   \created     11.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieExportDbc::mh_CheckDbcFileStatus(const Vector::DBC::Status & orc_Status)
 {
    sint32 s32_Return;
@@ -890,15 +853,12 @@ sint32 C_CieExportDbc::mh_CheckDbcFileStatus(const Vector::DBC::Status & orc_Sta
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Fills up the obligatory new symbol entries of a DBC file.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Fills up the obligatory new symbol entries of a DBC file.
 
    \param[in,out] orc_NewSymbols   symbol list to fill with standard entries
-
-   \created     12.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieExportDbc::mh_SetNewSymbols(std::list<std::string> & orc_NewSymbols)
 {
    orc_NewSymbols.push_back("NS_DESC_");
@@ -931,15 +891,12 @@ void C_CieExportDbc::mh_SetNewSymbols(std::list<std::string> & orc_NewSymbols)
    orc_NewSymbols.push_back("SG_MUL_VAL_");
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Fills up the obligatory attribute default map.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Fills up the obligatory attribute default map.
 
    \param[in,out] orc_AttributeDefaults   attribute default map to fill with standard values
-
-   \created     12.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieExportDbc::mh_SetAttributeDefaults(std::map<std::string, Vector::DBC::Attribute> & orc_AttributeDefaults)
 {
    // bus type
@@ -1007,15 +964,12 @@ void C_CieExportDbc::mh_SetAttributeDefaults(std::map<std::string, Vector::DBC::
    orc_AttributeDefaults.insert(std::pair<std::string, Vector::DBC::Attribute>(c_NmStationName, c_NmStationAttribute));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Fills up the obligatory attribute definition map.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Fills up the obligatory attribute definition map.
 
    \param[in,out] orc_AttributeDefinitions   attribute definition map to fill with standard values
-
-   \created     12.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieExportDbc::mh_SetAttributeDefinitions(std::map<std::string,
                                                          Vector::DBC::AttributeDefinition> & orc_AttributeDefinitions)
 {
@@ -1100,9 +1054,8 @@ void C_CieExportDbc::mh_SetAttributeDefinitions(std::map<std::string,
                                       c_SigInitialValueName, c_SigInitialValueAttribute));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Replace special characters in string for DBC files.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Replace special characters in string for DBC files.
 
    Aims:
    * convert into strings that can be used for DBC files as symbol names
@@ -1121,10 +1074,8 @@ void C_CieExportDbc::mh_SetAttributeDefinitions(std::map<std::string,
 
    \return
    Niceified string
-
-   \created     15.06.2018  STW/D.Pohl (copied and adapted from C_OSCUtils::m_NiceifyStringForFileName)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CieExportDbc::mh_NiceifyStringForDbcSymbol(const C_SCLString & orc_String)
 {
    C_SCLString c_Result;
@@ -1151,9 +1102,8 @@ C_SCLString C_CieExportDbc::mh_NiceifyStringForDbcSymbol(const C_SCLString & orc
    return c_Result;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle/escape critical symbols for DBC
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle/escape critical symbols for DBC
 
    Current:
    Only handle " character
@@ -1162,10 +1112,8 @@ C_SCLString C_CieExportDbc::mh_NiceifyStringForDbcSymbol(const C_SCLString & orc
 
    \return
    Escaped string
-
-   \created     25.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CieExportDbc::mh_EscapeCriticalSymbols(const C_SCLString & orc_String)
 {
    C_SCLString c_Retval;

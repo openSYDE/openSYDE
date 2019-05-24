@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Checksummed INI file class
 
    For details cf. documentation in .h file.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     16.04.2009  STW/A.Stangl (original implementation as CDLSecureINIFile)
-   \endimplementation
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -42,15 +35,12 @@ static const uint16 mu16_CHECKSUM_VERSION = 2U;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   constructor
+/*! \brief   constructor
 
    Open and parse INI file.
    Does NOT check the checksum.
 
    \param[in]     orc_FileName     path to INI file
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_OSCChecksummedIniFile::C_OSCChecksummedIniFile(const C_SCLString & orc_FileName) :
@@ -59,12 +49,9 @@ C_OSCChecksummedIniFile::C_OSCChecksummedIniFile(const C_SCLString & orc_FileNam
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   destructor
+/*! \brief   destructor
 
    clean up ...
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_OSCChecksummedIniFile::~C_OSCChecksummedIniFile(void)
@@ -108,8 +95,7 @@ uint16 C_OSCChecksummedIniFile::m_CalcCheckSum(const bool oq_Fast)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Verify checksum of INI file data
+/*! \brief    Verify checksum of INI file data
 
    Calculates checksum over INI file contents and compares it agains the checksum
     stored in the ini file data.
@@ -117,8 +103,6 @@ uint16 C_OSCChecksummedIniFile::m_CalcCheckSum(const bool oq_Fast)
    \return
    true   checksums match
    false  checksums do not match
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool C_OSCChecksummedIniFile::CheckCheckSum(void)
@@ -157,13 +141,10 @@ bool C_OSCChecksummedIniFile::CheckCheckSum(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Recalculate checksum
+/*! \brief    Recalculate checksum
 
    Calculated checksum over INI file constets and stores it within the contents.
    Note: Does not write to the file immediately; this is only done in the destructor of the base class
-
-   \created     16.04.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_OSCChecksummedIniFile::UpdateCheckSum(void)

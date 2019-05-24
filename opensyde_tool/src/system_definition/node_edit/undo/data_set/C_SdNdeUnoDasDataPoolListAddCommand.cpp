@@ -1,48 +1,40 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data pool list data set add undo command (implementation)
 
    Data pool list data set add undo command
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.01.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
 #include "C_SdNdeUnoDasDataPoolListAddCommand.h"
 #include "C_PuiSdHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     oru32_NodeIndex                  Node index
    \param[in]     oru32_DataPoolIndex              Node data pool index
@@ -50,10 +42,8 @@ using namespace stw_opensyde_core;
    \param[in,out] opc_DataPoolListModelViewManager Data pool lists model view manager to get objects to perform actions on
    \param[in]     orc_Indices                      Node data pool list indices
    \param[in,out] opc_Parent                       Optional pointer to parent
-
-   \created     27.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoDasDataPoolListAddCommand::C_SdNdeUnoDasDataPoolListAddCommand(const uint32 & oru32_NodeIndex,
                                                                          const uint32 & oru32_DataPoolIndex,
                                                                          const uint32 & oru32_DataPoolListIndex,
@@ -89,26 +79,20 @@ C_SdNdeUnoDasDataPoolListAddCommand::C_SdNdeUnoDasDataPoolListAddCommand(const u
    this->SetInitialData(c_OSCNames, c_OSCDataSetValues);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Redo add
-
-   \created     27.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Redo add
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDasDataPoolListAddCommand::redo(void)
 {
    this->Add();
    C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::redo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Undo add
-
-   \created     27.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Undo add
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDasDataPoolListAddCommand::undo(void)
 {
    C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::undo();

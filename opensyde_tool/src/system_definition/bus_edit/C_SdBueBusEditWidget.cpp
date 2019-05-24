@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal   (todo: remove this line for header files)
    \file
    \brief       Bus edit widget (note: main module description should be in .cpp file)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.03.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "constants.h"
@@ -27,36 +20,33 @@
 #include "C_OSCSystemBus.h"
 #include "C_GtGetText.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in]     ou32_BusIndex     Bus index
    \param[in]     osn_TabIndex      Tab index to show
    \param[in,out] opc_parent Optional pointer to parent
-
-   \created     01.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueBusEditWidget::C_SdBueBusEditWidget(const uint32 ou32_BusIndex, const sintn osn_TabIndex,
                                            QWidget * const opc_Parent) :
    QWidget(opc_Parent),
@@ -115,13 +105,10 @@ C_SdBueBusEditWidget::C_SdBueBusEditWidget(const uint32 ou32_BusIndex, const sin
            this, &C_SdBueBusEditWidget::m_TabChanged);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     27.03.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueBusEditWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(0, C_GtGetText::h_GetText("Properties"));
@@ -130,75 +117,60 @@ void C_SdBueBusEditWidget::InitStaticNames(void) const
    //Tool tips
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the actual tab index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the actual tab index
 
    \return
    Tab index
-
-   \created     19.05.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SdBueBusEditWidget::GetTabIndex(void) const
 {
    return this->mpc_Ui->pc_TabWidgetPageNavi->currentIndex();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     01.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueBusEditWidget::~C_SdBueBusEditWidget()
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Information about the save state of the node. Resets the data changed flag.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the save state of the node. Resets the data changed flag.
 
    \return
    true     Node was changed
    false    Node was not changed
-
-   \created     10.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdBueBusEditWidget::WasChanged(void) const
 {
    return this->mq_DataChanged;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Saves the actual data into the core but not in the files
-
-   \created     23.03.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Saves the actual data into the core but not in the files
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueBusEditWidget::Save(void) const
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Activates specific functionality
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Activates specific functionality
 
    mu32_FLAG_EDIT_NAME                    Opens the properties and selects the name for editing
    mu32_FLAG_OPEN_PROPERTIES              Opens the properties
    mu32_FLAG_OPEN_SYSDEF_BUS_COMIFDESCR   Opens the COM interface description
 
    \param[in]     ou32_Flag       Flag for specific functionality
-
-   \created     02.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueBusEditWidget::SetFlag(const uint32 ou32_Flag) const
 {
    if ((ou32_Flag == mu32_FLAG_EDIT_NAME) ||
@@ -223,9 +195,8 @@ void C_SdBueBusEditWidget::SetFlag(const uint32 ou32_Flag) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function to open a concrete datapool, datapool list or dataelement or the COM interface description
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function to open a concrete datapool, datapool list or dataelement or the COM interface description
 
    \param[in] os32_NodeIndex          Node index (if not used set to -1)
    \param[in] os32_DataPoolIndex      Datapool index (if not used set to -1)
@@ -236,10 +207,8 @@ void C_SdBueBusEditWidget::SetFlag(const uint32 ou32_Flag) const
                                       0: os32_ElementIndex is index of datapool data element without CAN reference
                                       1: os32_ElementIndex is index of datapool data element with associated CAN signal
                                       2: os32_ElementIndex is index of CAN message
-
-   \created     10.05.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueBusEditWidget::OpenDetail(const sint32 os32_NodeIndex, const sint32 os32_DataPoolIndex,
                                       const sint32 os32_ListIndex, const sint32 os32_ElementIndex,
                                       const sint32 os32_Flag) const
@@ -251,15 +220,15 @@ void C_SdBueBusEditWidget::OpenDetail(const sint32 os32_NodeIndex, const sint32 
 
       if (os32_Flag == 1)
       {
-         this->mpc_Ui->pc_WidgetComIfDescr->SelectSignal(os32_NodeIndex, static_cast<uint32>(os32_DataPoolIndex),
-                                                         static_cast<uint32>(os32_ListIndex),
-                                                         static_cast<uint32>(os32_ElementIndex));
+         this->mpc_Ui->pc_WidgetComIfDescr->SelectSignalSearch(os32_NodeIndex, static_cast<uint32>(os32_DataPoolIndex),
+                                                               static_cast<uint32>(os32_ListIndex),
+                                                               static_cast<uint32>(os32_ElementIndex));
       }
       else if (os32_Flag == 2)
       {
-         this->mpc_Ui->pc_WidgetComIfDescr->SelectMessage(os32_NodeIndex, static_cast<uint32>(os32_DataPoolIndex),
-                                                          static_cast<uint32>(os32_ListIndex),
-                                                          static_cast<uint32>(os32_ElementIndex));
+         this->mpc_Ui->pc_WidgetComIfDescr->SelectMessageSearch(os32_NodeIndex, static_cast<uint32>(os32_DataPoolIndex),
+                                                                static_cast<uint32>(os32_ListIndex),
+                                                                static_cast<uint32>(os32_ElementIndex));
       }
       else
       {
@@ -268,16 +237,15 @@ void C_SdBueBusEditWidget::OpenDetail(const sint32 os32_NodeIndex, const sint32 
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueBusEditWidget::m_DataChanged(void)
 {
    this->mq_DataChanged = true;
    Q_EMIT this->SigChanged();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for tab change of pc_TabWidgetPageNavi
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for tab change of pc_TabWidgetPageNavi
 
    The not shown widget in the other tab cause a resize of the tab widget itself.
    This function sets the size policy of all not shown widgets to ignore to achieve that the hided but visible
@@ -285,10 +253,8 @@ void C_SdBueBusEditWidget::m_DataChanged(void)
    The changed widget of the current tab must be reseted to the preferred size
 
    \param[in]     osn_Index         Index of selected tab
-
-   \created     23.01.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueBusEditWidget::m_TabChanged(const sintn osn_Index) const
 {
    sintn sn_Counter;
@@ -302,36 +268,30 @@ void C_SdBueBusEditWidget::m_TabChanged(const sintn osn_Index) const
       }
    }
    this->mpc_Ui->pc_TabWidgetPageNavi->widget(osn_Index)->setSizePolicy(QSizePolicy::Preferred,
-                                                                       QSizePolicy::Preferred);
+                                                                        QSizePolicy::Preferred);
    this->mpc_Ui->pc_TabWidgetPageNavi->widget(osn_Index)->adjustSize();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Getter to access UI information of this widget.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Getter to access UI information of this widget.
 
    \return
    const pointer of UI functionality
-
-   \created     06.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const Ui::C_SdBueBusEditWidget * C_SdBueBusEditWidget::GetUiWidget() const
 {
    return this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten show event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten show event slot
 
    Here: Load splitter position
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     07.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueBusEditWidget::showEvent(QShowEvent * const opc_Event)
 {
    //Necessary to initialize with appropriate size

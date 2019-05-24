@@ -1,21 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Context menu manager of system definition toplogy
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     08.09.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SDMANTOPOLOGYCONTEXTMENUMANAGER_H
 #define C_SDMANTOPOLOGYCONTEXTMENUMANAGER_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QGraphicsItem>
 
 #include "stwtypes.h"
@@ -24,12 +18,12 @@
 #include "C_SdContextMenuEntry.h"
 #include "C_SebUtil.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SdManTopologyContextMenuManager :
    public C_SebTopologyBaseContextMenuManager
@@ -51,6 +45,7 @@ Q_SIGNALS:
 protected:
    virtual void m_SetActionsInvisible(void) override;
    virtual bool m_ActivateSpecificActions(void) override;
+   virtual bool m_ItemTypeHasSetupStyle(const stw_types::sintn osn_ItemType) override;
 
 private:
    QAction * mpc_ActionEdit;
@@ -63,7 +58,7 @@ private:
    void m_InterfaceAssignment(void);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

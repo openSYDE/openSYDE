@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Main graphics scene for a concrete dashboard (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <iostream>
@@ -64,8 +57,9 @@
 #include "C_SdTopologyListWidget.h"
 #include "C_GtGetText.h"
 #include "C_SyvClipBoardHelper.h"
+#include "C_OgeWiCustomMessage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace QtCharts;
 using namespace stw_types;
@@ -74,21 +68,20 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -96,10 +89,8 @@ using namespace stw_opensyde_gui_elements;
    \param[in]     ou32_DashboardIndex Dashboard index
    \param[in]     oq_LoadDashboard    Optional flag to avoid loading any items initially
    \param[in,out] opc_Parent          Optional pointer to parent
-
-   \created     20.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaDashboardScene::C_SyvDaDashboardScene(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
                                              const bool oq_LoadDashboard, QObject * const opc_Parent) :
    C_SebScene(opc_Parent),
@@ -128,23 +119,19 @@ C_SyvDaDashboardScene::C_SyvDaDashboardScene(const uint32 ou32_ViewIndex, const 
    connect(this, &C_SyvDaDashboardScene::selectionChanged, this, &C_SyvDaDashboardScene::m_SelectionChanged);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     20.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaDashboardScene::~C_SyvDaDashboardScene(void)
 {
    //lint -e{1540}  no memory leak because of the parent of mpc_TestPointer and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checks if the cursor position is relevant for the proxy widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks if the cursor position is relevant for the proxy widget
 
    Checks all widgets of base type C_GiSvDaRectBaseGroup.
 
@@ -153,10 +140,8 @@ C_SyvDaDashboardScene::~C_SyvDaDashboardScene(void)
    \return
    true     Cursor is on a relevant position
    false    Cursor is not on a relevant position
-
-   \created     04.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaDashboardScene::IsMousePosRelevantForProxyWidgetInteraction(const QPointF & orc_ScenePos)
 {
    bool q_Return = false;
@@ -185,15 +170,12 @@ bool C_SyvDaDashboardScene::IsMousePosRelevantForProxyWidgetInteraction(const QP
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the state of the edit mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the state of the edit mode
 
    \param[in]     oq_Active      Flag for setting the edit mode
-
-   \created     03.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::SetEditMode(const bool oq_Active)
 {
    const QList<QGraphicsItem *> & rc_Items = this->items();
@@ -229,15 +211,36 @@ void C_SyvDaDashboardScene::SetEditMode(const bool oq_Active)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set dashboard index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Function to activate or deactivate drawing of performance heavy widgets
+
+   \param[in] oq_Active Flag if widgets should currently be drawn
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardScene::SetDrawingActive(const bool oq_Active) const
+{
+   const QList<QGraphicsItem *> & rc_Items = this->items();
+
+   // inform the items
+   for (QList<QGraphicsItem *>::const_iterator c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
+   {
+      QGraphicsItem * const pc_Parent = C_SebUtil::h_GetHighestParent(*c_ItItem);
+      //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+      //lint -e{740}  no problem because of common base class
+      C_GiSvDaRectBaseGroup * const pc_DataElement = dynamic_cast<C_GiSvDaRectBaseGroup *>(pc_Parent);
+      if (pc_DataElement != NULL)
+      {
+         pc_DataElement->SetDrawingActive(oq_Active);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set dashboard index
 
    \param[in] ou32_DashboardIndex New dashboard index
-
-   \created     19.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::SetDashboardIndex(const uint32 ou32_DashboardIndex)
 {
    const QList<QGraphicsItem *> & rc_Items = this->items();
@@ -260,13 +263,10 @@ void C_SyvDaDashboardScene::SetDashboardIndex(const uint32 ou32_DashboardIndex)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load dashboard widgets
-
-   \created     19.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load dashboard widgets
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::Load(void)
 {
    //Fill up with zeros
@@ -279,13 +279,10 @@ void C_SyvDaDashboardScene::Load(void)
    this->m_LoadSubset(c_SaveIndices, NULL, false, NULL);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save data
-
-   \created     26.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::Save(void) const
 {
    const QList<QGraphicsItem *> & rc_Items = this->items();
@@ -304,17 +301,14 @@ void C_SyvDaDashboardScene::Save(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy snapshot to scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy snapshot to scene
 
    \param[in] orc_Snapshot Object snapshot
    \param[in] opc_Pos      Optional position offset
    \param[in] opc_IDMap    Optional map for IDs to use
-
-   \created     23.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::CopyFromSnapshotToScene(const C_PuiSvDashboard & orc_Snapshot,
                                                     const QPointF * const opc_Pos, const QMap<C_PuiBsTemporaryDataID,
                                                                                               uint64> * const opc_IDMap)
@@ -471,17 +465,14 @@ void C_SyvDaDashboardScene::CopyFromSnapshotToScene(const C_PuiSvDashboard & orc
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clear item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clear item
 
    Hint: leaves all items which are not included in the system view dashboard
 
    \param[in,out] opc_Item Pointer to item which may be deleted
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::DeleteItem(QGraphicsItem * const opc_Item)
 {
    // if the selected item is a bus, the bus class itself is the parent
@@ -564,15 +555,12 @@ void C_SyvDaDashboardScene::DeleteItem(QGraphicsItem * const opc_Item)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set dark mode active
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set dark mode active
 
    \param[in] oq_Value Dark mode active
-
-   \created     10.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::SetDarkModeActive(const bool oq_Value)
 {
    const QList<QGraphicsItem *> & rc_Items = this->items();
@@ -613,13 +601,10 @@ void C_SyvDaDashboardScene::SetDarkModeActive(const bool oq_Value)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Activate dark mode switch functionality
-
-   \created     10.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Activate dark mode switch functionality
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::SetDarkModeInitialized(void)
 {
    if (this->mq_DarkModeInitialized == false)
@@ -634,15 +619,12 @@ void C_SyvDaDashboardScene::SetDarkModeInitialized(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy items to scene from copy paste manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy items to scene from copy paste manager
 
    \param[in] opc_Pos Optional position offset
-
-   \created     10.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::CopyFromManagerToScene(const QPointF * const opc_Pos)
 {
    QGraphicsView * const pc_View = this->views().at(0);
@@ -683,47 +665,38 @@ void C_SyvDaDashboardScene::CopyFromManagerToScene(const QPointF * const opc_Pos
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal for update of current scaling
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal for update of current scaling
 
    \param[in] orc_Transform Current scaling
-
-   \created     21.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::UpdateTransform(const QTransform & orc_Transform)
 {
    C_SebScene::UpdateTransform(orc_Transform);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if any item can be added to the scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if any item can be added to the scene
 
    \return
    true     Items can be added
    false    Items cannot be added
-
-   \created     03.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaDashboardScene::IsAnyItemAddable(void) const
 {
    return this->mq_EditMode;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if the graphics item is movable on the scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if the graphics item is movable on the scene
 
    \return
    true     Item is movable
    false    Item is not movable
-
-   \created     24.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaDashboardScene::IsItemMovable(const QGraphicsItem * const opc_Item) const
 {
    // no restrictions for moving elements
@@ -732,17 +705,14 @@ bool C_SyvDaDashboardScene::IsItemMovable(const QGraphicsItem * const opc_Item) 
    return this->mq_EditMode;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if the graphics item is selectable on the scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if the graphics item is selectable on the scene
 
    \return
    true     Item is selectable
    false    Item is not selectable
-
-   \created     24.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaDashboardScene::IsItemSelectable(const QGraphicsItem * const opc_Item) const
 {
    // no restrictions for moving elements
@@ -751,17 +721,14 @@ bool C_SyvDaDashboardScene::IsItemSelectable(const QGraphicsItem * const opc_Ite
    return this->mq_EditMode;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if the graphics item is deletable on the scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if the graphics item is deletable on the scene
 
    \return
    true     Item is deletable
    false    Item is not deletable
-
-   \created     16.05.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaDashboardScene::IsItemDeletable(const QGraphicsItem * const opc_Item) const
 {
    // no restrictions for deleting elements
@@ -770,16 +737,13 @@ bool C_SyvDaDashboardScene::IsItemDeletable(const QGraphicsItem * const opc_Item
    return this->mq_EditMode;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if the graphics item is changeable in the zorder
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if the graphics item is changeable in the zorder
 
    true     Z order is changeable
    false    Z order is not changeable
-
-   \created     24.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaDashboardScene::IsZOrderChangeable(const QGraphicsItem * const opc_Item) const
 {
    // no restrictions for using z order
@@ -788,17 +752,14 @@ bool C_SyvDaDashboardScene::IsZOrderChangeable(const QGraphicsItem * const opc_I
    return this->mq_EditMode;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if the graphics item can be aligned
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if the graphics item can be aligned
 
    \return
    true     Item can be aligned
    false    Item can not be alined
-
-   \created     24.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaDashboardScene::IsAlignmentUsable(const QGraphicsItem * const opc_Item) const
 {
    // no restrictions for using alignment
@@ -807,46 +768,37 @@ bool C_SyvDaDashboardScene::IsAlignmentUsable(const QGraphicsItem * const opc_It
    return this->mq_EditMode;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if the drag move over the scene can be used
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if the drag move over the scene can be used
 
    \return
    true     Drag move is available
    false    Drag move is available
-
-   \created     05.05.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaDashboardScene::IsSceneRubberBandAvailable(void) const
 {
    return this->mq_EditMode;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get dashboard index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get dashboard index
 
    \return
    Current dashboard index
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_types::uint32 C_SyvDaDashboardScene::GetDashboardIndex(void) const
 {
    return this->mu32_DashboardIndex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Registers all relevant dashboard widgets at the associated data dealer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Registers all relevant dashboard widgets at the associated data dealer
 
    \param[in]     orc_AllDataDealer    Reference to vector with all data dealer
-
-   \created     29.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::RegisterWidgets(C_SyvComDriverDiag & orc_ComDriver) const
 {
    const QList<QGraphicsItem *> & rc_Items = this->items();
@@ -884,15 +836,12 @@ void C_SyvDaDashboardScene::RegisterWidgets(C_SyvComDriverDiag & orc_ComDriver) 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Information about the start or stop of a connection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the start or stop of a connection
 
    \param[in]  oq_Active      Flag if connection is active or not active now
-
-   \created     01.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::ConnectionActiveChanged(const bool oq_Active) const
 {
    const QList<QGraphicsItem *> & rc_Items = this->items();
@@ -922,13 +871,10 @@ void C_SyvDaDashboardScene::ConnectionActiveChanged(const bool oq_Active) const
    //}
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates all values of all dashboard widgets
-
-   \created     29.08.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates all values of all dashboard widgets
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::UpdateShowValues(void) const
 {
    const QList<QGraphicsItem *> & rc_Items = this->items();
@@ -946,13 +892,10 @@ void C_SyvDaDashboardScene::UpdateShowValues(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle changes of transmission mode for any data element
-
-   \created     11.10.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle changes of transmission mode for any data element
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::UpdateTransmissionConfiguration(void) const
 {
    const QList<QGraphicsItem *> & rc_Items = this->items();
@@ -972,16 +915,13 @@ void C_SyvDaDashboardScene::UpdateTransmissionConfiguration(void) const
    Q_EMIT this->SigErrorChange();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle manual user operation finished event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle manual user operation finished event
 
    \param[in] os32_Result Operation result
    \param[in] ou8_NRC     Negative response code, if any
-
-   \created     09.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::HandleManualOperationFinished(const sint32 os32_Result, const uint8 ou8_NRC) const
 {
    const QList<QGraphicsItem *> & rc_Items = this->items();
@@ -999,16 +939,13 @@ void C_SyvDaDashboardScene::HandleManualOperationFinished(const sint32 os32_Resu
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal all widgets which read rail element ID registrations failed
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal all widgets which read rail element ID registrations failed
 
    \param[in]     orc_FailedIdRegisters    Failed IDs
    \param[in,out] orc_FailedIdErrorDetails Error details for element IDs which failed registration (if any)
-
-   \created     13.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::SetErrorForFailedCyclicElementIdRegistrations(
    const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_FailedIdRegisters,
    const std::vector<QString> & orc_FailedIdErrorDetails) const
@@ -1028,87 +965,72 @@ void C_SyvDaDashboardScene::SetErrorForFailedCyclicElementIdRegistrations(
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger error check
-
-   \created     17.01.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger error check
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::TriggerErrorCheck(void) const
 {
    Q_EMIT this->SigErrorChange();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get view index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get view index
 
    \return
    Current view index
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_types::uint32 C_SyvDaDashboardScene::GetViewIndex(void) const
 {
    return this->mu32_ViewIndex;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_opensyde_gui_logic::C_SebUnoBaseManager * C_SyvDaDashboardScene::m_GetUndoManager(void)
 {
    return &this->mc_UndoManager;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebBaseContextMenuManager * C_SyvDaDashboardScene::m_GetContextMenuManager(void)
 {
    return &this->mc_ContextMenuManager;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current copy paste manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current copy paste manager
 
    \return
    NULL No copy paste manager
    Else Valid copy paste manager
-
-   \created     10.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_opensyde_gui_logic::C_SebBaseCopyPasteManager * C_SyvDaDashboardScene::m_GetCopyPasteManager(void)
 {
    return &this->mc_CopyPasteManager;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current copy paste manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current copy paste manager
 
    \return
    NULL No copy paste manager
    Else Valid copy paste manager
-
-   \created     10.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const stw_opensyde_gui_logic::C_SebBaseCopyPasteManager * C_SyvDaDashboardScene::m_GetCopyPasteManagerConst(void) const
 {
    return &this->mc_CopyPasteManager;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add image to scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add image to scene
 
    \param[in] orc_Path     Image path
    \param[in] orc_Position Image scene position
-
-   \created     03.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_AddImage(const QString & orc_Path, const QPointF & orc_Position)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
@@ -1120,9 +1042,8 @@ void C_SyvDaDashboardScene::m_AddImage(const QString & orc_Path, const QPointF &
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add data from mime data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add data from mime data
 
    \param[in] opc_MimeData Mime data to add to scene
    \param[in] orc_Position Position to add data at
@@ -1130,10 +1051,8 @@ void C_SyvDaDashboardScene::m_AddImage(const QString & orc_Path, const QPointF &
    \return
    true: Item was added
    false: No item was added
-
-   \created     21.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaDashboardScene::m_AddOfMime(const QMimeData * const opc_MimeData, const QPointF & orc_Position)
 {
    bool q_Retval = true;
@@ -1276,26 +1195,20 @@ bool C_SyvDaDashboardScene::m_AddOfMime(const QMimeData * const opc_MimeData, co
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy items
-
-   \created     24.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy items
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_Copy(void)
 {
    this->mc_CopyPasteManager.CopyFromSceneToManager(this->selectedItems());
    Q_EMIT this->SigErrorChange();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Cut items
-
-   \created     24.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Cut items
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_Cut(void)
 {
    this->mc_CopyPasteManager.CopyFromSceneToManager(this->selectedItems());
@@ -1303,17 +1216,14 @@ void C_SyvDaDashboardScene::m_Cut(void)
    m_Delete(true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if paste currently possible
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if paste currently possible
 
    \return
    True  Paste possible
    False Paste impossible
-
-   \created     28.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaDashboardScene::m_IsPastePossible(void)
 {
    bool q_Retval = false;
@@ -1325,31 +1235,68 @@ bool C_SyvDaDashboardScene::m_IsPastePossible(void)
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if undo currently possible
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if undo currently possible
 
    \return
    True  Undo possible
    False Undo impossible
-
-   \created     28.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaDashboardScene::m_IsUndoAvailable(void) const
 {
    return this->mq_EditMode;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten context menu event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Optional check for user confirmation on delete action
+
+   \param[in] orc_SelectedItems Selected items
+
+   \return
+   true  Continue
+   false Abort
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvDaDashboardScene::m_HandleDeleteUserConfirmation(const QList<QGraphicsItem *> & orc_SelectedItems) const
+{
+   bool q_Retval = true;
+
+   Q_UNUSED(orc_SelectedItems)
+
+   if (this->views().size() > 0)
+   {
+      QGraphicsView * const pc_View = this->views().at(0);
+      if (pc_View != NULL)
+      {
+         C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
+         C_OgeWiCustomMessage c_MessageBox(pc_View, C_OgeWiCustomMessage::E_Type::eQUESTION);
+         c_MessageBox.SetDescription(C_GtGetText::h_GetText("Do you really want to delete the selected item(s)?"));
+         c_MessageBox.SetHeading(C_GtGetText::h_GetText("Items delete"));
+         c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
+         c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+         e_ReturnMessageBox = c_MessageBox.Execute();
+
+         switch (e_ReturnMessageBox)
+         {
+         case C_OgeWiCustomMessage::eOK:
+            q_Retval = true;
+            break;
+         default:
+            q_Retval = false;
+            break;
+         }
+      }
+   }
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten context menu event
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     07.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * const opc_Event)
 {
    // Prepare the widgets for showing the context menu item
@@ -1392,15 +1339,12 @@ void C_SyvDaDashboardScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * co
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse double click event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse double click event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     27.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    const QList<QGraphicsItem *> & rc_SelectedItems = this->selectedItems();
@@ -1428,13 +1372,10 @@ void C_SyvDaDashboardScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * con
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle edit properties
-
-   \created     04.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle edit properties
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_OnWidgetEditProperties(QGraphicsItem * const opc_Item) const
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -1447,15 +1388,24 @@ void C_SyvDaDashboardScene::m_OnWidgetEditProperties(QGraphicsItem * const opc_I
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add widget to scene and connnect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add param widget to scene and connnect signals
+
+   \param[in,out] opc_Item Param widget item
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaDashboardScene::m_AddParamWidgetToScene(C_GiSvDaParam * const opc_Item)
+{
+   m_AddWidgetToScene(opc_Item);
+   connect(opc_Item, &C_GiSvDaParam::SigNvmReadList, this, &C_SyvDaDashboardScene::SigNvmReadList);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add widget to scene and connnect signals
 
    \param[in,out] opc_Item Widget item
-
-   \created     31.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_AddWidgetToScene(C_GiSvDaRectBaseGroup * const opc_Item)
 {
    //Connection(s)
@@ -1479,15 +1429,12 @@ void C_SyvDaDashboardScene::m_AddWidgetToScene(C_GiSvDaRectBaseGroup * const opc
    Q_EMIT this->SigErrorChange();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete widget of scene and disconnect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete widget of scene and disconnect signals
 
    \param[in,out] opc_Item Widget item
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_RemoveWidgetOfScene(C_GiSvDaRectBaseGroup * const opc_Item)
 {
    if (opc_Item != NULL)
@@ -1515,15 +1462,12 @@ void C_SyvDaDashboardScene::m_RemoveWidgetOfScene(C_GiSvDaRectBaseGroup * const 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete boundary of scene and disconnect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete boundary of scene and disconnect signals
 
    \param[in,out] opc_Item Boundary item
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_RemoveBoundaryOfScene(C_GiSvDaBoundary * const opc_Item)
 {
    if (opc_Item != NULL)
@@ -1535,15 +1479,12 @@ void C_SyvDaDashboardScene::m_RemoveBoundaryOfScene(C_GiSvDaBoundary * const opc
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete text element of scene and disconnect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete text element of scene and disconnect signals
 
    \param[in,out] opc_Item Text element item
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_RemoveTextElementOfScene(C_GiSvDaTextElement * const opc_Item)
 {
    if (opc_Item != NULL)
@@ -1557,15 +1498,12 @@ void C_SyvDaDashboardScene::m_RemoveTextElementOfScene(C_GiSvDaTextElement * con
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete image group of scene and disconnect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete image group of scene and disconnect signals
 
    \param[in,out] opc_Item Image group item
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_RemoveImageGroupOfScene(C_GiSvDaImageGroup * const opc_Item)
 {
    if (opc_Item != NULL)
@@ -1577,15 +1515,12 @@ void C_SyvDaDashboardScene::m_RemoveImageGroupOfScene(C_GiSvDaImageGroup * const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete line arrow of scene and disconnect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete line arrow of scene and disconnect signals
 
    \param[in,out] opc_Item Line arrow item
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_RemoveLineArrowOfScene(C_GiSvDaArrow * const opc_Item)
 {
    if (opc_Item != NULL)
@@ -1597,17 +1532,14 @@ void C_SyvDaDashboardScene::m_RemoveLineArrowOfScene(C_GiSvDaArrow * const opc_I
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt index if item in array was deleted
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt index if item in array was deleted
 
    \param[in] ore_Type    Type of vector which changed
    \param[in] ors32_Index Index of vector which changed
    \param[in] ore_Action  Type of action
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_SyncIndex(const C_PuiSvDbDataElement::E_Type & ore_Type, const sint32 & ors32_Index,
                                         const C_PuiBsDataElement::E_Action & ore_Action) const
 {
@@ -1628,9 +1560,8 @@ void C_SyvDaDashboardScene::m_SyncIndex(const C_PuiSvDbDataElement::E_Type & ore
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load subset of system definition entries
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load subset of system definition entries
 
    \param[in] orc_OtherStartIndices Start indices
                                     0: Boundary
@@ -1649,10 +1580,8 @@ void C_SyvDaDashboardScene::m_SyncIndex(const C_PuiSvDbDataElement::E_Type & ore
    \param[in] opc_Pos               Optional position offset
    \param[in] orq_Selection         False: Ignore selection
    \param[in] opc_IDMap             Optional map for IDs to use
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_LoadSubset(const QVector<uint32> & orc_OtherStartIndices,
                                          const QPointF * const opc_Offset, const bool & orq_Selection,
                                          const QMap<C_PuiBsTemporaryDataID, uint64> * const opc_IDMap)
@@ -1718,7 +1647,7 @@ void C_SyvDaDashboardScene::m_LoadSubset(const QVector<uint32> & orc_OtherStartI
          for (uint32 u32_ItWidget = orc_OtherStartIndices[12]; u32_ItWidget < rc_Params.size(); ++u32_ItWidget)
          {
             const C_PuiSvDbWidgetBase & rc_WidgetBase = rc_Params[u32_ItWidget];
-            C_GiSvDaRectBaseGroup * pc_Item;
+            C_GiSvDaParam * pc_Item;
             //ID
             u64_CurUniqueID = m_GetNewUniqueID(opc_IDMap, static_cast<sint32>(C_PuiSvDbDataElement::ePARAM),
                                                u32_ItWidget - orc_OtherStartIndices[12]);
@@ -1737,7 +1666,7 @@ void C_SyvDaDashboardScene::m_LoadSubset(const QVector<uint32> & orc_OtherStartI
             pc_Item->LoadData();
             pc_Item->SetDisplayStyle(rc_WidgetBase.e_DisplayStyle, pc_View->GetDarkModeActive());
 
-            m_AddWidgetToScene(pc_Item);
+            m_AddParamWidgetToScene(pc_Item);
             if (orq_Selection == true)
             {
                m_UpdateSelection(pc_Item, false);
@@ -2104,13 +2033,10 @@ void C_SyvDaDashboardScene::m_LoadSubset(const QVector<uint32> & orc_OtherStartI
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle selection change
-
-   \created     28.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle selection change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_SelectionChanged(void)
 {
    QList<QGraphicsItem *>::const_iterator c_ItItem;
@@ -2175,13 +2101,10 @@ void C_SyvDaDashboardScene::m_SelectionChanged(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize base context menu manager signals (AFTER virtual get context menu manager is valid
-
-   \created     03.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize base context menu manager signals (AFTER virtual get context menu manager is valid
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::m_InitBaseSceneContextMenuManager(void)
 {
    connect(&this->mc_ContextMenuManager, &C_SyvDaContextMenuManager::SigEditProperties, this,

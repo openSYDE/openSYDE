@@ -1,18 +1,11 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
-   \file        CXFLFlashWriteParams.cpp
+   \file
    \brief       Software flashing parameters class
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     14.01.2010  STW/A.Stangl (refactored to this module from CXFLDownload.h/.c)
-   \endimplementation
+   \copyright   Copyright 2010 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------ */
 #include "precomp_headers.h"  //pre-compiled headers
@@ -83,8 +76,7 @@ C_XFLFlashWriteParameters::~C_XFLFlashWriteParameters(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   load flashing parameters from an INI file
+/*! \brief   load flashing parameters from an INI file
 
    Note: will not load all parameters !
    If the specified section does not exists default values will be used !
@@ -120,8 +112,6 @@ C_XFLFlashWriteParameters::~C_XFLFlashWriteParameters(void)
 
    \return
    C_NO_ERR     data loaded
-
-   \created     28.07.2008  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_XFLFlashWriteParameters::LoadFromIni(C_SCLIniFile & orc_IniFile, const C_SCLString & orc_Section)
@@ -171,8 +161,7 @@ void C_XFLFlashWriteParameters::LoadFromIni(C_SCLIniFile & orc_IniFile, const C_
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   save flashing parameters to an INI file
+/*! \brief   save flashing parameters to an INI file
 
    Note: will not save all parameters !
    The following table lists all saved parameters. The other member variables of the structure will not be stored.
@@ -206,8 +195,6 @@ void C_XFLFlashWriteParameters::LoadFromIni(C_SCLIniFile & orc_IniFile, const C_
    \return
    C_NO_ERR     data stored   \n
    else         could not write values
-
-   \created     28.07.2008  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_XFLFlashWriteParameters::SaveToIni(C_SCLIniFile & orc_IniFile, const C_SCLString & orc_Section) const

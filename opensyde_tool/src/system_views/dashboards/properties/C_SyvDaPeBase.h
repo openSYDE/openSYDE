@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for system view dashboard widget properties (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     05.09.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVDAPEBASE_H
 #define C_SYVDAPEBASE_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 #include "C_OgePopUpDialog.h"
 #include "C_PuiSvReadDataConfiguration.h"
@@ -25,7 +19,7 @@
 #include "C_PuiSvDbDataElementScaling.h"
 #include "C_SyvDaDashboardScene.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
 {
 class C_SyvDaPeBase;
@@ -33,9 +27,9 @@ class C_SyvDaPeBase;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_SyvDaPeBase :
    public QWidget
 {
@@ -108,6 +102,8 @@ private:
    void m_OkClicked(void);
    void m_CancelClicked(void);
    void m_Browse(void);
+   void m_Clear(void);
+   void m_ClearDataElement(void);
    void m_Configuration(void) const;
    void m_OnUseDefaultScalingChange(void) const;
 
@@ -116,7 +112,7 @@ private:
                           const stw_opensyde_gui_logic::C_PuiSvDbDataElementScaling & orc_Scaling) const;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

@@ -1,64 +1,51 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       openSYDE device definition container class
 
    Serves as data class to hold device definition data.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     05.09.2016  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_OSCDeviceDefinition.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Constructor
 
    Initialize all class elements with default values
-
-   \created     05.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCDeviceDefinition::C_OSCDeviceDefinition(void)
 {
    this->Clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clear elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clear elements
 
    Sets all numeric elements to zero and all strings to ""
-
-   \created     05.09.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCDeviceDefinition::Clear(void)
 {
    c_DeviceName = "";
@@ -78,12 +65,14 @@ void C_OSCDeviceDefinition::Clear(void)
    q_FlashloaderOpenSydeCan = false;
    q_FlashloaderOpenSydeEthernet = false;
    q_FlashloaderOpenSydeIsFileBased = false;
-   u32_FlashloaderOpenSydeRequestDownloadTimeout = 0U;
-   u32_FlashloaderOpenSydeTransferDataTimeout = 0;
    u32_UserEepromSizeBytes = 0U;
+   //Special default values
+   u32_FlashloaderResetWaitTime = 500U;
+   u32_FlashloaderOpenSydeRequestDownloadTimeout = 20000U;
+   u32_FlashloaderOpenSydeTransferDataTimeout = 2000U;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCDeviceDefinition::IsUpdateAvailable(const C_OSCSystemBus::E_Type oe_Type) const
 {
    bool q_Retval = false;
@@ -115,7 +104,7 @@ bool C_OSCDeviceDefinition::IsUpdateAvailable(const C_OSCSystemBus::E_Type oe_Ty
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCDeviceDefinition::IsRoutingAvailable(const C_OSCSystemBus::E_Type oe_Type) const
 {
    bool q_Retval = false;
@@ -145,7 +134,7 @@ bool C_OSCDeviceDefinition::IsRoutingAvailable(const C_OSCSystemBus::E_Type oe_T
    }
    return q_Retval;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCDeviceDefinition::IsDiagnosisAvailable(const C_OSCSystemBus::E_Type oe_Type) const
 {
    bool q_Retval = false;
@@ -176,16 +165,13 @@ bool C_OSCDeviceDefinition::IsDiagnosisAvailable(const C_OSCSystemBus::E_Type oe
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get string to display for this device
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get string to display for this device
 
    \return
    String to display
-
-   \created     18.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_scl::C_SCLString C_OSCDeviceDefinition::GetDisplayName(void) const
 {
    stw_scl::C_SCLString c_Retval;
@@ -199,4 +185,4 @@ stw_scl::C_SCLString C_OSCDeviceDefinition::GetDisplayName(void) const
    }
    return c_Retval;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------

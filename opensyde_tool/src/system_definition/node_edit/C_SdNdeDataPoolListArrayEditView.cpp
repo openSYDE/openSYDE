@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data pool list array edit view (implementation)
 
    Data pool list array edit view
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     03.02.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QScrollBar>
@@ -32,7 +25,7 @@
 #include "C_SdNdeSingleHeaderView.h"
 #include "C_GtGetText.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
@@ -41,29 +34,26 @@ using namespace stw_opensyde_gui_elements;
 using namespace stw_errors;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     03.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListArrayEditView::C_SdNdeDataPoolListArrayEditView(QWidget * const opc_Parent) :
    C_TblViewScroll(opc_Parent),
    mu32_NodeIndex(0),
@@ -130,15 +120,12 @@ C_SdNdeDataPoolListArrayEditView::C_SdNdeDataPoolListArrayEditView(QWidget * con
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListArrayEditView::~C_SdNdeDataPoolListArrayEditView(void)
 {
    if (this->mpc_ModelViewManager != NULL)
@@ -150,9 +137,8 @@ C_SdNdeDataPoolListArrayEditView::~C_SdNdeDataPoolListArrayEditView(void)
    //lint -e{1540,1740}  no memory leak because of the parent and the Qt memory management or never took ownership
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Specify associated list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Specify associated list
 
    \param[in] oru32_NodeIndex     Node index
    \param[in] oru32_DataPoolIndex Node data pool index
@@ -161,10 +147,8 @@ C_SdNdeDataPoolListArrayEditView::~C_SdNdeDataPoolListArrayEditView(void)
    \param[in] ore_ArrayEditType   Enum for node data pool list element variable
    \param[in] oru32_DataSetIndex  If min or max use 0
                                   Else use data set index
-
-   \created     07.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListArrayEditView::SetElement(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
                                                   const uint32 & oru32_ListIndex, const uint32 & oru32_ElementIndex,
                                                   const C_SdNdeDataPoolUtil::E_ArrayEditType & ore_ArrayEditType,
@@ -185,9 +169,8 @@ void C_SdNdeDataPoolListArrayEditView::SetElement(const uint32 & oru32_NodeIndex
    m_UpdateModelView();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if equal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if equal
 
    \param[in] oru32_NodeIndex     Node index
    \param[in] oru32_DataPoolIndex Node data pool index
@@ -196,10 +179,8 @@ void C_SdNdeDataPoolListArrayEditView::SetElement(const uint32 & oru32_NodeIndex
    \return
    True  Match
    False No match
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolListArrayEditView::Equals(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
                                               const uint32 & oru32_ListIndex, const uint32 & oru32_ElementIndex,
                                               const C_SdNdeDataPoolUtil::E_ArrayEditType & ore_ArrayEditType,
@@ -220,46 +201,37 @@ bool C_SdNdeDataPoolListArrayEditView::Equals(const uint32 & oru32_NodeIndex, co
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   GetUndocommand and take ownership
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   GetUndocommand and take ownership
 
    Internal undo command is reseted
 
    \return
    NULL No changes
    Else Undocommand accumulating all changes
-
-   \created     16.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QUndoCommand * C_SdNdeDataPoolListArrayEditView::TakeUndoCommand(void)
 {
    return this->mc_UndoManager.TakeUndoCommand();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Forward signal
-
-   \created     27.02.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Forward signal
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListArrayEditView::OnErrorChangePossible(void)
 {
    Q_EMIT this->SigErrorChangePossible();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do data change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do data change
 
    \param[in] oru32_ArrayIndex Array index
    \param[in] orc_NewData      New data
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListArrayEditView::OnDataChange(const uint32 & oru32_ArrayIndex, const QVariant & orc_NewData)
 {
    this->mc_UndoManager.DoDataChangeElements(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
@@ -268,31 +240,25 @@ void C_SdNdeDataPoolListArrayEditView::OnDataChange(const uint32 & oru32_ArrayIn
                                              this->mpc_ModelViewManager);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set model view manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set model view manager
 
    \param[in,out] opc_Value Model view manager
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListArrayEditView::SetModelViewManager(C_SdNdeDataPoolListModelViewManager * const opc_Value)
 {
    this->mpc_ModelViewManager = opc_Value;
    m_UpdateModelView();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get selected indices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get selected indices
 
    \return
    Selected indices
-
-   \created     27.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint32> C_SdNdeDataPoolListArrayEditView::m_GetSelectedIndices(void) const
 {
    std::vector<uint32> c_Retval;
@@ -309,13 +275,10 @@ std::vector<uint32> C_SdNdeDataPoolListArrayEditView::m_GetSelectedIndices(void)
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update model
-
-   \created     17.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update model
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListArrayEditView::m_UpdateModelView(void)
 {
    if (this->mpc_ModelViewManager != NULL)
@@ -337,13 +300,10 @@ void C_SdNdeDataPoolListArrayEditView::m_UpdateModelView(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update corner button size
-
-   \created     20.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update corner button size
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListArrayEditView::m_UpdateCornerButton(void)
 {
    tgl_assert(this->mpc_LabelCorner != NULL);

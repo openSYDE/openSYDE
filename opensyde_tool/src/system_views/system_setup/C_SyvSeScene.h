@@ -1,21 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Graphics scene for system view setup (header)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.06.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVSESCENE_H
 #define C_SYVSESCENE_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <list>
 #include "stwtypes.h"
 
@@ -26,12 +20,12 @@
 #include "C_GiNode.h"
 #include "C_GiSvPcBusConnector.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SyvSeScene :
    public C_SyvTopologyBaseScene
@@ -62,6 +56,7 @@ public:
 Q_SIGNALS:
    //lint -restore
    void SigErrorCheck(void) const;
+   void SigConnectionChange(void) const;
 
 protected:
    virtual C_SebBaseContextMenuManager * m_GetContextMenuManager(void) override;
@@ -101,7 +96,7 @@ private:
    C_SyvSeContextMenuManager mc_ContextMenuManager;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

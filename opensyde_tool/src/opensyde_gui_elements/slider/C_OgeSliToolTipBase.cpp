@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Slider with tool tip (implementation)
 
    Slider with tool tip
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.05.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QEvent>
@@ -25,35 +18,32 @@
 #include "C_OgeSliToolTipBase.h"
 #include "C_SdNdeDataPoolContentUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     22.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeSliToolTipBase::C_OgeSliToolTipBase(QWidget * const opc_Parent) :
    QSlider(opc_Parent),
    mf64_ToolTipRangeOffset(0.0),
@@ -64,34 +54,28 @@ C_OgeSliToolTipBase::C_OgeSliToolTipBase(QWidget * const opc_Parent) :
    connect(this, &C_OgeSliToolTipBase::valueChanged, this, &C_OgeSliToolTipBase::m_OnValueChange);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set value
 
    \param[in] orc_Value New value
-
-   \created     22.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSliToolTipBase::SetValueCustom(const sintn osn_Value)
 {
    this->setValue(osn_Value);
    m_OnValueChange();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set parameter for tooltip display format
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set parameter for tooltip display format
 
    Formula: ((Value - of64_ToolTipRangeOffset) * of64_ToolTipFactor) + of64_ToolTipOffset
 
    \param[in] of64_ToolTipRangeOffset See formula
    \param[in] of64_ToolTipOffset      See formula
    \param[in] of64_ToolTipFactor      See formula
-
-   \created     22.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSliToolTipBase::SetToolTipParameters(const stw_types::float64 of64_ToolTipRangeOffset,
                                                const stw_types::float64 of64_ToolTipOffset,
                                                const stw_types::float64 of64_ToolTipFactor,
@@ -103,9 +87,8 @@ void C_OgeSliToolTipBase::SetToolTipParameters(const stw_types::float64 of64_Too
    this->me_RepresentationType = oe_RepresentationType;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten default event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten default event slot
 
    Here: Handle tool tip
 
@@ -114,10 +97,8 @@ void C_OgeSliToolTipBase::SetToolTipParameters(const stw_types::float64 of64_Too
    \return
    True  Event was recognized and processed
    False Event ignored
-
-   \created     27.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OgeSliToolTipBase::event(QEvent * const opc_Event)
 {
    bool q_Return;
@@ -172,13 +153,10 @@ bool C_OgeSliToolTipBase::event(QEvent * const opc_Event)
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle slider value change
-
-   \created     22.05.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle slider value change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSliToolTipBase::m_OnValueChange(void)
 {
    QString c_Content;
@@ -202,13 +180,10 @@ void C_OgeSliToolTipBase::m_OnValueChange(void)
    this->m_MoveToolTip();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Move tooltip to slider-handle position
-
-   \created     19.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Move tooltip to slider-handle position
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSliToolTipBase::m_MoveToolTip(void)
 {
    if (this->m_GetToolTip() != NULL)

@@ -1,36 +1,31 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Core communication driver for flashloader protocols (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.11.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSYCOMDRIVERFLASH_H
 #define C_OSYCOMDRIVERFLASH_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 
 #include "C_OSCComDriverProtocol.h"
+#include "C_OSCProtocolDriverOsy.h"
 
 #include "C_OSCFlashProtocolStwFlashloader.h"
 #include "CSCLString.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCComDriverFlash :
    public C_OSCComDriverProtocol
@@ -50,6 +45,9 @@ public:
       stw_types::uint8 au8_FlashFingerprintDate[3]; ///< last date of flashing yy.mm.dd
       stw_types::uint8 au8_FlashFingerprintTime[3]; ///< last time of flashing hh.mm.ss
       stw_scl::C_SCLString c_FlashFingerprintUserName;
+
+      C_OSCProtocolDriverOsy::C_ListOfFeatures c_AvailableFeatures; ///< Available features of flashloader
+      stw_types::uint16 u16_MaxNumberOfBlockLength; ///< maximum size of service the server can handle
    };
 
    C_OSCFlashProtocolStwFlashloader::PR_ReportProgress mpr_XflReportProgress;
@@ -166,6 +164,9 @@ public:
                                                 const C_OSCProtocolDriverOsyNode & orc_NewNodeId,
                                                 stw_types::uint8 * const opu8_NrCode = NULL) const;
 
+   stw_types::sint32 SendOsyReadListOfFeatures(const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerId,
+                                               stw_opensyde_core::C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ListOfFeatures, stw_types::uint8 * const opu8_NrCode = NULL) const;
+
    // STW Flashloader services
    stw_types::sint32 SendStwRequestNodeReset(void);
    stw_types::sint32 SendStwRequestNodeReset(const C_OSCProtocolDriverOsyNode & orc_ServerId);
@@ -238,7 +239,7 @@ private:
    static const stw_types::uint16 mhu16_STW_FLASHLOADER_PROTOCOL_VERSION_3_00 = 0x3000U;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

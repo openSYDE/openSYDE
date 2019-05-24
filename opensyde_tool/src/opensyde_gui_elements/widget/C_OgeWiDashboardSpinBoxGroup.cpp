@@ -1,55 +1,45 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for dashboard spin boxes of all available types (implementation)
 
    Widget for dashboard spin boxes of all available types
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.08.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_OgeWiUtil.h"
 #include "C_OgeWiDashboardSpinBoxGroup.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     21.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeWiDashboardSpinBoxGroup::C_OgeWiDashboardSpinBoxGroup(QWidget * const opc_Parent) :
    C_OgeWiSpinBoxGroup(opc_Parent),
    mc_Unit("")
@@ -57,13 +47,10 @@ C_OgeWiDashboardSpinBoxGroup::C_OgeWiDashboardSpinBoxGroup(QWidget * const opc_P
    C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this, "Type", 2);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adjust font to current size
-
-   \created     17.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adjust font to current size
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardSpinBoxGroup::AdjustFontToSize(void)
 {
    //Consider borders (absolute) + buttons (relative)!
@@ -77,15 +64,12 @@ void C_OgeWiDashboardSpinBoxGroup::AdjustFontToSize(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update current unit
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update current unit
 
    \param[in] orc_Value New unit
-
-   \created     12.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardSpinBoxGroup::SetUnit(const QString & orc_Value)
 {
    this->mc_Unit = orc_Value;
@@ -100,15 +84,12 @@ void C_OgeWiDashboardSpinBoxGroup::SetUnit(const QString & orc_Value)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Activates or deactivates the unit
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Activates or deactivates the unit
 
    \param[in]     oq_ShowUnit    Flag for activating unit
-
-   \created     12.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardSpinBoxGroup::SetShowUnit(const bool oq_ShowUnit)
 {
    this->mq_ShowUnit = oq_ShowUnit;
@@ -123,15 +104,12 @@ void C_OgeWiDashboardSpinBoxGroup::SetShowUnit(const bool oq_ShowUnit)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set design type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set design type
 
    \param[in] oe_Type Design type
-
-   \created     13.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardSpinBoxGroup::SetDesignType(const C_PuiSvDbSpinBox::E_Type oe_Type)
 {
    switch (oe_Type)
@@ -145,38 +123,32 @@ void C_OgeWiDashboardSpinBoxGroup::SetDesignType(const C_PuiSvDbSpinBox::E_Type 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key event slot
 
    Here: handle enter press
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     26.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardSpinBoxGroup::keyPressEvent(QKeyEvent * const opc_Event)
 {
    C_OgeWiSpinBoxGroup::keyPressEvent(opc_Event);
    if ((opc_Event->key() == static_cast<sintn>(Qt::Key_Enter)) ||
        (opc_Event->key() == static_cast<sintn>(Qt::Key_Return)))
    {
-      Q_EMIT SigValueChanged();
+      Q_EMIT this->SigValueChanged();
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten show event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten show event slot
 
    Here: adjust font to size
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     17.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardSpinBoxGroup::showEvent(QShowEvent * const opc_Event)
 {
    C_OgeWiSpinBoxGroup::showEvent(opc_Event);
@@ -184,17 +156,14 @@ void C_OgeWiDashboardSpinBoxGroup::showEvent(QShowEvent * const opc_Event)
    AdjustFontToSize();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten resize event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten resize event slot
 
    Here: Adapt font
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     16.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardSpinBoxGroup::resizeEvent(QResizeEvent * const opc_Event)
 {
    C_OgeWiSpinBoxGroup::resizeEvent(opc_Event);

@@ -1,74 +1,89 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Base implementation of QChartView for showing C_OgeChaChartBase (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     04.05.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
 #include "C_OgeChaViewBase.h"
 #include "C_Uti.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace QtCharts;
 using namespace stw_types;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Chart      Pointer to chart
    \param[in,out] opc_Parent     Optional pointer to parent
-
-   \created     03.05.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeChaViewBase::C_OgeChaViewBase(QChart * const opc_Chart, QWidget * const opc_Parent) :
    QChartView(opc_Chart, opc_Parent),
    mq_IsTouching(false),
    mq_DragMoveActive(false),
+   mq_DrawingActive(true),
    mc_DragMovePos(0.0, 0.0)
 {
    this->setRubberBand(QChartView::RectangleRubberBand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten viewport event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Function to activate or deactivate drawing of performance heavy widgets
+
+   \param[in] oq_Active Flag if widgets should currently be drawn
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeChaViewBase::SetDrawingActive(const bool oq_Active)
+{
+   this->mq_DrawingActive = oq_Active;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
+
+   Here: Don't paint if not visible
+
+   \param[in,out] opc_Event Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeChaViewBase::paintEvent(QPaintEvent * const opc_Event)
+{
+   if (this->mq_DrawingActive)
+   {
+      QChartView::paintEvent(opc_Event);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten viewport event slot
 
    Here: Remember user touch event
 
    \param[in,out] opc_event Event identification and information
-
-   \created     20.05.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OgeChaViewBase::viewportEvent(QEvent * const opc_Event)
 {
    if (opc_Event->type() == QEvent::TouchBegin)
@@ -79,17 +94,14 @@ bool C_OgeChaViewBase::viewportEvent(QEvent * const opc_Event)
    return QChartView::viewportEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse press event slot
 
    Here: ignore all events while user touch event
 
    \param[in,out] opc_event Event identification and information
-
-   \created     20.05.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeChaViewBase::mousePressEvent(QMouseEvent * const opc_Event)
 {
    if (mq_IsTouching == false)
@@ -108,17 +120,14 @@ void C_OgeChaViewBase::mousePressEvent(QMouseEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse move event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse move event slot
 
    Here: ignore all events while user touch event
 
    \param[in,out] opc_event Event identification and information
-
-   \created     20.05.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeChaViewBase::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
    //update mouse
@@ -141,17 +150,14 @@ void C_OgeChaViewBase::mouseMoveEvent(QMouseEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse release event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse release event slot
 
    Here: ignore all events while user touch event
 
    \param[in,out] opc_event Event identification and information
-
-   \created     20.05.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeChaViewBase::mouseReleaseEvent(QMouseEvent * const opc_Event)
 {
    mq_IsTouching = false;
@@ -170,17 +176,14 @@ void C_OgeChaViewBase::mouseReleaseEvent(QMouseEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: allow zoom / scroll by keys
 
    \param[in,out] opc_event Event identification and information
-
-   \created     20.05.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeChaViewBase::keyPressEvent(QKeyEvent * const opc_Event)
 {
    switch (opc_Event->key())
@@ -209,17 +212,14 @@ void C_OgeChaViewBase::keyPressEvent(QKeyEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten wheel event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten wheel event slot
 
    Here: allow zoom
 
    \param[in,out] opc_event Event identification and information
-
-   \created     20.05.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeChaViewBase::wheelEvent(QWheelEvent * const opc_Event)
 {
    if (C_Uti::h_CheckKeyModifier(opc_Event->modifiers(), Qt::ControlModifier) == false)

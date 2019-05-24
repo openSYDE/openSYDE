@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Splitter with two-lines-handle (implementation)
 
    Splitter with two-lines-handle.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.11.2018  STW/G.Landsgesell
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
@@ -24,45 +17,42 @@
 #include "constants.h"
 #include "C_CamOgeSpi.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui;
 using namespace stw_types;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor of splitter.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor of splitter.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     20.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamOgeSpi::C_CamOgeSpi(QWidget * const opc_Parent) :
    C_OgeSpiBase(opc_Parent)
 {
    this->setHandleWidth(7);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create splitter handle
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create splitter handle for custom handle
 
-   \created     20.11.2018  STW/G.Landsgesell
+   \return
+   splitter handle
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QSplitterHandle * C_CamOgeSpi::createHandle(void)
 {
    C_CamOgeSpiHandle * const pc_Retval = new C_CamOgeSpiHandle(this->orientation(), this);
@@ -72,51 +62,42 @@ QSplitterHandle * C_CamOgeSpi::createHandle(void)
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor of handle.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor of handle.
 
   \param[in]      oe_Orientation    orientation of widgets (horizontal/vertical)
                                        || is a horizontal handle (because widgets are then horizontal arranged)
                                        =  is a vertical handle (because widgets are then vertical arranged)
    \param[in,out] opc_Parent        Optional pointer to parent
-
-   \created     20.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamOgeSpiHandle::C_CamOgeSpiHandle(const Qt::Orientation oe_Orientation, QSplitter * const opc_Parent) :
    QSplitterHandle(oe_Orientation, opc_Parent)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overridden double click event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overridden double click event slot
 
    Here: forward double click
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     20.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamOgeSpiHandle::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
 {
    QSplitterHandle::mouseDoubleClickEvent(opc_Event);
    Q_EMIT (this->SigDoubleClick());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overridden paint event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overridden paint event
 
    Draws the background element
 
    \param[in,out] opc_Event  Pointer to paint event
-
-   \created     20.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamOgeSpiHandle::paintEvent(QPaintEvent * const opc_Event)
 {
    Q_UNUSED(opc_Event)

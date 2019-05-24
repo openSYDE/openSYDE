@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Offers system view specific visualization and functionality of a node. (implementation)
 
    Offers system view specific visualization and functionality of a node.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     09.02.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -24,26 +17,25 @@
 #include "C_PuiSvHandler.h"
 #include "C_GiSvNodeSyvBase.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -53,10 +45,8 @@ using namespace stw_opensyde_gui_logic;
    \param[in]       orf64_Width          Width of node
    \param[in]       orf64_Height         Height of node
    \param[in,out]   opc_Parent           Optional pointer to parent
-
-   \created     09.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvNodeSyvBase::C_GiSvNodeSyvBase(const uint32 ou32_ViewIndex, const sint32 & ors32_NodeIndex,
                                      const uint64 & oru64_ID, const float64 & orf64_Width, const float64 & orf64_Height,
                                      QGraphicsItem * const opc_Parent) :
@@ -70,28 +60,22 @@ C_GiSvNodeSyvBase::C_GiSvNodeSyvBase(const uint32 ou32_ViewIndex, const sint32 &
    this->m_SetDrawBorder(true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the node connected state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the node connected state
 
    \param[in]     oq_Connected   Flag if connected or not
-
-   \created     23.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvBase::SetViewConnected(const bool oq_Connected)
 {
    this->mq_ViewConnected = oq_Connected;
    this->SetDrawWhiteFilter(!oq_Connected);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function for initially loading internal data
-
-   \created     10.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function for initially loading internal data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvBase::LoadData(void)
 {
    C_GiNode::LoadData();
@@ -113,17 +97,14 @@ void C_GiSvNodeSyvBase::LoadData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Get current error state and update error tooltip accordingly
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get current error state and update error tooltip accordingly
 
    \return
    True  Error detected
    False No error detected
-
-   \created     15.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvNodeSyvBase::m_UpdateError(void)
 {
    bool q_Retval = C_PuiSvHandler::h_GetInstance()->GetErrorNode(static_cast<uint32>(this->ms32_Index));

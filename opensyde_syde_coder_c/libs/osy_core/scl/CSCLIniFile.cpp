@@ -1,21 +1,14 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       INI file class
 
    ANSI C++ INI file class.
    For details cf. documentation in .h file.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-200x
-   license     use only under terms of contract / confidential
-
-   created     15.06.2009  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h" //pre-compiled headers
@@ -56,15 +49,12 @@ static const charn mcn_EqualIndicator = '=';
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Constructor
+/*! \brief   Constructor
 
    If it can load the file, it will do so and populate
    the section list with the values from the file.
 
    \param[in]     orc_FileName    path to ini file
-
-   \created     15.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLIniFile::C_SCLIniFile(const C_SCLString & orc_FileName) :
@@ -85,16 +75,13 @@ C_SCLIniFile::C_SCLIniFile(const C_SCLString & orc_FileName) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Destructor
+/*! \brief   Destructor
 
    Saves the file if any values have changed since the last save.
 
    Throws if
    - the filename is empty
    - writing to the file fails (e.g. write protected)
-
-   \created     15.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLIniFile::~C_SCLIniFile() SCL_WILL_THROW
@@ -106,8 +93,7 @@ C_SCLIniFile::~C_SCLIniFile() SCL_WILL_THROW
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Utility: file loader
+/*! \brief   Utility: file loader
 
    Attempts to load in the text file. If successful it will populate the
    Section list with the key/value pairs found in the file. Note that comments
@@ -119,8 +105,6 @@ C_SCLIniFile::~C_SCLIniFile() SCL_WILL_THROW
    \return
    true   file loaded
    false  file not loaded
-
-   \created     15.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool C_SCLIniFile::m_Load(const C_SCLString & orc_FileName)
@@ -244,15 +228,12 @@ bool C_SCLIniFile::m_Load(const C_SCLString & orc_FileName)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Write data to ini file
+/*! \brief   Write data to ini file
 
    Attempts to save the Section list and keys to the file.
    Throws if
    - the filename is empty
    - writing to the file fails (e.g. write protected)
-
-   \created     15.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_SCLIniFile::UpdateFile(void)
@@ -278,8 +259,7 @@ void C_SCLIniFile::UpdateFile(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Utility: set value of key
+/*! \brief   Utility: set value of key
 
    Given a key, a value and a section, this function will attempt to locate the
     Key within the given section, and if it finds it, change the keys value to
@@ -298,8 +278,6 @@ void C_SCLIniFile::UpdateFile(void)
    \return
    false   error (section or key empty)
    true    value written
-
-   \created     15.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool C_SCLIniFile::m_SetValue(const C_SCLString & orc_Section, const C_SCLString & orc_Key,
@@ -348,8 +326,7 @@ bool C_SCLIniFile::m_SetValue(const C_SCLString & orc_Section, const C_SCLString
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Write string value to ini file
+/*! \brief   Write string value to ini file
 
    Writes a string value.
 
@@ -364,8 +341,6 @@ bool C_SCLIniFile::m_SetValue(const C_SCLString & orc_Section, const C_SCLString
    \param[in]  orc_Key         key to write to
    \param[in]  orc_Value       value to write
    \param[in]  oq_ForceAppend  append at the end without checking whether key already exists
-
-   \created     15.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_SCLIniFile::WriteString(const C_SCLString & orc_Section, const C_SCLString & orc_Key,
@@ -381,8 +356,7 @@ void C_SCLIniFile::WriteString(const C_SCLString & orc_Section, const C_SCLStrin
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Write sintn value to ini file
+/*! \brief   Write sintn value to ini file
 
    Writes an sintn value.
 
@@ -397,8 +371,6 @@ void C_SCLIniFile::WriteString(const C_SCLString & orc_Section, const C_SCLStrin
    \param[in]  orc_Key         key to write to
    \param[in]  osn_Value       value to write
    \param[in]  oq_ForceAppend  append at the end without checking whether key already exists
-
-   \created     15.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_SCLIniFile::WriteInteger(const C_SCLString & orc_Section, const C_SCLString & orc_Key, const sintn osn_Value,
@@ -415,8 +387,7 @@ void C_SCLIniFile::WriteInteger(const C_SCLString & orc_Section, const C_SCLStri
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Write bool value to ini file
+/*! \brief   Write bool value to ini file
 
    Writes a bool value.
 
@@ -431,8 +402,6 @@ void C_SCLIniFile::WriteInteger(const C_SCLString & orc_Section, const C_SCLStri
    \param[in]  orc_Key         key to write to
    \param[in]  oq_Value        value to write
    \param[in]  oq_ForceAppend  append at the end without checking whether key already exists
-
-   \created     15.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_SCLIniFile::WriteBool(const C_SCLString & orc_Section, const C_SCLString & orc_Key, const bool oq_Value,
@@ -449,8 +418,7 @@ void C_SCLIniFile::WriteBool(const C_SCLString & orc_Section, const C_SCLString 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Write float64 value to ini file
+/*! \brief   Write float64 value to ini file
 
    Writes an float64 value.
 
@@ -465,8 +433,6 @@ void C_SCLIniFile::WriteBool(const C_SCLString & orc_Section, const C_SCLString 
    \param[in]  orc_Key         key to write to
    \param[in]  of64_Value      value to write
    \param[in]  oq_ForceAppend  append at the end without checking whether key already exists
-
-   \created     15.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_SCLIniFile::WriteFloat(const C_SCLString & orc_Section, const C_SCLString & orc_Key, const float64 of64_Value,
@@ -483,8 +449,7 @@ void C_SCLIniFile::WriteFloat(const C_SCLString & orc_Section, const C_SCLString
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Utility: get value of key
+/*! \brief   Utility: get value of key
 
    Returns the key value as a C_SCLString object. A return value of ""
     indicates that the key could not be found or an empty value.
@@ -495,8 +460,6 @@ void C_SCLIniFile::WriteFloat(const C_SCLString & orc_Section, const C_SCLString
 
    \return
    read value ("" if key or section does not exist)
-
-   \created     15.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 const C_SCLString & C_SCLIniFile::m_GetValue(const C_SCLString & orc_Key, const C_SCLString & orc_Section)
@@ -509,8 +472,7 @@ const C_SCLString & C_SCLIniFile::m_GetValue(const C_SCLString & orc_Key, const 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   read a C_SCLString value
+/*! \brief   read a C_SCLString value
 
    Read a C_SCLString value from the ini file.
    In the following cases the default will be used:
@@ -524,8 +486,6 @@ const C_SCLString & C_SCLIniFile::m_GetValue(const C_SCLString & orc_Key, const 
 
    \return
    C_SCLString value from ini (or default if error)
-
-   \created     15.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_SCLIniFile::ReadString(const C_SCLString & orc_Section, const C_SCLString & orc_Key,
@@ -542,8 +502,7 @@ C_SCLString C_SCLIniFile::ReadString(const C_SCLString & orc_Section, const C_SC
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   read a uint8 value
+/*! \brief   read a uint8 value
 
    Read a uint8 value from the ini file.
    In the following cases the default will be used:
@@ -558,8 +517,6 @@ C_SCLString C_SCLIniFile::ReadString(const C_SCLString & orc_Section, const C_SC
 
    \return
    uint8 value from ini (or default if error)
-
-   \created     21.08.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 uint8 C_SCLIniFile::ReadUint8(const C_SCLString & orc_Section, const C_SCLString & orc_Key, const uint8 ou8_Default)
@@ -575,8 +532,7 @@ uint8 C_SCLIniFile::ReadUint8(const C_SCLString & orc_Section, const C_SCLString
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   read a uint16 value
+/*! \brief   read a uint16 value
 
    Read a uint16 value from the ini file.
    In the following cases the default will be used:
@@ -591,8 +547,6 @@ uint8 C_SCLIniFile::ReadUint8(const C_SCLString & orc_Section, const C_SCLString
 
    \return
    uint16 value from ini (or default if error)
-
-   \created     21.08.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 uint16 C_SCLIniFile::ReadUint16(const C_SCLString & orc_Section, const C_SCLString & orc_Key, const uint16 ou16_Default)
@@ -608,8 +562,7 @@ uint16 C_SCLIniFile::ReadUint16(const C_SCLString & orc_Section, const C_SCLStri
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   read an sintn value
+/*! \brief   read an sintn value
 
    Read an sintn value from the ini file.
    In the following cases the default will be used:
@@ -626,8 +579,6 @@ uint16 C_SCLIniFile::ReadUint16(const C_SCLString & orc_Section, const C_SCLStri
 
    \return
    sintn value from ini (or default if error)
-
-   \created     15.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sintn C_SCLIniFile::ReadInteger(const C_SCLString & orc_Section, const C_SCLString & orc_Key, const sintn osn_Default)
@@ -666,8 +617,7 @@ sintn C_SCLIniFile::ReadInteger(const C_SCLString & orc_Section, const C_SCLStri
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   read a bool value
+/*! \brief   read a bool value
 
    Read a bool value from the ini file.
    In the following cases the default will be used:
@@ -684,8 +634,6 @@ sintn C_SCLIniFile::ReadInteger(const C_SCLString & orc_Section, const C_SCLStri
 
    \return
    bool value from ini (or default if error)
-
-   \created     15.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool C_SCLIniFile::ReadBool(const C_SCLString & orc_Section, const C_SCLString & orc_Key, const bool oq_Default)
@@ -694,8 +642,7 @@ bool C_SCLIniFile::ReadBool(const C_SCLString & orc_Section, const C_SCLString &
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   read a float64 value
+/*! \brief   read a float64 value
 
    Read a float64 value from the ini file.
    In the following cases the default will be used:
@@ -711,8 +658,6 @@ bool C_SCLIniFile::ReadBool(const C_SCLString & orc_Section, const C_SCLString &
 
    \return
    float64 value from ini (or default if error)
-
-   \created     15.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 float64 C_SCLIniFile::ReadFloat(const C_SCLString & orc_Section, const C_SCLString & orc_Key,
@@ -734,15 +679,12 @@ float64 C_SCLIniFile::ReadFloat(const C_SCLString & orc_Section, const C_SCLStri
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Erase whole section
+/*! \brief   Erase whole section
 
    Erase one section from the ini file.
    Will throw if the section is not found.
 
    \param[in]     orc_Section    ini section to erase
-
-   \created     15.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_SCLIniFile::EraseSection(const C_SCLString & orc_Section)
@@ -765,16 +707,13 @@ void C_SCLIniFile::EraseSection(const C_SCLString & orc_Section)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Delete one key
+/*! \brief   Delete one key
 
    Delete a specific key and its value in a specific section.
    If the section or the key is not found the function will do nothing.
 
    \param[in]     orc_Section    ini section containing key to erase
    \param[in]     orc_Key        key to erase
-
-   \created     15.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_SCLIniFile::DeleteKey(const C_SCLString & orc_Section, const C_SCLString & orc_Key)
@@ -814,8 +753,7 @@ C_SCLIniSection * C_SCLIniFile::m_CreateSection(const C_SCLString & orc_Section)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Detect whether a section exists.
+/*! \brief   Detect whether a section exists.
 
    Checks whether a specified section exists in the ini file.
 
@@ -824,8 +762,6 @@ C_SCLIniSection * C_SCLIniFile::m_CreateSection(const C_SCLString & orc_Section)
    \return
    true    section exists
    false   section does not exist
-
-   \created     15.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool C_SCLIniFile::SectionExists(const C_SCLString & orc_Section)
@@ -836,8 +772,7 @@ bool C_SCLIniFile::SectionExists(const C_SCLString & orc_Section)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Detect whether a key exists.
+/*! \brief   Detect whether a key exists.
 
    Checks whether a specified key exists within a specified section in the ini file.
 
@@ -847,8 +782,6 @@ bool C_SCLIniFile::SectionExists(const C_SCLString & orc_Section)
    \return
    true    key exists in section
    false   key does not exist in section
-
-   \created     15.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool C_SCLIniFile::ValueExists(const C_SCLString & orc_Section, const C_SCLString & orc_Key)
@@ -905,8 +838,7 @@ C_SCLIniKey * C_SCLIniFile::m_GetKey(const C_SCLString & orc_Key, C_SCLIniSectio
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Find section
+/*! \brief   Find section
 
    Given a section name, locates that section in the list and returns a pointer to it.
 
@@ -922,8 +854,6 @@ C_SCLIniKey * C_SCLIniFile::m_GetKey(const C_SCLString & orc_Key, C_SCLIniSectio
    \return
    NULL                section not found
    else                address of found section
-
-   \created     15.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLIniSection * C_SCLIniFile::m_GetSection(const C_SCLString & orc_Section)
@@ -986,8 +916,7 @@ C_SCLString C_SCLIniFile::mh_CommentStr(const C_SCLString & orc_Comment)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Read names of keys of section
+/*! \brief   Read names of keys of section
 
    Places the names of all keys of one section into a string list.
 
@@ -995,8 +924,6 @@ C_SCLString C_SCLIniFile::mh_CommentStr(const C_SCLString & orc_Comment)
    \param[out] opc_Strings     target string list (is not checked for validity)
    \param[in]  oq_Append       true: append to string list
                                false: clear string list before adding keys
-
-   \created     15.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_SCLIniFile::ReadSection(const C_SCLString & orc_Section, C_SCLStringList * const opc_Strings,
@@ -1026,8 +953,7 @@ void C_SCLIniFile::ReadSection(const C_SCLString & orc_Section, C_SCLStringList 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Read keys and values of one section
+/*! \brief   Read keys and values of one section
 
    Places the keys and values of one section into a string list.
    The format for each entry is "key=value".
@@ -1036,8 +962,6 @@ void C_SCLIniFile::ReadSection(const C_SCLString & orc_Section, C_SCLStringList 
    \param[out] opc_Strings     target string list (is not checked for validity)
    \param[in]  oq_Append       true: append to string list
                                false: clear string list before adding keys
-
-   \created     15.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_SCLIniFile::ReadSectionValues(const C_SCLString & orc_Section, C_SCLStringList * const opc_Strings,
@@ -1068,16 +992,13 @@ void C_SCLIniFile::ReadSectionValues(const C_SCLString & orc_Section, C_SCLStrin
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Read names of all sections
+/*! \brief   Read names of all sections
 
    Places the names of all sections into a string list.
 
    \param[out] opc_Strings     target string list (is not checked for validity)
    \param[in]  oq_Append       true: append to string list
                                false: clear string list before adding keys
-
-   \created     15.06.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_SCLIniFile::ReadSections(C_SCLStringList * const opc_Strings, const bool oq_Append) const
@@ -1122,15 +1043,12 @@ void C_SCLIniFile::mh_GetNextPair(const C_SCLString & orc_CommandLine, C_SCLStri
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   place INI file content into a string list
+/*! \brief   place INI file content into a string list
 
    Will write the current ini file content to the specified string list.
    The format is identical to the one used for writing the actual INI file.
 
    \param[out]     orc_Strings    content of INI file (will be cleared before adding INI file strings)
-
-   \created     10.09.2014  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_SCLIniFile::GetFileAsStringList(C_SCLStringList & orc_Strings) const

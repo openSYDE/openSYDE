@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Translate L2 CAN message to L7 interpretation
 
    Translate L2 CAN message to openSYDE protocol L7 interpretation
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.01.2017  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 
@@ -152,7 +145,6 @@ using namespace stw_can;
 #define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_PART2 (0x217U)
 #define UDS_H_ROUTINE_CTRL_SET_NODEID_BY_SERIALNUMBER_PART3 (0x218U)
 
-
 /* -- Types ---------------------------------------------------------------- */
 
 /* -- Global Variables ----------------------------------------------------- */
@@ -164,15 +156,12 @@ using namespace stw_can;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert the openSYDE address information to text
+/*! \brief   Convert the openSYDE address information to text
 
    \param[in]     ort_CanAddressInformation   Address information
 
    \return
    Text interpretation of address information
-
-   \created     08.10.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::m_AddressInformationToText(
@@ -216,8 +205,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_AddressInformationToText(
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert 24bit openSYDE data pool identifier code to text
+/*! \brief   Convert 24bit openSYDE data pool identifier code to text
 
    Return as "<dpindex>.<listindex>.<elementindex>"
    Will also warn if the reserved bit is set.
@@ -229,8 +217,6 @@ C_SCLString C_CMONProtocolOpenSYDE::m_AddressInformationToText(
 
    \return
    Text interpretation of data pool data identifier
-
-   \created     26.07.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::m_DataPoolIdentifierToText(
@@ -261,8 +247,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_DataPoolIdentifierToText(
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Disassemble CAN-ID
+/*! \brief   Disassemble CAN-ID
 
    \param[in]      ou32_CanId                  CAN-ID to decode
    \param[out]     opr_CanAddressInformation   store decoded CAN configuration
@@ -270,8 +255,6 @@ C_SCLString C_CMONProtocolOpenSYDE::m_DataPoolIdentifierToText(
    \return
    C_NO_ERR    disassembly successful
    C_CONFIG    invalid addressing/routing configuration
-
-   \created     24.10.2016  STW/U.Roesch
 */
 //-----------------------------------------------------------------------------
 sint32 C_CMONProtocolOpenSYDE::mh_DisassembleCanId(const uint32 ou32_CanId,
@@ -334,14 +317,10 @@ sint32 C_CMONProtocolOpenSYDE::mh_DisassembleCanId(const uint32 ou32_CanId,
    return s32_Return;
 }
 
-
 //-----------------------------------------------------------------------------
-/*!
-   \brief    constructor
+/*! \brief    constructor
 
    Initialize class members
-
-   \created     19.01.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_CMONProtocolOpenSYDE::C_CMONProtocolOpenSYDE(void) :
@@ -350,8 +329,7 @@ C_CMONProtocolOpenSYDE::C_CMONProtocolOpenSYDE(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert openSYDE service identifier to text
+/*! \brief   Convert openSYDE service identifier to text
 
    Assumptions (responsibility of caller):
    * ou8_ServiceSize must be >= 1
@@ -363,8 +341,6 @@ C_CMONProtocolOpenSYDE::C_CMONProtocolOpenSYDE(void) :
 
    \return
    Text interpretation of service identifier
-
-   \created     11.07.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::m_ServiceIdToText(const uint8 ou8_ServiceData,
@@ -452,15 +428,12 @@ C_SCLString C_CMONProtocolOpenSYDE::m_ServiceIdToText(const uint8 ou8_ServiceDat
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert openSYDE session identifier to text
+/*! \brief   Convert openSYDE session identifier to text
 
    \param[in]     ou8_SessionId        session ID
 
    \return
    Text interpretation of session ID
-
-   \created     04.08.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::m_SessionIdToText(const uint8 ou8_SessionId) const
@@ -488,8 +461,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_SessionIdToText(const uint8 ou8_SessionId)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert openSYDE service identifier data to text
+/*! \brief   Convert openSYDE service identifier data to text
 
    Assumptions (responsibility of caller):
    * ou8_ServiceSize must be >= 1
@@ -502,8 +474,6 @@ C_SCLString C_CMONProtocolOpenSYDE::m_SessionIdToText(const uint8 ou8_SessionId)
 
    \return
    Text interpretation of service identifier
-
-   \created     11.07.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::m_ServiceDataToText(const uint8 * const opu8_ServiceData,
@@ -876,15 +846,12 @@ C_SCLString C_CMONProtocolOpenSYDE::m_ServiceDataToText(const uint8 * const opu8
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert openSYDE negative response code to text
+/*! \brief   Convert openSYDE negative response code to text
 
    \param[in]     ou8_NrCode      negative response code
 
    \return
    Text interpretation of negative response code
-
-   \created     14.07.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::m_NegativeResponseCodeToText(const uint8 ou8_NrCode) const
@@ -965,8 +932,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_NegativeResponseCodeToText(const uint8 ou8
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get data as ASCII text if representable
+/*! \brief   Get data as ASCII text if representable
 
    Will add printable characters as such.
    Will insert non-printable characters as value.
@@ -976,8 +942,6 @@ C_SCLString C_CMONProtocolOpenSYDE::m_NegativeResponseCodeToText(const uint8 ou8
 
    \return
    Text interpretation of data
-
-   \created     04.08.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::m_GetSupposedlyAsciiText(const uint8 ou8_NumBytes, const uint8 * const opu8_Data)
@@ -1004,18 +968,14 @@ C_SCLString C_CMONProtocolOpenSYDE::m_GetSupposedlyAsciiText(const uint8 ou8_Num
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert three byte version to string
+/*! \brief   Convert three byte version to string
 
    Always prints as decimal
-
 
    \param[in]     opu8_Version          version in three byte binary format
 
    \return
    Text interpretation of data
-
-   \created     12.03.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::mh_ThreeByteVersionToString(const uint8 * const opu8_Version)
@@ -1026,8 +986,7 @@ C_SCLString C_CMONProtocolOpenSYDE::mh_ThreeByteVersionToString(const uint8 * co
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert openSYDE data identifier code and data to text
+/*! \brief   Convert openSYDE data identifier code and data to text
 
    \param[in]     ou16_DataIdentifier      data identifier
    \param[in]     oq_IsResponse            false: decode request
@@ -1037,8 +996,6 @@ C_SCLString C_CMONProtocolOpenSYDE::mh_ThreeByteVersionToString(const uint8 * co
 
    \return
    Text interpretation of data identifier
-
-   \created     20.07.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::m_DataIdentifierAndDataToText(const uint16 ou16_DataIdentifier,
@@ -1255,8 +1212,7 @@ C_SCLString C_CMONProtocolOpenSYDE::m_DataIdentifierAndDataToText(const uint16 o
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert openSYDE routine identifier code to text
+/*! \brief   Convert openSYDE routine identifier code to text
 
    \param[in]     ou16_RoutineIdentifier        routine identifier
    \param[in]     oq_IsResponse                 true: response flag was set
@@ -1267,8 +1223,6 @@ C_SCLString C_CMONProtocolOpenSYDE::m_DataIdentifierAndDataToText(const uint16 o
 
    \return
    Text interpretation of routine data
-
-   \created     20.07.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::m_RoutineDataToText(const uint16 ou16_RoutineIdentifier,
@@ -1424,15 +1378,12 @@ C_SCLString C_CMONProtocolOpenSYDE::m_RoutineDataToText(const uint16 ou16_Routin
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert openSYDE CAN message to text representation.
+/*! \brief   Convert openSYDE CAN message to text representation.
 
    \param[in]     orc_Msg              message to convert
 
    \return
    Text interpretation of CAN message ("" if the message can not be interpreted)
-
-   \created     19.01.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) const
@@ -1648,13 +1599,10 @@ C_SCLString C_CMONProtocolOpenSYDE::MessageToString(const T_STWCAN_Msg_RX & orc_
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief    Get raw data as text
+/*! \brief    Get raw data as text
 
    \return
    Text representation of raw data
-
-   \created     06.11.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::m_RawDataToString(const uint8 ou8_NumBytes, const uint8 * const opu8_Data) const
@@ -1674,13 +1622,10 @@ C_SCLString C_CMONProtocolOpenSYDE::m_RawDataToString(const uint8 ou8_NumBytes, 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get name of protocol as string
+/*! \brief   Get name of protocol as string
 
    \return
    Text representation of protocol name
-
-   \created     19.01.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolOpenSYDE::GetProtocolName(void) const

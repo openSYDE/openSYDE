@@ -1,53 +1,43 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Handler class for OSY data (implementation)
 
    Handler class for OSY data
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     17.01.2019  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
 #include "stwerrors.h"
 #include "C_CamDbOsy.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     17.01.2019  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamDbOsy::C_CamDbOsy() :
    mq_Active(true),
    mq_FoundAll(false),
@@ -55,43 +45,34 @@ C_CamDbOsy::C_CamDbOsy() :
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set active flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set active flag
 
    \param[in] oq_Active New active state
-
-   \created     23.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamDbOsy::SetActive(const bool oq_Active)
 {
    this->mq_Active = oq_Active;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set main data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set main data
 
    \param[in] orc_Data New data
-
-   \created     17.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamDbOsy::SetData(const stw_opensyde_core::C_OSCComMessageLoggerOsySysDefConfig & orc_Data)
 {
    this->mc_Data = orc_Data;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Find all messages and store the fast access index for them
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Find all messages and store the fast access index for them
 
    Warning: this might take a while
-
-   \created     21.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamDbOsy::FindAllMessages(void)
 {
    if (this->mq_FoundAll == false)
@@ -170,9 +151,8 @@ void C_CamDbOsy::FindAllMessages(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Search for a message with this ID, return the first one found
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Search for a message with this ID, return the first one found
 
    \param[in]  ou32_Id     CAN ID to search for
    \param[out] orc_Message Found message name (only valid if C_NO_ERR)
@@ -180,10 +160,8 @@ void C_CamDbOsy::FindAllMessages(void)
    \return
    C_NO_ERR Found at least one matching message
    C_NOACT  No matching message found
-
-   \created     22.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamDbOsy::FindMessageById(const uint32 ou32_Id, QString & orc_Message) const
 {
    sint32 s32_Retval = C_NOACT;
@@ -245,19 +223,16 @@ sint32 C_CamDbOsy::FindMessageById(const uint32 ou32_Id, QString & orc_Message) 
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Find message in data base
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Find message in data base
 
    \param[in] orc_Message Message name to search for
 
    \return
    C_NO_ERR Found message
    C_NOACT  Message not found in file
-
-   \created     17.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamDbOsy::FindMessage(const QString & orc_Message)
 {
    sint32 s32_Retval = C_NOACT;
@@ -361,39 +336,32 @@ sint32 C_CamDbOsy::FindMessage(const QString & orc_Message)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get active state of this database
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get active state of this database
 
    \return
    Current active state
-
-   \created     23.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_CamDbOsy::GetActive(void) const
 {
    return this->mq_Active;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all found messages
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all found messages
 
    \return
    All found messages
-
-   \created     21.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const QMap<QString, C_OSCCanMessageIdentificationIndices> & C_CamDbOsy::GetFoundMessages(void) const
 {
    return this->mc_FoundMessagesId;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get OSC CAN message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get OSC CAN message
 
    Requirement: this function can only return a valid index if the function FindMessage was at least called once
 
@@ -402,10 +370,8 @@ const QMap<QString, C_OSCCanMessageIdentificationIndices> & C_CamDbOsy::GetFound
    \return
    NULL OSC CAN message not found
    Else Valid OSC CAN message
-
-   \created     17.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const stw_opensyde_core::C_OSCCanMessage * C_CamDbOsy::GetOSCMessage(const QString & orc_Message) const
 {
    const stw_opensyde_core::C_OSCCanMessage * pc_Retval = NULL;
@@ -441,9 +407,8 @@ const stw_opensyde_core::C_OSCCanMessage * C_CamDbOsy::GetOSCMessage(const QStri
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get OSC list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get OSC list
 
    Requirement: this function can only return a valid index if the function FindMessage was at least called once
 
@@ -452,10 +417,8 @@ const stw_opensyde_core::C_OSCCanMessage * C_CamDbOsy::GetOSCMessage(const QStri
    \return
    NULL OSC list not found
    Else Valid OSC list
-
-   \created     17.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const stw_opensyde_core::C_OSCNodeDataPoolList * C_CamDbOsy::GetOSCList(const QString & orc_Message) const
 {
    const stw_opensyde_core::C_OSCNodeDataPoolList * pc_Retval = NULL;
@@ -485,19 +448,16 @@ const stw_opensyde_core::C_OSCNodeDataPoolList * C_CamDbOsy::GetOSCList(const QS
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Replace the bus index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Replace the bus index
 
    \param[in] ou32_BusIndex New bus index
 
    \return
    True  Is change
    False No change
-
-   \created     22.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_CamDbOsy::ReplaceOsyBusIndex(const uint32 ou32_BusIndex)
 {
    bool q_Retval;

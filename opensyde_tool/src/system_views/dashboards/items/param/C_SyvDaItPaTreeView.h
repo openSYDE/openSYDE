@@ -1,35 +1,29 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Parameter tree view (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.06.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVDAITPATREEVIEW_H
 #define C_SYVDAITPATREEVIEW_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_PuiSvDbParam.h"
 #include "C_SyvDaItPaTreeModel.h"
 #include "C_SyvDaItPaTreeDelegate.h"
 #include "C_OgeTreeViewToolTipBase.h"
 #include "C_PuiSvDbDataElementHandler.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SyvDaItPaTreeView :
    public stw_opensyde_gui_elements::C_OgeTreeViewToolTipBase
@@ -47,7 +41,8 @@ public:
    void ApplyEcuValues(void);
    void ReloadSetValues(void);
    void ApplySelectedEcuValues(void);
-   bool CheckRange(void) const;
+   bool CheckRange(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ListIds,
+                   const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListId> & orc_ListIds2) const;
    bool CheckAllListsRead(void) const;
    void PrepareChangedValues(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ListIds) const;
    void RemoveValuesChangedFlag(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ListIds)
@@ -130,7 +125,7 @@ private:
    C_SyvDaItPaTreeView & operator =(const C_SyvDaItPaTreeView &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

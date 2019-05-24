@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Node data pool util class (implementation)
 
    Node data pool util class
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.02.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <cmath>
@@ -29,15 +22,15 @@
 #include "C_Uti.h"
 #include "constants.h"
 #include "C_PuiSdHandler.h"
-#include "C_SdNdeDataPoolListHeaderWidget.h"
 #include "C_OgeWiTableSpinBoxGroup.h"
 #include "C_OgeWiParamSpinBoxGroup.h"
 #include "C_OgeLeTable.h"
 #include "C_OgeLeParam.h"
 #include "C_GtGetText.h"
 #include "C_SdNdeDataPoolContentUtil.h"
+#include "C_PuiSdSharedDatapools.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui_logic;
@@ -45,31 +38,28 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if indices connected
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if indices connected
 
    \param[in] orc_Items Indices to connect
 
    \return
    true  Indices connected
    false Indices not connected
-
-   \created     27.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolUtil::h_CheckConnected(const std::vector<uint32> & orc_Items)
 {
    bool q_Retval = true;
@@ -94,19 +84,16 @@ bool C_SdNdeDataPoolUtil::h_CheckConnected(const std::vector<uint32> & orc_Items
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert item selection to std vector
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert item selection to std vector
 
    \param[in] orc_Items Item selection
    \param[in] orq_Rows  Optional indicator if selection should be on rows or columns
 
    \return
    Std vector of selected items
-
-   \created     27.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint32> C_SdNdeDataPoolUtil::h_ConvertVector(const QModelIndexList & orc_Items, const bool & orq_Rows)
 {
    std::vector<uint32> c_Retval;
@@ -125,9 +112,8 @@ std::vector<uint32> C_SdNdeDataPoolUtil::h_ConvertVector(const QModelIndexList &
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert element type to generic
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert element type to generic
 
    \param[in]  orc_OSCElement     OSC Element
    \param[in]  orc_UIElement      UI Element
@@ -135,10 +121,8 @@ std::vector<uint32> C_SdNdeDataPoolUtil::h_ConvertVector(const QModelIndexList &
    \param[out] orc_Generic        Generic output
    \param[in]  oru32_Index        Optional array index
    \param[in]  ors32_DataSetIndex Optional data set index
-
-   \created     10.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolUtil::h_ConvertToElementGeneric(
    const stw_opensyde_core::C_OSCNodeDataPoolListElement & orc_OSCElement,
    const C_PuiSdNodeDataPoolListElement & orc_UIElement, const C_SdNdeDataPoolUtil::E_ElementDataChangeType & ore_Type,
@@ -220,18 +204,15 @@ void C_SdNdeDataPoolUtil::h_ConvertToElementGeneric(
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert node data pool content type to combo box index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert node data pool content type to combo box index
 
    \param[in] ore_Type Node data pool content type
 
    \return
    Combo box index
-
-   \created     15.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint8 C_SdNdeDataPoolUtil::h_ConvertContentTypeToComboBox(const C_OSCNodeDataPoolContent::E_Type & ore_Type)
 {
    sint8 s8_Retval;
@@ -276,18 +257,15 @@ sint8 C_SdNdeDataPoolUtil::h_ConvertContentTypeToComboBox(const C_OSCNodeDataPoo
    return s8_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert combo box index to node data pool content type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert combo box index to node data pool content type
 
    \param[in] ors8_Type Combo box index
 
    \return
    Node data pool content type
-
-   \created     15.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolContent::E_Type C_SdNdeDataPoolUtil::h_ConvertContentTypeFromComboBox(const sint8 & ors8_Type)
 {
    C_OSCNodeDataPoolContent::E_Type e_Retval;
@@ -330,18 +308,15 @@ C_OSCNodeDataPoolContent::E_Type C_SdNdeDataPoolUtil::h_ConvertContentTypeFromCo
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert node data pool list element access type to combo box index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert node data pool list element access type to combo box index
 
    \param[in] ore_Type Node data pool list element access type
 
    \return
    Combo box index
-
-   \created     17.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint8 C_SdNdeDataPoolUtil::h_ConvertElementAccessToComboBox(const C_OSCNodeDataPoolListElement::E_Access & ore_Type)
 {
    sint8 s8_Retval;
@@ -362,18 +337,15 @@ sint8 C_SdNdeDataPoolUtil::h_ConvertElementAccessToComboBox(const C_OSCNodeDataP
    return s8_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert combo box index to node data pool list element access type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert combo box index to node data pool list element access type
 
    \param[in] ors8_Type Combo box index
 
    \return
    Node data pool list element access type
-
-   \created     17.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolListElement::E_Access C_SdNdeDataPoolUtil::h_ConvertElementAccesFromComboBox(const sint8 & ors8_Type)
 {
    C_OSCNodeDataPoolListElement::E_Access e_Retval;
@@ -392,18 +364,15 @@ C_OSCNodeDataPoolListElement::E_Access C_SdNdeDataPoolUtil::h_ConvertElementAcce
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert node data pool content type to string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert node data pool content type to string
 
    \param[in] ore_Type Node data pool content type
 
    \return
    String representing the current type
-
-   \created     21.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SdNdeDataPoolUtil::h_ConvertContentTypeToString(const C_OSCNodeDataPoolContent::E_Type & ore_Type)
 {
    QString c_Retval;
@@ -448,18 +417,15 @@ QString C_SdNdeDataPoolUtil::h_ConvertContentTypeToString(const C_OSCNodeDataPoo
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert node data pool list element access type to string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert node data pool list element access type to string
 
    \param[in] ore_Type Node data pool list element access type
 
    \return
    String representing the current type
-
-   \created     21.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SdNdeDataPoolUtil::h_ConvertElementAccessToString(const C_OSCNodeDataPoolListElement::E_Access & ore_Type)
 {
    QString c_Retval;
@@ -480,9 +446,8 @@ QString C_SdNdeDataPoolUtil::h_ConvertElementAccessToString(const C_OSCNodeDataP
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create widget to use for editing this value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create widget to use for editing this value
 
    \param[in,out] opc_Parent           Parent widget
    \param[in]     orc_Index            Correlating index
@@ -496,10 +461,8 @@ QString C_SdNdeDataPoolUtil::h_ConvertElementAccessToString(const C_OSCNodeDataP
 
    \return
    Editor widget
-
-   \created     15.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QWidget * C_SdNdeDataPoolUtil::h_CreateGenericEditor(QWidget * const opc_Parent, const QModelIndex & orc_Index,
                                                      const C_OSCNodeDataPoolContent & orc_Min,
                                                      const C_OSCNodeDataPoolContent & orc_Max,
@@ -558,16 +521,13 @@ QWidget * C_SdNdeDataPoolUtil::h_CreateGenericEditor(QWidget * const opc_Parent,
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set value to widget used for editing this value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set value to widget used for editing this value
 
    \param[in,out] opc_Editor Editor widget
    \param[in]     orc_Index  Correlating index
-
-   \created     15.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolUtil::h_SetGenericEditorDataVariable(QWidget * const opc_Editor, const QModelIndex & orc_Index)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -586,17 +546,14 @@ void C_SdNdeDataPoolUtil::h_SetGenericEditorDataVariable(QWidget * const opc_Edi
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set model value from widget used to edit this value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set model value from widget used to edit this value
 
    \param[in,out] opc_Editor Editor widget
    \param[in,out] opc_Model  Model object
    \param[in]     orc_Index  Correlating index
-
-   \created     15.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolUtil::h_SetModelGenericDataVariable(QWidget * const opc_Editor,
                                                         QAbstractItemModel * const opc_Model,
                                                         const QModelIndex & orc_Index)
@@ -617,18 +574,15 @@ void C_SdNdeDataPoolUtil::h_SetModelGenericDataVariable(QWidget * const opc_Edit
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert generic data type to string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert generic data type to string
 
    \param[in] orc_Data Generic data type
 
    \return
    Generic data type string content
-
-   \created     21.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SdNdeDataPoolUtil::h_ConvertToString(const C_OSCNodeDataPoolContent & orc_Data)
 {
    QString c_Retval = "";
@@ -659,16 +613,13 @@ QString C_SdNdeDataPoolUtil::h_ConvertToString(const C_OSCNodeDataPoolContent & 
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle QString to OSCContent conversion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle QString to OSCContent conversion
 
    \param[in]     orc_Content QString input
    \param[in,out] orc_Output  OSCContent output
-
-   \created     21.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolUtil::h_SetString(const QString & orc_String, C_OSCNodeDataPoolContent & orc_Output)
 {
    if (orc_String.size() <= static_cast<sint32>(orc_Output.GetArraySize()))
@@ -700,18 +651,15 @@ void C_SdNdeDataPoolUtil::h_SetString(const QString & orc_String, C_OSCNodeDataP
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert sint8 array to string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert sint8 array to string
 
    \param[in] orc_Data     sint8 array
 
    \return
    String content
-
-   \created     21.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SdNdeDataPoolUtil::h_ConvertToString(const std::vector<sint8> & orc_Data)
 {
    QString c_Retval = "";
@@ -733,19 +681,16 @@ QString C_SdNdeDataPoolUtil::h_ConvertToString(const std::vector<sint8> & orc_Da
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paint table boolean item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paint table boolean item
 
    \param[in,out] opc_Painter                   Painter
    \param[in]     orc_Option                    Painter option
    \param[in]     orc_Index                     Current index (for value)
    \param[in]     orc_CheckMark                 Check mark pixmap (performance reasons)
    \param[in]     orq_IsEditing                 Optional flag if boolean in edit mode
-
-   \created     05.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolUtil::h_DrawTableBoolean(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
                                              const QModelIndex & orc_Index, const QPixmap & orc_CheckMark,
                                              const bool & orq_IsEditing)
@@ -790,17 +735,14 @@ void C_SdNdeDataPoolUtil::h_DrawTableBoolean(QPainter * const opc_Painter, const
    opc_Painter->restore();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paint table item background
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paint table item background
 
    \param[in,out] opc_Painter                   Painter
    \param[in]     orc_Option                    Option
    \param[in]     orq_UseSpecialBackgroundColor Optional flag to indicate if the field uses a special background color
-
-   \created     05.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolUtil::h_DrawTableBackground(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
                                                 const bool & orq_UseSpecialBackgroundColor)
 {
@@ -816,19 +758,16 @@ void C_SdNdeDataPoolUtil::h_DrawTableBackground(QPainter * const opc_Painter, co
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paint table item background
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paint table item background
 
    \param[in,out] opc_Painter   Painter
    \param[in]     orc_Option    Option
    \param[in]     orc_Default   Default color
    \param[in]     orc_Alternate Alternating color
    \param[in]     orc_Selected  Selection color
-
-   \created     30.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolUtil::h_DrawTableBackgroundGeneric(QPainter * const opc_Painter,
                                                        const QStyleOptionViewItem & orc_Option,
                                                        const QColor & orc_Default, const QColor & orc_Alternate,
@@ -857,18 +796,15 @@ void C_SdNdeDataPoolUtil::h_DrawTableBackgroundGeneric(QPainter * const opc_Pain
    opc_Painter->restore();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Draw selected table cell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Draw selected table cell
 
    \param[in,out] opc_Painter    Active painter
    \param[in]     orc_Option     Active option(s)
    \param[in]     orc_Index      Active index
    \param[in]     opc_TableModel Active table model
-
-   \created     07.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolUtil::h_DrawTableSelected(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
                                               const QModelIndex & orc_Index,
                                               const QAbstractTableModel * const opc_TableModel)
@@ -909,9 +845,8 @@ void C_SdNdeDataPoolUtil::h_DrawTableSelected(QPainter * const opc_Painter, cons
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility function to compare one item of two content types
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility function to compare one item of two content types
 
    \param[in] orc_Content1 Content 1
    \param[in] orc_Content2 Content 2
@@ -920,10 +855,8 @@ void C_SdNdeDataPoolUtil::h_DrawTableSelected(QPainter * const opc_Painter, cons
    \return
    True  Content1 smaller than Content2
    False Content1 greater or equal to Content2
-
-   \created     04.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolUtil::h_CompareSpecifiedItemSmaller(const C_OSCNodeDataPoolContent & orc_Content1,
                                                         const C_OSCNodeDataPoolContent & orc_Content2,
                                                         const uint32 & oru32_Index)
@@ -945,22 +878,21 @@ bool C_SdNdeDataPoolUtil::h_CompareSpecifiedItemSmaller(const C_OSCNodeDataPoolC
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Central function to calculate table widget height
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Central function to calculate table widget height
 
    \param[in] ou32_NodeIndex     Node index
    \param[in] ou32_DataPoolIndex Datapool index
    \param[in] ou32_ListIndex     List index
+   \param[in] osn_MaximumHeight  Check for maximum height in case of the last table/list
+                                 Default parameter is 0, in this case this check will not be run
 
    \return
    Table widget height
-
-   \created     06.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdNdeDataPoolUtil::h_GetTableSize(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
-                                           const uint32 ou32_ListIndex)
+                                           const uint32 ou32_ListIndex, const sintn osn_MaximumHeight)
 {
    sint32 s32_Retval;
    const C_OSCNodeDataPool * const pc_Datapool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(ou32_NodeIndex,
@@ -999,6 +931,41 @@ sint32 C_SdNdeDataPoolUtil::h_GetTableSize(const uint32 ou32_NodeIndex, const ui
          {
             sn_Height += sn_ItemOffset * static_cast<sintn>(u32_MaxVisibleItemCount);
          }
+
+         if (osn_MaximumHeight > 0)
+         {
+            const sintn sn_HeaderOffset = 66;
+            const sintn sn_MinimumMaximumHeight = sn_ConstOffset + (sn_ItemOffset *
+                                                                    static_cast<sintn>(u32_VisibleItemCount));
+            uint32 u32_ListCounter;
+            sintn sn_HeightOtherLists = 0;
+
+            // Check the available height for all lists/tables
+            for (u32_ListCounter = 0U; u32_ListCounter < (pc_Datapool->c_Lists.size() - 1UL); ++u32_ListCounter)
+            {
+               // Sum all other list heights
+               sn_HeightOtherLists +=
+                  static_cast<sintn>(C_SdNdeDataPoolUtil::h_GetTableSize(ou32_NodeIndex, ou32_DataPoolIndex,
+                                                                         u32_ListCounter)) +
+                  sn_HeaderOffset;
+            }
+
+            if ((sn_HeightOtherLists + (sn_Height + sn_HeaderOffset)) > osn_MaximumHeight)
+            {
+               // List does not fit
+               if (((osn_MaximumHeight - (sn_HeightOtherLists + sn_HeaderOffset)) < sn_MinimumMaximumHeight) &&
+                   (sn_Height >= sn_MinimumMaximumHeight))
+               {
+                  // List falls below the minimum of the maximum
+                  sn_Height = sn_MinimumMaximumHeight;
+               }
+               else
+               {
+                  // List can use the rest of the space
+                  sn_Height = (osn_MaximumHeight - sn_HeightOtherLists) - sn_HeaderOffset;
+               }
+            }
+         }
       }
       else
       {
@@ -1014,28 +981,86 @@ sint32 C_SdNdeDataPoolUtil::h_GetTableSize(const uint32 ou32_NodeIndex, const ui
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns all connected shared datapools of one group
 
-   \created     27.02.2017  STW/M.Echtler
+   \param[in]     ou32_SharedDatapoolGroup         Index of shared datapool group
+   \param[in]     ou32_BaseDatapoolId              Datapool Id of datapool which shall not be added to result
+   \param[in]     ou32_NodeIndex                   Node index which node name shall not be added as
+                                                   namespace to the datapool names
+   \param[out]    orc_SharedDatapoolGroup          Result vector with all connected shared datapool names of one group
+                                                   Will be cleared in any case
+
+   \return
+   C_NO_ERR    Shared datapool group found and copied
+   C_RANGE     ou32_SharedDatapoolGroup is invalid
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_SdNdeDataPoolUtil::GetSharedDatapoolGroup(const uint32 ou32_SharedDatapoolGroup,
+                                                   const C_OSCNodeDataPoolId & orc_BaseDatapoolId,
+                                                   const uint32 ou32_NodeIndex,
+                                                   std::vector<QString> & orc_SharedDatapoolNameGroup)
+{
+   sint32 s32_Return = C_RANGE;
+   const C_PuiSdSharedDatapools & rc_SharedDatapools = C_PuiSdHandler::h_GetInstance()->GetSharedDatapoolsConst();
+
+   std::vector<C_OSCNodeDataPoolId> c_SharedDatapoolGroup;
+
+   orc_SharedDatapoolNameGroup.clear();
+
+   if (rc_SharedDatapools.GetSharedDatapoolGroup(ou32_SharedDatapoolGroup, c_SharedDatapoolGroup) == C_NO_ERR)
+   {
+      uint32 u32_DatapoolIdCounter;
+
+      s32_Return = C_NO_ERR;
+
+      for (u32_DatapoolIdCounter = 0U; u32_DatapoolIdCounter < c_SharedDatapoolGroup.size();
+           ++u32_DatapoolIdCounter)
+      {
+         const C_OSCNodeDataPoolId & rc_DpId = c_SharedDatapoolGroup[u32_DatapoolIdCounter];
+
+         // Do not show the selected datapool
+         if (rc_DpId != orc_BaseDatapoolId)
+         {
+            const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(rc_DpId.u32_NodeIndex);
+            if ((pc_Node != NULL) &&
+                (rc_DpId.u32_DataPoolIndex < pc_Node->c_DataPools.size()))
+            {
+               QString c_Text = "";
+               if (rc_DpId.u32_NodeIndex != ou32_NodeIndex)
+               {
+                  // Add the node name if the datapool is of an other node
+                  c_Text = QString(pc_Node->c_Properties.c_Name.c_str()) + "::";
+               }
+
+               // Get the datapool name
+               c_Text += pc_Node->c_DataPools[rc_DpId.u32_DataPoolIndex].c_Name.c_str();
+
+               orc_SharedDatapoolNameGroup.push_back(c_Text);
+            }
+         }
+      }
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
+*/
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolUtil::C_SdNdeDataPoolUtil(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply style
 
    \param[in,out] opc_Widget Widget
    \param[in]     orc_Font   Font (Only supports pixel size!)
    \param[in]     orc_Color  Foreground color
-
-   \created     06.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolUtil::mh_ApplyStyleSheet(QWidget * const opc_Widget, const QFont & orc_Font,
                                              const QColor & orc_Color)
 {

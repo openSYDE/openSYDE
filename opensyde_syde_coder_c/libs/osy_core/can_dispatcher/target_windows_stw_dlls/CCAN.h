@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Header for C_CAN class.
@@ -6,15 +6,9 @@
    Header to class implementing an high level interface to communication driver DLLs in the STW-CAN-DLL
    format.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     xx.xx.2002  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2002 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CCANH
 #define CCANH
 
@@ -80,7 +74,6 @@ public:
    virtual stw_types::sint32 SER_Get_RX_Buf_Count(stw_types::uint32 & oru32_NumBytes,
                                                   stw_types::uint32 & oru32_MaxBufSize) const;
    virtual stw_types::sint32 SER_Read_Bytes(stw_types::uint8 * const opu8_Data, stw_types::uint32 & oru32_NumBytes);
-
 
    //additional functions for Windows STW CAN DLLs
    //DLL handling:

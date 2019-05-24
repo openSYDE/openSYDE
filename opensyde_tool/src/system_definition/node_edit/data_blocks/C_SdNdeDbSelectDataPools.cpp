@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget to handle data pool selections for data blocks (implementation)
 
    Widget to handle data pool selections for data blocks
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.10.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "TGLUtils.h"
@@ -26,7 +19,7 @@
 #include "C_SdNdeDbSelectDataPools.h"
 #include "ui_C_SdNdeDbSelectDataPools.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -34,21 +27,20 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -56,10 +48,8 @@ using namespace stw_opensyde_gui_elements;
    \param[in]     os32_SkipApplicationIndex    Application index to not display as used
    \param[in]     orc_UsedDataPoolIndicesIndex Data pools to always display as used
    \param[in,out] orc_Parent                   Reference to parent
-
-   \created     01.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDbSelectDataPools::C_SdNdeDbSelectDataPools(const stw_types::uint32 ou32_NodeIndex,
                                                    const sint32 os32_SkipApplicationIndex,
                                                    const std::vector<uint32> & orc_UsedDataPoolIndicesIndex,
@@ -101,25 +91,19 @@ C_SdNdeDbSelectDataPools::C_SdNdeDbSelectDataPools(const stw_types::uint32 ou32_
            &C_SdNdeDbSelectDataPools::m_UpdateSelection);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     01.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDbSelectDataPools::~C_SdNdeDbSelectDataPools(void)
 {
    delete this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     01.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbSelectDataPools::InitStaticNames(void) const
 {
    this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("Owned Datapool"));
@@ -132,32 +116,26 @@ void C_SdNdeDbSelectDataPools::InitStaticNames(void) const
    this->mpc_Ui->pc_PushButtonCancel->setText(C_GtGetText::h_GetText("Cancel"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get selected data elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get selected data elements
 
    \return
    Current selected data elements
-
-   \created     05.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<C_PuiSvDbNodeDataPoolListElementId> C_SdNdeDbSelectDataPools::GetSelectedDataPools(void) const
 {
    return this->mpc_Ui->pc_TreeView->GetSelectedDataElements();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     01.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbSelectDataPools::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
@@ -183,37 +161,28 @@ void C_SdNdeDbSelectDataPools::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Ok button click
-
-   \created     01.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Ok button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbSelectDataPools::m_OkClicked(void)
 {
    this->mrc_ParentDialog.accept();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Cancel button click
-
-   \created     01.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Cancel button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbSelectDataPools::m_CancelClicked(void)
 {
    this->mrc_ParentDialog.reject();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle view hiding / replacement
-
-   \created     01.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle view hiding / replacement
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbSelectDataPools::m_HandleHiding(void) const
 {
    if (this->mpc_Ui->pc_TreeView->IsEmpty() == true)
@@ -238,27 +207,22 @@ void C_SdNdeDbSelectDataPools::m_HandleHiding(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Filter for string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Filter for string
 
    \param[in] orc_Text String
-
-   \created     01.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbSelectDataPools::m_OnSearch(const QString & orc_Text) const
 {
    this->mpc_Ui->pc_TreeView->Search(orc_Text);
    if (orc_Text.isEmpty() == true)
    {
-      this->mpc_Ui->pc_TreeView->collapseAll();
       m_HandleHiding();
       m_UpdateSelection(this->mpc_Ui->pc_TreeView->GetSelectedDataElements().size());
    }
    else
    {
-      this->mpc_Ui->pc_TreeView->expandAll();
       m_HandleHiding();
       if (this->mpc_Ui->pc_TreeView->IsEmpty() == true)
       {
@@ -272,15 +236,12 @@ void C_SdNdeDbSelectDataPools::m_OnSearch(const QString & orc_Text) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update number of selected items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update number of selected items
 
    \param[in] osn_SelectionCount Number of selected items
-
-   \created     01.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbSelectDataPools::m_UpdateSelection(const sintn osn_SelectionCount) const
 {
    if (this->mpc_Ui->pc_TreeView->IsEmpty() == true)

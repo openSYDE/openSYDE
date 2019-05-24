@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Transparent (except scroll bars) scroll area (implementation)
 
@@ -9,50 +8,41 @@
    but needs to exist, to have a unique group,
    to apply a specific stylesheet for.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.03.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QScrollBar>
 
 #include "C_OgeTransparentScrollArea.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     24.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeTransparentScrollArea::C_OgeTransparentScrollArea(QWidget * const opc_Parent) :
    QScrollArea(opc_Parent)
 {
@@ -61,13 +51,10 @@ C_OgeTransparentScrollArea::C_OgeTransparentScrollArea(QWidget * const opc_Paren
    this->horizontalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Deactivating the behaviour that the scrollarea will resize if the scroll bar will be showed or hided
-
-   \created     23.05.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Deactivating the behaviour that the scrollarea will resize if the scroll bar will be showed or hided
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTransparentScrollArea::DeactivateScrollbarResize(void)
 {
    // configure the scrollbar to stop resizing the widget when showing or hiding the scrollbar
@@ -78,7 +65,7 @@ void C_OgeTransparentScrollArea::DeactivateScrollbarResize(void)
            &C_OgeTransparentScrollArea::m_ScrollBarRangeChanged);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTransparentScrollArea::m_ScrollBarRangeChanged(const sintn osn_Min, const sintn osn_Max) const
 {
    // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar

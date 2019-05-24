@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Offers system view update specific visualization and functionality of a node. (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.06.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_GINODESYVUPDATE_H
 #define C_GINODESYVUPDATE_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 
 #include "C_SyvUtil.h"
@@ -27,12 +21,12 @@
 #include "C_GiSvNodeSyvBase.h"
 #include "C_SyvUpNodePropertiesDialog.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_GiSvNodeSyvUpdate :
    public C_GiSvNodeSyvBase
@@ -55,9 +49,12 @@ public:
    void ShowInfo(void);
    void UpdateInitialPackageStatus(const stw_opensyde_gui_logic::C_SyvUpDeviceInfo & orc_DeviceApplicationInfos);
    bool HasNoResponseAndIsActive(void) const;
-   bool IsStwDeviceAndActive(void) const;
+   bool IsActiveInView(void) const;
+   bool IsStwDevice(void) const;
+   void UpdateIcons(void);
 
    virtual void GenerateHint(void) override;
+   virtual void UpdateTransform(const QTransform & orc_Transform) override;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -82,15 +79,22 @@ private:
    C_GiSvNodeSyvUpdate & operator =(const C_GiSvNodeSyvUpdate &);
 
    void m_InitIcons(void);
-   void m_UpdateIcons(void);
+   bool m_CheckAlwaysUpdate(void) const;
+   bool m_CheckUpdateDisabledState(QString * const opc_TooltipText = NULL) const;
+   void m_RefreshDialog(void);
 
    bool mq_UpdateConnected;
    bool mq_UpdateInProgress;
    stw_opensyde_gui_logic::C_SyvUtil::E_NodeUpdateInitialStatus me_InitialStatus;
    E_UpdateStatus me_UpdateStatus;
    bool mq_UpdateFailed;
+   bool mq_UpdateSuccess;
+   bool mq_ValidStatus;
    stw_types::uint32 mu32_FailedApplicationIndex;
-   std::vector<stw_diag_lib::C_XFLECUInformation> mc_FileInfos;
+   std::vector<stw_diag_lib::C_XFLECUInformation> mc_HexFileInfos;
+   std::vector<QString> mc_ParamFileInfos;
+   std::vector<QString> mc_FileInfos;
+   std::vector<bool> mc_HexAppInfoAmiguous;
    const stw_opensyde_core::C_OSCSuSequences::C_XflDeviceInformation * mpc_STWDevice;
    const stw_opensyde_core::C_OSCSuSequences::C_OsyDeviceInformation * mpc_OSYDevice;
    C_GiInfo * mpc_IconTopLeft;
@@ -98,7 +102,7 @@ private:
    C_SyvUpNodePropertiesDialog * mpc_InfoDialog;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Handle save'n load for user settings (implementation)
 
    Handle save'n load for user settings
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     15.07.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QFileInfo>
@@ -25,44 +18,40 @@
 #include "C_Uti.h"
 #include "C_UsFiler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_opensyde_gui_logic;
 using namespace stw_scl;
 using namespace stw_types;
 using namespace stw_errors;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const std::string C_UsFiler::mhc_TRACE_COL_WIDTH_IDENTIFIER = "TraceColWidths";
 const std::string C_UsFiler::mhc_TRACE_COL_POSITION_IDENTIFIER = "TraceColPositions";
 const std::string C_UsFiler::mhc_MESSAGE_GENERATOR_IDENTIFIER = "MessageGeneratorColWidths";
 const std::string C_UsFiler::mhc_MESSAGE_GENERATOR_SIGNALS_IDENTIFIER = "MessageSignalsColWidths";
 const std::string C_UsFiler::mhc_MESSAGE_GENERATOR_SELECTION_IDENTIFIER = "MessageSelection";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Constructor
-
-   \created     15.07.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_UsFiler::C_UsFiler(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save all user setting to default ini file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save all user setting to default ini file
 
    \param[in] orc_UserSettings  User settings to save
    \param[in] orc_Path          File path
@@ -73,10 +62,8 @@ C_UsFiler::C_UsFiler(void)
    C_NO_ERR: OK
    C_RANGE:  Parameter invalid
    C_NOACT:  File open failed
-
-   \created     15.07.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_UsFiler::h_Save(const C_UsHandler & orc_UserSettings, const QString & orc_Path,
                          const QString & orc_ActiveProject)
 {
@@ -115,9 +102,8 @@ sint32 C_UsFiler::h_Save(const C_UsHandler & orc_UserSettings, const QString & o
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load all values of ini file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load all values of ini file
 
    If ini not existing set default values.
 
@@ -130,10 +116,8 @@ sint32 C_UsFiler::h_Save(const C_UsHandler & orc_UserSettings, const QString & o
    C_NO_ERR: OK
    C_RANGE:  Parameter invalid
    C_NOACT:  File open failed
-
-   \created     15.07.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_UsFiler::h_Load(C_UsHandler & orc_UserSettings, const QString & orc_Path, const QString & orc_ActiveProject)
 {
    sint32 s32_Retval;
@@ -167,16 +151,13 @@ sint32 C_UsFiler::h_Load(C_UsHandler & orc_UserSettings, const QString & orc_Pat
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save recent projects part of user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save recent projects part of user settings
 
    \param[in]     orc_UserSettings User settings
    \param[in,out] orc_Ini          Ini handler
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_SaveRecentProjects(const C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini)
 {
    QStringList c_List = orc_UserSettings.GetRecentProjects();
@@ -195,16 +176,13 @@ void C_UsFiler::mh_SaveRecentProjects(const C_UsHandler & orc_UserSettings, C_SC
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save project independent part of user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save project independent part of user settings
 
    \param[in]     orc_UserSettings User settings
    \param[in,out] orc_Ini          Ini handler
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_SaveProjectIndependentSection(const C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini)
 {
    //Screen position
@@ -245,18 +223,15 @@ void C_UsFiler::mh_SaveProjectIndependentSection(const C_UsHandler & orc_UserSet
    orc_Ini.WriteInteger("Settings", "PopOpenSection", static_cast<sint32>(orc_UserSettings.GetPopOpenSection()));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save project dependent part of user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save project dependent part of user settings
 
    \param[in]     orc_UserSettings User settings
    \param[in,out] orc_Ini          Ini handler
    \param[in] orc_ActiveProject    Actual project to save project specific settings
                                    Empty string results in saving no information
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini,
                                                const QString & orc_ActiveProject)
 {
@@ -289,16 +264,13 @@ void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSetti
    //lint -e1764 This function is necessary for future use so keep interface as necessary
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load INI recent projects section
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load INI recent projects section
 
    \param[in,out] orc_UserSettings User settings
    \param[in,out] orc_Ini          Current ini
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_LoadRecentProjects(C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini)
 {
    QStringList c_List;
@@ -330,16 +302,13 @@ void C_UsFiler::mh_LoadRecentProjects(C_UsHandler & orc_UserSettings, C_SCLIniFi
    orc_UserSettings.SetRecentProjects(c_List);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load INI project independent section
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load INI project independent section
 
    \param[in,out] orc_UserSettings User settings
    \param[in,out] orc_Ini          Current ini
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini)
 {
    QPoint c_Pos;
@@ -403,18 +372,15 @@ void C_UsFiler::mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings,
    orc_UserSettings.SetPopOpenSection(static_cast< C_UsHandler::E_SettingsSubSection>(s32_Value));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load INI project independent section
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load INI project independent section
 
    \param[in,out] orc_UserSettings  User settings
    \param[in,out] orc_Ini           Current ini
    \param[in]     orc_ActiveProject Actual project to load project specific settings.
                                     Empty string results in default values
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini,
                                                const QString & orc_ActiveProject)
 {
@@ -454,18 +420,15 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
    //lint -e1764 This function is necessary for future use so keep interface as necessary
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save columns
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save columns
 
    \param[in,out] orc_Ini                Current ini
    \param[in]     orc_SectionName        Section name
    \param[in]     orc_IdentifierBaseName Identifier base name
    \param[in]     orc_Columns            Columns
-
-   \created     12.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_SaveColumns(C_SCLIniFile & orc_Ini, const C_SCLString & orc_SectionName,
                                const std::string & orc_IdentifierBaseName, const std::vector<sint32> & orc_Columns)
 {
@@ -479,18 +442,15 @@ void C_UsFiler::mh_SaveColumns(C_SCLIniFile & orc_Ini, const C_SCLString & orc_S
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load columns
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load columns
 
    \param[in,out] orc_Ini                Current ini
    \param[in]     orc_SectionName        Section name
    \param[in]     orc_IdentifierBaseName Identifier base name
    \param[in,out] orc_Columns            Columns
-
-   \created     12.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_LoadColumns(C_SCLIniFile & orc_Ini, const C_SCLString & orc_SectionName,
                                const std::string & orc_IdentifierBaseName, std::vector<sint32> & orc_Columns)
 {

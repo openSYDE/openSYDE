@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       header for class C_XFLHexFile
 
    Comfort layer on top of the hex file class
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     xx.xx.20xx  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2002 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CXFLHexfileH
 #define CXFLHexfileH
 
@@ -24,12 +18,12 @@
 #include "SCLDynamicArray.h"
 #include "DiagLib_config.h"
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 namespace stw_diag_lib
 {
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///Comfort layer on top of the hex file class
 class STW_DIAGLIB_EXPORT C_XFLHexFile : public stw_hex_file::C_HexFile
 {
@@ -44,7 +38,7 @@ public:
    stw_types::sint32 CalcFileChecksum(stw_types::uint32 & oru32_Checksum);
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 }
 

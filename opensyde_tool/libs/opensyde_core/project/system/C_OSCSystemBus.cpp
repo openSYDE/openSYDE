@@ -1,52 +1,42 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Store bus
 
    Data container class for all information describing a bus.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     02.09.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_OSCSystemBus.h"
 
 #include "CSCLChecksums.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_scl;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     02.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCSystemBus::C_OSCSystemBus(void) :
    e_Type(eCAN),
    c_Name("NewBus"),
@@ -57,31 +47,25 @@ C_OSCSystemBus::C_OSCSystemBus(void) :
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     02.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCSystemBus::~C_OSCSystemBus(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
    It is not endian-safe, so it should only be used on the same system it is created on.
 
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
-
-   \created     21.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCSystemBus::CalcHash(uint32 & oru32_HashValue) const
 {
    C_SCLChecksums::CalcCRC32(&this->e_Type, sizeof(this->e_Type), oru32_HashValue);
@@ -92,9 +76,8 @@ void C_OSCSystemBus::CalcHash(uint32 & oru32_HashValue) const
    C_SCLChecksums::CalcCRC32(&this->u16_RxTimeoutOffsetMs, sizeof(this->u16_RxTimeoutOffsetMs), oru32_HashValue);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Compare bus names for greater
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Compare bus names for greater
 
    Buses are compared by name.
    Primary sorting criteria: Name length: Shortest first
@@ -106,10 +89,8 @@ void C_OSCSystemBus::CalcHash(uint32 & oru32_HashValue) const
    \return
    true:  Bus 1 smaller than Bus 2
    false: Else
-
-   \created     05.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCSystemBus::h_CompareNameGreater(const C_OSCSystemBus & orc_Bus1, const C_OSCSystemBus & orc_Bus2)
 {
    bool q_Retval;
@@ -125,17 +106,14 @@ bool C_OSCSystemBus::h_CompareNameGreater(const C_OSCSystemBus & orc_Bus1, const
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if bus ID invalid
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if bus ID invalid
 
    \return
    true  Error
    false No error
-
-   \created     10.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCSystemBus::CheckErrorBusId(void) const
 {
    return (this->u8_BusID > 15);

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Project data file handler for can monitor (implementation)
 
    Project data file handler for can monitor
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     26.11.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -25,35 +18,32 @@
 #include "C_CamProHandlerFiler.h"
 #include "C_Uti.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_scl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle technical save operations for project
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle technical save operations for project
 
    \param[in]     orc_Handler   Data
    \param[in,out] orc_XMLParser XML parser to store in
-
-   \created     26.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandlerFiler::h_Save(const C_CamProHandler & orc_Handler, C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_XMLParser.CreateAndSelectNodeChild("opensyde-can-monitor-configuration");
@@ -73,9 +63,8 @@ void C_CamProHandlerFiler::h_Save(const C_CamProHandler & orc_Handler, C_OSCXMLP
    tgl_assert(orc_XMLParser.SelectNodeParent() == "opensyde-can-monitor-configuration");
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle technical load operations for project
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle technical load operations for project
 
    \param[out]    orc_Handler   Data
    \param[in,out] orc_XMLParser XML parser to load from
@@ -83,10 +72,8 @@ void C_CamProHandlerFiler::h_Save(const C_CamProHandler & orc_Handler, C_OSCXMLP
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     26.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamProHandlerFiler::h_Load(C_CamProHandler & orc_Handler, C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -126,16 +113,13 @@ sint32 C_CamProHandlerFiler::h_Load(C_CamProHandler & orc_Handler, C_OSCXMLParse
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save messages
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save messages
 
    \param[in]     orc_Messages  Data
    \param[in,out] orc_XMLParser XML parser to load from
-
-   \created     26.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandlerFiler::h_SaveMessages(const std::vector<C_CamProMessageData> & orc_Messages,
                                           C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -149,16 +133,13 @@ void C_CamProHandlerFiler::h_SaveMessages(const std::vector<C_CamProMessageData>
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save message
 
    \param[in]     orc_Message   Data
    \param[in,out] orc_XMLParser XML parser to load from
-
-   \created     26.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandlerFiler::h_SaveMessage(const C_CamProMessageData & orc_Message, C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_XMLParser.SetAttributeUint32("ID", orc_Message.u32_ID);
@@ -181,9 +162,8 @@ void C_CamProHandlerFiler::h_SaveMessage(const C_CamProMessageData & orc_Message
    orc_XMLParser.CreateNodeChild("database", orc_Message.c_DataBaseFilePath);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load messages
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load messages
 
    \param[out]    orc_Messages  Data
    \param[in,out] orc_XMLParser XML parser to load from
@@ -191,10 +171,8 @@ void C_CamProHandlerFiler::h_SaveMessage(const C_CamProMessageData & orc_Message
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     26.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamProHandlerFiler::h_LoadMessages(std::vector<C_CamProMessageData> & orc_Messages,
                                             C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -241,9 +219,8 @@ sint32 C_CamProHandlerFiler::h_LoadMessages(std::vector<C_CamProMessageData> & o
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load message
 
    \param[out]    orc_Message   Data
    \param[in,out] orc_XMLParser XML parser to load from
@@ -251,10 +228,8 @@ sint32 C_CamProHandlerFiler::h_LoadMessages(std::vector<C_CamProMessageData> & o
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     26.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamProHandlerFiler::h_LoadMessage(C_CamProMessageData & orc_Message, C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -413,16 +388,13 @@ sint32 C_CamProHandlerFiler::h_LoadMessage(C_CamProMessageData & orc_Message, C_
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save settings section.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save settings section.
 
    \param[in]     orc_Handler   Data
    \param[in,out] orc_XMLParser XML parser to store in
-
-   \created     30.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandlerFiler::h_SaveSettings(const C_CamProHandler & orc_Handler, C_OSCXMLParserBase & orc_XMLParser)
 {
    // CAN DLL configuration
@@ -453,9 +425,8 @@ void C_CamProHandlerFiler::h_SaveSettings(const C_CamProHandler & orc_Handler, C
    orc_XMLParser.SelectNodeParent();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load settings section.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load settings section.
 
    \param[out]    orc_Handler   Data
    \param[in,out] orc_XMLParser XML parser to load from
@@ -463,10 +434,8 @@ void C_CamProHandlerFiler::h_SaveSettings(const C_CamProHandler & orc_Handler, C
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     30.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamProHandlerFiler::h_LoadSettings(C_CamProHandler & orc_Handler, C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -550,16 +519,13 @@ sint32 C_CamProHandlerFiler::h_LoadSettings(C_CamProHandler & orc_Handler, C_OSC
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save filters.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save filters.
 
-   \param[in]     orc_Filters   Data
+   \param[in]     orc_Filters   Filters data
    \param[in,out] orc_XMLParser XML parser to load from
-
-   \created     05.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandlerFiler::h_SaveFilters(const std::vector<C_CamProFilterData> & orc_Filters,
                                          C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -573,16 +539,13 @@ void C_CamProHandlerFiler::h_SaveFilters(const std::vector<C_CamProFilterData> &
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save filter.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save filter.
 
-   \param[in]     orc_Filter   Data
+   \param[in]     orc_Filter    Filter data
    \param[in,out] orc_XMLParser XML parser to load from
-
-   \created     05.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandlerFiler::h_SaveFilter(const C_CamProFilterData & orc_Filter, C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_XMLParser.SetAttributeBool("active", orc_Filter.q_Enabled);
@@ -604,16 +567,13 @@ void C_CamProHandlerFiler::h_SaveFilter(const C_CamProFilterData & orc_Filter, C
    orc_XMLParser.SelectNodeParent();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save filter item.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save filter item.
 
-   \param[in]     orc_FilterItem    Data
+   \param[in]     orc_FilterItem    Filter item data
    \param[in,out] orc_XMLParser     XML parser to load from
-
-   \created     05.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandlerFiler::h_SaveFilterItem(const C_CamProFilterItemData & orc_FilterItem,
                                             C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -625,20 +585,17 @@ void C_CamProHandlerFiler::h_SaveFilterItem(const C_CamProFilterItemData & orc_F
    orc_XMLParser.SetAttributeBool("extended-ID", static_cast<bool>(orc_FilterItem.u8_ExtendedId));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load filters.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load filters.
 
-   \param[out]    orc_Filters   Data
+   \param[out]    orc_Filters   Filters data
    \param[in,out] orc_XMLParser XML parser to load from
 
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     05.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamProHandlerFiler::h_LoadFilters(std::vector<C_CamProFilterData> & orc_Filters,
                                            C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -686,20 +643,17 @@ sint32 C_CamProHandlerFiler::h_LoadFilters(std::vector<C_CamProFilterData> & orc
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load filter.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load filter.
 
-   \param[out]    orc_Filter     Data
+   \param[out]    orc_Filter     Filter data
    \param[in,out] orc_XMLParser  XML parser to load from
 
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     05.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamProHandlerFiler::h_LoadFilter(C_CamProFilterData & orc_Filter, C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -785,20 +739,17 @@ sint32 C_CamProHandlerFiler::h_LoadFilter(C_CamProFilterData & orc_Filter, C_OSC
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load filter.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load filter.
 
-   \param[out]    orc_Filter     Data
-   \param[in,out] orc_XMLParser  XML parser to load from
+   \param[out]    orc_FilterItem    Filter item data
+   \param[in,out] orc_XMLParser     XML parser to load from
 
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     05.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamProHandlerFiler::h_LoadFilterItem(C_CamProFilterItemData & orc_FilterItem,
                                               const C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -863,16 +814,13 @@ sint32 C_CamProHandlerFiler::h_LoadFilterItem(C_CamProFilterItemData & orc_Filte
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save databases.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save databases.
 
-   \param[in]     orc_databases   Data
+   \param[in]     orc_Databases   Databases data
    \param[in,out] orc_XMLParser   XML parser to load from
-
-   \created     17.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandlerFiler::h_SaveDatabases(const std::vector<C_CamProDatabaseData> & orc_Databases,
                                            C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -886,16 +834,13 @@ void C_CamProHandlerFiler::h_SaveDatabases(const std::vector<C_CamProDatabaseDat
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save filter.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save filter.
 
-   \param[in]     orc_Database   Data
+   \param[in]     orc_Database   Database data
    \param[in,out] orc_XMLParser  XML parser to load from
-
-   \created     17.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandlerFiler::h_SaveDatabase(const C_CamProDatabaseData & orc_Database, C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_XMLParser.SetAttributeBool("active", orc_Database.q_Enabled);
@@ -903,20 +848,17 @@ void C_CamProHandlerFiler::h_SaveDatabase(const C_CamProDatabaseData & orc_Datab
    orc_XMLParser.CreateNodeChild("name", orc_Database.c_Name.toStdString().c_str());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load databases.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load databases.
 
-   \param[out]    orc_databases   Data
+   \param[out]    orc_Databases   Databases data
    \param[in,out] orc_XMLParser   XML parser to load from
 
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     17.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamProHandlerFiler::h_LoadDatabases(std::vector<C_CamProDatabaseData> & orc_Databases,
                                              C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -965,20 +907,17 @@ sint32 C_CamProHandlerFiler::h_LoadDatabases(std::vector<C_CamProDatabaseData> &
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load database.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load database.
 
-   \param[out]    orc_Database     Data
+   \param[out]    orc_Database     Database data
    \param[in,out] orc_XMLParser    XML parser to load from
 
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     17.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamProHandlerFiler::h_LoadDatabase(C_CamProDatabaseData & orc_Database, C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -1015,16 +954,13 @@ sint32 C_CamProHandlerFiler::h_LoadDatabase(C_CamProDatabaseData & orc_Database,
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save settings section.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save settings section.
 
-   \param[in]     orc_Handler   Data
-   \param[in,out] orc_XMLParser XML parser to store in
-
-   \created     16.01.2019  STW/G.Landsgesell
+   \param[in]     orc_LoggingData   Logging data
+   \param[in,out] orc_XMLParser     XML parser to store in
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandlerFiler::h_SaveLoggingConfig(const C_CamProLoggingData & orc_LoggingData,
                                                C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -1036,20 +972,17 @@ void C_CamProHandlerFiler::h_SaveLoggingConfig(const C_CamProLoggingData & orc_L
    orc_XMLParser.CreateNodeChild("file-name", orc_LoggingData.c_FileName.toStdString().c_str());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load logging configuration.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load logging configuration.
 
-   \param[out]    orc_Database     Data
-   \param[in,out] orc_XMLParser    XML parser to load from
+   \param[out]    orc_LoggingData   Logging data
+   \param[in,out] orc_XMLParser     XML parser to load from
 
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     16.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamProHandlerFiler::h_LoadLoggingConfig(C_CamProLoggingData & orc_LoggingData,
                                                  C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -1109,13 +1042,10 @@ sint32 C_CamProHandlerFiler::h_LoadLoggingConfig(C_CamProLoggingData & orc_Loggi
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     26.11.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamProHandlerFiler::C_CamProHandlerFiler(void)
 {
 }

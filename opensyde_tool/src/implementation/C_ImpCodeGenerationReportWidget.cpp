@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Dialog for code generation report (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     16.10.2018  STW/G.Landsgesell (copied and adapted from data pool list import)
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QFileInfo>
@@ -23,30 +16,29 @@
 #include "C_ImpCodeGenerationReportWidget.h"
 #include "ui_C_ImpCodeGenerationReportWidget.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_ImpCodeGenerationReportWidget::mhc_HTML_TABLE_HEADER_START =
    "<td align=\"left\" valign=\"top\" style=\"padding: 5px 18px 5px 0px;white-space:pre;font-weight:bold;\">";
 const QString C_ImpCodeGenerationReportWidget::mhc_HTML_TABLE_DATA_START =
    "<td align=\"left\" valign=\"top\" style=\"padding: 5px 18px 5px 0px;white-space:pre;\">";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -55,10 +47,8 @@ const QString C_ImpCodeGenerationReportWidget::mhc_HTML_TABLE_DATA_START =
    \param[in]     ou32_DataPoolIndex  Data pool index
    \param[in]     ou32_InterfaceIndex Interface index
    \param[in]     orc_FilePath        Loaded file path
-
-   \created     16.10.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_ImpCodeGenerationReportWidget::C_ImpCodeGenerationReportWidget(
    stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
    QWidget(&orc_Parent),
@@ -81,40 +71,31 @@ C_ImpCodeGenerationReportWidget::C_ImpCodeGenerationReportWidget(
            &C_ImpCodeGenerationReportWidget::m_OkClicked);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     16.10.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_ImpCodeGenerationReportWidget::~C_ImpCodeGenerationReportWidget(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     13.04.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_ImpCodeGenerationReportWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelHeadingReport->setText(C_GtGetText::h_GetText("Details"));
    this->mpc_Ui->pc_BushButtonOk->setText(C_GtGetText::h_GetText("OK"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create report for code generation in HTML.
-
-   \created     16.10.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create report for code generation in HTML.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_ImpCodeGenerationReportWidget::CreateReport(const std::list<QString> & orc_ExportedFiles) const
 {
    QString c_MessageResultText;
@@ -173,17 +154,14 @@ void C_ImpCodeGenerationReportWidget::CreateReport(const std::list<QString> & or
    this->mpc_Ui->pc_TextBrowserReport->setHtml(c_MessageResultText);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     16.10.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_ImpCodeGenerationReportWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
@@ -209,13 +187,10 @@ void C_ImpCodeGenerationReportWidget::keyPressEvent(QKeyEvent * const opc_KeyEve
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of OK button click
-
-   \created     16.10.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of OK button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_ImpCodeGenerationReportWidget::m_OkClicked(void)
 {
    this->mrc_ParentDialog.accept();

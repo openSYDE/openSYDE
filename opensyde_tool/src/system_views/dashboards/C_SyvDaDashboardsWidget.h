@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for system view dashboards
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVDADASHBOARDSWIDGET_H
 #define C_SYVDADASHBOARDSWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 #include <QTimer>
 
@@ -24,8 +17,9 @@
 #include "C_OgeWiHover.h"
 #include "C_SyvComDriverDiag.h"
 #include "C_SyvDaDashboardToolbox.h"
+#include "C_SyvComDriverDiagConnect.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace Ui
 {
@@ -34,9 +28,9 @@ class C_SyvDaDashboardsWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SyvDaDashboardsWidget :
    public QWidget
@@ -58,9 +52,11 @@ public:
    bool GetEditMode(void) const;
 
    bool GetConnectActive(void) const;
-   stw_types::sint32 SetConnectActive(const bool oq_Value);
+   void SetConnectActive(const bool oq_Value);
 
+   bool PrepareToClose(void) const;
    void CheckError(void) const;
+   void OnPushButtonConnectPress(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -68,8 +64,10 @@ public:
 Q_SIGNALS:
    //lint -restore
    void SigChanged(void);
-   void SigEditModeClosed(void);
-   void SigSetPushButtonIcon(const QString & orc_IconPath);
+   void SigNumberDashboardsChanged(void);
+   void SigSetConfigurationAvailable(const bool oq_State);
+   void SigSetDarkModePushButtonIcon(const QString & orc_IconPath);
+   void SigSetConnectPushButtonIcon(const QString & orc_IconPath, const bool oq_DisplayAnimation);
    void SigBlockDragAndDrop(const bool oq_Block);
 
 protected:
@@ -92,16 +90,28 @@ private:
    void m_UpdateShowValues(void) const;
 
    stw_types::sint32 m_InitOsyDriver(QString & orc_Message);
-   stw_types::sint32 m_InitNodes(QString & orc_Message, QString & orc_MessageDetails);
    void m_CloseOsyDriver(void);
 
    void m_DataPoolWrite(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint8 ou8_DataPoolIndex,
                         const stw_types::uint16 ou16_ListIndex, const stw_types::uint16 ou16_ElementIndex);
    void m_DataPoolRead(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Index);
+   void m_NvmReadList(const stw_opensyde_core::C_OSCNodeDataPoolListId & orc_Index);
    void m_HandleManualOperationFinished(const stw_types::sint32 os32_Result, const stw_types::uint8 ou8_NRC);
+   void m_ConnectStepFinished(void);
+   void m_HandleConnectionResult(const stw_types::sint32 os32_Result, const QString & orc_Message,
+                                 const QString & orc_MessageDetails);
+
+   enum E_ConnectState
+   {
+      eCS_DISCONNECTED,
+      eCS_CONNECTING,
+      eCS_CONNECTED,
+      eCS_DISCONNECTING
+   };
 
    Ui::C_SyvDaDashboardsWidget * mpc_Ui;
    stw_opensyde_gui_logic::C_SyvComDriverDiag * mpc_ComDriver;
+   stw_opensyde_gui_logic::C_SyvComDriverDiagConnect * const mpc_ConnectionThread;
    stw_opensyde_gui_elements::C_OgeWiHover * mpc_Toolbox;
    QWidget * const mpc_ToolboxParent;
    C_SyvDaDashboardToolbox * mpc_ToolboxContent;
@@ -109,8 +119,10 @@ private:
    stw_types::uint32 mu32_ViewIndex;
    bool mq_EditModeActive;
    bool mq_ConnectActive;
+   std::set<stw_opensyde_core::C_OSCNodeDataPoolListId> mc_MissedReadNvmOperations;
    std::set<stw_opensyde_core::C_OSCNodeDataPoolListElementId> mc_MissedReadOperations;
    std::set<stw_opensyde_core::C_OSCNodeDataPoolListElementId> mc_MissedWriteOperations;
+   E_ConnectState me_ConnectState;
    static stw_types::uint32 mhu32_DisconnectTime;
    static const QString mhc_DarkModeEnabledIconPath;
    static const QString mhc_DarkModeDisabledIconPath;

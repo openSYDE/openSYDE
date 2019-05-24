@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       A concrete node selector widget for C_SdBueNodeSelectorCheckBoxListWidget (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     07.05.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SdBueNodeSelectorCheckBoxItemWidget.h"
 #include "ui_C_SdBueNodeSelectorCheckBoxItemWidget.h"
 
@@ -24,28 +17,27 @@
 #include "C_GtGetText.h"
 #include "TGLUtils.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -53,10 +45,8 @@ using namespace stw_opensyde_gui_logic;
    \param[in]     ou32_InterfaceIndex Index of node interface
    \param[in]     orc_Name            Name of node
    \param[in,out] opc_Parent          Optional pointer to parent
-
-   \created     07.05.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueNodeSelectorCheckBoxItemWidget::C_SdBueNodeSelectorCheckBoxItemWidget(const stw_types::uint32 ou32_NodeIndex,
                                                                              const stw_types::uint32 ou32_InterfaceIndex, const QString & orc_Name,
                                                                              QWidget * const opc_Parent) :
@@ -90,28 +80,22 @@ C_SdBueNodeSelectorCheckBoxItemWidget::C_SdBueNodeSelectorCheckBoxItemWidget(con
    this->UpdateToolTip();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     07.05.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueNodeSelectorCheckBoxItemWidget::~C_SdBueNodeSelectorCheckBoxItemWidget()
 {
    delete mpc_Ui;
    //lint -e{1740}  no memory leak because of the parent of mpc_CheckBox and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     23.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxItemWidget::InitStaticNames(void) const
 {
    //Tool tips
@@ -120,62 +104,50 @@ void C_SdBueNodeSelectorCheckBoxItemWidget::InitStaticNames(void) const
                                                                "Import messages and signals from standard file formats (*.dbc, *.eds, *.dcf)"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the configured indexes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the configured indexes
 
    \param[out]    ou32_Index       First index
    \param[out]    ou32_SubIndex    Second index
-
-   \created     07.05.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxItemWidget::GetIndexes(stw_types::uint32 & oru32_Index,
                                                        stw_types::uint32 & oru32_SubIndex) const
 {
    this->mpc_CheckBox->GetIndexes(oru32_Index, oru32_SubIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Setting checked state of check box
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Setting checked state of check box
 
    \param[in]     oq_Checked       Check flag
-
-   \created     07.05.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxItemWidget::SetChecked(const bool oq_Checked)
 {
    this->mpc_CheckBox->setChecked(oq_Checked);
    this->m_AdaptIcon(oq_Checked);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returning the check state of the check box
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returning the check state of the check box
 
    \return
    true: checked
    false: not checked
-
-   \created     07.05.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdBueNodeSelectorCheckBoxItemWidget::IsChecked(void) const
 {
    return this->mpc_CheckBox->isChecked();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the actual protocol to mark the protocol using nodes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the actual protocol to mark the protocol using nodes
 
    \param[in]     oe_Protocol     Protocol id
-
-   \created     09.05.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxItemWidget::SetProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol)
 {
    this->me_ProtocolType = oe_Protocol;
@@ -183,13 +155,10 @@ void C_SdBueNodeSelectorCheckBoxItemWidget::SetProtocol(const stw_opensyde_core:
    this->UpdateToolTip();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the tool tip of the widget
-
-   \created     09.05.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the tool tip of the widget
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxItemWidget::UpdateToolTip(void)
 {
    uint32 u32_NodeIndex;
@@ -288,7 +257,7 @@ void C_SdBueNodeSelectorCheckBoxItemWidget::UpdateToolTip(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxItemWidget::m_NodeToggled(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
                                                           const bool oq_Checked)
 {
@@ -297,7 +266,7 @@ void C_SdBueNodeSelectorCheckBoxItemWidget::m_NodeToggled(const uint32 ou32_Node
    Q_EMIT this->SigNodeToggled(ou32_NodeIndex, ou32_InterfaceIndex, oq_Checked);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxItemWidget::m_ImportClicked(void)
 {
    uint32 u32_NodeIndex;
@@ -308,15 +277,12 @@ void C_SdBueNodeSelectorCheckBoxItemWidget::m_ImportClicked(void)
    Q_EMIT this->SigComImport(u32_NodeIndex, u32_InterfaceIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapts the icon of the check box
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapts the icon of the check box
 
    \param[in]     oq_Checked      Flag if check box is checked
-
-   \created     07.05.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxItemWidget::m_AdaptIcon(const bool oq_Checked)
 {
    if (oq_Checked == true)

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for update PieChart (implementation)
 
    Widget for update PieChart
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.02.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
@@ -25,34 +18,31 @@
 #include "CSCLString.h"
 #include "C_SyvUpPieChart.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvUpPieChart::mhc_FilePath = "../../src/images/custom.gif";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     22.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvUpPieChart::C_SyvUpPieChart(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mu16_ValueInPercent(0),
@@ -74,30 +64,24 @@ C_SyvUpPieChart::C_SyvUpPieChart(QWidget * const opc_Parent) :
    connect(this->mpc_Movie, &QMovie::frameChanged, this, &C_SyvUpPieChart::m_OnFrameChanged);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     28.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvUpPieChart::~C_SyvUpPieChart(void)
 {
    delete (mpc_Movie);
    mpc_Movie = NULL;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update progress value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update progress value
 
    \param[in] ou16_Progress100 Progress in percent
-
-   \created     23.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPieChart::SetProgress100(const uint16 ou16_Progress100, const bool oq_Finished)
 {
    this->mu16_ValueInPercent = ou16_Progress100;
@@ -109,32 +93,26 @@ void C_SyvUpPieChart::SetProgress100(const uint16 ou16_Progress100, const bool o
    this->update();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set active color
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set active color
 
    \param[in] orc_Value New active color
-
-   \created     26.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPieChart::SetActiveColor(const QColor & orc_Value)
 {
    this->mc_ActiveColor = orc_Value;
    this->update();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overrided paint event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overrided paint event
 
    Draws the element
 
    \param[in,out] opc_Event  Pointer to paint event
-
-   \created     22.02.2018  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPieChart::paintEvent(QPaintEvent * const opc_Event)
 {
    const QRect c_CompleteRect = this->rect();
@@ -156,7 +134,7 @@ void C_SyvUpPieChart::paintEvent(QPaintEvent * const opc_Event)
       const QBrush c_BackgroundBrush(mc_STYLE_GUIDE_COLOR_10);
       const QBrush c_ForegroundBrush(mc_STYLE_GUIDE_COLOR_0);
       const QBrush c_PieBrush(mc_ActiveColor);
-      const QPen c_Pen(mc_STYLE_GUIDE_COLOR_8);
+      const QPen c_Pen(mc_STYLE_GUIDE_COLOR_1);
       QFont c_Font;
       QRect c_Rect;
       stw_types::sint16 s16_StartAngle;
@@ -206,13 +184,10 @@ void C_SyvUpPieChart::paintEvent(QPaintEvent * const opc_Event)
    QWidget::paintEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle frame changed
-
-   \created     26.02.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle frame changed
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPieChart::m_OnFrameChanged(void)
 {
    this->update();

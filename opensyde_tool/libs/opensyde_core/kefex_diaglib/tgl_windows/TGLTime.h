@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       DiagLib Target Glue Layer: Time functions
@@ -7,19 +7,13 @@
    - system timestamps
    - active delays
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.07.2009  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef TGLTIMEH
 #define TGLTIMEH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 
 #ifndef TGL_PACKAGE
@@ -30,12 +24,12 @@
 #endif
 #endif
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_tgl
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_TGLDateTime
 {
 public:
@@ -55,7 +49,7 @@ void TGL_PACKAGE TGL_Sleep(const stw_types::uint32 ou32_NumberMs);
 stw_types::uint32 TGL_PACKAGE TGL_GetTickCount(void);
 stw_types::uint64 TGL_PACKAGE TGL_GetTickCountUS(void);
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

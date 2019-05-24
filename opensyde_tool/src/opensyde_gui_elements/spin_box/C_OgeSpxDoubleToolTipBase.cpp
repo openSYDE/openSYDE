@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Double spin box with tool tip and custom context menu (implementation)
 
    Double spin box with tool tip and custom context menu
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     26.03.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QEvent>
@@ -25,34 +18,31 @@
 #include "C_GtGetText.h"
 #include "C_OgeSpxDoubleToolTipBase.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     26.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeSpxDoubleToolTipBase::C_OgeSpxDoubleToolTipBase(QWidget * const opc_Parent) :
    C_OgeSpxDoubleDynamicDecimalsBase(opc_Parent),
    C_OgeSpxAllBase(),
@@ -63,9 +53,8 @@ C_OgeSpxDoubleToolTipBase::C_OgeSpxDoubleToolTipBase(QWidget * const opc_Parent)
    m_InitContextMenu();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten default event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten default event slot
 
    Here: Handle tool tip
 
@@ -74,129 +63,103 @@ C_OgeSpxDoubleToolTipBase::C_OgeSpxDoubleToolTipBase(QWidget * const opc_Parent)
    \return
    True  Event was recognized and processed
    False Event ignored
-
-   \created     26.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OgeSpxDoubleToolTipBase::event(QEvent * const opc_Event)
 {
    return this->m_HandleEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set minimum value (simple wrapper with tool tip update)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set minimum value (simple wrapper with tool tip update)
 
    \param[in] of64_Value New minimum value
-
-   \created     02.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxDoubleToolTipBase::SetMinimumCustom(const stw_types::float64 of64_Value)
 {
    this->setMinimum(of64_Value);
    this->ActivateDefaultToolTip();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set maximum value (simple wrapper with tool tip update)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set maximum value (simple wrapper with tool tip update)
 
    \param[in] of64_Value New maximum value
-
-   \created     02.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxDoubleToolTipBase::SetMaximumCustom(const stw_types::float64 of64_Value)
 {
    this->setMaximum(of64_Value);
    this->ActivateDefaultToolTip();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get enabled status
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get enabled status
 
    \return
    Enabled status
-
-   \created     20.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OgeSpxDoubleToolTipBase::m_IsEnabled(void) const
 {
    return this->isEnabled();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get minimum as string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get minimum as string
 
    \return
    Minimum as string
-
-   \created     20.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_OgeSpxDoubleToolTipBase::m_GetMinimum(void) const
 {
    return QString::number(this->minimum());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get maximum as string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get maximum as string
 
    \return
    Maximum as string
-
-   \created     20.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_OgeSpxDoubleToolTipBase::m_GetMaximum(void) const
 {
    return QString::number(this->maximum());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set mouse tracking status
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set mouse tracking status
 
    \param[in] oq_Active New mouse tracking status
-
-   \created     20.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxDoubleToolTipBase::m_SetMouseTracking(const bool oq_Active)
 {
    this->setMouseTracking(oq_Active);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Call base event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Call base event slot
 
    \param[in,out] opc_Event Event identification and information
 
    \return
    True  Event was recognized and processed
    False Event ignored
-
-   \created     20.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OgeSpxDoubleToolTipBase::m_CallBaseEvent(QEvent * const opc_Event)
 {
    return C_OgeSpxDoubleDynamicDecimalsBase::event(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize custom context menu functionality
-
-   \created     18.05.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize custom context menu functionality
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxDoubleToolTipBase::m_InitContextMenu(void)
 {
    this->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -205,13 +168,10 @@ void C_OgeSpxDoubleToolTipBase::m_InitContextMenu(void)
            &C_OgeSpxDoubleToolTipBase::m_OnCustomContextMenuRequested);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Setup context menu entries
-
-   \created     18.05.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Setup context menu entries
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxDoubleToolTipBase::m_SetupContextMenu(void)
 {
    // reset to empty menu
@@ -274,15 +234,12 @@ void C_OgeSpxDoubleToolTipBase::m_SetupContextMenu(void)
                                     &C_OgeSpxDoubleToolTipBase::stepDown);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show custom context menu
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show custom context menu
 
    \param[in] orc_Pos Local context menu position
-
-   \created     18.05.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxDoubleToolTipBase::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 {
    m_SetupContextMenu(); // setup the custom menu here to have real "is-read-only" information
@@ -290,91 +247,73 @@ void C_OgeSpxDoubleToolTipBase::m_OnCustomContextMenuRequested(const QPoint & or
    this->mpc_ContextMenu->popup(c_PosGlobal);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Call line edit undo.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Call line edit undo.
 
    For custom context menu we need access to the line edit
    functions of the spin box.
-
-   \created     18.05.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxDoubleToolTipBase::m_Undo() const
 {
    this->lineEdit()->undo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Call line edit redo.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Call line edit redo.
 
    For custom context menu we need access to the line edit
    functions of the spin box.
-
-   \created     18.05.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxDoubleToolTipBase::m_Redo() const
 {
    this->lineEdit()->redo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Call line edit cut.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Call line edit cut.
 
    For custom context menu we need access to the line edit
    functions of the spin box.
-
-   \created     18.05.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxDoubleToolTipBase::m_Cut() const
 {
    this->lineEdit()->cut();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Call line edit copy.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Call line edit copy.
 
    For custom context menu we need access to the line edit
    functions of the spin box.
-
-   \created     18.05.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxDoubleToolTipBase::m_Copy() const
 {
    this->lineEdit()->copy();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Call line edit paste.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Call line edit paste.
 
    For custom context menu we need access to the line edit
    functions of the spin box.
-
-   \created     18.05.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxDoubleToolTipBase::m_Paste() const
 {
    this->lineEdit()->paste();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Call line edit delete.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Call line edit delete.
 
    For custom context menu we need access to the line edit
    functions of the spin box.
-
-   \created     18.05.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxDoubleToolTipBase::m_Delete() const
 {
    this->lineEdit()->del();

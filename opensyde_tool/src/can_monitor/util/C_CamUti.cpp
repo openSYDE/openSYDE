@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       CAN monitor utility functions. (implementation)
 
    CAN monitor utility functions
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     05.02.2019  STW/G.Landsgesell
-   \endimplementation
+   \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QDir>
@@ -27,35 +20,32 @@
 #include "C_OgeWiCustomMessage.h"
 #include "C_GtGetText.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Always get absolute path from path relative to project file.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Always get absolute path from path relative to project file.
 
    \param[in]  orc_Path     Absolute or relative path
 
    \return
    Absolute path
-
-   \created     11.02.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_CamUti::h_GetAbsPathFromProj(const QString & orc_Path)
 {
    QString c_Folder = C_CamProHandler::h_GetInstance()->GetCurrentProjDir(); // always absolute or empty
@@ -69,9 +59,8 @@ QString C_CamUti::h_GetAbsPathFromProj(const QString & orc_Path)
    return C_Uti::h_ConcatPathIfNecessary(c_Folder, orc_Path);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle paths after file save dialog.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle paths after file save dialog.
 
    Check if path could be made relative and ask user if he wants to save the path
    relative or absolute.
@@ -88,10 +77,8 @@ QString C_CamUti::h_GetAbsPathFromProj(const QString & orc_Path)
 
    \return
    path the user wants to save
-
-   \created     11.02.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_CamUti::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const QString & orc_Path,
                                               const QString & orc_AbsoluteReferenceDir)
 {

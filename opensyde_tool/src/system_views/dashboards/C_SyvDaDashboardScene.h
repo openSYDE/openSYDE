@@ -1,26 +1,21 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Main graphics scene for a concrete dashboard (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVDADASHBOARDSCENE_H
 #define C_SYVDADASHBOARDSCENE_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <C_OgeChaChartBase.h>
 #include <QTimer>
 
+#include "C_GiSvDaParam.h"
 #include "C_GiSvDaArrow.h"
 #include "C_GiSvDaBoundary.h"
 #include "C_GiSvDaRectBaseGroup.h"
@@ -33,12 +28,12 @@
 #include "C_SyvDaContextMenuManager.h"
 #include "C_SyvComDriverDiag.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SyvDaDashboardScene :
    public C_SebScene
@@ -53,6 +48,7 @@ public:
    virtual bool IsMousePosRelevantForProxyWidgetInteraction(const QPointF & orc_ScenePos) override;
 
    void SetEditMode(const bool oq_Active);
+   void SetDrawingActive(const bool oq_Active) const;
    void SetDashboardIndex(const stw_types::uint32 ou32_DashboardIndex);
    void Load(void);
    void Save(void) const;
@@ -100,6 +96,7 @@ Q_SIGNALS:
    void SigDataPoolWrite(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint8 ou8_DataPoolIndex,
                          const stw_types::uint16 ou16_ListIndex, const stw_types::uint16 ou16_ElementIndex);
    void SigDataPoolRead(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Index);
+   void SigNvmReadList(const stw_opensyde_core::C_OSCNodeDataPoolListId & orc_Id);
 
 protected:
    virtual stw_opensyde_gui_logic::C_SebUnoBaseManager * m_GetUndoManager(void) override;
@@ -116,6 +113,7 @@ protected:
    virtual void m_Cut(void);
    virtual bool m_IsPastePossible(void);
    virtual bool m_IsUndoAvailable(void) const;
+   virtual bool m_HandleDeleteUserConfirmation(const QList<QGraphicsItem *> & orc_SelectedItems) const override;
 
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
    //lint -save -e1960
@@ -132,6 +130,7 @@ private:
    void m_OnWidgetEditProperties(QGraphicsItem * const opc_Item) const;
 
    //Connects
+   void m_AddParamWidgetToScene(C_GiSvDaParam * const opc_Item);
    void m_AddWidgetToScene(C_GiSvDaRectBaseGroup * const opc_Item);
 
    void m_RemoveWidgetOfScene(C_GiSvDaRectBaseGroup * const opc_Item);
@@ -164,7 +163,7 @@ private:
    bool mq_DarkModeInitialized;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

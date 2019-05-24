@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for system view dashboard widget properties (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     05.09.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <climits>
@@ -33,7 +26,7 @@
 #include "C_PuiSvHandler.h"
 #include "ui_C_SyvDaPeBase.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -42,7 +35,7 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const sintn C_SyvDaPeBase::mhsn_INDEX_MANUAL = 0;
 const sintn C_SyvDaPeBase::mhsn_INDEX_ON_CHANGE = 1;
 const sintn C_SyvDaPeBase::mhsn_INDEX_THEME_OPENSYDE = 0;
@@ -50,19 +43,18 @@ const sintn C_SyvDaPeBase::mhsn_INDEX_THEME_OPENSYDE_2 = 1;
 const sintn C_SyvDaPeBase::mhsn_INDEX_THEME_FLAT = 2;
 const sintn C_SyvDaPeBase::mhsn_INDEX_THEME_SKEUMORPH = 3;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -77,10 +69,8 @@ const sintn C_SyvDaPeBase::mhsn_INDEX_THEME_SKEUMORPH = 3;
    \param[in]     oq_ShowWidgetSpecificPart   Optional flag if widget specific part is visible
    \param[in]     oq_AllowChangeOfDataElement Optional flag if data element may be changed
    \param[in]     orc_DisplayName             Optional display name (only used if element name cannot be changed)
-
-   \created     05.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32 ou32_ViewIndex,
                              const uint32 ou32_DashboardIndex, const QString & orc_Name,
                              const C_PuiSvDbNodeDataPoolListElementId & orc_Id,
@@ -170,6 +160,11 @@ C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32 ou32_Vi
 
    InitStaticNames();
 
+   //Clear
+   this->mpc_Ui->pc_PushButtonClearDataElement->setText("");
+   this->mpc_Ui->pc_PushButtonClearDataElement->setIcon(QIcon("://images/main_page_and_navi_bar/Icon_clear_table.svg"));
+   this->mpc_Ui->pc_PushButtonClearDataElement->setIconSize(QSize(20, 20));
+
    //Spin box
    //lint -e{10,530,747,1015,1013}  c++11 feature
    this->mpc_Ui->pc_DoubleSpinBoxOffset->SetMinimumCustom(std::numeric_limits<float64>::lowest());
@@ -179,6 +174,7 @@ C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32 ou32_Vi
    connect(this->mpc_Ui->pc_BushButtonOk, &QPushButton::clicked, this, &C_SyvDaPeBase::m_OkClicked);
    connect(this->mpc_Ui->pc_BushButtonCancel, &QPushButton::clicked,
            this, &C_SyvDaPeBase::m_CancelClicked);
+   connect(this->mpc_Ui->pc_PushButtonClearDataElement, &QPushButton::clicked, this, &C_SyvDaPeBase::m_Clear);
    connect(this->mpc_Ui->pc_PushButtonDataElement, &QPushButton::clicked, this, &C_SyvDaPeBase::m_Browse);
    connect(this->mpc_Ui->pc_PushButtonUpdateModeConfigure, &QPushButton::clicked, this,
            &C_SyvDaPeBase::m_Configuration);
@@ -190,15 +186,12 @@ C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32 ou32_Vi
            &C_SyvDaPeBase::SigRefresh);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     05.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeBase::~C_SyvDaPeBase(void)
 {
    delete mpc_Ui;
@@ -206,13 +199,10 @@ C_SyvDaPeBase::~C_SyvDaPeBase(void)
    //lint -e{1740}  no memory leak because the ownership of these objects was never transfered to this class
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     05.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::InitStaticNames(void)
 {
    this->mpc_ParentDialog->SetSubTitle(C_GtGetText::h_GetText("Properties"));
@@ -227,7 +217,8 @@ void C_SyvDaPeBase::InitStaticNames(void)
    this->mpc_Ui->pc_LabelOffset->setText(C_GtGetText::h_GetText("Offset"));
    this->mpc_Ui->pc_LabelUnit->setText(C_GtGetText::h_GetText("Unit"));
    this->mpc_Ui->pc_LabelNamespaceDescription->setText(C_GtGetText::h_GetText("Source"));
-   this->mpc_Ui->pc_CheckBoxDefaultScaling->setText(C_GtGetText::h_GetText("Use the default values of SYSTEM DEFINITION"));
+   this->mpc_Ui->pc_CheckBoxDefaultScaling->setText(C_GtGetText::h_GetText(
+                                                       "Use the default values of SYSTEM DEFINITION"));
    this->mpc_Ui->pc_PushButtonUpdateModeConfigure->setText(C_GtGetText::h_GetText("Configure"));
    this->mpc_Ui->pc_ComboBoxTransmissionMode->addItem(C_GtGetText::h_GetText("On Trigger"));
    this->mpc_Ui->pc_ComboBoxTransmissionMode->addItem(C_GtGetText::h_GetText("On Change"));
@@ -240,15 +231,12 @@ void C_SyvDaPeBase::InitStaticNames(void)
    this->mpc_Ui->pc_ComboBoxTheme->addItem(C_GtGetText::h_GetText("Skeuomorphic"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Place widget in pop up dialog
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Place widget in pop up dialog
 
    \param[in,out] opc_Widget Widget to place in pop up dialog
-
-   \created     05.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::SetWidget(QWidget * const opc_Widget)
 {
    if (opc_Widget != NULL)
@@ -259,15 +247,12 @@ void C_SyvDaPeBase::SetWidget(QWidget * const opc_Widget)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the write mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the write mode
 
    \param[in]     oe_WriteMode      New write mode
-
-   \created     12.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::SetWriteMode(const C_PuiSvDbWidgetBase::E_WriteMode oe_WriteMode) const
 {
    switch (oe_WriteMode)
@@ -284,15 +269,12 @@ void C_SyvDaPeBase::SetWriteMode(const C_PuiSvDbWidgetBase::E_WriteMode oe_Write
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set theme
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set theme
 
    \param[in] oe_Style Current theme
-
-   \created     12.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::SetTheme(const C_PuiSvDbWidgetBase::E_Style oe_Style) const
 {
    switch (oe_Style)
@@ -312,61 +294,49 @@ void C_SyvDaPeBase::SetTheme(const C_PuiSvDbWidgetBase::E_Style oe_Style) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the preview scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the preview scene
 
    \return     Pointer to preview scene
-
-   \created     05.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaDashboardScene * C_SyvDaPeBase::GetPreviewScene(void)
 {
    return this->mpc_Scene;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get scene view size for improved item placement
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get scene view size for improved item placement
 
    \return
    Scene view size
-
-   \created     05.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QSize C_SyvDaPeBase::h_GetSceneViewSize(void)
 {
    return QSize(259, 146);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get offset for icon placement
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get offset for icon placement
 
    \return
    Offset for icon placement
-
-   \created     10.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 float64 C_SyvDaPeBase::h_GetFixIconOffset(void)
 {
    return 25.0;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get ideal item size according to current scene size
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get ideal item size according to current scene size
 
    \param[out] orc_ItemPos  Ideal item position
    \param[out] orc_ItemSize Ideal item size
    \param[in]  opc_Item     Graphics item
-
-   \created     10.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::h_GetIdealItemRect(QPointF & orc_ItemPos, QSizeF & orc_ItemSize,
                                        const QGraphicsItem * const opc_Item)
 {
@@ -390,31 +360,25 @@ void C_SyvDaPeBase::h_GetIdealItemRect(QPointF & orc_ItemPos, QSizeF & orc_ItemS
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current data element id
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current data element id
 
    \return
    Current data element id
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbNodeDataPoolListElementId C_SyvDaPeBase::GetDataElementId(void) const
 {
    return this->mc_DataElement;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current scaling information
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current scaling information
 
    \return
    Current scaling information
-
-   \created     08.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbDataElementScaling C_SyvDaPeBase::GetScalingInformation() const
 {
    C_PuiSvDbDataElementScaling c_Retval;
@@ -426,16 +390,13 @@ C_PuiSvDbDataElementScaling C_SyvDaPeBase::GetScalingInformation() const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current write mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current write mode
 
    \return
    Current write mode
-
-   \created     12.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbWidgetBase::E_WriteMode C_SyvDaPeBase::GetWriteMode(void) const
 {
    C_PuiSvDbWidgetBase::E_WriteMode e_Retval;
@@ -454,16 +415,13 @@ C_PuiSvDbWidgetBase::E_WriteMode C_SyvDaPeBase::GetWriteMode(void) const
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current theme
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current theme
 
    \return
    Current theme
-
-   \created     12.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbWidgetBase::E_Style C_SyvDaPeBase::GetTheme(void) const
 {
    C_PuiSvDbWidgetBase::E_Style e_Retval;
@@ -488,16 +446,13 @@ C_PuiSvDbWidgetBase::E_Style C_SyvDaPeBase::GetTheme(void) const
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current display name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current display name
 
    \return
    Current display name
-
-   \created     15.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaPeBase::GetDisplayName(void) const
 {
    QString c_Retval = this->mpc_Ui->pc_LineEditDataElementDisplayName->text();
@@ -521,17 +476,14 @@ QString C_SyvDaPeBase::GetDisplayName(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     05.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
@@ -560,13 +512,10 @@ void C_SyvDaPeBase::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Ok button click
-
-   \created     05.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Ok button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::m_OkClicked(void)
 {
    if (this->mpc_ParentDialog != NULL)
@@ -575,13 +524,10 @@ void C_SyvDaPeBase::m_OkClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Cancel button
-
-   \created     05.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Cancel button
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::m_CancelClicked(void)
 {
    //Clean up last config if necessary
@@ -602,13 +548,10 @@ void C_SyvDaPeBase::m_CancelClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of browse button
-
-   \created     06.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of browse button
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::m_Browse(void)
 {
    //Set parent for better hierarchy handling via window manager
@@ -626,54 +569,7 @@ void C_SyvDaPeBase::m_Browse(void)
       //Only accept valid selection (assumed if any elements
       if (c_DataElements.size() > 0)
       {
-         if (this->mq_ReadElement == true)
-         {
-            //Clean up last config if necessary
-            if (this->mq_NewConfigAdded == true)
-            {
-               this->mq_NewConfigAdded = false;
-               tgl_assert(C_PuiSvHandler::h_GetInstance()->RemoveViewReadRailItem(this->mu32_ViewIndex,
-                                                                                  this->mc_DataElement) == C_NO_ERR);
-            }
-            else
-            {
-               //Only clean up if last selection was: valid and datapool element
-               if ((this->mc_DataElement.GetIsValid() == true) &&
-                   (this->mc_DataElement.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT))
-               {
-                  const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-                  //Save initial configuration
-                  this->mc_OriginalConfigId = this->mc_DataElement;
-                  tgl_assert(pc_View != NULL);
-                  if (pc_View != NULL)
-                  {
-                     const QMap<C_OSCNodeDataPoolListElementId,
-                                C_PuiSvReadDataConfiguration>::const_iterator c_ItResult =
-                        pc_View->GetReadRailAssignments().find(this->mc_OriginalConfigId);
-                     tgl_assert(c_ItResult != pc_View->GetReadRailAssignments().end());
-                     if (c_ItResult != pc_View->GetReadRailAssignments().end())
-                     {
-                        this->mc_OriginalConfigData = c_ItResult.value();
-                        const uint32 u32_Usages = pc_View->CountReadUsage(this->mc_DataElement);
-                        //Allow delete if either no usages
-                        // or only usage is by this element (assumed based on initial ID)
-                        if ((u32_Usages == 0) ||
-                            ((u32_Usages == 1) && (this->mc_DataElement == this->mc_InitialDataElement)))
-                        {
-                           //Remove initial configuration
-                           if (C_PuiSvHandler::h_GetInstance()->RemoveViewReadRailItem(this->mu32_ViewIndex,
-                                                                                       this->mc_DataElement) ==
-                               C_NO_ERR)
-                           {
-                              //Only restore it if last instance was deleted
-                              this->mq_ConfigRestorationNecessary = true;
-                           }
-                        }
-                     }
-                  }
-               }
-            }
-         }
+         m_ClearDataElement();
          this->mc_DataElement = c_DataElements[0];
 
          //Add configuration if not already done
@@ -723,13 +619,77 @@ void C_SyvDaPeBase::m_Browse(void)
    //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of configuration button
-
-   \created     08.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle clear data element button
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaPeBase::m_Clear(void)
+{
+   m_ClearDataElement();
+   this->mc_DataElement.MarkInvalid(stw_opensyde_core::C_OSCNodeDataPool::eDIAG, "");
+   m_InitNoDataElement();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle clear data element request
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaPeBase::m_ClearDataElement()
+{
+   if (this->mq_ReadElement == true)
+   {
+      //Clean up last config if necessary
+      if (this->mq_NewConfigAdded == true)
+      {
+         this->mq_NewConfigAdded = false;
+         tgl_assert(C_PuiSvHandler::h_GetInstance()->RemoveViewReadRailItem(this->mu32_ViewIndex,
+                                                                            this->mc_DataElement) == C_NO_ERR);
+      }
+      else
+      {
+         //Only clean up if last selection was: valid and datapool element
+         if ((this->mc_DataElement.GetIsValid() == true) &&
+             (this->mc_DataElement.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT))
+         {
+            const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+            //Save initial configuration
+            this->mc_OriginalConfigId = this->mc_DataElement;
+            tgl_assert(pc_View != NULL);
+            if (pc_View != NULL)
+            {
+               const QMap<C_OSCNodeDataPoolListElementId,
+                          C_PuiSvReadDataConfiguration>::const_iterator c_ItResult =
+                  pc_View->GetReadRailAssignments().find(this->mc_OriginalConfigId);
+               tgl_assert(c_ItResult != pc_View->GetReadRailAssignments().end());
+               if (c_ItResult != pc_View->GetReadRailAssignments().end())
+               {
+                  this->mc_OriginalConfigData = c_ItResult.value();
+                  const uint32 u32_Usages = pc_View->CountReadUsage(this->mc_DataElement);
+                  //Allow delete if either no usages
+                  // or only usage is by this element (assumed based on initial ID)
+                  if ((u32_Usages == 0) ||
+                      ((u32_Usages == 1) && (this->mc_DataElement == this->mc_InitialDataElement)))
+                  {
+                     //Remove initial configuration
+                     if (C_PuiSvHandler::h_GetInstance()->RemoveViewReadRailItem(this->mu32_ViewIndex,
+                                                                                 this->mc_DataElement) ==
+                         C_NO_ERR)
+                     {
+                        //Only restore it if last instance was deleted
+                        this->mq_ConfigRestorationNecessary = true;
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of configuration button
+*/
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::m_Configuration(void) const
 {
    QPointer<C_OgePopUpDialog> c_New;
@@ -802,13 +762,10 @@ void C_SyvDaPeBase::m_Configuration(void) const
    //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register change of use default scaling property
-
-   \created     12.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register change of use default scaling property
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::m_OnUseDefaultScalingChange(void) const
 {
    bool q_Enabled;
@@ -853,13 +810,10 @@ void C_SyvDaPeBase::m_OnUseDefaultScalingChange(void) const
    this->mpc_Ui->pc_LineEditUnit->setEnabled(q_Enabled);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize no data element state
-
-   \created     06.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize no data element state
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::m_InitNoDataElement(void) const
 {
    this->mpc_Ui->pc_LineEditDataElement->setText("-");
@@ -871,16 +825,13 @@ void C_SyvDaPeBase::m_InitNoDataElement(void) const
    m_OnUseDefaultScalingChange();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize valid data element state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize valid data element state
 
    \param[in] orc_Id      Element id to use for default initialization (only used if not invalid)
    \param[in] orc_Scaling Scaling information for default initialization
-
-   \created     06.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::m_InitDataElement(const C_PuiSvDbNodeDataPoolListElementId & orc_Id,
                                       const C_PuiSvDbDataElementScaling & orc_Scaling) const
 {

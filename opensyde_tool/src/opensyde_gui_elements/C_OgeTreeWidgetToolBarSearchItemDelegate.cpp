@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Toolbar search item delegate (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     16.03.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
@@ -28,50 +21,44 @@
 #include "C_OgeTreeWidgetToolBarSearchItemWidget.h"
 #include "C_Uti.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     16.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeTreeWidgetToolBarSearchItemDelegate::C_OgeTreeWidgetToolBarSearchItemDelegate(QObject * const opc_Parent) :
    QStyledItemDelegate(opc_Parent)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint method
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint method
 
    Custom way to paint tree widget item
 
    \param[in,out] opc_Painter Painter (default interface)
    \param[in]     orc_Option  Option (default interface)
    \param[in]     orc_index   Index (default interface)
-
-   \created     16.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTreeWidgetToolBarSearchItemDelegate::paint(QPainter * const opc_Painter,
                                                      const QStyleOptionViewItem & orc_Option,
                                                      const QModelIndex & orc_Index) const
@@ -112,11 +99,11 @@ void C_OgeTreeWidgetToolBarSearchItemDelegate::paint(QPainter * const opc_Painte
       {
          // adapt the position of the icon
          // it will be drawn into the free space of the widget. The layout left margin of the widget must be big enough.
-         QRect c_Rect = orc_Option.rect.adjusted(15, 8, 15, 8);
+         QRect c_Rect = orc_Option.rect.adjusted(0, 8, 0, 8);
          c_Icon.paint(opc_Painter, c_Rect, Qt::AlignLeft);
       }
 
-      // showEvent will not be triggered. Seperate initialization necessary
+      // showEvent will not be triggered. Separate initialization necessary
       // rendering of QWidget itself
       // store the configuration of the original painter before translation. The change of the coordinates
       // is only necessary here.
@@ -126,6 +113,7 @@ void C_OgeTreeWidgetToolBarSearchItemDelegate::paint(QPainter * const opc_Painte
                           QPoint(0, 0),
                           QRegion(0, 0, orc_Option.rect.width(), orc_Option.rect.height()),
                           QWidget::RenderFlag::DrawChildren);
+
       // restore the previous coordinates
       opc_Painter->restore();
    }
@@ -136,19 +124,16 @@ void C_OgeTreeWidgetToolBarSearchItemDelegate::paint(QPainter * const opc_Painte
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reimplement default size hint
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reimplement default size hint
 
    \param[in] orc_Option Option
    \param[in] orc_Index  Index
-
-   \created     26.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QSize C_OgeTreeWidgetToolBarSearchItemDelegate::sizeHint(const QStyleOptionViewItem & orc_Option,
                                                          const QModelIndex & orc_Index) const
 {
    Q_UNUSED(orc_Index)
-   return QSize(orc_Option.rect.width(), 50);
+   return QSize(orc_Option.rect.width(), 40);
 }

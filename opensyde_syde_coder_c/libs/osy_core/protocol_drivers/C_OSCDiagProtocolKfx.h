@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       openSYDE: Diagnostic protocol driver for KEFEX protocol
@@ -23,15 +23,9 @@
    The other error codes cannot necessarily be mapped to correct error codes defined by the base class of this class.
    See the individual function headers for details.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     18.07.2017  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCDIAGPROTOCOLKFXH
 #define C_OSCDIAGPROTOCOLKFXH
 

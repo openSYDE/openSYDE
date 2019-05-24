@@ -1,18 +1,11 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data class for logging CAN messages (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.12.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -35,10 +28,7 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     20.09.2018  STW/B.Bayer
+/*! \brief   Default constructor
 */
 //-----------------------------------------------------------------------------
 C_OSCComMessageLoggerDataSignal::C_OSCComMessageLoggerDataSignal(void) :
@@ -53,8 +43,7 @@ C_OSCComMessageLoggerDataSignal::C_OSCComMessageLoggerDataSignal(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check if current smaller than orc_Cmp
+/*! \brief   Check if current smaller than orc_Cmp
 
    Comparing by start bit
 
@@ -63,8 +52,6 @@ C_OSCComMessageLoggerDataSignal::C_OSCComMessageLoggerDataSignal(void) :
    \return
    true  Current smaller than orc_Cmp
    false orc_Cmp equal or bigger than current
-
-   \created     25.01.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 bool C_OSCComMessageLoggerDataSignal::operator <(const C_OSCComMessageLoggerDataSignal & orc_Cmp) const
@@ -80,10 +67,7 @@ bool C_OSCComMessageLoggerDataSignal::operator <(const C_OSCComMessageLoggerData
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     03.09.2018  STW/B.Bayer
+/*! \brief   Default constructor
 */
 //-----------------------------------------------------------------------------
 C_OSCComMessageLoggerData::C_OSCComMessageLoggerData(void) :
@@ -107,10 +91,7 @@ C_OSCComMessageLoggerData::C_OSCComMessageLoggerData(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     17.12.2018  STW/B.Bayer
+/*! \brief   Default destructor
 */
 //-----------------------------------------------------------------------------
 C_OSCComMessageLoggerData::~C_OSCComMessageLoggerData(void)
@@ -118,10 +99,7 @@ C_OSCComMessageLoggerData::~C_OSCComMessageLoggerData(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Sort the signals
-
-   \created     25.01.2019  STW/B.Bayer
+/*! \brief   Sort the signals
 */
 //-----------------------------------------------------------------------------
 void C_OSCComMessageLoggerData::SortSignals(void)

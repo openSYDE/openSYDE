@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Export code of a openSYDE node. (implementation)
 
    Export code of a openSYDE node
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     16.10.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "TGLFile.h"
@@ -28,39 +21,35 @@
 #include "C_OSCLoggingHandler.h"
 #include "C_OSCUtils.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_scl;
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     16.10.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCExportNode::C_OSCExportNode(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create code for one application
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create code for one application
 
    Creates code for one programmable application.
 
@@ -84,10 +73,8 @@ C_OSCExportNode::C_OSCExportNode(void)
    C_RANGE   Information which application runs the DPD is invalid or refers to an invalid application
              Data pool does not provide information about owning application or refers to an invalid application
              ApplicationIndex references invalid application
-
-   \created     06.09.2018  STW/A.Stangl (refactored from existing code)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw_types::uint16 ou16_ApplicationIndex,
                                            const C_SCLString & orc_Path, std::vector<C_SCLString> & orc_Files)
 {
@@ -306,9 +293,8 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check for correct preconditions for creating source code
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check for correct preconditions for creating source code
 
    \param[in]  orc_Node   Node as information source for exported code
    \param[in]  orc_Path   Storage path for created files
@@ -318,10 +304,8 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
    C_NO_ERR  Node configuration is OK
    C_RANGE   Information which application runs the DPD is invalid or refers to an invalid application
              Data pool does not provide information about owning application or refers to an invalid application
-
-   \created     06.09.2018  STW/A.Stangl (refactored from existing code)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportNode::mh_CheckPrerequisites(const C_OSCNode & orc_Node)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -356,9 +340,8 @@ sint32 C_OSCExportNode::mh_CheckPrerequisites(const C_OSCNode & orc_Node)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt com data pool elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt com data pool elements
 
    \param[in]     orc_Node           Current node containing data pools
    \param[in]     ou32_DataPoolIndex Data pool index within data pools owned by node
@@ -368,10 +351,8 @@ sint32 C_OSCExportNode::mh_CheckPrerequisites(const C_OSCNode & orc_Node)
    C_NO_ERR Operation successful
    C_RANGE  Data pool index or type invalid
    C_CONFIG Protocol not found
-
-   \created     19.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCExportNode::mh_GetAdaptedComDataPool(const C_OSCNode & orc_Node, const uint32 ou32_DataPoolIndex,
                                                  C_OSCNodeDataPool & orc_DataPool)
 {

@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget base for parameterization widget.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.08.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QFileDialog>
@@ -41,7 +35,7 @@
 #include "C_OSCParamSetHandler.h"
 #include "C_OgeWiCustomMessage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -50,23 +44,22 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvDaItPaWidgetNew::mhc_FILE_EXTENSION_PARAMSET = ".syde_ps";
 const QString C_SyvDaItPaWidgetNew::mhc_FILE_EXTENSION_PARAMSETIMAGE = ".syde_psi";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -75,10 +68,8 @@ const QString C_SyvDaItPaWidgetNew::mhc_FILE_EXTENSION_PARAMSETIMAGE = ".syde_ps
    \param[in]     oru32_ParamIndex     Param index
    \param[in]     opc_DataWidget       Data widget
    \param[in,out] opc_Parent           Optional pointer to parent
-
-   \created     25.10.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaWidgetNew::C_SyvDaItPaWidgetNew(const uint32 & oru32_ViewIndex,
                                            C_PuiSvDbDataElementHandler * const opc_DataWidget,
                                            QWidget * const opc_Parent) :
@@ -130,43 +121,34 @@ C_SyvDaItPaWidgetNew::C_SyvDaItPaWidgetNew(const uint32 & oru32_ViewIndex,
            &C_SyvDaItPaWidgetNew::m_HandleRemoveTrigger);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     25.10.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaWidgetNew::~C_SyvDaItPaWidgetNew()
 {
    delete mpc_Ui;
    //lint -e{1740}  no memory leak because of the mpc_ComDriver because of handling it on an other position
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     02.07.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_PushButtonAdd->setText(C_GtGetText::h_GetText("Add List"));
    this->mpc_Ui->pc_LabelTreeEmpty->setText(C_GtGetText::h_GetText("Add any NVM Lists via the '+' button"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Information about the start or stop of a connection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the start or stop of a connection
 
    \param[in]  oq_Active      Flag if connection is active or not active now
-
-   \created     06.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::ConnectionActiveChanged(const bool oq_Active)
 {
    this->mq_IsConnected = oq_Active;
@@ -192,45 +174,36 @@ void C_SyvDaItPaWidgetNew::ConnectionActiveChanged(const bool oq_Active)
    m_UpdateButtonToolTips();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the com driver for parametrization functions
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the com driver for parametrization functions
 
    \param[in]  opc_ComDriver     Reference to the com driver
-
-   \created     27.10.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::SetSyvComDriver(C_SyvComDriverDiag & orc_ComDriver)
 {
    this->mpc_ComDriver = &orc_ComDriver;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update shown ECU values
-
-   \created     09.11.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update shown ECU values
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::UpdateECUValues(void) const
 {
    this->mpc_Ui->pc_TreeView->UpdateECUValues();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle manual user operation finished event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle manual user operation finished event
 
    \param[in] os32_Result Operation result
 
    \return
    true  Operation was relevant and was handled
    false Operation was not relevant and was not handled
-
-   \created     15.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItPaWidgetNew::HandleManualOperationFinished(const sint32 os32_Result, const uint8 ou8_NRC)
 {
    bool q_Return = this->mq_ReadActive;
@@ -297,8 +270,9 @@ bool C_SyvDaItPaWidgetNew::HandleManualOperationFinished(const sint32 os32_Resul
                         const C_OSCNodeDataPoolListElementId & rc_CurId = this->mc_ListsWithCRCError[u32_ItList];
                         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
                            rc_CurId.u32_NodeIndex);
-                        const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
-                           rc_CurId.u32_NodeIndex, rc_CurId.u32_DataPoolIndex);
+                        const C_OSCNodeDataPool * const pc_DataPool =
+                           C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+                              rc_CurId.u32_NodeIndex, rc_CurId.u32_DataPoolIndex);
                         const C_OSCNodeDataPoolList * const pc_List =
                            C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
                               rc_CurId.u32_NodeIndex, rc_CurId.u32_DataPoolIndex, rc_CurId.u32_ListIndex);
@@ -343,7 +317,8 @@ bool C_SyvDaItPaWidgetNew::HandleManualOperationFinished(const sint32 os32_Resul
          //Ignore warn because CRC errors on read should be fixed by this widget
          if ((s32_Result != C_NO_ERR) && (s32_Result != C_CHECKSUM))
          {
-            C_OgeWiCustomMessage c_MessageResult(pc_ParamWidget->GetPopUpParent()->parentWidget(), // parent because of
+            C_OgeWiCustomMessage c_MessageResult(pc_ParamWidget->GetPopUpParent()->parentWidget(), // parent because
+                                                                                                   // of
                                                                                                    // style issues
                                                  C_OgeWiCustomMessage::E_Type::eERROR);
             c_MessageResult.SetHeading(C_GtGetText::h_GetText("System Parametrization"));
@@ -362,7 +337,8 @@ bool C_SyvDaItPaWidgetNew::HandleManualOperationFinished(const sint32 os32_Resul
                QString c_Node = C_GtGetText::h_GetText("Node");
                if ((this->mu32_ListCounter - 1UL) < this->mc_ListIds.size())
                {
-                  const C_OSCNodeDataPoolListElementId & rc_CurEntryId = this->mc_ListIds[this->mu32_ListCounter - 1UL];
+                  const C_OSCNodeDataPoolListElementId & rc_CurEntryId =
+                     this->mc_ListIds[this->mu32_ListCounter - 1UL];
                   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
                      rc_CurEntryId.u32_NodeIndex);
                   if (pc_Node != NULL)
@@ -398,7 +374,8 @@ bool C_SyvDaItPaWidgetNew::HandleManualOperationFinished(const sint32 os32_Resul
                      QString(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(ou8_NRC, 16));
                   break;
                }
-               c_MessageResult.SetDescription(QString(C_GtGetText::h_GetText("%1 responded with error response.")).arg(
+               c_MessageResult.SetDescription(QString(C_GtGetText::h_GetText(
+                                                         "%1 responded with error response.")).arg(
                                                  c_Node));
                c_MessageResult.SetDetails(c_Details);
             }
@@ -417,15 +394,12 @@ bool C_SyvDaItPaWidgetNew::HandleManualOperationFinished(const sint32 os32_Resul
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set dark flag value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set dark flag value
 
    \param[in] oq_Value New dark flag value
-
-   \created     24.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::SetDark(const bool oq_Value) const
 {
    this->mpc_Ui->pc_TreeView->SetDark(oq_Value);
@@ -440,13 +414,10 @@ void C_SyvDaItPaWidgetNew::SetDark(const bool oq_Value) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle add button click
-
-   \created     08.11.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle add button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::ButtonAddClicked(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -507,13 +478,10 @@ void C_SyvDaItPaWidgetNew::ButtonAddClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete action
-
-   \created     16.11.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::ButtonDeleteClicked(void)
 {
    C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
@@ -544,26 +512,20 @@ void C_SyvDaItPaWidgetNew::ButtonDeleteClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle read selected items action
-
-   \created     27.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle read selected items action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::ReadSelected(void)
 {
    this->mc_ListIds = this->mpc_Ui->pc_TreeView->GetAllSelectedListIds();
    m_ReadElements();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle write selected items action
-
-   \created     27.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle write selected items action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::WriteSelected(void)
 {
    const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> c_SelectedListIds =
@@ -572,25 +534,19 @@ void C_SyvDaItPaWidgetNew::WriteSelected(void)
    m_HandleWriteProcessTrigger(c_SelectedListIds);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle apply selected items action
-
-   \created     27.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle apply selected items action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::ApplySelected(void) const
 {
    this->mpc_Ui->pc_TreeView->ApplySelectedEcuValues();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle record selected items action
-
-   \created     27.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle record selected items action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::RecordSelected(void)
 {
    const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> c_SelectedListIds =
@@ -599,13 +555,10 @@ void C_SyvDaItPaWidgetNew::RecordSelected(void)
    this->m_RecordElements(c_SelectedListIds);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle remove selected items action
-
-   \created     27.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle remove selected items action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::RemoveSelected(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -635,147 +588,117 @@ void C_SyvDaItPaWidgetNew::RemoveSelected(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get flag if read is allowed
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get flag if read is allowed
 
    \return
    Flag if read is allowed
-
-   \created     03.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItPaWidgetNew::AllowReadAction(void) const
 {
    return this->mq_ReadAllowed;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get template with the type description for the current selection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get template with the type description for the current selection
 
    \return
    Template with the type description for the current selection
-
-   \created     03.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaItPaWidgetNew::GetSelectedItemTypeTemplate(void) const
 {
    return this->mpc_Ui->pc_TreeView->GetSelectedItemTypeTemplate();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get selected item count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get selected item count
 
    \return
    Current selected item count
-
-   \created     01.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SyvDaItPaWidgetNew::GetSelectedItemCount(void) const
 {
    return this->mpc_Ui->pc_TreeView->GetSelectedItemCount();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current column widths
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current column widths
 
    \return
    Current column widths
-
-   \created     28.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<sint32> C_SyvDaItPaWidgetNew::GetCurrentColumnWidths(void) const
 {
    return this->mpc_Ui->pc_TreeView->GetCurrentColumnWidths();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current column position indices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current column position indices
 
    \return
    Current column position indices
-
-   \created     28.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<sint32> C_SyvDaItPaWidgetNew::GetCurrentColumnPositionIndices(void) const
 {
    return this->mpc_Ui->pc_TreeView->GetCurrentColumnPositionIndices();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply new column widths
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply new column widths
 
    \param[in] orc_NewColWidths New column widths
-
-   \created     28.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::SetColumnWidth(const std::vector<sint32> & orc_NewColWidths) const
 {
    this->mpc_Ui->pc_TreeView->SetColumnWidth(orc_NewColWidths);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set column position indices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set column position indices
 
    \param[in] orc_NewColPositionIndices New column position indices
-
-   \created     28.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::SetColumnPositionIndices(const std::vector<sint32> & orc_NewColPositionIndices) const
 {
    this->mpc_Ui->pc_TreeView->SetColumnPositionIndices(orc_NewColPositionIndices);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all expanded tree items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all expanded tree items
 
    \return
    All expanded tree items
-
-   \created     28.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<C_PuiSvDbExpandedTreeIndex> C_SyvDaItPaWidgetNew::GetAllExpandedTreeItems(void) const
 {
    return this->mpc_Ui->pc_TreeView->GetAllExpandedTreeItems();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set all items as expanded
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set all items as expanded
 
    \param[in] orc_Items Items to expand
-
-   \created     28.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::SetAllExpandedTreeItems(const std::vector<C_PuiSvDbExpandedTreeIndex> & orc_Items) const
 {
    this->mpc_Ui->pc_TreeView->SetAllExpandedTreeItems(orc_Items);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Information about the start or stop of edit mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the start or stop of edit mode
 
    \param[in]  oq_Active  Flag if edit mode is active or not active now
-
-   \created     05.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::SetEditModeActive(const bool oq_Active)
 {
    this->mq_Editable = oq_Active;
@@ -788,38 +711,32 @@ void C_SyvDaItPaWidgetNew::SetEditModeActive(const bool oq_Active)
    m_UpdateButtonToolTips();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    Here: draw background
    (Not automatically drawn in any QWidget derivative)
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     25.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::paintEvent(QPaintEvent * const opc_Event)
 {
    stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
    QWidget::paintEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::ButtonReadClicked(void)
 {
    this->mc_ListIds = this->mpc_Ui->pc_TreeView->GetAllListIds();
    m_ReadElements();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Write button handling
-
-   \created     04.12.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Write button handling
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::ButtonWriteClicked(void)
 {
    if (this->mpc_Ui->pc_TreeView->CheckAllListsRead() == true)
@@ -837,7 +754,7 @@ void C_SyvDaItPaWidgetNew::ButtonWriteClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_ButtonRecordClicked(void)
 {
    const std::vector<C_OSCNodeDataPoolListElementId> c_ListItemIds = this->mpc_Ui->pc_TreeView->GetAllListIds();
@@ -845,7 +762,7 @@ void C_SyvDaItPaWidgetNew::m_ButtonRecordClicked(void)
    m_RecordElements(c_ListItemIds);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_ButtonImportClicked(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -902,20 +819,18 @@ void C_SyvDaItPaWidgetNew::m_ButtonImportClicked(void)
 
             if (c_File.compare("") != 0)
             {
+               C_OSCParamSetHandler c_ParamSetFileHandler;
                sint32 s32_Result;
-
-               const std::vector<C_OSCParamSetInterpretedNode> * const pc_Data =
-                  C_OSCParamSetHandler::h_GetInstance().GetInterpretedData();
 
                //User settings store
                C_UsHandler::h_GetInstance()->SetProjSvParamImport(pc_View->GetName(), c_File);
 
-               C_OSCParamSetHandler::h_GetInstance().ClearContent();
-               s32_Result = C_OSCParamSetHandler::h_GetInstance().ReadFile(c_File.toStdString().c_str(), true, true);
+               s32_Result = c_ParamSetFileHandler.ReadFile(c_File.toStdString().c_str(), true, true);
 
                if (s32_Result == C_NO_ERR)
                {
-                  s32_Result = this->m_FillDataFromImport(*pc_Data);
+                  const C_OSCParamSetInterpretedData & rc_Data = c_ParamSetFileHandler.GetInterpretedData();
+                  s32_Result = this->m_FillDataFromImport(rc_Data.c_InterpretedNodes);
 
                   if (s32_Result == C_NO_ERR)
                   {
@@ -947,42 +862,58 @@ void C_SyvDaItPaWidgetNew::m_ButtonImportClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle read action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle read action
 
    Prerequisites: mc_ListIds valid
-
-   \created     27.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_ReadElements(void)
 {
    sint32 s32_Result = C_NO_ERR;
 
-   this->mc_ListsWithCRCError.clear();
-   this->mu32_ListCounter = 0U;
-
    if (this->mpc_ComDriver != NULL)
    {
-      if (this->mu32_ListCounter < this->mc_ListIds.size())
+      //Check all list IDs valid -> node active in view
+      const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+
+      if (pc_View != NULL)
       {
-         const C_OSCNodeDataPoolListElementId & rc_ID = this->mc_ListIds[this->mu32_ListCounter];
-
-         this->mq_ReadActive = true;
-         // Start the poll for the first list
-         // All other lists will be handled by HandleManualOperationFinished and get triggered by the
-         // finished signal of the poll thread
-         s32_Result = this->mpc_ComDriver->PollNvmReadList(rc_ID.u32_NodeIndex,
-                                                           static_cast<uint8>(rc_ID.u32_DataPoolIndex),
-                                                           static_cast<uint16>(rc_ID.u32_ListIndex));
-
+         for (uint32 u32_ItList = 0UL; u32_ItList < this->mc_ListIds.size(); ++u32_ItList)
+         {
+            const C_OSCNodeDataPoolListElementId & rc_ID = this->mc_ListIds[u32_ItList];
+            const std::vector<uint8> & rc_ActiveFlags = pc_View->GetNodeActiveFlags();
+            if ((rc_ID.u32_NodeIndex < rc_ActiveFlags.size()) && (rc_ActiveFlags[rc_ID.u32_NodeIndex] == 1U))
+            {
+               //Valid
+            }
+            else
+            {
+               s32_Result = C_RANGE;
+            }
+         }
          if (s32_Result == C_NO_ERR)
          {
-            ++this->mu32_ListCounter;
-            m_UpdateReadAllowedFlag(false);
-            m_UpdateButtonToolTips();
+            this->mc_ListsWithCRCError.clear();
+            this->mu32_ListCounter = 0U;
+
+            if (this->mu32_ListCounter < this->mc_ListIds.size())
+            {
+               const C_OSCNodeDataPoolListElementId & rc_ID = this->mc_ListIds[this->mu32_ListCounter];
+               this->mq_ReadActive = true;
+               // Start the poll for the first list
+               // All other lists will be handled by HandleManualOperationFinished and get triggered by the
+               // finished signal of the poll thread
+               Q_EMIT this->SigNvmReadList(rc_ID);
+               ++this->mu32_ListCounter;
+               m_UpdateReadAllowedFlag(false);
+               m_UpdateButtonToolTips();
+            }
          }
+      }
+      else
+      {
+         s32_Result = C_CONFIG;
       }
    }
    else
@@ -1014,13 +945,10 @@ void C_SyvDaItPaWidgetNew::m_ReadElements(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle write action
-
-   \created     27.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle write action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_WriteElements(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ChangedIds)
 {
    //Step 1: Check the changed elements for all specified lists
@@ -1077,7 +1005,7 @@ void C_SyvDaItPaWidgetNew::m_WriteElements(const std::vector<C_OSCNodeDataPoolLi
       if ((c_InterestingChangedElements.size() > 0) || (c_InterestingInvalidLists.size() > 0))
       {
          //Step 2: Check valid values
-         if (this->mpc_Ui->pc_TreeView->CheckRange() == true)
+         if (this->mpc_Ui->pc_TreeView->CheckRange(c_InterestingChangedElements, c_InterestingInvalidLists) == true)
          {
             //Step 3: Write new values to data (required for write process)
             this->mpc_Ui->pc_TreeView->PrepareChangedValues(c_InterestingChangedElements);
@@ -1176,17 +1104,14 @@ void C_SyvDaItPaWidgetNew::m_WriteElements(const std::vector<C_OSCNodeDataPoolLi
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle load action for specified list IDs
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle load action for specified list IDs
 
    \param[in] orc_ElementIds   Element IDs to load for
    \param[in] orc_Id           Trigger source ID
    \param[in] ou32_ValidLayers Number of valid layers in trigger source ID
-
-   \created     16.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_LoadElements(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ElementIds,
                                           const C_OSCNodeDataPoolListElementId & orc_Id,
                                           const uint32 ou32_ValidLayers) const
@@ -1220,23 +1145,24 @@ void C_SyvDaItPaWidgetNew::m_LoadElements(const std::vector<C_OSCNodeDataPoolLis
          const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
          if (pc_ParamWidget != NULL)
          {
+            C_OSCParamSetHandler c_ParamSetHandler;
             sint32 s32_Result;
 
             //User settings store
             C_UsHandler::h_GetInstance()->SetProjSvParamImport(pc_View->GetName(), c_File);
 
-            C_OSCParamSetHandler::h_GetInstance().ClearContent();
-            s32_Result = C_OSCParamSetHandler::h_GetInstance().ReadFile(c_File.toStdString().c_str(), true, true);
+            s32_Result = c_ParamSetHandler.ReadFile(c_File.toStdString().c_str(), true, true);
 
             if (s32_Result == C_NO_ERR)
             {
                const QSize c_SizeImportReport(1210, 790);
-               const std::vector<C_OSCParamSetInterpretedNode> * const pc_Data =
-                  C_OSCParamSetHandler::h_GetInstance().GetInterpretedData();
+               const C_OSCParamSetInterpretedData & rc_Data = c_ParamSetHandler.GetInterpretedData();
 
                QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(
                   pc_ParamWidget->GetPopUpParent(), pc_ParamWidget->GetPopUpParent());
-               C_SyvDaItPaImportReport * const pc_Dialog = new C_SyvDaItPaImportReport(*c_New, *pc_Data, orc_ElementIds,
+               C_SyvDaItPaImportReport * const pc_Dialog = new C_SyvDaItPaImportReport(*c_New,
+                                                                                       rc_Data.c_InterpretedNodes,
+                                                                                       orc_ElementIds,
                                                                                        orc_Id, ou32_ValidLayers,
                                                                                        c_File);
                Q_UNUSED(pc_Dialog)
@@ -1305,17 +1231,14 @@ void C_SyvDaItPaWidgetNew::m_LoadElements(const std::vector<C_OSCNodeDataPoolLis
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle save action for specified list IDs
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle save action for specified list IDs
 
    \param[in] orc_ListIds      List IDs to save for
    \param[in] orc_Id           Trigger source ID
    \param[in] ou32_ValidLayers Number of valid layers in trigger source ID
-
-   \created     16.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds,
                                           const C_OSCNodeDataPoolListElementId & orc_Id,
                                           const uint32 ou32_ValidLayers) const
@@ -1323,6 +1246,7 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OSCNodeDataPoolLis
    sint32 s32_Result = C_NO_ERR;
    uint32 u32_ListCounter;
    uint32 u32_IntNodeCounter;
+   C_OSCParamSetHandler c_ParamSetFileHandler;
 
    std::vector<C_OSCParamSetInterpretedNode> c_IntNodes;
    std::vector<uint32> c_UsedNodeIndices;
@@ -1333,9 +1257,6 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OSCNodeDataPoolLis
    {
       return;
    }
-
-   // Clear previous content
-   C_OSCParamSetHandler::h_GetInstance().ClearContent();
 
    // Convert all necessary information to the interpreted node format
    for (u32_ListCounter = 0U; u32_ListCounter < orc_ListIds.size(); ++u32_ListCounter)
@@ -1467,8 +1388,7 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OSCNodeDataPoolLis
          // Prepare the param set handler
          for (u32_IntNodeCounter = 0U; u32_IntNodeCounter < c_IntNodes.size(); ++u32_IntNodeCounter)
          {
-            s32_Result =
-               C_OSCParamSetHandler::h_GetInstance().SetInterpretedDataForNode(c_IntNodes[u32_IntNodeCounter]);
+            s32_Result = c_ParamSetFileHandler.AddInterpretedDataForNode(c_IntNodes[u32_IntNodeCounter]);
 
             if (s32_Result != C_NO_ERR)
             {
@@ -1527,7 +1447,7 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OSCNodeDataPoolLis
 
                   if (q_Continue == true)
                   {
-                     s32_Result = C_OSCParamSetHandler::h_GetInstance().CreateCleanFileWithoutCRC(
+                     s32_Result = c_ParamSetFileHandler.CreateCleanFileWithoutCRC(
                         c_FileName.toStdString().c_str(), true);
                   }
                   else
@@ -1586,15 +1506,12 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OSCNodeDataPoolLis
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle record action for specified list IDs
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle record action for specified list IDs
 
    \param[in] orc_ListIds List IDs to record for
-
-   \created     27.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_RecordElements(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -1617,7 +1534,7 @@ void C_SyvDaItPaWidgetNew::m_RecordElements(const std::vector<C_OSCNodeDataPoolL
          Q_UNUSED(pc_Dialog)
 
          //Resize
-         c_New->SetSize(QSize(900, 746));
+         c_New->SetSize(QSize(900, 801));
 
          if (c_New->exec() != static_cast<sintn>(QDialog::Accepted))
          {
@@ -1634,7 +1551,7 @@ void C_SyvDaItPaWidgetNew::m_RecordElements(const std::vector<C_OSCNodeDataPoolL
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDaItPaWidgetNew::m_FillDataFromImport(const std::vector<C_OSCParamSetInterpretedNode> & orc_NewData)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -1839,27 +1756,21 @@ sint32 C_SyvDaItPaWidgetNew::m_FillDataFromImport(const std::vector<C_OSCParamSe
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply action
-
-   \created     17.11.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_ButtonApplyClicked(void) const
 {
    this->mpc_Ui->pc_TreeView->ApplyEcuValues();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update number of selection items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update number of selection items
 
    \param[in] ou32_Count New selection count
-
-   \created     17.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_UpdateButtons(void)
 {
    if (this->mpc_Ui->pc_TreeView->IsEmpty() == false)
@@ -1882,13 +1793,10 @@ void C_SyvDaItPaWidgetNew::m_UpdateButtons(void)
    m_UpdateButtonToolTips();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle dynamic button tool tips
-
-   \created     18.05.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle dynamic button tool tips
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_UpdateButtonToolTips(void) const
 {
    const QString c_ReasonEditMode =
@@ -1908,13 +1816,10 @@ void C_SyvDaItPaWidgetNew::m_UpdateButtonToolTips(void) const
    this->mpc_Ui->pc_PushButtonAdd->SetToolTipInformation(c_Heading, c_Description);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle tree reinit action
-
-   \created     02.07.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle tree reinit action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_HandleTreeInitAction(void)
 {
    this->mpc_Ui->pc_TreeView->Init(this->mpc_DataWidget);
@@ -1930,30 +1835,27 @@ void C_SyvDaItPaWidgetNew::m_HandleTreeInitAction(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   handle the tree read action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   handle the tree read action
 
    \param[in] orc_ListIds Current list IDs
-
-   \created     05.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_HandleTreeReadAction(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
 {
+   //Deactivate any left over active write actions
+   this->mq_WriteActive = false;
+   //Start read
    this->mc_ListIds = orc_ListIds;
    m_ReadElements();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle list IDs write trigger
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle list IDs write trigger
 
    \param[in] orc_ListIds List IDs to write
-
-   \created     05.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_HandleWriteProcessTrigger(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
 {
    if (this->mpc_Ui->pc_TreeView->CheckListsRead(orc_ListIds) == true)
@@ -1965,19 +1867,18 @@ void C_SyvDaItPaWidgetNew::m_HandleWriteProcessTrigger(const std::vector<C_OSCNo
       //Activate flag to continue write after read
       this->mq_WriteActive = true;
       this->mc_ElementsToWriteAfterRead = orc_ListIds;
-      m_HandleTreeReadAction(orc_ListIds);
+      //Start read
+      this->mc_ListIds = orc_ListIds;
+      m_ReadElements();
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete the specified list IDs
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete the specified list IDs
 
    \param[in] orc_ListIds List IDs to delete
-
-   \created     05.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_HandleRemoveTrigger(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
 {
    C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
@@ -2007,24 +1908,20 @@ void C_SyvDaItPaWidgetNew::m_HandleRemoveTrigger(const std::vector<C_OSCNodeData
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update the read allowed flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update the read allowed flag
 
    \param[in] oq_NewValue Flag if read action is allowed now
-
-   \created     05.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWidgetNew::m_UpdateReadAllowedFlag(const bool oq_NewValue)
 {
    this->mq_ReadAllowed = oq_NewValue;
    this->mpc_Ui->pc_TreeView->SetActionActive(!oq_NewValue);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get default file name proposition for specified layer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get default file name proposition for specified layer
 
    \param[in] ou32_ViewIndex   View index
    \param[in] orc_Id           ID to get default file name for
@@ -2032,10 +1929,8 @@ void C_SyvDaItPaWidgetNew::m_UpdateReadAllowedFlag(const bool oq_NewValue)
 
    \return
    Default file name proposition for specified layer
-
-   \created     19.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaItPaWidgetNew::mh_GetDefaultFileName(const uint32 ou32_ViewIndex,
                                                     const C_OSCNodeDataPoolListElementId & orc_Id,
                                                     const uint32 ou32_ValidLayers)
@@ -2062,19 +1957,16 @@ QString C_SyvDaItPaWidgetNew::mh_GetDefaultFileName(const uint32 ou32_ViewIndex,
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get file name for index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get file name for index
 
    \param[in] orc_Id     ID to get file for
    \param[in] ou32_Value Index to get file for
 
    \return
    Get Name for current file
-
-   \created     19.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaItPaWidgetNew::mh_GetFile(const C_OSCNodeDataPoolListElementId & orc_Id, const uint32 ou32_Value)
 {
    QString c_Retval;

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for Database list items (implementation)
 
    Widget for Database list items including a checkbox, database name, browse button and remove button.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     14.12.2018  STW/G.Landsgesell
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QFileDialog>
@@ -35,35 +28,33 @@
 #include "C_OgeWiCustomMessage.h"
 #include "C_CamUti.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_types;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     14.12.2018  STW/G.Landsgesell
+   \param[in,out]    opc_Parent     Optional pointer to parent
+   \param[in]        orc_Database   Database data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosDatabaseItemWidget::C_CamMosDatabaseItemWidget(const C_CamProDatabaseData & orc_Database,
                                                        QWidget * const opc_Parent) :
    stw_opensyde_gui_elements::C_OgeWiOnlyBackground(opc_Parent),
@@ -142,27 +133,21 @@ C_CamMosDatabaseItemWidget::C_CamMosDatabaseItemWidget(const C_CamProDatabaseDat
            &C_CamMosDatabaseItemWidget::m_ButtonReleased);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     14.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosDatabaseItemWidget::~C_CamMosDatabaseItemWidget()
 {
    delete this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set icon and tool tip depending on state.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set icon and tool tip depending on state.
 
    \param[in]     oe_State
-
-   \created     18.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::SetState(const C_CamMosDatabaseItemWidget::E_LoadingState oe_State)
 {
    QString c_Icon = "";
@@ -229,42 +214,33 @@ void C_CamMosDatabaseItemWidget::SetState(const C_CamMosDatabaseItemWidget::E_Lo
    this->mpc_Ui->pc_LabDatabase->setEnabled(!q_Error);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set bus index of database data.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set bus index of database data.
 
    \param[in]     u32_BusIndex        bus index
-
-   \created     20.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::SetBusIndex(const uint32 u32_BusIndex)
 {
    this->mc_Database.s32_BusIndex = static_cast<sint32>(u32_BusIndex);
    this->UpdateTooltip();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Remember all buses of openSYDE system definition for future selection.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remember all buses of openSYDE system definition for future selection.
 
    \param[in]     orc_Busses      buses
-
-   \created     07.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::SetBusses(const std::vector<stw_opensyde_core::C_OSCSystemBus> & orc_Busses)
 {
    this->mc_Busses = orc_Busses;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update tool tip: total path and bus index.
-
-   \created     07.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update tool tip: total path and bus index.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::UpdateTooltip(void) const
 {
    QString c_AbsolutePath = C_CamUti::h_GetAbsPathFromProj(this->mc_Database.c_Name);
@@ -290,15 +266,12 @@ void C_CamMosDatabaseItemWidget::UpdateTooltip(void) const
                                                        c_ToolTipContent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update database name to react if relativeness changed.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update database name to react if relativeness changed.
 
    \param[in]   orc_NewDatabaseName    new database path
-
-   \created     05.02.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::UpdateDatabasePathRelativeness(const QString & orc_NewDatabaseName)
 {
    this->mc_Database.c_Name = orc_NewDatabaseName;
@@ -308,13 +281,10 @@ void C_CamMosDatabaseItemWidget::UpdateDatabasePathRelativeness(const QString & 
    this->UpdateTooltip();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function for cyclic checking of file changes.
-
-   \created     09.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function for cyclic checking of file changes.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::CheckFile(void)
 {
    bool q_Remove = false;
@@ -403,33 +373,27 @@ void C_CamMosDatabaseItemWidget::CheckFile(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get associated database data.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get associated database data.
 
    \return
    database data
-
-   \created     19.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamProDatabaseData C_CamMosDatabaseItemWidget::GetDatabaseData(void) const
 {
    return this->mc_Database;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Browse for database path and check if already used
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Browse for database path and check if already used
 
    \param[in]    opc_Parent    pointer to parent (to integrate browse window correctly)
 
    \return
    new database path (empty if already existing or user canceled)
-
-   \created     08.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_CamMosDatabaseItemWidget::h_BrowseForDatabasePath(QWidget * const opc_Parent)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -502,17 +466,14 @@ QString C_CamMosDatabaseItemWidget::h_BrowseForDatabasePath(QWidget * const opc_
    return c_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Append message warning to database delete request if necessary
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Append message warning to database delete request if necessary
 
    \param[in]     orc_File        File to delete
    \param[in,out] orc_Description Current description
    \param[in,out] orc_Details     Current details
-
-   \created     05.02.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::h_AppendMessageWarningIfNecessary(const QString & orc_File, QString & orc_Description,
                                                                    QString & orc_Details)
 {
@@ -538,13 +499,10 @@ void C_CamMosDatabaseItemWidget::h_AppendMessageWarningIfNecessary(const QString
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for select bus button.
-
-   \created     19.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for select bus button.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::m_OnSelectBus()
 {
    QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
@@ -571,13 +529,10 @@ void C_CamMosDatabaseItemWidget::m_OnSelectBus()
    //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for browse button.
-
-   \created     14.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for browse button.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::m_OnBrowse()
 {
    const QString c_Name = C_CamMosDatabaseItemWidget::h_BrowseForDatabasePath(this); // multi-selection is not possible
@@ -641,26 +596,20 @@ void C_CamMosDatabaseItemWidget::m_OnBrowse()
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for remove button.
-
-   \created     14.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for remove button.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::m_OnRemove()
 {
    // inform list about remove
    Q_EMIT (this->SigRemoveDatabase(this, true));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for checkbox toggle.
-
-   \created     14.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for checkbox toggle.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::m_OnChxToggle(const bool & orq_Checked)
 {
    // inform list about check box toggle
@@ -668,13 +617,10 @@ void C_CamMosDatabaseItemWidget::m_OnChxToggle(const bool & orq_Checked)
    this->mc_Database.q_Enabled = orq_Checked;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set text of label from a path.
-
-   \created     17.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set text of label from a path.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::m_SetMinimizedPath(void) const
 {
    QFont c_Font = mc_STYLE_GUIDE_FONT_REGULAR_13;
@@ -686,9 +632,8 @@ void C_CamMosDatabaseItemWidget::m_SetMinimizedPath(void) const
    // padding 66 for 3 buttons a 16px and 3x padding a 6px
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for pressed signal of any button
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for pressed signal of any button
 
    We need to know when a button of the item was pressed, but is not released already. The signal clicked will be
    send normally when pressed and released is sent.
@@ -696,36 +641,33 @@ void C_CamMosDatabaseItemWidget::m_SetMinimizedPath(void) const
    be caused before the released signal of the button and the group of the buttons will be set invisible
    for a short time.
    This prevents the sending of the clicked signal of the button.
-
-   \created     28.01.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::m_ButtonPressed(void)
 {
    this->mq_ButtonPressed = true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for released signal of any button
-
-   \created     28.01.2019  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for released signal of any button
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseItemWidget::m_ButtonReleased(void)
 {
    this->mq_ButtonPressed = false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overridden event function.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overridden event function.
 
     Here: Show or hide buttons
 
-   \created     14.12.2018  STW/G.Landsgesell
+   \param[in,out]    opc_Event   Event identification and information
+
+   \retval  True   Event was recognized and processed
+   \retval  False  Event ignored
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_CamMosDatabaseItemWidget::event(QEvent * const opc_Event)
 {
    if (this->isEnabled() == true)

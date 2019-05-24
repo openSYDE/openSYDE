@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Base widget for style setup to customize graphic elements
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     28.10.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QVBoxLayout>
@@ -26,38 +19,35 @@
 
 #include "C_GtGetText.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_types;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] orc_Parent  Reference to parent
    \param[in]     orc_Name    Name of the bus for the title
    \param[in]     oq_DarkMode Optional flag if dark mode active
-
-   \created     12.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSyBaseWidget::C_GiSyBaseWidget(C_OgePopUpDialog & orc_Parent, const QString & orc_Name, const bool oq_DarkMode) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_GiSyBaseWidget()),
@@ -98,15 +88,12 @@ C_GiSyBaseWidget::C_GiSyBaseWidget(C_OgePopUpDialog & orc_Parent, const QString 
            this, &C_GiSyBaseWidget::m_CancelClicked);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     12.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSyBaseWidget::~C_GiSyBaseWidget(void)
 {
    delete mpc_Ui;
@@ -114,13 +101,10 @@ C_GiSyBaseWidget::~C_GiSyBaseWidget(void)
    //lint -e{1740}  no memory leak because the ownership of these objects was never transfered to this class
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     28.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyBaseWidget::InitStaticNames(void)
 {
    this->mpc_ParentDialog->SetSubTitle(C_GtGetText::h_GetText("Setup Style"));
@@ -130,15 +114,12 @@ void C_GiSyBaseWidget::InitStaticNames(void)
    this->mpc_Ui->pc_LabelPreview->setText(C_GtGetText::h_GetText("Example Preview"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief  Place widget in pop up dialog
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Place widget in pop up dialog
 
    \param[in,out] opc_Widget Widget to place in pop up dialog
-
-   \created     21.07.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyBaseWidget::SetWidget(QWidget * const opc_Widget)
 {
    if (opc_Widget != NULL)
@@ -156,46 +137,37 @@ void C_GiSyBaseWidget::SetWidget(QWidget * const opc_Widget)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the preview scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the preview scene
 
    \return     Pointer to preview scene
-
-   \created     28.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdTopologyScene * C_GiSyBaseWidget::GetPreviewScene(void)
 {
    return this->mpc_Scene;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get scene view size for improved item placement
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get scene view size for improved item placement
 
    \return
    Scene view size
-
-   \created     14.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QSize C_GiSyBaseWidget::h_GetSceneViewSize(void)
 {
    return QSize(296, 168);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     02.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyBaseWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
@@ -224,13 +196,10 @@ void C_GiSyBaseWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Ok button click
-
-   \created     16.08.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Ok button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyBaseWidget::m_OkClicked(void)
 {
    tgl_assert(this->mpc_ParentDialog != NULL);
@@ -240,13 +209,10 @@ void C_GiSyBaseWidget::m_OkClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Cancel button
-
-   \created     16.08.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Cancel button
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyBaseWidget::m_CancelClicked(void)
 {
    tgl_assert(this->mpc_ParentDialog != NULL);

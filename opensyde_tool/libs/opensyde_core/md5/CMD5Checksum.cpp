@@ -71,7 +71,7 @@ using namespace stw_md5;
 using namespace stw_types;
 using namespace stw_scl;
 
-//AST/STW: moved constants here as they are not needed globally
+//STW: moved constants here as they are not needed globally
 //MD5ChecksumDefines.h : MD5 Checksum constants
 
 //Magic initialization constants
@@ -188,7 +188,7 @@ ARGUMENTS:		CString& strFilePath : the full pathname of the specified file
 NOTES:			Provides an interface to the CMD5Checksum class. 'strFilePath' name should 
 				hold the full pathname of the file, eg C:\My Documents\Arcticle.txt.
 				NB.
-                AST/STW: if there are any problems the function will return an empty string.
+                STW: if there are any problems the function will return an empty string.
 *****************************************************************************************/
 C_SCLString CMD5Checksum::GetMD5(const C_SCLString & strFilePath)
 {
@@ -217,7 +217,7 @@ RETURNS:		CString : the hexadecimal MD5 checksum for the specified file
 ARGUMENTS:		CFile& File : the specified file
 NOTES:			Provides an interface to the CMD5Checksum class. 'File' should be open in 
 				binary readonly mode before calling this function. 
-                AST/STW: if there are any problems the function will return an empty string.
+                STW: if there are any problems the function will return an empty string.
 *****************************************************************************************/
 C_SCLString CMD5Checksum::GetMD5(FILE * const opt_File)
 {

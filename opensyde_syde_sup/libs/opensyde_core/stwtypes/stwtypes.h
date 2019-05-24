@@ -1,38 +1,32 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \file       stwtypes.h
+   \file
    \brief      STW specific standard defines and types
 
    Standard typedefs in compliance with STW C++ Coding Rules.
-   here: for Windows applications.
+   here: for 32bit compilation under Windows.
 
    Suitable for applications compiled with:
-   - Borland C++ Builder
+   - Embarcadero C++ Builder
    - MinGW
    - MS Visual C++
 
-   \implementation
-   project     to be used in all kinds of applications
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     23.08.2007  STW/U.Meyler
-   \endimplementation
+   \copyright   Copyright 2007 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef STWTYPESH
 #define STWTYPESH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 #ifdef __cplusplus
 namespace stw_types
 {
 #endif
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 typedef unsigned char uint8;       ///< data type  8bit unsigned
 typedef signed char sint8;         ///< data type  8bit signed
@@ -51,7 +45,7 @@ typedef unsigned int uintn; ///< data type native unsigned int
 typedef signed int sintn;   ///< data type native signed int
 typedef char charn;         ///< data type native char
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 
 #ifdef __cplusplus
 }

@@ -1,52 +1,42 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Buffer for max performance model additions (implementation)
 
    Buffer for max performance model additions
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     29.08.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_CamMetTreeGUIBuffer.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     29.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMetTreeGUIBuffer::C_CamMetTreeGUIBuffer(QObject * const opc_Parent) :
    QObject(opc_Parent),
    mq_Connected(false)
@@ -56,15 +46,12 @@ C_CamMetTreeGUIBuffer::C_CamMetTreeGUIBuffer(QObject * const opc_Parent) :
    connect(this, &C_CamMetTreeGUIBuffer::SigInternalTrigger, this, &C_CamMetTreeGUIBuffer::m_HandleUpdateUi);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new data into queue to update ui later
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new data into queue to update ui later
 
    \param[in] orc_NewData Single, new data entry
-
-   \created     29.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeGUIBuffer::HandleData(const C_CamMetTreeLoggerData & orc_NewData)
 {
    this->mc_BufferMutex.lock();
@@ -77,13 +64,10 @@ void C_CamMetTreeGUIBuffer::HandleData(const C_CamMetTreeLoggerData & orc_NewDat
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Removes all already added entries without reading
-
-   \created     25.01.2019  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Removes all already added entries without reading
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeGUIBuffer::ClearBuffer(void)
 {
    this->mc_BufferMutex.lock();
@@ -91,13 +75,10 @@ void C_CamMetTreeGUIBuffer::ClearBuffer(void)
    this->mc_BufferMutex.unlock();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger UI update
-
-   \created     29.08.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger UI update
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeGUIBuffer::m_HandleUpdateUi(void)
 {
    std::list<C_CamMetTreeLoggerData> c_BufferCopy;

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Importing data from Vector DBC file (implementation)
 
    Importing bus definition with all nodes from a Vector DBC file.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     23.10.2017  STW/U.Roesch
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <cstdlib>
 
 #include "precomp_headers.h"
@@ -34,20 +27,20 @@
 #include "C_OSCLoggingHandler.h"
 #include "C_CieUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_scl;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const C_SCLString C_CieImportDbc::mhc_SendType = "GenMsgSendType";
 const C_SCLString C_CieImportDbc::mhc_CycleTime = "GenMsgCycleTime";
 const C_SCLString C_CieImportDbc::mhc_InitialValue = "GenSigStartValue";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 Vector::DBC::AttributeDefinition C_CieImportDbc::mhc_AttributeSendType;
 C_SCLString C_CieImportDbc::mhc_DefaultSendTypeValue; // get value from network attribute default values
 float32 C_CieImportDbc::mhf32_DefaultInitialValue;    // default initial value of DBC file or openSYDE
@@ -55,22 +48,22 @@ bool C_CieImportDbc::mhq_DefaultValueDefined;         // in DBC file
 C_SCLStringList C_CieImportDbc::mhc_WarningMessages;  // empty list
 C_SCLString C_CieImportDbc::mhc_ErrorMessage = "";    // empty string
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief    Import network configuration from .dbc file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Import network configuration from .dbc file
 
    The caller is responsible to provided valid pointers for the function parameters.
 
-   \param[in]  orc_File            path and name of .dbc file
-   \param[out] orc_Definition      communication stack definition filled with data read from .dbc file
-   \param[out] orc_WarningMessages list of global warnings e.g. why some messages could not be imported
-   \param[out] orc_ErrorMessages   error message with reason for failed import
+   \param[in]  orc_File               path and name of .dbc file
+   \param[out] orc_Definition         communication stack definition filled with data read from .dbc file
+   \param[out] orc_WarningMessages    list of global warnings e.g. why some messages could not be imported
+   \param[out] orc_ErrorMessage       error message with reason for failed import
+   \param[in]  oq_AddUnmappedMessages Optional flag to include unmapped messages in the output
 
    \return
    C_NO_ERR    required data from file successfully stored in orc_Definition
@@ -78,13 +71,12 @@ C_SCLString C_CieImportDbc::mhc_ErrorMessage = "";    // empty string
    C_CONFIG    orc_File does not point to a valid file
    C_RD_WR     error while reading file
    C_WARN      unknown parameter found -> default value set and error reported
-
-   \created     25.10.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieImportDbc::h_ImportNetwork(const C_SCLString & orc_File,
                                        C_CieConverter::C_CIECommDefinition & orc_Definition,
-                                       C_SCLStringList & orc_WarningMessages, C_SCLString & orc_ErrorMessage)
+                                       C_SCLStringList & orc_WarningMessages, C_SCLString & orc_ErrorMessage,
+                                       const bool oq_AddUnmappedMessages)
 {
    sint32 s32_Return;
 
@@ -163,12 +155,40 @@ sint32 C_CieImportDbc::h_ImportNetwork(const C_SCLString & orc_File,
          std::set<std::string>::const_iterator c_Iter;
          for (c_Iter = c_MessageAssignment.begin(); c_Iter != c_MessageAssignment.end(); ++c_Iter)
          {
-            C_SCLString c_String = C_SCLString((*c_Iter).c_str());
-            osc_write_log_warning("DBC file import",
-                                  "message \"" + c_String + "\" is not assigned to a node and ignored.");
-            mhc_WarningMessages.Append("Message \"" + c_String + "\" is not assigned to a node and ignored.");
+            if (oq_AddUnmappedMessages)
+            {
+               for (auto c_DbcMessage : c_DbcNetwork.messages)
+               {
+                  if (c_DbcMessage.second.name.compare(*c_Iter) == 0)
+                  {
+                     //Add found message to unmapped messages
+                     C_CieConverter::C_CIENodeMessage c_Message;
+
+                     if (C_CieImportDbc::mh_PrepareMessage(c_DbcMessage.second, c_Message) != stw_errors::C_NO_ERR)
+                     {
+                        s32_Return = stw_errors::C_WARN;
+                     }
+
+                     orc_Definition.c_UnmappedMessages.push_back(c_Message);
+
+                     //Stop searching after finding the message
+                     break;
+                  }
+               }
+            }
+            else
+            {
+               const C_SCLString c_String = C_SCLString((*c_Iter).c_str());
+               //Report issue
+               osc_write_log_warning("DBC file import",
+                                     "message \"" + c_String + "\" is not assigned to a node and ignored.");
+               mhc_WarningMessages.Append("Message \"" + c_String + "\" is not assigned to a node and ignored.");
+            }
          }
-         s32_Return = stw_errors::C_WARN;
+         if (oq_AddUnmappedMessages == false)
+         {
+            s32_Return = stw_errors::C_WARN;
+         }
       }
    }
 
@@ -180,10 +200,8 @@ sint32 C_CieImportDbc::h_ImportNetwork(const C_SCLString & orc_File,
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief    Read data from .dbc file
-
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Read data from .dbc file
 
    \param[in]  orc_File        path and name of .dbc file
    \param[out] orc_Network     data read from .dbc file
@@ -193,10 +211,8 @@ sint32 C_CieImportDbc::h_ImportNetwork(const C_SCLString & orc_File,
    C_RANGE     orc_File is empty string
    C_CONFIG    orc_File does not point to a valid file
    C_RD_WR     error while reading file
-
-   \created     23.10.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieImportDbc::mh_ReadFile(const C_SCLString & orc_File, Vector::DBC::Network & orc_Network)
 {
    sint32 s32_Return = stw_errors::C_NO_ERR;
@@ -226,10 +242,8 @@ sint32 C_CieImportDbc::mh_ReadFile(const C_SCLString & orc_File, Vector::DBC::Ne
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief    Get node definitions
-
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Get node definitions
 
    \param[in]  orc_DbcNode           node definitions from DBC file
    \param[out] orc_Node              target node definitions
@@ -237,10 +251,8 @@ sint32 C_CieImportDbc::mh_ReadFile(const C_SCLString & orc_File, Vector::DBC::Ne
    \return
    C_NO_ERR    all data successfully retrieved
    C_WARN      unknown parameter found -> default value set and error reported
-
-   \created     27.10.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieImportDbc::mh_GetNode(const Vector::DBC::Node & orc_DbcNode, C_CieConverter::C_CIENode & orc_Node)
 {
    sint32 s32_Return = stw_errors::C_NO_ERR;
@@ -251,10 +263,8 @@ sint32 C_CieImportDbc::mh_GetNode(const Vector::DBC::Node & orc_DbcNode, C_CieCo
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief    Get message definition
-
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Get message definition
 
    \param[in]      orc_DbcMessage        message definition from DBC file
    \param[in, out] orc_Node              target node definitions
@@ -263,10 +273,8 @@ sint32 C_CieImportDbc::mh_GetNode(const Vector::DBC::Node & orc_DbcNode, C_CieCo
    C_NO_ERR    all data successfully retrieved
    C_WARN      unknown parameter found -> default value set and error reported
    C_CONFIG    node does not contain this message
-
-   \created     27.10.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieImportDbc::mh_GetMessage(const Vector::DBC::Message & orc_DbcMessage, C_CieConverter::C_CIENode & orc_Node)
 {
    sint32 s32_Return = stw_errors::C_NO_ERR;
@@ -321,34 +329,7 @@ sint32 C_CieImportDbc::mh_GetMessage(const Vector::DBC::Message & orc_DbcMessage
    {
       C_CieConverter::C_CIENodeMessage c_TxMessage;
 
-      c_TxMessage.c_CanMessage.c_Name = orc_DbcMessage.name.c_str();
-      c_TxMessage.c_CanMessage.c_Comment = orc_DbcMessage.comment.c_str();
-      if (orc_DbcMessage.id & (1 << 31U))
-      {
-         c_TxMessage.c_CanMessage.q_IsExtended = true;
-      }
-      else
-      {
-         c_TxMessage.c_CanMessage.q_IsExtended = false;
-      }
-
-      c_TxMessage.c_CanMessage.u32_CanId = orc_DbcMessage.id & 0x7FFFFFFF;
-      c_TxMessage.c_CanMessage.u16_Dlc = static_cast<uint16>(orc_DbcMessage.size);
-
-      osc_write_log_info("DBC file import", "Importing signals for CAN Tx message \"" +
-                         c_TxMessage.c_CanMessage.c_Name + "\" ...");
-
-      // get all signal definitions for this message
-      for (auto c_DbcSignal : orc_DbcMessage.signals)
-      {
-         if (mh_GetSignal(c_DbcSignal.second, c_TxMessage) != stw_errors::C_NO_ERR)
-         {
-            s32_Return = stw_errors::C_WARN;
-         }
-      }
-
-      // get transmission definitions
-      if (mh_GetTransmission(orc_DbcMessage, c_TxMessage) != stw_errors::C_NO_ERR)
+      if (C_CieImportDbc::mh_PrepareMessage(orc_DbcMessage, c_TxMessage) != stw_errors::C_NO_ERR)
       {
          s32_Return = stw_errors::C_WARN;
       }
@@ -359,34 +340,7 @@ sint32 C_CieImportDbc::mh_GetMessage(const Vector::DBC::Message & orc_DbcMessage
    {
       C_CieConverter::C_CIENodeMessage c_RxMessage;
 
-      c_RxMessage.c_CanMessage.c_Name = orc_DbcMessage.name.c_str();
-      c_RxMessage.c_CanMessage.c_Comment = orc_DbcMessage.comment.c_str();
-      if (orc_DbcMessage.id & (1 << 31U))
-      {
-         c_RxMessage.c_CanMessage.q_IsExtended = true;
-      }
-      else
-      {
-         c_RxMessage.c_CanMessage.q_IsExtended = false;
-      }
-
-      c_RxMessage.c_CanMessage.u32_CanId = orc_DbcMessage.id & 0x7FFFFFFF;
-      c_RxMessage.c_CanMessage.u16_Dlc = static_cast<uint16>(orc_DbcMessage.size);
-
-      osc_write_log_info("DBC file import", "Importing signals for CAN Rx message \"" +
-                         c_RxMessage.c_CanMessage.c_Name + "\" ...");
-
-      // get all signal definitions for this message
-      for (auto c_DbcSignal : orc_DbcMessage.signals)
-      {
-         if (mh_GetSignal(c_DbcSignal.second, c_RxMessage) != stw_errors::C_NO_ERR)
-         {
-            s32_Return = stw_errors::C_WARN;
-         }
-      }
-
-      // get transmission definitions
-      if (mh_GetTransmission(orc_DbcMessage, c_RxMessage) != stw_errors::C_NO_ERR)
+      if (C_CieImportDbc::mh_PrepareMessage(orc_DbcMessage, c_RxMessage) != stw_errors::C_NO_ERR)
       {
          s32_Return = stw_errors::C_WARN;
       }
@@ -402,10 +356,58 @@ sint32 C_CieImportDbc::mh_GetMessage(const Vector::DBC::Message & orc_DbcMessage
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief    Get signal definition
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Parse and convert message
 
+   \param[in]     orc_DbcMessage       Message to convert
+   \param[in,out] orc_Message          Converted message
+
+   \retval   C_NO_ERR   No error occurred
+   \retval   C_WARN     Could not find at least one thing
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_CieImportDbc::mh_PrepareMessage(const Vector::DBC::Message & orc_DbcMessage,
+                                         C_CieConverter::C_CIENodeMessage & orc_Message)
+{
+   sint32 s32_Return = stw_errors::C_NO_ERR;
+
+   orc_Message.c_CanMessage.c_Name = orc_DbcMessage.name.c_str();
+   orc_Message.c_CanMessage.c_Comment = orc_DbcMessage.comment.c_str();
+   if (orc_DbcMessage.id & (1 << 31U))
+   {
+      orc_Message.c_CanMessage.q_IsExtended = true;
+   }
+   else
+   {
+      orc_Message.c_CanMessage.q_IsExtended = false;
+   }
+
+   orc_Message.c_CanMessage.u32_CanId = orc_DbcMessage.id & 0x7FFFFFFF;
+   orc_Message.c_CanMessage.u16_Dlc = static_cast<uint16>(orc_DbcMessage.size);
+
+   osc_write_log_info("DBC file import",
+                      "Importing signals for CAN message \"" + orc_Message.c_CanMessage.c_Name + "\" ...");
+
+   // get all signal definitions for this message
+   for (auto c_DbcSignal : orc_DbcMessage.signals)
+   {
+      if (mh_GetSignal(c_DbcSignal.second, orc_Message) != stw_errors::C_NO_ERR)
+      {
+         s32_Return = stw_errors::C_WARN;
+      }
+   }
+
+   // get transmission definitions
+   if (mh_GetTransmission(orc_DbcMessage, orc_Message) != stw_errors::C_NO_ERR)
+   {
+      s32_Return = stw_errors::C_WARN;
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Get signal definition
 
    \param[in]  orc_DbcSignal         signal definition from DBC file
    \param[out] orc_Message           target message definitions
@@ -413,14 +415,13 @@ sint32 C_CieImportDbc::mh_GetMessage(const Vector::DBC::Message & orc_DbcMessage
    \return
    C_NO_ERR    all data successfully retrieved
    C_WARN      unknown parameter found -> default value set and warning reported
-
-   \created     02.11.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieImportDbc::mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal,
                                     C_CieConverter::C_CIENodeMessage & orc_Message)
 {
    sint32 s32_Return = stw_errors::C_NO_ERR;
+
    std::map<uintn, std::string>::const_iterator c_ItValueDescr;
 
    C_CieConverter::C_CIECanSignal c_Signal;
@@ -473,9 +474,8 @@ sint32 C_CieImportDbc::mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal,
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief    Get signal values and type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Get signal values and type
 
    Set minimum and maximum values for a signal.
 
@@ -486,10 +486,8 @@ sint32 C_CieImportDbc::mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal,
    \return
    C_NO_ERR    all data successfully retrieved
    C_WARN      unknown parameter found -> default value set and error reported
-
-   \created     02.11.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSignal,
                                           C_CieConverter::C_CIEDataPoolElement & orc_Element,
                                           C_SCLStringList & orc_WarningMessages)
@@ -854,9 +852,8 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief    Get attribute definition
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Get attribute definition
 
    Search all attribute definitions for the prepared strings and set according
    attribute definition.
@@ -866,10 +863,8 @@ sint32 C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSig
    \return
    C_NO_ERR    attribute definitions found
    C_WARN      attribute definition not found
-
-   \created     10.11.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieImportDbc::mh_GetAttributeDefinitions(const Vector::DBC::Network & orc_DbcNetwork)
 {
    sint32 s32_Return = stw_errors::C_NO_ERR;
@@ -955,9 +950,8 @@ sint32 C_CieImportDbc::mh_GetAttributeDefinitions(const Vector::DBC::Network & o
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief    Get transmission type and time
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Get transmission type and time
 
    Search attribute values for required parameters and copy values to converter
    structure.
@@ -971,10 +965,8 @@ sint32 C_CieImportDbc::mh_GetAttributeDefinitions(const Vector::DBC::Network & o
    \return
    C_NO_ERR    all data successfully retrieved
    C_WARN      unknown parameter found -> default value set and error reported
-
-   \created     10.11.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieImportDbc::mh_GetTransmission(const Vector::DBC::Message & orc_DbcMessage,
                                           C_CieConverter::C_CIENodeMessage & orc_Message)
 {
@@ -1058,9 +1050,8 @@ sint32 C_CieImportDbc::mh_GetTransmission(const Vector::DBC::Message & orc_DbcMe
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief    Check if datatype is big enough for value.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Check if datatype is big enough for value.
 
    \param[in]  of64_Value            value to check for range condition
    \param[in]  oe_Datatype           datatype of value
@@ -1068,10 +1059,8 @@ sint32 C_CieImportDbc::mh_GetTransmission(const Vector::DBC::Message & orc_DbcMe
    \return
    C_NO_ERR    value in range
    C_RANGE     value can't be stored fully for this datatype
-
-   \created     08.05.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_types::sint32 C_CieImportDbc::mh_CheckRange(float64 of64_Value, C_OSCNodeDataPoolContent::E_Type oe_Datatype)
 {
    sint32 s32_Return;

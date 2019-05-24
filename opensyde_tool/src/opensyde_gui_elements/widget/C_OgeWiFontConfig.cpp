@@ -1,34 +1,27 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Custom font configuration widget (implementation)
 
    Custom font configuration widget
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.07.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_GtGetText.h"
 #include "C_OgeWiFontConfig.h"
 #include "ui_C_OgeWiFontConfig.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_8 = 0;
 const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_9 = 1;
 const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_10 = 2;
@@ -51,27 +44,24 @@ const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_300 = 18;
 const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_400 = 19;
 const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_500 = 20;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     27.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeWiFontConfig::C_OgeWiFontConfig(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_OgeWiFontConfig)
@@ -131,24 +121,18 @@ C_OgeWiFontConfig::C_OgeWiFontConfig(QWidget * const opc_Parent) :
    connect(this->mpc_Ui->pc_PushButtonUnderline, &QPushButton::clicked, this, &C_OgeWiFontConfig::m_TriggerUpdate);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     27.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeWiFontConfig::~C_OgeWiFontConfig(void)
 {
    delete mpc_Ui;
 }
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     27.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiFontConfig::InitStaticNames(void) const
 {
    //Translation: italic
@@ -159,15 +143,12 @@ void C_OgeWiFontConfig::InitStaticNames(void) const
    this->mpc_Ui->pc_PushButtonUnderline->setText(C_GtGetText::h_GetText("U"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply font
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply font
 
    \param[in] orc_Font New font
-
-   \created     27.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiFontConfig::SetFont(const QFont & orc_Font)
 {
    //Disconnect update
@@ -200,13 +181,10 @@ void C_OgeWiFontConfig::SetFont(const QFont & orc_Font)
    connect(this->mpc_Ui->pc_PushButtonUnderline, &QPushButton::toggled, this, &C_OgeWiFontConfig::m_TriggerUpdate);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger update of font
-
-   \created     27.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger update of font
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiFontConfig::m_TriggerUpdate(void)
 {
    QFont c_Font = this->mpc_Ui->pc_FontComboBox->currentFont();
@@ -219,18 +197,15 @@ void C_OgeWiFontConfig::m_TriggerUpdate(void)
    Q_EMIT this->SigFontUpdate(c_Font);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get size index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get size index
 
    \param[in] orc_Font Current font
 
    \return
    Size combo box index
-
-   \created     27.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_OgeWiFontConfig::GetSizeIndex(const QFont & orc_Font) const
 {
    sintn sn_Retval = -1;
@@ -315,15 +290,12 @@ sintn C_OgeWiFontConfig::GetSizeIndex(const QFont & orc_Font) const
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update font size
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update font size
 
    \param[in,out] orc_Font Font to update
-
-   \created     27.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiFontConfig::GetSize(QFont & orc_Font) const
 {
    switch (this->mpc_Ui->pc_ComboBoxSize->currentIndex())

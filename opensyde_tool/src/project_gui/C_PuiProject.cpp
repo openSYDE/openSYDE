@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Complete project information (implementation)
 
@@ -8,17 +7,11 @@
 
    Note: For openSYDE_Test.pro there exists a simply copied dummy class of this class!
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     15.09.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QDir>
@@ -38,7 +31,7 @@
 #include "C_GtGetText.h"
 #include "C_PuiSvHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
@@ -47,24 +40,24 @@ using namespace stw_errors;
 using namespace stw_tgl;
 using namespace stw_scl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 C_PuiProject * C_PuiProject::mhpc_Singleton = NULL;
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save project
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save project
 
-   \param[in] oq_ForceSaveAll Optional flag if all files should be saved
+   \param[in] oq_ForceSaveAll              Optional flag if all files should be saved
+   \param[in] oq_UseDeprecatedFileFormatV2 Flag to enable saving using the deprecated V2 file format
 
    \return
    C_NO_ERR   data saved
@@ -73,54 +66,94 @@ C_PuiProject * C_PuiProject::mhpc_Singleton = NULL;
    C_RANGE    Path is empty
    C_NOACT    Could not create project directory
    C_COM      Bus sorting failed
-
-   \created     15.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
-sint32 C_PuiProject::Save(const bool oq_ForceSaveAll)
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiProject::Save(const bool oq_ForceSaveAll, const bool oq_UseDeprecatedFileFormatV2)
 {
    sint32 s32_Retval;
-   QFileInfo c_File(mc_Path);
+   const QFileInfo c_File(mc_Path);
    QDir c_Directory(c_File.absolutePath());
 
    if (c_Directory.mkpath(".") == true)
    {
       C_PuiProject::h_HandlePendingEvents();
       //lint -e{40} Defined by project file
-      s32_Retval = C_OSCProjectFiler::h_Save(*this, mc_Path.toStdString().c_str(), APPLICATION_VERSION);
+      s32_Retval = C_OSCProjectFiler::h_Save(*this,
+                                             mc_Path.toStdString().c_str(),
+                                             stw_opensyde_gui_logic::C_Uti::h_GetApplicationVersion(
+                                                false).toStdString().c_str());
       if (s32_Retval == C_NO_ERR)
       {
          // save system definition only if it has changed
          if ((C_PuiSdHandler::h_GetInstance()->HasHashChanged() == true) || (oq_ForceSaveAll == true))
          {
             QString c_SystemDefintionPath;
-            h_AdaptProjectPathToSystemDefinition(mc_Path, c_SystemDefintionPath);
+            //Each format uses different folders!
+            if (oq_UseDeprecatedFileFormatV2)
             {
-               stw_scl::C_SCLString c_Path;
-               //Create path
-               c_Path = TGL_ExtractFilePath(c_SystemDefintionPath.toStdString().c_str());
-               TGL_CreateDirectory(c_Path);
+               mh_AdaptProjectPathToSystemDefinitionV2(mc_Path, c_SystemDefintionPath);
             }
-            s32_Retval = C_PuiSdHandler::h_GetInstance()->SaveToFile(c_SystemDefintionPath.toStdString().c_str());
+            else
+            {
+               h_AdaptProjectPathToSystemDefinition(mc_Path, c_SystemDefintionPath);
+            }
+            {
+               const QFileInfo c_RefFile(c_SystemDefintionPath);
+               const QDir c_Dir = c_RefFile.dir();
+               //Create path (if necessary)
+               if ((c_Dir.mkdir(".") == true) || (c_Dir.exists() == true))
+               {
+                  s32_Retval =
+                     C_PuiSdHandler::h_GetInstance()->SaveToFile(
+                        c_SystemDefintionPath.toStdString().c_str(), oq_UseDeprecatedFileFormatV2);
+               }
+               else
+               {
+                  s32_Retval = C_RD_WR;
+               }
+            }
          }
 
          if (s32_Retval == C_NO_ERR)
          {
-            QString c_SystemViewsPath;
-            mh_AdaptProjectPathToSystemViews(mc_Path, c_SystemViewsPath);
+            // save system views only if it has changed
+            if ((C_PuiSvHandler::h_GetInstance()->HasHashChanged() == true) || (oq_ForceSaveAll == true))
             {
-               stw_scl::C_SCLString c_Path;
-               //Create path
-               c_Path = TGL_ExtractFilePath(c_SystemViewsPath.toStdString().c_str());
-               TGL_CreateDirectory(c_Path);
+               QString c_SystemViewsPath;
+               //Each format uses different folders!
+               if (oq_UseDeprecatedFileFormatV2)
+               {
+                  mh_AdaptProjectPathToSystemViewsV1(mc_Path, c_SystemViewsPath);
+               }
+               else
+               {
+                  mh_AdaptProjectPathToSystemViews(mc_Path, c_SystemViewsPath);
+               }
+               {
+                  const QFileInfo c_RefFile(c_SystemViewsPath);
+                  const QDir c_Dir = c_RefFile.dir();
+                  //Create path (if necessary)
+                  if ((c_Dir.mkdir(".") == true) || (c_Dir.exists() == true))
+                  {
+                     s32_Retval = C_PuiSvHandler::h_GetInstance()->SaveToFile(
+                        c_SystemViewsPath.toStdString().c_str(), oq_UseDeprecatedFileFormatV2);
+                  }
+                  else
+                  {
+                     s32_Retval = C_RD_WR;
+                  }
+               }
             }
-            s32_Retval = C_PuiSvHandler::h_GetInstance()->SaveToFile(c_SystemViewsPath.toStdString().c_str());
          }
       }
       if (s32_Retval == C_NO_ERR)
       {
-         //calculate the hash value and save it for comparing
-         this->mu32_CalculatedProjectHash = this->m_CalcHashProject();
+         //Only update hash in non deprecated mode
+         if (oq_UseDeprecatedFileFormatV2 == false)
+         {
+            //calculate the hash value and save it for comparing
+            this->mu32_CalculatedProjectHash = this->m_CalcHashProject();
+         }
       }
    }
    else
@@ -130,11 +163,10 @@ sint32 C_PuiProject::Save(const bool oq_ForceSaveAll)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load project
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load project
 
-   \param[in]   orc_Path   Project path
+   \param[in] opu16_FileVersion Optional storage for system definition file version
 
    \return
    C_RD_WR  Problems accessing file system (e.g. no read access to file)
@@ -143,11 +175,9 @@ sint32 C_PuiProject::Save(const bool oq_ForceSaveAll)
    C_CONFIG Content of a project file is invalid or incomplete
    C_COM    Device definition not found for project
    C_OVERFLOW  node in system definition references a device not part of the device definitions
-
-   \created     15.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
-sint32 C_PuiProject::Load(void)
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiProject::Load(uint16 * const opu16_FileVersion)
 {
    sint32 s32_Retval;
 
@@ -159,24 +189,47 @@ sint32 C_PuiProject::Load(void)
    }
    else
    {
+      //Load project file
       s32_Retval = C_OSCProjectFiler::h_Load(*this, this->mc_Path.toStdString().c_str());
       if (s32_Retval == C_NO_ERR)
       {
          QString c_SystemDefintionPath;
+         //Try newest path
          h_AdaptProjectPathToSystemDefinition(this->mc_Path, c_SystemDefintionPath);
-         s32_Retval = C_PuiSdHandler::h_GetInstance()->LoadFromFile(c_SystemDefintionPath.toStdString().c_str());
-         if (s32_Retval == C_NO_ERR)
          {
-            QString c_SystemViewsPath;
-            mh_AdaptProjectPathToSystemViews(this->mc_Path, c_SystemViewsPath);
-            s32_Retval = C_PuiSvHandler::h_GetInstance()->LoadFromFile(c_SystemViewsPath.toStdString().c_str());
-         }
-         else
-         {
-            if (s32_Retval == C_OVERFLOW)
+            const QFileInfo c_FileInfoSysDef(c_SystemDefintionPath);
+            //If this path does not work try the deprecated path
+            if (c_FileInfoSysDef.exists() == false)
             {
-               //remap "device not found" error code
-               s32_Retval = C_COM;
+               mh_AdaptProjectPathToSystemDefinitionV2(this->mc_Path, c_SystemDefintionPath);
+            }
+            //Load system definition
+            s32_Retval = C_PuiSdHandler::h_GetInstance()->LoadFromFile(
+               c_SystemDefintionPath.toStdString().c_str(), opu16_FileVersion);
+            if (s32_Retval == C_NO_ERR)
+            {
+               QString c_SystemViewsPath;
+               //Try newest path
+               mh_AdaptProjectPathToSystemViews(this->mc_Path, c_SystemViewsPath);
+               {
+                  const QFileInfo c_FileInfoSysView(c_SystemViewsPath);
+                  //If this path does not work try the deprecated path
+                  if (c_FileInfoSysView.exists() == false)
+                  {
+                     mh_AdaptProjectPathToSystemViewsV1(this->mc_Path, c_SystemViewsPath);
+                  }
+                  //Load system views
+                  s32_Retval = C_PuiSvHandler::h_GetInstance()->LoadFromFile(
+                     c_SystemViewsPath.toStdString().c_str());
+               }
+            }
+            else
+            {
+               if (s32_Retval == C_OVERFLOW)
+               {
+                  //remap "device not found" error code
+                  s32_Retval = C_COM;
+               }
             }
          }
       }
@@ -190,17 +243,14 @@ sint32 C_PuiProject::Load(void)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Compares the last saved hash value against the actual hash
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Compares the last saved hash value against the actual hash
 
    \return
    false    Hash has not changed
    true     Hash has changed
-
-   \created     10.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_PuiProject::HasHashChanged(void) const
 {
    const uint32 u32_NewHash = this->m_CalcHashProject();
@@ -214,15 +264,12 @@ bool C_PuiProject::HasHashChanged(void) const
    return q_Changed;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set path of project (always absolute and with "/" as delimiters)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set path of project (always absolute and with "/" as delimiters)
 
    \param[in]   orc_Path   Project path
-
-   \created     16.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiProject::SetPath(const QString & orc_Path)
 {
    if (orc_Path != "")
@@ -236,37 +283,28 @@ void C_PuiProject::SetPath(const QString & orc_Path)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get default path
-
-   \created     16.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get default path
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_PuiProject::h_GetDefaultPath(void)
 {
    return C_Uti::h_GetExePath() + "/Examples/ESX-3CM/ESX-3CM.syde";
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current path
-
-   \created     16.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current path
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_PuiProject::GetPath(void) const
 {
    return this->mc_Path;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current folder path without project name
-
-   \created     21.12.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current folder path without project name
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_PuiProject::GetFolderPath(void) const
 {
    const QString c_Path = TGL_ExtractFilePath(this->mc_Path.toStdString().c_str()).c_str();
@@ -274,16 +312,13 @@ QString C_PuiProject::GetFolderPath(void) const
    return c_Path;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current project name (name of *.syde file)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current project name (name of *.syde file)
 
    \return
    name of project
-
-   \created     19.02.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_PuiProject::GetName(void) const
 {
    QString c_Return = "";
@@ -297,32 +332,26 @@ QString C_PuiProject::GetName(void) const
    return c_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get information about project load switch.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get information about project load switch.
 
    \return
    true     successfully loaded a provided project (switch to last known use case)
    false    loaded a project from recent project list (stay at main page)
-
-   \created     08.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_PuiProject::GetSwitchUseCaseFlag() const
 {
    return this->mq_SwitchToLastKnownUseCase;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get singleton (Create if necessary)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get singleton (Create if necessary)
 
    \return
    Pointer to singleton
-
-   \created     06.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiProject * C_PuiProject::h_GetInstance(void)
 {
    if (C_PuiProject::mhpc_Singleton == NULL)
@@ -332,13 +361,10 @@ C_PuiProject * C_PuiProject::h_GetInstance(void)
    return C_PuiProject::mhpc_Singleton;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up singleton
-
-   \created     06.02.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clean up singleton
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiProject::h_Destroy(void)
 {
    if (C_PuiProject::mhpc_Singleton != NULL)
@@ -348,19 +374,16 @@ void C_PuiProject::h_Destroy(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get accumulated file size of all project files in byte
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get accumulated file size of all project files in byte
 
    \param[in] orc_ProjectPath Project path
 
    \return
    0    File not found
    Else Accumulated, relevant file sizes (Byte)
-
-   \created     15.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint64 C_PuiProject::h_GetProjectSize(const QString & orc_ProjectPath)
 {
    uint64 u64_Retval = 0ULL;
@@ -381,15 +404,12 @@ uint64 C_PuiProject::h_GetProjectSize(const QString & orc_ProjectPath)
    return u64_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Standard constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Standard constructor
 
    \param[in]   orc_Path   Project path
-
-   \created     15.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiProject::C_PuiProject(void) :
    C_OSCProject(),
    mu32_CalculatedProjectHash(),
@@ -398,13 +418,10 @@ C_PuiProject::C_PuiProject(void) :
    m_InitialProjectLoad();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Standard destructor
-
-   \created     15.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Standard destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiProject::~C_PuiProject(void)
 {
    //Clean up singleton
@@ -412,18 +429,15 @@ C_PuiProject::~C_PuiProject(void)
    C_PuiSdHandler::h_Destroy();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value of the project file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the hash value of the project file
 
    Start value is 0xFFFFFFFF
 
    \return
    Calculated hash value
-
-   \created     30.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_PuiProject::m_CalcHashProject(void) const
 {
    uint32 u32_Hash = 0xFFFFFFFFU;
@@ -433,13 +447,10 @@ uint32 C_PuiProject::m_CalcHashProject(void) const
    return u32_Hash;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load empty project
-
-   \created     17.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load empty project
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiProject::LoadEmpty(void)
 {
    C_OSCProject c_Tmp;
@@ -447,6 +458,7 @@ void C_PuiProject::LoadEmpty(void)
    //Default values
    this->mc_Path = "";
    this->c_Author = c_Tmp.c_Author;
+   this->c_Editor = c_Author;
    this->c_CreationTime = c_Tmp.c_CreationTime;
    this->c_ModificationTime = c_Tmp.c_ModificationTime;
    this->c_Template = C_GtGetText::h_GetText("New project");
@@ -457,29 +469,23 @@ void C_PuiProject::LoadEmpty(void)
    this->mu32_CalculatedProjectHash = this->m_CalcHashProject();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if project is never saved empty project
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if project is never saved empty project
 
    \return
    True  Never saved
    False Has valid save location
-
-   \created     13.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_PuiProject::IsEmptyProject(void) const
 {
    return (this->GetPath().compare("") == 0);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle all pending events to guarantee valid CRC check
-
-   \created     07.05.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle all pending events to guarantee valid CRC check
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiProject::h_HandlePendingEvents(void)
 {
    QWidget * const pc_PreviousFocusWidget = QApplication::focusWidget();
@@ -508,59 +514,76 @@ void C_PuiProject::h_HandlePendingEvents(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Automatically create sub-folder for system definition
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Automatically create sub-folder for system definition
 
    \param[in]   orc_ProjectPath         Project path
    \param[in]   orc_SystemDefintionPath System definition path
-
-   \created     15.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiProject::h_AdaptProjectPathToSystemDefinition(const QString & orc_ProjectPath,
                                                         QString & orc_SystemDefintionPath)
 {
-   QFileInfo c_File;
+   const QFileInfo c_File(orc_ProjectPath);
 
-   c_File.setFile(orc_ProjectPath);
-
-   orc_SystemDefintionPath = c_File.path() + "/" + c_File.baseName() + ".syde_sysdef";
+   orc_SystemDefintionPath = c_File.path() + "/system_definition/" + c_File.baseName() + ".syde_sysdef";
 }
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Automatically create sub-folder for system views
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Automatically create sub-folder for system views
 
    \param[in]   orc_ProjectPath     Project path
    \param[in]   orc_SystemViewsPath System views path
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiProject::mh_AdaptProjectPathToSystemViews(const QString & orc_ProjectPath, QString & orc_SystemViewsPath)
 {
-   QFileInfo c_File;
+   const QFileInfo c_File(orc_ProjectPath);
 
-   c_File.setFile(orc_ProjectPath);
+   orc_SystemViewsPath = c_File.path() + "/system_views/" + c_File.baseName() + ".syde_sysviews";
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Automatically create sub-folder for system views (V1)
+
+   \param[in]   orc_ProjectPath     Project path
+   \param[in]   orc_SystemViewsPath System views path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiProject::mh_AdaptProjectPathToSystemViewsV1(const QString & orc_ProjectPath, QString & orc_SystemViewsPath)
+{
+   const QFileInfo c_File(orc_ProjectPath);
 
    orc_SystemViewsPath = c_File.path() + "/" + c_File.baseName() + ".syde_sysviews";
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load initial project and handle occurring errors
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Automatically create sub-folder for system definition (V2)
+
+   \param[in]   orc_ProjectPath         Project path
+   \param[in]   orc_SystemDefintionPath System definition path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiProject::mh_AdaptProjectPathToSystemDefinitionV2(const QString & orc_ProjectPath,
+                                                           QString & orc_SystemDefintionPath)
+{
+   const QFileInfo c_File(orc_ProjectPath);
+
+   orc_SystemDefintionPath = c_File.path() + "/" + c_File.baseName() + ".syde_sysdef";
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load initial project and handle occurring errors
 
    Loading Order:
       1. Provided argument
       2. If none: first project in recent projects list with existing .syde
       3. If failed: next project in recent projects list with existing .syde
       4. If failed: empty project
-
-   \created     08.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiProject::m_InitialProjectLoad()
 {
+   uint16 u16_Version;
    sint32 s32_Error;
 
    // Initial project from command line
@@ -588,8 +611,8 @@ void C_PuiProject::m_InitialProjectLoad()
    }
 
    // load it (first try)
-   s32_Error = this->Load();
-   C_PopErrorHandling::mh_ProjectLoadErr(s32_Error, this->GetPath(), NULL);
+   s32_Error = this->Load(&u16_Version);
+   C_PopErrorHandling::mh_ProjectLoadErr(s32_Error, this->GetPath(), NULL, u16_Version);
 
    if (s32_Error == C_NO_ERR)
    {
@@ -620,8 +643,8 @@ void C_PuiProject::m_InitialProjectLoad()
       }
 
       // load it (second try)
-      s32_Error = this->Load();
-      C_PopErrorHandling::mh_ProjectLoadErr(s32_Error, this->GetPath(), NULL);
+      s32_Error = this->Load(&u16_Version);
+      C_PopErrorHandling::mh_ProjectLoadErr(s32_Error, this->GetPath(), NULL, u16_Version);
 
       if (s32_Error == C_NO_ERR)
       {

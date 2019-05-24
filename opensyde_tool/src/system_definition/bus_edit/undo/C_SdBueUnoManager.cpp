@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Message and signal undo command stack (implementation)
 
    Message and signal undo command stack
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.04.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -33,46 +26,40 @@
 #include "C_SdBueUnoSignalDeleteCommand.h"
 #include "C_SdBueUnoSignalMoveCommand.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     20.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueUnoManager::C_SdBueUnoManager(QObject * const opc_Parent) :
    C_UtiUndoStack(opc_Parent),
    mpc_DeleteCommand(NULL)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     24.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueUnoManager::~C_SdBueUnoManager(void)
 {
    if (this->mpc_DeleteCommand != NULL)
@@ -81,36 +68,30 @@ C_SdBueUnoManager::~C_SdBueUnoManager(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do connect node to protocol
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do connect node to protocol
 
    \param[in]     ou32_NodeIndex      Node index
    \param[in]     ou32_InterfaceIndex Interface index
    \param[in]     oe_Protocol         Com protocol
    \param[in,out] opc_Widget          Widget to notify for changes
-
-   \created     21.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::DoConnectNodeToProt(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
                                             const C_OSCCanProtocol::E_Type oe_Protocol, QWidget * const opc_Widget)
 {
    this->DoPush(new C_SdBueUnoBusProtNodeConnectCommand(ou32_NodeIndex, ou32_InterfaceIndex, oe_Protocol, opc_Widget));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do connect node to protocol and create data pool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do connect node to protocol and create data pool
 
    \param[in]     ou32_NodeIndex      Node index
    \param[in]     ou32_InterfaceIndex Interface index
    \param[in]     oe_Protocol         Com protocol
    \param[in,out] opc_Widget          Widget to notify for changes
-
-   \created     21.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::DoConnectNodeToProtAndAddDataPool(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
                                                           const C_OSCCanProtocol::E_Type oe_Protocol,
                                                           QWidget * const opc_Widget)
@@ -119,18 +100,15 @@ void C_SdBueUnoManager::DoConnectNodeToProtAndAddDataPool(const uint32 ou32_Node
                                                                  opc_Widget));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do disconnect node from protocol
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do disconnect node from protocol
 
    \param[in]     ou32_NodeIndex      Node index
    \param[in]     ou32_InterfaceIndex Interface index
    \param[in]     oe_Protocol         Com protocol
    \param[in,out] opc_Widget          Widget to notify for changes
-
-   \created     21.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::DoDisconnectNodeFromProt(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
                                                  const C_OSCCanProtocol::E_Type oe_Protocol, QWidget * const opc_Widget)
 {
@@ -138,35 +116,29 @@ void C_SdBueUnoManager::DoDisconnectNodeFromProt(const uint32 ou32_NodeIndex, co
                                                            opc_Widget));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do add datapool to protocol
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do add datapool to protocol
 
    \param[in]     ou32_NodeIndex      Node index
    \param[in]     ou32_InterfaceIndex Interface index
    \param[in]     oe_Protocol         Com protocol
    \param[in,out] opc_Widget          Widget to notify for changes
-
-   \created     14.05.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::DoAddDataPool(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
                                       const C_OSCCanProtocol::E_Type oe_Protocol, QWidget * const opc_Widget)
 {
    this->DoPush(new C_SdBueUnoBusProtNodeCreateCommand(ou32_NodeIndex, ou32_InterfaceIndex, oe_Protocol, opc_Widget));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do add message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do add message
 
    \param[in]     orc_MessageId          Message identification indices
    \param[in,out] opc_MessageSyncManager Message sync manager to perform actions on
    \param[in,out] opc_MessageTreeWidget  Message tree widget to perform actions on
-
-   \created     20.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::DoAddMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                      C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
                                      QTreeWidget * const opc_MessageTreeWidget)
@@ -188,9 +160,8 @@ void C_SdBueUnoManager::DoAddMessage(const C_OSCCanMessageIdentificationIndices 
    this->DoPush(pc_UndoCommand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do paste messages
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do paste messages
 
    \param[in]     orc_MessageId               Message identification indices
    \param[in]     orc_Messages                Message data
@@ -203,10 +174,8 @@ void C_SdBueUnoManager::DoAddMessage(const C_OSCCanMessageIdentificationIndices 
    \param[in,out] opc_MessageSyncManager      Message sync manager to perform actions on
    \param[in,out] opc_MessageTreeWidget       Message tree widget to perform actions on
    \param[out]    orc_NewIds                  New pasted message IDs
-
-   \created     24.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::DoPasteMessages(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                         const std::vector<C_OSCCanMessage> & orc_Messages,
                                         const std::vector<std::vector<C_OSCNodeDataPoolListElement> > & orc_OSCSignalCommons, const std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UISignalCommons, const std::vector<std::vector<C_PuiSdNodeCanSignal> > & orc_UISignals, const std::vector<std::vector<QString> > & orc_OwnerNodeName, const std::vector<std::vector<uint32> > & orc_OwnerNodeInterfaceIndex, const std::vector<std::vector<bool> > & orc_OwnerIsTxFlag, C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager, QTreeWidget * const opc_MessageTreeWidget,
@@ -281,9 +250,8 @@ void C_SdBueUnoManager::DoPasteMessages(const C_OSCCanMessageIdentificationIndic
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do paste signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do paste signals
 
    \param[in]     orc_MessageId          Message identification indices
    \param[in]     orc_Signals            Signals data
@@ -292,10 +260,8 @@ void C_SdBueUnoManager::DoPasteMessages(const C_OSCCanMessageIdentificationIndic
    \param[in]     orc_UISignals          Signal ui data
    \param[in,out] opc_MessageSyncManager Message sync manager to perform actions on
    \param[in,out] opc_MessageTreeWidget  Message tree widget to perform actions on
-
-   \created     24.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::DoPasteSignals(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                        const uint32 & oru32_SignalIndex,
                                        const std::vector<C_OSCCanSignal> & orc_Signals,
@@ -334,17 +300,14 @@ void C_SdBueUnoManager::DoPasteSignals(const C_OSCCanMessageIdentificationIndice
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do delete message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do delete message
 
    \param[in]     orc_MessageId          Message identification indices
    \param[in,out] opc_MessageSyncManager Message sync manager to perform actions on
    \param[in,out] opc_MessageTreeWidget  Message tree widget to perform actions on
-
-   \created     20.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::DoDeleteMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                         C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
                                         QTreeWidget * const opc_MessageTreeWidget)
@@ -360,19 +323,16 @@ void C_SdBueUnoManager::DoDeleteMessage(const C_OSCCanMessageIdentificationIndic
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do add signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do add signal
 
    \param[in]     orc_MessageId          Message identification indices
    \param[in]     oru32_SignalIndex      Signal index
    \param[in]     ou16_StartBit          Start bit of signal
    \param[in,out] opc_MessageSyncManager Message sync manager to perform actions on
    \param[in,out] opc_MessageTreeWidget  Message tree widget to perform actions on
-
-   \created     20.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::DoAddSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                     const uint32 & oru32_SignalIndex, const uint16 ou16_StartBit,
                                     C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
@@ -386,18 +346,15 @@ void C_SdBueUnoManager::DoAddSignal(const C_OSCCanMessageIdentificationIndices &
                                                pc_MessageTreeWidget));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do delete signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do delete signal
 
    \param[in]     orc_MessageId          Message identification indices
    \param[in]     oru32_SignalIndex      Signal index
    \param[in,out] opc_MessageSyncManager Message sync manager to perform actions on
    \param[in,out] opc_MessageTreeWidget  Message tree widget to perform actions on
-
-   \created     20.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::DoDeleteSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                        const uint32 & oru32_SignalIndex,
                                        C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
@@ -415,9 +372,8 @@ void C_SdBueUnoManager::DoDeleteSignal(const C_OSCCanMessageIdentificationIndice
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do move signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do move signal
 
    \param[in]     orc_SourceMessageIds      Source message identification indices
    \param[in]     oru32_SourceSignalIndices Source signal index
@@ -425,10 +381,8 @@ void C_SdBueUnoManager::DoDeleteSignal(const C_OSCCanMessageIdentificationIndice
    \param[in]     oru32_TargetSignalIndices Target signal index
    \param[in,out] opc_MessageSyncManager    Message sync manager to perform actions on
    \param[in,out] opc_MessageTreeWidget     Message tree widget to perform actions on
-
-   \created     20.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::DoMoveSignal(const std::vector<C_OSCCanMessageIdentificationIndices> & orc_SourceMessageIds,
                                      const std::vector<uint32> & oru32_SourceSignalIndices,
                                      const std::vector<C_OSCCanMessageIdentificationIndices> & orc_TargetMessageIds,
@@ -472,13 +426,10 @@ void C_SdBueUnoManager::DoMoveSignal(const std::vector<C_OSCCanMessageIdentifica
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Commit delete command to undo stack
-
-   \created     24.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Commit delete command to undo stack
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::CommitDelete(void)
 {
    if (this->mpc_DeleteCommand != NULL)
@@ -488,16 +439,13 @@ void C_SdBueUnoManager::CommitDelete(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get cureent delete command (created if necessary)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get cureent delete command (created if necessary)
 
    \return
    Guaranteed pointer to current delete command
-
-   \created     24.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QUndoCommand * C_SdBueUnoManager::m_GetDeleteCommand(void)
 {
    if (this->mpc_DeleteCommand == NULL)
@@ -507,16 +455,13 @@ QUndoCommand * C_SdBueUnoManager::m_GetDeleteCommand(void)
    return this->mpc_DeleteCommand;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Attempt patch of message id
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Attempt patch of message id
 
    \param[in,out] opc_MessageSyncManager Message sync manager to perform actions on
    \param[in,out] orc_Message            Message to patch message id
-
-   \created     09.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::mh_PatchMessageId(const C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
                                           C_OSCCanMessage & orc_Message)
 {
@@ -526,9 +471,8 @@ void C_SdBueUnoManager::mh_PatchMessageId(const C_PuiSdNodeCanMessageSyncManager
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert last known owners as restored from copy operation to current connected nodes (as possible)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert last known owners as restored from copy operation to current connected nodes (as possible)
 
    \param[in]  orc_MessageId                   New message id from current bus to use as fallback
    \param[in]  orc_LastOwnerNodeName           Original owners node names
@@ -537,10 +481,8 @@ void C_SdBueUnoManager::mh_PatchMessageId(const C_PuiSdNodeCanMessageSyncManager
    \param[out] orc_NewOwnerNodeName            New/valid owners node names (empty if no matches found)
    \param[out] orc_NewOwnerNodeInterfaceIndex  New/valid owners interface indices (empty if no matches found)
    \param[out] orc_NewOwnerIsTxFlag            New/valid owners TX flags (empty if no matches found)
-
-   \created     18.02.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::mh_HandleLastOwnersValidation(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                       const std::vector<QString> & orc_LastOwnerNodeName,
                                                       const std::vector<uint32> & orc_LastOwnerNodeInterfaceIndex,

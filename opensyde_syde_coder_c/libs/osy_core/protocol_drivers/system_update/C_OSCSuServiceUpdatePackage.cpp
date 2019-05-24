@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       openSYDE: Service Update Package
 
    For details cf. documentation in .h file.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.03.2018  STW/D.Pohl
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -28,6 +21,7 @@
 #include "C_OSCLoggingHandler.h"
 #include "C_OSCSystemDefinition.h"
 #include "C_OSCSystemDefinitionFiler.h"
+#include "C_OSCSystemDefinitionFilerV2.h"
 #include "C_OSCDeviceDefinition.h"
 #include "C_OSCDeviceDefinitionFiler.h"
 #include "C_OSCSuSequences.h"
@@ -83,8 +77,7 @@ stw_scl::C_SCLString C_OSCSuServiceUpdatePackage::mhc_ErrorMessage;        // de
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Create an update package
+/*! \brief   Create an update package
 
    Result of function after successful execution:
    * zipped service update package with the following contents:
@@ -101,15 +94,16 @@ stw_scl::C_SCLString C_OSCSuServiceUpdatePackage::mhc_ErrorMessage;        // de
    Assumptions:
    * write permission to target folder
 
-   \param[in]  orc_PackagePath           full path of target package (zip archive)
-                                         (with constant extension ".syde_sup", e.g. "C:\\012345.syde_sup")
-   \param[in]  orc_SystemDefinition      Current system definition (class instance - no file!)
-   \param[in]  ou32_ActiveBusIndex       index of bus the client is connected to
-   \param[in]  orc_ActiveNodes           list of all nodes contains information which node is available for update
-   \param[in]  orc_NodesUpdateOrder      update order of nodes (index is update position, value is node index)
-   \param[in]  orc_ApplicationsToWrite   files for updating nodes
-   \param[out] orc_WarningMessages       warning messages for created package (empty list if no warnings)
-   \param[out] orc_ErrorMessage          error message in case of failure (empty string if no error)
+   \param[in]  orc_PackagePath              full path of target package (zip archive)
+                                            (with constant extension ".syde_sup", e.g. "C:\\012345.syde_sup")
+   \param[in]  orc_SystemDefinition         Current system definition (class instance - no file!)
+   \param[in]  ou32_ActiveBusIndex          index of bus the client is connected to
+   \param[in]  orc_ActiveNodes              list of all nodes contains information which node is available for update
+   \param[in]  orc_NodesUpdateOrder         update order of nodes (index is update position, value is node index)
+   \param[in]  orc_ApplicationsToWrite      files for updating nodes
+   \param[out] orc_WarningMessages          warning messages for created package (empty list if no warnings)
+   \param[out] orc_ErrorMessage             error message in case of failure (empty string if no error)
+   \param[in]  oq_SaveInCompatibilityFormat Flag to export in compatibility format (V2)
 
    \return
    C_NO_ERR    success
@@ -130,8 +124,6 @@ stw_scl::C_SCLString C_OSCSuServiceUpdatePackage::mhc_ErrorMessage;        // de
                could not save device definition file
    C_BUSY      could not package result to zip archive
                could not delete temporary result folder
-
-   \created     01.03.2018  STW/D.Pohl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCSuServiceUpdatePackage::h_CreatePackage(const C_SCLString & orc_PackagePath,
@@ -141,7 +133,8 @@ sint32 C_OSCSuServiceUpdatePackage::h_CreatePackage(const C_SCLString & orc_Pack
                                                     const vector<uint32> & orc_NodesUpdateOrder,
                                                     const vector<C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
                                                     C_SCLStringList & orc_WarningMessages,
-                                                    C_SCLString & orc_ErrorMessage)
+                                                    C_SCLString & orc_ErrorMessage,
+                                                    const bool oq_SaveInCompatibilityFormat)
 {
    sint32 s32_Return;
 
@@ -226,9 +219,25 @@ sint32 C_OSCSuServiceUpdatePackage::h_CreatePackage(const C_SCLString & orc_Pack
    if (s32_Return == C_NO_ERR)
    {
       // take current system definition of view (is required) and store to file
-      C_SCLString c_SysDefPath = c_PackagePathTmp + mc_SUP_SYSDEF;
-      s32_Return = C_OSCSystemDefinitionFiler::h_SaveSystemDefinitionFile(orc_SystemDefinition,
-                                                                          c_SysDefPath);
+      const C_SCLString c_SysDefPath = c_PackagePathTmp + mc_SUP_SYSDEF;
+      if (oq_SaveInCompatibilityFormat)
+      {
+         s32_Return = C_OSCSystemDefinitionFilerV2::h_SaveSystemDefinitionFile(orc_SystemDefinition, c_SysDefPath);
+      }
+      else
+      {
+         std::vector<C_SCLString> c_AdditionalFiles;
+         s32_Return = C_OSCSystemDefinitionFiler::h_SaveSystemDefinitionFile(orc_SystemDefinition,
+                                                                             c_SysDefPath, &c_AdditionalFiles);
+         if (s32_Return == C_NO_ERR)
+         {
+            //Add files to pack
+            for (uint32 u32_ItFile = 0UL; u32_ItFile < c_AdditionalFiles.size(); ++u32_ItFile)
+            {
+               c_SupFiles.insert(c_AdditionalFiles[u32_ItFile]);
+            }
+         }
+      }
 
       if (s32_Return != C_NO_ERR)
       {
@@ -333,8 +342,7 @@ sint32 C_OSCSuServiceUpdatePackage::h_CreatePackage(const C_SCLString & orc_Pack
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Unpack an update package
+/*! \brief   Unpack an update package
 
    We have to unzip the package persistent to target folder on disk (orc_TargetUnzipPath) because we need
    the application files for update. If orc_TargetUnzipPath folder exists already it will be deleted.
@@ -372,8 +380,6 @@ sint32 C_OSCSuServiceUpdatePackage::h_CreatePackage(const C_SCLString & orc_Pack
    C_RANGE     error code of a called core function (should not occur for valid and compatible service update package)
    C_NOACT     error code of a called core function (should not occur for valid and compatible service update package)
    C_OVERFLOW  error code of a called core function (should not occur for valid and compatible service update package)
-
-   \created     15.03.2018  STW/D.Pohl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCSuServiceUpdatePackage::h_UnpackPackage(const C_SCLString & orc_PackagePath,
@@ -447,7 +453,7 @@ sint32 C_OSCSuServiceUpdatePackage::h_UnpackPackage(const C_SCLString & orc_Pack
    // open zip file and unpack contents to target folder
    if (s32_Return == C_NO_ERR)
    {
-      s32_Return = C_OSCZipFile::h_UnpackZipFile(orc_PackagePath, c_TargetUnzipPath);
+      s32_Return = C_OSCZipFile::h_UnpackZipFile(orc_PackagePath, c_TargetUnzipPath, &mhc_ErrorMessage);
       if (s32_Return != C_NO_ERR)
       {
          osc_write_log_error("Unpacking Update Package", mhc_ErrorMessage);
@@ -547,13 +553,10 @@ sint32 C_OSCSuServiceUpdatePackage::h_UnpackPackage(const C_SCLString & orc_Pack
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Returns fix defined service update package extension.
+/*! \brief   Returns fix defined service update package extension.
 
    \return
    service update package extension
-
-   \created     09.03.2018  STW/D.Pohl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_OSCSuServiceUpdatePackage::h_GetPackageExtension()
@@ -562,8 +565,7 @@ C_SCLString C_OSCSuServiceUpdatePackage::h_GetPackageExtension()
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Precondition checks for creating update package (internal function).
+/*! \brief   Precondition checks for creating update package (internal function).
 
    \param[in]  orc_PackagePath           (see function h_CreatePackage)
    \param[in]  orc_SystemDefinition      (see function h_CreatePackage)
@@ -571,7 +573,6 @@ C_SCLString C_OSCSuServiceUpdatePackage::h_GetPackageExtension()
    \param[in]  orc_ActiveNodes           (see function h_CreatePackage)
    \param[in]  orc_NodesUpdateOrder      (see function h_CreatePackage)
    \param[in]  orc_ApplicationsToWrite   (see function h_CreatePackage)
-
 
    \return
    C_NO_ERR    success
@@ -583,8 +584,6 @@ C_SCLString C_OSCSuServiceUpdatePackage::h_GetPackageExtension()
    C_OVERFLOW  size of orc_ActiveNodes does not match system definition
                size of orc_ActiveNodes is not the same as the size of nodes in orc_ApplicationsToWrite
    C_NOACT     active bus index is not in system definition
-
-   \created     07.03.2018  STW/D.Pohl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCSuServiceUpdatePackage::h_CheckParamsToCreatePackage(const C_SCLString & orc_PackagePath,
@@ -715,8 +714,7 @@ sint32 C_OSCSuServiceUpdatePackage::h_CheckParamsToCreatePackage(const C_SCLStri
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Copies a file from source to target folder (internal function).
+/*! \brief   Copies a file from source to target folder (internal function).
 
    Assumptions:
    * read permission of source folder
@@ -728,8 +726,6 @@ sint32 C_OSCSuServiceUpdatePackage::h_CheckParamsToCreatePackage(const C_SCLStri
    \return
    C_NO_ERR    success
    C_RD_WR     read/write error (see log file)
-
-   \created     06.03.2018  STW/D.Pohl (code snippet copied from C_OSCSuSequences::h_CreateTemporaryFolder)
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCSuServiceUpdatePackage::h_CopyFile(const C_SCLString & orc_SourceFile, const C_SCLString & orc_TargetFile)
@@ -778,8 +774,7 @@ sint32 C_OSCSuServiceUpdatePackage::h_CopyFile(const C_SCLString & orc_SourceFil
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Creates update package definition file (internal function).
+/*! \brief   Creates update package definition file (internal function).
 
    Version 1.0
 
@@ -792,8 +787,6 @@ sint32 C_OSCSuServiceUpdatePackage::h_CopyFile(const C_SCLString & orc_SourceFil
    \return
    C_NO_ERR    success
    C_RD_WR     read/write error (see log file)
-
-   \created     07.03.2018  STW/D.Pohl
 */
 //-----------------------------------------------------------------------------
 void C_OSCSuServiceUpdatePackage::h_CreateUpdatePackageDefFile(const C_SCLString & orc_Path,
@@ -877,8 +870,7 @@ void C_OSCSuServiceUpdatePackage::h_CreateUpdatePackageDefFile(const C_SCLString
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Creates specific device definition (internal function).
+/*! \brief   Creates specific device definition (internal function).
 
    C_OSCSystemDefinitionFiler::h_LoadSystemDefinitionFile needs device definition.
    Because we don't want a generic device definition of all devices in the service update
@@ -894,8 +886,6 @@ void C_OSCSuServiceUpdatePackage::h_CreateUpdatePackageDefFile(const C_SCLString
    \return
    C_NO_ERR    success
    C_RD_WR     read/write error (see log file)
-
-   \created     08.03.2018  STW/D.Pohl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCSuServiceUpdatePackage::h_CreateDeviceIniFile(const C_SCLString & orc_Path,
@@ -944,8 +934,7 @@ sint32 C_OSCSuServiceUpdatePackage::h_CreateDeviceIniFile(const C_SCLString & or
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Helper function to convert parameters for service update package (internal function).
+/*! \brief   Helper function to convert parameters for service update package (internal function).
 
    Assumptions:
    * checked parameters
@@ -960,8 +949,6 @@ sint32 C_OSCSuServiceUpdatePackage::h_CreateDeviceIniFile(const C_SCLString & or
    \return
    C_NO_ERR     success
    C_WARN       could not find update position for active node
-
-   \created     08.03.2018  STW/D.Pohl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCSuServiceUpdatePackage::h_SupDefParamAdapter(const C_OSCSystemDefinition & orc_SystemDefinition,
@@ -1021,8 +1008,7 @@ sint32 C_OSCSuServiceUpdatePackage::h_SupDefParamAdapter(const C_OSCSystemDefini
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Finds update position of node.
+/*! \brief   Finds update position of node.
 
    \param[in]     orc_NodesUpdateOrder      (see function h_CreatePackage)
    \param[in]     ou32_NodeForUpdate        node with applications (!) to update
@@ -1031,8 +1017,6 @@ sint32 C_OSCSuServiceUpdatePackage::h_SupDefParamAdapter(const C_OSCSystemDefini
    \return
    C_NO_ERR     successful
    C_NOACT      node not available in node update order
-
-   \created     13.06.2018  STW/D.Pohl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCSuServiceUpdatePackage::h_GetUpdatePositionOfNode(const vector<uint32> & orc_NodesUpdateOrder,
@@ -1055,8 +1039,7 @@ sint32 C_OSCSuServiceUpdatePackage::h_GetUpdatePositionOfNode(const vector<uint3
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Adapts nodes update order by interchanging index with value to match openSYDE API functions.
+/*! \brief   Adapts nodes update order by interchanging index with value to match openSYDE API functions.
 
    \param[in]     orc_UpdateOrderByNodes    key is node position, value is update position
    \param[out]    orc_NodesUpdateOrder      update position is index and value is node position
@@ -1064,8 +1047,6 @@ sint32 C_OSCSuServiceUpdatePackage::h_GetUpdatePositionOfNode(const vector<uint3
    \return
    C_NO_ERR   successful
    C_WARN     contains no nodes for update order
-
-   \created     13.06.2018  STW/D.Pohl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCSuServiceUpdatePackage::h_SetNodesUpdateOrder(const map<uint32, uint32> & orc_UpdateOrderByNodes,

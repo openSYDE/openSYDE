@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Handle user settings data (header)
@@ -6,20 +6,14 @@
    This class handles all actions concerning user settings.
    (note: main module description should be in .cpp file)
 
-   \implementation
-   project     STW Qt user settings
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     30.06.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 #ifndef C_USHANDLER_H
 #define C_USHANDLER_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>
 #include <QStringList>
 #include <QFile>
@@ -31,13 +25,13 @@
 #include "C_UsNode.h"
 #include "C_UsSystemView.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_UsHandler
 {
@@ -88,8 +82,6 @@ public:
    const QList<QString> GetProjSdNodeKeysInternal(void) const;
    const QList<QString> GetProjSdBusKeysInternal(void) const;
    const QList<QString> GetProjSvSetupViewKeysInternal(void) const;
-   void GetProjSvSetupNodeInfoSizePos(const QString & orc_ViewName, QPoint & orc_Pos, QSize & orc_Size,
-                                      bool & orq_Maximized) const;
    C_UsSystemViewDashboard GetProjSvDashboardSettings(const QString & orc_ViewName,
                                                       const QString & orc_DashboardName) const;
    void GetProjLastScreenMode(stw_types::sint32 & ors32_SysDefSubMode, stw_types::uint32 & oru32_SysDefIndex,
@@ -103,7 +95,7 @@ public:
    void SetRecentProjects(const QStringList & orc_New);
    void SetScreenPos(const QPoint & orc_New);
    void SetAppSize(const QSize & orc_New);
-   void SetAppMaximized(const bool & orq_New);
+   void SetAppMaximized(const bool oq_New);
    void SetSdTopologyToolboxPos(const QPoint & orc_New);
    void SetSdTopologyToolboxSize(const QSize & orc_New);
    void SetNaviBarSize(const stw_types::sint32 os32_Value);
@@ -156,13 +148,18 @@ public:
    void SetProjSvParamExport(const QString & orc_ViewName, const QString & orc_Path);
    void SetProjSvParamImport(const QString & orc_ViewName, const QString & orc_Path);
    void SetProjSvParamRecord(const QString & orc_ViewName, const QString & orc_Path, const QString & orc_FileName);
-   void SetProjSvSetupNodeInfoSizePos(const QString & orc_ViewName, const QPoint & orc_Pos, const QSize & orc_Size,
-                                      const bool & orq_Maximized);
    void AddProjSvUpdateDataRate(const QString & orc_ViewName, const stw_types::uint32 ou32_Checksum,
                                 const stw_types::uint64 ou64_DataRateBytesPerS);
+   void AddProjSvUpdateDataRatePerNode(const QString & orc_ViewName, const stw_types::uint32 ou32_Checksum,
+                                       const QMap<stw_types::uint32, stw_types::float64> & orc_DataRateBytesPerMs);
    void SetProjSvUpdateSplitterX(const QString & orc_ViewName, const stw_types::sint32 os32_Value);
+   void SetProjSvUpdateHorizontalSplitterY(const QString & orc_ViewName, const stw_types::sint32 os32_Value);
    void SetProjSvUpdateProgressLog(const QString & orc_ViewName, const QPoint & orc_Position, const QSize & orc_Size,
                                    const bool & orq_Maximized);
+   void SetProjSvUpdateSummaryBig(const QString & orc_ViewName, const bool oq_BigVisible);
+   void SetProjSvUpdateEmptyOptionalSectionsVisible(const QString & orc_ViewName, const bool oq_Visible);
+   void SetProjSvUpdateSectionsExpandedFlags(const QString & orc_ViewName, const QString & orc_NodeName,
+                                             const QMap<stw_types::uint32, bool> & orc_SectionsExpanded);
    void SetProjSvDashboardToolbox(const QString & orc_ViewName, const QPoint & orc_Position, const QSize & orc_Size,
                                   const bool & orq_Maximized);
    void SetProjSvDashboardSelectedTabIndex(const QString & orc_ViewName, const stw_types::sint32 os32_Index);
@@ -178,6 +175,7 @@ public:
                               const stw_types::uint32 ou32_SysViewIndex, const stw_types::uint32 ou32_SysViewFlag);
    void SetProjLastSysDefTabIndex(const stw_types::sintn osn_SysDefNodeEditTabIndex,
                                   const stw_types::sintn osn_SysDefBusEditTabIndex);
+   void CopyProjSvSettings(const QString & orc_SourceViewName, const QString & orc_TargetViewName);
 
    void ClearMaps(void);
 
@@ -244,7 +242,7 @@ private:
    stw_types::sintn msn_SysDefBusEditTabIndex;           ///< History of last known tab index in bus edit
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

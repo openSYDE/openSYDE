@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Button in material design displaying only an icon
 
@@ -8,50 +7,41 @@
    but needs to exist, to have a unique group,
    to apply a specific stylesheet for.
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.09.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
 #include <QEvent>
 #include "C_OgePubIconOnly.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     27.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgePubIconOnly::C_OgePubIconOnly(QWidget * const opc_Parent) :
    C_OgePubToolTipBase(opc_Parent),
    mq_Hovered(false)
@@ -60,9 +50,8 @@ C_OgePubIconOnly::C_OgePubIconOnly(QWidget * const opc_Parent) :
    this->mc_IconNormal = QPixmap(this->size());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten default event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten default event slot
 
    Here: Handle hover
 
@@ -71,10 +60,8 @@ C_OgePubIconOnly::C_OgePubIconOnly(QWidget * const opc_Parent) :
    \return
    True  Event was recognized and processed
    False Event ignored
-
-   \created     07.08.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OgePubIconOnly::event(QEvent * const opc_Event)
 {
    bool q_Retval = C_OgePubToolTipBase::event(opc_Event);
@@ -102,17 +89,14 @@ bool C_OgePubIconOnly::event(QEvent * const opc_Event)
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    Here: Draw icon for complete size
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     04.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgePubIconOnly::paintEvent(QPaintEvent * const opc_Event)
 {
    QPainter c_Painter(this);
@@ -143,16 +127,13 @@ void C_OgePubIconOnly::paintEvent(QPaintEvent * const opc_Event)
    c_Painter.drawPixmap(0, 0, c_Pixmap);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set the Icon for Enabled and Disabled mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set the Icon for Enabled and Disabled mode
 
    \param[in]     oc_IconPathEnabled      String for Enabled Icon Path
                   oc_IconPathDisabled     String for Disabled Icon Path
-
-   \created     07.08.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgePubIconOnly::SetCustomIcons(QString oc_IconPathNormal, QString oc_IconPathHovered, QString oc_IconPathClicked,
                                       QString oc_IconPathDisabled)
 {

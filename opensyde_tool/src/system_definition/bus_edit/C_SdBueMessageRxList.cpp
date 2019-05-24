@@ -1,56 +1,46 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Message receiver edit list (implementation)
 
    Message receiver edit list
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.03.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "TGLUtils.h"
 #include "C_GtGetText.h"
 #include "C_SdBueMessageRxList.h"
 #include "ui_C_SdBueMessageRxList.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     22.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageRxList::C_SdBueMessageRxList(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueMessageRxList),
@@ -70,46 +60,37 @@ C_SdBueMessageRxList::C_SdBueMessageRxList(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_ScrollArea->DeactivateScrollbarResize();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     22.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageRxList::~C_SdBueMessageRxList(void)
 {
    m_Clear();
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     28.03.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxList::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelEmpty->setText(C_GtGetText::h_GetText("No receivers available."));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add all entries
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add all entries
 
    \param[in] orc_EntryNames                 Entry name
    \param[in] orc_NodeIndexes                Node index (ID)
    \param[in] orc_InterfaceIndexes           Interface Index (ID)
    \param[in] orc_UseAutoReceiveTimeoutFlags Flag whether to use auto receive timeout or custom
    \param[in] orc_ReceiveTimeoutValues       Receive timeout value
-
-   \created     22.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxList::AddNodes(const std::vector<QString> & orc_EntryNames,
                                     const std::vector<uint32> & orc_NodeIndexes,
                                     const std::vector<uint32> & orc_InterfaceIndexes,
@@ -152,15 +133,12 @@ void C_SdBueMessageRxList::AddNodes(const std::vector<QString> & orc_EntryNames,
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update last known cycle time value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update last known cycle time value
 
    \param[in] ou32_Value Last known cycle time value
-
-   \created     22.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxList::SetLastKnownCycleTimeValue(const uint32 ou32_Value)
 {
    this->mu32_LastKnownCycleTimeValue = ou32_Value;
@@ -174,15 +152,12 @@ void C_SdBueMessageRxList::SetLastKnownCycleTimeValue(const uint32 ou32_Value)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set flag to always hide timeout section
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set flag to always hide timeout section
 
    \param[in] oq_Hide Flag to always hide timeout section
-
-   \created     23.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxList::SetAlwaysHideTimeout(const bool oq_Hide)
 {
    this->mq_AlwaysHide = oq_Hide;
@@ -196,16 +171,13 @@ void C_SdBueMessageRxList::SetAlwaysHideTimeout(const bool oq_Hide)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check specific entries
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check specific entries
 
    \param[in] orc_NodeIndexes      Node index (ID)
    \param[in] orc_InterfaceIndexes Interface Index (ID)
-
-   \created     22.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxList::CheckNodes(const std::vector<uint32> & orc_NodeIndexes,
                                       const std::vector<uint32> & orc_InterfaceIndexes) const
 {
@@ -218,17 +190,14 @@ void C_SdBueMessageRxList::CheckNodes(const std::vector<uint32> & orc_NodeIndexe
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check specific entry
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check specific entry
 
    \param[in] ou32_NodeIndex      Node index (ID)
    \param[in] ou32_InterfaceIndex Interface Index (ID)
    \param[in] oq_Checked          Status
-
-   \created     22.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxList::CheckSpecificNode(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
                                              const bool oq_Checked) const
 {
@@ -242,13 +211,10 @@ void C_SdBueMessageRxList::CheckSpecificNode(const uint32 ou32_NodeIndex, const 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up
-
-   \created     22.03.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clean up
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxList::m_Clear(void)
 {
    for (uint32 u32_ItEntry = 0; u32_ItEntry < this->mc_Entries.size(); ++u32_ItEntry)

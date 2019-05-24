@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for showing an usage bar of an selector item (implementation)
 
    The widget draws three bars for used, reserved and free space in the complete area.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     23.02.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
@@ -30,32 +23,29 @@
 
 #include "C_Uti.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent           Optional pointer to parent
-
-   \created     23.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolSelectorItemUsageWidget::C_SdNdeDataPoolSelectorItemUsageWidget(QWidget * const opc_Parent) :
    stw_opensyde_gui_elements::C_OgeWiWithToolTip(opc_Parent),
    mq_UsedToFull(false),
@@ -76,19 +66,16 @@ C_SdNdeDataPoolSelectorItemUsageWidget::C_SdNdeDataPoolSelectorItemUsageWidget(Q
    this->mc_Pen.setColor(Qt::transparent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the actual percentage of the usage
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the actual percentage of the usage
 
    \param[in] ou32_Size                   Maximum size
    \param[in] ou32_Used                   Absolute used space of the available space
    \param[in] ou32_Reserved               Absolute reserved space of the available space
    \param[out] oru32_PercentageUsed       Calculated usage percentage
    \param[out] oru32_PercentageReserved   Calculated reservation percentage
-
-   \created     23.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorItemUsageWidget::SetData(const uint32 ou32_Size, const uint32 ou32_Used,
                                                      const uint32 ou32_Reserved, uint32 & oru32_PercentageUsed,
                                                      uint32 & oru32_PercentageReserved)
@@ -151,17 +138,14 @@ void C_SdNdeDataPoolSelectorItemUsageWidget::SetData(const uint32 ou32_Size, con
    oru32_PercentageReserved = this->mu32_PercentageReserved;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overrided paint event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overrided paint event
 
    Draws the usage bars
 
    \param[in,out] opc_Event  Pointer to paint event
-
-   \created     23.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorItemUsageWidget::paintEvent(QPaintEvent * const opc_Event)
 {
    QPainter c_Painter(this);

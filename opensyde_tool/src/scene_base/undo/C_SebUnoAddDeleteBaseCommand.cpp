@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Add and delete base class (implementation)
 
    Add and delete base class
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.07.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -26,35 +19,32 @@
 #include "C_GiBiTextElement.h"
 #include "C_GiBiImageGroup.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Scene  Pointer to currently active scene
    \param[in]     orc_IDs    Affected unique IDs
    \param[in]     orc_Text   Command description
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     20.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoAddDeleteBaseCommand::C_SebUnoAddDeleteBaseCommand(QGraphicsScene * const opc_Scene,
                                                            const std::vector<uint64> & orc_IDs,
                                                            const QString & orc_Text, QUndoCommand * const opc_Parent) :
@@ -62,17 +52,14 @@ C_SebUnoAddDeleteBaseCommand::C_SebUnoAddDeleteBaseCommand(QGraphicsScene * cons
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Store items in new structure and save indices in map
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Store items in new structure and save indices in map
 
    \param[in,out] orc_Storage             Data structure to store data in
    \param[in,out] orc_MapTypeAndIndexToID Map to locate new items
    \param[in]     orc_AllElements         Items to store
-
-   \created     21.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoAddDeleteBaseCommand::m_StoreCommon(C_PuiBsElements & orc_Storage, QMap<C_PuiBsTemporaryDataID,
                                                                                      uint64> & orc_MapTypeAndIndexToID,
                                                  const C_PuiBsElements & orc_AllElements)

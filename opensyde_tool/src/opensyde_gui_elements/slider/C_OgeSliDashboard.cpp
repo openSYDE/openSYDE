@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Slider part of dashboard slider item (implementation)
 
@@ -9,17 +8,11 @@
    but needs to exist, to have a unique group,
    to apply a specific stylesheet for.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     17.08.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
@@ -28,34 +21,31 @@
 #include "C_OgeWiUtil.h"
 #include "C_OgeSliDashboard.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     17.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeSliDashboard::C_OgeSliDashboard(QWidget * const opc_Parent) :
    C_OgeSliToolTipBase(opc_Parent),
    mpc_SvgRenderer(NULL),
@@ -66,30 +56,24 @@ C_OgeSliDashboard::C_OgeSliDashboard(QWidget * const opc_Parent) :
    C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Type", 1);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     23.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeSliDashboard::~C_OgeSliDashboard(void)
 {
    delete this->mpc_SvgRenderer;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set current style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set current style
 
    \param[in] oe_Style  Widget style
    \param[in] oq_IsDark Dark mode active flag
-
-   \created     23.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSliDashboard::SetCurrentStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_IsDark)
 {
    this->me_Style = oe_Style;
@@ -97,16 +81,13 @@ void C_OgeSliDashboard::SetCurrentStyle(const C_PuiSvDbWidgetBase::E_Style oe_St
    m_ReinitStyle();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply style
 
    \param[in] oe_Style New style type
    \param[in] oe_Type  New item type
-
-   \created     18.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSliDashboard::SetDisplayStyle(const C_PuiSvDbSlider::E_Type oe_Type)
 {
    this->me_Type = oe_Type;
@@ -129,13 +110,10 @@ void C_OgeSliDashboard::SetDisplayStyle(const C_PuiSvDbSlider::E_Type oe_Type)
    m_ReinitStyle();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update style for resized element
-
-   \created     18.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update style for resized element
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSliDashboard::HandleResize(void)
 {
    QString c_Style = "";
@@ -176,17 +154,14 @@ void C_OgeSliDashboard::HandleResize(void)
    this->setStyleSheet(c_Style);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten resize event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten resize event slot
 
    Here: Update style
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     18.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSliDashboard::resizeEvent(QResizeEvent * const opc_Event)
 {
    QSlider::resizeEvent(opc_Event);
@@ -194,32 +169,26 @@ void C_OgeSliDashboard::resizeEvent(QResizeEvent * const opc_Event)
    HandleResize();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    Here: paint handle manually
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     22.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSliDashboard::paintEvent(QPaintEvent * const opc_Event)
 {
    C_OgeSliToolTipBase::paintEvent(opc_Event);
    m_DrawHandle(opc_Event->rect());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set SVG path
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set SVG path
 
    \param[in] orc_Path SVG path
-
-   \created     23.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSliDashboard::m_SetSvg(const QString & orc_Path)
 {
    delete this->mpc_SvgRenderer;
@@ -234,13 +203,10 @@ void C_OgeSliDashboard::m_SetSvg(const QString & orc_Path)
    this->update();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Manually draw handle
-
-   \created     23.08.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Manually draw handle
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSliDashboard::m_DrawHandle(const QRect & orc_Rect)
 {
    if (this->mpc_SvgRenderer != NULL)
@@ -264,13 +230,10 @@ void C_OgeSliDashboard::m_DrawHandle(const QRect & orc_Rect)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set appropriate handle for current style
-
-   \created     23.08.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set appropriate handle for current style
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSliDashboard::m_ReinitStyle(void)
 {
    switch (this->me_Type)

@@ -1,34 +1,28 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Connection of any item to bus (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     29.06.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_GILIBUSCONNECTORBASE_H
 #define C_GILIBUSCONNECTORBASE_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_GiLiLineGroup.h"
 #include "C_GiBiCustomToolTip.h"
 #include "C_GiUnique.h"
 #include "C_GiLiBus.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_GiLiBusConnectorBase :
    public C_GiLiLineGroup,
@@ -53,7 +47,7 @@ public:
                           QGraphicsItem * const opc_Parent = NULL);
    ~C_GiLiBusConnectorBase(void);
    virtual QPointF GetPos(void) const;
-   std::vector<QPointF> GetPointScenePos(void) const;
+   std::vector<QPointF> GetPointsScenePos(void) const;
    virtual void SetPoints(const std::vector<QPointF> & orc_ScenePos);
    const C_GiLiBus * GetBusItem(void) const;
    const C_GiBiConnectableItem * GetGenericPositionItem(void) const;
@@ -77,7 +71,6 @@ Q_SIGNALS:
    void SigShowToolTip(const QPointF & orc_ScenePos, const C_GiBiCustomToolTip * const opc_Item);
 
 protected:
-   const C_GiLiBus * mpc_BusItem;         ///< Bus item this connection is connected to
    stw_types::sint32 ms32_ConnIndex;      ///< Connection item this connection is connected to
    stw_types::sint32 ms32_KnownLineCount; ///< Number of known bus segments to detect new / deleted
    ///< points
@@ -101,13 +94,14 @@ protected:
    virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_Event) override;
    //lint -restore
 
+   void m_SetBus(const C_GiLiBus * const opc_Bus);
    void m_UpdateBus(const QPointF & orc_Pos, const C_GiLiBus * const opc_BusItem);
    void m_UpdateConnection(const QPointF & orc_ScenePos);
    C_GiLiLineConnection * m_GetCurrentConn(void) const;
    void m_CalcConnProgress(const C_GiLiLineConnection * const opc_Conn, const QPointF & orc_ScenePos);
    void m_UpdateExternal(void);
    void m_UpdateInternal(void);
-   stw_types::sint32 ms32_GetBusInteractionIndex(void) const;
+   stw_types::sint32 m_GetBusInteractionIndex(void) const;
    void m_UpdatePointBus(void);
    void m_CalcConnPos(const C_GiLiLineConnection * const opc_Conn, QPointF & orc_OutPos) const;
    void m_UpdateGenericPoint(void);
@@ -130,10 +124,16 @@ private:
    C_GiLiBusConnectorBase(const C_GiLiBusConnectorBase &);
    C_GiLiBusConnectorBase & operator =(const C_GiLiBusConnectorBase &);
 
+   const C_GiLiBus * mpc_BusItem; ///< Bus item this connection is connected to
+   std::vector<QPointF> mc_LastKnownBusScenePoints;
+
+   bool m_CheckAnyRelevantBusPointChanged(void) const;
+   bool m_CheckOnlyOneBusPointMoved(void) const;
+   void m_UpdateLastKnownBusPoints(void);
    void m_CommonInit(void);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for showing an application in the application list (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     30.01.2016 STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_Uti.h"
@@ -36,7 +29,7 @@
 #include "C_OgeWiCustomMessage.h"
 #include "C_ImpUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
@@ -45,29 +38,26 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_scl;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     ou32_NodeIndex        Node index
    \param[in]     ou32_ApplicationIndex Application index
    \param[in,out] opc_Parent            Optional pointer to parent
-
-   \created     30.01.2016 STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDbWidget::C_SdNdeDbWidget(const uint32 ou32_NodeIndex, const uint32 ou32_ApplicationIndex,
                                  QWidget * const opc_Parent) :
    QWidget(opc_Parent),
@@ -134,28 +124,22 @@ C_SdNdeDbWidget::C_SdNdeDbWidget(const uint32 ou32_NodeIndex, const uint32 ou32_
    connect(this->mpc_Ui->pc_PushButtonOpenIde, &QPushButton::clicked, this, &C_SdNdeDbWidget::m_OnOpenIdeClicked);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     30.01.2016 STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDbWidget::~C_SdNdeDbWidget(void)
 {
    delete mpc_Ui;
    //lint -e{1740}  no memory leak because of the parent of mpc_DataPoolLabel and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     15.12.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelComment->setText(C_GtGetText::h_GetText("Comment"));
@@ -205,13 +189,10 @@ void C_SdNdeDbWidget::InitStaticNames(void) const
                                                             C_GtGetText::h_GetText("Delete Data Block."));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update data pool section
-
-   \created     03.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update data pool section
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbWidget::UpdateDataPools(void)
 {
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
@@ -279,15 +260,12 @@ void C_SdNdeDbWidget::UpdateDataPools(void)
    this->mpc_Ui->pc_LabelDataPoolEmpty->setVisible(this->mpc_DataPoolLabel == NULL);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the application index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the application index
 
    \param[in]     ou32_ApplicationIndex          New index of the application
-
-   \created     21.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbWidget::UpdateApplicationIndex(const uint32 ou32_ApplicationIndex)
 {
    this->mu32_ApplicationIndex = ou32_ApplicationIndex;
@@ -295,45 +273,36 @@ void C_SdNdeDbWidget::UpdateApplicationIndex(const uint32 ou32_ApplicationIndex)
    this->InitStaticNames();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get node index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get node index
 
    \return
    Current node index
-
-   \created     15.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SdNdeDbWidget::GetNodeIndex(void) const
 {
    return this->mu32_NodeIndex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get application index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get application index
 
    \return
    Current application index
-
-   \created     15.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SdNdeDbWidget::GetApplicationIndex(void) const
 {
    return this->mu32_ApplicationIndex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check process ID value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check process ID value
 
    \param[in] osn_Value Current value
-
-   \created     04.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbWidget::CheckProcessIdError(void) const
 {
    QString c_Info;
@@ -362,13 +331,10 @@ void C_SdNdeDbWidget::CheckProcessIdError(void) const
    //this->mpc_Ui->pc_SpinBoxProcessId->SetToolTipAdditionalInfo(c_Info, !q_Valid);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load new data into UI
-
-   \created     15.12.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load new data into UI
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbWidget::m_LoadData(void)
 {
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
@@ -395,9 +361,6 @@ void C_SdNdeDbWidget::m_LoadData(void)
 
          switch (pc_Application->e_Type)
          {
-         case C_OSCNodeApplication::E_Type::eFILE_CONTAINER:
-            this->mpc_Ui->pc_LabelTypeValue->setText(C_GtGetText::h_GetText("File Container"));
-            break;
          case C_OSCNodeApplication::E_Type::ePROGRAMMABLE_APPLICATION:
             this->mpc_Ui->pc_LabelTypeValue->setText(C_GtGetText::h_GetText("Programmable Application"));
             break;
@@ -416,13 +379,10 @@ void C_SdNdeDbWidget::m_LoadData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   handle show or hide of data pool section
-
-   \created     03.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   handle show or hide of data pool section
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbWidget::m_HandleType(void) const
 {
    C_OSCNodeApplication::E_Type e_Type = m_GetType();
@@ -434,16 +394,13 @@ void C_SdNdeDbWidget::m_HandleType(void) const
 
    //Project
    this->mpc_Ui->pc_PushButtonGenerateCode->setVisible(q_Visible);
-   this->mpc_Ui->pc_PushButtonOpenIde->setVisible(e_Type != C_OSCNodeApplication::eFILE_CONTAINER);
+   this->mpc_Ui->pc_PushButtonOpenIde->setVisible(q_Visible);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On edit action
-
-   \created     15.12.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On edit action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbWidget::m_OnEdit(void)
 {
    //Previous implementation
@@ -455,13 +412,10 @@ void C_SdNdeDbWidget::m_OnEdit(void)
    m_ShowProperties();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show properties
-
-   \created     04.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show properties
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbWidget::m_ShowProperties(void)
 {
    const C_OSCNodeApplication * const pc_Application = C_PuiSdHandler::h_GetInstance()->GetApplication(
@@ -502,13 +456,10 @@ void C_SdNdeDbWidget::m_ShowProperties(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On delete action
-
-   \created     15.12.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On delete action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbWidget::m_OnDelete(void)
 {
    bool q_DeletePoosible = false;
@@ -564,13 +515,10 @@ void C_SdNdeDbWidget::m_OnDelete(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle data pool link clicked
-
-   \created     08.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle data pool link clicked
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbWidget::m_OnDataPoolLinkClicked(const QString & orc_Link)
 {
    bool q_Ok;
@@ -582,13 +530,10 @@ void C_SdNdeDbWidget::m_OnDataPoolLinkClicked(const QString & orc_Link)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Unassign all data pools associated to this application
-
-   \created     04.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Unassign all data pools associated to this application
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbWidget::m_UnassignAllAssociatedDataPools(void) const
 {
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
@@ -608,16 +553,13 @@ void C_SdNdeDbWidget::m_UnassignAllAssociatedDataPools(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current application type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current application type
 
    \return
    Current application type
-
-   \created     03.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeApplication::E_Type C_SdNdeDbWidget::m_GetType(void) const
 {
    C_OSCNodeApplication::E_Type e_Retval = C_OSCNodeApplication::eBINARY;
@@ -632,16 +574,13 @@ C_OSCNodeApplication::E_Type C_SdNdeDbWidget::m_GetType(void) const
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Count all data pools which are associated with this application
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Count all data pools which are associated with this application
 
    \return
    Number of data pools which are associated with this application (0 in error case)
-
-   \created     04.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SdNdeDbWidget::m_CountAllAssociatedDataPools(void) const
 {
    uint32 u32_Retval = 0;
@@ -662,13 +601,10 @@ uint32 C_SdNdeDbWidget::m_CountAllAssociatedDataPools(void) const
    return u32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   trigger code export
-
-   \created     09.10.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   trigger code export
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbWidget::m_OnCodeExportClicked(void)
 {
    std::vector<stw_types::uint32> c_Node;
@@ -686,13 +622,10 @@ void C_SdNdeDbWidget::m_OnCodeExportClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger open IDE
-
-   \created     09.10.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger open IDE
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbWidget::m_OnOpenIdeClicked(void)
 {
    const C_OSCNodeApplication * const pc_Application = C_PuiSdHandler::h_GetInstance()->GetApplication(

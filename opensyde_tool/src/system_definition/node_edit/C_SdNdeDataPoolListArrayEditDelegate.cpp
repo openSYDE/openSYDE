@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Node data pool list array edit drawing delegate (implementation)
 
    Node data pool list array edit drawing delegate
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     08.02.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -24,43 +17,39 @@
 #include "C_SdNdeDataPoolContentUtil.h"
 #include "C_SdNdeDataPoolListArrayEditDelegate.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     08.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListArrayEditDelegate::C_SdNdeDataPoolListArrayEditDelegate(QObject * const opc_Parent) :
    QStyledItemDelegate(opc_Parent),
    mpc_Model(NULL)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten create editor event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten create editor event slot
 
    Here: Create appropriate editor widget
 
@@ -70,10 +59,8 @@ C_SdNdeDataPoolListArrayEditDelegate::C_SdNdeDataPoolListArrayEditDelegate(QObje
 
    \return
    Editor widget
-
-   \created     14.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QWidget * C_SdNdeDataPoolListArrayEditDelegate::createEditor(QWidget * const opc_Parent,
                                                              const QStyleOptionViewItem & orc_Option,
                                                              const QModelIndex & orc_Index) const
@@ -88,18 +75,15 @@ QWidget * C_SdNdeDataPoolListArrayEditDelegate::createEditor(QWidget * const opc
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten set editor data event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten set editor data event slot
 
    Here: Pass relevant data
 
    \param[in,out] opc_Editor Editor widget
    \param[in]     orc_Index  Correlating index
-
-   \created     14.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListArrayEditDelegate::setEditorData(QWidget * const opc_Editor,
                                                          const QModelIndex & orc_Index) const
 {
@@ -109,19 +93,16 @@ void C_SdNdeDataPoolListArrayEditDelegate::setEditorData(QWidget * const opc_Edi
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten set model data event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten set model data event slot
 
    Here: Pass relevant data
 
    \param[in,out] opc_Editor Editor widget
    \param[in,out] opc_Model  Model object
    \param[in]     orc_Index  Correlating index
-
-   \created     14.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListArrayEditDelegate::setModelData(QWidget * const opc_Editor,
                                                         QAbstractItemModel * const opc_Model,
                                                         const QModelIndex & orc_Index) const
@@ -132,23 +113,19 @@ void C_SdNdeDataPoolListArrayEditDelegate::setModelData(QWidget * const opc_Edit
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set model for column look up
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set model for column look up
 
    \param[in] opc_Model  Model for column look up
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListArrayEditDelegate::SetModel(const C_SdNdeDataPoolListArrayEditModel * const opc_Value)
 {
    this->mpc_Model = opc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create widget to use for editing this value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create widget to use for editing this value
 
    \param[in,out] opc_Parent    Parent widget
    \param[in]     orc_Index     Correlating index
@@ -156,10 +133,8 @@ void C_SdNdeDataPoolListArrayEditDelegate::SetModel(const C_SdNdeDataPoolListArr
 
    \return
    Editor widget
-
-   \created     15.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QWidget * C_SdNdeDataPoolListArrayEditDelegate::m_CreateEditor(QWidget * const opc_Parent,
                                                                const QModelIndex & orc_Index) const
 {

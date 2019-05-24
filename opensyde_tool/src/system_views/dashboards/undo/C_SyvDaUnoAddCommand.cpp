@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Add undo command (implementation)
 
    Add undo command
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.07.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "gitypes.h"
@@ -28,27 +21,26 @@
 #include "C_SyvDaDashboardScene.h"
 #include "C_SyvDaUnoAddCommand.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor for adding a generic element
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor for adding a generic element
 
    \param[in,out] opc_Scene                         Pointer to currently active scene
    \param[in]     orc_IDs                           Affected unique IDs
@@ -58,11 +50,8 @@ using namespace stw_opensyde_gui_logic;
    \param[in,out] opc_Parent                        Optional pointer to parent
    \param[in]     orq_ForceUseAdditionalInformation Optional flag to force use of additional string information
    \param[in]     orq_DarkModeDefault               Optional flag to change default values
-
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaUnoAddCommand::C_SyvDaUnoAddCommand(QGraphicsScene * const opc_Scene,
                                            const std::vector<stw_types::uint64> & orc_IDs,
                                            const C_PuiSvDbDataElement::E_Type & ore_Type, const QPointF & orc_NewPos,
@@ -79,24 +68,18 @@ C_SyvDaUnoAddCommand::C_SyvDaUnoAddCommand(QGraphicsScene * const opc_Scene,
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     22.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaUnoAddCommand::~C_SyvDaUnoAddCommand(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add elements without previous knowledge
-
-   \created     23.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add elements without previous knowledge
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoAddCommand::m_AddNew(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -262,16 +245,13 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Decode theme string and assign
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Decode theme string and assign
 
    \param[in,out] orc_Base  Base widget data to assign theme to
    \param[in]     orc_Theme Theme string
-
-   \created     05.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoAddCommand::mh_DecodeTheme(C_PuiSvDbWidgetBase & orc_Base, const QString & orc_Theme)
 {
    const QString c_Theme1 = C_GtGetText::h_GetText("openSYDE");

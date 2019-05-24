@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       DiagLib Target Glue Layer: Task system related functionality
 
@@ -8,15 +7,9 @@
 
    Here: Implementation for Windows.
 
-   \implementation
-   project     DiagLib
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.07.2009  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h" //pre-compiled headers
@@ -68,14 +61,11 @@ void C_TGLCriticalSection::Acquire(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   claim the section if it is free; do not if it is not
+/*! \brief   claim the section if it is free; do not if it is not
 
    \return
    true      section was claimed
    false     section was not claimed is it is already occupied
-
-   \created     24.08.2017 STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool C_TGLCriticalSection::TryAcquire(void)

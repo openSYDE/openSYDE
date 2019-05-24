@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget base for dashboard label widget
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     10.08.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "constants.h"
@@ -21,34 +15,31 @@
 #include "C_SyvDaItDashboardLabelWidget.h"
 #include "ui_C_SyvDaItDashboardLabelWidget.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     10.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItDashboardLabelWidget::C_SyvDaItDashboardLabelWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvDaItDashboardLabelWidget),
@@ -73,56 +64,44 @@ C_SyvDaItDashboardLabelWidget::C_SyvDaItDashboardLabelWidget(QWidget * const opc
    this->mpc_Ui->pc_LabelValue->setFont(c_Font);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     10.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItDashboardLabelWidget::~C_SyvDaItDashboardLabelWidget(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reset font after stylesheet polish action
-
-   \created     22.05.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reset font after stylesheet polish action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardLabelWidget::ResetFont(void) const
 {
    this->mpc_Ui->pc_LabelValue->ResetFont();
    m_UpdateCaptionFont();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set caption label text
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set caption label text
 
    \param[in] orc_Text New value
-
-   \created     10.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardLabelWidget::SetCaption(const QString & orc_Text) const
 {
    this->mpc_Ui->pc_LabelCaption->setText(orc_Text.toUpper());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set value label text
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set value label text
 
    \param[in] orc_Text New value
-
-   \created     10.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardLabelWidget::SetValue(const QString & orc_Text) const
 {
    if (this->mq_ShowUnit == true)
@@ -135,27 +114,21 @@ void C_SyvDaItDashboardLabelWidget::SetValue(const QString & orc_Text) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set unit
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set unit
 
    \param[in] orc_Text New unit
-
-   \created     04.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardLabelWidget::SetUnit(const QString & orc_Text)
 {
    this->mc_Unit = orc_Text;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adjust font to current size
-
-   \created     17.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adjust font to current size
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardLabelWidget::AdjustFontToSize(void) const
 {
    const QSize c_ExpectedSize(this->width(), (this->height() * 10) / 17);
@@ -164,17 +137,14 @@ void C_SyvDaItDashboardLabelWidget::AdjustFontToSize(void) const
    this->m_UpdateCaptionFont();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set display style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set display style
 
    \param[in] oe_Type        Type
    \param[in] oq_ShowCaption Show caption
    \param[in] oq_ShowUnit    Show unit
-
-   \created     05.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardLabelWidget::SetDisplayStyle(const C_PuiSvDbLabel::E_Type oe_Type, const bool oq_ShowCaption,
                                                     const bool oq_ShowUnit)
 {
@@ -191,48 +161,39 @@ void C_SyvDaItDashboardLabelWidget::SetDisplayStyle(const C_PuiSvDbLabel::E_Type
    this->mq_ShowUnit = oq_ShowUnit;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten resize event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten resize event slot
 
    Here: Adapt caption based on value label
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     11.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardLabelWidget::resizeEvent(QResizeEvent * const opc_Event)
 {
    QWidget::resizeEvent(opc_Event);
    this->AdjustFontToSize();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    Here: draw background
    (Not automatically drawn in any QWidget derivative)
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     10.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardLabelWidget::paintEvent(QPaintEvent * const opc_Event)
 {
    stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
    QWidget::paintEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt caption relative to value label
-
-   \created     11.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt caption relative to value label
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardLabelWidget::m_UpdateCaptionFont(void) const
 {
    QFont c_FontCaption;

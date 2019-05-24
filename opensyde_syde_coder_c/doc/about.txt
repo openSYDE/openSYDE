@@ -1,7 +1,6 @@
 ---------------------------------------------------------------------
 File:      about.txt
 Content:   Information about this project
-Author:    AST / andreas.stangl@sensor-technik.de
 ---------------------------------------------------------------------
 
 Description:

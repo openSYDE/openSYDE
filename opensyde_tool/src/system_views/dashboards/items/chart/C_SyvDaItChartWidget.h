@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for showing a chart with its data configuration and data selection. (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.08.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVDAITCHARTWIDGET_H
 #define C_SYVDAITCHARTWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 #include <QLineSeries>
 #include <QList>
@@ -26,7 +20,7 @@
 #include <QColor>
 #include <vector>
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 #include "stwtypes.h"
 
@@ -45,9 +39,9 @@ class C_SyvDaItChartWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_SyvDaItChartWidget :
    public QWidget
 {
@@ -61,6 +55,7 @@ public:
    void SetData(const stw_opensyde_gui_logic::C_PuiSvDbChart & orc_Data);
    stw_opensyde_gui_logic::C_PuiSvDbChart & GetData(void);
 
+   void SetDrawingActive(const bool oq_Active);
    void SetDisplayStyle(const stw_opensyde_gui_logic::C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode);
    void SetWidthOfDataSeriesSelector(const stw_types::sintn osn_Width) const;
    stw_types::sintn GetWidthOfDataSeriesSelector(void) const;
@@ -81,8 +76,9 @@ public:
                    const stw_opensyde_gui_logic::C_PuiSvDbDataElementScaling & orc_ElementScaling);
    stw_types::uint32 GetCountDataSeries(void) const;
    void UpdateTimeAxis(void);
+   void UpdateValueAxis(void);
    void UpdateError(const stw_types::uint32 ou32_DataElementIndex, const QString & orc_ErrorText,
-                    const bool oq_IsTransmissionError) const;
+                    const bool oq_IsTransmissionError, const bool oq_ErrorActive) const;
    void UpdateTransparence(const stw_types::uint32 ou32_DataElementIndex, const stw_types::sintn osn_Value) const;
 
 protected:
@@ -123,6 +119,7 @@ private:
    // Color configuration for the data series
    static const QColor mhac_DataColors[10];
    std::vector<bool> mc_DataColorsUsed;
+   bool mq_DrawingActive;
 
    std::map<stw_types::uint32, stw_types::uint32> mc_ElementHandlerRegIndexToDataElementIndex;
 
@@ -139,7 +136,7 @@ private:
    C_SyvDaItChartWidget & operator =(const C_SyvDaItChartWidget &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

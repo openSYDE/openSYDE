@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Custom header view for table (implementation)
 
    Custom header view for table
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.03.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QSpinBox>
@@ -25,35 +18,32 @@
 #include "C_SdNdeDataPoolListTableHeaderView.h"
 #include "C_OgeWiUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in]     ore_Orientation Orientation
    \param[in,out] opc_Parent      Optional pointer to parent
-
-   \created     13.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListTableHeaderView::C_SdNdeDataPoolListTableHeaderView(const Qt::Orientation & ore_Orientation,
                                                                        QWidget * const opc_Parent) :
    QHeaderView(ore_Orientation, opc_Parent)
@@ -81,29 +71,23 @@ C_SdNdeDataPoolListTableHeaderView::C_SdNdeDataPoolListTableHeaderView(const Qt:
    delete (pc_Option);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     06.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListTableHeaderView::~C_SdNdeDataPoolListTableHeaderView(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten view options event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten view options event slot
 
    \return
    Currently active view options
-
-   \created     13.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QStyleOptionViewItem C_SdNdeDataPoolListTableHeaderView::viewOptions(void) const
 {
    //Seems to ignore drawing delegate which might be the only use for this virtual function
@@ -115,19 +99,16 @@ QStyleOptionViewItem C_SdNdeDataPoolListTableHeaderView::viewOptions(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint section event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint section event slot
 
    Here: Draw icon manually
 
    \param[in,out] opc_Painter      Painter
    \param[in]     orc_Rect         Rectangle
    \param[in]     osn_LogicalIndex Logical index
-
-   \created     13.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableHeaderView::paintSection(QPainter * const opc_Painter, const QRect & orc_Rect,
                                                       const sintn osn_LogicalIndex) const
 {
@@ -147,34 +128,28 @@ void C_SdNdeDataPoolListTableHeaderView::paintSection(QPainter * const opc_Paint
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse enter event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse enter event slot
 
    Here: apply custom style
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     18.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableHeaderView::enterEvent(QEvent * const opc_Event)
 {
    QHeaderView::enterEvent(opc_Event);
    C_OgeWiUtil::h_ApplyStylesheetProperty(this, "IsHovered", true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse leave event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse leave event slot
 
    Here: revert custom style
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     18.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableHeaderView::leaveEvent(QEvent * const opc_Event)
 {
    C_OgeWiUtil::h_ApplyStylesheetProperty(this, "IsHovered", false);

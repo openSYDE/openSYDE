@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for new data block properties (implementation)
 
    Widget for new data block properties
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     04.10.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QFileDialog>
@@ -36,7 +29,7 @@
 #include "C_ImpUtil.h"
 #include "C_OgeWiUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -45,21 +38,20 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
    Warning: uninitialized if os32_ApplicationIndex invalid
@@ -67,10 +59,8 @@ using namespace stw_opensyde_gui_elements;
    \param[in]     ou32_NodeIndex        Node index
    \param[in]     os32_ApplicationIndex Application index
    \param[in,out] orc_Parent            Reference to parent
-
-   \created     04.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDbProperties::C_SdNdeDbProperties(const stw_types::uint32 ou32_NodeIndex, const sint32 os32_ApplicationIndex,
                                          stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
    QWidget(&orc_Parent),
@@ -124,59 +114,47 @@ C_SdNdeDbProperties::C_SdNdeDbProperties(const stw_types::uint32 ou32_NodeIndex,
            &C_SdNdeDbProperties::m_HandleRevertCodeGenerator);
 
    // connect for updating paths that are relative to project path
-   connect(this->mpc_Ui->pc_LineEditProject, &C_OgeLeFilePathWrapper::editingFinished,
+   connect(this->mpc_Ui->pc_LineEditProject, &C_OgeLeFilePath::editingFinished,
            this, &C_SdNdeDbProperties::m_UpdatePathsRelativeToProject);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     04.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDbProperties::~C_SdNdeDbProperties(void)
 {
    delete this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get window size for binary case
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get window size for binary case
 
    \return
    Window size for binary case
-
-   \created     09.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QSize C_SdNdeDbProperties::h_GetBinaryWindowSize(void)
 {
    return QSize(900, 524);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get window size for default case
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get window size for default case
 
    \return
    Window size for default case
-
-   \created     09.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QSize C_SdNdeDbProperties::h_GetDefaultWindowSize(void)
 {
    return QSize(900, 877);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     04.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::InitStaticNames(void) const
 {
    this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("Data Block"));
@@ -254,56 +232,47 @@ void C_SdNdeDbProperties::InitStaticNames(void) const
       C_GtGetText::h_GetText(""),
       C_GtGetText::h_GetText("Set path to default openSYDE code generator (syde_coder_c)."));
 }
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init from application
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init from application
 
    Warning: should only be used in case of invalid application index
 
    \param[in] orc_Application Application to use for initialization
-
-   \created     05.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::LoadFromData(const C_OSCNodeApplication & orc_Application)
 {
    this->mc_SelectedDataPools.clear();
    m_LoadFromData(orc_Application);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply new data block properties
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply new data block properties
 
    \param[in,out] orc_Application Application to apply to
-
-   \created     04.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::ApplyNewData(C_OSCNodeApplication & orc_Application) const
 {
    //Section 1
    orc_Application.c_Name = this->mpc_Ui->pc_LineEditName->text().toStdString().c_str();
    orc_Application.c_Comment = this->mpc_Ui->pc_CommentText->toPlainText().toStdString().c_str();
    //Section 2
-   orc_Application.c_ProjectPath = this->mpc_Ui->pc_LineEditProject->GetCompletePath().toStdString().c_str();
+   orc_Application.c_ProjectPath = this->mpc_Ui->pc_LineEditProject->GetPath().toStdString().c_str();
    orc_Application.u8_ProcessId = static_cast<uint8>(this->mpc_Ui->pc_SpinBoxProcessID->value());
-   orc_Application.c_ResultPath = this->mpc_Ui->pc_LineEditOutputFile->GetCompletePath().toStdString().c_str();
+   orc_Application.c_ResultPath = this->mpc_Ui->pc_LineEditOutputFile->GetPath().toStdString().c_str();
    orc_Application.c_IDECall = this->mpc_Ui->pc_LineEditIDE->text().toStdString().c_str();
    orc_Application.c_CodeGeneratorPath =
-      this->mpc_Ui->pc_LineEditCodeGenerator->GetCompletePath().toStdString().c_str();
-   orc_Application.c_GeneratePath = this->mpc_Ui->pc_LineEditCodeGenerate->GetCompletePath().toStdString().c_str();
+      this->mpc_Ui->pc_LineEditCodeGenerator->GetPath().toStdString().c_str();
+   orc_Application.c_GeneratePath = this->mpc_Ui->pc_LineEditCodeGenerate->GetPath().toStdString().c_str();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle data pools of application
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle data pools of application
 
    \param[in] ou32_ApplicationIndex Index of application to apply data pools to
-
-   \created     05.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::HandleDataPools(const uint32 ou32_ApplicationIndex) const
 {
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
@@ -345,17 +314,14 @@ void C_SdNdeDbProperties::HandleDataPools(const uint32 ou32_ApplicationIndex) co
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     04.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
@@ -381,15 +347,12 @@ void C_SdNdeDbProperties::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Ok button click
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Ok button click
 
    Only allow OK if application name and process ID are valid, if process ID error: list existing ones!
-
-   \created     04.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_OkClicked(void)
 {
    const QString c_ErrorName = this->m_CheckName();
@@ -438,28 +401,22 @@ void C_SdNdeDbProperties::m_OkClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Cancel button click
-
-   \created     04.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Cancel button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_CancelClicked()
 {
    this->mrc_ParentDialog.reject();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check data block name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check data block name
 
    \return
    error text of name check (empty if no error occured)
-
-   \created     07.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SdNdeDbProperties::m_CheckName() const
 {
    QString c_Return = "";
@@ -506,16 +463,13 @@ QString C_SdNdeDbProperties::m_CheckName() const
    return c_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check process ID
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check process ID
 
    \return
    error text of process ID check (empty if no error occured)
-
-   \created     07.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SdNdeDbProperties::m_CheckID(void) const
 {
    QString c_Return = "";
@@ -574,16 +528,13 @@ QString C_SdNdeDbProperties::m_CheckID(void) const
    return c_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load from specified data block
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load from specified data block
 
    \param[in] ou32_NodeIndex        Node index
    \param[in] ou32_ApplicationIndex Application index
-
-   \created     04.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_LoadData(const stw_types::uint32 ou32_NodeIndex,
                                      const stw_types::uint32 ou32_ApplicationIndex)
 {
@@ -608,15 +559,12 @@ void C_SdNdeDbProperties::m_LoadData(const stw_types::uint32 ou32_NodeIndex,
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load from specified data block
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load from specified data block
 
    \param[in] orc_Application Application
-
-   \created     04.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_LoadFromData(const C_OSCNodeApplication & orc_Application)
 {
    //Section 1
@@ -646,9 +594,6 @@ void C_SdNdeDbProperties::m_LoadFromData(const C_OSCNodeApplication & orc_Applic
    case C_OSCNodeApplication::eBINARY:
       this->mpc_Ui->pc_LabelTypeValue->setText(C_GtGetText::h_GetText("Binary"));
       break;
-   case C_OSCNodeApplication::eFILE_CONTAINER:
-      this->mpc_Ui->pc_LabelTypeValue->setText(C_GtGetText::h_GetText("File container"));
-      break;
    case C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION:
       this->mpc_Ui->pc_LabelTypeValue->setText(C_GtGetText::h_GetText("Programmable application"));
       break;
@@ -658,7 +603,7 @@ void C_SdNdeDbProperties::m_LoadFromData(const C_OSCNodeApplication & orc_Applic
                                              C_PuiProject::h_GetInstance()->GetFolderPath());
 
    const QString c_ProjectPath =
-      C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditProject->GetCompletePath());
+      C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditProject->GetPath());
    this->mpc_Ui->pc_SpinBoxProcessID->setValue(orc_Application.u8_ProcessId);
    this->mpc_Ui->pc_LineEditOutputFile->SetPath(orc_Application.c_ResultPath.c_str(), c_ProjectPath);
    this->mpc_Ui->pc_LineEditIDE->setText(orc_Application.c_IDECall.c_str());
@@ -672,9 +617,8 @@ void C_SdNdeDbProperties::m_LoadFromData(const C_OSCNodeApplication & orc_Applic
    this->m_CheckID();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set visibility of properties that are different for programmable and binary applications
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set visibility of properties that are different for programmable and binary applications
 
    long description of function within several lines
 
@@ -682,10 +626,8 @@ void C_SdNdeDbProperties::m_LoadFromData(const C_OSCNodeApplication & orc_Applic
 
    \return
    possible return value(s) and description
-
-   \created     30.10.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_SetVisibilityOfProgrammableLines(const bool & orq_Visible) const
 {
    // process ID
@@ -719,20 +661,17 @@ void C_SdNdeDbProperties::m_SetVisibilityOfProgrammableLines(const bool & orq_Vi
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle click on browse button for "Project Path" section
-
-   \created     04.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle click on browse button for "Project Path" section
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_OnClickProject(void)
 {
    QString c_FolderName; // for default folder
 
-   const QDir c_Folder(this->mpc_Ui->pc_LineEditProject->GetCompletePath());
+   const QDir c_Folder(C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditProject->GetPath()));
 
-   if ((c_Folder.exists() == true) && (this->mpc_Ui->pc_LineEditProject->GetCompletePath().isEmpty() == false))
+   if ((c_Folder.exists() == true) && (this->mpc_Ui->pc_LineEditProject->GetPath().isEmpty() == false))
    {
       c_FolderName = c_Folder.path();
    }
@@ -756,20 +695,20 @@ void C_SdNdeDbProperties::m_OnClickProject(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle click on browse button for "Output File" section
-
-   \created     04.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle click on browse button for "Output File" section
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_OnClickOutput(void)
 {
    QString c_FolderName; // for default folder
-   QString c_FilePath = "";
+   //Project path
    const QString c_ProjectPath =
-      C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditProject->GetCompletePath());
-   const QFileInfo c_File(c_ProjectPath);
+      C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditProject->GetPath());
+   //Output file may be relative to project
+   QString c_FilePath = this->mpc_Ui->pc_LineEditOutputFile->GetPath();
+   const QDir c_ProjectDir(c_ProjectPath);
+   const QFileInfo c_File(c_ProjectDir.absoluteFilePath(c_FilePath));
    const QString c_FilterName = QString(C_GtGetText::h_GetText("HEX file (*.hex);;Others (*.*)"));
 
    if (c_File.exists() == true)
@@ -794,18 +733,15 @@ void C_SdNdeDbProperties::m_OnClickOutput(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle click on browse button for "Code Generator" section
-
-   \created     04.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle click on browse button for "Code Generator" section
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_OnClickGenerator(void)
 {
    QString c_FolderName; // for default folder
 
-   const QFileInfo c_File(this->mpc_Ui->pc_LineEditCodeGenerator->GetCompletePath());
+   const QFileInfo c_File(this->mpc_Ui->pc_LineEditCodeGenerator->GetPath());
 
    if (c_File.exists() == true)
    {
@@ -828,20 +764,17 @@ void C_SdNdeDbProperties::m_OnClickGenerator(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle click on browse button for "Code Generator Output File" section
-
-   \created     04.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle click on browse button for "Code Generator Output File" section
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_OnClickGenerate(void)
 {
    QString c_FolderName; // for default folder
 
-   const QDir c_Folder(this->mpc_Ui->pc_LineEditCodeGenerate->GetCompletePath());
+   const QDir c_Folder(this->mpc_Ui->pc_LineEditCodeGenerate->GetPath());
 
-   if ((c_Folder.exists() == true) && (this->mpc_Ui->pc_LineEditCodeGenerate->GetCompletePath().isEmpty() == false))
+   if ((c_Folder.exists() == true) && (this->mpc_Ui->pc_LineEditCodeGenerate->GetPath().isEmpty() == false))
    {
       c_FolderName = c_Folder.path();
    }
@@ -858,18 +791,15 @@ void C_SdNdeDbProperties::m_OnClickGenerate(void)
    {
       // check if relative path is possible and appreciated
       c_Path =
-         C_ImpUtil::h_AskUserToSaveRelativePath(this, c_Path, this->mpc_Ui->pc_LineEditProject->GetCompletePath());
-      this->mpc_Ui->pc_LineEditCodeGenerate->SetPath(c_Path, this->mpc_Ui->pc_LineEditProject->GetCompletePath());
+         C_ImpUtil::h_AskUserToSaveRelativePath(this, c_Path, this->mpc_Ui->pc_LineEditProject->GetPath());
+      this->mpc_Ui->pc_LineEditCodeGenerate->SetPath(c_Path, this->mpc_Ui->pc_LineEditProject->GetPath());
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle click on button "Clear project"
-
-   \created     04.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle click on button "Clear project"
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_OnClickClearProject(void) const
 {
    this->mpc_Ui->pc_LineEditProject->SetPath("", "");
@@ -880,13 +810,10 @@ void C_SdNdeDbProperties::m_OnClickClearProject(void) const
    this->mpc_Ui->pc_LineEditCodeGenerate->SetPath("", "");
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for text changed signal of line edit name
-
-   \created     07.11.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for text changed signal of line edit name
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_OnNameEdited(void) const
 {
    const QString c_ErrorText = this->m_CheckName();
@@ -906,13 +833,10 @@ void C_SdNdeDbProperties::m_OnNameEdited(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for value changed signal of process ID spin box
-
-   \created     07.11.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for value changed signal of process ID spin box
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_OnProcessIDChanged(void) const
 {
    const QString c_ErrorText = this->m_CheckID();
@@ -931,13 +855,10 @@ void C_SdNdeDbProperties::m_OnProcessIDChanged(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up all data pool widgets
-
-   \created     05.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clean up all data pool widgets
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_CleanUpDataPoolWidgets(void)
 {
    for (std::vector<C_SdNdeDbDataPoolEntry *>::const_iterator c_It = this->mc_DataPoolWidgets.begin();
@@ -953,13 +874,10 @@ void C_SdNdeDbProperties::m_CleanUpDataPoolWidgets(void)
    this->mc_DataPoolWidgets.clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update owned datapools count
-
-   \created     17.10.2018  STW/S.Singer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update owned datapools count
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_UpdateOwnedDpsCount(void) const
 {
    //update owned dp count
@@ -967,37 +885,31 @@ void C_SdNdeDbProperties::m_UpdateOwnedDpsCount(void) const
                                                       this->mc_SelectedDataPools.size()));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update tool tips for paths that are relative to project path
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update tool tips for paths that are relative to project path
 
    Slot for project path editing finished signal.
-
-   \created     05.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_UpdatePathsRelativeToProject() const
 {
    const QString c_ProjectPath =
-      C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditProject->GetCompletePath());
+      C_ImpUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditProject->GetPath());
    QString c_Temp;
 
    // output file path
-   c_Temp = this->mpc_Ui->pc_LineEditOutputFile->GetCompletePath();
+   c_Temp = this->mpc_Ui->pc_LineEditOutputFile->GetPath();
    this->mpc_Ui->pc_LineEditOutputFile->SetPath(c_Temp, c_ProjectPath);
 
    // generated code directory
-   c_Temp = this->mpc_Ui->pc_LineEditCodeGenerate->GetCompletePath();
+   c_Temp = this->mpc_Ui->pc_LineEditCodeGenerate->GetPath();
    this->mpc_Ui->pc_LineEditCodeGenerate->SetPath(c_Temp, c_ProjectPath);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize the data pools section (based on member variable)
-
-   \created     05.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize the data pools section (based on member variable)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_InitDataPoolsSection(void)
 {
    m_CleanUpDataPoolWidgets();
@@ -1029,13 +941,10 @@ void C_SdNdeDbProperties::m_InitDataPoolsSection(void)
    this->m_UpdateOwnedDpsCount();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle add data pools operation
-
-   \created     05.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle add data pools operation
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_HandleAddDataPools(void)
 {
    QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
@@ -1064,28 +973,22 @@ void C_SdNdeDbProperties::m_HandleAddDataPools(void)
    //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle revert to default code generator action
-
-   \created     09.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle revert to default code generator action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_HandleRevertCodeGenerator(void) const
 {
    this->mpc_Ui->pc_LineEditCodeGenerator->SetPath(C_ImpUtil::h_GetSydeCoderCPath(), C_Uti::h_GetExePath());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle delete datapool entry
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle delete datapool entry
 
    \param[in,out] opc_Source Source widget
    \param[in]     ou32_Index Data pool index
-
-   \created     05.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_HandleDeleteDataPool(C_SdNdeDbDataPoolEntry * const opc_Source, const uint32 ou32_Index)
 {
    if (opc_Source != NULL)

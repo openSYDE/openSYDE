@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       openSYDE: Diagnostic protocol driver for KEFEX protocol
 
    For details cf. documentation in .h file.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     18.07.2017  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -58,8 +51,7 @@ void C_OSCDiagProtocolKfx::mh_UnpackDataPoolIndex(const uint16 ou16_Index, uint1
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Handling of ECRR/TCRR reception
+/*! \brief   Handling of ECRR/TCRR reception
 
    Called by KEFEX protocol implementation when a response to a
    previously requested ECRR or TCRR request was received.
@@ -70,8 +62,6 @@ void C_OSCDiagProtocolKfx::mh_UnpackDataPoolIndex(const uint16 ou16_Index, uint1
    \param[in]     ou32_TimeStamp       timestamp of reported value
    \param[in]     oq_IsTimeStamped     true: response contained timestamp
    \param[in]     oq_Error             true: error response; false: data response
-
-   \created     01.08.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_OSCDiagProtocolKfx::mh_CyclicResponseReceived(void * const opv_Instance, const uint32 ou32_Index,
@@ -89,8 +79,7 @@ void C_OSCDiagProtocolKfx::mh_CyclicResponseReceived(void * const opv_Instance, 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Handling an ECRR/TCRR reception
+/*! \brief   Handling an ECRR/TCRR reception
 
    Called by KEFEX protocol implementation when a response to a
    previously requested ECRR or TCRR request was received.
@@ -102,8 +91,6 @@ void C_OSCDiagProtocolKfx::mh_CyclicResponseReceived(void * const opv_Instance, 
    \param[in]     ou32_TimeStamp       timestamp of reported value (ignored by us ...)
    \param[in]     oq_IsTimeStamped     true: response contained timestamp (ignored by us ...)
    \param[in]     oq_Error             true: error response; false: data response
-
-   \created     01.08.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_OSCDiagProtocolKfx::m_CyclicResponseReceived(const uint32 ou32_Index, const sint64 os64_Value,
@@ -156,12 +143,9 @@ void C_OSCDiagProtocolKfx::m_CyclicResponseReceived(const uint32 ou32_Index, con
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   constructor
+/*! \brief   constructor
 
    Set up class
-
-   \created     18.07.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_OSCDiagProtocolKfx::C_OSCDiagProtocolKfx(void) :
@@ -180,12 +164,9 @@ C_OSCDiagProtocolKfx::C_OSCDiagProtocolKfx(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   destructor
+/*! \brief   destructor
 
    Tear down class
-
-   \created     18.07.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_OSCDiagProtocolKfx::~C_OSCDiagProtocolKfx(void)
@@ -195,14 +176,11 @@ C_OSCDiagProtocolKfx::~C_OSCDiagProtocolKfx(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Make communication dispatcher to use known
+/*! \brief   Make communication dispatcher to use known
 
    Pass dispatcher down to KEFEX protocol driver class and set RX filters.
 
    \param[in]    opc_Dispatcher  CAN dispatcher to use for communication
-
-   \created     24.07.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_OSCDiagProtocolKfx::SetDispatcher(stw_can::C_CAN_Dispatcher * const opc_Dispatcher)
@@ -224,15 +202,12 @@ void C_OSCDiagProtocolKfx::SetDispatcher(stw_can::C_CAN_Dispatcher * const opc_D
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Configure communication parameters
+/*! \brief   Configure communication parameters
 
    Pass parameters down to KEFEX protocol driver class.
    Will update the RX filters of the installed CAN dispatcher.
 
    \param[in]    orc_Config   communication parameters
-
-   \created     24.07.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_OSCDiagProtocolKfx::SetCommunicationParameters(const stw_diag_lib::C_KFXCommConfiguration & orc_Config)
@@ -245,8 +220,7 @@ void C_OSCDiagProtocolKfx::SetCommunicationParameters(const stw_diag_lib::C_KFXC
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Configure whether the NvmWrite Start and Finalize services are required
+/*! \brief   Configure whether the NvmWrite Start and Finalize services are required
 
    Configure whether the NvmWriteStart and NvmWriteFinalize services need to be executed for the target.
    If set to "true" the service functions will try to execute the services.
@@ -256,8 +230,6 @@ void C_OSCDiagProtocolKfx::SetCommunicationParameters(const stw_diag_lib::C_KFXC
     are only supported on newer target driver's.
 
    \param[in]    oq_IsUsed   on/off (see function description)
-
-   \created     27.07.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_OSCDiagProtocolKfx::SetNvmValidFlagUsed(const bool oq_IsUsed)
@@ -266,8 +238,7 @@ void C_OSCDiagProtocolKfx::SetNvmValidFlagUsed(const bool oq_IsUsed)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get endianness of data returned by and passed to protocol services
+/*! \brief   Get endianness of data returned by and passed to protocol services
 
    Here: return "little"
 
@@ -281,8 +252,7 @@ uint8 C_OSCDiagProtocolKfx::GetEndianness(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Perform cyclic communication tasks
+/*! \brief   Perform cyclic communication tasks
 
    Invoke protocol's "Cycle" function.
    * read and handle all incoming service responses
@@ -291,8 +261,6 @@ uint8 C_OSCDiagProtocolKfx::GetEndianness(void) const
    \return
    C_NO_ERR   finished cycle
    C_CONFIG   CAN dispatcher not installed
-
-   \created     18.07.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolKfx::Cycle(void)
@@ -309,8 +277,7 @@ sint32 C_OSCDiagProtocolKfx::Cycle(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Read numeric data from server's data pool
+/*! \brief   Read numeric data from server's data pool
 
    Send request and wait for response.
    This function is used for plain numeric data pool elements (i.e. non-array elements).
@@ -424,8 +391,7 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadNumeric(const uint8 ou8_DataPoolIndex, 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Read array data from server's data pool
+/*! \brief   Read array data from server's data pool
 
    Send request and wait for response.
    This function is used for plain numeric data pool elements (i.e. non-array elements).
@@ -510,8 +476,7 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadArray(const uint8 ou8_DataPoolIndex, co
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Write numeric data to server's data pool
+/*! \brief   Write numeric data to server's data pool
 
    Send request and wait for response.
 
@@ -627,8 +592,7 @@ sint32 C_OSCDiagProtocolKfx::DataPoolWriteNumeric(const uint8 ou8_DataPoolIndex,
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Write array data to server's data pool
+/*! \brief   Write array data to server's data pool
 
    Send request and wait for response.
 
@@ -708,8 +672,7 @@ sint32 C_OSCDiagProtocolKfx::DataPoolWriteArray(const uint8 ou8_DataPoolIndex, c
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Set rate of event driven transmissions
+/*! \brief   Set rate of event driven transmissions
 
    Configure update rate of event driven transmissions in ms.
    Three "rails" can be configured for event driven transmissions.
@@ -741,8 +704,7 @@ sint32 C_OSCDiagProtocolKfx::DataPoolSetEventDataRate(const uint8 ou8_Rail, cons
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Request cyclic driven transmission of data pool element.
+/*! \brief   Request cyclic driven transmission of data pool element.
 
    Request cyclic transmission of data pool element.
 
@@ -800,8 +762,7 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadCyclic(const uint8 ou8_DataPoolIndex, c
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Request change driven transmission of data pool element.
+/*! \brief   Request change driven transmission of data pool element.
 
    Request change driven transmission of data pool element.
 
@@ -859,8 +820,7 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadChangeDriven(const uint8 ou8_DataPoolIn
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Request stop all change driven transmissions.
+/*! \brief   Request stop all change driven transmissions.
 
    Request stop of all change driven transmissions.
    Shall send the request and wait for the response.
@@ -906,8 +866,7 @@ sint32 C_OSCDiagProtocolKfx::DataPoolStopEventDriven(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Request cyclic driven transmission of NVM content.
+/*! \brief   Request cyclic driven transmission of NVM content.
 
    \param[in]     ou32_MemoryAddress   NVM memory address to read (first read byte)
    \param[in,out] orc_DataRecord       in: size defines number of bytes to read
@@ -922,8 +881,6 @@ sint32 C_OSCDiagProtocolKfx::DataPoolStopEventDriven(void)
    C_NOACT    could not send protocol request
    C_CONFIG   CAN dispatcher not installed
    C_WARN     error response
-
-   \created     26.07.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolKfx::NvmRead(const uint32 ou32_MemoryAddress, std::vector<uint8> & orc_DataRecord,
@@ -969,8 +926,7 @@ sint32 C_OSCDiagProtocolKfx::NvmRead(const uint32 ou32_MemoryAddress, std::vecto
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Announce writing data to NVM
+/*! \brief   Announce writing data to NVM
 
    In this protocol the corresponding services is not available/required on all targets.
    So the function checks a configurable flag and returns "OK" if the service is marked as not available.
@@ -985,8 +941,6 @@ sint32 C_OSCDiagProtocolKfx::NvmRead(const uint32 ou32_MemoryAddress, std::vecto
    C_NOACT    could not send protocol request
    C_CONFIG   CAN dispatcher not installed
    C_WARN     error response
-
-   \created     27.07.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolKfx::NvmWriteStartTransaction(const uint8 ou8_DataPoolIndex, const uint16 ou16_NVMAccessCount)
@@ -1030,8 +984,7 @@ sint32 C_OSCDiagProtocolKfx::NvmWriteStartTransaction(const uint8 ou8_DataPoolIn
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Cyclic driven request for NVM write operation
+/*! \brief   Cyclic driven request for NVM write operation
 
    Usage:
    * First call NvmWriteStartTransaction. (Here you can register any non zero amount of NVM write operations)
@@ -1050,8 +1003,6 @@ sint32 C_OSCDiagProtocolKfx::NvmWriteStartTransaction(const uint8 ou8_DataPoolIn
    C_NOACT    could not send protocol request
    C_CONFIG   CAN dispatcher not installed
    C_WARN     error response
-
-   \created     27.07.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolKfx::NvmWrite(const uint32 ou32_MemoryAddress, const std::vector<uint8> & orc_DataRecord,
@@ -1096,8 +1047,7 @@ sint32 C_OSCDiagProtocolKfx::NvmWrite(const uint32 ou32_MemoryAddress, const std
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Finalize writing to NVM
+/*! \brief   Finalize writing to NVM
 
    \return
    C_NO_ERR   request sent, positive response received; or: no action required
@@ -1105,8 +1055,6 @@ sint32 C_OSCDiagProtocolKfx::NvmWrite(const uint32 ou32_MemoryAddress, const std
    C_NOACT    could not send protocol request
    C_CONFIG   CAN dispatcher not installed
    C_WARN     error response
-
-   \created     27.07.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDiagProtocolKfx::NvmWriteFinalizeTransaction(void)
@@ -1145,8 +1093,7 @@ sint32 C_OSCDiagProtocolKfx::NvmWriteFinalizeTransaction(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Read data pool version
+/*! \brief   Read data pool version
 
    Version format: One byte for Major, Minor, Release
 
@@ -1206,8 +1153,7 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadVersion(const uint8 ou8_DataPoolIndex, 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Notify NVM data changes
+/*! \brief   Notify NVM data changes
 
    \param[in]  ou8_DataPoolIndex            Data pool index
    \param[in]  ou8_ListIndex                List index
@@ -1269,8 +1215,7 @@ sint32 C_OSCDiagProtocolKfx::NvmNotifyOfChanges(const uint8 ou8_DataPoolIndex, c
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Verify data pool consistency
+/*! \brief   Verify data pool consistency
 
    Here: try to logon; server will verify ...
 
@@ -1331,8 +1276,7 @@ sint32 C_OSCDiagProtocolKfx::DataPoolVerify(const uint8 ou8_DataPoolIndex, const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Perform a logoff
+/*! \brief   Perform a logoff
 
    Logoff from the server ECU.
 

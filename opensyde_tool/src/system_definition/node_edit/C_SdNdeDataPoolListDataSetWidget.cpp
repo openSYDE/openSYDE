@@ -1,47 +1,39 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data set edit widget
 
    Data set edit widget
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     15.03.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SdNdeDataPoolListDataSetWidget.h"
 #include "ui_C_SdNdeDataPoolListDataSetWidget.h"
 #include "C_GtGetText.h"
 #include "C_PuiSdHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -49,10 +41,8 @@ using namespace stw_opensyde_core;
    \param[in]     oru32_NodeIndex     Node index
    \param[in]     oru32_DataPoolIndex Data pool index
    \param[in]     oru32_ListIndex     List index
-
-   \created     15.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListDataSetWidget::C_SdNdeDataPoolListDataSetWidget(
    stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, const uint32 & oru32_NodeIndex,
    const uint32 & oru32_DataPoolIndex, const uint32 & oru32_ListIndex) :
@@ -127,28 +117,22 @@ C_SdNdeDataPoolListDataSetWidget::C_SdNdeDataPoolListDataSetWidget(
            &C_SdNdeDataPoolListDataSetWidget::m_HandleButtonChange);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     15.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListDataSetWidget::~C_SdNdeDataPoolListDataSetWidget(void)
 {
    delete mpc_Ui;
    //lint -e{1740}  no memory leak because of the parent and the Qt memory management or never took ownership
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     15.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListDataSetWidget::InitStaticNames(void) const
 {
    const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
@@ -170,49 +154,40 @@ void C_SdNdeDataPoolListDataSetWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_PushButtonMoveRight->SetToolTipInformation(C_GtGetText::h_GetText("Move right"), "");
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   GetUndocommand and take ownership
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   GetUndocommand and take ownership
 
    Internal undo command is reseted
 
    \return
    NULL No changes
    Else Undocommand accumulating all changes
-
-   \created     16.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QUndoCommand * C_SdNdeDataPoolListDataSetWidget::TakeUndoCommand(void) const
 {
    return this->mpc_Ui->pc_TableView->TakeUndoCommand();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set model view manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set model view manager
 
    \param[in,out] opc_Value Model view manager
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListDataSetWidget::SetModelViewManager(C_SdNdeDataPoolListModelViewManager * const opc_Value) const
 {
    this->mpc_Ui->pc_TableView->SetModelViewManager(opc_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: handle list paste
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     26.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListDataSetWidget::keyPressEvent(QKeyEvent * const opc_Event)
 {
    bool q_CallOrig = true;
@@ -305,13 +280,10 @@ void C_SdNdeDataPoolListDataSetWidget::keyPressEvent(QKeyEvent * const opc_Event
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize icons of buttons for all states.
-
-   \created     10.08.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize icons of buttons for all states.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListDataSetWidget::m_InitButtonIcons(void) const
 {
    // TODO icon states: svg icons move left and move right; 4 different states
@@ -343,33 +315,26 @@ void C_SdNdeDataPoolListDataSetWidget::m_InitButtonIcons(void) const
                                                     "://images/system_definition/NodeEdit/lists/PasteDisabled.svg");
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On ok clicked
-
-   \created     15.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On ok clicked
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListDataSetWidget::m_OkClicked(void)
 {
    this->mrc_Parent.accept();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On cancel clicked
-
-   \created     15.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On cancel clicked
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListDataSetWidget::m_CancelClicked(void)
 {
    this->mrc_Parent.reject();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set buttons status
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set buttons status
 
    \param[in] orq_AddActive       Push button add active
    \param[in] orq_CutActive       Push button cut active
@@ -378,10 +343,8 @@ void C_SdNdeDataPoolListDataSetWidget::m_CancelClicked(void)
    \param[in] orq_DeleteActive    Push button delete active
    \param[in] orq_MoveLeftActive  Push button move left active
    \param[in] orq_MoveRightActive Push button move right active
-
-   \created     16.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListDataSetWidget::m_HandleButtonChange(const bool & orq_AddActive, const bool & orq_CutActive,
                                                             const bool & orq_CopyActive, const bool & orq_PasteActive,
                                                             const bool & orq_DeleteActive,
@@ -425,15 +388,12 @@ void C_SdNdeDataPoolListDataSetWidget::m_HandleButtonChange(const bool & orq_Add
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle data set count change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle data set count change
 
    \param[in] ors32_NewColumnCount New column count
-
-   \created     20.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListDataSetWidget::m_OnDataSetCountChange(const sint32 & ors32_NewColumnCount) const
 {
    if (ors32_NewColumnCount > 0)
@@ -448,15 +408,12 @@ void C_SdNdeDataPoolListDataSetWidget::m_OnDataSetCountChange(const sint32 & ors
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle data set selction change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle data set selction change
 
    \param[in] oru32_SelectionCount Selected item count
-
-   \created     21.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListDataSetWidget::m_OnDataSetSelectionChange(const uint32 & oru32_SelectionCount) const
 {
    QString c_Text;
@@ -477,13 +434,10 @@ void C_SdNdeDataPoolListDataSetWidget::m_OnDataSetSelectionChange(const uint32 &
    this->mpc_Ui->pc_SelectionLabel->setText(c_Text);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init context menu entries
-
-   \created     20.02.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init context menu entries
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListDataSetWidget::m_SetupContextMenu(void)
 {
    this->mpc_ContextMenu = new stw_opensyde_gui_elements::C_OgeContextMenu(this);
@@ -536,15 +490,12 @@ void C_SdNdeDataPoolListDataSetWidget::m_SetupContextMenu(void)
            &C_SdNdeDataPoolListDataSetWidget::m_OnCustomContextMenuRequested);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show custom context menu
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show custom context menu
 
    \param[in] orc_Pos Local context menu position
-
-   \created     20.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListDataSetWidget::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 {
    const QPoint c_Global = this->mapToGlobal(orc_Pos);
@@ -556,13 +507,10 @@ void C_SdNdeDataPoolListDataSetWidget::m_OnCustomContextMenuRequested(const QPoi
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle insert action
-
-   \created     13.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle insert action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListDataSetWidget::m_DoInsert(void) const
 {
    this->mpc_Ui->pc_TableView->Insert(true);

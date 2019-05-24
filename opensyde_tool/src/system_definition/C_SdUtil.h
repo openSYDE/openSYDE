@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       System definition utility functions (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.04.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SDUTIL_H
 #define C_SDUTIL_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 #include <QString>
 #include <QIcon>
@@ -30,12 +24,12 @@
 #include "C_OSCNodeDataPoolListElementId.h"
 #include "C_OSCCanMessageIdentificationIndices.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SdUtil
 {
@@ -90,6 +84,9 @@ public:
    static bool h_CheckNodeInterfaceAvailable(
       const std::vector<stw_opensyde_core::C_OSCNodeComInterfaceSettings> & orc_ComInterfaces,
       const stw_opensyde_core::C_OSCSystemBus::E_Type & ore_BusType);
+   static bool h_CheckNodeInterfaceConnected(
+      const std::vector<stw_opensyde_core::C_OSCNodeComInterfaceSettings> & orc_ComInterfaces,
+      const stw_opensyde_core::C_OSCSystemBus::E_Type & ore_BusType);
    static bool h_CheckDatapoolNumber(const stw_types::uint32 & oru32_NodeIndex,
                                      const stw_opensyde_core::C_OSCNodeDataPool::E_Type & ore_DataPoolType,
                                      const bool & orq_AlreadyChecked, QWidget * const opc_Parent);
@@ -116,7 +113,7 @@ public:
                                              std::vector<T> & orc_OSCContentTmp, std::vector<U> & orc_UIContentTmp);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

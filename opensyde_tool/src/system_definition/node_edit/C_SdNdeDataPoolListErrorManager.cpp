@@ -1,52 +1,42 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Node data pool list error manager (implementation)
 
    Node data pool list error manager
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.05.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
 #include "C_SdNdeDataPoolListErrorManager.h"
 #include "C_PuiSdHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     24.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListErrorManager::C_SdNdeDataPoolListErrorManager(void) :
    QObject(),
    mu32_NodeIndex(0),
@@ -55,16 +45,13 @@ C_SdNdeDataPoolListErrorManager::C_SdNdeDataPoolListErrorManager(void) :
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set new data pool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new data pool
 
    \param[in] oru32_NodeIndex     Node index
    \param[in] oru32_DataPoolIndex Data pool index
-
-   \created     24.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListErrorManager::Init(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex)
 {
    const C_OSCNode * pc_Node;
@@ -78,13 +65,10 @@ void C_SdNdeDataPoolListErrorManager::Init(const uint32 & oru32_NodeIndex, const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check error state change
-
-   \created     24.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check error state change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListErrorManager::OnErrorChange(void)
 {
    const bool q_PreviousErrorState = this->mq_ErrorInList;

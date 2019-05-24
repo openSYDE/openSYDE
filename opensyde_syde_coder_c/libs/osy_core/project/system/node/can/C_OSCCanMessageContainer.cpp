@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Storage container for all CAN message types (implementation)
 
    Storage container for all CAN message types
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.04.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -41,10 +34,7 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     06.04.2017  STW/M.Echtler
+/*! \brief   Default constructor
 */
 //-----------------------------------------------------------------------------
 C_OSCCanMessageContainer::C_OSCCanMessageContainer(void) :
@@ -53,14 +43,11 @@ C_OSCCanMessageContainer::C_OSCCanMessageContainer(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
 
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
-
-   \created     06.04.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCCanMessageContainer::CalcHash(uint32 & oru32_HashValue) const
@@ -88,12 +75,9 @@ void C_OSCCanMessageContainer::CalcHash(uint32 & oru32_HashValue) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Recalculate all data element indices
+/*! \brief   Recalculate all data element indices
 
    Based on assumption data elements are sorted in data pool by message and signal
-
-   \created     07.04.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCCanMessageContainer::ReCalcDataElementIndices(void)
@@ -126,16 +110,13 @@ void C_OSCCanMessageContainer::ReCalcDataElementIndices(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get start of message in data pool list element vector
+/*! \brief   Get start of message in data pool list element vector
 
    \param[in] orq_IsTx           Flag if message is tx (else rx)
    \param[in] oru32_MessageIndex Message index
 
    \return
    Data pool list element index of message start
-
-   \created     10.04.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 uint32 C_OSCCanMessageContainer::GetMessageSignalDataStartIndex(const bool & orq_IsTx,
@@ -160,15 +141,12 @@ uint32 C_OSCCanMessageContainer::GetMessageSignalDataStartIndex(const bool & orq
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Request reference to either list
+/*! \brief   Request reference to either list
 
    \param[in] orq_IsTx Flag if tx message vector was requested (else rx message vector is output)
 
    \return
    Either tx or rx list (as requested)
-
-   \created     10.04.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 const std::vector<C_OSCCanMessage> & C_OSCCanMessageContainer::GetMessagesConst(const bool & orq_IsTx) const
@@ -184,15 +162,12 @@ const std::vector<C_OSCCanMessage> & C_OSCCanMessageContainer::GetMessagesConst(
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Request reference to either list
+/*! \brief   Request reference to either list
 
    \param[in] orq_IsTx Flag if tx message vector was requested (else rx message vector is output)
 
    \return
    Either tx or rx list (as requested)
-
-   \created     10.04.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 std::vector<C_OSCCanMessage> & C_OSCCanMessageContainer::GetMessages(const bool & orq_IsTx)
@@ -208,8 +183,7 @@ std::vector<C_OSCCanMessage> & C_OSCCanMessageContainer::GetMessages(const bool 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check message error
+/*! \brief   Check message error
 
    IMPORTANT: some error types (e.g. name & id conflict) can only be checked via system definition
 
@@ -224,8 +198,6 @@ std::vector<C_OSCCanMessage> & C_OSCCanMessageContainer::GetMessages(const bool 
    \param[out] opq_IdInvalid                        Id out of 11 bit / 29 bit range
    \param[out] opq_SignalInvalid                    An error found for a signal
    \param[in]  ou32_CANMessageValidSignalsDLCOffset CAN message DLC offset for valid signal range check
-
-   \created     10.04.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolList * const opc_List,
@@ -409,8 +381,7 @@ void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolLis
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check messages error
+/*! \brief   Check messages error
 
    IMPORTANT: some error types (e.g. name & id conflict) can only be checked via system definition
 
@@ -423,8 +394,6 @@ void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolLis
    \return
    true  Error
    false No error detected
-
-   \created     10.04.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 bool C_OSCCanMessageContainer::CheckLocalError(const C_OSCNodeDataPoolList & orc_ListTx,
@@ -483,14 +452,11 @@ bool C_OSCCanMessageContainer::CheckLocalError(const C_OSCNodeDataPoolList & orc
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check whether container contains at least one TX or RX message
+/*! \brief   Check whether container contains at least one TX or RX message
 
    \return
    true   at least one TX or RX message is defined
    false  else
-
-   \created     28.11.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool C_OSCCanMessageContainer::ContainsAtLeastOneMessage(void) const

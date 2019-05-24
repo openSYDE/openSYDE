@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Table Widget for Node COM Interface Settings (header)
@@ -6,30 +6,24 @@
    Table Widget for Node COM Interface Settings
    (note: main module description should be in .cpp file)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     28.09.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OGETABLEWIDGETCOMIF_H
 #define C_OGETABLEWIDGETCOMIF_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <map>
 #include <QTableWidget>
 #include "stwtypes.h"
 #include "C_NagToolTip.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_elements
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_OgeTableWidgetComIF :
    public QTableWidget
 {
@@ -51,6 +45,8 @@ protected:
    virtual void mouseMoveEvent(QMouseEvent * const opc_Event) override;
    virtual bool event(QEvent * const opc_Event) override;
    //lint -restore
+
+   virtual void m_HideToolTip(void);
 
 private:
    class C_ItemID
@@ -76,12 +72,11 @@ private:
    stw_types::sint32 ms32_HoveredVertHeader;
    stw_types::sint32 ms32_HoveredHorzHeader;
 
-   void m_HideTooltip(void);
    void m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos);
    void m_ScrollBarRangeChangedVer(const stw_types::sintn osn_Min, const stw_types::sintn osn_Max) const;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

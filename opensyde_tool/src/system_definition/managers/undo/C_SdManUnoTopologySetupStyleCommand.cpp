@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Setup style undo command (implementation)
 
    Setup style undo command
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.12.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -24,36 +17,33 @@
 #include "C_GiLiBus.h"
 #include "C_SdTopologyDataSnapshot.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
 using namespace std;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Scene   Pointer to currently active scene
    \param[in]     orc_IDs     Affected unique IDs
    \param[in]     oq_DarkMode Optional flag if dark mode is active
    \param[in,out] opc_Parent  Optional pointer to parent
-
-   \created     06.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologySetupStyleCommand::C_SdManUnoTopologySetupStyleCommand(QGraphicsScene * const opc_Scene,
                                                                          const std::vector<uint64> & orc_IDs,
                                                                          const bool oq_DarkMode,
@@ -66,27 +56,21 @@ C_SdManUnoTopologySetupStyleCommand::C_SdManUnoTopologySetupStyleCommand(QGraphi
    this->mpc_NextState = new C_SdTopologyDataSnapshot();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     06.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologySetupStyleCommand::~C_SdManUnoTopologySetupStyleCommand(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore all style features for all internally stored items from the snapshot using the preserved mapping
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore all style features for all internally stored items from the snapshot using the preserved mapping
 
    \param[out] orc_MapIDToTypeAndIndex Map for ID to state data entry
    \param[out] opc_Snapshot            Preserved state data
-
-   \created     06.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologySetupStyleCommand::m_Restore(const QMap<uint64,
                                                                C_PuiBsTemporaryDataID> & orc_MapIDToTypeAndIndex,
                                                     const C_PuiBsElements * const opc_Snapshot)
@@ -127,17 +111,14 @@ void C_SdManUnoTopologySetupStyleCommand::m_Restore(const QMap<uint64,
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save all style features of the specified items in the snapshot and preserve a mapping for later access
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save all style features of the specified items in the snapshot and preserve a mapping for later access
 
    \param[in]  orc_Items    Items to save style features for
    \param[out] orc_Map      Map for ID to state data entry
    \param[out] opc_Snapshot Preserved state data
-
-   \created     06.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologySetupStyleCommand::m_CreateMapAndSaveState(const vector<QGraphicsItem *> & orc_Items,
                                                                   QMap<uint64, C_PuiBsTemporaryDataID> & orc_Map,
                                                                   C_PuiBsElements * const opc_Snapshot) const

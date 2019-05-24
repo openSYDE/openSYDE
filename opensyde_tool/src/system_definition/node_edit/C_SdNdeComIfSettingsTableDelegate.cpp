@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       COM IF settings table delegate (implementation)
 
    COM IF settings table delegate
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.02.2017  STW/S.Singer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
@@ -31,36 +24,33 @@
 #include "C_OgeWiUtil.h"
 #include "C_SdUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_types;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     08.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeComIfSettingsTableDelegate::C_SdNdeComIfSettingsTableDelegate(QObject * const opc_Parent,
                                                                      const stw_types::uint32 ou32_NodeIndex) :
    QStyledItemDelegate(opc_Parent)
@@ -70,9 +60,8 @@ C_SdNdeComIfSettingsTableDelegate::C_SdNdeComIfSettingsTableDelegate(QObject * c
    connect(this, &C_SdNdeComIfSettingsTableDelegate::SigEdit, this, &C_SdNdeComIfSettingsTableDelegate::m_StoreEdit);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten create editor event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten create editor event slot
 
    Here: Create appropiate editor widget
 
@@ -82,10 +71,8 @@ C_SdNdeComIfSettingsTableDelegate::C_SdNdeComIfSettingsTableDelegate(QObject * c
 
    \return
    Editor widget
-
-   \created     20.02.2017  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QWidget * C_SdNdeComIfSettingsTableDelegate::createEditor(QWidget * const opc_Parent,
                                                           const QStyleOptionViewItem & orc_Option,
                                                           const QModelIndex & orc_Index) const
@@ -117,18 +104,15 @@ QWidget * C_SdNdeComIfSettingsTableDelegate::createEditor(QWidget * const opc_Pa
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten set editor data event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten set editor data event slot
 
    Here: Pass relevant data
 
    \param[in,out] opc_Editor Editor widget
    \param[in]     orc_Index  Correlating index
-
-   \created     20.02.2017  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeComIfSettingsTableDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex & orc_Index) const
 {
    if ((opc_Editor != NULL) && (orc_Index.isValid() == true))
@@ -152,19 +136,16 @@ void C_SdNdeComIfSettingsTableDelegate::setEditorData(QWidget * const opc_Editor
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten set model data event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten set model data event slot
 
    Here: Pass relevant data
 
    \param[in,out] opc_Editor Editor widget
    \param[in,out] opc_Model  Model object
    \param[in]     orc_Index  Correlating index
-
-   \created     20.02.2017  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeComIfSettingsTableDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel * const opc_Model,
                                                      const QModelIndex & orc_Index) const
 {
@@ -188,15 +169,12 @@ void C_SdNdeComIfSettingsTableDelegate::setModelData(QWidget * const opc_Editor,
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check new node id value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check new node id value
 
    \param[in] orsn_Value New node id
-
-   \created     08.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeComIfSettingsTableDelegate::m_CheckValue(const sintn & orsn_Value) const
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -242,15 +220,12 @@ void C_SdNdeComIfSettingsTableDelegate::m_CheckValue(const sintn & orsn_Value) c
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Store currently edited index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Store currently edited index
 
    \param[in] orc_Index Currently edited index
-
-   \created     08.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeComIfSettingsTableDelegate::m_StoreEdit(const QModelIndex & orc_Index)
 {
    this->mc_Edit = orc_Index;

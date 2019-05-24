@@ -1,24 +1,16 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for handling CAN DLL configuration
  (implementation)
 
    Widget for handling CAN DLL configuration
 
-
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     15.11.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QFileInfo>
@@ -38,7 +30,7 @@
 #include "C_UsHandler.h"
 #include "C_CamUti.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -47,29 +39,26 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_can;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     15.11.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosDllWidget::C_CamMosDllWidget(QWidget * const opc_Parent) :
    C_OgeWiOnlyBackground(opc_Parent),
    mpc_Ui(new Ui::C_CamMosDllWidget)
@@ -79,40 +68,31 @@ C_CamMosDllWidget::C_CamMosDllWidget(QWidget * const opc_Parent) :
    this->m_InitUi();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     15.11.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosDllWidget::~C_CamMosDllWidget()
 {
    delete this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load all user settings.
-
-   \created     21.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load all user settings.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDllWidget::LoadUserSettings(void) const
 {
    this->mpc_Ui->pc_WiHeader->SetExpanded(C_UsHandler::h_GetInstance()->GetWiDllConfigExpanded());
    this->m_OnExpand(C_UsHandler::h_GetInstance()->GetWiDllConfigExpanded());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Prepare widget for menu view in collapsed state resp. expanded view.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Prepare widget for menu view in collapsed state resp. expanded view.
 
    \param[in]     oq_Expand       true: prepare for expanded, false: prepare for collapsed menu
-
-   \created     14.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDllWidget::PrepareForExpanded(const bool oq_Expand) const
 {
    if (oq_Expand == false)
@@ -128,13 +108,12 @@ void C_CamMosDllWidget::PrepareForExpanded(const bool oq_Expand) const
    this->mpc_Ui->pc_WiHeader->ShowExpandButton(oq_Expand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for communication change signal.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for communication change signal.
 
-   \created     01.02.2019  STW/G.Landsgesell
+   \param[in]  oq_Online    Online/offline flag
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDllWidget::OnCommunicationStarted(const bool oq_Online) const
 {
    this->mpc_Ui->pc_RadioButtonOther->setDisabled(oq_Online);
@@ -142,13 +121,10 @@ void C_CamMosDllWidget::OnCommunicationStarted(const bool oq_Online) const
    this->mpc_Ui->pc_RadioButtonVector->setDisabled(oq_Online);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize GUI elements
-
-   \created     23.11.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize GUI elements
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDllWidget::m_InitUi(void)
 {
    // initialize background color
@@ -213,13 +189,10 @@ void C_CamMosDllWidget::m_InitUi(void)
            this, &C_CamMosDllWidget::m_LoadConfig);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load configuration (i.e. DLL paths)
-
-   \created     30.11.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load configuration (i.e. DLL paths)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDllWidget::m_LoadConfig(void) const
 {
    const C_CamProHandler::E_CANDllType e_CANDllType = C_CamProHandler::h_GetInstance()->GetCANDllType();
@@ -263,15 +236,12 @@ void C_CamMosDllWidget::m_LoadConfig(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of configure DLL button.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of configure DLL button.
 
    Open CAN DLL and try to call interactive setup.
-
-   \created     26.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDllWidget::m_ConfigureDllClicked(void)
 {
    const QString c_Path = C_Uti::h_GetAbsolutePathFromExe(C_CamProHandler::h_GetInstance()->GetCANDllPath());
@@ -307,52 +277,40 @@ void C_CamMosDllWidget::m_ConfigureDllClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of radio buttons PEAK and Vector.
-
-   \created     23.11.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of radio buttons PEAK and Vector.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDllWidget::m_ConcreteDllClicked(void) const
 {
    this->m_ShowCustomDllPath(false);
    this->m_UpdateCANDllPath();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for other DLL radio button.
-
-   \created     23.11.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for other DLL radio button.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDllWidget::m_OtherDllClicked(void) const
 {
    this->m_ShowCustomDllPath(true);
    this->m_UpdateCANDllPath();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show DLL path line edit and description label.
-
-   \created     23.11.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show DLL path line edit and description label.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDllWidget::m_ShowCustomDllPath(const bool oq_Active) const
 {
    this->mpc_Ui->pc_WidgetCustomDll->setVisible(oq_Active);
    this->mpc_Ui->pc_LineEditCustomDllPath->setFocus();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set new CAN DLL path in data handling.
-
-   \created     29.11.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new CAN DLL path in data handling.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDllWidget::m_UpdateCANDllPath(void) const
 {
    C_CamProHandler::E_CANDllType e_Type;
@@ -383,30 +341,24 @@ void C_CamMosDllWidget::m_UpdateCANDllPath(void) const
    C_CamProHandler::h_GetInstance()->SetCANDllType(e_Type);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of expand signal.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of expand signal.
 
    \param[in] oq_Expand    true: expand; false: collapse
-
-   \created     10.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDllWidget::m_OnExpand(const bool oq_Expand) const
 {
    this->mpc_Ui->pc_WiContent->setVisible(oq_Expand);
    C_UsHandler::h_GetInstance()->SetWiDllConfigExpanded(oq_Expand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for browse button click.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for browse button click.
 
    Browse for CAN DLL.
-
-   \created     06.02.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDllWidget::m_OnBrowse(void)
 {
    QString c_Path = "";

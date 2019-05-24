@@ -1,15 +1,3 @@
-//03.11.14:  AST  Added KEFEX protocol service EEPROM WRITE SSL
-//21.04.11:  AST  Code should now be endian-safe
-//02.04.09:  AST  Logon: removed target specific interpretation of project index
-//16.03.09:  AST  added decoding of ECRR (into lower-hyst, upper-hyst and hyst-base)
-//28.11.08:  AST  KEFEX protocol: added check for valid DLCs
-//                Moved KEFEX protocol specific functions to this module to render CCMONProtocol.cpp easier to
-//                 maintain
-//15.04.03:  AST  added KEFEX protocol service StartupIndication
-//03.03.03:  AST  added KEFEX protocol services ServiceRead/ServiceWrite
-
-//---------------------------------------------------------------------------
-
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -70,8 +58,6 @@ static const uint8 mu8_KFX_PROTOCOL_SRR_CF                       = 0x43U;
    \brief    constructor
 
    Initialize class members
-
-   \created     xx.xx.xxxx  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_CMONProtocolKEFEX::C_CMONProtocolKEFEX(void) :
@@ -106,8 +92,6 @@ void C_CMONProtocolKEFEX::SetBaseID(const uint16 ou16_BaseID)
    \return
    C_NO_ERR  -> data added to INI file
    C_RD_WR   -> error writing data
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_CMONProtocolKEFEX::SaveParamsToIni(C_SCLIniFile & orc_IniFile, const C_SCLString & orc_Section)
@@ -138,8 +122,6 @@ sint32 C_CMONProtocolKEFEX::SaveParamsToIni(C_SCLIniFile & orc_IniFile, const C_
    \return
    C_NO_ERR  -> data read from INI file
    C_RD_WR   -> error reading data
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_CMONProtocolKEFEX::LoadParamsFromIni(C_SCLIniFile & orc_IniFile, const C_SCLString & orc_Section)
@@ -200,8 +182,6 @@ C_SCLString C_CMONProtocolKEFEX::m_KFXTextAndValueToString(const charn * const o
 
    \return
    Text interpretation of CAN message ("" if the message can not be interpreted)
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolKEFEX::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) const
@@ -1125,8 +1105,6 @@ C_SCLString C_CMONProtocolKEFEX::MessageToString(const T_STWCAN_Msg_RX & orc_Msg
 
    \return
    Text representation of protocol name
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolKEFEX::GetProtocolName(void) const

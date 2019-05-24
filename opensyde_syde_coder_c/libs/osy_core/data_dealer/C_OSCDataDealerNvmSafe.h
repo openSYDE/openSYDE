@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Encapsulates safety relevant sequences for NVM access. (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.10.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCDATADEALERNVMSAFE_H
 #define C_OSCDATADEALERNVMSAFE_H
 
@@ -24,6 +18,7 @@
 #include "C_OSCParamSetRawNode.h"
 #include "C_OSCParamSetRawEntry.h"
 #include "C_OSCParamSetInterpretedList.h"
+#include "C_OSCParamSetInterpretedFileInfoData.h"
 #include "C_OSCNodeDataPoolListId.h"
 #include "C_OSCNodeDataPoolListElementId.h"
 
@@ -55,7 +50,8 @@ public:
    static void h_NvmSafeClearInternalContent(void);
    stw_types::sint32 NvmSafeReadParameterValues(const std::vector<C_OSCNodeDataPoolListId> & orc_ListIds,
                                                 stw_types::uint8 * const opu8_NrCode);
-   static stw_types::sint32 h_NvmSafeCreateCleanFileWithoutCRC(const stw_scl::C_SCLString & orc_Path);
+   static stw_types::sint32 h_NvmSafeCreateCleanFileWithoutCRC(const stw_scl::C_SCLString & orc_Path, const stw_opensyde_core::C_OSCParamSetInterpretedFileInfoData & orc_FileInfo =
+                                                                  stw_opensyde_core::C_OSCParamSetInterpretedFileInfoData());
    static stw_types::sint32 h_NvmSafeReadFileWithoutCRC(const stw_scl::C_SCLString & orc_Path);
    stw_types::sint32 NvmSafeCheckParameterFileContents(const stw_scl::C_SCLString & orc_Path,
                                                        std::vector<C_OSCNodeDataPoolListId> & orc_DataPoolLists);

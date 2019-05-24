@@ -1,34 +1,28 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Data class, containing the update package configuration (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.02.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVUPUPDATEPACKAGECONFIG_H
 #define C_SYVUPUPDATEPACKAGECONFIG_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>
 #include <vector>
 
 #include "C_OSCNodeApplication.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SyvUpUpdatePackageConfigNodeApp
 {
@@ -49,6 +43,8 @@ public:
    QString c_DeviceType; // Device type as identificator
 
    std::vector<C_SyvUpUpdatePackageConfigNodeApp> c_AppConfigs;
+   std::vector<QString> c_ParamSetConfigs;
+   std::vector<QString> c_FileConfigs;
 };
 
 class C_SyvUpUpdatePackageConfig
@@ -59,7 +55,7 @@ public:
    std::vector<C_SyvUpUpdatePackageConfigNode> c_NodeConfigs;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

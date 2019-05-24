@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       openSYDE protocol IP driver interface
@@ -15,15 +15,9 @@
    Typically each client protocol driver uses one IpDispatcher to communicate with one server node.
    Specific implementations can use e.g. the WinSock or POSIX APIs.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     26.04.2017  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCIPDISPATCHERH
 #define C_OSCIPDISPATCHERH
 

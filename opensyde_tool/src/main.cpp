@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       main function of project
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.07.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include "precomp_headers.h"
 
@@ -31,34 +24,31 @@
 #include "stwerrors.h"
 #include "C_SdUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default main
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default main
 
    Set up and start application.
 
    \return
    0: success
    else: error
-
-   \created     06.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn main(sintn osn_Argc, charn * opacn_Argv[])
 {
    // turn on the DPI support**
@@ -72,9 +62,8 @@ sintn main(sintn osn_Argc, charn * opacn_Argv[])
       stw_opensyde_core::C_OSCLoggingHandler::h_SetWriteToFileActive(true);
       stw_opensyde_core::C_OSCLoggingHandler::h_SetCompleteLogFileLocation(c_FilePath.toStdString().c_str());
 
-      osc_write_log_info("Startup", ("Starting openSYDE Version: " +
-                                     stw_opensyde_gui_logic::C_Uti::h_ConvertVersionToSTWStyle(
-                                        APPLICATION_VERSION)).toStdString().c_str());
+      osc_write_log_info("Startup", QString(QString("Starting openSYDE Version: ") +
+                                            stw_opensyde_gui_logic::C_Uti::h_GetApplicationVersion()).toStdString().c_str());
    }
    {
       //Set stylesheet (SECOND)

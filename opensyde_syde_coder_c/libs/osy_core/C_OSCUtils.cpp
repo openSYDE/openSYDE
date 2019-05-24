@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
-   \brief       OpenSYDE utility functions (implementation)
+   \brief       openSYDE utility functions (implementation)
 
-   OpenSYDE utility functions
+   openSYDE utility functions
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.01.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -47,8 +40,7 @@ const stw_types::float64 C_OSCUtils::mhf64_Epsilon = 1e-5;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   CheckValidCName
+/*! \brief   CheckValidCName
 
    Function adapted from KEFEX to openSYDE (KFXCheckValidCName)
    Check if tName follows C naming conventions:
@@ -56,15 +48,12 @@ const stw_types::float64 C_OSCUtils::mhf64_Epsilon = 1e-5;
    -> only alphanumeric characters + "_"
    -> should not be longer than "ou16_MaxLength" characters
 
-
    \param[in]     orc_Name         symbol name to check
    \param[in]     ou16_MaxLength   permitted maximum identifier length
 
    \return
    true  -> OK
    false -> violation of rules
-
-   \created     23.01.2017  STW/S.Singer
 */
 //-----------------------------------------------------------------------------
 bool C_OSCUtils::h_CheckValidCName(const stw_scl::C_SCLString & orc_Name, const stw_types::uint16 ou16_MaxLength)
@@ -97,8 +86,7 @@ bool C_OSCUtils::h_CheckValidCName(const stw_scl::C_SCLString & orc_Name, const 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Compare to float64s for near equality
+/*! \brief   Compare to float64s for near equality
 
    \param[in] orf64_Float1 Float 1 to compare
    \param[in] orf64_Float2 Float 2 to compare
@@ -106,8 +94,6 @@ bool C_OSCUtils::h_CheckValidCName(const stw_scl::C_SCLString & orc_Name, const 
    \return
    true  Equal
    false Not equal
-
-   \created     10.05.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 bool C_OSCUtils::h_IsFloat64NearlyEqual(const float64 & orf64_Float1, const float64 & orf64_Float2)
@@ -117,8 +103,7 @@ bool C_OSCUtils::h_IsFloat64NearlyEqual(const float64 & orf64_Float1, const floa
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Compare to float32s for near equality
+/*! \brief   Compare to float32s for near equality
 
    \param[in] orf32_Float1 Float 1 to compare
    \param[in] orf32_Float2 Float 2 to compare
@@ -126,8 +111,6 @@ bool C_OSCUtils::h_IsFloat64NearlyEqual(const float64 & orf64_Float1, const floa
    \return
    true  Equal
    false Not equal
-
-   \created     10.05.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 bool C_OSCUtils::h_IsFloat32NearlyEqual(const float32 & orf32_Float1, const float32 & orf32_Float2)
@@ -138,8 +121,7 @@ bool C_OSCUtils::h_IsFloat32NearlyEqual(const float32 & orf32_Float1, const floa
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   create target folder (from bottom-up if required)
+/*! \brief   create target folder (from bottom-up if required)
 
    Nice and simple logic grabbed from
     https://stackoverflow.com/questions/1530760/how-do-i-recursively-create-a-folder-in-win32
@@ -149,8 +131,6 @@ bool C_OSCUtils::h_IsFloat32NearlyEqual(const float32 & orf32_Float1, const floa
    \return
    C_NO_ERR  folder created
    C_NOACT   could not create folder
-
-   \created     11.04.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCUtils::h_CreateFolderRecursively(const C_SCLString & orc_Folder)
@@ -176,8 +156,7 @@ sint32 C_OSCUtils::h_CreateFolderRecursively(const C_SCLString & orc_Folder)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Replace special characters in string
+/*! \brief   Replace special characters in string
 
    Aims:
    * convert into strings that can be used for file system folder names
@@ -211,8 +190,6 @@ sint32 C_OSCUtils::h_CreateFolderRecursively(const C_SCLString & orc_Folder)
 
    \return
    Niceified string
-
-   \created     11.04.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_OSCUtils::h_NiceifyStringForFileName(const C_SCLString & orc_String)
@@ -250,8 +227,7 @@ C_SCLString C_OSCUtils::h_NiceifyStringForFileName(const C_SCLString & orc_Strin
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Replace non-C characters in string
+/*! \brief   Replace non-C characters in string
 
    Aims:
    * convert a text string so that it can be used as a comment in C code
@@ -266,8 +242,6 @@ C_SCLString C_OSCUtils::h_NiceifyStringForFileName(const C_SCLString & orc_Strin
 
    \return
    Niceified string
-
-   \created     30.08.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_OSCUtils::h_NiceifyStringForCComment(const C_SCLString & orc_String)
@@ -303,8 +277,7 @@ C_SCLString C_OSCUtils::h_NiceifyStringForCComment(const C_SCLString & orc_Strin
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check if scaling active
+/*! \brief   Check if scaling active
 
    \param[in] of64_Factor Factor
    \param[in] of64_Offset Offset
@@ -312,8 +285,6 @@ C_SCLString C_OSCUtils::h_NiceifyStringForCComment(const C_SCLString & orc_Strin
    \return
    True  Scaling active
    False Scaling inactive
-
-   \created     15.11.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 bool C_OSCUtils::h_IsScalingActive(const float64 of64_Factor, const float64 of64_Offset)
@@ -323,8 +294,7 @@ bool C_OSCUtils::h_IsScalingActive(const float64 of64_Factor, const float64 of64
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Scales a value
+/*! \brief   Scales a value
 
    returns ((value * factor) + offset)
 
@@ -334,8 +304,6 @@ bool C_OSCUtils::h_IsScalingActive(const float64 of64_Factor, const float64 of64
 
    \return
    Scaled value
-
-   \created     27.09.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 float64 C_OSCUtils::h_GetValueScaled(const float64 of64_Value, const float64 of64_Factor, const float64 of64_Offset)
@@ -349,8 +317,7 @@ float64 C_OSCUtils::h_GetValueScaled(const float64 of64_Value, const float64 of6
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates a scaled value back to the unscaled value
+/*! \brief   Calculates a scaled value back to the unscaled value
 
    returns ((value - of64_Offset) - offset)
 
@@ -360,8 +327,6 @@ float64 C_OSCUtils::h_GetValueScaled(const float64 of64_Value, const float64 of6
 
    \return
    Origin value
-
-   \created     29.09.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 float64 C_OSCUtils::h_GetValueUnscaled(const float64 of64_Value, const float64 of64_Factor, const float64 of64_Offset)

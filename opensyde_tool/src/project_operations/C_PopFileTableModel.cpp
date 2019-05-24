@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Model for project file table (implementation)
 
    Model for project file table
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     12.05.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <cmath>
@@ -31,7 +24,7 @@
 #include "C_PuiProject.h"
 #include "C_Uti.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_tgl;
@@ -39,41 +32,35 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     12.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PopFileTableModel::C_PopFileTableModel(QObject * const opc_Parent) :
    QAbstractTableModel(opc_Parent)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal data changes to table
-
-   \created     03.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal data changes to table
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PopFileTableModel::UpdateData(const std::vector<QString> & orc_RecentFilePaths,
                                      const std::vector<C_OSCProject> & orc_RecentProjects)
 {
@@ -87,18 +74,15 @@ void C_PopFileTableModel::UpdateData(const std::vector<QString> & orc_RecentFile
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get table row count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get table row count
 
    \param[in] orc_Parent Parent
 
    \return
    Row count
-
-   \created     12.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_PopFileTableModel::rowCount(const QModelIndex & orc_Parent) const
 {
    stw_types::sintn sn_Retval = 0;
@@ -109,18 +93,15 @@ sintn C_PopFileTableModel::rowCount(const QModelIndex & orc_Parent) const
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get table column count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get table column count
 
    \param[in] orc_Parent Parent
 
    \return
    Column count
-
-   \created     12.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_PopFileTableModel::columnCount(const QModelIndex & orc_Parent) const
 {
    sintn sn_Retval = 0;
@@ -133,19 +114,16 @@ sintn C_PopFileTableModel::columnCount(const QModelIndex & orc_Parent) const
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data at index
 
    \param[in] orc_Index Index
    \param[in] osn_Role  Data role
 
    \return
    Data
-
-   \created     12.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
 {
    QVariant c_Retval;
@@ -241,18 +219,19 @@ QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const sintn os
             if ((u32_Index < this->mc_RecentFilePaths.size()) && (u32_Index < this->mc_RecentProjects.size()))
             {
                const QString & rc_RecentFilePaths = this->mc_RecentFilePaths[u32_Index];
-               const C_OSCProject & rc_RecentProjects = this->mc_RecentProjects[u32_Index];
+               const C_OSCProject & rc_RecentProject = this->mc_RecentProjects[u32_Index];
                QFileInfo c_ProjectFileInfo;
-
                c_ProjectFileInfo.setFile(rc_RecentFilePaths);
                QString c_TooltipContent;
-               c_TooltipContent = QString(C_GtGetText::h_GetText("Version: %1 \nAuthor: %2 \nCreated: %3 \n"
-                                                                 "Last modified: %4 \nUsed openSYDE version: %5")).
-                                  arg(rc_RecentProjects.c_Version.c_str()).
-                                  arg(rc_RecentProjects.c_Author.c_str()).
-                                  arg(C_OSCProject::h_GetTimeFormatted(rc_RecentProjects.c_CreationTime).c_str()).
-                                  arg(C_OSCProject::h_GetTimeFormatted(rc_RecentProjects.c_ModificationTime).c_str()).
-                                  arg(C_Uti::h_ConvertVersionToSTWStyle(rc_RecentProjects.c_OpenSYDEVersion.c_str()));
+               c_TooltipContent =
+                  QString(C_GtGetText::h_GetText("Version: %1 \nAuthor: %2 \nCreated: %3 \n"
+                                                 "Last modified: %4 (by %5) \nUsed openSYDE version: %6")).
+                  arg(rc_RecentProject.c_Version.c_str()).
+                  arg(rc_RecentProject.c_Author.c_str()).
+                  arg(C_OSCProject::h_GetTimeFormatted(rc_RecentProject.c_CreationTime).c_str()).
+                  arg(C_OSCProject::h_GetTimeFormatted(rc_RecentProject.c_ModificationTime).c_str()).
+                  arg(rc_RecentProject.c_Editor.c_str()).
+                  arg(C_Uti::h_ConvertVersionToSTWStyle(rc_RecentProject.c_OpenSYDEVersion.c_str()));
                if (c_ProjectFileInfo.exists() == true)
                {
                   const uint64 u64_SizeByte = C_PuiProject::h_GetProjectSize(rc_RecentFilePaths);
@@ -274,18 +253,15 @@ QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const sintn os
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Column to enum conversion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Column to enum conversion
 
    \param[in]  ors32_Column Column
 
    \return
    Enum value
-
-   \created     12.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PopFileTableModel::E_Columns C_PopFileTableModel::h_ColumnToEnum(const sint32 & ors32_Column)
 {
    C_PopFileTableModel::E_Columns e_Retval = eNAME;
@@ -308,19 +284,16 @@ C_PopFileTableModel::E_Columns C_PopFileTableModel::h_ColumnToEnum(const sint32 
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Enum to column conversion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Enum to column conversion
 
    \param[in] ore_Value Enum value
 
    \return
    Column
    -1 Error
-
-   \created     12.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PopFileTableModel::h_EnumToColumn(const C_PopFileTableModel::E_Columns & ore_Value)
 {
    sint32 s32_Retval;
@@ -344,9 +317,8 @@ sint32 C_PopFileTableModel::h_EnumToColumn(const C_PopFileTableModel::E_Columns 
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert row to message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert row to message
 
    \param[in]  ors32_Row     Model row
    \param[out] orc_MessageId Message identification indices
@@ -354,10 +326,8 @@ sint32 C_PopFileTableModel::h_EnumToColumn(const C_PopFileTableModel::E_Columns 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     05.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PopFileTableModel::ConvertRowToFile(const sint32 & ors32_Row, QString & orc_FilePath) const
 {
    sint32 s32_Retval = C_NO_ERR;

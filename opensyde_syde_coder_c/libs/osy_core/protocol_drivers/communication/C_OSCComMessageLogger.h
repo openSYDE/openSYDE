@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Class for logging CAN messages (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     03.09.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCCOMMESSAGELOGGER_H
 #define C_OSCCOMMESSAGELOGGER_H
 
@@ -58,8 +52,8 @@ public:
    C_OSCComMessageLogger(void);
    virtual ~C_OSCComMessageLogger(void);
 
-   void Continue(void);
-   void Pause(void);
+   virtual void Continue(void);
+   virtual void Pause(void);
    virtual void Stop(void);
    virtual void Start(void);
 
@@ -92,6 +86,7 @@ public:
 
    // CAN bus handling
    virtual stw_types::sint32 HandleCanMessage(const stw_can::T_STWCAN_Msg_RX & orc_Msg, const bool oq_IsTx);
+   virtual void ResetCounter(void);
    virtual void UpdateBusLoad(const stw_types::uint8 ou8_BusLoad);
    virtual void UpdateTxErrors(const stw_types::uint32 ou32_TxErrors);
 
@@ -143,6 +138,7 @@ private:
    C_OSCComMessageLogger & operator =(const C_OSCComMessageLogger &);
 
    void m_ConvertCanMessage(const stw_can::T_STWCAN_Msg_RX & orc_Msg, const bool oq_IsTx);
+   void m_ResetCounter(void);
 
    C_OSCComMessageLoggerData mc_HandledCanMessage;
    stw_types::uint64 mu64_FirstTimeStamp;

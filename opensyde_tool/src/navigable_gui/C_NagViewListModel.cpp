@@ -1,69 +1,56 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       View item list model (implementation)
 
    View item list model
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     02.08.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QMimeData>
 #include "C_NagViewListModel.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     02.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_NagViewListModel::C_NagViewListModel(QObject * const opc_Parent) :
    QAbstractListModel(opc_Parent),
    msn_Rows(0)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set new number of rows
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new number of rows
 
    \param[in] osn_Rows Set new number of rows
-
-   \created     02.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagViewListModel::SetNumRows(const sintn osn_Rows)
 {
    if ((this->msn_Rows != osn_Rows) && (osn_Rows >= 0))
@@ -102,18 +89,15 @@ void C_NagViewListModel::SetNumRows(const sintn osn_Rows)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get table row count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get table row count
 
    \param[in] orc_Parent Parent
 
    \return
    Row count
-
-   \created     02.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_NagViewListModel::rowCount(const QModelIndex & orc_Parent) const
 {
    stw_types::sintn sn_Retval = 0;
@@ -124,19 +108,16 @@ sintn C_NagViewListModel::rowCount(const QModelIndex & orc_Parent) const
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data at index
 
    \param[in] orc_Index Index
    \param[in] osn_Role  Data role
 
    \return
    Data
-
-   \created     02.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_NagViewListModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
 {
    QVariant c_Retval;
@@ -147,18 +128,15 @@ QVariant C_NagViewListModel::data(const QModelIndex & orc_Index, const sintn osn
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get flags for item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get flags for item
 
    \param[in] orc_Index Item
 
    \return
    Flags for item
-
-   \created     02.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 Qt::ItemFlags C_NagViewListModel::flags(const QModelIndex & orc_Index) const
 {
    Qt::ItemFlags c_Retval = QAbstractListModel::flags(orc_Index);
@@ -169,16 +147,13 @@ Qt::ItemFlags C_NagViewListModel::flags(const QModelIndex & orc_Index) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Mime types
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Mime types
 
    \return
    Table mime types
-
-   \created     02.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QStringList C_NagViewListModel::mimeTypes(void) const
 {
    //Append original types (Default events only accept this type)
@@ -190,18 +165,15 @@ QStringList C_NagViewListModel::mimeTypes(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overloaded function for stored mime data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overloaded function for stored mime data
 
    \param[in] orc_Items Current selected items
 
    \return
    Mime data for drag event
-
-   \created     02.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QMimeData * C_NagViewListModel::mimeData(const QModelIndexList & orc_Indices) const
 {
    QMimeData * pc_Retval = NULL;

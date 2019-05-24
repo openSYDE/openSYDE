@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Utility class for stylesheets of openSYDE CAN Monitor (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     16.11.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QFile>
@@ -24,12 +17,12 @@
 
 #include "C_CamUtiStyleSheets.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 // Configuration for dynamic transparency color configuration of elements
 //lint -e{36,155}  c++11 feature
 const std::vector<QString> C_CamUtiStyleSheets::mhc_ScrollAreaElements(
@@ -101,25 +94,23 @@ const std::vector<C_CamUtiStyleSheets::C_PropertyValueColorConfig> C_CamUtiStyle
 }
    );
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Combine all available stylesheets
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Combine all available stylesheets
 
-   \param[out]   orc_Stylesheet   QSS file
-
-   \created     16.11.2018  STW/B.Bayer
+   \return
+   QSS file
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_CamUtiStyleSheets::h_GetStylesheet(void)
 {
    QString c_Stylesheet;
@@ -154,27 +145,21 @@ QString C_CamUtiStyleSheets::h_GetStylesheet(void)
    return c_Stylesheet;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     16.11.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamUtiStyleSheets::C_CamUtiStyleSheets()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Append stylesheet of file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Append stylesheet of file
 
    \param[in]     orc_File       QSS file
    \param[in,out] orc_Stylesheet Stylesheet
-
-   \created     26.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamUtiStyleSheets::mh_AppendStylesheet(const QString & orc_File, QString & orc_Stylesheet)
 {
    QFile c_File(orc_File);
@@ -183,29 +168,23 @@ void C_CamUtiStyleSheets::mh_AppendStylesheet(const QString & orc_File, QString 
    orc_Stylesheet += QLatin1String(c_File.readAll());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Append dynamic created stylesheet
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Append dynamic created stylesheet
 
    \param[in,out] orc_Stylesheet Stylesheet
-
-   \created     27.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamUtiStyleSheets::mh_AppendDynamicStylesheet(QString & orc_Stylesheet)
 {
    mh_AppendScrollBarStyleSheets(orc_Stylesheet);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply stylesheets for scroll bars
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply stylesheets for scroll bars
 
    \param[in,out] orc_Stylesheet Dynamic stylesheet document
-
-   \created     27.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamUtiStyleSheets::mh_AppendScrollBarStyleSheets(QString & orc_Stylesheet)
 {
    mh_AppendScrollBarStyleSheet(C_CamUtiStyleSheets::mhc_ScrollBarElementsDark,
@@ -214,17 +193,14 @@ void C_CamUtiStyleSheets::mh_AppendScrollBarStyleSheets(QString & orc_Stylesheet
                                 C_CamUtiStyleSheets::mhc_ScrollBarPropertiesBright, orc_Stylesheet);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply stylesheets for scroll bar
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply stylesheets for scroll bar
 
    \param[in]     orc_ScrollBarElements   Which elements to apply the stylesheets for
    \param[in]     orc_ScrollBarProperties Which stylesheets should be applied for these elements
    \param[in,out] orc_Stylesheet          Dynamic stylesheet document
-
-   \created     27.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamUtiStyleSheets::mh_AppendScrollBarStyleSheet(const std::vector<QString> & orc_ScrollBarElements,
                                                        const std::vector<C_PropertyValueColorConfig> & orc_ScrollBarProperties,
                                                        QString & orc_Stylesheet)

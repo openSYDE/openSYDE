@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Table view for dashboard table widget (implementation)
 
    Table view for dashboard table widget
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     29.08.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QScrollBar>
@@ -28,36 +21,33 @@
 #include "C_SyvDaItTaView.h"
 #include "C_SdNdeDataPoolListTableHeaderView.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Data   Data storage
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     29.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItTaView::C_SyvDaItTaView(C_PuiSvDbDataElementHandler * const opc_Data, QWidget * const opc_Parent) :
    C_TblViewScroll(opc_Parent),
    mc_Model(opc_Data)
@@ -87,7 +77,7 @@ C_SyvDaItTaView::C_SyvDaItTaView(C_PuiSvDbDataElementHandler * const opc_Data, Q
    this->setHorizontalHeader(new C_SdNdeDataPoolListTableHeaderView(Qt::Horizontal));
    this->horizontalHeader()->setStretchLastSection(false);
    this->horizontalHeader()->setFixedHeight(27);
-   this->horizontalHeader()->setMinimumSectionSize(0);
+   this->horizontalHeader()->setMinimumSectionSize(4);
    //Row Height
    this->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
    this->verticalHeader()->setDefaultSectionSize(20);
@@ -101,79 +91,61 @@ C_SyvDaItTaView::C_SyvDaItTaView(C_PuiSvDbDataElementHandler * const opc_Data, Q
    this->setMouseTracking(true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     06.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItTaView::~C_SyvDaItTaView(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize min & max values and names for data elements
-
-   \created     01.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize min & max values and names for data elements
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaView::UpdateStaticValues(void)
 {
    this->mc_Model.InitMinMaxAndName();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get newest values
-
-   \created     01.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get newest values
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaView::UpdateValue(void)
 {
    this->mc_Model.UpdateValue();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update the error icon
-
-   \created     09.08.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update the error icon
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaView::UpdateError(void)
 {
    this->mc_Model.UpdateError();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update of the color transparence value configured by the actual timeout state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update of the color transparence value configured by the actual timeout state
 
    \param[in] ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
    \param[in] osn_Value                       Value for transparence (0..255)
-
-   \created     05.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaView::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
 {
    this->mc_Model.UpdateTransparence(ou32_DataElementIndex, osn_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new data element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new data element
 
    \param[in] orc_DataPoolElementId New data element ID
-
-   \created     21.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaView::AddItem(const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId)
 {
    const QModelIndexList c_IndexList = this->selectedIndexes();
@@ -188,13 +160,10 @@ void C_SyvDaItTaView::AddItem(const C_PuiSvDbNodeDataPoolListElementId & orc_Dat
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Remove all selected items
-
-   \created     21.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove all selected items
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaView::RemoveSelectedItems(std::vector<C_PuiSvDbNodeDataPoolListElementId> & orc_RemovedDataElements)
 {
    const QModelIndexList c_IndexList = this->selectedIndexes();
@@ -202,16 +171,13 @@ void C_SyvDaItTaView::RemoveSelectedItems(std::vector<C_PuiSvDbNodeDataPoolListE
    this->mc_Model.RemoveItems(c_IndexList, orc_RemovedDataElements);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get selected item indices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get selected item indices
 
    \return
    Selected item indices
-
-   \created     10.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint32> C_SyvDaItTaView::GetUniqueSelectedRows(void) const
 {
    std::vector<uint32> c_Retval;
@@ -220,16 +186,13 @@ std::vector<uint32> C_SyvDaItTaView::GetUniqueSelectedRows(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get only valid selected item indices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get only valid selected item indices
 
    \return
    Only valid selected item indices
-
-   \created     10.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint32> C_SyvDaItTaView::GetUniqueAndValidSelectedRows(void) const
 {
    std::vector<uint32> c_Retval;
@@ -246,15 +209,12 @@ std::vector<uint32> C_SyvDaItTaView::GetUniqueAndValidSelectedRows(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore column widths
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore column widths
 
    \param[in] orc_ColumnWidths Stored column widths (Restores default values if empty)
-
-   \created     29.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaView::SetCurrentColumnWidths(const std::vector<sint32> & orc_ColumnWidths)
 {
    if (orc_ColumnWidths.size() > 0)
@@ -274,16 +234,13 @@ void C_SyvDaItTaView::SetCurrentColumnWidths(const std::vector<sint32> & orc_Col
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current column widths
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current column widths
 
    \return
    Current column widths
-
-   \created     29.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<sint32> C_SyvDaItTaView::GetCurrentColumnWidths(void) const
 {
    std::vector<sint32> c_Retval;
@@ -295,15 +252,12 @@ std::vector<sint32> C_SyvDaItTaView::GetCurrentColumnWidths(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set selection available if necessary
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set selection available if necessary
 
    \param[in] oq_Active Selection active flag
-
-   \created     02.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaView::SetSelectionAvailable(const bool oq_Active)
 {
    if (oq_Active == true)
@@ -317,16 +271,13 @@ void C_SyvDaItTaView::SetSelectionAvailable(const bool oq_Active)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply style
 
    \param[in] oe_Style    New style type
    \param[in] oq_DarkMode Flag if dark mode is active
-
-   \created     29.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaView::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode)
 {
    this->mc_Delegate.SetDisplayStyle(oe_Style, oq_DarkMode);

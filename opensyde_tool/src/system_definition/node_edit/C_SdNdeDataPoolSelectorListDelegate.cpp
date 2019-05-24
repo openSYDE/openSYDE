@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Node data pool list drawing delegate (implementation)
 
    This delegate handles the drawing of an datapool item widget when dragging an item in the list.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.02.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
@@ -24,32 +17,29 @@
 #include "stwtypes.h"
 #include "C_SdNdeDataPoolSelectorListDelegate.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent        Optional pointer to parent
-
-   \created     01.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolSelectorListDelegate::C_SdNdeDataPoolSelectorListDelegate(QObject * const opc_Parent) :
    QStyledItemDelegate(opc_Parent),
    mpc_ActualWidget(NULL),
@@ -57,19 +47,16 @@ C_SdNdeDataPoolSelectorListDelegate::C_SdNdeDataPoolSelectorListDelegate(QObject
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    Here: Draw widget for drag event
 
    \param[in,out] opc_Painter Painter
    \param[in,out] opc_Option  Option
    \param[in,out] opc_Widget  Widget
-
-   \created     31.01.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorListDelegate::paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
                                                 const QModelIndex & orc_Index) const
 {
@@ -94,6 +81,7 @@ void C_SdNdeDataPoolSelectorListDelegate::paint(QPainter * const opc_Painter, co
                               this->mpc_ActualWidget->GetDataPoolSize(),
                               this->mpc_ActualWidget->GetDataPoolUsedSize(),
                               this->mpc_ActualWidget->GetDataPoolReservedSize());
+         c_ItemWidget.SetShareDatapool(this->mpc_ActualWidget->GetShareDatapool());
          c_ItemWidget.SetMaximized(this->mpc_ActualWidget->GetMaximized());
          c_ItemWidget.setStyleSheet(this->mpc_ActualWidget->styleSheet());
 
@@ -112,16 +100,13 @@ void C_SdNdeDataPoolSelectorListDelegate::paint(QPainter * const opc_Painter, co
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update index to paint widget in drag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update index to paint widget in drag
 
    \param[in] s32_Index          Update index for
    \param[in] opc_MovingWidget   Actual widget which will be moved
-
-   \created     01.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorListDelegate::StartPaint(const sint32 s32_Index,
                                                      C_SdNdeDataPoolSelectorItemWidget * const opc_Widget)
 {
@@ -129,13 +114,10 @@ void C_SdNdeDataPoolSelectorListDelegate::StartPaint(const sint32 s32_Index,
    this->mpc_ActualWidget = opc_Widget;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Stop paint widget in drag
-
-   \created     21.02.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Stop paint widget in drag
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolSelectorListDelegate::StopPaint(void)
 {
    this->ms32_IndexPaint = -1;

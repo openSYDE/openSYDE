@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
-   \file        CXFLFlashWrite.cpp
+   \file
    \brief       Implements the software update procedure based on the STW flashloader protocol.
 
    Download is seen from the side of the ECU (-> transfer PC to ECU).
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     xx.xx.200x  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------ */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -44,7 +37,7 @@
 #include "CSCLDateTime.h"
 #include "CSCLStringList.h"
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 using namespace stw_types;
 using namespace stw_errors;
@@ -53,18 +46,18 @@ using namespace stw_tgl;
 using namespace stw_diag_lib;
 using namespace stw_hex_file;
 
-/* -- Defines ------------------------------------------------------------- */
+/* -- Defines ------------------------------------------------------------------------------------------------------- */
 
-/* -- Types --------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ---------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables --------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 static const uint16 mu16_PROTOCOL_VERSION_3_00 = 0x3000U;
 
-/* -- Module Global Function Prototypes ----------------------------------- */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------ */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 void C_XFLFlashWrite::m_InitProtocol(const C_XFLFlashWriteParameters & orc_Params)
 {
    CfgSetFlashId       (orc_Params.u32_SendID, orc_Params.u32_ReceiveID);
@@ -72,8 +65,8 @@ void C_XFLFlashWrite::m_InitProtocol(const C_XFLFlashWriteParameters & orc_Param
    CfgSetLocalId       (mu8_ActualLocalID);
 }
 
-//---------------------------------------------------------------------------
-//22.09.2009  A.Stangl   added information about which node is currently addressed
+//----------------------------------------------------------------------------------------------------------------------
+
 sint32 C_XFLFlashWrite::m_Wakeup(const C_XFLWakeupParameters & orc_Params)
 {
    sint32 s32_Return;
@@ -86,8 +79,8 @@ sint32 C_XFLFlashWrite::m_Wakeup(const C_XFLWakeupParameters & orc_Params)
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
-//   26.01.2010        STW/A.Stangl  ask-user callback has new signature
+//----------------------------------------------------------------------------------------------------------------------
+
 void C_XFLFlashWrite::m_FlashingFinished(const E_XFLFlashFinishedAction oe_Action)
 {
    uint32 u32_Action;
@@ -144,7 +137,7 @@ void C_XFLFlashWrite::m_FlashingFinished(const E_XFLFlashFinishedAction oe_Actio
    this->TRG_ReportStatus(TGL_LoadStr(STR_FM_FINISHED), gu8_DL_REPORT_STATUS_TYPE_INFORMATION);
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //opq_SectorBasedCRCsSupported -> For servers below protocol V3.00r0 we have to
 //                                detect whether they support checksums hard-coded
 //                                For newer servers this does not matter anyway.
@@ -192,9 +185,8 @@ sint32 C_XFLFlashWrite::m_GetVersionNumber(uint8 & oru8_Version, bool & orq_Sect
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   write block based checksums to server
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   write block based checksums to server
 
    Check server to find out how many blocks there are.
    Then request calculation of checksum for all defined blocks.
@@ -206,10 +198,8 @@ sint32 C_XFLFlashWrite::m_GetVersionNumber(uint8 & oru8_Version, bool & orq_Sect
    \return
    C_NO_ERR     everything OK (checksum writing confirmed by server)
    else         return value of protocol class function
-
-   \created     29.07.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLFlashWrite::m_WriteBlockBasedChecksums(void)
 {
    sint32 s32_Return;
@@ -240,9 +230,8 @@ sint32 C_XFLFlashWrite::m_WriteBlockBasedChecksums(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Write hex file to STW flashloader server node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Write hex file to STW flashloader server node
 
    Write hex file to STW flashloader server node with the specified parameters.
 
@@ -251,10 +240,8 @@ sint32 C_XFLFlashWrite::m_WriteBlockBasedChecksums(void)
    \return
    C_NO_ERR     hex file written to target   \n
    else         could not write file to target
-
-   \created     xx.xx.200x  STW
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLFlashWrite::ExecuteWrite(const C_XFLFlashWriteParameters & orc_Params)
 {
    sint32 s32_Return;
@@ -512,9 +499,8 @@ sint32 C_XFLFlashWrite::ExecuteWrite(const C_XFLFlashWriteParameters & orc_Param
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   update resp. check flash content checksums
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   update resp. check flash content checksums
 
    To be called after the flash content was modified
 
@@ -534,10 +520,8 @@ sint32 C_XFLFlashWrite::ExecuteWrite(const C_XFLFlashWriteParameters & orc_Param
    \return
    C_NO_ERR           no errors
    else               trouble
-
-   \created     08.02.2016  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLFlashWrite::m_WriteFlashChecksums(const uint8 ou8_Mode,
                                               const C_XFLWakeupParameters & orc_WakeupConfig)
 {
@@ -628,9 +612,8 @@ sint32 C_XFLFlashWrite::m_WriteFlashChecksums(const uint8 ou8_Mode,
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   do a auto-detect of the sectors to erase
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   do a auto-detect of the sectors to erase
 
    The flash memory mapping is read from the server.
 
@@ -654,10 +637,8 @@ sint32 C_XFLFlashWrite::m_WriteFlashChecksums(const uint8 ou8_Mode,
                        number of sectors
    C_RANGE            hex file data occupies protected flash sector
    C_OVERFLOW         hex file data occupies memory not available on the server
-
-   \created     16.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLFlashWrite::m_SetAutoSectors(C_HexFile & orc_HexFile, const bool oq_AllButProtected,
                                          C_XFLFlashInformation & orc_FlashInfo)
 {
@@ -772,10 +753,8 @@ sint32 C_XFLFlashWrite::m_SetAutoSectors(C_HexFile & orc_HexFile, const bool oq_
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-//21.03.2011  AST    added support for more than 255 sectors
-//18.12.2009  AST    if protocol version >= 3.00r0 "C-Application" is interpreted as "all except protected sectors"
-//15.04.2008  AST    added support for auto mode
+//----------------------------------------------------------------------------------------------------------------------
+
 sint32 C_XFLFlashWrite::m_SetSectorsToErase(C_HexFile & orc_HexFile, const C_SCLString & orc_DeviceID,
                                             const C_XFLFlashWriteParameters & orc_Params,
                                             C_XFLFlashInformation & orc_FlashInfo,
@@ -945,9 +924,8 @@ sint32 C_XFLFlashWrite::m_SetSectorsToErase(C_HexFile & orc_HexFile, const C_SCL
    return C_NO_ERR;
 }
 
-//---------------------------------------------------------------------------
-//07.12.07  AST   ranges can be used (e.g.: 1,2-4,5 will erase 1,2,3,4,5)
-//28.07.00        will work with only one sector specified without any commas
+//----------------------------------------------------------------------------------------------------------------------
+
 sint32 C_XFLFlashWrite::m_SetUserDefinedSectors(const C_SCLString & orc_Sectors)
 {
    uint16 u16_Index;
@@ -1049,9 +1027,8 @@ sint32 C_XFLFlashWrite::m_SetUserDefinedSectors(const C_SCLString & orc_Sectors)
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   write fingerprint data to server
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   write fingerprint data to server
 
    Write programming data and time, username.
    Set application checksum to "0" to signal that programming was started, but not finished.
@@ -1061,10 +1038,8 @@ sint32 C_XFLFlashWrite::m_SetUserDefinedSectors(const C_SCLString & orc_Sectors)
 
    \return
    C_NO_ERR    checksum calculated
-
-   \created     23.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLFlashWrite::m_WriteStartFingerPrint(const C_XFLFingerPrintSupportedIndexes & orc_FingerPrintIndexes)
 {
    sint32 s32_Return;
@@ -1128,18 +1103,8 @@ sint32 C_XFLFlashWrite::m_WriteStartFingerPrint(const C_XFLFingerPrintSupportedI
    return C_NO_ERR;
 }
 
+//----------------------------------------------------------------------------------------------------------------------
 
-//---------------------------------------------------------------------------
-// changes
-// AST:     01.07.10   corrected reported hex file line in error texts
-// AST:     26.01.10   ask-user callback has new signature
-// AST:     18.12.09   improved frequency of progress callback execution to be more convenient with
-//                      lower communication bitrates
-// AST:     11.07.08   added optional device-ID x-check between hex-file and server
-// AST:     19.05.08   added handling of parameter u8_IgnoreInvalidHexfileError
-// AST:     22.04.08   added parameters oq_ProtocolVersionGE3 and opt_FingerPrintIndexes
-// AST:     24.01.06   load hexfile before erasing flash, so an invalid hexfile
-//                      will not leave the ECU erased
 sint32 C_XFLFlashWrite::m_FlashESXLokalID(const C_SCLString & orc_DeviceID,
                                           const C_XFLFingerPrintSupportedIndexes & orc_FingerPrintIndexes,
                                           const C_XFLFlashWriteParameters & orc_Params,
@@ -1482,7 +1447,7 @@ sint32 C_XFLFlashWrite::m_FlashESXLokalID(const C_SCLString & orc_DeviceID,
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_XFLFlashWrite::m_ReportVerboseStatus(const C_SCLString & orc_StatusText)
 {
@@ -1492,7 +1457,7 @@ void C_XFLFlashWrite::m_ReportVerboseStatus(const C_SCLString & orc_StatusText)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_XFLFlashWrite::m_WriteFingerPrintCheckSum(const bool oq_FingerPrintAvailable, const uint32 ou32_Checksum)
 {
@@ -1510,9 +1475,8 @@ sint32 C_XFLFlashWrite::m_WriteFingerPrintCheckSum(const bool oq_FingerPrintAvai
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   extract device ID from hex-file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   extract device ID from hex-file
 
    Scan through the hex-file and try to find the "device_info" structure.
    Then extract the device ID from it and return it.
@@ -1528,10 +1492,8 @@ sint32 C_XFLFlashWrite::m_WriteFingerPrintCheckSum(const bool oq_FingerPrintAvai
    C_NO_ERR     everything OK (device ID in oc_DeviceID)
    C_NOACT      device-ID not found
    C_CONFIG     ambiguous device-IDs in hex-file
-
-   \created     11.07.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLFlashWrite::m_ScanDeviceIDFromHexFile(const uint32 ou32_StartAddress,
                                                     const bool oq_FailIfNotFoundAtStartAddress,
                                                     C_XFLHexFile & orc_HexFile, C_SCLString & orc_DeviceID) const
@@ -1586,9 +1548,8 @@ sint32 C_XFLFlashWrite::m_ScanDeviceIDFromHexFile(const uint32 ou32_StartAddress
    return C_NOACT;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   perform device ID x-check between hex-file and server's device ID
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   perform device ID x-check between hex-file and server's device ID
 
    Depending on configuration settings check whether the specified device ID matches
     the one in the hex-file.
@@ -1602,10 +1563,8 @@ sint32 C_XFLFlashWrite::m_ScanDeviceIDFromHexFile(const uint32 ou32_StartAddress
    C_NO_ERR     everything OK (either device ID matches, override by user, not configured to be checked)
    C_CHECKSUM   device-ID does not match and no override (or other problems, cf. comments at parameter enums) -> fail
    C_CONFIG     at least one of the parameters is invalid
-
-   \created     11.07.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLFlashWrite::m_DoDeviceIDXCheck(C_XFLHexFile & orc_HexFile, const C_SCLString & orc_DeviceID,
                                            const C_XFLFlashWriteParameters & orc_Params,
                                            const uint16 ou16_ProtocolVersion)
@@ -1767,15 +1726,14 @@ sint32 C_XFLFlashWrite::m_DoDeviceIDXCheck(C_XFLHexFile & orc_HexFile, const C_S
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_XFLFlashWrite::~C_XFLFlashWrite(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default implementation of user interaction interface
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default implementation of user interaction interface
 
    Default: keep empty and warn.
    Derived implementation should return C_NO_ERR to continue the ongoing process.
@@ -1786,10 +1744,8 @@ C_XFLFlashWrite::~C_XFLFlashWrite(void)
 
    \return
    C_CONFIG     missing implementation in derived class -> abort process
-
-   \created     ??.??.20??  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLFlashWrite::TRG_UserInteraction(const E_XFLUserInteractionReason oe_Reason,
                                             const C_SCLString & orc_MessageText, uint32 & oru32_AdditionalValue)
 {
@@ -1801,6 +1757,5 @@ sint32 C_XFLFlashWrite::TRG_UserInteraction(const E_XFLUserInteractionReason oe_
    return C_CONFIG;
 }
 
-//---------------------------------------------------------------------------
-
+//----------------------------------------------------------------------------------------------------------------------
 

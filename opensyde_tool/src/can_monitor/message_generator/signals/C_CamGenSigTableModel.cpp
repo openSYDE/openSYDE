@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Model for message generator signals table (implementation)
 
    Model for message generator signals table
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.12.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -34,7 +27,7 @@
 #include "C_CamGenSigTableModel.h"
 #include "C_SdNdeDataPoolContentUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -42,55 +35,46 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamGenSigTableModel::C_CamGenSigTableModel(QObject * const opc_Parent) :
    QAbstractTableModel(opc_Parent),
    mu32_MessageIndex(0UL)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle signal reload on external trigger
-
-   \created     22.01.2019  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle signal reload on external trigger
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableModel::TriggerSignalReload(void)
 {
    //Trigger find message!
    this->SetMessage(this->mu32_MessageIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set current message index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set current message index
 
    \param[in] ou32_Message Message index
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableModel::SetMessage(const uint32 ou32_Message)
 {
    this->beginResetModel();
@@ -108,15 +92,12 @@ void C_CamGenSigTableModel::SetMessage(const uint32 ou32_Message)
    this->endResetModel();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update the message DLC
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update the message DLC
 
    \param[in] ou32_MessageIndex Message index
-
-   \created     14.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableModel::UpdateMessageDLC(const uint32 ou32_MessageIndex)
 {
    if (ou32_MessageIndex == this->mu32_MessageIndex)
@@ -126,9 +107,8 @@ void C_CamGenSigTableModel::UpdateMessageDLC(const uint32 ou32_MessageIndex)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get header data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get header data
 
    \param[in] osn_Section    Section
    \param[in] oe_Orientation Orientation
@@ -136,10 +116,8 @@ void C_CamGenSigTableModel::UpdateMessageDLC(const uint32 ou32_MessageIndex)
 
    \return
    Header string
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_CamGenSigTableModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
                                            const sintn osn_Role) const
 {
@@ -202,18 +180,15 @@ QVariant C_CamGenSigTableModel::headerData(const sintn osn_Section, const Qt::Or
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get table column count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get table column count
 
    \param[in] orc_Parent Parent
 
    \return
    Column count
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_CamGenSigTableModel::columnCount(const QModelIndex & orc_Parent) const
 {
    stw_types::sintn sn_Retval = 0;
@@ -232,9 +207,8 @@ sintn C_CamGenSigTableModel::columnCount(const QModelIndex & orc_Parent) const
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get table row count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get table row count
 
    Compare with file header description.
 
@@ -242,10 +216,8 @@ sintn C_CamGenSigTableModel::columnCount(const QModelIndex & orc_Parent) const
 
    \return
    Row count
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_CamGenSigTableModel::rowCount(const QModelIndex & orc_Parent) const
 {
    sintn sn_Retval;
@@ -295,19 +267,16 @@ sintn C_CamGenSigTableModel::rowCount(const QModelIndex & orc_Parent) const
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data at index
 
    \param[in] orc_Index Index
    \param[in] osn_Role  Data role
 
    \return
    Data
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_CamGenSigTableModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
 {
    QVariant c_Retval;
@@ -605,9 +574,8 @@ QVariant C_CamGenSigTableModel::data(const QModelIndex & orc_Index, const sintn 
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set data at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set data at index
 
    \param[in] orc_Index Index
    \param[in] orc_Value New data
@@ -616,10 +584,8 @@ QVariant C_CamGenSigTableModel::data(const QModelIndex & orc_Index, const sintn 
    \return
    true  success
    false failure
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_CamGenSigTableModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value, const sintn osn_Role)
 {
    bool q_Retval = false;
@@ -807,18 +773,15 @@ bool C_CamGenSigTableModel::setData(const QModelIndex & orc_Index, const QVarian
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get flags for item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get flags for item
 
    \param[in] orc_Index Item
 
    \return
    Flags for item
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 Qt::ItemFlags C_CamGenSigTableModel::flags(const QModelIndex & orc_Index) const
 {
    Qt::ItemFlags c_Retval = Qt::NoItemFlags;
@@ -878,18 +841,15 @@ Qt::ItemFlags C_CamGenSigTableModel::flags(const QModelIndex & orc_Index) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Column to enum conversion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Column to enum conversion
 
    \param[in] os32_Column Column
 
    \return
    Enum value
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamGenSigTableModel::E_Columns C_CamGenSigTableModel::h_ColumnToEnum(const sint32 os32_Column)
 {
    C_CamGenSigTableModel::E_Columns e_Retval;
@@ -917,19 +877,16 @@ C_CamGenSigTableModel::E_Columns C_CamGenSigTableModel::h_ColumnToEnum(const sin
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Enum to column conversion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Enum to column conversion
 
    \param[in] oe_Value Enum value
 
    \return
    Column
    -1 Error
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamGenSigTableModel::h_EnumToColumn(const C_CamGenSigTableModel::E_Columns oe_Value)
 {
    sint32 s32_Retval = -1;
@@ -955,17 +912,14 @@ sint32 C_CamGenSigTableModel::h_EnumToColumn(const C_CamGenSigTableModel::E_Colu
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if message in interpreted display mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if message in interpreted display mode
 
    \return
    True  Interpreted display mode
    False Raw display mode
-
-   \created     14.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_CamGenSigTableModel::m_CheckInterpretedMode(void) const
 {
    bool q_Retval = false;
@@ -987,16 +941,13 @@ bool C_CamGenSigTableModel::m_CheckInterpretedMode(void) const
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get  interpreted OSY message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get  interpreted OSY message
 
    \return
    Interpreted OSY message
-
-   \created     14.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const stw_opensyde_core::C_OSCCanMessage * C_CamGenSigTableModel::m_GetMessageInterpretedOsy(void) const
 {
    const stw_opensyde_core::C_OSCCanMessage * pc_Retval = NULL;
@@ -1011,18 +962,15 @@ const stw_opensyde_core::C_OSCCanMessage * C_CamGenSigTableModel::m_GetMessageIn
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get interpreted OSY signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get interpreted OSY signal
 
    \param[in] ou32_Index Signal index
 
    \return
    Interpreted OSY signal
-
-   \created     14.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const stw_opensyde_core::C_OSCCanSignal * C_CamGenSigTableModel::m_GetSignalInterpretedOsy(const uint32 ou32_Index)
 const
 {
@@ -1037,16 +985,13 @@ const
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get list for interpreted OSY list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get list for interpreted OSY list
 
    \return
    List for interpreted OSY list
-
-   \created     14.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const stw_opensyde_core::C_OSCNodeDataPoolList * C_CamGenSigTableModel::m_GetMessageListInterpreted(void) const
 {
    const stw_opensyde_core::C_OSCNodeDataPoolList * pc_Retval = NULL;
@@ -1061,18 +1006,15 @@ const stw_opensyde_core::C_OSCNodeDataPoolList * C_CamGenSigTableModel::m_GetMes
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get interpreted OSY signal common part
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get interpreted OSY signal common part
 
    \param[in] ou32_Index Signal index
 
    \return
    Interpreted OSY signal common part
-
-   \created     14.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_OSCNodeDataPoolListElement * C_CamGenSigTableModel::m_GetSignalInterpretedOsyCommon(const uint32 ou32_Index)
 const
 {
@@ -1088,16 +1030,13 @@ const
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get interpreted DBC message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get interpreted DBC message
 
    \return
    Interpreted DBC message
-
-   \created     14.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_CieConverter::C_CIECanMessage * C_CamGenSigTableModel::m_GetMessageInterpretedDbc(void) const
 {
    const C_CieConverter::C_CIECanMessage * pc_Retval = NULL;
@@ -1112,18 +1051,15 @@ const C_CieConverter::C_CIECanMessage * C_CamGenSigTableModel::m_GetMessageInter
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get interpreted DBC signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get interpreted DBC signal
 
    \param[in] ou32_Index Signal index
 
    \return
    Interpreted DBC signal
-
-   \created     14.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_CieConverter::C_CIECanSignal * C_CamGenSigTableModel::m_GetSignalInterpretedDbc(const uint32 ou32_Index) const
 {
    const C_CieConverter::C_CIECanSignal * pc_Retval = NULL;
@@ -1137,9 +1073,8 @@ const C_CieConverter::C_CIECanSignal * C_CamGenSigTableModel::m_GetSignalInterpr
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Decode raw value into C_OSCNodeDataPoolContent
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Decode raw value into C_OSCNodeDataPoolContent
 
    Based on: DBC
 
@@ -1148,10 +1083,8 @@ const C_CieConverter::C_CIECanSignal * C_CamGenSigTableModel::m_GetSignalInterpr
 
    \return
    Value as C_OSCNodeDataPoolContent
-
-   \created     14.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolContent C_CamGenSigTableModel::mh_DecodeRawToContentDbc(const std::vector<uint8> & orc_Raw,
                                                                          const C_CieConverter::C_CIECanSignal & orc_Signal)
 {
@@ -1163,9 +1096,8 @@ C_OSCNodeDataPoolContent C_CamGenSigTableModel::mh_DecodeRawToContentDbc(const s
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if a checkbox is possible for the raw value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if a checkbox is possible for the raw value
 
    \param[in] orc_Min Minimum value
    \param[in] orc_Max Maximum value
@@ -1173,10 +1105,8 @@ C_OSCNodeDataPoolContent C_CamGenSigTableModel::mh_DecodeRawToContentDbc(const s
    \return
    True  Use check box
    False Use other edit method
-
-   \created     14.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_CamGenSigTableModel::m_CheckUseCheckBox(const C_OSCNodeDataPoolContent & orc_Min,
                                                const C_OSCNodeDataPoolContent & orc_Max) const
 {
@@ -1201,19 +1131,16 @@ bool C_CamGenSigTableModel::m_CheckUseCheckBox(const C_OSCNodeDataPoolContent & 
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle all requests for column "Raw" in interpreted mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle all requests for column "Raw" in interpreted mode
 
    \param[in] ou32_Index Row index
    \param[in] osn_Role   Requested role type
 
    \return
    Returned value as specified by role
-
-   \created     14.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_CamGenSigTableModel::m_HandleColRawInterpreted(const uint32 ou32_Index, const sintn osn_Role) const
 {
    QVariant c_Retval;
@@ -1447,19 +1374,16 @@ QVariant C_CamGenSigTableModel::m_HandleColRawInterpreted(const uint32 ou32_Inde
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle all requests for column "Physical" in interpreted mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle all requests for column "Physical" in interpreted mode
 
    \param[in] ou32_Index Row index
    \param[in] osn_Role   Requested role type
 
    \return
    Returned value as specified by role
-
-   \created     14.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_CamGenSigTableModel::m_HandleColPhysicalInterpreted(const uint32 ou32_Index, const sintn osn_Role) const
 {
    QVariant c_Retval;
@@ -1667,19 +1591,16 @@ QVariant C_CamGenSigTableModel::m_HandleColPhysicalInterpreted(const uint32 ou32
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility so set a boolean in a content structure
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility so set a boolean in a content structure
 
    true -> 1
    false -> 0
 
    \param[in,out] orc_Value Value to change
    \param[in]     oq_Value  New value to set
-
-   \created     24.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenSigTableModel::mh_SetBoolInContent(C_OSCNodeDataPoolContent & orc_Value, const bool oq_Value)
 {
    switch (orc_Value.GetType())
@@ -1787,9 +1708,8 @@ void C_CamGenSigTableModel::mh_SetBoolInContent(C_OSCNodeDataPoolContent & orc_V
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function to get border (min/max) values depending on current bit length
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function to get border (min/max) values depending on current bit length
 
    \param[in] orc_InitValue  Init value to use for output content type
    \param[in] ou16_BitLength Signal bit length (only supported up to 64 bit)
@@ -1797,10 +1717,8 @@ void C_CamGenSigTableModel::mh_SetBoolInContent(C_OSCNodeDataPoolContent & orc_V
 
    \return
    Border value with the init value type and the value set as specified by the bit length and the border flag
-
-   \created     29.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolContent C_CamGenSigTableModel::mh_GetBorderValue(const C_OSCNodeDataPoolContent & orc_InitValue,
                                                                   const uint16 ou16_BitLength, const bool oq_IsMin)
 {
@@ -2015,18 +1933,15 @@ C_OSCNodeDataPoolContent C_CamGenSigTableModel::mh_GetBorderValue(const C_OSCNod
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get maximum value for an unsigned variable with the specified number of bits
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get maximum value for an unsigned variable with the specified number of bits
 
    \param[in] ou16_Bit Number of bits for variable (only supported up to 64 bit)
 
    \return
    Maximum value for an unsigned variable with the specified number of bits
-
-   \created     29.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint64 C_CamGenSigTableModel::mh_GetMax(const uint16 ou16_Bit)
 {
    uint64 u64_Max = 0ULL;

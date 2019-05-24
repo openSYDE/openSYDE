@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget to display one data pool list header (implementation)
 
    Widget to display one data pool list header
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     17.01.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -38,7 +31,7 @@
 #include "C_SdNdeDataPoolListPopUp.h"
 #include "TGLUtils.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
@@ -47,24 +40,23 @@ using namespace stw_opensyde_core;
 using namespace stw_errors;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const uint32 C_SdNdeDataPoolListHeaderWidget::mhu32_HeaderHeight = 66;
 const uint32 C_SdNdeDataPoolListHeaderWidget::mhu32_HeaderExpandedHeight = 66;
 const sintn C_SdNdeDataPoolListHeaderWidget::mhsn_GroupSize = 270;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -75,10 +67,8 @@ const sintn C_SdNdeDataPoolListHeaderWidget::mhsn_GroupSize = 270;
    \param[in]     ou32_NodeIndex       Node index
    \param[in]     ou32_DataPoolIndex   Data pool index
    \param[in]     ou32_ListIndex       List index
-
-   \created     17.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListHeaderWidget::C_SdNdeDataPoolListHeaderWidget(QWidget * const opc_Parent,
                                                                  QTreeWidget * const opc_ListWidget,
                                                                  C_SdNdeUnoDataPoolManager * const opc_UndoManager,
@@ -92,7 +82,6 @@ C_SdNdeDataPoolListHeaderWidget::C_SdNdeDataPoolListHeaderWidget(QWidget * const
    mu32_NodeIndex(ou32_NodeIndex),
    mu32_DataPoolIndex(ou32_DataPoolIndex),
    mu32_ListIndex(ou32_ListIndex),
-   mu32_ExpandedHeight(200),
    mq_InitActive(true),
    mq_DataSetError(false)
 {
@@ -192,24 +181,20 @@ C_SdNdeDataPoolListHeaderWidget::C_SdNdeDataPoolListHeaderWidget(QWidget * const
            &C_SdNdeDataPoolListHeaderWidget::m_UpdateErrorToolTip);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     17.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListHeaderWidget::~C_SdNdeDataPoolListHeaderWidget(void)
 {
    delete mpc_Ui;
    //lint -e1740 Never took ownership of those items
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -219,10 +204,8 @@ C_SdNdeDataPoolListHeaderWidget::~C_SdNdeDataPoolListHeaderWidget(void)
    \param[in]     ou32_NodeIndex       Node index
    \param[in]     ou32_DataPoolIndex   Data pool index
    \param[in]     ou32_ListIndex       List index
-
-   \created     01.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::SetInitParameters(QTreeWidget * const opc_TreeWidget,
                                                         C_SdNdeUnoDataPoolManager * const opc_UndoManager,
                                                         C_SdNdeDataPoolListModelViewManager * const opc_ModelViewManager, const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
@@ -236,15 +219,12 @@ void C_SdNdeDataPoolListHeaderWidget::SetInitParameters(QTreeWidget * const opc_
    this->mu32_ListIndex = ou32_ListIndex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set new index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new index
 
    \param[in] ors32_Value New index
-
-   \created     17.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::SetIndex(const uint32 & oru32_Value)
 {
    this->mu32_ListIndex = oru32_Value;
@@ -252,13 +232,10 @@ void C_SdNdeDataPoolListHeaderWidget::SetIndex(const uint32 & oru32_Value)
    m_UpdateUi();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     17.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelSize->setText(C_GtGetText::h_GetText("Size: "));
@@ -278,16 +255,13 @@ void C_SdNdeDataPoolListHeaderWidget::InitStaticNames(void) const
                                                                 "Edit the Datasets which can be used to set defined value for each variable contained in this list."));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register expand or collapse
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register expand or collapse
 
    \param[in]     orq_Expanded true:  expanded
                                false: collapsed
-
-   \created     03.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::RegisterExpandOrCollapse(const bool & orq_Expanded) const
 {
    this->mpc_Ui->pc_PushButtonExpand->setChecked(orq_Expanded);
@@ -307,13 +281,10 @@ void C_SdNdeDataPoolListHeaderWidget::RegisterExpandOrCollapse(const bool & orq_
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check error status
-
-   \created     27.02.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check error status
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::CheckError(void)
 {
    const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
@@ -402,25 +373,19 @@ void C_SdNdeDataPoolListHeaderWidget::CheckError(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle variables size change
-
-   \created     27.02.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle variables size change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::VariablesSizeChange(void)
 {
    m_UpdateUi();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle data set size change
-
-   \created     20.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle data set size change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::UpdateDataSetCount(void)
 {
    const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
@@ -486,15 +451,12 @@ void C_SdNdeDataPoolListHeaderWidget::UpdateDataSetCount(void)
    Q_EMIT this->SigUpdated();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Notify widget if it is currently selected
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Notify widget if it is currently selected
 
    \param[in] orq_Selected Flag if selected
-
-   \created     22.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::NotifySelection(const bool & orq_Selected)
 {
    if (orq_Selected == false)
@@ -512,13 +474,10 @@ void C_SdNdeDataPoolListHeaderWidget::NotifySelection(const bool & orq_Selected)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set initial focus for header after add operation
-
-   \created     31.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set initial focus for header after add operation
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::SetEditFocus(void)
 {
    if (this->mc_DoubleClickTimer.isActive() == true)
@@ -530,13 +489,10 @@ void C_SdNdeDataPoolListHeaderWidget::SetEditFocus(void)
    this->mpc_Ui->pc_LineEditName->setFocus();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Prepare expanded mode state
-
-   \created     01.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Prepare expanded mode state
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::PrepareExpandedMode(void) const
 {
    this->mpc_Ui->pc_PushButtonFullScreen->hide();
@@ -547,13 +503,10 @@ void C_SdNdeDataPoolListHeaderWidget::PrepareExpandedMode(void) const
    m_OnDoubleClickTimeout();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle full screen trigger
-
-   \created     13.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle full screen trigger
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::PopUp(void)
 {
    QPointer<C_OgePopUpDialog> c_Dialog = new C_OgePopUpDialog(this, this, false);
@@ -600,13 +553,10 @@ void C_SdNdeDataPoolListHeaderWidget::PopUp(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle event push button expand clicked
-
-   \created     17.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle event push button expand clicked
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::m_OnPushButtonExpandClicked(const bool oq_Checked)
 {
    //Resize expanded
@@ -628,15 +578,12 @@ void C_SdNdeDataPoolListHeaderWidget::m_OnPushButtonExpandClicked(const bool oq_
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle widget resize (including signal to parent class)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle widget resize (including signal to parent class)
 
    \param[in] ou32_NewHeight New height of widget
-
-   \created     17.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::m_HandleWidgetResize(const uint32 ou32_NewHeight)
 {
    this->setMinimumHeight(static_cast<sintn>(ou32_NewHeight));
@@ -650,13 +597,10 @@ void C_SdNdeDataPoolListHeaderWidget::m_HandleWidgetResize(const uint32 ou32_New
    Q_EMIT this->SigNewHeight(this);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update list name prefix
-
-   \created     17.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update list name prefix
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::m_UpdateListNamePrefix(void) const
 {
    const QString c_Text = QString(C_GtGetText::h_GetText("List #%1 - ")).arg(QString::number(this->mu32_ListIndex + 1));
@@ -664,28 +608,22 @@ void C_SdNdeDataPoolListHeaderWidget::m_UpdateListNamePrefix(void) const
    this->mpc_Ui->pc_LabelListNamePrefix->setText(c_Text);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle the event of an internal item getting keyboard focus
-
-   \created     19.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle the event of an internal item getting keyboard focus
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::m_HandleFocus(void)
 {
    Q_EMIT this->SigExclusiveSelection(this->mu32_ListIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle text edit focus change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle text edit focus change
 
    \param[in] oq_Active true:  focus
                         false: no focus
-
-   \created     19.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::m_HandleTextEditFocus(const bool oq_Active)
 {
    if (oq_Active == true)
@@ -698,13 +636,10 @@ void C_SdNdeDataPoolListHeaderWidget::m_HandleTextEditFocus(const bool oq_Active
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update all fields according to data
-
-   \created     26.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update all fields according to data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::m_UpdateUi(void)
 {
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
@@ -777,13 +712,10 @@ void C_SdNdeDataPoolListHeaderWidget::m_UpdateUi(void)
    this->mq_InitActive = false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register edit name finished
-
-   \created     13.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register edit name finished
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::m_EditNameFinished(void)
 {
    if (this->mq_InitActive == false)
@@ -802,13 +734,10 @@ void C_SdNdeDataPoolListHeaderWidget::m_EditNameFinished(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register edit comment finished
-
-   \created     13.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register edit comment finished
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::m_EditCommentFinished(void)
 {
    if (this->mq_InitActive == false)
@@ -826,13 +755,10 @@ void C_SdNdeDataPoolListHeaderWidget::m_EditCommentFinished(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register edit size finished
-
-   \created     13.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register edit size finished
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::m_EditSizeFinished(void)
 {
    if (this->mq_InitActive == false)
@@ -852,13 +778,10 @@ void C_SdNdeDataPoolListHeaderWidget::m_EditSizeFinished(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Open data set edit & save changes
-
-   \created     15.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Open data set edit & save changes
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::m_OpenDataSetEdit(void)
 {
    C_OSCNodeDataPoolList c_OSCList;
@@ -906,13 +829,10 @@ void C_SdNdeDataPoolListHeaderWidget::m_OpenDataSetEdit(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check error on name change
-
-   \created     31.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check error on name change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::m_ChangeName(void) const
 {
    QString c_Content;
@@ -948,13 +868,10 @@ void C_SdNdeDataPoolListHeaderWidget::m_ChangeName(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle double click timeout
-
-   \created     01.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle double click timeout
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::m_OnDoubleClickTimeout(void) const
 {
    this->mpc_Ui->pc_LineEditName->setEnabled(true);
@@ -962,25 +879,19 @@ void C_SdNdeDataPoolListHeaderWidget::m_OnDoubleClickTimeout(void) const
    this->mpc_Ui->pc_SpinBoxSize->setEnabled(true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle OK action
-
-   \created     01.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle OK action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::m_OnOK(void)
 {
    Q_EMIT this->SigClose();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update error tool tip
-
-   \created     19.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update error tool tip
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListHeaderWidget::m_UpdateErrorToolTip(void) const
 {
    const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
@@ -1038,7 +949,8 @@ void C_SdNdeDataPoolListHeaderWidget::m_UpdateErrorToolTip(void) const
             }
             if (q_OutOfDataPool == true)
             {
-               c_Content += C_GtGetText::h_GetText("Reserved list size is bigger than the reserved NVM Datapool size.\n");
+               c_Content +=
+                  C_GtGetText::h_GetText("Reserved list size is bigger than the reserved NVM Datapool size.\n");
             }
             c_Content += "\n";
          }

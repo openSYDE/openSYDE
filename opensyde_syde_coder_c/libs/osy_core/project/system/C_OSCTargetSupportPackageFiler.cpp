@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief        File handler for target support package file data.
 
    Handle XML loading and parsing.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.10.2018  STW/G.Landsgesell
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -47,8 +40,7 @@ using namespace stw_scl;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Load target support package.
+/*! \brief   Load target support package.
 
    Load data from specified file and place it in target support package instance
 
@@ -60,8 +52,6 @@ using namespace stw_scl;
    C_RANGE     specified target support package file does not exist
    C_NOACT     specified file is present but structure is invalid (e.g. invalid XML file)
    C_CONFIG    in specified file is a XML node or attribute missing
-
-   \created     01.10.2018  STW/G.Landsgesell
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCTargetSupportPackageFiler::h_Load(C_OSCTargetSupportPackage & orc_TargetSupportPackage,
@@ -95,8 +85,7 @@ sint32 C_OSCTargetSupportPackageFiler::h_Load(C_OSCTargetSupportPackage & orc_Ta
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Load data from xml file.
+/*! \brief   Load data from xml file.
 
    Parse a .syde_tsp file and save parameters to C_OSCTargetSupportPackage.
 
@@ -106,8 +95,6 @@ sint32 C_OSCTargetSupportPackageFiler::h_Load(C_OSCTargetSupportPackage & orc_Ta
    \return
    C_NO_ERR    XML data read and placed into target support package instance
    C_CONFIG    XML node or attribute missing
-
-   \created     01.10.2018  STW/G.Landsgesell
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCTargetSupportPackageFiler::mh_Load(C_OSCTargetSupportPackage & orc_TargetSupportPackage,
@@ -282,8 +269,7 @@ sint32 C_OSCTargetSupportPackageFiler::mh_Load(C_OSCTargetSupportPackage & orc_T
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Load applications data from XML file.
+/*! \brief   Load applications data from XML file.
 
    Requires the XML parser to be on node "application".
 
@@ -293,8 +279,6 @@ sint32 C_OSCTargetSupportPackageFiler::mh_Load(C_OSCTargetSupportPackage & orc_T
    \return
    C_NO_ERR    application data read and placed into target support package instance
    C_CONFIG    XML node or attribute missing
-
-   \created     02.10.2018  STW/G.Landsgesell
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCTargetSupportPackageFiler::mh_ParseApplication(C_OSCTargetSupportPackage & orc_TargetSupportPackage,

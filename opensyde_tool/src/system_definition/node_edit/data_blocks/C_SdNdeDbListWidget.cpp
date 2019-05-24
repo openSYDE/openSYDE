@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       List widget for node applications (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     30.01.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QApplication>
@@ -26,32 +19,29 @@
 #include "C_PuiSdHandler.h"
 #include "C_OgeWiUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent        Optional pointer to parent
-
-   \created     30.01.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDbListWidget::C_SdNdeDbListWidget(QWidget * const opc_Parent) :
    QListWidget(opc_Parent),
    mu32_NodeIndex(0U),
@@ -83,43 +73,34 @@ C_SdNdeDbListWidget::C_SdNdeDbListWidget(QWidget * const opc_Parent) :
    C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this, "C_SdNdeDbWidget", true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     30.01.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDbListWidget::~C_SdNdeDbListWidget()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set node index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node index
 
    \param[in] ou32_NodeIndex Node index
-
-   \created     21.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbListWidget::SetIndex(const stw_types::uint32 ou32_NodeIndex)
 {
    this->mu32_NodeIndex = ou32_NodeIndex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds a new node application to the list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds a new node application to the list
 
    \param[in] ou32_NodeIndex        Node index
    \param[in] ou32_ApplicationIndex Application index
-
-   \created     30.01.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbListWidget::AddApplication(const uint32 ou32_NodeIndex, const uint32 ou32_ApplicationIndex)
 {
    QListWidgetItem * pc_Item = new QListWidgetItem(NULL, static_cast<sintn>(QListWidgetItem::ItemType::UserType));
@@ -143,7 +124,6 @@ void C_SdNdeDbListWidget::AddApplication(const uint32 ou32_NodeIndex, const uint
    this->setItemWidget(pc_Item, pc_ItemWidget);
 
    //Connections
-   connect(pc_ItemWidget, &C_SdNdeDbWidget::SigDuplicate, this, &C_SdNdeDbListWidget::SigDuplicate);
    connect(pc_ItemWidget, &C_SdNdeDbWidget::SigDelete, this, &C_SdNdeDbListWidget::SigDelete);
    connect(pc_ItemWidget, &C_SdNdeDbWidget::SigReloadDataPools, this,
            &C_SdNdeDbListWidget::SigReloadDataPools);
@@ -156,13 +136,10 @@ void C_SdNdeDbListWidget::AddApplication(const uint32 ou32_NodeIndex, const uint
    //lint -e{429}  no memory leak because of the parent of pc_Item by calling addItem and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update applications
-
-   \created     03.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update applications
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbListWidget::UpdateApplications(void) const
 {
    // Update all application indexes of the concrete widgets
@@ -179,17 +156,14 @@ void C_SdNdeDbListWidget::UpdateApplications(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten drop event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten drop event
 
    Here: Synchronizing application data with widgets
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     21.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbListWidget::dropEvent(QDropEvent * const opc_Event)
 {
    // deactivate the painting of the drag widget
@@ -251,17 +225,14 @@ void C_SdNdeDbListWidget::dropEvent(QDropEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten start drag event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten start drag event
 
    Here: start custom paint
 
    \param[in] oc_SupportedActions Supported actions
-
-   \created     30.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbListWidget::startDrag(const Qt::DropActions oc_SupportedActions)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -276,7 +247,7 @@ void C_SdNdeDbListWidget::startDrag(const Qt::DropActions oc_SupportedActions)
    QListWidget::startDrag(oc_SupportedActions);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbListWidget::m_MoveApplication(const sintn osn_SourceIndex, const sintn osn_TargetIndex)
 {
    QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -293,7 +264,7 @@ void C_SdNdeDbListWidget::m_MoveApplication(const sintn osn_SourceIndex, const s
    QApplication::restoreOverrideCursor();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbListWidget::m_UpdateApplicationIndexes(void) const
 {
    sintn sn_Counter;
@@ -312,13 +283,10 @@ void C_SdNdeDbListWidget::m_UpdateApplicationIndexes(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger node ID recheck
-
-   \created     04.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger node ID recheck
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbListWidget::m_CheckNodeId(void) const
 {
    // Update all application indexes of the concrete widgets

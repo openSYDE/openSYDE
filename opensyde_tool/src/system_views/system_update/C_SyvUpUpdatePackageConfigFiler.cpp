@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Update package configuration file reader/writer (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.02.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwerrors.h"
@@ -25,28 +18,27 @@
 #include "TGLUtils.h"
 #include "CSCLString.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_scl;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load update package configuration
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load update package configuration
 
    \param[in]     orc_FilePath       File path for configuration
    \param[in]     orc_Config         Update package configuration
@@ -56,10 +48,8 @@ using namespace stw_opensyde_core;
    C_RD_WR    Specified file does not exist
    C_NOACT    Could not read data from file
    C_CONFIG   Content of file is invalid or incomplete
-
-   \created     20.02.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvUpUpdatePackageConfigFiler::h_LoadConfig(const QString & orc_FilePath,
                                                      C_SyvUpUpdatePackageConfig & orc_Config)
 {
@@ -107,9 +97,8 @@ sint32 C_SyvUpUpdatePackageConfigFiler::h_LoadConfig(const QString & orc_FilePat
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load update package configuration
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load update package configuration
 
    \param[in]     orc_FilePath       File path for configuration
    \param[out]    orc_Config         Update package configuration
@@ -119,10 +108,8 @@ sint32 C_SyvUpUpdatePackageConfigFiler::h_LoadConfig(const QString & orc_FilePat
    C_RANGE     File already exists
    C_NOACT     Could not write data to file
    C_CONFIG    Error on creating XML file
-
-   \created     20.02.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvUpUpdatePackageConfigFiler::h_SaveConfig(const QString & orc_FilePath,
                                                      const C_SyvUpUpdatePackageConfig & orc_Config)
 {
@@ -186,18 +173,15 @@ sint32 C_SyvUpUpdatePackageConfigFiler::h_SaveConfig(const QString & orc_FilePat
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     20.02.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvUpUpdatePackageConfigFiler::C_SyvUpUpdatePackageConfigFiler()
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvUpUpdatePackageConfigFiler::mh_SaveNode(C_OSCXMLParser & orc_XMLParser,
                                                   const C_SyvUpUpdatePackageConfigNode & orc_NodeConfig)
 {
@@ -207,7 +191,7 @@ bool C_SyvUpUpdatePackageConfigFiler::mh_SaveNode(C_OSCXMLParser & orc_XMLParser
 
    if (q_Success == true)
    {
-      uint32 u32_AppCounter;
+      uint32 u32_Counter;
 
       orc_XMLParser.CreateNodeChild("name", orc_NodeConfig.c_Name.toStdString().c_str());
       orc_XMLParser.CreateNodeChild("type", orc_NodeConfig.c_DeviceType.toStdString().c_str());
@@ -217,9 +201,34 @@ bool C_SyvUpUpdatePackageConfigFiler::mh_SaveNode(C_OSCXMLParser & orc_XMLParser
       if (q_Success == true)
       {
          // Save all application configurations
-         for (u32_AppCounter = 0U; u32_AppCounter < orc_NodeConfig.c_AppConfigs.size(); ++u32_AppCounter)
+         for (u32_Counter = 0U; u32_Counter < orc_NodeConfig.c_AppConfigs.size(); ++u32_Counter)
          {
-            q_Success = mh_SaveApp(orc_XMLParser, orc_NodeConfig.c_AppConfigs[u32_AppCounter]);
+            q_Success = mh_SaveApp(orc_XMLParser, orc_NodeConfig.c_AppConfigs[u32_Counter]);
+
+            if (q_Success == false)
+            {
+               break;
+            }
+         }
+
+         //Only continue with xml saving if no error
+         if (q_Success == true)
+         {
+            // Return
+            tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
+         }
+      }
+
+      if (q_Success == true)
+      {
+         q_Success = (orc_XMLParser.CreateAndSelectNodeChild("parameter-set-images") == "parameter-set-images");
+      }
+      if (q_Success == true)
+      {
+         // Save all parameter set configurations
+         for (u32_Counter = 0U; u32_Counter < orc_NodeConfig.c_ParamSetConfigs.size(); ++u32_Counter)
+         {
+            q_Success = mh_SaveParamSet(orc_XMLParser, orc_NodeConfig.c_ParamSetConfigs[u32_Counter]);
 
             if (q_Success == false)
             {
@@ -231,6 +240,31 @@ bool C_SyvUpUpdatePackageConfigFiler::mh_SaveNode(C_OSCXMLParser & orc_XMLParser
          tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
       }
 
+      if (q_Success == true)
+      {
+         q_Success = (orc_XMLParser.CreateAndSelectNodeChild("files") == "files");
+      }
+      if (q_Success == true)
+      {
+         // Save all file configurations
+         for (u32_Counter = 0U; u32_Counter < orc_NodeConfig.c_FileConfigs.size(); ++u32_Counter)
+         {
+            q_Success = mh_SaveFile(orc_XMLParser, orc_NodeConfig.c_FileConfigs[u32_Counter]);
+
+            if (q_Success == false)
+            {
+               break;
+            }
+         }
+
+         //Only continue with xml saving if no error
+         if (q_Success == true)
+         {
+            // Return
+            tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
+         }
+      }
+
       // Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "nodes");
    }
@@ -238,7 +272,7 @@ bool C_SyvUpUpdatePackageConfigFiler::mh_SaveNode(C_OSCXMLParser & orc_XMLParser
    return q_Success;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvUpUpdatePackageConfigFiler::mh_SaveApp(C_OSCXMLParser & orc_XMLParser,
                                                  const C_SyvUpUpdatePackageConfigNodeApp & orc_AppConfig)
 {
@@ -259,7 +293,43 @@ bool C_SyvUpUpdatePackageConfigFiler::mh_SaveApp(C_OSCXMLParser & orc_XMLParser,
    return q_Success;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvUpUpdatePackageConfigFiler::mh_SaveParamSet(C_OSCXMLParser & orc_XMLParser, const QString & orc_Path)
+{
+   bool q_Success;
+
+   q_Success = (orc_XMLParser.CreateAndSelectNodeChild("parameter-set-image") == "parameter-set-image");
+
+   if (q_Success == true)
+   {
+      orc_XMLParser.CreateNodeChild("path", orc_Path.toStdString().c_str());
+
+      // Return
+      tgl_assert(orc_XMLParser.SelectNodeParent() == "parameter-set-images");
+   }
+
+   return q_Success;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvUpUpdatePackageConfigFiler::mh_SaveFile(C_OSCXMLParser & orc_XMLParser, const QString & orc_Path)
+{
+   bool q_Success;
+
+   q_Success = (orc_XMLParser.CreateAndSelectNodeChild("file") == "file");
+
+   if (q_Success == true)
+   {
+      orc_XMLParser.CreateNodeChild("path", orc_Path.toStdString().c_str());
+
+      // Return
+      tgl_assert(orc_XMLParser.SelectNodeParent() == "files");
+   }
+
+   return q_Success;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvUpUpdatePackageConfigFiler::mh_LoadNodes(C_OSCXMLParser & orc_XMLParser,
                                                    C_SyvUpUpdatePackageConfig & orc_Config)
 {
@@ -302,8 +372,38 @@ bool C_SyvUpUpdatePackageConfigFiler::mh_LoadNodes(C_OSCXMLParser & orc_XMLParse
                // Get all applications for this node
                q_Success = mh_LoadApps(orc_XMLParser, c_NodeConfig);
 
-               //Return
-               tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
+               //Only continue with xml parsing if no error
+               if (q_Success == true)
+               {
+                  //Return
+                  tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
+               }
+            }
+
+            if (q_Success == true)
+            {
+               // Get all applications for this node
+               q_Success = mh_LoadParamSets(orc_XMLParser, c_NodeConfig);
+
+               //Only continue with xml parsing if no error
+               if (q_Success == true)
+               {
+                  //Return
+                  tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
+               }
+            }
+
+            if (q_Success == true)
+            {
+               // Get all applications for this node
+               q_Success = mh_LoadFiles(orc_XMLParser, c_NodeConfig);
+
+               //Only continue with xml parsing if no error
+               if (q_Success == true)
+               {
+                  //Return
+                  tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
+               }
             }
 
             if (q_Success == true)
@@ -330,7 +430,7 @@ bool C_SyvUpUpdatePackageConfigFiler::mh_LoadNodes(C_OSCXMLParser & orc_XMLParse
    return q_Success;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvUpUpdatePackageConfigFiler::mh_LoadApps(C_OSCXMLParser & orc_XMLParser,
                                                   C_SyvUpUpdatePackageConfigNode & orc_NodeConfig)
 {
@@ -399,6 +499,114 @@ bool C_SyvUpUpdatePackageConfigFiler::mh_LoadApps(C_OSCXMLParser & orc_XMLParser
 
          //Return
          tgl_assert(orc_XMLParser.SelectNodeParent() == "applications");
+      }
+   }
+   else
+   {
+      q_Success = false;
+   }
+
+   return q_Success;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvUpUpdatePackageConfigFiler::mh_LoadParamSets(C_OSCXMLParser & orc_XMLParser,
+                                                       C_SyvUpUpdatePackageConfigNode & orc_NodeConfig)
+{
+   bool q_Success = true;
+
+   if (orc_XMLParser.SelectNodeChild("parameter-set-images") == "parameter-set-images")
+   {
+      if (orc_XMLParser.SelectNodeChild("parameter-set-image") == "parameter-set-image")
+      {
+         do
+         {
+            QString c_Path;
+
+            // Path of application
+            if (orc_XMLParser.SelectNodeChild("path") == "path")
+            {
+               c_Path = orc_XMLParser.GetNodeContent().c_str();
+               //Return
+               tgl_assert(orc_XMLParser.SelectNodeParent() == "parameter-set-image");
+            }
+            else
+            {
+               q_Success = false;
+            }
+
+            if (q_Success == true)
+            {
+               // Parameter set image finished
+               orc_NodeConfig.c_ParamSetConfigs.push_back(c_Path);
+            }
+            else
+            {
+               break;
+            }
+         }
+         while (orc_XMLParser.SelectNodeNext("parameter-set-image") == "parameter-set-image");
+
+         //Only continue with xml parsing if no error
+         if (q_Success == true)
+         {
+            //Return
+            tgl_assert(orc_XMLParser.SelectNodeParent() == "parameter-set-images");
+         }
+      }
+   }
+   else
+   {
+      q_Success = false;
+   }
+
+   return q_Success;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvUpUpdatePackageConfigFiler::mh_LoadFiles(C_OSCXMLParser & orc_XMLParser,
+                                                   C_SyvUpUpdatePackageConfigNode & orc_NodeConfig)
+{
+   bool q_Success = true;
+
+   if (orc_XMLParser.SelectNodeChild("files") == "files")
+   {
+      if (orc_XMLParser.SelectNodeChild("file") == "file")
+      {
+         do
+         {
+            QString c_Path;
+
+            // Path of application
+            if (orc_XMLParser.SelectNodeChild("path") == "path")
+            {
+               c_Path = orc_XMLParser.GetNodeContent().c_str();
+               //Return
+               tgl_assert(orc_XMLParser.SelectNodeParent() == "file");
+            }
+            else
+            {
+               q_Success = false;
+            }
+
+            if (q_Success == true)
+            {
+               // Parameter set image finished
+               orc_NodeConfig.c_FileConfigs.push_back(c_Path);
+            }
+            else
+            {
+               break;
+            }
+         }
+         while (orc_XMLParser.SelectNodeNext("file") == "file");
+
+         //Only continue with xml parsing if no error
+         if (q_Success == true)
+         {
+            //Return
+            tgl_assert(orc_XMLParser.SelectNodeParent() == "files");
+         }
       }
    }
    else

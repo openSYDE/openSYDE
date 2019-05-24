@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for showing a concrete instance of C_SyvDaDashboardWidget in a seperated window
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     03.07.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QHBoxLayout>
@@ -31,28 +25,27 @@
 #include "C_OgePopUpDialog.h"
 #include "C_SyvDaDashboardTabProperties.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -61,10 +54,8 @@ using namespace stw_opensyde_gui_elements;
    \param[in]     orc_Name       Name of dashboard
    \param[in,out] opc_Widget     Optional dashboard widget to integrate instead of creating a new one
    \param[in,out] opc_Parent     Optional pointer to parent
-
-   \created     03.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaTearOffWidget::C_SyvDaTearOffWidget(const uint32 ou32_ViewIndex, const stw_types::uint32 ou32_DataIndex,
                                            const QString & orc_Name, C_SyvDaDashboardWidget * const opc_Widget,
                                            QWidget * const opc_Parent) :
@@ -75,6 +66,17 @@ C_SyvDaTearOffWidget::C_SyvDaTearOffWidget(const uint32 ou32_ViewIndex, const st
    QHBoxLayout * pc_Layout;
 
    mpc_Ui->setupUi(this);
+
+   //Style error label
+   this->mpc_Ui->pc_ErrorLabelTitle->SetForegroundColor(24);
+   this->mpc_Ui->pc_ErrorLabelTitle->SetFontPixel(14, false, true);
+   this->mpc_Ui->pc_ErrorLabelIcon->SetSvg("://images/Error_iconV2.svg");
+
+   //Handle button icons
+   this->mpc_Ui->pc_PbConfirm->SetSvg("://images/main_page_and_navi_bar/IconEdit.svg");
+
+   //Remove debug label
+   this->mpc_Ui->pc_GroupBoxButtons->setTitle("");
 
    pc_Layout = new QHBoxLayout(this->mpc_Ui->pc_DashboardContainerWidget);
    pc_Layout->setSpacing(0);
@@ -122,9 +124,9 @@ C_SyvDaTearOffWidget::C_SyvDaTearOffWidget(const uint32 ou32_ViewIndex, const st
    connect(this->mpc_Dashboard, &C_SyvDaDashboardWidget::SigErrorChange, this, &C_SyvDaTearOffWidget::SigErrorChange);
 
    // Connect buttons
-   connect(this->mpc_Ui->pc_PbConfirm, &stw_opensyde_gui_elements::C_OgePubTextWithBorderEdit::clicked,
+   connect(this->mpc_Ui->pc_PbConfirm, &stw_opensyde_gui_elements::C_OgePubSystemCommissioningEdit::clicked,
            this, &C_SyvDaTearOffWidget::SigConfirmClicked);
-   connect(this->mpc_Ui->pc_PbCancel, &stw_opensyde_gui_elements::C_OgePubTextWithBorderEdit::clicked,
+   connect(this->mpc_Ui->pc_PbCancel, &stw_opensyde_gui_elements::C_OgePubSystemCommissioningEdit::clicked,
            this, &C_SyvDaTearOffWidget::SigCancelClicked);
    //Connect tab
    connect(this->mpc_Ui->pc_WidgetTab, &C_OgeWiDashboardTab::SigActiveChanged, this,
@@ -139,134 +141,102 @@ C_SyvDaTearOffWidget::C_SyvDaTearOffWidget(const uint32 ou32_ViewIndex, const st
            &C_SyvDaTearOffWidget::SigDataPoolWrite);
    connect(this->mpc_Dashboard, &C_SyvDaDashboardWidget::SigDataPoolRead, this,
            &C_SyvDaTearOffWidget::SigDataPoolRead);
+   connect(this->mpc_Dashboard, &C_SyvDaDashboardWidget::SigNvmReadList, this,
+           &C_SyvDaTearOffWidget::SigNvmReadList);
 
    //lint -e{429}  no memory leak because of the parent of pc_Layout and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     03.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaTearOffWidget::~C_SyvDaTearOffWidget()
 {
    delete mpc_Ui;
    //lint -e{1740}  no memory leak because of the parent of mpc_Dashboard and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initializes all visible strings on the widget
-
-   \created     03.07.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initializes all visible strings on the widget
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::InitText(void) const
 {
-   this->mpc_Ui->pc_PbConfirm->setText(C_GtGetText::h_GetText("Confirm"));
+   this->mpc_Ui->pc_PbConfirm->setText(C_GtGetText::h_GetText("Edit"));
    this->mpc_Ui->pc_PbCancel->setText(C_GtGetText::h_GetText("Cancel"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the index of the dashboard
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the index of the dashboard
 
    \return
    Index of the dashboard
-
-   \created     03.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SyvDaTearOffWidget::GetIndex(void) const
 {
    return this->mpc_Dashboard->GetDataIndex();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set data index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set data index
 
    \param[in] ou32_Value New data index
-
-   \created     06.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::SetDataIndex(const uint32 ou32_Value)
 {
    this->mpc_Dashboard->SetDataIndex(ou32_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the name of the dashboard
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the name of the dashboard
 
    \return
    Name of the dashboard
-
-   \created     03.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaTearOffWidget::GetName() const
 {
    return this->mpc_Dashboard->GetName();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get integrated widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get integrated widget
 
    \return
    Current integrated widget
-
-   \created     22.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaDashboardWidget * C_SyvDaTearOffWidget::GetWidget(void)
 {
    return this->mpc_Dashboard;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the edit mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the edit mode
 
    \param[in]     oq_Active      Flag for edit mode
-
-   \created     03.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::SetEditMode(const bool oq_Active)
 {
    this->mpc_Ui->pc_BackgroundWidget->SetEditBackground(oq_Active);
-   this->mpc_Ui->pc_GroupBoxButtons->setVisible(oq_Active);
 
    this->mpc_Dashboard->SetEditMode(oq_Active);
 
-   if (oq_Active == true)
-   {
-      // TODO create copy of dashboard in case of clicking cancel
-      this->mpc_Ui->pc_BackgroundWidget->layout()->setContentsMargins(8, 0, 8, 8);
-   }
-   else
-   {
-      this->mpc_Ui->pc_BackgroundWidget->layout()->setContentsMargins(0, 0, 0, 0);
-   }
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_GroupBox, "Edit", oq_Active);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the dark mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the dark mode
 
    \param[in] oq_Active Dark mode active
-
-   \created     02.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::SetDarkMode(const bool oq_Active)
 {
    if (this->mpc_Dashboard != NULL)
@@ -277,13 +247,10 @@ void C_SyvDaTearOffWidget::SetDarkMode(const bool oq_Active)
    this->mpc_Ui->pc_WidgetTab->SetDarkMode(oq_Active);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save data
-
-   \created     26.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::Save(void) const
 {
    if (this->mpc_Dashboard != NULL)
@@ -292,16 +259,13 @@ void C_SyvDaTearOffWidget::Save(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle manual user operation finished event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle manual user operation finished event
 
    \param[in] os32_Result Operation result
    \param[in] ou8_NRC     Negative response code, if any
-
-   \created     09.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::HandleManualOperationFinished(const sint32 os32_Result, const uint8 ou8_NRC) const
 {
    if (this->mpc_Dashboard != NULL)
@@ -310,16 +274,13 @@ void C_SyvDaTearOffWidget::HandleManualOperationFinished(const sint32 os32_Resul
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal all widgets which read rail element ID registrations failed
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal all widgets which read rail element ID registrations failed
 
    \param[in]     orc_FailedIdRegisters    Failed IDs
    \param[in,out] orc_FailedIdErrorDetails Error details for element IDs which failed registration (if any)
-
-   \created     13.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::SetErrorForFailedCyclicElementIdRegistrations(
    const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_FailedIdRegisters,
    const std::vector<QString> & orc_FailedIdErrorDetails) const
@@ -331,15 +292,12 @@ void C_SyvDaTearOffWidget::SetErrorForFailedCyclicElementIdRegistrations(
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Registers all relevant dashboard widgets at the associated data dealer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Registers all relevant dashboard widgets at the associated data dealer
 
    \param[in]     orc_AllDataDealer    Reference to vector with all data dealer
-
-   \created     29.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::RegisterWidgets(C_SyvComDriverDiag & orc_ComDriver) const
 {
    if (this->mpc_Dashboard != NULL)
@@ -348,17 +306,14 @@ void C_SyvDaTearOffWidget::RegisterWidgets(C_SyvComDriverDiag & orc_ComDriver) c
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Information about the start or stop of a connection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the start or stop of a connection
 
    \param[in] oq_Active        Flag if connection is active or not active now
    \param[in] oq_WidgetTabOnly Optional flag if tab widget should be adapted to the connection change
                                 (use if scene was already changed)
-
-   \created     01.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::ConnectionActiveChanged(const bool oq_Active, const bool oq_WidgetTabOnly) const
 {
    if ((this->mpc_Dashboard != NULL) && (oq_WidgetTabOnly == false))
@@ -368,13 +323,10 @@ void C_SyvDaTearOffWidget::ConnectionActiveChanged(const bool oq_Active, const b
    this->mpc_Ui->pc_WidgetTab->SetInteractive(!oq_Active);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates all values of all dashboard widgets
-
-   \created     29.08.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates all values of all dashboard widgets
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::UpdateShowValues(void) const
 {
    if (this->mpc_Dashboard != NULL)
@@ -383,13 +335,10 @@ void C_SyvDaTearOffWidget::UpdateShowValues(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle changes of transmission mode for any data element
-
-   \created     11.10.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle changes of transmission mode for any data element
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::UpdateTransmissionConfiguration(void) const
 {
    if (this->mpc_Dashboard != NULL)
@@ -398,15 +347,28 @@ void C_SyvDaTearOffWidget::UpdateTransmissionConfiguration(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten close event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
+
+   Here: draw background
+   (Not automatically drawn in any QWidget derivative)
+
+   \param[in,out] opc_Event Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaTearOffWidget::paintEvent(QPaintEvent * const opc_Event)
+{
+   stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
+
+   QWidget::paintEvent(opc_Event);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten close event slot
 
    \param[in,out] opc_Event    Event identification and information
-
-   \created     25.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::closeEvent(QCloseEvent * const opc_Event)
 {
    // do not really close the widget. It has to "go back" to the tab widget
@@ -419,16 +381,13 @@ void C_SyvDaTearOffWidget::closeEvent(QCloseEvent * const opc_Event)
    Q_EMIT this->SigWidgetComeBack(this);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle active flag changed
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle active flag changed
 
    \param[in] opc_Source Signal source widget
    \param[in] oq_Active  New active flag
-
-   \created     06.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::m_OnActiveChange(C_OgeWiDashboardTab * const opc_Source, const bool oq_Active)
 {
    if (this->mpc_Dashboard != NULL)
@@ -448,15 +407,12 @@ void C_SyvDaTearOffWidget::m_OnActiveChange(C_OgeWiDashboardTab * const opc_Sour
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy dashboard content
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy dashboard content
 
    \param[in] opc_Source Signal source widget
-
-   \created     26.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::m_OnCopy(C_OgeWiDashboardTab * const opc_Source) const
 {
    Q_UNUSED(opc_Source)
@@ -480,13 +436,10 @@ void C_SyvDaTearOffWidget::m_OnCopy(C_OgeWiDashboardTab * const opc_Source) cons
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Open popup to edit dashboard tab properties
-
-   \created     24.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Open popup to edit dashboard tab properties
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::m_OnEditProperties(C_OgeWiDashboardTab * const opc_Source)
 {
    if ((this->mpc_Dashboard != NULL) && (opc_Source != NULL))
@@ -523,28 +476,31 @@ void C_SyvDaTearOffWidget::m_OnEditProperties(C_OgeWiDashboardTab * const opc_So
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Perform error check
-
-   \created     27.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Perform error check
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::m_CheckError(void) const
 {
    if (this->mpc_Dashboard != NULL)
    {
+      QString c_ErrorTextHeading;
       QString c_ErrorText;
-      const bool q_ViewSetupError = C_SyvUtil::h_CheckViewSetupError(this->mpc_Dashboard->GetViewIndex(), c_ErrorText);
+      QString c_ErrorTextTooltip;
+      const bool q_ViewSetupError = C_SyvUtil::h_CheckViewSetupError(
+         this->mpc_Dashboard->GetViewIndex(), c_ErrorTextHeading, c_ErrorText, c_ErrorTextTooltip);
 
       if (q_ViewSetupError == true)
       {
-         this->mpc_Ui->pc_ErrorLabel->SetCompleteText(c_ErrorText);
-         this->mpc_Ui->pc_ErrorFrame->setVisible(true);
+         this->mpc_Ui->pc_ErrorLabelIcon->SetToolTipInformation("", c_ErrorTextTooltip, C_NagToolTip::eERROR);
+         this->mpc_Ui->pc_ErrorLabelTitle->setText(c_ErrorTextHeading);
+         this->mpc_Ui->pc_ErrorLabelTitle->SetToolTipInformation("", c_ErrorTextTooltip, C_NagToolTip::eERROR);
+         this->mpc_Ui->pc_ErrorLabel->SetCompleteText(c_ErrorText, c_ErrorTextTooltip);
+         this->mpc_Ui->pc_GroupBoxErrorContent->setVisible(true);
       }
       else
       {
-         this->mpc_Ui->pc_ErrorFrame->setVisible(false);
+         this->mpc_Ui->pc_GroupBoxErrorContent->setVisible(false);
       }
    }
 }

@@ -1,33 +1,26 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Translate L2 CAN message to openSYDE interpretation (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     08.10.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
 
 #include "C_OSCComLoggerProtocolOpenSYDE.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_scl;
 using namespace stw_opensyde_core;
 using namespace stw_cmon_protocol;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 // ISO15765-2 addressing mode
 #define OSY_CTP_ADDR_MODE_PHYSICAL   (0U) ///< CAN TP mode fixed physical addressing
 
@@ -38,68 +31,56 @@ using namespace stw_cmon_protocol;
 #define OSY_BROADCAST (0x7FU) ///< Broadcast ID
 #define OSY_CLIENT    (0x7EU) ///< Standard client ID (can vary, it is the default ID of the openSYDE gui)
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     08.10.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCComLoggerProtocolOpenSYDE::C_OSCComLoggerProtocolOpenSYDE(void) :
    C_CMONProtocolOpenSYDE()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds an openSYDE system definition configuration for analyzing
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds an openSYDE system definition configuration for analyzing
 
    \param[in]     opc_SysDefConfig               Pointer to openSYDE system definition configuration
-
-   \created     09.10.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCComLoggerProtocolOpenSYDE::AddOsySysDef(const C_OSCComMessageLoggerOsySysDefConfig * const opc_SysDefConfig)
 {
    this->mc_SysDefConfigs.push_back(opc_SysDefConfig);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Removes an openSYDE system definition configuration
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Removes an openSYDE system definition configuration
 
    \param[in]     opc_SysDefConfig               Pointer to openSYDE system definition configuration
-
-   \created     09.10.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCComLoggerProtocolOpenSYDE::RemoveOsySysDef(const C_OSCComMessageLoggerOsySysDefConfig * const opc_SysDefConfig)
 {
    this->mc_SysDefConfigs.remove(opc_SysDefConfig);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert the openSYDE address information to text
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert the openSYDE address information to text
 
    \param[in]     ort_CanAddressInformation   Address information
 
    \return
    Text interpretation of address information
-
-   \created     08.10.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCComLoggerProtocolOpenSYDE::m_AddressInformationToText(
    const C_CMONProtocolOpenSYDE::T_CanAddressInformation & ort_CanAddressInformation) const
 {
@@ -206,6 +187,7 @@ C_SCLString C_OSCComLoggerProtocolOpenSYDE::m_AddressInformationToText(
                  ++u32_InterfaceCounter)
             {
                if ((q_SourceNodeFound == false) &&
+                   (rc_Node.c_Properties.c_ComInterfaces[u32_InterfaceCounter].q_IsBusConnected == true) &&
                    (rc_Node.c_Properties.c_ComInterfaces[u32_InterfaceCounter].u8_NodeID ==
                     ort_CanAddressInformation.t_NodeIdSource.u8_NodeId) &&
                    (rc_Node.c_Properties.c_ComInterfaces[u32_InterfaceCounter].u32_BusIndex == u32_SourceBusIndex))
@@ -216,6 +198,7 @@ C_SCLString C_OSCComLoggerProtocolOpenSYDE::m_AddressInformationToText(
                }
 
                if ((q_TargetNodeFound == false) &&
+                   (rc_Node.c_Properties.c_ComInterfaces[u32_InterfaceCounter].q_IsBusConnected == true) &&
                    (rc_Node.c_Properties.c_ComInterfaces[u32_InterfaceCounter].u8_NodeID ==
                     ort_CanAddressInformation.t_NodeIdTarget.u8_NodeId) &&
                    (rc_Node.c_Properties.c_ComInterfaces[u32_InterfaceCounter].u32_BusIndex == u32_TargetBusIndex))
@@ -280,9 +263,8 @@ C_SCLString C_OSCComLoggerProtocolOpenSYDE::m_AddressInformationToText(
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert 24bit openSYDE data pool identifier code to text
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert 24bit openSYDE data pool identifier code to text
 
    \param[in]     ou32_DataPoolIdentifier      Data pool data identifier
    \param[in]     oq_IsResponse                Flag if service for accessing the datapool element was a response or
@@ -291,10 +273,8 @@ C_SCLString C_OSCComLoggerProtocolOpenSYDE::m_AddressInformationToText(
 
    \return
    Text interpretation of data pool data identifier
-
-   \created     09.10.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCComLoggerProtocolOpenSYDE::m_DataPoolIdentifierToText(const uint32 ou32_DataPoolIdentifier,
                                                                        const bool oq_IsResponse,
                                                                        const T_CanAddressInformation & ort_CanAddressInformation)
@@ -379,7 +359,8 @@ const
             for (u32_InterfaceCounter = 0U; u32_InterfaceCounter < rc_Node.c_Properties.c_ComInterfaces.size();
                  ++u32_InterfaceCounter)
             {
-               if ((rc_Node.c_Properties.c_ComInterfaces[u32_InterfaceCounter].u8_NodeID == u8_NodeId) &&
+               if ((rc_Node.c_Properties.c_ComInterfaces[u32_InterfaceCounter].q_IsBusConnected == true) &&
+                   (rc_Node.c_Properties.c_ComInterfaces[u32_InterfaceCounter].u8_NodeID == u8_NodeId) &&
                    (rc_Node.c_Properties.c_ComInterfaces[u32_InterfaceCounter].u32_BusIndex == u32_BusIndexWithNode))
                {
                   // This is the node

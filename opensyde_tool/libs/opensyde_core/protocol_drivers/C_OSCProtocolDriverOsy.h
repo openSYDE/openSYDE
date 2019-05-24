@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       openSYDE protocol driver
@@ -14,41 +14,38 @@
    - inbetween calls rescind CPU time to other threads
    - "wait" until we get a response or reach the timeout
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     12.05.2017  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCPROTOCOLDRIVEROSYH
 #define C_OSCPROTOCOLDRIVEROSYH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 #include "stwtypes.h"
 #include "C_OSCProtocolDriverOsyTpBase.h"
 #include "stw_can.h" //for CAN message type
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCProtocolDriverOsy
 {
 private:
    typedef void (* PR_OsyTunnelCanMessageReceived)(void * const opv_Instance, const stw_types::uint8 ou8_CanChannel,
                                                    const stw_can::T_STWCAN_Msg_RX & orc_CanMessage);
+   typedef void (* PR_OsyHandleWaitTime)(void * const opv_Instance);
 
    stw_tgl::C_TGLCriticalSection mc_LockReception; ///< for locking reception handling
 
    PR_OsyTunnelCanMessageReceived mpr_OnOsyTunnelCanMessageReceived;
    void * mpv_OnAsyncTunnelCanMessageInstance;
+   PR_OsyHandleWaitTime mpr_OnOsyWaitTime;
+   void * mpv_OnOsyWaitTimeInstance;
 
    C_OSCProtocolDriverOsyTpBase * mpc_TransportProtocol; ///< installed transport protocol
 
@@ -57,6 +54,9 @@ private:
 
    //timeouts:
    stw_types::uint32 mu32_TimeoutPollingMs; ///< timeout used when "polling" services
+
+   //maximum service size including header (used in WriteMemoryByAddress):
+   stw_types::uint16 mu16_MaxServiceSize;
 
    void m_LogServiceError(const stw_scl::C_SCLString & orc_Service, const stw_types::sint32 os32_ReturnCode,
                           const stw_types::uint8 ou8_NrCode) const;
@@ -137,6 +137,8 @@ private:
    static const stw_types::uint16 mhu16_OSY_DI_ECU_SERIAL_NUMBER           = 0xF18CU;
    static const stw_types::uint16 mhu16_OSY_DI_SYS_SUPPLIER_ECU_HW_NUMBER  = 0xF192U;
    static const stw_types::uint16 mhu16_OSY_DI_SYS_SUPPLIER_ECU_HW_VERSION = 0xF193U;
+   static const stw_types::uint16 mhu16_OSY_DI_LIST_OF_FEATURES            = 0xA800U;
+   static const stw_types::uint16 mhu16_OSY_DI_MAX_NUMBER_OF_BLOCK_LENGTH  = 0xA801U;
    static const stw_types::uint16 mhu16_OSY_DI_DATARATE_1                  = 0xA810U;
    static const stw_types::uint16 mhu16_OSY_DI_DATARATE_2                  = 0xA811U;
    static const stw_types::uint16 mhu16_OSY_DI_DATARATE_3                  = 0xA812U;
@@ -179,7 +181,7 @@ private:
 
 protected:
    void m_LogErrorWithHeader(const stw_scl::C_SCLString & orc_Activity, const stw_scl::C_SCLString & orc_Information,
-                             const stw_types::charn * const opcn_Function) const;
+                             const stw_types::charn * const opcn_Function, const bool oq_AsError = true) const;
 
    virtual void m_OsyReadDataPoolDataEventReceived(const stw_types::uint8 ou8_DataPoolIndex,
                                                    const stw_types::uint16 ou16_ListIndex,
@@ -229,13 +231,26 @@ public:
       stw_scl::C_SCLString c_Name;     ///< Data pool name
    };
 
+   ///list of features supported by server
+   class C_ListOfFeatures
+   {
+   public:
+      bool q_FlashloaderCanWriteToNvm;           ///< set to true in Flashloader to show that "Writing to NVM" is
+                                                 // supported
+      bool q_MaxNumberOfBlockLengthAvailable;    ///< true: MaxNumberOfBlockLength can be read
+      bool q_EthernetToEthernetRoutingSupported; ///< true: E2E routing supported
+   };
+
    C_OSCProtocolDriverOsy(void);
    virtual ~C_OSCProtocolDriverOsy(void);
 
    void SetTimeoutPolling(const stw_types::uint32 ou32_TimeoutPollingMs);
    void ResetTimeoutPolling(void);
+   void SetMaxServiceSize(const stw_types::uint16 ou16_MaxServiceSize);
+
    void InitializeTunnelCanMessage(PR_OsyTunnelCanMessageReceived const opr_OsyTunnelCanMessageReceived,
                                    void * const opv_Instance);
+   void InitializeHandleWaitTime(PR_OsyHandleWaitTime const opr_OsyHandleWaitTime, void * const opv_Instance);
 
    stw_types::sint32 IsConnected(void);
    stw_types::sint32 ReConnect(void);
@@ -246,8 +261,12 @@ public:
    stw_types::sint32 SetNodeIdentifiers(const C_OSCProtocolDriverOsyNode & orc_ClientId,
                                         const C_OSCProtocolDriverOsyNode & orc_ServerId);
 
+   C_OSCProtocolDriverOsyTpBase * GetTransportProtocol(void);
+   void GetNodeIdentifiers(C_OSCProtocolDriverOsyNode & orc_ClientId, C_OSCProtocolDriverOsyNode & orc_ServerId) const;
+
    static stw_scl::C_SCLString h_GetOpenSydeServiceErrorDetails(const stw_types::sint32 os32_FunctionResult,
-                                                                const stw_types::uint8 ou8_NrCode);
+                                                                const stw_types::uint8 ou8_NrCode,
+                                                                bool * const opq_IsHardError = NULL);
 
    //openSYDE protocol services:
    //Session management:
@@ -261,6 +280,10 @@ public:
                                            stw_types::uint8 * const opu8_NrCode = NULL);
    stw_types::sint32 OsyReadHardwareVersionNumber(stw_scl::C_SCLString & orc_HardwareVersionNumber,
                                                   stw_types::uint8 * const opu8_NrCode = NULL);
+   stw_types::sint32 OsyReadListOfFeatures(C_ListOfFeatures & orc_ListOfFeatures,
+                                           stw_types::uint8 * const opu8_NrCode = NULL);
+   stw_types::sint32 OsyReadMaxNumberOfBlockLength(stw_types::uint16 & oru16_MaxNumberOfBlockLength,
+                                                   stw_types::uint8 * const opu8_NrCode = NULL);
    stw_types::sint32 OsyReadDeviceName(stw_scl::C_SCLString & orc_DeviceName,
                                        stw_types::uint8 * const opu8_NrCode = NULL);
    stw_types::sint32 OsyReadApplicationName(stw_scl::C_SCLString & orc_ApplicationName,
@@ -414,6 +437,8 @@ public:
 
    // Default Timeout
    static const stw_types::uint32 hu32_DEFAULT_TIMEOUT = 1000U; // In ms
+   // Cyclic time till the registered function mpr_OnOsyWaitTime will be called in m_PollForSpecificServiceResponse
+   static const stw_types::uint32 hu32_DEFAULT_HANDLE_WAIT_TIME = 2000U; // In ms
    // Sessions for service OsyDiagnosticSessionControl
    static const stw_types::uint8 hu8_DIAGNOSTIC_SESSION_DEFAULT            = 0x01U;
    static const stw_types::uint8 hu8_DIAGNOSTIC_SESSION_EXTENDED_DIAGNOSIS = 0x03U;
@@ -442,7 +467,7 @@ public:
    static const stw_types::uint8 hu8_OSY_IP_2_IP_STATUS_CONNECTED   = 3U;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif // C_OSCPROTOCOLDRIVEROSYH

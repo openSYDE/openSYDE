@@ -1,31 +1,26 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Properties dialog for datapool properties (header)
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     28.10.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SDNDEDATAPOOLPROPERTIES_H
 #define C_SDNDEDATAPOOLPROPERTIES_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 
 #include "stwtypes.h"
 
 #include "C_OgePopUpDialog.h"
 #include "C_OSCNodeDataPool.h"
+#include "C_OSCNodeDataPoolId.h"
 #include "C_OSCCanProtocol.h"
 #include "C_PuiSdNodeDataPool.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
 {
 class C_SdNdeDatapoolProperties;
@@ -33,9 +28,9 @@ class C_SdNdeDatapoolProperties;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_SdNdeDatapoolProperties :
    public QWidget
 {
@@ -50,7 +45,8 @@ public:
                                       const stw_opensyde_core::C_OSCNodeDataPool::E_Type oe_DatapoolType,
                                       const stw_types::sint32 os32_DataPoolIndex,
                                       const stw_types::uint32 & oru32_NodeIndex, const bool oq_SelectName,
-                                      const bool oq_ShowApplicationSection);
+                                      const bool oq_ShowApplicationSection,
+                                      const stw_opensyde_core::C_OSCNodeDataPoolId * const opc_SharedDatapoolId);
    virtual ~C_SdNdeDatapoolProperties(void);
 
    void InitStaticNames(void);
@@ -77,11 +73,12 @@ private:
 
    void m_OkClicked(void);
    void m_CancelClicked(void);
-   void m_ApplyType(void);
+   void m_ApplyType(const bool oq_SharedDatapool);
    void m_LoadCodeGenerationAndApplication(void) const;
    void m_SpinBoxChanged(const stw_types::sintn osn_Value) const;
    void m_UpdateSizePrediction(void) const;
    void m_CheckDatapoolName(void) const;
+   bool m_CheckDatapoolNameNotDuplicate(std::vector<stw_scl::C_SCLString> * const opc_ExistingDatapoolNames) const;
    void m_InitSpinBox(void) const;
    void m_InitComboBoxProtocols(const bool oq_NewDataPool, const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_ComProtocolType =
                                    stw_opensyde_core::C_OSCCanProtocol::eLAYER2) const;
@@ -90,9 +87,10 @@ private:
    void m_OnComTypeChange(void) const;
    void m_OnSafetyChange(const bool oq_IsSafety) const;
    void m_HandleDataPoolSafetyAdaptation(void);
+   void m_BreakSharedRelation(void);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

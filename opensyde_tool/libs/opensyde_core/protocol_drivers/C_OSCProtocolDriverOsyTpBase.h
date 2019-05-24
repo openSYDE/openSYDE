@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       openSYDE protocol transport-protocol abstract class definition
@@ -10,31 +10,25 @@
    All elements and functionality common to all transport protocols are contained here.
    Elements and functionality that is specific to the transport protocol needs to be implemented there.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.02.2016  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCPROTOCOLDRIVEROSYTPBASE
 #define C_OSCPROTOCOLDRIVEROSYTPBASE
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 #include <deque>
 #include "stwtypes.h"
 #include "TGLTasks.h"
 #include "CSCLString.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 ///container for one openSYDE protocol service
 class C_OSCProtocolDriverOsyService
@@ -49,7 +43,7 @@ public:
    bool q_CanTransferWithoutFlowControl; // Flag if service shall use openSYDE Multi Frame transfer
 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///identifier of one node
 class C_OSCProtocolDriverOsyNode
 {
@@ -70,7 +64,7 @@ public:
    bool operator < (const C_OSCProtocolDriverOsyNode & orc_Cmp) const;
 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///interface class
 class C_OSCProtocolDriverOsyTpBase
 {
@@ -135,9 +129,11 @@ public:
    virtual stw_types::sint32 Cycle(void) = 0;
    virtual stw_types::sint32 SetNodeIdentifiers(const C_OSCProtocolDriverOsyNode & orc_ClientIdentifier,
                                                 const C_OSCProtocolDriverOsyNode & orc_ServerIdentifier);
+   virtual void GetNodeIdentifiers(C_OSCProtocolDriverOsyNode & orc_ClientIdentifier,
+                                   C_OSCProtocolDriverOsyNode & orc_ServerIdentifier);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

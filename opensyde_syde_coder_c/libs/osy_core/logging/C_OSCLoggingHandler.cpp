@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Handler class for logging operations (implementation)
 
    Handler class for logging operations
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     14.09.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -52,12 +45,9 @@ std::ofstream C_OSCLoggingHandler::mhc_File;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Set write to file active flag
+/*! \brief   Set write to file active flag
 
    \param[in] oq_Active New write to file active flag
-
-   \created     14.09.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCLoggingHandler::h_SetWriteToFileActive(const bool oq_Active)
@@ -71,12 +61,9 @@ void C_OSCLoggingHandler::h_SetWriteToFileActive(const bool oq_Active)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Set write to console active flag
+/*! \brief   Set write to console active flag
 
    \param[in] oq_Active New write to console active flag
-
-   \created     14.09.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCLoggingHandler::h_SetWriteToConsoleActive(const bool oq_Active)
@@ -85,12 +72,9 @@ void C_OSCLoggingHandler::h_SetWriteToConsoleActive(const bool oq_Active)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Set log file location path and file name
+/*! \brief   Set log file location path and file name
 
    \param[in] orc_CompleteLogFileLocation Log file location path and file name
-
-   \created     14.09.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCLoggingHandler::h_SetCompleteLogFileLocation(const C_SCLString & orc_CompleteLogFileLocation)
@@ -104,13 +88,10 @@ void C_OSCLoggingHandler::h_SetCompleteLogFileLocation(const C_SCLString & orc_C
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get complete log file location
+/*! \brief   Get complete log file location
 
    \return
    Current complete log file location
-
-   \created     16.02.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 const C_SCLString & C_OSCLoggingHandler::h_GetCompleteLogFileLocation(void)
@@ -119,15 +100,12 @@ const C_SCLString & C_OSCLoggingHandler::h_GetCompleteLogFileLocation(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Write info message to log
+/*! \brief   Write info message to log
 
    \param[in] orc_Activity Current activity
    \param[in] orc_Message  Message to write (No '\n' necessary)
    \param[in] opc_Class    Current class
    \param[in] opc_Function Current function
-
-   \created     14.09.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCLoggingHandler::h_WriteLogInfo(const C_SCLString & orc_Activity, const C_SCLString & orc_Message,
@@ -138,15 +116,12 @@ void C_OSCLoggingHandler::h_WriteLogInfo(const C_SCLString & orc_Activity, const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Write warning message to log
+/*! \brief   Write warning message to log
 
    \param[in] orc_Activity Current activity
    \param[in] orc_Message  Message to write (No '\n' necessary)
    \param[in] opc_Class    Current class
    \param[in] opc_Function Current function
-
-   \created     14.09.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCLoggingHandler::h_WriteLogWarning(const C_SCLString & orc_Activity, const C_SCLString & orc_Message,
@@ -157,15 +132,12 @@ void C_OSCLoggingHandler::h_WriteLogWarning(const C_SCLString & orc_Activity, co
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Write error message to log
+/*! \brief   Write error message to log
 
    \param[in] orc_Activity Current activity
    \param[in] orc_Message  Message to write (No '\n' necessary)
    \param[in] opc_Class    Current class
    \param[in] opc_Function Current function
-
-   \created     14.09.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCLoggingHandler::h_WriteLogError(const C_SCLString & orc_Activity, const C_SCLString & orc_Message,
@@ -176,15 +148,12 @@ void C_OSCLoggingHandler::h_WriteLogError(const C_SCLString & orc_Activity, cons
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get readable stw error
+/*! \brief   Get readable stw error
 
    \param[in] os32_Error STW error value
 
    \return
    STW error string
-
-   \created     20.09.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_OSCLoggingHandler::h_StwError(const sint32 os32_Error)
@@ -239,10 +208,7 @@ C_SCLString C_OSCLoggingHandler::h_StwError(const sint32 os32_Error)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Utility to flush current log entries (No manual call necessary)
-
-   \created     22.02.2018  STW/M.Echtler
+/*! \brief   Utility to flush current log entries (No manual call necessary)
 */
 //-----------------------------------------------------------------------------
 void C_OSCLoggingHandler::h_Flush(void)
@@ -268,8 +234,7 @@ void C_OSCLoggingHandler::h_Flush(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get date time as formatted string
+/*! \brief   Get date time as formatted string
 
    Format:2017-08-29 07:32:19.123
 
@@ -277,8 +242,6 @@ void C_OSCLoggingHandler::h_Flush(void)
 
    \return
    Formatted string
-
-   \created     14.09.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 std::string C_OSCLoggingHandler::h_UtilConvertDateTimeToString(const C_TGLDateTime & orc_DateTime)
@@ -296,8 +259,7 @@ std::string C_OSCLoggingHandler::h_UtilConvertDateTimeToString(const C_TGLDateTi
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Write message to log
+/*! \brief   Write message to log
 
    \param[in] oe_Type      Message type (maximum 7 characters)
    \param[in] orc_Activity Current activity (maximum 26 characters)
@@ -305,8 +267,6 @@ std::string C_OSCLoggingHandler::h_UtilConvertDateTimeToString(const C_TGLDateTi
    \param[in] opc_Class    Current class (combined with function: maximum 50 characters)
                            May be file path string which is reduced to file base name automatically
    \param[in] opc_Function Current function (combined with function: maximum 50 characters)
-
-   \created     14.09.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCLoggingHandler::mh_WriteLog(const C_SCLString & orc_Type, const C_SCLString & orc_Activity,
@@ -378,10 +338,7 @@ void C_OSCLoggingHandler::mh_WriteLog(const C_SCLString & orc_Type, const C_SCLS
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Open file if necessary
-
-   \created     22.02.2018  STW/M.Echtler
+/*! \brief   Open file if necessary
 */
 //-----------------------------------------------------------------------------
 void C_OSCLoggingHandler::mh_OpenFile(void)
@@ -400,10 +357,7 @@ void C_OSCLoggingHandler::mh_OpenFile(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     22.02.2018  STW/M.Echtler
+/*! \brief   Default constructor
 */
 //-----------------------------------------------------------------------------
 C_OSCLoggingHandler::C_OSCLoggingHandler(void)
@@ -411,12 +365,9 @@ C_OSCLoggingHandler::C_OSCLoggingHandler(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     22.02.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 C_OSCLoggingHandler::~C_OSCLoggingHandler(void)

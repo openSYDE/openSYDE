@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Table view for system view dashboard data element update mode (implementation)
 
    Table view for system view dashboard data element update mode
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     11.09.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QScrollBar>
@@ -26,34 +19,31 @@
 #include "C_SyvDaPeUpdateModeTableHeaderView.h"
 #include "constants.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     ou32_ViewIndex     View index
    \param[in,out] opc_TreeWidget     Complete tree widget
    \param[in,out] opc_TreeWidgetItem Tree widget item
-
-   \created     11.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeUpdateModeTableView::C_SyvDaPeUpdateModeTableView(const uint32 ou32_ViewIndex,
                                                            QTreeWidget * const opc_TreeWidget,
                                                            QTreeWidgetItem * const opc_TreeWidgetItem) :
@@ -106,24 +96,18 @@ C_SyvDaPeUpdateModeTableView::C_SyvDaPeUpdateModeTableView(const uint32 ou32_Vie
    this->setMouseTracking(true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     05.07.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeUpdateModeTableView::~C_SyvDaPeUpdateModeTableView(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init default columns
-
-   \created     12.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init default columns
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeTableView::InitColumns(void)
 {
    this->setColumnWidth(C_SyvDaPeUpdateModeTableModel::h_EnumToColumn(C_SyvDaPeUpdateModeTableModel::eICON), 26);
@@ -145,15 +129,12 @@ void C_SyvDaPeUpdateModeTableView::InitColumns(void)
    this->hideColumn(C_SyvDaPeUpdateModeTableModel::h_EnumToColumn(C_SyvDaPeUpdateModeTableModel::eDATA_POOL));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adjust widget size to items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adjust widget size to items
 
    \param[in] orq_Initial Flag if initial call
-
-   \created     08.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeTableView::AdjustToItems(const bool & orq_Initial, const bool oq_Last)
 {
    if (((this->mpc_TreeWidgetItem != NULL) && (this->mpc_TreeWidget != NULL)) && (this->model() != NULL))

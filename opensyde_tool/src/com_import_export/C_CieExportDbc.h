@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Export data to Vector DBC file (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.04.2018  STW/D.Pohl
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_CIEEXPORTDBC_H
 #define C_CIEEXPORTDBC_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 #include "stwerrors.h"
 #include "CSCLString.h"
@@ -25,12 +19,12 @@
 #include "C_CieConverter.h"
 #include "C_OSCNodeDataPoolContent.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_CieExportDbc
 {
@@ -74,7 +68,6 @@ private:
    static stw_scl::C_SCLString mh_NiceifyStringForDbcSymbol(const stw_scl::C_SCLString & orc_String);
    static stw_scl::C_SCLString mh_EscapeCriticalSymbols(const stw_scl::C_SCLString & orc_String);
 
-
    static const std::string mhc_SigInitialValue;
    static const std::string mhc_MsgCycleTime;
    static const std::string mhc_MsgSendType;
@@ -83,7 +76,7 @@ private:
    static C_ExportStatistic mhc_ExportStatistic;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Informational Line / Arrow for user (implementation)
 
    Informational Line / Arrow for user
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.10.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPen>
@@ -29,39 +22,36 @@
 #include "C_GiSyLineWidget.h"
 #include "gitypes.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString mc_NAME_ARROW = "LINE/ARROW";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 const stw_types::float64 C_GiBiArrow::mhf64_ShapeOffsetFactor = 4.0;
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in]     oru64_ID   Unique ID
    \param[in]     opc_Points Points for line
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     27.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiBiArrow::C_GiBiArrow(const uint64 & oru64_ID, const std::vector<QPointF> * const opc_Points,
                          QGraphicsItem * const opc_Parent) :
    C_GiLiLineGroup(opc_Points, false, opc_Parent),
@@ -102,25 +92,22 @@ C_GiBiArrow::C_GiBiArrow(const uint64 & oru64_ID, const std::vector<QPointF> * c
    connect(this, &C_GiBiArrow::ChangedGraphic, this, &C_GiBiArrow::m_GenerateArrows);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     27.10.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiBiArrow::~C_GiBiArrow(void)
 {
    //lint -e{1540}  no memory leak because of the parent of mpc_ArrowHeadStart and -End and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Shape including arrow head(s)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Shape including arrow head(s)
 
-   \created     28.10.2016  STW/M.Echtler
+   \return
+   shape of arrow
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QPainterPath C_GiBiArrow::shape() const
 {
    const float64 f64_AdaptedWidth = static_cast<stw_types::float64>(this->GetWidth()) * mhf64_ShapeOffsetFactor;
@@ -140,15 +127,12 @@ QPainterPath C_GiBiArrow::shape() const
    return c_LineBounding.GetShape();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Custom set width
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Custom set width
 
    \param[in] ors32_Width New width
-
-   \created     28.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiArrow::SetWidth(const sint32 & ors32_Width)
 {
    C_GiLiLineGroup::SetWidth(ors32_Width);
@@ -156,29 +140,26 @@ void C_GiBiArrow::SetWidth(const sint32 & ors32_Width)
    mf64_ArrowHeight = mhf64_ShapeOffsetFactor * static_cast<float64>(ors32_Width);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the type of this item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the type of this item
 
    \return  ID
-
-   \created     02.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_GiBiArrow::type() const
 {
    return msn_GRAPHICS_ITEM_LINE_ARROW;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Open style dialog
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Open style dialog
 
    \param[in] oq_DarkMode Optional dark mode flag
 
-   \created     23.08.2016  STW/M.Echtler
+   \retval true   style dialog was accepted
+   \retval false  style dialog was rejected
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiBiArrow::OpenStyleDialog(const bool oq_DarkMode)
 {
    bool q_Retval;
@@ -216,15 +197,36 @@ bool C_GiBiArrow::OpenStyleDialog(const bool oq_DarkMode)
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Copy the style of the provided element
 
-   \param[in]     opc_InputDialog      Dialog with style result
+   Warning: Only expected to work if the provided item is of the same type as this element
 
-   \created     23.08.2016  STW/M.Echtler
+   \param[in] opc_GuidelineItem Detailed input parameter description
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiBiArrow::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
+{
+   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   const C_GiBiArrow * const pc_Item = dynamic_cast<const C_GiBiArrow * const>(opc_GuidelineItem);
+
+   if (pc_Item != NULL)
+   {
+      this->ApplyStyle(pc_Item->GetColor(), pc_Item->GetWidth(), pc_Item->GetLineType(),
+                       pc_Item->GetStartArrowHeadType(), pc_Item->GetEndArrowHeadType());
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply style
+
+   \param[in]     orc_LineColor     line color
+   \param[in]     osn_Width         line width
+   \param[in]     oe_LineType       line type
+   \param[in]     oe_StartArrow     start arrow head type
+   \param[in]     oe_EndArrow       end arrow head type
+*/
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiArrow::ApplyStyle(const QColor & orc_LineColor, const sintn osn_Width,
                              const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType oe_LineType,
                              const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType oe_StartArrow,
@@ -238,124 +240,100 @@ void C_GiBiArrow::ApplyStyle(const QColor & orc_LineColor, const sintn osn_Width
    this->TriggerSigChangedGraphic();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get start arrow head type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get start arrow head type
 
    \return
    Current value
-
-   \created     02.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType C_GiBiArrow::GetStartArrowHeadType() const
 {
    return this->me_StartArrowHeadType;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get end arrow head type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get end arrow head type
 
    \return
    Current value
-
-   \created     02.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType C_GiBiArrow::GetEndArrowHeadType() const
 {
    return this->me_EndArrowHeadType;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get line type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get line type
 
    \return
    Current value
-
-   \created     02.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType C_GiBiArrow::GetLineType() const
 {
    return this->me_LineType;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set start arrow head type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set start arrow head type
 
    \param[in] ore_New New value
-
-   \created     02.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiArrow::SetStartArrowHeadType(const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType & ore_New)
 {
    this->me_StartArrowHeadType = ore_New;
    m_GenerateArrows();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set end arrow head type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set end arrow head type
 
    \param[in] ore_New New value
-
-   \created     02.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiArrow::SetEndArrowHeadType(const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType & ore_New)
 {
    this->me_EndArrowHeadType = ore_New;
    m_GenerateArrows();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set line type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set line type
 
    \param[in] ore_New New value
-
-   \created     02.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiArrow::SetLineType(const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType & ore_New)
 {
    this->me_LineType = ore_New;
    this->mpc_LinePath->SetLineStyle(me_LineType);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check where interaction point placement is for the specified type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check where interaction point placement is for the specified type
 
    \param[in] ore_Type Arrow head type
 
    \return
    true:  interaction point not at end
    false: interaction point at end
-
-   \created     15.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiBiArrow::h_HasOffsetInteractionPoint(const C_PuiBsLineArrow::E_ArrowHeadType & ore_Type)
 {
    return (ore_Type == C_PuiBsLineArrow::E_ArrowHeadType::eRECT) ||
           (ore_Type == C_PuiBsLineArrow::E_ArrowHeadType::eCIRCLE);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse press event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     28.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiArrow::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    if (opc_Event->button() == Qt::LeftButton)
@@ -377,13 +355,10 @@ void C_GiBiArrow::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
    C_GiLiLineGroup::mousePressEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Generate polygon for arrows
-
-   \created     28.10.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Generate polygon for arrows
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiArrow::m_GenerateArrows()
 {
    const QVector<C_GiLiLineConnection *> c_Lines = this->GetLines();
@@ -395,13 +370,12 @@ void C_GiBiArrow::m_GenerateArrows()
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   load from internal data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load from internal data
 
-   \created     21.07.2017  STW/M.Echtler
+   \param[in]  orc_Data    Line data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiArrow::m_LoadFromData(const C_PuiBsLineArrow & orc_Data)
 {
    this->LoadBasicData(orc_Data);
@@ -410,13 +384,12 @@ void C_GiBiArrow::m_LoadFromData(const C_PuiBsLineArrow & orc_Data)
    this->SetEndArrowHeadType(orc_Data.e_EndArrowHeadType);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update internal data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update internal data
 
-   \created     21.07.2017  STW/M.Echtler
+   \param[in]  orc_Data    line data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiArrow::m_UpdateData(C_PuiBsLineArrow & orc_Data) const
 {
    this->UpdateBasicData(orc_Data);
@@ -425,18 +398,15 @@ void C_GiBiArrow::m_UpdateData(C_PuiBsLineArrow & orc_Data) const
    orc_Data.e_LineType = this->me_LineType;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Generate polygon for arrow
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Generate polygon for arrow
 
    \param[in,out] opc_ArrowItem     Arrow item to fill
    \param[in]     ore_ArrowHeadType Arrow head type to generate
    \param[in]     opc_Conn          Connect to align arrow to
    \param[in]     orq_Start         Flag if line start or end
-
-   \created     28.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiArrow::m_GenerateArrow(QGraphicsPathItem * const opc_ArrowItem,
                                   const C_PuiBsLineArrow::E_ArrowHeadType & ore_ArrowHeadType,
                                   const C_GiLiLineConnection * const opc_Conn, const bool & orq_Start)

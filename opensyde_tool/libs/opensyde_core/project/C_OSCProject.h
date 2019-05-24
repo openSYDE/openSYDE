@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Handle user project data
@@ -9,30 +9,24 @@
    This class handles all actions concerning the user project.
    (See .cpp file for full description)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     04.07.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCPROJECTH
 #define C_OSCPROJECTH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 #include "CSCLDateTime.h"
 #include "CSCLString.h"
 #include "C_OSCXMLParser.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCProject
 {
@@ -45,8 +39,9 @@ public:
    static stw_scl::C_SCLString h_GetTimeFormatted(const stw_scl::C_SCLDateTime & orc_Time);
    static stw_scl::C_SCLDateTime h_GetTimeOfString(const stw_scl::C_SCLString & orc_Str);
 
-   stw_scl::C_SCLString c_Author;             ///< Author
-   stw_scl::C_SCLDateTime c_CreationTime;     ///< Time of last known modification
+   stw_scl::C_SCLString c_Author;             ///< Author (person who created this project)
+   stw_scl::C_SCLString c_Editor;             ///< Editor (person who last modified this project)
+   stw_scl::C_SCLDateTime c_CreationTime;     ///< Time of creation
    stw_scl::C_SCLDateTime c_ModificationTime; ///< Time of last known modification
    stw_scl::C_SCLString c_OpenSYDEVersion;    ///< openSYDE version used to save this project
    stw_scl::C_SCLString c_Template;           ///< Template this project is based on
@@ -56,7 +51,7 @@ protected:
    static stw_types::sint32 mh_CheckTimeFormat(const stw_scl::C_SCLString & orc_Time);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

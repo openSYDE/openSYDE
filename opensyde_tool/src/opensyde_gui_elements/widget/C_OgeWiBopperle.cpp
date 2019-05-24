@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for showing points as index indicator (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     07.02.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
@@ -22,33 +15,30 @@
 #include "stwtypes.h"
 #include "C_OgeWiBopperle.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const stw_types::sintn C_OgeWiBopperle::mhsn_PointSize = 5;
 const stw_types::sintn C_OgeWiBopperle::mhsn_PointDistance = 10;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent        Optional pointer to parent
-
-   \created     01.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeWiBopperle::C_OgeWiBopperle(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    ms32_CountIndex(1),
@@ -57,62 +47,50 @@ C_OgeWiBopperle::C_OgeWiBopperle(QWidget * const opc_Parent) :
    this->m_AdaptSize();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the maximum count of index points
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the maximum count of index points
 
    \param[in]   os32_Count        Maximum count of index points
-
-   \created     07.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiBopperle::SetCountIndex(const sint32 os32_Count)
 {
    this->ms32_CountIndex = os32_Count;
    this->m_AdaptSize();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the current index point
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the current index point
 
    \param[in]   os32_Index        Current index
-
-   \created     07.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiBopperle::SetCurrentIndex(const sint32 os32_Index)
 {
    this->ms32_CurrentIndex = os32_Index;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the colors of the points
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the colors of the points
 
    \param[in]   orc_ColorActive        Color of the active point
    \param[in]   orc_ColorActive        Color of the inactive point
-
-   \created     07.02.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiBopperle::SetColor(const QColor & orc_ColorActive, const QColor & orc_ColorInactive)
 {
    this->mc_ColorActive = orc_ColorActive;
    this->mc_ColorInactive = orc_ColorInactive;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overrided paint event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overrided paint event
 
    Draws the background element
 
    \param[in,out] opc_Event  Pointer to paint event
-
-   \created     06.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiBopperle::paintEvent(QPaintEvent * const opc_Event)
 {
    QPainter c_Painter(this);
@@ -145,7 +123,7 @@ void C_OgeWiBopperle::paintEvent(QPaintEvent * const opc_Event)
    QWidget::paintEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiBopperle::m_AdaptSize()
 {
    const sintn sn_CountIndex = this->ms32_CountIndex;

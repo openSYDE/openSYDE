@@ -1,21 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for showing and editing COM interface description
 
    Widget for editing bus properties
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.03.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QSpacerItem>
@@ -30,36 +24,33 @@
 #include "C_PuiSdHandler.h"
 #include "C_GtGetText.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     24.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueComIfDescriptionWidget::C_SdBueComIfDescriptionWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueComIfDescriptionWidget),
@@ -169,15 +160,12 @@ C_SdBueComIfDescriptionWidget::C_SdBueComIfDescriptionWidget(QWidget * const opc
            &C_SdBueComIfDescriptionWidget::DeleteSignal);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     24.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueComIfDescriptionWidget::~C_SdBueComIfDescriptionWidget(void)
 {
    if (this->mq_IndexValid == true)
@@ -216,13 +204,10 @@ C_SdBueComIfDescriptionWidget::~C_SdBueComIfDescriptionWidget(void)
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     06.08.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::InitStaticNames(void) const
 {
    // tooltip Layer 2
@@ -241,17 +226,14 @@ void C_SdBueComIfDescriptionWidget::InitStaticNames(void) const
                                                                 "Edit Messages and Signals of protocol type ECoS (ESX CANopen safety protocol)."));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the node 'mode' of the widget with all necessary indexes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the node 'mode' of the widget with all necessary indexes
 
    \param[in] ou32_NodeIndex     Node index
    \param[in] ou32_DataPoolIndex Data pool index
    \param[in] ou32_ListIndex     List index
-
-   \created     31.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::SetNodeDataPool(const stw_types::uint32 ou32_NodeIndex,
                                                     const stw_types::uint32 ou32_DataPoolIndex,
                                                     const stw_types::uint32 ou32_ListIndex)
@@ -313,15 +295,12 @@ void C_SdBueComIfDescriptionWidget::SetNodeDataPool(const stw_types::uint32 ou32
    //lint -e{429}  no memory leak because of the parent of pc_Spacer by insertSpacerItem and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the bus 'mode' of the widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the bus 'mode' of the widget
 
    \param[in] ou32_BusIndex      Bus index
-
-   \created     31.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::SetBusId(const uint32 ou32_BusIndex)
 {
    this->m_SaveMessageUserSettings();
@@ -347,13 +326,10 @@ void C_SdBueComIfDescriptionWidget::SetBusId(const uint32 ou32_BusIndex)
    this->mpc_Ui->pc_MessageSelectorWidget->SetInitialFocus();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle complete reload
-
-   \created     04.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle complete reload
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::Reload(void)
 {
    const C_OSCCanProtocol::E_Type e_Protocol = this->GetActProtocol();
@@ -370,13 +346,10 @@ void C_SdBueComIfDescriptionWidget::Reload(void)
    m_OnMessagesSelected();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle connection change
-
-   \created     12.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle connection change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::PartialReload(void)
 {
    //Update node check marks
@@ -386,15 +359,12 @@ void C_SdBueComIfDescriptionWidget::PartialReload(void)
    Q_EMIT this->SigErrorChange();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle selection change with all aspects
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle selection change with all aspects
 
    \param[in] orc_MessageId Message identification indices
-
-   \created     08.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::SelectMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId) const
 {
    m_SelectMessageProperties(orc_MessageId);
@@ -402,40 +372,38 @@ void C_SdBueComIfDescriptionWidget::SelectMessage(const C_OSCCanMessageIdentific
    this->mpc_Ui->pc_MessageSelectorWidget->SelectMessage(orc_MessageId);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle selection change with all aspects
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle selection change with all aspects
 
    \param[in] ou32_NodeIndex     Node index
    \param[in] ou32_DataPoolIndex Data pool index
    \param[in] ou32_ListIndex     List index
    \param[in] ou32_MessageIndex  Message index
-
-   \created     10.05.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
-void C_SdBueComIfDescriptionWidget::SelectMessage(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
-                                                  const uint32 ou32_ListIndex, const uint32 ou32_MessageIndex) const
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueComIfDescriptionWidget::SelectMessageSearch(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
+                                                        const uint32 ou32_ListIndex,
+                                                        const uint32 ou32_MessageIndex) const
 {
    C_OSCCanMessageIdentificationIndices c_MessageId;
 
    // fills all information except the message index
    m_PrepareMessageId(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex, c_MessageId);
 
+   //Update protocol (might change)
+   this->m_SetProtocol(c_MessageId.e_ComProtocol);
+
    c_MessageId.u32_MessageIndex = ou32_MessageIndex;
    this->SelectMessage(c_MessageId);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle selection change with all aspects
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle selection change with all aspects
 
    \param[in] orc_MessageId     Message identification indices
    \param[in] oru32_SignalIndex Signal index
-
-   \created     08.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::SelectSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                  const uint32 & oru32_SignalIndex) const
 {
@@ -444,26 +412,24 @@ void C_SdBueComIfDescriptionWidget::SelectSignal(const C_OSCCanMessageIdentifica
    this->mpc_Ui->pc_MessageSelectorWidget->SelectSignal(orc_MessageId, oru32_SignalIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle selection change with all aspects
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle selection change with all aspects
 
    \param[in] ou32_NodeIndex     Node index
    \param[in] ou32_DataPoolIndex Data pool index
    \param[in] ou32_ListIndex     List index
    \param[in] ou32_ElementIndex  Element index in the datapool
-
-   \created     10.05.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
-void C_SdBueComIfDescriptionWidget::SelectSignal(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
-                                                 const uint32 ou32_ListIndex, const uint32 ou32_ElementIndex) const
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueComIfDescriptionWidget::SelectSignalSearch(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
+                                                       const uint32 ou32_ListIndex,
+                                                       const uint32 ou32_ElementIndex) const
 {
    C_OSCCanMessageIdentificationIndices c_MessageId;
 
-   // fills all informations except the message index
-   const std::vector<C_OSCCanMessage> * pc_Messages = m_PrepareMessageId(ou32_NodeIndex, ou32_DataPoolIndex,
-                                                                         ou32_ListIndex, c_MessageId);
+   // fills all information except the message index
+   const std::vector<C_OSCCanMessage> * const pc_Messages = m_PrepareMessageId(ou32_NodeIndex, ou32_DataPoolIndex,
+                                                                               ou32_ListIndex, c_MessageId);
 
    if (pc_Messages != NULL)
    {
@@ -480,6 +446,10 @@ void C_SdBueComIfDescriptionWidget::SelectSignal(const uint32 ou32_NodeIndex, co
             if (ou32_ElementIndex == rc_Message.c_Signals[u32_SignalIndex].u32_ComDataElementIndex)
             {
                c_MessageId.u32_MessageIndex = u32_Counter;
+
+               //Update protocol (might change)
+               this->m_SetProtocol(c_MessageId.e_ComProtocol);
+
                this->SelectSignal(c_MessageId, u32_SignalIndex);
                break;
             }
@@ -488,95 +458,77 @@ void C_SdBueComIfDescriptionWidget::SelectSignal(const uint32 ou32_NodeIndex, co
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new signal
 
    \param[in] orc_MessageId      Message identification indices
    \param[in] ou16_StartBit      Start bit for new signal
-
-   \created     06.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::AddSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                               const uint16 ou16_StartBit) const
 {
    this->mpc_Ui->pc_MessageSelectorWidget->AddSignal(orc_MessageId, ou16_StartBit);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy specific signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy specific signal
 
    \param[in] orc_MessageId      Message identification indices
    \param[in] ou32_SignalIndex   Signal index
-
-   \created     06.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::CopySignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                const uint32 ou32_SignalIndex) const
 {
    this->mpc_Ui->pc_MessageSelectorWidget->CopySignal(orc_MessageId, ou32_SignalIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Cut specific signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Cut specific signal
 
    \param[in] orc_MessageId      Message identification indices
    \param[in] ou32_SignalIndex   Signal index
-
-   \created     06.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::CutSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                               const uint32 ou32_SignalIndex) const
 {
    this->mpc_Ui->pc_MessageSelectorWidget->CutSignal(orc_MessageId, ou32_SignalIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paste copied signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paste copied signal
 
    \param[in] orc_MessageId      Message identification indices
    \param[in] ou16_StartBit      Start bit for new signal
-
-   \created     06.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::PasteSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                 const uint16 ou16_StartBit) const
 {
    this->mpc_Ui->pc_MessageSelectorWidget->PasteSignal(orc_MessageId, ou16_StartBit);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete specific signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete specific signal
 
    \param[in] orc_MessageId      Message identification indices
    \param[in] ou32_SignalIndex   Signal index
-
-   \created     06.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::DeleteSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                  const uint32 ou32_SignalIndex) const
 {
    this->mpc_Ui->pc_MessageSelectorWidget->DeleteSignal(orc_MessageId, ou32_SignalIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press release event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press release event slot
 
    \param[in,out] opc_KeyEvent Key event identification and information
-
-   \created     24.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    //Debug commands
@@ -644,17 +596,14 @@ void C_SdBueComIfDescriptionWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent
    QWidget::keyPressEvent(opc_KeyEvent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten show event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten show event slot
 
    Here: Load splitter position
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     22.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::showEvent(QShowEvent * const opc_Event)
 {
    //Redundant call in bus edit but necessary for node edit
@@ -663,24 +612,21 @@ void C_SdBueComIfDescriptionWidget::showEvent(QShowEvent * const opc_Event)
    QWidget::showEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten hide event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten hide event slot
 
    Here: Save info
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     02.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::hideEvent(QHideEvent * const opc_Event)
 {
    m_SaveMessageUserSettings();
    QWidget::hideEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_ConnectNodeToProt(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex)
 {
    this->mc_UndoManager.DoConnectNodeToProt(ou32_NodeIndex, ou32_InterfaceIndex,
@@ -689,7 +635,7 @@ void C_SdBueComIfDescriptionWidget::m_ConnectNodeToProt(const uint32 ou32_NodeIn
    Q_EMIT this->SigChanged();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_ConnectNodeToProtAndAddDataPool(const uint32 ou32_NodeIndex,
                                                                       const uint32 ou32_InterfaceIndex)
 {
@@ -700,7 +646,7 @@ void C_SdBueComIfDescriptionWidget::m_ConnectNodeToProtAndAddDataPool(const uint
    Q_EMIT this->SigChanged();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_DisconnectNodeFromProt(const uint32 ou32_NodeIndex,
                                                              const uint32 ou32_InterfaceIndex)
 {
@@ -710,7 +656,7 @@ void C_SdBueComIfDescriptionWidget::m_DisconnectNodeFromProt(const uint32 ou32_N
    Q_EMIT this->SigChanged();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_AddDataPool(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex)
 {
    this->mc_UndoManager.DoAddDataPool(ou32_NodeIndex, ou32_InterfaceIndex,
@@ -720,13 +666,10 @@ void C_SdBueComIfDescriptionWidget::m_AddDataPool(const uint32 ou32_NodeIndex, c
    Q_EMIT this->SigChanged();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle protocol change
-
-   \created     04.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle protocol change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_ProtocolChanged(void)
 {
    //Undo
@@ -735,13 +678,10 @@ void C_SdBueComIfDescriptionWidget::m_ProtocolChanged(void)
    Reload();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Realod messages after connection change
-
-   \created     24.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Realod messages after connection change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_ReloadMessages(void)
 {
    //Message sync manager
@@ -763,7 +703,7 @@ void C_SdBueComIfDescriptionWidget::m_ReloadMessages(void)
    this->mpc_Ui->pc_MsgSigTableWidget->UpdateData();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCCanProtocol::E_Type C_SdBueComIfDescriptionWidget::GetActProtocol(void) const
 {
    C_OSCCanProtocol::E_Type e_Protocol;
@@ -785,13 +725,10 @@ C_OSCCanProtocol::E_Type C_SdBueComIfDescriptionWidget::GetActProtocol(void) con
    return e_Protocol;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger load of splitter user settings
-
-   \created     07.08.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger load of splitter user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::TriggerLoadOfSplitterUserSettings(void) const
 {
    const sint32 s32_FirstSegmentWidth = C_UsHandler::h_GetInstance()->GetSdBusEditTreeSplitterX();
@@ -799,17 +736,14 @@ void C_SdBueComIfDescriptionWidget::TriggerLoadOfSplitterUserSettings(void) cons
    this->mpc_Ui->pc_Splitter->SetFirstSegment(s32_FirstSegmentWidth);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set current protocol
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set current protocol
 
    Warning: no update mechanism is triggered
 
    \param[in] oe_Protocol Current protocol
-
-   \created     02.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_SetProtocol(const C_OSCCanProtocol::E_Type oe_Protocol) const
 {
    switch (oe_Protocol)
@@ -826,15 +760,12 @@ void C_SdBueComIfDescriptionWidget::m_SetProtocol(const C_OSCCanProtocol::E_Type
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Select message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Select message
 
    \param[in] orc_MessageId Message identification indices
-
-   \created     21.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_SelectMessageProperties(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 const
 {
@@ -844,16 +775,13 @@ const
    this->mpc_Ui->pc_MsgSigTableWidget->setVisible(false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Select signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Select signal
 
    \param[in] orc_MessageId     Message identification indices
    \param[in] oru32_SignalIndex Signal index
-
-   \created     21.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_SelectSignalProperties(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                              const uint32 & oru32_SignalIndex) const
 {
@@ -863,67 +791,52 @@ void C_SdBueComIfDescriptionWidget::m_SelectSignalProperties(const C_OSCCanMessa
    this->mpc_Ui->pc_MsgSigTableWidget->setVisible(false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Any message id is invalid
-
-   \created     25.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Any message id is invalid
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_OnMessageIdChange(void) const
 {
    this->mpc_Ui->pc_MessageSelectorWidget->OnMessageIdChange();
    this->mpc_Ui->pc_NodeSelectorWidget->Refresh();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   The specified message data was changed
-
-   \created     25.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   The specified message data was changed
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_OnMessageNameChange(void) const
 {
    this->mpc_Ui->pc_MessageSelectorWidget->OnMessageNameChange();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   The signal name has changed
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   The signal name has changed
 
    \param[in] orc_MessageId Message identification indices
-
-   \created     27.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_OnSignalNameChange(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 const
 {
    this->mpc_Ui->pc_MessageSelectorWidget->OnSignalNameChange(orc_MessageId);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle connection change
-
-   \created     26.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle connection change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_OnConnectionChange(void) const
 {
    this->mpc_Ui->pc_MsgSigEditWidget->OnConnectionChange();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On change of signal count in message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On change of signal count in message
 
    \param[in] orc_MessageId Message identification indices
-
-   \created     26.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_OnSignalCountOfMessageChanged(
    const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 {
@@ -937,40 +850,31 @@ void C_SdBueComIfDescriptionWidget::m_OnSignalCountOfMessageChanged(
    Q_EMIT this->SigChanged();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger global error check (icons only)
-
-   \created     28.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger global error check (icons only)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_RecheckErrorGlobal(void) const
 {
    this->mpc_Ui->pc_MessageSelectorWidget->RecheckErrorGlobal();
    Q_EMIT this->SigErrorChange();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger recheck of error values for tree
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger recheck of error values for tree
 
    \param[in] orc_MessageId Message identification indices
-
-   \created     28.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_RecheckError(const C_OSCCanMessageIdentificationIndices & orc_MessageId) const
 {
    this->mpc_Ui->pc_MessageSelectorWidget->RecheckError(orc_MessageId);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   If messages selected
-
-   \created     03.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   If messages selected
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_OnMessagesSelected(void) const
 {
    this->mpc_Ui->pc_MsgSigEditWidget->setVisible(false);
@@ -979,13 +883,10 @@ void C_SdBueComIfDescriptionWidget::m_OnMessagesSelected(void) const
    this->mpc_Ui->pc_MsgSigTableWidget->UpdateData();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On change of message count
-
-   \created     05.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On change of message count
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_OnMessageCountChanged(void)
 {
    //Update messages
@@ -997,25 +898,19 @@ void C_SdBueComIfDescriptionWidget::m_OnMessageCountChanged(void)
    Q_EMIT this->SigChanged();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Change of RX configuration of message
-
-   \created     09.05.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Change of RX configuration of message
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_OnMessageRxChanged(void) const
 {
    this->mpc_Ui->pc_NodeSelectorWidget->Refresh();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register any change
-
-   \created     09.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register any change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_OnChange(void)
 {
    this->mpc_Ui->pc_NodeSelectorWidget->Refresh();
@@ -1023,13 +918,10 @@ void C_SdBueComIfDescriptionWidget::m_OnChange(void)
    Q_EMIT this->SigChanged();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save current state in user settings
-
-   \created     02.05.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save current state in user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_SaveMessageUserSettings(void) const
 {
    if (this->mq_IndexValid == true)
@@ -1073,15 +965,12 @@ void C_SdBueComIfDescriptionWidget::m_SaveMessageUserSettings(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore state from user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore state from user settings
 
    Warning: This does reopen a const copy of the user settings
-
-   \created     02.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueComIfDescriptionWidget::m_RestoreMessageUserSettings(void)
 {
    C_OSCCanProtocol::E_Type e_SelectedProtocol = GetActProtocol();
@@ -1170,7 +1059,7 @@ void C_SdBueComIfDescriptionWidget::m_RestoreMessageUserSettings(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const std::vector<C_OSCCanMessage> * C_SdBueComIfDescriptionWidget::m_PrepareMessageId(const uint32 ou32_NodeIndex,
                                                                                        const uint32 ou32_DataPoolIndex,
                                                                                        const uint32 ou32_ListIndex,

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Graphics view for the message layout viewer (implementation)
 
    detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     04.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QHelpEvent>
@@ -25,64 +18,55 @@
 
 #include "C_SdBueMlvGraphicsView.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_parent Optional pointer to parent
-
-   \created     04.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvGraphicsView::C_SdBueMlvGraphicsView(QWidget * const opc_Parent) :
    QGraphicsView(opc_Parent)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_parent Optional pointer to parent
-
-   \created     04.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvGraphicsView::~C_SdBueMlvGraphicsView()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show tool tip
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show tool tip
 
    \param[in] orc_ScenePos Scne position to show tool tip at
    \param[in] orc_Heading  Heading of tool tip
    \param[in] orc_Content  Content of tool tip
    \param[in] oq_Error     Flag if error tool tip
-
-   \created     26.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsView::ShowToolTip(const QPointF & orc_ScenePos, const QString & orc_Heading,
                                          const QString & orc_Content, const bool oq_Error)
 {
@@ -102,29 +86,23 @@ void C_SdBueMlvGraphicsView::ShowToolTip(const QPointF & orc_ScenePos, const QSt
    this->mc_ToolTip.DoMove(this->mapToGlobal(this->mapFromScene(c_AdaptedScenePos)));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Hide tool tip
-
-   \created     26.10.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Hide tool tip
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsView::HideToolTip(void)
 {
    this->mc_ToolTip.hide();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten drag enter event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten drag enter event slot
 
    Here: Do not accept external *.syde file here. It will be handled in NagMainWindow
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     17.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsView::dragEnterEvent(QDragEnterEvent * const opc_Event)
 {
    QGraphicsView::dragEnterEvent(opc_Event);
@@ -141,9 +119,8 @@ void C_SdBueMlvGraphicsView::dragEnterEvent(QDragEnterEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten default event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten default event slot
 
    Here: Handle tool tip
 
@@ -152,10 +129,8 @@ void C_SdBueMlvGraphicsView::dragEnterEvent(QDragEnterEvent * const opc_Event)
    \return
    True  Event was recognized and processed
    False Event ignored
-
-   \created     16.01.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdBueMlvGraphicsView::event(QEvent * const opc_Event)
 {
    if (opc_Event->type() == QEvent::ToolTip)

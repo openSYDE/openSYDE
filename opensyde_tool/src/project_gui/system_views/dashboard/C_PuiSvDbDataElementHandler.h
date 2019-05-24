@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Base functions and data storing for datapool elements and its content (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.08.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_PUISVDBDATAELEMENTHANDLER_H
 #define C_PUISVDBDATAELEMENTHANDLER_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QVector>
 #include <QList>
 #include <QMap>
@@ -33,12 +27,12 @@
 #include "C_PuiSvDbDataElementContent.h"
 #include "C_PuiSvDbDataElementScaling.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_PuiSvDbDataElementHandler :
    public C_PuiSvDbDataElement
@@ -88,8 +82,7 @@ protected:
                                     QVector<stw_types::float64> & orc_Values,
                                     QVector<stw_types::uint32> & orc_Timestamps, const bool oq_UseScaling = true);
    stw_types::sint32 m_GetLastNvmValue(const stw_types::uint32 ou32_WidgetDataPoolElementIndex,
-                                       std::vector<stw_types::float64> & orc_Values,
-                                       std::vector<QString> * const opc_StringifiedValues = NULL);
+                                       stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Value);
    stw_types::sint32 m_GetTimoutPercentage100(const stw_types::uint32 ou32_DataElementIndex,
                                               stw_types::uint8 & oru8_TimoutPercentage100) const;
    stw_types::sint32 m_ScaleMinMax(const stw_types::uint32 ou32_WidgetDataPoolElementIndex,
@@ -143,7 +136,7 @@ private:
    C_PuiSvDbDataElementHandler & operator =(const C_PuiSvDbDataElementHandler &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

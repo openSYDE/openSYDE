@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for progress log (implementation)
 
    Widget for progress log
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     15.02.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QUrl>
 #include <QScrollBar>
 #include <QDesktopServices>
@@ -30,36 +23,33 @@
 #include "C_SyvUpProgressLog.h"
 #include "ui_C_SyvUpProgressLog.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     15.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvUpProgressLog::C_SyvUpProgressLog(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvUpProgressLog),
@@ -79,15 +69,12 @@ C_SyvUpProgressLog::C_SyvUpProgressLog(QWidget * const opc_Parent) :
       &C_SyvUpProgressLog::m_ScrollToBottom);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     15.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvUpProgressLog::~C_SyvUpProgressLog(void)
 {
    Clear();
@@ -95,13 +82,10 @@ C_SyvUpProgressLog::~C_SyvUpProgressLog(void)
    //lint -e{1579}  Clean up in clear function
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clear all known widgets
-
-   \created     15.02.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clear all known widgets
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpProgressLog::Clear(void)
 {
    //Connect
@@ -153,30 +137,24 @@ void C_SyvUpProgressLog::Clear(void)
    this->mpc_LogHyperlink = NULL;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set heading
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set heading
 
    \param[in] orc_Value New heading
-
-   \created     15.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpProgressLog::SetHeading(const QString & orc_Value) const
 {
    m_SetHeadingVisible();
    this->mpc_Ui->pc_LabelPreview->setText(orc_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add log sub heading
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add log sub heading
 
    \param[in] orc_Value New log entry
-
-   \created     28.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpProgressLog::AddSubHeading(const QString & orc_Value)
 {
    QLabel * const pc_Entry = new C_OgeLabGroupItem(this);
@@ -190,17 +168,14 @@ void C_SyvUpProgressLog::AddSubHeading(const QString & orc_Value)
    //lint -e{429}  deleted later, stored internally
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add log entry
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add log entry
 
    \param[in] ou32_NodeIndex Node index
    \param[in] orc_Value      New log entry
    \param[in] oq_Update      Flag if entry for update
-
-   \created     15.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpProgressLog::AddEntry(const uint32 ou32_NodeIndex, const QString & orc_Value, const bool oq_Update)
 {
    C_SyvUpProgressLogEntry * const pc_Entry = new C_SyvUpProgressLogEntry(ou32_NodeIndex, this);
@@ -237,13 +212,10 @@ void C_SyvUpProgressLog::AddEntry(const uint32 ou32_NodeIndex, const QString & o
    //lint -e{429}  deleted later, stored internally
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add spacer
-
-   \created     16.02.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add spacer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpProgressLog::AddSpacer(void)
 {
    C_SyvUpProgressLogEntry * const pc_Entry = new C_SyvUpProgressLogEntry(0, this);
@@ -259,17 +231,14 @@ void C_SyvUpProgressLog::AddSpacer(void)
    //lint -e{429}  deleted later, stored internally
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update log entry
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update log entry
 
    \param[in] ou32_NodeIndex Node index
    \param[in] orc_Value      New log status
    \param[in] oq_Update      Flag if entry for update
-
-   \created     15.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpProgressLog::UpdateStatus(const uint32 ou32_NodeIndex, const QString & orc_Value,
                                       const bool oq_Update) const
 {
@@ -293,13 +262,10 @@ void C_SyvUpProgressLog::UpdateStatus(const uint32 ou32_NodeIndex, const QString
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add log hyperlink
-
-   \created     16.02.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add log hyperlink
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpProgressLog::AddLogHyperlink(void)
 {
    const QString c_LogFilePath = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
@@ -337,16 +303,13 @@ void C_SyvUpProgressLog::AddLogHyperlink(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all registered connect node entry indices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all registered connect node entry indices
 
    \return
    All registered connect node entry indices
-
-   \created     21.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint32> C_SyvUpProgressLog::GetConnectNodeEntryIndices(void)
 {
    std::vector<uint32> c_Retval;
@@ -362,13 +325,10 @@ std::vector<uint32> C_SyvUpProgressLog::GetConnectNodeEntryIndices(void)
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set heading visible
-
-   \created     20.02.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set heading visible
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpProgressLog::m_SetHeadingVisible(void) const
 {
    if (this->mpc_Ui->pc_LabelPreview->isVisible() == false)
@@ -381,13 +341,10 @@ void C_SyvUpProgressLog::m_SetHeadingVisible(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Open log link
-
-   \created     16.02.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Open log link
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpProgressLog::m_OpenLink(void) const
 {
    const QString c_LogFilePath = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
@@ -395,29 +352,23 @@ void C_SyvUpProgressLog::m_OpenLink(void) const
    QDesktopServices::openUrl(QUrl(QString("file:%1").arg(c_LogFilePath)));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Scroll to bottom
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Scroll to bottom
 
    \param[in] osn_Min New scroll bar minimum
    \param[in] osn_Max New scroll bar maximum
-
-   \created     16.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpProgressLog::m_ScrollToBottom(const sintn osn_Min, const sintn osn_Max) const
 {
    Q_UNUSED(osn_Min)
    this->mpc_Ui->pc_ScrollArea->verticalScrollBar()->setValue(osn_Max);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Setup context menu entries
-
-   \created     18.05.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Setup context menu entries
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpProgressLog::m_SetupContextMenu(void)
 {
    this->mpc_ContextMenu->clear();
@@ -427,15 +378,12 @@ void C_SyvUpProgressLog::m_SetupContextMenu(void)
                                     );
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show custom context menu
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show custom context menu
 
    \param[in] orc_Pos Local context menu position
-
-   \created     18.04.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpProgressLog::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 {
    m_SetupContextMenu(); // setup the custom menu here to have real "is-read-only" information
@@ -444,14 +392,10 @@ void C_SyvUpProgressLog::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
    this->mpc_ContextMenu->popup(c_PosGlobal);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy link location to clipboard
-
-
-   \created     18.05.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy link location to clipboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpProgressLog::m_CopyHyperLink() const
 {
    // get link location

@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Offers system view setup specific visualization and functionality of a node. (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.06.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QGraphicsSceneMouseEvent>
@@ -32,28 +25,27 @@
 #include "C_GiSvNodeSyvSetup.h"
 #include "C_OgeWiCustomMessage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -63,10 +55,8 @@ using namespace stw_opensyde_gui_elements;
    \param[in]       orf64_Width          Width of node
    \param[in]       orf64_Height         Height of node
    \param[in,out]   opc_Parent           Optional pointer to parent
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvNodeSyvSetup::C_GiSvNodeSyvSetup(const uint32 ou32_ViewIndex, const sint32 & ors32_NodeIndex,
                                        const uint64 & oru64_ID, const float64 & orf64_Width,
                                        const float64 & orf64_Height, QGraphicsItem * const opc_Parent) :
@@ -76,35 +66,28 @@ C_GiSvNodeSyvSetup::C_GiSvNodeSyvSetup(const uint32 ou32_ViewIndex, const sint32
    mq_EditMode(false)
 {
    this->m_InitCheckBox();
-   this->m_InitInteractiveIcons(0);
 
    this->mc_DefaultCursor = QCursor(Qt::ArrowCursor);
    this->RestoreDefaultCursor();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvNodeSyvSetup::~C_GiSvNodeSyvSetup()
 {
    //lint -e{1540}  no memory leak because of the parent of mpc_CheckBox and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the node connected state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the node connected state
 
    \param[in]     oq_Connected   Flag if connected or not
-
-   \created     23.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvSetup::SetViewConnected(const bool oq_Connected)
 {
    uint32 u32_Counter;
@@ -125,31 +108,25 @@ void C_GiSvNodeSyvSetup::SetViewConnected(const bool oq_Connected)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the state of the connection to the view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the state of the connection to the view
 
    \return
    true     is connected
    false    is not connected
-
-   \created     23.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvNodeSyvSetup::IsViewConnected(void) const
 {
    return this->mq_ViewConnected;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set the mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set the mode
 
    \param[in]     oq_Active      Flag for the edit mode
-
-   \created     23.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvSetup::SetEditMode(const bool oq_Active)
 {
    this->mq_EditMode = oq_Active;
@@ -160,13 +137,10 @@ void C_GiSvNodeSyvSetup::SetEditMode(const bool oq_Active)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   generate custom tool tip
-
-   \created     28.06.2017 STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   generate custom tool tip
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvSetup::GenerateHint(void)
 {
    if (this->mpc_HoveredInteractiveIcon == NULL)
@@ -207,28 +181,22 @@ void C_GiSvNodeSyvSetup::GenerateHint(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot function for updating internal data
-
-   \created     09.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for updating internal data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvSetup::UpdateData(void)
 {
    C_PuiSvHandler::h_GetInstance()->SetViewNodeCheckedState(this->mu32_ViewIndex, static_cast<uint32>(this->ms32_Index),
                                                             this->IsViewConnected());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse press event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     26.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvSetup::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    if (opc_Event->button() == Qt::LeftButton)
@@ -300,6 +268,8 @@ void C_GiSvNodeSyvSetup::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Ev
             //New default
             this->SetViewConnected(!this->mpc_CheckBox->IsChecked());
             Q_EMIT this->SigViewConnectionChanged();
+            //Block of move necessary (emitted move signals might screw with other items)
+            this->m_BlockMoveAndResize();
          }
          else
          {
@@ -313,15 +283,12 @@ void C_GiSvNodeSyvSetup::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Ev
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse move event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse move event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     19.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvSetup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_Event)
 {
    // adapt the hint
@@ -370,7 +337,7 @@ void C_GiSvNodeSyvSetup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_Eve
    C_GiNode::hoverMoveEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvSetup::m_InitCheckBox(void)
 {
    const sint32 s32_IconSize = this->m_GetIconSize();
@@ -389,7 +356,7 @@ void C_GiSvNodeSyvSetup::m_InitCheckBox(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvSetup::m_UpdateCheckBox(void)
 {
    if (this->mpc_CheckBox != NULL)
@@ -397,67 +364,5 @@ void C_GiSvNodeSyvSetup::m_UpdateCheckBox(void)
       const sint32 s32_IconSize = this->m_GetIconSize();
       this->mpc_CheckBox->SetNewSize(QSizeF(static_cast<float64>(s32_IconSize),
                                             static_cast<float64>(s32_IconSize)));
-   }
-}
-
-//-----------------------------------------------------------------------------
-void C_GiSvNodeSyvSetup::m_InitInteractiveIcons(const uint32 ou32_Count)
-{
-   //bool q_Continue = true;
-
-   //Temporary icon restriction for agritechnica
-   //if (this->ms32_Index >= 0)
-   //{
-   //   const C_OSCNode * const pc_Node =
-   //      C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(static_cast<uint32>(this->ms32_Index));
-   //   if (pc_Node != NULL)
-   //   {
-   //      if (pc_Node->c_DeviceType != "ESX-3CM")
-   //      {
-   //         q_Continue = false;
-   //      }
-   //   }
-   //}
-   if ((ou32_Count > 0) && (ou32_Count < 4))
-   {
-      uint32 u32_Counter;
-      const sint32 s32_IconSize = this->m_GetIconSize();
-      const sint32 s32_SpaceBetween = s32_IconSize / 2;
-      const sint32 s32_SpaceLeft = ((static_cast<sint32>(this->m_GetBoundary()->boundingRect().width()) -
-                                     (s32_IconSize * static_cast<sint32>(ou32_Count))) -
-                                    (s32_SpaceBetween * (static_cast<sint32>(ou32_Count) - 1))) / 2;
-      const float64 f64_Height = this->m_GetBoundary()->boundingRect().height() / 1.6;
-
-      this->mc_InteractiveIcons.reserve(ou32_Count);
-      for (u32_Counter = 0; u32_Counter < ou32_Count; ++u32_Counter)
-      {
-         const sint32 s32_PosX = s32_SpaceLeft + (static_cast<sint32>(u32_Counter) * (s32_IconSize + s32_SpaceBetween));
-         this->mc_InteractiveIcons.push_back(new C_GiRectPixmap(QRect(s32_PosX, static_cast<sint32>(f64_Height),
-                                                                      s32_IconSize, s32_IconSize)));
-
-         if (this->mc_InteractiveIcons[u32_Counter] != NULL)
-         {
-            QPixmap c_Pixmap;
-            this->mc_InteractiveIcons[u32_Counter]->setZValue(mf64_ZORDER_INIT_NODE + 1.0);
-            this->mc_InteractiveIcons[u32_Counter]->SetBackgroundColor(Qt::transparent);
-
-            switch (u32_Counter)
-            {
-            case 0:
-               c_Pixmap.load("://images/system_definition/IconGenerateCode.svg");
-               break;
-            case 1:
-               c_Pixmap.load("://images/system_views/actions/logicad_icon_orange-grau.png");
-               break;
-            default:
-               c_Pixmap.load(":images/tools_icons/EnterpriseArchitect.png");
-               break;
-            }
-
-            this->mc_InteractiveIcons[u32_Counter]->SetPixmap(c_Pixmap);
-
-            this->addToGroup(this->mc_InteractiveIcons[u32_Counter]);
-         }
-      }
    }
 }

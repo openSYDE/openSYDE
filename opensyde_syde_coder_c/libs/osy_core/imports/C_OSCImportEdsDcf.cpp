@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Utility class to handle imports of file type .eds and .dcf (implementation)
 
    Utility class to handle imports of file type .eds and .dcf
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     10.04.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -49,8 +42,7 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Import EDS or DCF file
+/*! \brief   Import EDS or DCF file
 
    Some assumptions:
    * Data types are not parsed but calculated automatically instead
@@ -71,8 +63,6 @@ using namespace stw_opensyde_core;
    C_RANGE  Operation failure: parameter invalid
    C_NOACT  Node Id not allowed
    C_CONFIG Parsing error
-
-   \created     10.04.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCImportEdsDcf::h_Import(const C_SCLString & orc_FilePath, const uint8 ou8_NodeId,
@@ -149,10 +139,7 @@ sint32 C_OSCImportEdsDcf::h_Import(const C_SCLString & orc_FilePath, const uint8
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     10.04.2018  STW/M.Echtler
+/*! \brief   Default constructor
 */
 //-----------------------------------------------------------------------------
 C_OSCImportEdsDcf::C_OSCImportEdsDcf(void)
@@ -160,8 +147,7 @@ C_OSCImportEdsDcf::C_OSCImportEdsDcf(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get CO object by object ID
+/*! \brief   Get CO object by object ID
 
    \param[in] orc_Objects All CO objects
    \param[in] ou32_Id     Object ID
@@ -169,8 +155,6 @@ C_OSCImportEdsDcf::C_OSCImportEdsDcf(void)
    \return
    NULL Object not found
    Else Valid object
-
-   \created     10.04.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 const C_OSCCanOpenObject * C_OSCImportEdsDcf::mh_GetCOObject(
@@ -192,8 +176,7 @@ const C_OSCCanOpenObject * C_OSCImportEdsDcf::mh_GetCOObject(
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Load core messages data
+/*! \brief   Load core messages data
 
    \param[in]  ou32_StartingId      Starting ID for message section
    \param[in]  ou8_NodeId           Node ID
@@ -206,8 +189,6 @@ const C_OSCCanOpenObject * C_OSCImportEdsDcf::mh_GetCOObject(
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     10.04.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCImportEdsDcf::mh_ParseMessages(const uint32 ou32_StartingId, const uint8 ou8_NodeId,
@@ -374,8 +355,7 @@ sint32 C_OSCImportEdsDcf::mh_ParseMessages(const uint32 ou32_StartingId, const u
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Load core signal data
+/*! \brief   Load core signal data
 
    \param[in]  ou32_COMessageId     ID for CO message section
    \param[in]  ou8_NodeId           Node ID
@@ -387,8 +367,6 @@ sint32 C_OSCImportEdsDcf::mh_ParseMessages(const uint32 ou32_StartingId, const u
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     10.04.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCImportEdsDcf::mh_ParseSignals(const uint32 ou32_COMessageId, const uint8 ou8_NodeId,
@@ -594,16 +572,13 @@ sint32 C_OSCImportEdsDcf::mh_ParseSignals(const uint32 ou32_COMessageId, const u
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get value of CO Object
+/*! \brief   Get value of CO Object
 
    \param[in]  orc_COObject CO object
    \param[in]  oq_IsEds     Flag if current file is an EDS file
 
    \return
    CO object value
-
-   \created     10.04.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_OSCImportEdsDcf::mh_GetCOObjectValue(const C_OSCCanOpenObject & orc_COObject, const bool oq_IsEds)
@@ -623,8 +598,7 @@ C_SCLString C_OSCImportEdsDcf::mh_GetCOObjectValue(const C_OSCCanOpenObject & or
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert string to integer value
+/*! \brief   Convert string to integer value
 
    \param[in]  orc_COValue CO object value
    \param[in]  ou8_NodeId  Node ID
@@ -633,8 +607,6 @@ C_SCLString C_OSCImportEdsDcf::mh_GetCOObjectValue(const C_OSCCanOpenObject & or
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     10.04.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCImportEdsDcf::mh_GetIntegerValue(const C_SCLString & orc_COValue, const uint8 ou8_NodeId,
@@ -711,8 +683,7 @@ sint32 C_OSCImportEdsDcf::mh_GetIntegerValue(const C_SCLString & orc_COValue, co
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert string to integer value
+/*! \brief   Convert string to integer value
 
    \param[in]  orc_COValue CO object value
    \param[out] oru32_Value Parsed value
@@ -720,8 +691,6 @@ sint32 C_OSCImportEdsDcf::mh_GetIntegerValue(const C_SCLString & orc_COValue, co
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     10.04.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCImportEdsDcf::mh_GetIntegerValueSimple(const C_SCLString & orc_COValue, uint32 & oru32_Value)
@@ -757,8 +726,7 @@ sint32 C_OSCImportEdsDcf::mh_GetIntegerValueSimple(const C_SCLString & orc_COVal
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Add user notification  for import section
+/*! \brief   Add user notification  for import section
 
    \param[in]     ou32_COObjectId     CO object ID
    \param[in]     orc_COSectionName   CO object sub section name
@@ -766,8 +734,6 @@ sint32 C_OSCImportEdsDcf::mh_GetIntegerValueSimple(const C_SCLString & orc_COVal
    \param[in]     os32_COSubSectionId Optional CO object sub section ID
    \param[in]     oq_IsError          Optional CO object sub section ID
    \param[in,out] opc_ImportMessages  Import result messages
-
-   \created     11.04.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCImportEdsDcf::mh_AddUserMessage(const uint32 ou32_COObjectId, const C_SCLString & orc_COSectionName,
@@ -815,8 +781,7 @@ void C_OSCImportEdsDcf::mh_AddUserMessage(const uint32 ou32_COObjectId, const C_
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Calculate min max based on current type and number of bits
+/*! \brief   Calculate min max based on current type and number of bits
 
    \param[in,out] orc_Element     Data pool element
    \param[in]     ou16_NumberBits Number of bits
@@ -825,8 +790,6 @@ void C_OSCImportEdsDcf::mh_AddUserMessage(const uint32 ou32_COObjectId, const C_
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
    C_CONFIG Operation failure: Element invalid
-
-   \created     11.04.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCImportEdsDcf::mh_CalcMinMax(C_OSCNodeDataPoolListElement & orc_Element, const uint16 ou16_NumberBits)
@@ -1010,13 +973,10 @@ sint32 C_OSCImportEdsDcf::mh_CalcMinMax(C_OSCNodeDataPoolListElement & orc_Eleme
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Load dummy data types
+/*! \brief   Load dummy data types
 
    \param[in]  orc_FilePath Ini file path
    \param[out] orc_Dummies  Found and valid dummy data types
-
-   \created     12.04.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCImportEdsDcf::mh_LoadDummies(const C_SCLString & orc_FilePath, std::vector<uint32> & orc_Dummies)

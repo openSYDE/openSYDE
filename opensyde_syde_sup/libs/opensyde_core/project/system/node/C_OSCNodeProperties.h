@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Data class for general node properties (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.12.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCNODEPROPERTIES_H
 #define C_OSCNODEPROPERTIES_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <vector>
 #include "CSCLString.h"
@@ -26,12 +20,12 @@
 #include "C_OSCNodeOpenSydeServerSettings.h"
 #include "C_OSCDeviceDefinition.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCNodeProperties
 {
@@ -54,6 +48,7 @@ public:
    ///possible types of diagnostic protocols
    enum E_DiagnosticServerProtocol
    {
+      eDS_NONE,     ///< No diagnostic server available
       eDS_KEFEX,    ///< Diagnostic server protocol type KEFEX
       eDS_OPEN_SYDE ///< Diagnostic server protocol type openSYDE
    };
@@ -61,6 +56,7 @@ public:
    ///possible types of flashloader protocols
    enum E_FlashLoaderProtocol
    {
+      eFL_NONE,     ///< No Flash loader available
       eFL_STW,      ///< Flash loader protocol type STW Flashloader
       eFL_OPEN_SYDE ///< Flash loader protocol type openSYDE
    };
@@ -74,7 +70,7 @@ public:
    C_OSCNodeStwFlashloaderSettings c_STWFlashloaderSettings;   ///< Optional STW flashloader settings
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

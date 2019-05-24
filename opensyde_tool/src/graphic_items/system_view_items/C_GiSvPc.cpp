@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Offers visualization and functionality of a PC. (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.06.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <cmath>
@@ -33,14 +26,14 @@
 #include "C_SyvSeDllConfigurationDialog.h"
 #include "C_OSCSystemBus.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const uint32 C_GiSvPc::mhu32_ScaleCategory0 = 3U; // no scaling -> default
 const uint32 C_GiSvPc::mhu32_ScaleCategory1 = 0U;
 const uint32 C_GiSvPc::mhu32_ScaleCategory2 = 1U;
@@ -57,28 +50,25 @@ const float64 C_GiSvPc::mahf64_ScaleMinHeightNode[3] =
 
 const stw_types::float64 C_GiSvPc::mhf64_InitSizeOfPc = 150.0;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in] ou64_UniqueID  Unique item ID
    \param[in] ou32_ViewIndex View index
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvPc::C_GiSvPc(const uint64 ou64_UniqueID, const uint32 ou32_ViewIndex) :
    C_GiImageGroupWithoutData(ou64_UniqueID, "", true),
    C_PuiSvDbDataElement(ou32_ViewIndex, 0, 0, C_PuiSvDbDataElement::eUNKNOWN),
@@ -116,30 +106,24 @@ C_GiSvPc::C_GiSvPc(const uint64 ou64_UniqueID, const uint32 ou32_ViewIndex) :
    //lint -e{1566}  no memory leak because of the parent of mpc_ConflictIcon and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvPc::~C_GiSvPc(void)
 {
    //lint -e{1540}  no memory leak because of the parent of mpc_ConflictIcon and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Find closest point in shape to scene position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Find closest point in shape to scene position
 
    \param[in]  orc_ScenePoint Scene position
    \param[out] orc_Closest    Closest point in shape
-
-   \created     03.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvPc::FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Closest) const
 {
    const QRectF c_Bounding = this->mpc_SvgGraphicsItem->sceneBoundingRect();
@@ -234,23 +218,19 @@ void C_GiSvPc::FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Cl
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the type of this item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the type of this item
 
    \return  ID
-
-   \created     01.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_GiSvPc::type(void) const
 {
    return msn_GRAPHICS_ITEM_PC;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Open communication dialog
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Open communication dialog
 
    Depends on CAN or Ethernet.
    Ethernet does not offer a communication dialog yet.
@@ -258,10 +238,8 @@ sintn C_GiSvPc::type(void) const
    \return
    true     Ok was clicked
    false    Cancel was clicked or the PC is connected to an Ethernet bus
-
-   \created     05.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvPc::OpenDialog(void) const
 {
    bool q_Retval = false;
@@ -325,27 +303,21 @@ bool C_GiSvPc::OpenDialog(void) const
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set connection change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set connection change
 
    \param[in] oq_Active Flag if connected
-
-   \created     14.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvPc::SetConnected(const bool oq_Connected)
 {
    this->mq_Connected = oq_Connected;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function for initially loading internal data
-
-   \created     28.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function for initially loading internal data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvPc::LoadData(void)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
@@ -362,13 +334,10 @@ void C_GiSvPc::LoadData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function for updating internal data
-
-   \created     28.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function for updating internal data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvPc::UpdateData(void)
 {
    C_PuiBsBox c_Data;
@@ -377,27 +346,21 @@ void C_GiSvPc::UpdateData(void)
    C_PuiSvHandler::h_GetInstance()->SetViewPCBox(this->mu32_ViewIndex, c_Data);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete data in system views
-
-   \created     28.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete data in system views
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvPc::DeleteData(void)
 {
    //Not allowed
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Change PC item to edit mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Change PC item to edit mode
 
    \param[in] oq_EditMode Edit mode flag
-
-   \created     28.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvPc::SetEditMode(const bool oq_EditMode)
 {
    if (oq_EditMode == true)
@@ -414,13 +377,10 @@ void C_GiSvPc::SetEditMode(const bool oq_EditMode)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Generate hint to display as tool tip.
-
-   \created     18.02.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Generate hint to display as tool tip.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvPc::GenerateHint()
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
@@ -455,32 +415,26 @@ void C_GiSvPc::GenerateHint()
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Resize update slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Resize update slot
 
    \param[in] of64_DiffWidth  Width difference
    \param[in] of64_DiffHeight Height difference
-
-   \created     29.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvPc::m_ResizeUpdateItems(const float64 of64_DiffWidth, const float64 of64_DiffHeight)
 {
    this->m_UpdateItems(of64_DiffWidth, of64_DiffHeight, false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overridden mouse press event.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overridden mouse press event.
 
    Here: hide tool tip
 
    \param[in,out]    opc_Event Event   identification and information
-
-   \created     18.02.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvPc::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    C_GiImageGroupWithoutData::mousePressEvent(opc_Event);
@@ -489,17 +443,14 @@ void C_GiSvPc::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
    Q_EMIT (this->SigHideToolTip());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overridden hover leave event.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overridden hover leave event.
 
    Here: hide tool tip
 
    \param[in,out]    opc_Event Event   identification and information
-
-   \created     18.02.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvPc::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event)
 {
    C_GiImageGroupWithoutData::hoverLeaveEvent(opc_Event);
@@ -508,17 +459,14 @@ void C_GiSvPc::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event)
    Q_EMIT (this->SigHideToolTip());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Open CAN DLL dialog
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Open CAN DLL dialog
 
    \return
    true     Ok was clicked
    false    Cancel was clicked
-
-   \created     05.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvPc::m_OpenCANDllDialog(void) const
 {
    bool q_Retval = false;
@@ -565,17 +513,14 @@ bool C_GiSvPc::m_OpenCANDllDialog(void) const
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if current platform is laptop
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if current platform is laptop
 
    \return
    True  Laptop
    False PC
-
-   \created     28.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvPc::mh_GetIsLaptop(void)
 {
    SYSTEM_POWER_STATUS t_PowerStatus;
@@ -594,13 +539,10 @@ bool C_GiSvPc::mh_GetIsLaptop(void)
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize conflict icon
-
-   \created     29.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize conflict icon
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvPc::m_InitConflictIcon(void)
 {
    const float64 f64_PosX = (this->mpc_SvgGraphicsItem->boundingRect().width() - 33.0) - // static offset for correct
@@ -620,13 +562,10 @@ void C_GiSvPc::m_InitConflictIcon(void)
    this->mpc_ConflictIcon->setVisible(false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Detect and update current icon size
-
-   \created     29.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Detect and update current icon size
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvPc::m_DetectIconSize(void)
 {
    const uint32 u32_ScaleCategory = this->m_GetScaleCategory();
@@ -654,17 +593,14 @@ void C_GiSvPc::m_DetectIconSize(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update items to resize
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update items to resize
 
    \param[in] of64_DiffWidth  Width difference
    \param[in] of64_DiffHeight Height difference
    \param[in] oq_Initial      Initial flag
-
-   \created     29.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvPc::m_UpdateItems(const float64 of64_DiffWidth, const float64 of64_DiffHeight, const bool oq_Initial)
 {
    const sint32 s32_OldIconSize = this->ms32_IconSize;
@@ -684,19 +620,16 @@ void C_GiSvPc::m_UpdateItems(const float64 of64_DiffWidth, const float64 of64_Di
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current scale category
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current scale category
 
    \return
    mhu32_ScaleCategory0 Default
    mhu32_ScaleCategory1 Category 1
    mhu32_ScaleCategory2 Category 2
    mhu32_ScaleCategory3 Category 3
-
-   \created     29.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_GiSvPc::m_GetScaleCategory(void) const
 {
    const QSizeF c_ActSize = this->mpc_SvgGraphicsItem->boundingRect().size(); //Karsten

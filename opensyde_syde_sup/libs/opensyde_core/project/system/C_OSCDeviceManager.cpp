@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Manager for all device descriptions (implementation)
 
    Manager for all device descriptions
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.09.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -27,7 +20,7 @@
 #include "TGLFile.h"
 #include "C_OSCLoggingHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_types;
 using namespace stw_errors;
@@ -35,21 +28,20 @@ using namespace stw_opensyde_core;
 using namespace stw_scl;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Search for device with specified name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Search for device with specified name
 
    The returned pointer points to one of the device instances owned by this class.
    So the caller has to consider the lifetime of the used instance of this class when using
@@ -60,10 +52,8 @@ using namespace stw_tgl;
    \return
    != NULL:  pointer to device definition
    NULL:     device definition not found
-
-   \created     19.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_OSCDeviceDefinition * C_OSCDeviceManager::LookForDevice(const C_SCLString & orc_Name) const
 {
    const C_OSCDeviceDefinition * pc_Device = NULL;
@@ -79,52 +69,43 @@ const C_OSCDeviceDefinition * C_OSCDeviceManager::LookForDevice(const C_SCLStrin
    return pc_Device;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all device groups
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all device groups
 
    \return
    copy of all device groups owned by this class
-
-   \created     19.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<C_OSCDeviceGroup> C_OSCDeviceManager::GetDeviceGroups(void) const
 {
    return mc_DeviceGroups;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get "WasLoaded" flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get "WasLoaded" flag
 
    Flag will be set after loading device definitions.
    Can be used to prevent multiple loading.
 
    \return
    status of flag
-
-   \created     26.02.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCDeviceManager::WasLoaded(void) const
 {
    return mq_WasLoaded;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load all known devices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load all known devices
 
    \param[in]   orc_File   Ini file path
 
    \return
    C_NO_ERR   all information loaded without problems
    C_RD_WR    could not load information
-
-   \created     19.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCDeviceManager::LoadFromFile(const C_SCLString & orc_File)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -159,13 +140,10 @@ sint32 C_OSCDeviceManager::LoadFromFile(const C_SCLString & orc_File)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     19.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCDeviceManager::C_OSCDeviceManager(void) :
    mq_WasLoaded(false)
 {

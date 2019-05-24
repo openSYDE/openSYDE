@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Utilitiy functions for C_OSCNodeDataPoolContent access (implementation)
 
    Utilitiy functions for C_OSCNodeDataPoolContent access
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.11.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <cmath>
@@ -31,40 +24,36 @@
 #include "C_OSCNodeDataPoolFiler.h"
 #include "C_SdNdeDataPoolContentUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const float64 C_SdNdeDataPoolContentUtil::mhf64_Epsilon = 1e-5; // to check for a 6 digit precision (openSYDE default)
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     13.11.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolContentUtil::C_SdNdeDataPoolContentUtil(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert value to double
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert value to double
 
    \param[in]  orc_Value             Data element value
    \param[in]  orc_DataPoolElementId Data element ID
@@ -73,10 +62,8 @@ C_SdNdeDataPoolContentUtil::C_SdNdeDataPoolContentUtil(void)
    \return
    C_NO_ERR Success
    C_RANGE  Content is a array
-
-   \created     01.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdNdeDataPoolContentUtil::h_GetValueAsFloat64(const C_OSCNodeDataPoolContent & orc_Content,
                                                        float64 & orf64_Output)
 {
@@ -129,9 +116,8 @@ sint32 C_SdNdeDataPoolContentUtil::h_GetValueAsFloat64(const C_OSCNodeDataPoolCo
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert value to double
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert value to double
 
    The vector will be cleared first.
 
@@ -141,10 +127,8 @@ sint32 C_SdNdeDataPoolContentUtil::h_GetValueAsFloat64(const C_OSCNodeDataPoolCo
 
    \param[in]  orc_Content             Data element value
    \param[in]  orc_Output              Vector with values
-
-   \created     28.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolContentUtil::h_GetValuesAsFloat64(const C_OSCNodeDataPoolContent & orc_Content,
                                                       std::vector<float64> & orc_Output)
 {
@@ -200,17 +184,14 @@ void C_SdNdeDataPoolContentUtil::h_GetValuesAsFloat64(const C_OSCNodeDataPoolCon
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert value to uint64
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert value to uint64
 
    \param[in]  orc_Content  Data element value
    \param[in]  oru64_Output Output value
    \param[in]  ou32_Index   Optional fallback index if array
-
-   \created     15.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolContentUtil::h_GetAnyValueAsUint64(const C_OSCNodeDataPoolContent & orc_Content,
                                                        uint64 & oru64_Output, const uint32 ou32_Index)
 {
@@ -293,17 +274,14 @@ void C_SdNdeDataPoolContentUtil::h_GetAnyValueAsUint64(const C_OSCNodeDataPoolCo
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert value to sint64
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert value to sint64
 
    \param[in]  orc_Content  Data element value
    \param[in]  ors64_Output Output value
    \param[in]  ou32_Index   Optional fallback index if array
-
-   \created     15.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolContentUtil::h_GetAnyValueAsSint64(const C_OSCNodeDataPoolContent & orc_Content,
                                                        sint64 & ors64_Output, const uint32 ou32_Index)
 {
@@ -386,9 +364,8 @@ void C_SdNdeDataPoolContentUtil::h_GetAnyValueAsSint64(const C_OSCNodeDataPoolCo
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets a float value in the content class
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets a float value in the content class
 
    The of64_Value value will be casted to the current type of the orc_Content class.
    If the orc_Content holds an array, the value will be set to the position ou32_ArrayIndex.
@@ -399,10 +376,8 @@ void C_SdNdeDataPoolContentUtil::h_GetAnyValueAsSint64(const C_OSCNodeDataPoolCo
    \param[in]     of64_Value         Value to set and cast
    \param[in,out] orc_Content        Content class with configured type and array configuration
    \param[in]    ou32_ArrayIndex     Optional index for array position if content class has an array
-
-   \created     29.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolContentUtil::h_SetValueInContent(const float64 of64_Value, C_OSCNodeDataPoolContent & orc_Content,
                                                      const uint32 ou32_ArrayIndex)
 {
@@ -743,9 +718,8 @@ void C_SdNdeDataPoolContentUtil::h_SetValueInContent(const float64 of64_Value, C
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets a scaled float value in the content class
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets a scaled float value in the content class
 
    The of64_Value value will be casted to the current type of the orc_Content class.
    If the orc_Content holds an array, the value will be set to the position ou32_ArrayIndex.
@@ -756,10 +730,8 @@ void C_SdNdeDataPoolContentUtil::h_SetValueInContent(const float64 of64_Value, C
    \param[in]     of64_Value         Value to set and cast
    \param[in,out] orc_Content        Content class with configured type and array configuration
    \param[in]    ou32_ArrayIndex     Optional index for array position if content class has an array
-
-   \created     23.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolContentUtil::h_SetScaledValueInContent(const float64 of64_ScaledValue,
                                                            C_OSCNodeDataPoolContent & orc_Content,
                                                            const float64 of64_Factor, const float64 of64_Offset,
@@ -774,9 +746,8 @@ void C_SdNdeDataPoolContentUtil::h_SetScaledValueInContent(const float64 of64_Sc
    C_SdNdeDataPoolContentUtil::h_SetValueInContent(f64_Value, orc_Content, ou32_ArrayIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get number of steps for the specified element ID
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get number of steps for the specified element ID
 
    \param[in]  orc_Min     Unscaled minimum value
    \param[in]  orc_Max     Unscaled maximum value
@@ -786,10 +757,8 @@ void C_SdNdeDataPoolContentUtil::h_SetScaledValueInContent(const float64 of64_Sc
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid or type not supported
-
-   \created     04.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdNdeDataPoolContentUtil::h_GetNumberOfAvailableSteps(const C_OSCNodeDataPoolContent & orc_Min,
                                                                const C_OSCNodeDataPoolContent & orc_Max,
                                                                uint64 & oru64_Steps, const uint32 ou32_Index)
@@ -982,9 +951,8 @@ sint32 C_SdNdeDataPoolContentUtil::h_GetNumberOfAvailableSteps(const C_OSCNodeDa
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get minimal required type after scaling to store all values
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get minimal required type after scaling to store all values
 
    \param[in]  orc_Min     Unscaled minimum
    \param[in]  orc_Max     Unscaled maximum
@@ -995,10 +963,8 @@ sint32 C_SdNdeDataPoolContentUtil::h_GetNumberOfAvailableSteps(const C_OSCNodeDa
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     04.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdNdeDataPoolContentUtil::h_GetMinMaxAfterScaling(const C_OSCNodeDataPoolContent & orc_Min,
                                                            const C_OSCNodeDataPoolContent & orc_Max,
                                                            const float64 of64_Factor, const float64 of64_Offset,
@@ -1193,9 +1159,8 @@ sint32 C_SdNdeDataPoolContentUtil::h_GetMinMaxAfterScaling(const C_OSCNodeDataPo
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get minimal required type after scaling to store all values
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get minimal required type after scaling to store all values
 
    \param[in]  orc_Min     Unscaled minimum
    \param[in]  orc_Max     Unscaled maximum
@@ -1205,10 +1170,8 @@ sint32 C_SdNdeDataPoolContentUtil::h_GetMinMaxAfterScaling(const C_OSCNodeDataPo
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     04.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdNdeDataPoolContentUtil::h_GetMinimalTypeAfterScaling(const C_OSCNodeDataPoolContent & orc_Min,
                                                                 const C_OSCNodeDataPoolContent & orc_Max,
                                                                 const float64 of64_Factor, const float64 of64_Offset,
@@ -1277,9 +1240,8 @@ sint32 C_SdNdeDataPoolContentUtil::h_GetMinimalTypeAfterScaling(const C_OSCNodeD
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get minimal required type after scaling to store all values
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get minimal required type after scaling to store all values
 
    \param[in] of64_Min   Unscaled minimum
    \param[in] of64_Max   Unscaled maximum
@@ -1288,10 +1250,8 @@ sint32 C_SdNdeDataPoolContentUtil::h_GetMinimalTypeAfterScaling(const C_OSCNodeD
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     04.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolContent::E_Type C_SdNdeDataPoolContentUtil::h_GetMinimumTypeForRange(const float64 of64_Min,
                                                                                       const float64 of64_Max,
                                                                                       const uint64 ou64_Steps)
@@ -1383,15 +1343,12 @@ C_OSCNodeDataPoolContent::E_Type C_SdNdeDataPoolContentUtil::h_GetMinimumTypeFor
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set input content values to zero
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set input content values to zero
 
    \param[in,out] orc_Content Content
-
-   \created     30.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolContentUtil::h_ZeroContent(C_OSCNodeDataPoolContent & orc_Content)
 {
    if (orc_Content.GetArray() == false)
@@ -1471,9 +1428,8 @@ void C_SdNdeDataPoolContentUtil::h_ZeroContent(C_OSCNodeDataPoolContent & orc_Co
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Simple conversion from content to QVariant
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Simple conversion from content to QVariant
 
    Simple means: array types not supported
 
@@ -1483,10 +1439,8 @@ void C_SdNdeDataPoolContentUtil::h_ZeroContent(C_OSCNodeDataPoolContent & orc_Co
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     26.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdNdeDataPoolContentUtil::h_SimpleConvertToVariant(const C_OSCNodeDataPoolContent & orc_Content,
                                                             QVariant & orc_Variant)
 {
@@ -1536,9 +1490,8 @@ sint32 C_SdNdeDataPoolContentUtil::h_SimpleConvertToVariant(const C_OSCNodeDataP
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Simple conversion from QVariant to content
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Simple conversion from QVariant to content
 
    Simple means: not all types supported
 
@@ -1548,10 +1501,8 @@ sint32 C_SdNdeDataPoolContentUtil::h_SimpleConvertToVariant(const C_OSCNodeDataP
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     26.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdNdeDataPoolContentUtil::h_SimpleConvertFromVariant(const QVariant & orc_Variant,
                                                               C_OSCNodeDataPoolContent & orc_Content)
 {
@@ -1598,18 +1549,15 @@ sint32 C_SdNdeDataPoolContentUtil::h_SimpleConvertFromVariant(const QVariant & o
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all values as scaled strings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all values as scaled strings
 
    \param[in]  orc_Content The source content
    \param[in]  of64_Factor Scaling factor
    \param[in]  of64_Offset Scaling offset
    \param[out] orc_Output  Scaled strings
-
-   \created     14.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolContentUtil::h_GetValuesAsScaledString(const C_OSCNodeDataPoolContent & orc_Content,
                                                            const float64 of64_Factor, const float64 of64_Offset,
                                                            std::vector<QString> & orc_Output)
@@ -1633,18 +1581,15 @@ void C_SdNdeDataPoolContentUtil::h_GetValuesAsScaledString(const C_OSCNodeDataPo
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all values as one scaled and combined string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all values as one scaled and combined string
 
    \param[in]  orc_Content The source content
    \param[in]  of64_Factor Scaling factor
    \param[in]  of64_Offset Scaling offset
    \param[out] orc_Output  Scaled and combined string
-
-   \created     14.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolContentUtil::h_GetValuesAsScaledCombinedString(const C_OSCNodeDataPoolContent & orc_Content,
                                                                    const float64 of64_Factor, const float64 of64_Offset,
                                                                    QString & orc_Output)
@@ -1655,18 +1600,15 @@ void C_SdNdeDataPoolContentUtil::h_GetValuesAsScaledCombinedString(const C_OSCNo
    orc_Output = C_SdNdeDataPoolContentUtil::h_CombineString(c_Output);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Combine value string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Combine value string
 
    \param[in] orc_Input Values
 
    \return
    Combined value string
-
-   \created     26.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SdNdeDataPoolContentUtil::h_CombineString(const std::vector<QString> & orc_Input)
 {
    QString c_Retval = "";
@@ -1682,19 +1624,16 @@ QString C_SdNdeDataPoolContentUtil::h_CombineString(const std::vector<QString> &
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all value as scaled string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all value as scaled string
 
    \param[in]  orc_Content The source content
    \param[in]  of64_Factor Scaling factor
    \param[in]  of64_Offset Scaling offset
    \param[out] orc_Output  Scaled string
    \param[in]  ou32_Index  Index to use in case of array
-
-   \created     14.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolContentUtil::h_GetValueAsScaledString(const C_OSCNodeDataPoolContent & orc_Content,
                                                           const float64 of64_Factor, const float64 of64_Offset,
                                                           QString & orc_Output, const uint32 ou32_Index)
@@ -1707,15 +1646,12 @@ void C_SdNdeDataPoolContentUtil::h_GetValueAsScaledString(const C_OSCNodeDataPoo
    orc_Output.replace(QLocale::c().decimalPoint(), QLocale::system().decimalPoint(), Qt::CaseInsensitive);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set content to maximum type value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set content to maximum type value
 
    \param[in,out] orc_Content Content
-
-   \created     14.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolContentUtil::h_InitMax(C_OSCNodeDataPoolContent & orc_Content)
 {
    switch (orc_Content.GetType())
@@ -1853,15 +1789,12 @@ void C_SdNdeDataPoolContentUtil::h_InitMax(C_OSCNodeDataPoolContent & orc_Conten
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set content to minimum type value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set content to minimum type value
 
    \param[in,out] orc_Content Content
-
-   \created     14.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolContentUtil::h_InitMin(C_OSCNodeDataPoolContent & orc_Content)
 {
    switch (orc_Content.GetType())
@@ -2019,9 +1952,8 @@ void C_SdNdeDataPoolContentUtil::h_InitMin(C_OSCNodeDataPoolContent & orc_Conten
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets a value in range of minimum and maximum value.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets a value in range of minimum and maximum value.
 
    If value is in range that means between min and max value, the caller can
    choose if value should be left as it is or should be set to zero.
@@ -2056,10 +1988,8 @@ void C_SdNdeDataPoolContentUtil::h_InitMin(C_OSCNodeDataPoolContent & orc_Conten
    C_NO_ERR    expected standard case, value was set (or left) successfully
    C_CONFIG    min, max and value have not the same datatype
    C_RANGE     min and max values are interchanged (max < min)
-
-   \created     09.05.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdNdeDataPoolContentUtil::h_SetValueInMinMaxRange(const C_OSCNodeDataPoolContent & orc_Min,
                                                            const C_OSCNodeDataPoolContent & orc_Max,
                                                            C_OSCNodeDataPoolContent & orc_Value,
@@ -2204,19 +2134,16 @@ sint32 C_SdNdeDataPoolContentUtil::h_SetValueInMinMaxRange(const C_OSCNodeDataPo
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert node data pool content type to QVariant
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert node data pool content type to QVariant
 
    \param[in] orc_Input   Node data pool content type
    \param[in] oru32_Index Optional array index
 
    \return
    QVariant content
-
-   \created     15.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_SdNdeDataPoolContentUtil::h_ConvertContentToGeneric(const C_OSCNodeDataPoolContent & orc_Input,
                                                                const uint32 & oru32_Index)
 {
@@ -2303,9 +2230,8 @@ QVariant C_SdNdeDataPoolContentUtil::h_ConvertContentToGeneric(const C_OSCNodeDa
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert node data pool content type to QVariant using scaling
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert node data pool content type to QVariant using scaling
 
    \param[in] orc_Input   Node data pool content type
    \param[in] of64_Factor Factor
@@ -2314,10 +2240,8 @@ QVariant C_SdNdeDataPoolContentUtil::h_ConvertContentToGeneric(const C_OSCNodeDa
 
    \return
    QVariant content
-
-   \created     13.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(const C_OSCNodeDataPoolContent & orc_Input,
                                                                      const float64 of64_Factor,
                                                                      const float64 of64_Offset,
@@ -2364,19 +2288,17 @@ QVariant C_SdNdeDataPoolContentUtil::h_ConvertScaledContentToGeneric(const C_OSC
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set node data pool content according to QVariant data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node data pool content according to QVariant data
 
    \param[in]  orc_Value    Variant value
    \param[out] orc_Output   Node data pool content to set
    \param[in]  oru32_Index  Optional array index
-
-   \created     15.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
-sint32 C_SdNdeDataPoolContentUtil::h_SetDataVariableFromGeneric(const QVariant & orc_Value, C_OSCNodeDataPoolContent & orc_Output,
-                                                     const uint32 & oru32_Index)
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_SdNdeDataPoolContentUtil::h_SetDataVariableFromGeneric(const QVariant & orc_Value,
+                                                                C_OSCNodeDataPoolContent & orc_Output,
+                                                                const uint32 & oru32_Index)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -2790,23 +2712,21 @@ sint32 C_SdNdeDataPoolContentUtil::h_SetDataVariableFromGeneric(const QVariant &
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set node data pool content according to QVariant data using scaling
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set node data pool content according to QVariant data using scaling
 
    \param[in]  orc_Value    Variant value
    \param[out] orc_Output   Node data pool content to set
    \param[in]  of64_Factor  Factor
    \param[in]  of64_Offset  Offset
    \param[in]  oru32_Index  Optional array index
-
-   \created     13.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdNdeDataPoolContentUtil::h_SetDataVariableFromGenericWithScaling(const QVariant & orc_Value,
-                                                             C_OSCNodeDataPoolContent & orc_Output,
-                                                             const float64 of64_Factor, const float64 of64_Offset,
-                                                             const uint32 & oru32_Index)
+                                                                           C_OSCNodeDataPoolContent & orc_Output,
+                                                                           const float64 of64_Factor,
+                                                                           const float64 of64_Offset,
+                                                                           const uint32 & oru32_Index)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -2853,9 +2773,8 @@ sint32 C_SdNdeDataPoolContentUtil::h_SetDataVariableFromGenericWithScaling(const
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Store current content as string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Store current content as string
 
    Use case: store to string to later use the same string to restore the same content
 
@@ -2863,10 +2782,8 @@ sint32 C_SdNdeDataPoolContentUtil::h_SetDataVariableFromGenericWithScaling(const
 
    \return
    Current content encoded as string
-
-   \created     16.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SdNdeDataPoolContentUtil::h_GetAllContentAsString(const C_OSCNodeDataPoolContent & orc_Input)
 {
    stw_scl::C_SCLString c_Retval;
@@ -2877,9 +2794,8 @@ QString C_SdNdeDataPoolContentUtil::h_GetAllContentAsString(const C_OSCNodeDataP
    return c_Retval.c_str();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore content from string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore content from string
 
    Use case: store to string to later use the same string to restore the same content
 
@@ -2889,10 +2805,8 @@ QString C_SdNdeDataPoolContentUtil::h_GetAllContentAsString(const C_OSCNodeDataP
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
-
-   \created     16.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdNdeDataPoolContentUtil::h_SetAllContentFromString(const QString & orc_Input,
                                                              C_OSCNodeDataPoolContent & orc_Output)
 {

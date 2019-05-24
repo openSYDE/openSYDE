@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Class for system view dashboard slider item (implementation)
 
    Class for system view dashboard slider item
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     17.08.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QGraphicsView>
@@ -36,7 +29,7 @@
 #include "C_SdNdeDataPoolContentUtil.h"
 #include "C_OSCNodeDataPoolListElement.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -45,21 +38,20 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -68,10 +60,8 @@ using namespace stw_opensyde_core;
    \param[in]     ors32_DataIndex        Index of data element in dashboard in system view
    \param[in]     oru64_ID               Unique ID
    \param[in,out] opc_Parent             Optional pointer to parent
-
-   \created     17.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvDaSliderBase::C_GiSvDaSliderBase(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
                                        const sint32 & ors32_DataIndex, const uint64 & oru64_ID,
                                        QGraphicsItem * const opc_Parent) :
@@ -85,44 +75,35 @@ C_GiSvDaSliderBase::C_GiSvDaSliderBase(const uint32 & oru32_ViewIndex, const uin
    this->mpc_Widget->SetWidget(this->mpc_SliderWidget);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     10.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvDaSliderBase::~C_GiSvDaSliderBase(void)
 {
    //lint -e{1540}  no memory leak because of the parent of mpc_Slider and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the type of this item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the type of this item
 
    \return  ID
-
-   \created     25.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_GiSvDaSliderBase::type(void) const
 {
    return msn_GRAPHICS_ITEM_DB_SLIDER;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply style
 
    \param[in] oe_Style    New style type
    \param[in] oq_DarkMode Flag if dark mode is active
-
-   \created     18.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSliderBase::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode)
 {
    C_GiSvDaRectBaseGroup::SetDisplayStyle(oe_Style, oq_DarkMode);
@@ -145,13 +126,10 @@ void C_GiSvDaSliderBase::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_S
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adjust font to current size
-
-   \created     17.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adjust font to current size
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSliderBase::ReInitializeSize(void)
 {
    if (this->mpc_SliderWidget != NULL)
@@ -160,13 +138,10 @@ void C_GiSvDaSliderBase::ReInitializeSize(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load data from system view dashboard
-
-   \created     19.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load data from system view dashboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSliderBase::LoadData(void)
 {
    const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
@@ -188,13 +163,10 @@ void C_GiSvDaSliderBase::LoadData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update data in system view dashboard
-
-   \created     19.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update data in system view dashboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSliderBase::UpdateData(void)
 {
    const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
@@ -219,13 +191,10 @@ void C_GiSvDaSliderBase::UpdateData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete data in system view dashboard
-
-   \created     19.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete data in system view dashboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSliderBase::DeleteData(void)
 {
    if (this->ms32_Index >= 0)
@@ -237,15 +206,12 @@ void C_GiSvDaSliderBase::DeleteData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Information about the start or stop of a connection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the start or stop of a connection
 
    \param[in]  oq_Active Flag if connection is active or not active now
-
-   \created     14.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSliderBase::ConnectionActiveChanged(const bool oq_Active)
 {
    if (oq_Active == true)
@@ -269,13 +235,10 @@ void C_GiSvDaSliderBase::ConnectionActiveChanged(const bool oq_Active)
    C_GiSvDaRectBaseGroup::ConnectionActiveChanged(oq_Active);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sends the current set value of the element
-
-   \created     29.08.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sends the current set value of the element
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSliderBase::SendCurrentValue(void)
 {
    if (this->mpc_SliderWidget != NULL)
@@ -308,13 +271,10 @@ void C_GiSvDaSliderBase::SendCurrentValue(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Call properties for widgets
-
-   \created     13.09.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Call properties for widgets
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaSliderBase::CallProperties(void)
 {
    const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
@@ -372,7 +332,10 @@ bool C_GiSvDaSliderBase::CallProperties(void)
             c_Tmp.c_ElementId = pc_Dialog->GetDataElementId();
             c_Tmp.c_ElementScaling = pc_Dialog->GetScalingInformation();
             c_Box.c_DataPoolElementsConfig.clear();
-            c_Box.c_DataPoolElementsConfig.push_back(c_Tmp);
+            if (c_Tmp.c_ElementId.GetIsValid())
+            {
+               c_Box.c_DataPoolElementsConfig.push_back(c_Tmp);
+            }
             c_Box.e_ElementWriteMode = pc_Dialog->GetWriteMode();
 
             //Force update
@@ -382,7 +345,10 @@ bool C_GiSvDaSliderBase::CallProperties(void)
             this->SetDisplayStyle(this->me_Style, this->mq_DarkMode);
             this->UpdateTypePe(c_Box.e_Type, c_Box.q_ShowMinMax);
             this->ClearDataPoolElements();
-            this->RegisterDataPoolElement(pc_Dialog->GetDataElementId(), pc_Dialog->GetScalingInformation());
+            if (c_Tmp.c_ElementId.GetIsValid())
+            {
+               this->RegisterDataPoolElement(pc_Dialog->GetDataElementId(), pc_Dialog->GetScalingInformation());
+            }
 
             tgl_assert(C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex,
                                                                            this->mu32_DashboardIndex,
@@ -402,18 +368,15 @@ bool C_GiSvDaSliderBase::CallProperties(void)
    return true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update type
 
    Warning: Only use for preview
 
    \param[in] oe_Type        Type
    \param[in] oq_ShowMinMax  Show minimum / maximum
-
-   \created     13.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSliderBase::UpdateTypePe(const C_PuiSvDbSlider::E_Type oe_Type, const bool oq_ShowMinMax)
 {
    if (this->mpc_SliderWidget != NULL)
@@ -423,19 +386,16 @@ void C_GiSvDaSliderBase::UpdateTypePe(const C_PuiSvDbSlider::E_Type oe_Type, con
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set value
 
    Warning: Only use for preview
 
    \param[in] osn_Value   New value
    \param[in] osn_Min     New min value
    \param[in] osn_Max     New max value
-
-   \created     13.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSliderBase::SetValuePe(const sintn osn_Value, const sintn osn_Min, const sintn osn_Max)
 {
    if (this->mpc_SliderWidget != NULL)
@@ -446,7 +406,7 @@ void C_GiSvDaSliderBase::SetValuePe(const sintn osn_Value, const sintn osn_Min, 
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaSliderBase::m_UpdateStaticValues(void)
 {
    const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
@@ -585,17 +545,14 @@ void C_GiSvDaSliderBase::m_UpdateStaticValues(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get flag if this element was configured to react on change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get flag if this element was configured to react on change
 
    \return
    true  On change
    false Manual (default)
-
-   \created     09.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaSliderBase::m_IsOnChange(void) const
 {
    bool q_Retval = false;

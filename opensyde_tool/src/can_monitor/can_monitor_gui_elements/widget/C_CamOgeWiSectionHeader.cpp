@@ -1,53 +1,43 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Section header including a label and optional button for expand/collapse. (implementation)
 
    Section header including a label and optional button for expand/collapse.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.11.2018  STW/G.Landsgesell
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_CamOgeWiSectionHeader.h"
 #include "ui_C_CamOgeWiSectionHeader.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     20.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamOgeWiSectionHeader::C_CamOgeWiSectionHeader(QWidget * const opc_Parent) :
    C_OgeWiOnlyBackground(opc_Parent),
    mpc_Ui(new Ui::C_CamOgeWiSectionHeader),
@@ -70,28 +60,22 @@ C_CamOgeWiSectionHeader::C_CamOgeWiSectionHeader(QWidget * const opc_Parent) :
            this, &C_CamOgeWiSectionHeader::m_OnExpandToggled);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     20.11.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamOgeWiSectionHeader::~C_CamOgeWiSectionHeader()
 {
    delete this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set button type.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set button type.
 
    \param[in]     ore_ButtonType    Up down: button states are ^ and v
                                     Left right: button states are < and >
-
-   \created     20.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamOgeWiSectionHeader::SetIconType(const C_CamOgeWiSectionHeader::E_ButtonType & ore_ButtonType)
 {
    this->me_ButtonType = ore_ButtonType;
@@ -117,46 +101,37 @@ void C_CamOgeWiSectionHeader::SetIconType(const C_CamOgeWiSectionHeader::E_Butto
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set state of button.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set state of button.
 
    \param[in]     orq_IsOpen     true: section is open; false: section is closed
-
-   \created     21.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamOgeWiSectionHeader::SetOpen(const bool & orq_IsOpen) const
 {
    this->mpc_Ui->pc_PushButton->setChecked(orq_IsOpen);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set title of section.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set title of section.
 
    \param[in]     orc_Title      Title
-
-   \created     20.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamOgeWiSectionHeader::SetTitle(const QString & orc_Title) const
 {
    this->mpc_Ui->pc_Label->setText(orc_Title.toUpper());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for button toggle.
-
-   \created     05.02.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for button toggle.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamOgeWiSectionHeader::m_OnExpandToggled(const bool oq_Expand)
 {
    Q_EMIT (this->SigExpandSection(oq_Expand));
 
-   if(this->me_ButtonType == E_ButtonType::eLEFTRIGHT)
+   if (this->me_ButtonType == E_ButtonType::eLEFTRIGHT)
    {
       this->mpc_Ui->pc_Label->setVisible(oq_Expand);
    }

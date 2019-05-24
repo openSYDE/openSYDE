@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Setup style undo command (implementation)
 
    Setup style undo command
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.07.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -25,35 +18,32 @@
 #include "C_GiBiTextElement.h"
 #include "C_SebUnoSetupStyleCommand.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Scene   Pointer to currently active scene
    \param[in]     orc_IDs     Affected unique IDs
    \param[in]     oq_DarkMode Optional flag if dark mode is active
    \param[in,out] opc_Parent  Optional pointer to parent
-
-   \created     25.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoSetupStyleCommand::C_SebUnoSetupStyleCommand(QGraphicsScene * const opc_Scene,
                                                      const std::vector<uint64> & orc_IDs, const bool oq_DarkMode,
                                                      QUndoCommand * const opc_Parent) :
@@ -64,83 +54,65 @@ C_SebUnoSetupStyleCommand::C_SebUnoSetupStyleCommand(QGraphicsScene * const opc_
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     25.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoSetupStyleCommand::~C_SebUnoSetupStyleCommand(void)
 {
    delete (mpc_PreviousState);
    delete (mpc_NextState);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal for registering setup style start
-
-   \created     25.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal for registering setup style start
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoSetupStyleCommand::InitPrevious(void)
 {
    std::vector<QGraphicsItem *> c_Items = m_GetSceneItems();
    m_CreateMapAndSaveState(c_Items, this->mc_MapIDToTypeAndIndexPrevious, this->mpc_PreviousState);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal for registering setup style complete
-
-   \created     06.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal for registering setup style complete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoSetupStyleCommand::InitNext(void)
 {
    std::vector<QGraphicsItem *> c_Items = m_GetSceneItems();
    m_CreateMapAndSaveState(c_Items, this->mc_MapIDToTypeAndIndexNext, this->mpc_NextState);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Undo style
-
-   \created     06.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Undo style
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoSetupStyleCommand::undo()
 {
    m_Restore(this->mc_MapIDToTypeAndIndexPrevious, this->mpc_PreviousState);
    QUndoCommand::undo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Redo style
-
-   \created     06.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Redo style
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoSetupStyleCommand::redo()
 {
    m_Restore(this->mc_MapIDToTypeAndIndexNext, this->mpc_NextState);
    QUndoCommand::redo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore all style features for all internally stored items from the snapshot using the preserved mapping
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore all style features for all internally stored items from the snapshot using the preserved mapping
 
    \param[out] orc_MapIDToTypeAndIndex Map for ID to state data entry
    \param[out] opc_Snapshot            Preserved state data
-
-   \created     06.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoSetupStyleCommand::m_Restore(const QMap<uint64, C_PuiBsTemporaryDataID> & orc_MapIDToTypeAndIndex,
                                           const C_PuiBsElements * const opc_Snapshot)
 {
@@ -231,17 +203,14 @@ void C_SebUnoSetupStyleCommand::m_Restore(const QMap<uint64, C_PuiBsTemporaryDat
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save all style features of the specified items in the snapshot and preserve a mapping for later access
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save all style features of the specified items in the snapshot and preserve a mapping for later access
 
    \param[in]  orc_Items    Items to save style features for
    \param[out] orc_Map      Map for ID to state data entry
    \param[out] orc_Snapshot Preserved state data
-
-   \created     06.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoSetupStyleCommand::m_CreateMapAndSaveState(const std::vector<QGraphicsItem *> & orc_Items, QMap<uint64,
                                                                                                              C_PuiBsTemporaryDataID> & orc_Map,
                                                         C_PuiBsElements * const opc_Snapshot) const

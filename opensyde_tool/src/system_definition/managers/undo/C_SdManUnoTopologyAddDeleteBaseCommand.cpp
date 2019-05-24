@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Add and delete base class for system definition items (implementation)
 
    These classes will probably require a lot of common functions
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.11.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -35,7 +28,7 @@
 #include "C_PuiSdHandler.h"
 #include "TGLUtils.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_tgl;
 using namespace std;
@@ -43,31 +36,28 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Scene               Pointer to currently active scene
    \param[in]     orc_IDs                 Affected unique IDs
    \param[in]     orc_Text                Command description
    \param[in,out] opc_Parent              Optional pointer to parent
    \param[in]     orc_InitialSnapshotData Initial snapshot data
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyAddDeleteBaseCommand::C_SdManUnoTopologyAddDeleteBaseCommand(QGraphicsScene * const opc_Scene,
                                                                                const std::vector<stw_types::uint64> & orc_IDs, const QString & orc_Text, QUndoCommand * const opc_Parent,
                                                                                const C_SdTopologyDataSnapshot & orc_InitialSnapshotData)
@@ -78,28 +68,22 @@ C_SdManUnoTopologyAddDeleteBaseCommand::C_SdManUnoTopologyAddDeleteBaseCommand(Q
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     22.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyAddDeleteBaseCommand::~C_SdManUnoTopologyAddDeleteBaseCommand(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Filter all relevant objects
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Filter all relevant objects
 
    \param[in]  orc_AllItems         All available items
    \param[in]  orc_SelectedItems    All selected items
    \param[out] orc_AllRelevantItems Filtered items
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyAddDeleteBaseCommand::h_GetAllRelevantObjects(const QList<QGraphicsItem *> & orc_AllItems,
                                                                      const QList<QGraphicsItem *> & orc_SelectedItems,
                                                                      QList<QGraphicsItem *> & orc_AllRelevantItems)
@@ -137,28 +121,22 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::h_GetAllRelevantObjects(const QList
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get backup data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get backup data
 
    \return
    Current backup data
-
-   \created     24.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdTopologyDataSnapshot C_SdManUnoTopologyAddDeleteBaseCommand::GetDataBackup() const
 {
    return this->mc_DataBackup;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete all relevant items and save them to internal backup
-
-   \created     23.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete all relevant items and save them to internal backup
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyAddDeleteBaseCommand::m_DeleteSave(void)
 {
    m_SaveToData();
@@ -166,13 +144,10 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_DeleteSave(void)
    Q_EMIT this->SigErrorChange();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore all items
-
-   \created     23.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore all items
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyAddDeleteBaseCommand::m_Restore(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -185,78 +160,63 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_Restore(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get boundary element type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get boundary element type
 
    \return
    Boundary element type
-
-   \created     20.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdManUnoTopologyAddDeleteBaseCommand::GetBoundaryType(void) const
 {
    return static_cast<sint32>(C_PuiSdDataElement::eBOUNDARY);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get image element type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get image element type
 
    \return
    Image element type
-
-   \created     20.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdManUnoTopologyAddDeleteBaseCommand::GetImageType(void) const
 {
    return static_cast<sint32>(C_PuiSdDataElement::eIMAGE);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get line arrow element type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get line arrow element type
 
    \return
    Line arrow element type
-
-   \created     20.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdManUnoTopologyAddDeleteBaseCommand::GetLineArrowType(void) const
 {
    return static_cast<sint32>(C_PuiSdDataElement::eLINE_ARROW);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get text element type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get text element type
 
    \return
    Text element type
-
-   \created     20.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdManUnoTopologyAddDeleteBaseCommand::GetTextElementType(void) const
 {
    return static_cast<sint32>(C_PuiSdDataElement::eTEXT_ELEMENT);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add all busses which are under influence of the selected node or bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add all busses which are under influence of the selected node or bus
 
    \param[in]  orc_AllItems         All available items
    \param[in]  oru32_BusIndex       Bus index
    \param[in]  oru32_NodeIndex      Node index
    \param[out] orc_AllRelevantItems Filtered items
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyAddDeleteBaseCommand::mh_SearchAndAddAllAffectedBusConnectorsToTheFront(
    const QList<QGraphicsItem *> & orc_AllItems, const sint32 & ors32_BusIndex, const sint32 & ors32_NodeIndex,
    QList<QGraphicsItem *> & orc_AllRelevantItems)
@@ -292,17 +252,14 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::mh_SearchAndAddAllAffectedBusConnec
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add all busses which are under influence of the selected node or bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add all busses which are under influence of the selected node or bus
 
    \param[in]  orc_AllItems         All available items
    \param[in]  ou32_BusIndex        Unique bus index
    \param[out] orc_AllRelevantItems Filtered items
-
-   \created     20.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyAddDeleteBaseCommand::mh_SearchAndAddAllAffectedBusTextElementsToTheFront(
    const QList<QGraphicsItem *> & orc_AllItems, const uint32 ou32_BusIndex,
    QList<QGraphicsItem *> & orc_AllRelevantItems)
@@ -325,13 +282,10 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::mh_SearchAndAddAllAffectedBusTextEl
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save currently relevant system definition part to data
-
-   \created     22.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save currently relevant system definition part to data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyAddDeleteBaseCommand::m_SaveToData(void)
 {
    vector<QGraphicsItem *> c_RelatedItems = this->m_GetSceneItems();
@@ -535,26 +489,20 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_SaveToData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clear all data storage
-
-   \created     23.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clear all data storage
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyAddDeleteBaseCommand::m_Clear(void)
 {
    this->mc_MapTypeAndIndexToID.clear();
    this->mc_DataBackup.Clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete all relevant items
-
-   \created     23.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete all relevant items
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyAddDeleteBaseCommand::m_Delete(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2

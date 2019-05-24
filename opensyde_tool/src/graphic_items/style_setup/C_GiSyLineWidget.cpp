@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for bus style setup to customize bus optics
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     12.08.2016  STW/S.Singer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QColorDialog>
@@ -30,39 +23,36 @@
 #include "C_GiLiLine.h"
 #include "C_SdTopologyScene.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_types;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString mc_PATH_BACKGROUND_IMG = ":/images/graphic_items/TransparentBtnBackground.png";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in]     ou32_Mode   CAN-Bus / Ethernet-Bus or line
    \param[in]     orc_Scene   Used scene for preview
    \param[in,out] orc_Parent  Reference to parent
-
-   \created     12.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSyLineWidget::C_GiSyLineWidget(const E_Type oe_Mode, C_GiSyBaseWidget & orc_Parent) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_GiSyLineWidget),
@@ -163,15 +153,12 @@ C_GiSyLineWidget::C_GiSyLineWidget(const E_Type oe_Mode, C_GiSyBaseWidget & orc_
    mh_InitArrow(this->mpc_Ui->pc_ComboBoxEndArrow);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     12.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSyLineWidget::~C_GiSyLineWidget(void)
 {
    delete mpc_Ui;
@@ -179,13 +166,10 @@ C_GiSyLineWidget::~C_GiSyLineWidget(void)
    // and Qt management takes care of the rest
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     28.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyLineWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelWidth->setText(C_GtGetText::h_GetText("Width"));
@@ -196,13 +180,10 @@ void C_GiSyLineWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelLineEndArrow->setText(C_GtGetText::h_GetText("End Type"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On Show Event
-
-   \created     19.12.2016  STW/S.Singer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On Show Event
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyLineWidget::showEvent(QShowEvent * const opc_Event)
 {
    //color
@@ -216,58 +197,46 @@ void C_GiSyLineWidget::showEvent(QShowEvent * const opc_Event)
    QWidget::showEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get actual line width
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get actual line width
 
    \return  Actual line width
-
-   \created     12.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_types::sintn C_GiSyLineWidget::GetLineWidth(void) const
 {
    return this->mpc_Ui->pc_SpinBoxWidth->value();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set line width
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set line width
 
    \param[in]  orc_Value   New line width
-
-   \created     12.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyLineWidget::SetLineWidth(const stw_types::sintn osn_Value)
 {
    this->mpc_Ui->pc_SpinBoxWidth->setValue(osn_Value);
    m_UpdatePreview();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get actual color of line
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get actual color of line
 
    \return  Actual line color
-
-   \created     12.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QColor C_GiSyLineWidget::GetLineColor(void) const
 {
    return this->mc_Color;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set line color
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set line color
 
    \param[in]  orc_Value   New line color
-
-   \created     12.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyLineWidget::SetLineColor(const QColor & orc_Value)
 {
    QString c_Style = this->mpc_Ui->pc_BushButtonColor->styleSheet();
@@ -280,29 +249,23 @@ void C_GiSyLineWidget::SetLineColor(const QColor & orc_Value)
    this->m_UpdatePreview();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   GetInnerlineColor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   GetInnerlineColor
 
    \return  Actual color of inner line
-
-   \created     12.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QColor C_GiSyLineWidget::GetInnerLineColor(void) const
 {
    return this->mc_InnerLineColor;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set inner line color
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set inner line color
 
    \param[in]  orc_Value   New inner line color
-
-   \created     12.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyLineWidget::SetInnerLineColor(const QColor & orc_Value)
 {
    QString c_Style = this->mpc_Ui->pc_BushButtonColorInner->styleSheet();
@@ -315,30 +278,24 @@ void C_GiSyLineWidget::SetInnerLineColor(const QColor & orc_Value)
    m_UpdatePreview();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get line style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get line style
 
    \return  Actual style of line
-
-   \created     07.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType C_GiSyLineWidget::GetLineStyle(void) const
 {
    return static_cast<stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType>(
       this->mpc_Ui->pc_ComboBoxLineStyle->currentIndex());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set line style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set line style
 
    \param[in]  orc_Value   New style of line
-
-   \created     07.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyLineWidget::SetLineStyle(const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType oe_Value)
 {
    // set the state of the combo box
@@ -347,30 +304,24 @@ void C_GiSyLineWidget::SetLineStyle(const stw_opensyde_gui_logic::C_PuiBsLineArr
    m_UpdatePreview();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get the arrow type on the start of the line
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get the arrow type on the start of the line
 
    \return  Actual start arrow of line
-
-   \created     07.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType C_GiSyLineWidget::GetStartArrow(void) const
 {
    return static_cast<stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType>(
       this->mpc_Ui->pc_ComboBoxStartArrow->currentIndex());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set the arrow type on the start of the line
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set the arrow type on the start of the line
 
    \param[in]  orc_Value   New start arrow of line
-
-   \created     07.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyLineWidget::SetStartArrow(const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType oe_Value)
 {
    // set the state of the combo box
@@ -379,30 +330,24 @@ void C_GiSyLineWidget::SetStartArrow(const stw_opensyde_gui_logic::C_PuiBsLineAr
    m_UpdatePreview();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get the arrow type on the end of the line
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get the arrow type on the end of the line
 
    \return  Actual end arrow of line
-
-   \created     07.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType C_GiSyLineWidget::GetEndArrow(void) const
 {
    return static_cast<stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType>(
       this->mpc_Ui->pc_ComboBoxEndArrow->currentIndex());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set the arrow type on the end of the line
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set the arrow type on the end of the line
 
    \param[in]  orc_Value   New end arrow of line
-
-   \created     07.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyLineWidget::SetEndArrow(const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType oe_Value)
 {
    // set the state of the combo box
@@ -411,13 +356,10 @@ void C_GiSyLineWidget::SetEndArrow(const stw_opensyde_gui_logic::C_PuiBsLineArro
    m_UpdatePreview();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update of preview click
-
-   \created     17.08.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update of preview click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyLineWidget::m_UpdatePreview(void)
 {
    const QSize c_ViewSize = C_GiSyBaseWidget::h_GetSceneViewSize();
@@ -515,15 +457,12 @@ void C_GiSyLineWidget::m_UpdatePreview(void)
    this->mpc_ParentDialog->GetPreviewScene()->clearSelection();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Color button
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Color button
 
    Offers the possibility to choose a color for the line
-
-   \created     17.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyLineWidget::m_ColorClicked(void)
 {
    QString c_Style = this->mpc_Ui->pc_BushButtonColor->styleSheet();
@@ -546,15 +485,12 @@ void C_GiSyLineWidget::m_ColorClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of inner color button
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of inner color button
 
    Offers the possibility to choose a color for the inner line
-
-   \created     17.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyLineWidget::m_ColorInnerClicked(void)
 {
    QString c_Style = this->mpc_Ui->pc_BushButtonColorInner->styleSheet();
@@ -577,28 +513,22 @@ void C_GiSyLineWidget::m_ColorInnerClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of spin box changed
-
-   \created     17.08.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of spin box changed
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyLineWidget::m_ValueChanged(void)
 {
    this->m_UpdatePreview();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init any arrow selection box
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init any arrow selection box
 
    \param[in,out] opc_ComboBox ComboBox to initialize with arrows
    \param[in]     orq_Rotate   Flag if content should be rotated 180 degrees
-
-   \created     14.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSyLineWidget::mh_InitArrow(C_OgeCbxIconOnly * const opc_ComboBox, const bool & orq_Rotate)
 {
    if (opc_ComboBox != NULL)

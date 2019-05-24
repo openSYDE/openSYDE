@@ -1,21 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Node data pool reader/writer (header)
+   \brief       Node data pool reader/writer (V3) (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     10.01.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
-#ifndef C_OSCNODEDATAPOOLFILER_H
-#define C_OSCNODEDATAPOOLFILER_H
+//----------------------------------------------------------------------------------------------------------------------
+#ifndef C_OSCNODEDATAPOOLFILERV3_H
+#define C_OSCNODEDATAPOOLFILERV3_H
 
 /* -- Includes ------------------------------------------------------------- */
 
@@ -35,21 +29,18 @@ public:
    C_OSCNodeDataPoolFiler();
 
    ///load functions
-   static stw_types::sint32 h_LoadDataPool(const stw_types::uint16 ou16_XmlFormatVersion,
-                                           C_OSCNodeDataPool & orc_NodeDataPool, C_OSCXMLParserBase & orc_XMLParser);
-   static stw_types::sint32 h_LoadDataPoolList(const stw_types::uint16 ou16_XmlFormatVersion,
-                                               C_OSCNodeDataPoolList & orc_NodeDataPoolList,
+   static stw_types::sint32 h_LoadDataPoolFile(C_OSCNodeDataPool & orc_NodeDataPool,
+                                               const stw_scl::C_SCLString & orc_FilePath);
+   static stw_types::sint32 h_LoadDataPool(C_OSCNodeDataPool & orc_NodeDataPool, C_OSCXMLParserBase & orc_XMLParser);
+   static stw_types::sint32 h_LoadDataPoolList(C_OSCNodeDataPoolList & orc_NodeDataPoolList,
                                                C_OSCXMLParserBase & orc_XMLParser);
-   static stw_types::sint32 h_LoadDataPoolElement(const stw_types::uint16 ou16_XmlFormatVersion,
-                                                  C_OSCNodeDataPoolListElement & orc_NodeDataPoolListElement,
+   static stw_types::sint32 h_LoadDataPoolElement(C_OSCNodeDataPoolListElement & orc_NodeDataPoolListElement,
                                                   C_OSCXMLParserBase & orc_XMLParser);
-   static stw_types::sint32 h_LoadDataPoolLists(const stw_types::uint16 ou16_XmlFormatVersion,
-                                                std::vector<C_OSCNodeDataPoolList> & orc_NodeDataPoolLists,
+   static stw_types::sint32 h_LoadDataPoolLists(std::vector<C_OSCNodeDataPoolList> & orc_NodeDataPoolLists,
                                                 C_OSCXMLParserBase & orc_XMLParser);
-   static stw_types::sint32 h_LoadDataPoolListElements(const stw_types::uint16 ou16_XmlFormatVersion,
-                                                       std::vector<C_OSCNodeDataPoolListElement> & orc_NodeDataPoolListElements, C_OSCXMLParserBase & orc_XMLParser);
-   static stw_types::sint32 h_LoadDataPoolListElementDataSetValues(const stw_types::uint16 ou16_XmlFormatVersion,
-                                                                   const C_OSCNodeDataPoolContent & orc_ContentType,
+   static stw_types::sint32 h_LoadDataPoolListElements(
+      std::vector<C_OSCNodeDataPoolListElement> & orc_NodeDataPoolListElements, C_OSCXMLParserBase & orc_XMLParser);
+   static stw_types::sint32 h_LoadDataPoolListElementDataSetValues(const C_OSCNodeDataPoolContent & orc_ContentType,
                                                                    std::vector<C_OSCNodeDataPoolContent> & orc_NodeDataPoolListElementDataSetValues, C_OSCXMLParserBase & orc_XMLParser);
    static stw_types::sint32 h_LoadDataPoolElementType(C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
                                                       C_OSCXMLParserBase & orc_XMLParser);
@@ -59,6 +50,8 @@ public:
                                                     C_OSCXMLParserBase & orc_XMLParser);
 
    ///save functions
+   static stw_types::sint32 h_SaveDataPoolFile(const C_OSCNodeDataPool & orc_NodeDataPool,
+                                               const stw_scl::C_SCLString & orc_FilePath);
    static void h_SaveDataPool(const C_OSCNodeDataPool & orc_NodeDataPool, C_OSCXMLParserBase & orc_XMLParser);
    static void h_SaveDataPoolList(const C_OSCNodeDataPoolList & orc_NodeDataPoolList,
                                   C_OSCXMLParserBase & orc_XMLParser);
@@ -87,6 +80,7 @@ public:
                                           C_OSCXMLParserBase & orc_XMLParser);
    static void h_SaveDataPoolContentV1(const C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
                                        C_OSCXMLParserBase & orc_XMLParser);
+   static stw_scl::C_SCLString h_GetFileName(const stw_scl::C_SCLString & orc_DatapoolName);
 
 private:
    static stw_scl::C_SCLString mh_NodeDataPoolContentToString(

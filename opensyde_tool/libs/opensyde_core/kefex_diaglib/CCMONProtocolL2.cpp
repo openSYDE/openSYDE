@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       CAN message to text conversion class for layer 2 CAN messages
 
@@ -8,25 +7,11 @@
    The interpretation is based on no high level protocol.
    The raw CAN message data will be returned as a string.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.04.2010  STW/A.Stangl
-   \endimplementation
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author              Description
-   26.08.2010        STW/A.Stangl        Only display a maximum of 8 bytes (even if the DLC is greater)
-                                          prevents potential out-of-bounds read access
-   21.04.2010        STW/A.Stangl        file created (moved code here from CCMONProtocol.cpp)
-   \endhistory
+   \copyright   Copyright 2010 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -38,37 +23,34 @@
 #include "CCMONProtocolL2.h"
 #include "CSCLString.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_cmon_protocol;
 using namespace stw_scl;
 using namespace stw_can;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert CAN message to text representation.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert CAN message to text representation.
 
    \param[in]     orc_Msg              message to convert
 
    \return
    Text interpretation of CAN message ("" if the message can not be interpreted)
-
-   \created     xx.xx.20xx  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolL2::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) const
 {
    C_SCLString c_Text;
@@ -108,20 +90,17 @@ C_SCLString C_CMONProtocolL2::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) c
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get name of protocol as string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get name of protocol as string
 
    \return
    Text representation of protocol name
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolL2::GetProtocolName(void) const
 {
    return "CAN Layer 2";
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 

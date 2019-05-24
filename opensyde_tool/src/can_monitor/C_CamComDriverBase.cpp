@@ -1,68 +1,54 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Thread safe core communication driver base class (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     08.10.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_CamComDriverBase.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_tgl;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     08.10.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamComDriverBase::C_CamComDriverBase(void) :
    C_OSCComDriverBase()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     08.10.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamComDriverBase::~C_CamComDriverBase(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Starts the logging
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Starts the logging
 
    This function is thread safe
 
@@ -71,10 +57,8 @@ C_CamComDriverBase::~C_CamComDriverBase(void)
    \return
    C_NO_ERR                          CAN initialized and logging started
    C_CONFIG                          CAN dispatcher is not set
-
-   \created     25.01.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamComDriverBase::StartLogging(const stw_types::sint32 os32_Bitrate)
 {
    sint32 s32_Return;
@@ -86,15 +70,12 @@ sint32 C_CamComDriverBase::StartLogging(const stw_types::sint32 os32_Bitrate)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Stops the logging
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Stops the logging
 
    This function is thread safe
-
-   \created     25.01.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamComDriverBase::StopLogging(void)
 {
    this->mc_CriticalSectionMsg.Acquire();
@@ -102,15 +83,12 @@ void C_CamComDriverBase::StopLogging(void)
    this->mc_CriticalSectionMsg.Release();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Continues the paused the logging
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Continues the paused the logging
 
    This function is thread safe
-
-   \created     25.01.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamComDriverBase::ContinueLogging(void)
 {
    this->mc_CriticalSectionMsg.Acquire();
@@ -118,15 +96,12 @@ void C_CamComDriverBase::ContinueLogging(void)
    this->mc_CriticalSectionMsg.Release();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Pauses the logging.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Pauses the logging.
 
    This function is thread safe
-
-   \created     25.01.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamComDriverBase::PauseLogging(void)
 {
    this->mc_CriticalSectionMsg.Acquire();
@@ -134,15 +109,12 @@ void C_CamComDriverBase::PauseLogging(void)
    this->mc_CriticalSectionMsg.Release();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update the bitrate to adapt the calculation for the bus load
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update the bitrate to adapt the calculation for the bus load
 
    \param[in]  os32_Bitrate          CAN bitrate in kBit/s. Is used for the bus load calculation not the initialization
-
-   \created     01.02.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamComDriverBase::UpdateBitrate(const sint32 os32_Bitrate)
 {
    this->mc_CriticalSectionMsg.Acquire();
@@ -150,15 +122,12 @@ void C_CamComDriverBase::UpdateBitrate(const sint32 os32_Bitrate)
    this->mc_CriticalSectionMsg.Release();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Distributes the CAN message to all registered C_OSCMessageLogger instances.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Distributes the CAN message to all registered C_OSCMessageLogger instances.
 
    This function is thread safe
-
-   \created     08.10.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamComDriverBase::DistributeMessages(void)
 {
    this->mc_CriticalSectionMsg.Acquire();
@@ -166,15 +135,12 @@ void C_CamComDriverBase::DistributeMessages(void)
    this->mc_CriticalSectionMsg.Release();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sending a CAN message by putting it into the queue
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sending a CAN message by putting it into the queue
 
    This function is thread safe
-
-   \created     08.10.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamComDriverBase::SendCanMessageQueued(const stw_can::T_STWCAN_Msg_TX & orc_Msg)
 {
    this->mc_CriticalSectionMsg.Acquire();
@@ -182,18 +148,15 @@ void C_CamComDriverBase::SendCanMessageQueued(const stw_can::T_STWCAN_Msg_TX & o
    this->mc_CriticalSectionMsg.Release();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sends a CAN message with a specific configuration
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sends a CAN message with a specific configuration
 
    Interval is ignored in this function.
    Use AddCyclicCanMessage for registration of a cyclic CAN message.
 
    \param[in]     orc_MsgCfg         CAN message configuration
-
-   \created     21.12.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamComDriverBase::SendCanMessage(const C_OSCComDriverBaseCanMessage & orc_MsgCfg)
 {
    this->mc_CriticalSectionMsg.Acquire();
@@ -201,15 +164,12 @@ void C_CamComDriverBase::SendCanMessage(const C_OSCComDriverBaseCanMessage & orc
    this->mc_CriticalSectionMsg.Release();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Registers a cyclic CAN message with a specific configuration
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Registers a cyclic CAN message with a specific configuration
 
    \param[in]     orc_MsgCfg         CAN message configuration
-
-   \created     21.12.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamComDriverBase::AddCyclicCanMessage(const C_OSCComDriverBaseCanMessage & orc_MsgCfg)
 {
    this->mc_CriticalSectionMsg.Acquire();
@@ -217,15 +177,12 @@ void C_CamComDriverBase::AddCyclicCanMessage(const C_OSCComDriverBaseCanMessage 
    this->mc_CriticalSectionMsg.Release();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Removes a cyclic CAN message with a specific configuration
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Removes a cyclic CAN message with a specific configuration
 
    \param[in]     orc_MsgCfg         CAN message configuration
-
-   \created     21.12.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamComDriverBase::RemoveCyclicCanMessage(const C_OSCComDriverBaseCanMessage & orc_MsgCfg)
 {
    this->mc_CriticalSectionMsg.Acquire();
@@ -233,13 +190,10 @@ void C_CamComDriverBase::RemoveCyclicCanMessage(const C_OSCComDriverBaseCanMessa
    this->mc_CriticalSectionMsg.Release();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Removes all cyclic CAN messages
-
-   \created     21.12.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Removes all cyclic CAN messages
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamComDriverBase::RemoveAllCyclicCanMessages(void)
 {
    this->mc_CriticalSectionMsg.Acquire();

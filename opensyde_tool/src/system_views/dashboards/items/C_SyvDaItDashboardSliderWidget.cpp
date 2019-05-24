@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget base for dashboard slider widget
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     17.08.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -21,35 +15,32 @@
 #include "C_SyvDaItDashboardSliderWidget.h"
 #include "ui_C_SyvDaItDashboardSliderWidget.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     17.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItDashboardSliderWidget::C_SyvDaItDashboardSliderWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvDaItDashboardSliderWidget),
@@ -67,46 +58,37 @@ C_SyvDaItDashboardSliderWidget::C_SyvDaItDashboardSliderWidget(QWidget * const o
            &C_SyvDaItDashboardSliderWidget::SigOnChange);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     17.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItDashboardSliderWidget::~C_SyvDaItDashboardSliderWidget(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set current style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set current style
 
    \param[in] oe_Style  Widget style
    \param[in] oq_IsDark Dark mode active flag
-
-   \created     23.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardSliderWidget::SetCurrentStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style,
                                                      const bool oq_IsDark) const
 {
    this->mpc_Ui->pc_HorizontalSlider->SetCurrentStyle(oe_Style, oq_IsDark);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply style
 
    \param[in] oe_Style New style type
    \param[in] oe_Type  New item type
-
-   \created     18.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardSliderWidget::SetDisplayStyle(const stw_opensyde_gui_logic::C_PuiSvDbSlider::E_Type oe_Type)
 const
 {
@@ -129,13 +111,10 @@ const
    this->mpc_Ui->pc_LabelMax->setFont(c_Font);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adjust font to current size
-
-   \created     17.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adjust font to current size
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardSliderWidget::AdjustFontToSize(void) const
 {
    const sintn sn_Margins = 2 * 6;
@@ -156,16 +135,13 @@ void C_SyvDaItDashboardSliderWidget::AdjustFontToSize(void) const
    C_SyvDaItUtil::h_SyncFontSize(this->mpc_Ui->pc_LabelMin, this->mpc_Ui->pc_LabelMax);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set minimum
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set minimum
 
    \param[in] osn_Value  New minimum
    \param[in] orc_String New displayed minimum
-
-   \created     21.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardSliderWidget::SetMin(const sintn osn_Value, const QString & orc_String)
 {
    this->mpc_Ui->pc_HorizontalSlider->setMinimum(osn_Value);
@@ -174,16 +150,13 @@ void C_SyvDaItDashboardSliderWidget::SetMin(const sintn osn_Value, const QString
    this->m_UpdateLabels();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set maximum
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set maximum
 
    \param[in] osn_Value  New maximum
    \param[in] orc_String New displayed maximum
-
-   \created     21.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardSliderWidget::SetMax(const sintn osn_Value, const QString & orc_String)
 {
    this->mpc_Ui->pc_HorizontalSlider->setMaximum(osn_Value);
@@ -192,15 +165,12 @@ void C_SyvDaItDashboardSliderWidget::SetMax(const sintn osn_Value, const QString
    this->m_UpdateLabels();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the flag for showing minimum and maximum
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the flag for showing minimum and maximum
 
    \param[in]     oq_Value       Flag for showing minimum and maximum
-
-   \created     13.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardSliderWidget::SetShowMinMax(const bool oq_Value)
 {
    this->mq_ShowMinMax = oq_Value;
@@ -208,48 +178,39 @@ void C_SyvDaItDashboardSliderWidget::SetShowMinMax(const bool oq_Value)
    this->m_UpdateLabels();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set value
 
    \param[in] orc_Value New value
-
-   \created     21.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardSliderWidget::SetValue(const sintn osn_Value) const
 {
    this->mpc_Ui->pc_HorizontalSlider->SetValueCustom(osn_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get value
 
    \return
    Actual value
-
-   \created     29.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SyvDaItDashboardSliderWidget::GetValue(void) const
 {
    return this->mpc_Ui->pc_HorizontalSlider->value();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set parameter for tooltip display format
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set parameter for tooltip display format
 
    Formula: ((Value - of64_ToolTipRangeOffset) * of64_ToolTipFactor) + of64_ToolTipOffset
 
    \param[in] of64_ToolTipRangeOffset See formula
    \param[in] of64_ToolTipOffset      See formula
    \param[in] of64_ToolTipFactor      See formula
-
-   \created     22.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardSliderWidget::SetToolTipParameters(const float64 of64_ToolTipRangeOffset,
                                                           const float64 of64_ToolTipOffset,
                                                           const float64 of64_ToolTipFactor,
@@ -260,17 +221,14 @@ const
                                                            of64_ToolTipFactor, oe_RepresentationType);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten resize event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten resize event slot
 
    Here: Handle resize specific update
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     18.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardSliderWidget::resizeEvent(QResizeEvent * const opc_Event)
 {
    QWidget::resizeEvent(opc_Event);
@@ -278,7 +236,7 @@ void C_SyvDaItDashboardSliderWidget::resizeEvent(QResizeEvent * const opc_Event)
    AdjustFontToSize();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_SyvDaItDashboardSliderWidget::m_UpdateLabels(void) const
 {

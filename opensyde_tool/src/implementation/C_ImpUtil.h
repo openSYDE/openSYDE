@@ -1,35 +1,29 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Class for use case implementation functionality (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     16.10.2017  STW/G.Landsgesell
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_IMPUTIL_H
 #define C_IMPUTIL_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <windows.h>
 #include <QWidget>
 #include <QString>
 #include "stwtypes.h"
 #include "C_OSCNodeApplication.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_ImpUtil
 {
@@ -49,6 +43,8 @@ public:
    static QString h_GetAbsolutePathFromProject(const QString & orc_Path);
    static QString h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const QString & orc_Path,
                                               const QString & orc_AbsoluteReferenceDir);
+   static QStringList h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const QStringList & orc_Paths,
+                                                  const QString & orc_AbsoluteReferenceDir);
 
 private:
    struct T_HandleData
@@ -68,7 +64,7 @@ private:
    static WINBOOL CALLBACK mh_EnumWindowsCallback(HWND opc_Handle, const LPARAM os32_LParam);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

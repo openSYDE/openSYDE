@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget to display one data pool list com header (implementation)
 
    Widget to display one data pool list com header
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     23.03.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QPainter>
 #include "C_SdNdeDataPoolListComHeaderWidget.h"
 #include "ui_C_SdNdeDataPoolListComHeaderWidget.h"
@@ -29,7 +22,7 @@
 #include "C_CieDataPoolListStructure.h"
 #include "C_CieUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -38,21 +31,20 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -61,10 +53,8 @@ using namespace stw_opensyde_core;
    \param[in]     ou32_ListIndex          List index
    \param[in]     orq_UseAlternatingColor Flag for has alternative color
    \param[in,out] opc_Parent              Optional pointer to parent
-
-   \created     23.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListComHeaderWidget::C_SdNdeDataPoolListComHeaderWidget(const uint32 ou32_NodeIndex,
                                                                        const uint32 ou32_DataPoolIndex,
                                                                        const uint32 ou32_ListIndex,
@@ -120,27 +110,21 @@ C_SdNdeDataPoolListComHeaderWidget::C_SdNdeDataPoolListComHeaderWidget(const uin
            &C_SdNdeDataPoolListComHeaderWidget::m_OnLinkFileImport);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     23.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListComHeaderWidget::~C_SdNdeDataPoolListComHeaderWidget(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     23.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListComHeaderWidget::InitStaticNames(void)
 {
    this->mpc_Ui->pc_LabelConnected->setText(C_GtGetText::h_GetText("Used on: "));
@@ -152,29 +136,23 @@ void C_SdNdeDataPoolListComHeaderWidget::InitStaticNames(void)
                                                                "Import messages and signals from standard file formats (*.dbc, *.eds, *.dcf)"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get error active flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get error active flag
 
    \return
    True  Error active
    False Error inactive
-
-   \created     18.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolListComHeaderWidget::GetErrorActive(void) const
 {
    return this->mpc_Ui->pc_LabelListError->isVisible();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update message and signals label
-
-   \created     23.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update message and signals label
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListComHeaderWidget::UpdateMessagesAndSignals(void) const
 {
    const C_OSCNodeDataPoolList * const pc_DataPoolList1 = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
@@ -315,17 +293,14 @@ void C_SdNdeDataPoolListComHeaderWidget::UpdateMessagesAndSignals(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    Here: Manually draw background
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     24.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListComHeaderWidget::paintEvent(QPaintEvent * const opc_Event)
 {
    QPainter c_Painter(this);
@@ -336,13 +311,10 @@ void C_SdNdeDataPoolListComHeaderWidget::paintEvent(QPaintEvent * const opc_Even
    QWidget::paintEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update bus link & edit button
-
-   \created     18.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update bus link & edit button
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListComHeaderWidget::m_UpdateBusLink(void)
 {
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
@@ -441,25 +413,19 @@ void C_SdNdeDataPoolListComHeaderWidget::m_UpdateBusLink(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Forward signal
-
-   \created     23.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Forward signal
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListComHeaderWidget::m_OnLinkEdit(void)
 {
    Q_EMIT this->SigEdit(this->mu32_DataPoolIndex, this->mu32_ListIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Forward signal
-
-   \created     23.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Forward signal
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListComHeaderWidget::m_OnLinkSwitchToBus(void)
 {
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
@@ -484,13 +450,10 @@ void C_SdNdeDataPoolListComHeaderWidget::m_OnLinkSwitchToBus(void)
       }
    }
 }
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Forward signal
-
-   \created     06.04.2018  STW/D.Pohl
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Forward signal
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListComHeaderWidget::m_OnLinkFileImport(void)
 {
    sint32 s32_Return;

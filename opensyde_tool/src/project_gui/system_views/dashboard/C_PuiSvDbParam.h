@@ -1,33 +1,27 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       UI class for dashboard parameterization table data (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.10.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_PUISVDBPARAM_H
 #define C_PUISVDBPARAM_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 #include "C_PuiSvDbWidgetBase.h"
 #include "C_OSCNodeDataPoolListId.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_PuiSvDbExpandedTreeIndex
 {
 public:
@@ -46,6 +40,7 @@ public:
    stw_types::sint32 CheckError(const stw_opensyde_core::C_OSCNodeDataPoolListId & orc_ListId, bool & orq_Error) const;
    static stw_types::sint32 h_CheckMinMax(const stw_opensyde_core::C_OSCNodeDataPoolListElement & orc_Elem,
                                           const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Value, bool & orq_Ok);
+   virtual stw_types::sint32 RemoveElement(const stw_types::uint32 & oru32_Index);
 
    std::vector<stw_types::sint32> c_DataSetSelectionIndices; ///< Index of selected data set (-1 if
    ///< invalid)
@@ -63,7 +58,7 @@ public:
    ///<   visible index 2
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

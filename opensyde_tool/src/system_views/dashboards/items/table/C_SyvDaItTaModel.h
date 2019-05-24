@@ -1,35 +1,29 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Table model for dashboard table widget (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     29.08.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVDAITTAMODEL_H
 #define C_SYVDAITTAMODEL_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QAbstractTableModel>
 #include <QIcon>
 #include "stwtypes.h"
 #include "C_PuiSvDbWidgetBase.h"
 #include "C_PuiSvDbDataElementHandler.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_SyvDaItTaModel :
    public QAbstractTableModel
 {
@@ -97,22 +91,23 @@ private:
    std::vector<stw_types::sintn> mc_Transparency;
    std::vector<bool> mc_InterpretAsStringFlags;
    std::vector<bool> mc_ShowPercentage;
-   QIcon mc_IconParameter;
-   QIcon mc_IconSignal;
-   QIcon mc_IconVariable;
-   QIcon mc_IconParameterWarning;
-   QIcon mc_IconSignalWarning;
-   QIcon mc_IconVariableWarning;
-   QIcon mc_IconParameterError;
-   QIcon mc_IconSignalError;
-   QIcon mc_IconVariableError;
+   QString mc_IconParameter;
+   QString mc_IconSignal;
+   QString mc_IconVariable;
+   QString mc_IconParameterWarning;
+   QString mc_IconSignalWarning;
+   QString mc_IconVariableWarning;
+   QString mc_IconParameterError;
+   QString mc_IconSignalError;
+   QString mc_IconVariableError;
+
    QColor mc_TextColor;
 
    stw_types::float32 GetPercentage(const stw_types::uint32 ou32_Index) const;
    QString GetValue(const stw_types::uint32 ou32_Index) const;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

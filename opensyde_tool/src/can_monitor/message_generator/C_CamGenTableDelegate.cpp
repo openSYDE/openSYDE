@@ -1,35 +1,29 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Delegate component for message generator table (implementation)
 
    Delegate component for message generator table
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.02.2019  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_Uti.h"
 #include "constants.h"
 #include "C_TblDelegateUtil.h"
 #include "C_CamGenTableDelegate.h"
+#include "TGLUtils.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QColor C_CamGenTableDelegate::mhc_DefaultBorderColor = Qt::transparent;
 const QColor C_CamGenTableDelegate::mhc_DefaultBackgroundColor = Qt::transparent;
 const QFont C_CamGenTableDelegate::mhc_DefaultFont = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_12);
@@ -38,43 +32,37 @@ const QColor C_CamGenTableDelegate::mhc_HighlightForegroundColor = mc_STYLE_GUID
 const QColor C_CamGenTableDelegate::mhc_HighlightBorderColor = Qt::transparent;
 const QFont C_CamGenTableDelegate::mhc_HighlightFont = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_12);
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     06.02.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamGenTableDelegate::C_CamGenTableDelegate(QObject * const opc_Parent) :
    C_TblDelegate(opc_Parent)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paint item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paint item
 
    Here: paint data manually (for alignment)
 
    \param[in,out] opc_Painter Painter
    \param[in]     orc_Option  Option
    \param[in]     orc_Index   Index
-
-   \created     06.02.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableDelegate::paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
                                   const QModelIndex & orc_Index) const
 {
@@ -92,5 +80,7 @@ void C_CamGenTableDelegate::paint(QPainter * const opc_Painter, const QStyleOpti
                                             C_CamGenTableDelegate::mhc_HighlightBorderColor,
                                             C_CamGenTableDelegate::mhc_HighlightFont, 19, 25) == true)
    {
+      // to make sure text is not painted twice
+      tgl_assert(orc_Index.data(static_cast<sintn>(Qt::DisplayRole)).toString().isEmpty());
    }
 }

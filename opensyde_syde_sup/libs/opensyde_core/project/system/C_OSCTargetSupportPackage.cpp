@@ -1,52 +1,43 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       short description (implementation)
 
    detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.10.2018  STW/G.Landsgesell
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_OSCTargetSupportPackage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Constructor
 
    Initialize all class elements with default values
-
-   \created     02.10.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCTSPApplication::C_OSCTSPApplication(void) :
+   q_IsProgrammable(true),
    u8_ProcessId(0),
    c_Name(""),
    c_Comment(""),
@@ -59,36 +50,30 @@ C_OSCTSPApplication::C_OSCTSPApplication(void) :
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Constructor
 
    Initialize all class elements with default values
-
-   \created     01.10.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCTargetSupportPackage::C_OSCTargetSupportPackage(void) :
    c_DeviceName(""),
    c_Comment(""),
    u8_ApplicationIndex(0U),
-   u8_MaxParallelTransmissions(16U),
-   u16_MaxMessageBufferTx(512U),
-   u16_MaxRoutingMessageBufferRx(512U),
+   u8_MaxParallelTransmissions(64U),
+   u16_MaxMessageBufferTx(585U),
+   u16_MaxRoutingMessageBufferRx(585U),
    c_TemplatePath("")
 {
    c_Applications.clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clear elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clear elements
 
    Sets all strings to "" and other values to default.
-
-   \created     01.10.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCTargetSupportPackage::Clear(void)
 {
    c_DeviceName = "";
@@ -96,9 +81,9 @@ void C_OSCTargetSupportPackage::Clear(void)
    c_TemplatePath = "";
 
    u8_ApplicationIndex = 0U;
-   u8_MaxParallelTransmissions = 16U;
-   u16_MaxMessageBufferTx = 512U;
-   u16_MaxRoutingMessageBufferRx = 512U;
+   u8_MaxParallelTransmissions = 64U;
+   u16_MaxMessageBufferTx = 585U;
+   u16_MaxRoutingMessageBufferRx = 585U;
 
    c_Applications.clear();
 }

@@ -1,21 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \file        Ccan.cpp
+   \file
    \brief       C_CAN implementation
 
    Experimental CAN driver for MPC5200 Linux SocketCAN.
 
    Only for demonstration purposes. Not fully tested and implemented. Not really portable.
 
-   \implementation
-   project     Y_TC3
-   copyright   STW (c) 2012-2012
-   license     use only under terms of contract / confidential
-
-   created     2012-03-09  STW/T.Heilig
-   \endimplementation
+   \copyright   Copyright 2012 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------ */
 #include <cstdio>

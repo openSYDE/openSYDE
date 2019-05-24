@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       openSYDE: Diagnostic protocol driver abstract base class
 
    For details cf. documentation in .h file.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     02.03.2017  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -37,12 +30,9 @@ using namespace stw_opensyde_core;
 
 /* -- Implementation ------------------------------------------------------- */
 //-----------------------------------------------------------------------------
-/*!
-   \brief   constructor
+/*! \brief   constructor
 
    Set up class
-
-   \created     21.03.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_OSCDiagProtocolBase::C_OSCDiagProtocolBase(void) :
@@ -53,12 +43,9 @@ C_OSCDiagProtocolBase::C_OSCDiagProtocolBase(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   constructor
+/*! \brief   constructor
 
    Tear down class
-
-   \created     17.03.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_OSCDiagProtocolBase::~C_OSCDiagProtocolBase(void)
@@ -67,8 +54,7 @@ C_OSCDiagProtocolBase::~C_OSCDiagProtocolBase(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Initialization of the protocol
+/*! \brief   Initialization of the protocol
 
    Setting all callbacks for the async messages
 
@@ -76,8 +62,6 @@ C_OSCDiagProtocolBase::~C_OSCDiagProtocolBase(void)
    \param[in]  opr_DataPoolReadEventErrorReceived  function to be called if an async DataPoolReadEvent error message
                                                    is received
    \param[in]  opv_Instance                        instance pointer to pass back when invoking read event callback
-
-   \created     21.07.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCDiagProtocolBase::Initialize(const PR_DataPoolReadEventReceived opr_DataPoolReadEventReceived,

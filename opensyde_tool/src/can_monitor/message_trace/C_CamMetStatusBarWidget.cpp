@@ -1,24 +1,16 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget with all status information labels
  (implementation)
 
    Widget with all status information labels
 
-
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     15.11.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_CamMetStatusBarWidget.h"
@@ -27,33 +19,30 @@
 #include "C_GtGetText.h"
 #include "C_OgeWiUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     15.11.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMetStatusBarWidget::C_CamMetStatusBarWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_CamMetStatusBarWidget),
@@ -67,28 +56,22 @@ C_CamMetStatusBarWidget::C_CamMetStatusBarWidget(QWidget * const opc_Parent) :
    this->InitStaticNames();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     15.11.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMetStatusBarWidget::~C_CamMetStatusBarWidget()
 {
    delete this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     16.11.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetStatusBarWidget::InitStaticNames(void)
 {
-   this->SetBusLoad(0U);
+   this->SetBusLoad(0U, 0);
    this->SetTxErrors(0U);
    this->m_UpdateFilterLabel();
 
@@ -105,19 +88,20 @@ void C_CamMetStatusBarWidget::InitStaticNames(void)
       C_GtGetText::h_GetText("Number of failed tries to send CAN messages."));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the label with CAN bus load
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the label with CAN bus load
 
    \param[in]     ou8_BusLoad         CAN bus load in percentage
-
-   \created     16.11.2018  STW/B.Bayer
+   \param[in]     os32_CANBitrate     CAN bitrate
 */
-//-----------------------------------------------------------------------------
-void C_CamMetStatusBarWidget::SetBusLoad(const stw_types::uint8 ou8_BusLoad)
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetStatusBarWidget::SetBusLoad(const stw_types::uint8 ou8_BusLoad, const stw_types::sint32 os32_CANBitrate)
 {
-   this->mpc_Ui->pc_BusLoadLabel->setText(QString(C_GtGetText::h_GetText("Bus Load: %1%")).
-                                          arg(QString::number(ou8_BusLoad)));
+   const QString c_Bitrate =
+      (os32_CANBitrate > 0) ? QString(" (@%1 kBit/s)").arg(QString::number(os32_CANBitrate)) : "";
+
+   this->mpc_Ui->pc_BusLoadLabel->setText(QString(C_GtGetText::h_GetText("Bus Load: %1%%2")).
+                                          arg(QString::number(ou8_BusLoad)).arg(c_Bitrate));
 
    // Prevent applying the stylesheet each call
    if ((this->mq_BusLoadWarning == false) &&
@@ -140,15 +124,12 @@ void C_CamMetStatusBarWidget::SetBusLoad(const stw_types::uint8 ou8_BusLoad)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the label with TX errors
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the label with TX errors
 
    \param[in]     ou32_TxErrors         Count of TX errors
-
-   \created     16.11.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetStatusBarWidget::SetTxErrors(const stw_types::uint32 ou32_TxErrors)
 {
    if (ou32_TxErrors > 0U)
@@ -178,43 +159,34 @@ void C_CamMetStatusBarWidget::SetTxErrors(const stw_types::uint32 ou32_TxErrors)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the number of filtered CAN messages
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the number of filtered CAN messages
 
    \param[in]     ou32_FilteredMessages         Number of filtered messages
-
-   \created     29.11.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetStatusBarWidget::SetFilteredMessages(const stw_types::uint32 ou32_FilteredMessages)
 {
    this->mu32_FilteredMessages = ou32_FilteredMessages;
    this->m_UpdateFilterLabel();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the label with active filters
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the label with active filters
 
    \param[in]     ou32_ActiveFilters         Number of active CAN filters
-
-   \created     16.11.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetStatusBarWidget::SetActiveFilters(const stw_types::uint32 ou32_ActiveFilters)
 {
    this->mu32_ActiveFilters = ou32_ActiveFilters;
    this->m_UpdateFilterLabel();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update the filter label
-
-   \created     29.11.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update the filter label
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetStatusBarWidget::m_UpdateFilterLabel(void) const
 {
    if (this->mu32_ActiveFilters > 0U)

@@ -1,34 +1,29 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Parameter set file reader/writer base (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     12.10.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCPARAMSETFILERBASE_H
 #define C_OSCPARAMSETFILERBASE_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 #include "CSCLString.h"
 #include "C_OSCXMLParser.h"
 #include "C_OSCParamSetDataPoolInfo.h"
+#include "C_OSCParamSetInterpretedFileInfoData.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 ///filer class to read and write parameter set files
 class C_OSCParamSetFilerBase
@@ -37,6 +32,10 @@ public:
    static stw_types::sint32 h_AddCRC(const stw_scl::C_SCLString & orc_Path);
    static stw_types::sint32 h_CheckFileVersion(C_OSCXMLParserBase & orc_XMLParser);
    static void h_SaveFileVersion(C_OSCXMLParserBase & orc_XMLParser);
+   static void h_SaveFileInfo(C_OSCXMLParserBase & orc_XMLParser,
+                              const C_OSCParamSetInterpretedFileInfoData & orc_FileInfo);
+   static void h_LoadFileInfo(C_OSCXMLParserBase & orc_XMLParser, C_OSCParamSetInterpretedFileInfoData & orc_FileInfo,
+                              bool & orq_MissingOptionalContent);
 
 protected:
    C_OSCParamSetFilerBase(void);
@@ -44,11 +43,11 @@ protected:
    static stw_types::sint32 h_LoadNodeName(stw_scl::C_SCLString & orc_Name, C_OSCXMLParserBase & orc_XMLParser);
    static void h_SaveNodeName(const stw_scl::C_SCLString & orc_Name, C_OSCXMLParserBase & orc_XMLParser);
    static stw_types::sint32 h_LoadDataPoolInfos(std::vector<C_OSCParamSetDataPoolInfo> & orc_DataPoolInfos,
-                                                C_OSCXMLParserBase & orc_XMLParser);
+                                                C_OSCXMLParserBase & orc_XMLParser, bool & orq_MissingOptionalContent);
    static void h_SaveDataPoolInfos(const std::vector<C_OSCParamSetDataPoolInfo> & orc_DataPoolInfos,
                                    C_OSCXMLParserBase & orc_XMLParser);
    static stw_types::sint32 h_LoadDataPoolInfo(C_OSCParamSetDataPoolInfo & orc_DataPoolInfo,
-                                               C_OSCXMLParserBase & orc_XMLParser);
+                                               C_OSCXMLParserBase & orc_XMLParser, bool & orq_MissingOptionalContent);
    static void h_SaveDataPoolInfo(const C_OSCParamSetDataPoolInfo & orc_DataPoolInfo,
                                   C_OSCXMLParserBase & orc_XMLParser);
 
@@ -56,7 +55,7 @@ private:
    static stw_types::uint16 mhu16_FileVersion;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

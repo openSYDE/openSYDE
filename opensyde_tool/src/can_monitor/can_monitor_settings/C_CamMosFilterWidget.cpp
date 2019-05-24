@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for handling CAN Message filter configuration (implementation)
 
    Widget for handling CAN Message filter configuration
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     15.11.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QListWidgetItem>
@@ -35,35 +28,32 @@
 #include "C_UsHandler.h"
 #include "C_OgeWiCustomMessage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_types;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     15.11.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosFilterWidget::C_CamMosFilterWidget(QWidget * const opc_Parent) :
    C_OgeWiOnlyBackground(opc_Parent),
    mpc_Ui(new Ui::C_CamMosFilterWidget)
@@ -78,13 +68,10 @@ C_CamMosFilterWidget::C_CamMosFilterWidget(QWidget * const opc_Parent) :
            this, &C_CamMosFilterWidget::m_LoadConfig);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     15.11.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosFilterWidget::~C_CamMosFilterWidget()
 {
    // clean up item widgets
@@ -93,28 +80,22 @@ C_CamMosFilterWidget::~C_CamMosFilterWidget()
    delete this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load all user settings.
-
-   \created     21.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load all user settings.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterWidget::LoadUserSettings(void) const
 {
    this->mpc_Ui->pc_WiHeader->SetExpanded(C_UsHandler::h_GetInstance()->GetWiFilterExpanded());
    this->m_OnExpand(C_UsHandler::h_GetInstance()->GetWiFilterExpanded());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Prepare widget for menu view in collapsed state resp. expanded view.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Prepare widget for menu view in collapsed state resp. expanded view.
 
    \param[in]     oq_Expand       true: prepare for expanded, false: prepare for collapsed menu
-
-   \created     14.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterWidget::PrepareForExpanded(const bool oq_Expand) const
 {
    if (oq_Expand == false)
@@ -130,13 +111,10 @@ void C_CamMosFilterWidget::PrepareForExpanded(const bool oq_Expand) const
    this->mpc_Ui->pc_WiHeader->ShowExpandButton(oq_Expand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up.
-
-   \created     05.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clean up.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterWidget::Clear(void)
 {
    // remove all filters
@@ -153,13 +131,10 @@ void C_CamMosFilterWidget::Clear(void)
    mc_Entries.clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize GUI elements
-
-   \created     05.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize GUI elements
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterWidget::m_InitUi(void)
 {
    // initialize colors
@@ -205,13 +180,10 @@ void C_CamMosFilterWidget::m_InitUi(void)
    connect(this->mpc_Ui->pc_BtnAdd, &C_CamOgePubSettingsAdd::clicked, this, &C_CamMosFilterWidget::m_OnAddClicked);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load configuration (i.e. filter widgets)
-
-   \created     05.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load configuration (i.e. filter widgets)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterWidget::m_LoadConfig(void)
 {
    // show no filter label as default
@@ -232,18 +204,15 @@ void C_CamMosFilterWidget::m_LoadConfig(void)
    this->m_UpdateTitleFilterCount();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Remove filter widget (GUI only)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove filter widget (GUI only)
 
    Counterpart of m_AddFilterWidget.
    Does no external data handling.
 
    \param[in]     opc_ItemWidget      Filter widget to remove
-
-   \created     17.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterWidget::m_RemoveFilterWidget(C_CamMosFilterItemWidget * const opc_ItemWidget) const
 {
    if (opc_ItemWidget != NULL)
@@ -259,17 +228,14 @@ void C_CamMosFilterWidget::m_RemoveFilterWidget(C_CamMosFilterItemWidget * const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for toggle button.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for toggle button.
 
    \param[in]     orq_Enabled    true: enable, false: disable
 
    Switch between disable and enable filters.
-
-   \created     27.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterWidget::m_EnableFilters(const bool & orq_Enabled)
 {
    // update data handling
@@ -309,13 +275,10 @@ void C_CamMosFilterWidget::m_EnableFilters(const bool & orq_Enabled)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for add button.
-
-   \created     27.11.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for add button.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterWidget::m_OnAddClicked()
 {
    // Create unique name
@@ -374,18 +337,15 @@ void C_CamMosFilterWidget::m_OnAddClicked()
    //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new filter widget (GUI only).
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new filter widget (GUI only).
 
    Counterpart of m_RemoveFilterWidget.
    Does no external data handling.
 
    \param[in]     orc_FilterData      filter data
-
-   \created     28.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterWidget::m_AddFilterWidget(const C_CamProFilterData & orc_FilterData)
 {
    C_CamMosFilterItemWidget * pc_NewItem = new C_CamMosFilterItemWidget(orc_FilterData, this);
@@ -409,15 +369,12 @@ void C_CamMosFilterWidget::m_AddFilterWidget(const C_CamProFilterData & orc_Filt
            &C_CamMosFilterWidget::m_UpdateFilterConfiguration);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Remove existing filter widget.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove existing filter widget.
 
    \param[in]     opc_Item       Filter widget to remove
-
-   \created     28.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterWidget::m_RemoveFilter(C_CamMosFilterItemWidget * const opc_ItemWidget)
 {
    // ask user
@@ -480,16 +437,13 @@ void C_CamMosFilterWidget::m_RemoveFilter(C_CamMosFilterItemWidget * const opc_I
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Activate or deactivate given filter.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Activate or deactivate given filter.
 
    \param[in]     opc_ItemWidget    Filter widget to select
    \param[in]     orq_Enable        True: activate filter, false: deactivate filter
-
-   \created     28.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterWidget::m_ActivateFilter(const C_CamMosFilterItemWidget * const opc_ItemWidget,
                                             const bool & orq_Enable)
 {
@@ -526,18 +480,15 @@ void C_CamMosFilterWidget::m_ActivateFilter(const C_CamMosFilterItemWidget * con
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update filter configuration of specified filter.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update filter configuration of specified filter.
 
    Slot for signal from item widget on editing finished.
 
    \param[in]     opc_ItemWidget      widget of filter item
    \param[in]     orc_Filter
-
-   \created     06.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterWidget::m_UpdateFilterConfiguration(const C_CamMosFilterItemWidget * const opc_ItemWidget,
                                                        const C_CamProFilterData & orc_FilterOld,
                                                        const C_CamProFilterData & orc_FilterNew)
@@ -573,16 +524,13 @@ void C_CamMosFilterWidget::m_UpdateFilterConfiguration(const C_CamMosFilterItemW
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Count active filters
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Count active filters
 
    \return
    number of active filters
-
-   \created     05.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamMosFilterWidget::m_CountActiveFilterPackages() const
 {
    sint32 s32_Return = 0;
@@ -599,18 +547,15 @@ sint32 C_CamMosFilterWidget::m_CountActiveFilterPackages() const
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data handling index of filter from filter widget pointer.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data handling index of filter from filter widget pointer.
 
    \param[in]  opc_ItemWidget    pointer to filter widget
 
    \return
    index of filter in data handling
-
-   \created     06.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamMosFilterWidget::m_GetIndexFromWidget(const C_CamMosFilterItemWidget * const opc_ItemWidget)
 {
    sint32 s32_Return = 0;
@@ -636,18 +581,15 @@ sint32 C_CamMosFilterWidget::m_GetIndexFromWidget(const C_CamMosFilterItemWidget
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all active filter items in given list of filter items.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all active filter items in given list of filter items.
 
    \param[in,out]     orc_ActiveFilterItems     active filter items
 
    \return
    list of active filter items
-
-   \created     14.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterWidget::m_GetActiveFilterItems(QList<C_CamProFilterItemData> & orc_ActiveFilterItems) const
 {
    QList<C_CamProFilterItemData> c_TempItems;
@@ -662,28 +604,22 @@ void C_CamMosFilterWidget::m_GetActiveFilterItems(QList<C_CamProFilterItemData> 
    orc_ActiveFilterItems = c_TempItems;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of expand signal.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of expand signal.
 
    \param[in] oq_Expand    true: expand; false: collapse
-
-   \created     10.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterWidget::m_OnExpand(const bool oq_Expand) const
 {
    this->mpc_Ui->pc_WiContent->setVisible(oq_Expand);
    C_UsHandler::h_GetInstance()->SetWiFilterExpanded(oq_Expand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update title: show filter number
-
-   \created     25.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update title: show filter number
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterWidget::m_UpdateTitleFilterCount(void) const
 {
    this->mpc_Ui->pc_WiHeader->SetTitle(

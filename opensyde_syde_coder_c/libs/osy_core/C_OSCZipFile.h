@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       openSYDE Core zip/unzip utilities
@@ -9,15 +9,9 @@
    Wrapper for the miniz library.
    Provides functions to zip/unzip data to/from file
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     05.10.2018  STW/A.Stangl (refactored from pre-existing code)
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCZIPFILEH
 #define C_OSCZIPFILEH
 

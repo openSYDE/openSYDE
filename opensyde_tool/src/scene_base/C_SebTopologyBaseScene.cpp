@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Common graphics scene with topology functionality (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.06.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QApplication>
@@ -40,58 +33,49 @@
 #include "C_GiSdTextElement.h"
 #include "C_GiSdImageGroup.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent              Optional pointer to parent
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebTopologyBaseScene::C_SebTopologyBaseScene(QObject * const opc_Parent) :
    C_SebScene(opc_Parent)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebTopologyBaseScene::~C_SebTopologyBaseScene()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load system definition
-
-   \created     12.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load system definition
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebTopologyBaseScene::Load(void)
 {
    C_SebUnoBaseManager * const pc_UndoManager = this->m_GetUndoManager();
@@ -109,13 +93,10 @@ void C_SebTopologyBaseScene::Load(void)
    QApplication::restoreOverrideCursor();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking the nodes for errors
-
-   \created     14.03.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking the nodes for errors
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebTopologyBaseScene::CheckAllItemsForChanges(void) const
 {
    QList<QGraphicsItem *> c_Items = this->items();
@@ -145,7 +126,7 @@ void C_SebTopologyBaseScene::CheckAllItemsForChanges(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebTopologyBaseScene::m_LoadProject(void)
 {
    QVector<uint32> c_SaveNodeIndices;
@@ -171,9 +152,8 @@ void C_SebTopologyBaseScene::m_LoadProject(void)
    this->m_LoadSubset(c_SaveNodeIndices, c_SaveBusIndices, c_SaveIndices, NULL, false, NULL, NULL);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load subset of system definition entries
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load subset of system definition entries
 
    \param[in] orc_NodeIndices              Node indices to add
    \param[in] orc_BusIndices               Bus indices to add
@@ -187,10 +167,8 @@ void C_SebTopologyBaseScene::m_LoadProject(void)
    \param[in] orq_Selection                False: Ignore selection
    \param[in] opc_AdditionalConnectionData Additional data for bus connections
    \param[in] opc_IDMap                    Optional map for IDs to use
-
-   \created     11.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebTopologyBaseScene::m_LoadSubset(const QVector<uint32> & orc_NodeIndices,
                                           const QVector<uint32> & orc_BusIndices,
                                           const QVector<uint32> & orc_OtherStartIndices,
@@ -591,9 +569,8 @@ void C_SebTopologyBaseScene::m_LoadSubset(const QVector<uint32> & orc_NodeIndice
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get new unique ID
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get new unique ID
 
    \param[in] opc_IDMap                    Optional map for item to id
    \param[in] oru32_Index                  Optional current index
@@ -601,10 +578,8 @@ void C_SebTopologyBaseScene::m_LoadSubset(const QVector<uint32> & orc_NodeIndice
 
    \return
    New unique ID
-
-   \created     24.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint64 C_SebTopologyBaseScene::m_GetNewUniqueBusConnectorID(const QMap<C_PuiBsTemporaryDataID,
                                                                        uint64> * const opc_IDMap,
                                                             const uint32 & oru32_Index,
@@ -644,30 +619,24 @@ uint64 C_SebTopologyBaseScene::m_GetNewUniqueBusConnectorID(const QMap<C_PuiBsTe
    return u64_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new bus text element to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new bus text element to scene and connect signals
 
    \param[in,out] opc_Item Pointer to new bus text element
-
-   \created     21.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebTopologyBaseScene::m_AddBusTextElementToScene(C_GiTextElementBus * const opc_Item)
 {
    this->m_AddTextElementToScene(opc_Item);
    connect(opc_Item, &C_GiTextElementBus::SigHideToolTip, this, &C_SebTopologyBaseScene::m_HandleHideToolTip);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new node to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new node to scene and connect signals
 
    \param[in,out] opc_NodeGraphicsItem Pointer to new node
-
-   \created     20.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebTopologyBaseScene::m_AddNodeToScene(C_GiNode * const opc_NodeGraphicsItem)
 {
    connect(opc_NodeGraphicsItem, &C_GiNode::SigHideToolTip, this,
@@ -680,15 +649,12 @@ void C_SebTopologyBaseScene::m_AddNodeToScene(C_GiNode * const opc_NodeGraphicsI
    m_AddAnyItemToScene(opc_NodeGraphicsItem);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new bus to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new bus to scene and connect signals
 
    \param[in,out] opc_BusGraphicsItem Pointer to new bus
-
-   \created     26.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebTopologyBaseScene::m_AddBusToScene(C_GiLiBus * const opc_BusGraphicsItem)
 {
    connect(opc_BusGraphicsItem, &C_GiLiBus::SigHideToolTip, this,
@@ -700,15 +666,12 @@ void C_SebTopologyBaseScene::m_AddBusToScene(C_GiLiBus * const opc_BusGraphicsIt
    m_AddAnyItemToScene(opc_BusGraphicsItem);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new bus connector to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new bus connector to scene and connect signals
 
    \param[in,out] opc_BusConnectorGraphicsItem Connector item
-
-   \created     14.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebTopologyBaseScene::m_AddBusConnectorToScene(C_GiLiBusConnector * const opc_BusConnectorGraphicsItem)
 {
    if (opc_BusConnectorGraphicsItem != NULL)
@@ -720,15 +683,12 @@ void C_SebTopologyBaseScene::m_AddBusConnectorToScene(C_GiLiBusConnector * const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new bus connector base item to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new bus connector base item to scene and connect signals
 
    \param[in,out] opc_BusConnectorGraphicsItem Connector item
-
-   \created     30.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebTopologyBaseScene::m_AddBusConnectorBaseToScene(C_GiLiBusConnectorBase * const opc_BusConnectorGraphicsItem)
 {
    if (opc_BusConnectorGraphicsItem != NULL)
@@ -754,13 +714,10 @@ void C_SebTopologyBaseScene::m_AddBusConnectorBaseToScene(C_GiLiBusConnectorBase
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize scene undo manager connections
-
-   \created     30.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize scene undo manager connections
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebTopologyBaseScene::m_InitSceneUndoManager(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -775,13 +732,10 @@ void C_SebTopologyBaseScene::m_InitSceneUndoManager(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore default cursors for all items
-
-   \created     03.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore default cursors for all items
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebTopologyBaseScene::m_RestoreCursors(void) const
 {
    const QList<QGraphicsItem *> & rc_Items = this->items();
@@ -798,17 +752,14 @@ void C_SebTopologyBaseScene::m_RestoreCursors(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse move event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse move event slot
 
    Here: Signal bus text mouse move update
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     21.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebTopologyBaseScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    QGraphicsItem * const pc_Item = this->itemAt(opc_Event->scenePos(), QTransform());

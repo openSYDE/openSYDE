@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       A sizeable variant of QGraphicsPixmapItem (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     07.11.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPixmap>
@@ -22,34 +15,31 @@
 #include "stwtypes.h"
 #include "C_GiImage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in]     orc_ImagePath  File path to image
    \param[in,out] opc_Parent     Optional pointer to parent
-
-   \created     07.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiImage::C_GiImage(const QString & orc_ImagePath, QGraphicsItem * const opc_Parent) :
    QGraphicsPixmapItem(opc_Parent),
    C_GiBiSizeableItem(0.0, 0.0)
@@ -62,18 +52,15 @@ C_GiImage::C_GiImage(const QString & orc_ImagePath, QGraphicsItem * const opc_Pa
    this->setPixmap(this->mc_OriginalPixmap);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in]     orc_Pixmap   Pixmap with image
    \param[in,out] opc_Parent   Optional pointer to parent
-
-   \created     07.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiImage::C_GiImage(const QPixmap & orc_Pixmap, const float64 of64_Width, const float64 of64_Height,
                      QGraphicsItem * const opc_Parent) :
    QGraphicsPixmapItem(opc_Parent),
@@ -83,24 +70,18 @@ C_GiImage::C_GiImage(const QPixmap & orc_Pixmap, const float64 of64_Width, const
    this->Redraw();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     25.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiImage::~C_GiImage()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the drawing of the rectangle
-
-   \created     27.10.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the drawing of the rectangle
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiImage::Redraw(void)
 {
    // calculate the scaling on the original picture to get best quality
@@ -112,15 +93,12 @@ void C_GiImage::Redraw(void)
    this->setPixmap(c_Pixmap);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the original image without compression
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the original image without compression
 
    \return     Original image without scaling
-
-   \created     08.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QPixmap C_GiImage::GetImage(void) const
 {
    return this->mc_OriginalPixmap;

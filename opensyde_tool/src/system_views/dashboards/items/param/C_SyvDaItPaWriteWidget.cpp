@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for handling the process of writing changed NVM elements to the server.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.08.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <list>
@@ -33,7 +27,7 @@
 #include "C_PuiSvDbDataElementHandler.h"
 #include "C_OgeWiCustomMessage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
@@ -41,21 +35,20 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -63,10 +56,8 @@ using namespace stw_opensyde_gui_elements;
    \param[in]     orc_ComDriver        Reference to the com driver
    \param[in]     orc_ChangedElements  All changed datapool elements
    \param[in]     orc_InvalidLists     All lists to update CRC for
-
-   \created     25.10.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaWriteWidget::C_SyvDaItPaWriteWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
                                                C_SyvComDriverDiag & orc_ComDriver,
                                                const std::vector<C_OSCNodeDataPoolListElementId> & orc_ChangedElements,
@@ -116,28 +107,22 @@ C_SyvDaItPaWriteWidget::C_SyvDaItPaWriteWidget(stw_opensyde_gui_elements::C_OgeP
    this->m_StartWriteChangedElements(orc_ChangedElements, orc_InvalidLists);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     25.10.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaWriteWidget::~C_SyvDaItPaWriteWidget()
 {
    delete mpc_Ui;
    //lint -e{1740}  no memory leak because the ownership of these objects was never transfered to this class
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initializes all visible strings on the widget
-
-   \created     26.10.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initializes all visible strings on the widget
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::InitText(void)
 {
    // set title
@@ -162,34 +147,28 @@ void C_SyvDaItPaWriteWidget::InitText(void)
    this->mpc_Ui->pc_CbNotifiction->setText(QString(C_GtGetText::h_GetText("Trigger Application Notification")));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current step
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current step
 
    \return
    Current step
-
-   \created     02.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaWriteWidget::E_Step C_SyvDaItPaWriteWidget::GetStep(void) const
 {
    return this->me_Step;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns all changed elements with successful adapted CRCs
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns all changed elements with successful adapted CRCs
 
    \param[out] orc_AffectedElementValues All possibly changed elements
 
    \return
    C_NO_ERR    Process was finished successful and all changed element ids returned
    C_RD_WR     An error occurred. The data on the server may not be valid.
-
-   \created     09.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDaItPaWriteWidget::GetChangedElements(std::map<C_OSCNodeDataPoolListElementId,
                                                            C_SyvDaItPaValuePairs> & orc_AffectedElementValues) const
 {
@@ -206,17 +185,14 @@ sint32 C_SyvDaItPaWriteWidget::GetChangedElements(std::map<C_OSCNodeDataPoolList
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: handle escape key
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     10.07.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::keyPressEvent(QKeyEvent * const opc_Event)
 {
    if (opc_Event->key() == static_cast<sintn>(Qt::Key_Escape))
@@ -229,18 +205,15 @@ void C_SyvDaItPaWriteWidget::keyPressEvent(QKeyEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start of writing all changed elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start of writing all changed elements
 
    Prepares step 1.
 
    \param[in]     orc_ChangedElements  All changed datapool elements (Is used to detect the affected nodes)
    \param[in]     orc_InvalidLists     All lists to update CRC for
-
-   \created     06.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_StartWriteChangedElements(
    const std::vector<C_OSCNodeDataPoolListElementId> & orc_ChangedElements,
    const std::vector<C_OSCNodeDataPoolListId> & orc_InvalidLists)
@@ -369,15 +342,12 @@ void C_SyvDaItPaWriteWidget::m_StartWriteChangedElements(
    this->mc_Timer.start();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Take a break before writing values to nvm.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Take a break before writing values to nvm.
 
    Implemented steps: 0
-
-   \created     25.06.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_PrepareForWrite(void)
 {
    // all the GUI stuff is already done in constructor (because first state is default state)
@@ -385,15 +355,12 @@ void C_SyvDaItPaWriteWidget::m_PrepareForWrite(void)
    m_ShowParameterValues(false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Write all changed elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Write all changed elements
 
    Implemented steps: 1
-
-   \created     06.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_WriteChangedElementsOfNode(void)
 {
    if (this->mu32_CurrentNode < this->mc_AllNodeIndexes.size())
@@ -478,15 +445,12 @@ void C_SyvDaItPaWriteWidget::m_WriteChangedElementsOfNode(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reads the relevant lists back
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reads the relevant lists back
 
    Implemented steps: 2, 3
-
-   \created     06.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_ReadBackElementsOfNode(void)
 {
    if (this->mu32_CurrentNode < this->mc_AllNodeIndexes.size())
@@ -596,17 +560,14 @@ void C_SyvDaItPaWriteWidget::m_ReadBackElementsOfNode(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Displays the read values
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Displays the read values
 
    Implemented steps: 3
 
    \param[in] oq_ShowReadValues Flag if read values are to be displayed
-
-   \created     06.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_ShowParameterValues(const bool oq_ShowReadValues)
 {
    // Show the read list in the confirm area
@@ -632,6 +593,8 @@ void C_SyvDaItPaWriteWidget::m_ShowParameterValues(const bool oq_ShowReadValues)
          {
             // Not the first initial node
             c_NodeText.push_back(c_Text);
+            //Reset text after node is finished (should only be for one node)
+            c_Text = "";
          }
 
          if (pc_OSCNode != NULL)
@@ -664,8 +627,7 @@ void C_SyvDaItPaWriteWidget::m_ShowParameterValues(const bool oq_ShowReadValues)
             if (pc_OSCDataPool != NULL)
             {
                c_Text += QString("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(1UL));
-               c_Text += QString(C_GtGetText::h_GetText("Datapool #")) +
-                         QString::number(u32_CurDataPoolIndex + 1U) +
+               c_Text += QString(C_GtGetText::h_GetText("Datapool")) +
                          " - " + QString(pc_OSCDataPool->c_Name.c_str()) + "</div>";
             }
          }
@@ -676,8 +638,7 @@ void C_SyvDaItPaWriteWidget::m_ShowParameterValues(const bool oq_ShowReadValues)
             uint32 u32_ElementCounter;
             // Heading for list
             c_Text += QString("<div %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(2UL));
-            c_Text += QString(C_GtGetText::h_GetText("List #")) + QString::number((*c_ItItem).u32_ListIndex + 1U) +
-                      " - " + QString(pc_OSCList->c_Name.c_str()) + "</div>";
+            c_Text += QString(C_GtGetText::h_GetText("List")) + " - " + QString(pc_OSCList->c_Name.c_str()) + "</div>";
             c_Text += QString("<table width=\"100%\" %1>").arg(C_SyvDaItUtil::mh_GetHtmlIndentStyle(3UL));
 
             for (u32_ElementCounter = 0U; u32_ElementCounter < pc_OSCList->c_Elements.size(); ++u32_ElementCounter)
@@ -794,15 +755,12 @@ void C_SyvDaItPaWriteWidget::m_ShowParameterValues(const bool oq_ShowReadValues)
    this->mpc_Ui->pc_TextEditConfirm->setHtml(c_Text);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Writes the CRC of relevant lists
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Writes the CRC of relevant lists
 
    Implemented steps: 5
-
-   \created     06.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_WriteCrcOfNode(void)
 {
    if (this->mu32_CurrentNode < this->mc_AllNodeIndexes.size())
@@ -890,7 +848,7 @@ void C_SyvDaItPaWriteWidget::m_WriteCrcOfNode(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItPaWriteWidget::m_SendNotification(void)
 {
    const bool q_Retval = this->mpc_Ui->pc_CbNotifiction->isChecked();
@@ -913,13 +871,10 @@ bool C_SyvDaItPaWriteWidget::m_SendNotification(void)
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle next notification request or result handling
-
-   \created     26.07.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle next notification request or result handling
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_SendNextNotification(void)
 {
    sint32 s32_Result;
@@ -997,13 +952,10 @@ void C_SyvDaItPaWriteWidget::m_SendNextNotification(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Ok button click
-
-   \created     25.10.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Ok button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_OkClicked(void)
 {
    if (this->m_SendNotification() == false)
@@ -1015,13 +967,10 @@ void C_SyvDaItPaWriteWidget::m_OkClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Cancel button
-
-   \created     25.10.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Cancel button
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_OnCancel(void)
 {
    if ((me_Step == eCONFIRM) || (me_Step == eREADBACK) || (me_Step == eWRITE))
@@ -1045,29 +994,23 @@ void C_SyvDaItPaWriteWidget::m_OnCancel(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Change of confirm status of correctness of the NVM lists
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Change of confirm status of correctness of the NVM lists
 
    Implemented steps: 4
-
-   \created     26.10.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_ConfirmCheckBoxChanged(void) const
 {
    this->mpc_Ui->pc_PbConfirm->setEnabled(this->mpc_Ui->pc_CbConfirm->isChecked());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   User confirms the correctness of the NVM lists
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   User confirms the correctness of the NVM lists
 
    Implemented steps: 4
-
-   \created     26.10.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_ConfirmClicked(void)
 {
    if (this->me_Step == eBEFOREWRITE)
@@ -1106,9 +1049,8 @@ void C_SyvDaItPaWriteWidget::m_ConfirmClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checks if the element was changed
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks if the element was changed
 
    \param[in] ou32_NodeIndex     Node index
    \param[in] ou32_DataPoolIndex Data pool index
@@ -1119,10 +1061,8 @@ void C_SyvDaItPaWriteWidget::m_ConfirmClicked(void)
    \return
    true     Element was changed
    false    Element was not changed
-
-   \created     10.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItPaWriteWidget::m_WasElementChanged(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
                                                  const uint32 ou32_ListIndex, const uint32 ou32_ElementIndex,
                                                  const bool oq_CheckReadValues)
@@ -1183,16 +1123,13 @@ bool C_SyvDaItPaWriteWidget::m_WasElementChanged(const uint32 ou32_NodeIndex, co
    return q_Changed;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get suspect element report
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get suspect element report
 
    \return
    String with details for suspect elements (empty if nothing to report)
-
-   \created     24.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaItPaWriteWidget::m_GetSuspectElementReport(void) const
 {
    QString c_Retval;
@@ -1236,7 +1173,7 @@ QString C_SyvDaItPaWriteWidget::m_GetSuspectElementReport(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_Timer(void)
 {
    if (this->me_Step == eBEFOREWRITE)
@@ -1265,7 +1202,7 @@ void C_SyvDaItPaWriteWidget::m_Timer(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_ReportError(const QString & orc_FunctionName, const QString & orc_ErrorText,
                                            const stw_types::sint32 os32_ErrorCode)
 {
@@ -1286,15 +1223,12 @@ void C_SyvDaItPaWriteWidget::m_ReportError(const QString & orc_FunctionName, con
    this->mpc_ParentDialog->reject();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle error for function "NvmSafeWriteChangedValues"
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle error for function "NvmSafeWriteChangedValues"
 
    \param[in] os32_ErrorCode Function result
-
-   \created     17.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteChangedValues(const sint32 os32_ErrorCode)
 {
    const QString c_Log = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
@@ -1404,15 +1338,12 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteChangedValues(const sint32
    this->mpc_ParentDialog->reject();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle error for function "NvmSafeReadValues"
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle error for function "NvmSafeReadValues"
 
    \param[in] os32_ErrorCode Function result
-
-   \created     17.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeReadValues(const sint32 os32_ErrorCode)
 {
    const QString c_Log = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
@@ -1525,15 +1456,12 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeReadValues(const sint32 os32_Er
    this->mpc_ParentDialog->reject();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle error for function "NvmSafeWriteCrcs"
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle error for function "NvmSafeWriteCrcs"
 
    \param[in] os32_ErrorCode Function result
-
-   \created     17.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteCrcs(const sint32 os32_ErrorCode)
 {
    const QString c_Log = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
@@ -1667,15 +1595,12 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteCrcs(const sint32 os32_Err
    this->mpc_ParentDialog->reject();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle error for function "NvmNotifyOfChanges"
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle error for function "NvmNotifyOfChanges"
 
    \param[in] os32_ErrorCode Function result
-
-   \created     17.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_ReportErrorNvmNotifyOfChanges(const sint32 os32_ErrorCode)
 {
    const QString c_Log = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
@@ -1777,16 +1702,13 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmNotifyOfChanges(const sint32 os32_E
    this->mpc_ParentDialog->reject();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Read and store updated values to use later in param widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read and store updated values to use later in param widget
 
    \return
    String with details for suspect elements (empty if nothing to report)
-
-   \created     23.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaItPaWriteWidget::m_ReadAndStoreUpdatedValues(void)
 {
    for (std::map<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
@@ -1807,18 +1729,15 @@ QString C_SyvDaItPaWriteWidget::m_ReadAndStoreUpdatedValues(void)
    return m_GetSuspectElementReport();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get list name (and containers) as string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get list name (and containers) as string
 
    \param[in] orc_Id List ID
 
    \return
    List name (and containers) as string
-
-   \created     23.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaItPaWriteWidget::mh_GetId(const C_OSCNodeDataPoolListId & orc_Id)
 {
    QString c_Default = C_GtGetText::h_GetText("Unknown");
@@ -1836,9 +1755,8 @@ QString C_SyvDaItPaWriteWidget::mh_GetId(const C_OSCNodeDataPoolListId & orc_Id)
    return c_Default;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get Element for specified ID from read values
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get Element for specified ID from read values
 
    \param[in] ou32_NodeIndex     Node index
    \param[in] ou32_DataPoolIndex Data pool index
@@ -1848,9 +1766,8 @@ QString C_SyvDaItPaWriteWidget::mh_GetId(const C_OSCNodeDataPoolListId & orc_Id)
    \return
    NULL Element not found
    Else Valid element
-   \created     24.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_OSCNodeDataPoolListElement * C_SyvDaItPaWriteWidget::m_GetReadElementById(const uint32 ou32_NodeIndex,
                                                                                   const uint32 ou32_DataPoolIndex,
                                                                                   const uint32 ou32_ListIndex,

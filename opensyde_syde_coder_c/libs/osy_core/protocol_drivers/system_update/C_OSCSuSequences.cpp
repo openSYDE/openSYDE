@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       openSYDE: Sequences for system update.
 
    For details cf. documentation in .h file.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     08.11.2017  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -56,8 +49,7 @@ using namespace stw_diag_lib;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Utility: check whether node is an active node on a specific bus
+/*! \brief   Utility: check whether node is an active node on a specific bus
 
    Assumptions:
    * mpc_SystemDefinition and mc_ActiveNodes must be valid
@@ -71,8 +63,6 @@ using namespace stw_diag_lib;
    \return
    true    node is active on specified bus
    false   node not active on specified bus
-
-   \created     14.12.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool C_OSCSuSequences::m_IsNodeActive(const uint32 ou32_NodeIndex, const uint32 ou32_BusIndex,
@@ -114,8 +104,7 @@ bool C_OSCSuSequences::m_IsNodeActive(const uint32 ou32_NodeIndex, const uint32 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Utility: check whether node is directly required in update
+/*! \brief   Utility: check whether node is directly required in update
 
    Assumptions:
    * mpc_SystemDefinition and mc_ActiveNodes must be valid
@@ -126,8 +115,6 @@ bool C_OSCSuSequences::m_IsNodeActive(const uint32 ou32_NodeIndex, const uint32 
    \return
    true    node is directly required for update
    false   node not directly required for update (might still be necessary for routing!)
-
-   \created     07.06.2018  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 bool C_OSCSuSequences::m_IsNodeRequired(const uint32 ou32_NodeIndex) const
@@ -147,8 +134,7 @@ bool C_OSCSuSequences::m_IsNodeRequired(const uint32 ou32_NodeIndex) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Reports some information about the current sequence
+/*! \brief   Reports some information about the current sequence
 
    To be overridden by application.
    Default implementation here: print to console.
@@ -170,8 +156,6 @@ bool C_OSCSuSequences::m_IsNodeRequired(const uint32 ou32_NodeIndex) const
    Flag for aborting sequence
    - true   abort sequence
    - false  continue sequence
-
-   \created     18.12.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 bool C_OSCSuSequences::m_ReportProgress(const E_ProgressStep oe_Step, const sint32 os32_Result,
@@ -184,8 +168,7 @@ bool C_OSCSuSequences::m_ReportProgress(const E_ProgressStep oe_Step, const sint
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Reports some information about the current sequence for a specific server
+/*! \brief   Reports some information about the current sequence for a specific server
 
    To be overridden by application.
    Default implementation here: print to console.
@@ -202,8 +185,6 @@ bool C_OSCSuSequences::m_ReportProgress(const E_ProgressStep oe_Step, const sint
    Flag for aborting sequence
    - true   abort sequence
    - false  continue sequence
-
-   \created     18.12.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 bool C_OSCSuSequences::m_ReportProgress(const E_ProgressStep oe_Step, const sint32 os32_Result,
@@ -219,16 +200,13 @@ bool C_OSCSuSequences::m_ReportProgress(const E_ProgressStep oe_Step, const sint
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Reports information read from openSYDE server node
+/*! \brief   Reports information read from openSYDE server node
 
    Called by ReadDeviceInformation() after it has read information from an openSYDE node.
    Default implementation here: print read information to console
 
    \param[in]     orc_Info         Information read from node
    \param[in]     ou32_NodeIndex   Index of node within mpc_SystemDefinition
-
-   \created     18.12.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_OSCSuSequences::m_ReportOpenSydeFlashloaderInformationRead(const C_OsyDeviceInformation & orc_Info,
@@ -246,16 +224,13 @@ void C_OSCSuSequences::m_ReportOpenSydeFlashloaderInformationRead(const C_OsyDev
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Reports information read from STW flashloader server node
+/*! \brief   Reports information read from STW flashloader server node
 
    Called by ReadDeviceInformation() after it has read information from an STW flashloader node.
    Default implementation here: print read information to console; checksum block or sector information is not printed
 
    \param[in]     orc_Info         Information read from node
    \param[in]     ou32_NodeIndex   Index of node within mpc_SystemDefinition
-
-   \created     09.02.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_OSCSuSequences::m_ReportStwFlashloaderInformationRead(const C_XflDeviceInformation & orc_Info,
@@ -273,8 +248,7 @@ void C_OSCSuSequences::m_ReportStwFlashloaderInformationRead(const C_XflDeviceIn
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   report progress of STW Flashloader operation to application
+/*! \brief   report progress of STW Flashloader operation to application
 
    Report progress information from STW Flashloader driver via virtual function.
 
@@ -285,8 +259,6 @@ void C_OSCSuSequences::m_ReportStwFlashloaderInformationRead(const C_XflDeviceIn
    \return
    C_NO_ERR    continue operation
    else        abort operation (not honored at each position)
-
-   \created     12.02.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCSuSequences::m_XflReportProgress(const uint8 ou8_Progress, const C_SCLString & orc_Text)
@@ -304,8 +276,7 @@ sint32 C_OSCSuSequences::m_XflReportProgress(const uint8 ou8_Progress, const C_S
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Flash one openSYDE address based node
+/*! \brief   Flash one openSYDE address based node
 
    Flash one or more files.
 
@@ -318,7 +289,6 @@ sint32 C_OSCSuSequences::m_XflReportProgress(const uint8 ou8_Progress, const C_S
 
    * Reports progress from 0..100 for the overall process
    * Reports 0..100 for each file being flashed
-
 
    \param[in]     orc_FilesToFlash              Files to flash
    \param[in]     ou32_RequestDownloadTimeout   Maximum time in ms it can take to erase one continuous area in flash
@@ -333,8 +303,6 @@ sint32 C_OSCSuSequences::m_XflReportProgress(const uint8 ou8_Progress, const C_S
    C_NOACT     could not extract device name from hex file
    C_OVERFLOW  device name of device does not match name contained in hex file
    C_BUSY      procedure aborted by user (as returned by m_ReportProgress)
-
-   \created     19.12.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCSuSequences::m_FlashNodeOpenSydeHex(const std::vector<C_SCLString> & orc_FilesToFlash,
@@ -557,8 +525,7 @@ sint32 C_OSCSuSequences::m_FlashNodeOpenSydeHex(const std::vector<C_SCLString> &
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Flash one hex file to openSYDE address based node
+/*! \brief   Flash one hex file to openSYDE address based node
 
    Assumptions/prerequisites (not explicitly checked by this function):
    * mc_CurrentNode contains ID of node to work with
@@ -578,8 +545,6 @@ sint32 C_OSCSuSequences::m_FlashNodeOpenSydeHex(const std::vector<C_SCLString> &
    C_NO_ERR   file flashed
    C_COM      communication driver reported problem
    C_BUSY     procedure aborted by user (as returned by m_ReportProgress)
-
-   \created     19.12.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeHex(const stw_hex_file::C_HexDataDump & orc_HexDataDump,
@@ -771,8 +736,7 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeHex(const stw_hex_file::C_HexData
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Flash one openSYDE file based node
+/*! \brief   Flash one openSYDE file based node
 
    Writes one or more files.
 
@@ -802,8 +766,6 @@ xx   C_CONFIG    no signature block found in hex file
 xx   C_NOACT     could not extract device name from hex file
 xx   C_OVERFLOW  device name of device does not match name contained in hex file
    C_BUSY      procedure aborted by user (as returned by m_ReportProgress)
-
-   \created     23.02.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCSuSequences::m_FlashNodeOpenSydeFile(const std::vector<C_SCLString> & orc_FilesToFlash,
@@ -866,8 +828,7 @@ sint32 C_OSCSuSequences::m_FlashNodeOpenSydeFile(const std::vector<C_SCLString> 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Flash one file to openSYDE file based node
+/*! \brief   Flash one file to openSYDE file based node
 
    Assumptions/prerequisites (not explicitly checked by this function):
    * mc_CurrentNode contains ID of node to work with
@@ -891,8 +852,6 @@ sint32 C_OSCSuSequences::m_FlashNodeOpenSydeFile(const std::vector<C_SCLString> 
    C_COM      communication driver reported problem
    C_RD_WR    could not read from input file
    C_BUSY     procedure aborted by user (as returned by m_ReportProgress)
-
-   \created     19.12.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeFile(const C_SCLString & orc_FileToFlash,
@@ -1114,8 +1073,7 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeFile(const C_SCLString & orc_File
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Write openSYDE flashing fingerprint
+/*! \brief   Write openSYDE flashing fingerprint
 
    Assumptions/prerequisites (not explicitly checked by this function):
    * mc_CurrentNode contains ID of node to work with
@@ -1127,8 +1085,6 @@ sint32 C_OSCSuSequences::m_FlashOneFileOpenSydeFile(const C_SCLString & orc_File
    \return
    C_NO_ERR    flashed all files
    C_COM       error result from device (see log for details)
-
-   \created     08.02.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCSuSequences::m_WriteFingerPrintOsy(void)
@@ -1173,8 +1129,7 @@ sint32 C_OSCSuSequences::m_WriteFingerPrintOsy(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Flash one STW Flashloader based node
+/*! \brief   Flash one STW Flashloader based node
 
    Flash one or more files.
 
@@ -1193,8 +1148,6 @@ sint32 C_OSCSuSequences::m_WriteFingerPrintOsy(void)
    \return
    C_NO_ERR    flashed all files
    C_COM       error flashing (see log for details)
-
-   \created     08.02.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCSuSequences::m_FlashNodeXfl(const std::vector<C_SCLString> & orc_FilesToFlash)
@@ -1233,8 +1186,7 @@ sint32 C_OSCSuSequences::m_FlashNodeXfl(const std::vector<C_SCLString> & orc_Fil
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Read information of openSYDE server node
+/*! \brief   Read information of openSYDE server node
 
    Utility function used to read openSYDE information from server node and report it.
    See documentation of ReadDeviceInformation() for full description.
@@ -1245,8 +1197,6 @@ sint32 C_OSCSuSequences::m_FlashNodeXfl(const std::vector<C_SCLString> & orc_Fil
    \return
    C_COM      communication driver reported problem
    C_NO_ERR   information read
-
-   \created     09.02.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCSuSequences::m_ReadDeviceInformationOpenSyde(const uint8 ou8_ProgressToReport, const uint32 ou32_NodeIndex)
@@ -1366,8 +1316,7 @@ sint32 C_OSCSuSequences::m_ReadDeviceInformationOpenSyde(const uint8 ou8_Progres
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Read information of STW flashloader server node
+/*! \brief   Read information of STW flashloader server node
 
    Utility function used to read STW flashloader information from server node and report it.
    See documentation of ReadDeviceInformation() for full description.
@@ -1378,8 +1327,6 @@ sint32 C_OSCSuSequences::m_ReadDeviceInformationOpenSyde(const uint8 ou8_Progres
    \return
    C_COM      communication driver reported problem
    C_NO_ERR   information read
-
-   \created     09.02.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCSuSequences::m_ReadDeviceInformationStwFlashloader(const uint8 ou8_ProgressToReport,
@@ -1421,12 +1368,9 @@ sint32 C_OSCSuSequences::m_ReadDeviceInformationStwFlashloader(const uint8 ou8_P
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   constructor
+/*! \brief   constructor
 
    Set up class
-
-   \created     08.12.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_OSCSuSequences::C_OSCSuSequences(void) :
@@ -1437,12 +1381,9 @@ C_OSCSuSequences::C_OSCSuSequences(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   constructor
+/*! \brief   constructor
 
    Tear down class
-
-   \created     08.12.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_OSCSuSequences::~C_OSCSuSequences(void)
@@ -1450,8 +1391,7 @@ C_OSCSuSequences::~C_OSCSuSequences(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Copy referenced files to a temporary folder
+/*! \brief   Copy referenced files to a temporary folder
 
    Copy all files to be flashed to a "temp" folder.
    Ensures a clearly defined state during the whole flashing procedure.
@@ -1491,8 +1431,6 @@ C_OSCSuSequences::~C_OSCSuSequences(void)
    C_RD_WR     could not copy file
    C_TIMEOUT   could not create target directory
    C_CONFIG    at least one file based node has at least two identical named files
-
-   \created     21.12.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCSuSequences::h_CreateTemporaryFolder(const std::vector<C_OSCNode> & orc_Nodes,
@@ -1547,7 +1485,8 @@ sint32 C_OSCSuSequences::h_CreateTemporaryFolder(const std::vector<C_OSCNode> & 
                for (uint16 u16_File = 0U; u16_File < orc_ApplicationsToWrite[u16_Node].c_FilesToFlash.size();
                     u16_File++)
                {
-                  if (TGL_FileExists(orc_ApplicationsToWrite[u16_Node].c_FilesToFlash[u16_File]) == false)
+                  const C_SCLString c_File = orc_ApplicationsToWrite[u16_Node].c_FilesToFlash[u16_File];
+                  if (TGL_FileExists(c_File) == false)
                   {
                      s32_Return = C_RANGE;
                      break;
@@ -1746,8 +1685,7 @@ sint32 C_OSCSuSequences::h_CreateTemporaryFolder(const std::vector<C_OSCNode> & 
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check whether application on client side match applications on devices
+/*! \brief   Check whether application on client side match applications on devices
 
    Compares a list of application properties to a second list of application properties.
    The function will report which elements of the first list are present in the second list.
@@ -1767,8 +1705,6 @@ sint32 C_OSCSuSequences::h_CreateTemporaryFolder(const std::vector<C_OSCNode> & 
    \param[out]    orc_ApplicationsPresentOnServer   size matches size of orc_ClientSideApplications
                                                     0: application not contained in orc_ServerSideApplications
                                                     1: application contained in orc_ServerSideApplications
-
-   \created     15.02.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_OSCSuSequences::h_CheckForChangedApplications(
@@ -1793,8 +1729,7 @@ void C_OSCSuSequences::h_CheckForChangedApplications(
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Initialization of the protocol
+/*! \brief   Initialization of the protocol
 
    Enter Flashloader for all nodes
    Note: STW Flashloader nodes can only be end-points, not routers
@@ -1831,8 +1766,6 @@ void C_OSCSuSequences::h_CheckForChangedApplications(
    C_CONFIG   mpc_SystemDefinition is NULL (Init() not called)
    C_COM      communication driver reported problem
    C_WARN     activation for at least one device failed (see log for details)
-
-   \created     08.12.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 stw_types::sint32 C_OSCSuSequences::ActivateFlashloader(const bool oq_FailOnFirstError)
@@ -2279,8 +2212,7 @@ stw_types::sint32 C_OSCSuSequences::ActivateFlashloader(const bool oq_FailOnFirs
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Read information of server nodes
+/*! \brief   Read information of server nodes
 
    Prerequisite:
    All nodes marked as active in mc_ActiveNodes are present and are in flashloader mode
@@ -2328,8 +2260,6 @@ stw_types::sint32 C_OSCSuSequences::ActivateFlashloader(const bool oq_FailOnFirs
    C_WARN     reading failed for at least one node
    C_NO_ERR   information read
    C_COM      communication driver reported error
-
-   \created     18.12.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCSuSequences::ReadDeviceInformation(const bool oq_FailOnFirstError)
@@ -2466,8 +2396,7 @@ sint32 C_OSCSuSequences::ReadDeviceInformation(const bool oq_FailOnFirstError)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Read information of server nodes
+/*! \brief   Read information of server nodes
 
    Prerequisite:
    All nodes marked as active in mc_ActiveNodes are present and are in flashloader mode
@@ -2505,8 +2434,6 @@ sint32 C_OSCSuSequences::ReadDeviceInformation(const bool oq_FailOnFirstError)
    C_CONFIG    for address based targets: no signature block found in hex file
    C_COM       communication driver reported problem
    C_BUSY      procedure aborted by user (as returned by m_ReportProgress)
-
-   \created     19.12.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCSuSequences::UpdateSystem(const std::vector<C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
@@ -2720,8 +2647,7 @@ sint32 C_OSCSuSequences::UpdateSystem(const std::vector<C_OSCSuSequences::C_DoFl
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Reset all devices in the system
+/*! \brief   Reset all devices in the system
 
    Reset all nodes backwards from the tiniest twigs up to the mighty trunk
    For STW Flashloader we can send a NET Reset
@@ -2738,8 +2664,6 @@ sint32 C_OSCSuSequences::UpdateSystem(const std::vector<C_OSCSuSequences::C_DoFl
    C_NO_ERR    reset requests were sent out to all nodes
    C_CONFIG    mpc_SystemDefinition is NULL (Init() not called)
    C_COM       communication driver reported problem
-
-   \created     19.12.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCSuSequences::ResetSystem(void)
@@ -2861,16 +2785,13 @@ sint32 C_OSCSuSequences::ResetSystem(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert information read from openSYDE server node to string list
+/*! \brief   Convert information read from openSYDE server node to string list
 
    Can be used by the application for a no-frills approach to get a textual representation of the information
    reported by m_ReportOpenSydeFlashloaderInformationRead.
 
    \param[in]     orc_Info         openSYDE server node information
    \param[out]    orc_Text         textual representation of read information
-
-   \created     13.02.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_OSCSuSequences::h_OpenSydeFlashloaderInformationToText(const C_OsyDeviceInformation & orc_Info,
@@ -2938,8 +2859,7 @@ void C_OSCSuSequences::h_OpenSydeFlashloaderInformationToText(const C_OsyDeviceI
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert information read from STW Flashloader server node to string list
+/*! \brief   Convert information read from STW Flashloader server node to string list
 
    Can be used by the application for a no-frills approach to get a textual representation of the information
    reported by m_ReportStwFlashloaderInformationRead.
@@ -2947,8 +2867,6 @@ void C_OSCSuSequences::h_OpenSydeFlashloaderInformationToText(const C_OsyDeviceI
 
    \param[in]     orc_Info         STW Flashloader server node information
    \param[out]    orc_Text         textual representation of read information
-
-   \created     13.02.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_OSCSuSequences::h_StwFlashloaderInformationToText(const C_XflDeviceInformation & orc_Info,
@@ -3247,16 +3165,13 @@ void C_OSCSuSequences::h_StwFlashloaderInformationToText(const C_XflDeviceInform
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Compare two instances
+/*! \brief   Compare two instances
 
    \param[in]   orc_Source   instance to compare *this against
 
    \return
    true:   orc_Source == (*this)
    false:  orc_Source != (*this)
-
-   \created     15.02.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 bool C_OSCSuSequences::C_ApplicationProperties::operator ==(const C_ApplicationProperties & orc_Source) const
@@ -3268,8 +3183,7 @@ bool C_OSCSuSequences::C_ApplicationProperties::operator ==(const C_ApplicationP
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Reconnects the current server
+/*! \brief   Reconnects the current server
 
    Checking if the target node is really connected to Ethernet.
    It is only necessary in case of ETH -> ETH routing and
@@ -3285,8 +3199,6 @@ bool C_OSCSuSequences::C_ApplicationProperties::operator ==(const C_ApplicationP
    C_BUSY     could not re-connect to node
    C_RANGE    node not found or no openSYDE protocol installed
    C_COM      communication driver reported error
-
-   \created     09.04.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCSuSequences::m_ReconnectToTargetServer(const bool oq_RestartRouting, const uint32 ou32_NodeIndex)
@@ -3322,8 +3234,7 @@ sint32 C_OSCSuSequences::m_ReconnectToTargetServer(const bool oq_RestartRouting,
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Disconnects the current server
+/*! \brief   Disconnects the current server
 
    \param[in]  oq_DisconnectOnIp2IpRouting    Flag if a disconnect in case of Ethernet to Ethernet routing shall be
                                               executed. If the routing is still necessary after this call, the
@@ -3333,8 +3244,6 @@ sint32 C_OSCSuSequences::m_ReconnectToTargetServer(const bool oq_RestartRouting,
    C_NO_ERR   disconnected or no reconnect necessary
    C_NOACT    could not disconnect to node
    C_RANGE    node not found or no openSYDE protocol installed
-
-   \created     19.04.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCSuSequences::m_DisconnectFromTargetServer(const bool oq_DisconnectOnIp2IpRouting)

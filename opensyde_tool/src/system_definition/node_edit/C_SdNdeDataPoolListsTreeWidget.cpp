@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget to store and manage multiple data pool list entries (implementation)
 
    Widget to store and manage multiple data pool list entries
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     17.01.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <iostream>
@@ -41,7 +34,7 @@
 #include "C_UsHandler.h"
 #include "C_OgeWiCustomMessage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
@@ -50,29 +43,26 @@ using namespace stw_opensyde_core;
 using namespace stw_errors;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     17.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListsTreeWidget::C_SdNdeDataPoolListsTreeWidget(QWidget * const opc_Parent) :
    QTreeWidget(opc_Parent),
    mu32_NodeIndex(0),
@@ -136,29 +126,23 @@ C_SdNdeDataPoolListsTreeWidget::C_SdNdeDataPoolListsTreeWidget(QWidget * const o
            &C_SdNdeDataPoolListsTreeWidget::m_OnErrorChangePossible);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     22.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListsTreeWidget::~C_SdNdeDataPoolListsTreeWidget(void)
 {
    m_StoreUserSettings();
    //lint -e{1540,1579}  no memory leak because of the parent of items and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set new data pool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new data pool
 
    \param[in] oru32_NodeIndex     Node index
    \param[in] oru32_DataPoolIndex Data pool index
-
-   \created     27.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::SetDataPool(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex)
 {
    QElapsedTimer c_Timer;
@@ -191,13 +175,10 @@ void C_SdNdeDataPoolListsTreeWidget::SetDataPool(const uint32 & oru32_NodeIndex,
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new list
-
-   \created     17.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new list
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::AddEntry(void)
 {
    //Top level
@@ -209,13 +190,10 @@ void C_SdNdeDataPoolListsTreeWidget::AddEntry(void)
    m_InitialItemConfigure(pc_Item, s32_Index);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update widgets from data
-
-   \created     26.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update widgets from data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::UpdateUI(void)
 {
    const C_OSCNodeDataPool * const pc_OSCDataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
@@ -272,15 +250,12 @@ void C_SdNdeDataPoolListsTreeWidget::UpdateUI(void)
    Q_EMIT this->SigSizeChange();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Insert new row at specified row index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Insert new row at specified row index
 
    \param[in] oru32_TargetRow Row index
-
-   \created     26.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::InsertRowWithoutData(const uint32 & oru32_TargetRow)
 {
    QTreeWidgetItem * const pc_Item = new QTreeWidgetItem(static_cast<sintn>(QTreeWidgetItem::ItemType::UserType));
@@ -288,13 +263,10 @@ void C_SdNdeDataPoolListsTreeWidget::InsertRowWithoutData(const uint32 & oru32_T
    this->insertTopLevelItem(oru32_TargetRow, pc_Item);
    m_InitialItemConfigure(pc_Item, oru32_TargetRow);
 }
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy tree item to clipboard
-
-   \created     25.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy tree item to clipboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::Copy(void) const
 {
    C_SdNdeDataPoolListTableWidget * const pc_Table = m_GetActiveTable();
@@ -331,13 +303,10 @@ void C_SdNdeDataPoolListsTreeWidget::Copy(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy tree item to clipboard and delete it afterwards
-
-   \created     27.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy tree item to clipboard and delete it afterwards
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::Cut(void)
 {
    C_SdNdeDataPoolListTableWidget * const pc_Table = m_GetActiveTable();
@@ -353,13 +322,10 @@ void C_SdNdeDataPoolListsTreeWidget::Cut(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paste tree item
-
-   \created     25.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paste tree item
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::Paste(void)
 {
    C_SdNdeDataPoolListTableWidget * const pc_Table = m_GetActiveTable();
@@ -376,13 +342,10 @@ void C_SdNdeDataPoolListsTreeWidget::Paste(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete tree item
-
-   \created     26.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete tree item
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::Delete(void)
 {
    C_SdNdeDataPoolListTableWidget * const pc_Table = m_GetActiveTable();
@@ -399,27 +362,21 @@ void C_SdNdeDataPoolListsTreeWidget::Delete(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Insert triggered via action
-
-   \created     08.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Insert triggered via action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::InsertAction(void)
 {
    Insert();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Insert tree item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Insert tree item
 
    \param[in] orq_SetFocus Optional flag if inital focus should be set
-
-   \created     27.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::Insert(const bool & orq_SetFocus)
 {
    C_SdNdeDataPoolListTableWidget * const pc_Table = m_GetActiveTable();
@@ -467,13 +424,10 @@ void C_SdNdeDataPoolListsTreeWidget::Insert(const bool & orq_SetFocus)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Move selected item up by one slot
-
-   \created     27.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Move selected item up by one slot
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::DoMoveUp(void)
 {
    C_SdNdeDataPoolListTableWidget * const pc_Table = m_GetActiveTable();
@@ -515,13 +469,10 @@ void C_SdNdeDataPoolListsTreeWidget::DoMoveUp(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Move selected item down by one slot
-
-   \created     27.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Move selected item down by one slot
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::DoMoveDown(void)
 {
    C_SdNdeDataPoolListTableWidget * const pc_Table = m_GetActiveTable();
@@ -564,13 +515,10 @@ void C_SdNdeDataPoolListsTreeWidget::DoMoveDown(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Enter name edit
-
-   \created     06.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Enter name edit
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::Edit(void) const
 {
    C_SdNdeDataPoolListTableWidget * const pc_Table = m_GetActiveTable();
@@ -600,13 +548,10 @@ void C_SdNdeDataPoolListsTreeWidget::Edit(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle pop up request
-
-   \created     13.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle pop up request
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::PopUp(void) const
 {
    QTreeWidgetItem * const pc_Table = m_GetActiveTableTreeWidget();
@@ -648,17 +593,14 @@ void C_SdNdeDataPoolListsTreeWidget::PopUp(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check node data pool full
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check node data pool full
 
    \return
    true  Data pool full
    false else
-
-   \created     27.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolListsTreeWidget::CheckDataPoolFull(void) const
 {
    bool q_Retval = false;
@@ -675,16 +617,13 @@ bool C_SdNdeDataPoolListsTreeWidget::CheckDataPoolFull(void) const
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function to open a concrete datapool list or dataelement
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function to open a concrete datapool list or dataelement
 
    \param[in] os32_ListIndex          Optional list index (if not used set to -1)
    \param[in] os32_DataElementIndex   Optional data element index (if not used set to -1)
-
-   \created     16.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::OpenDetail(const sint32 os32_ListIndex, const sint32 os32_DataElementIndex)
 {
    QTreeWidgetItem * pc_Item = this->topLevelItem(os32_ListIndex);
@@ -724,54 +663,42 @@ void C_SdNdeDataPoolListsTreeWidget::OpenDetail(const sint32 os32_ListIndex, con
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register model change
-
-   \created     18.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register model change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::UpdateModels(void)
 {
    this->mc_ModelViewManager.UpdateModels();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register size change
-
-   \created     24.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register size change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::RegisterSizeChange(void)
 {
    this->UpdateUI();
    m_HandleSizeChange();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle error change signal of any list item
-
-   \created     24.02.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle error change signal of any list item
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::HandleErrorChange(void)
 {
    this->mc_ErrorManager.OnErrorChange();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten drop event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten drop event slot
 
    Here: Skip old item, find new item and add widget (widget is not copied)
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     17.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::dropEvent(QDropEvent * const opc_Event)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -827,17 +754,14 @@ void C_SdNdeDataPoolListsTreeWidget::dropEvent(QDropEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten drag enter event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten drag enter event slot
 
    Here: Accept table item type
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     03.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::dragEnterEvent(QDragEnterEvent * const opc_Event)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -871,17 +795,14 @@ void C_SdNdeDataPoolListsTreeWidget::dragEnterEvent(QDragEnterEvent * const opc_
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten drag move event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten drag move event slot
 
    Here: selective deactivation of autoexpand feature
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     03.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::dragMoveEvent(QDragMoveEvent * const opc_Event)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -915,18 +836,15 @@ void C_SdNdeDataPoolListsTreeWidget::dragMoveEvent(QDragMoveEvent * const opc_Ev
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten selection changed event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten selection changed event slot
 
    Here: minimize last selected item & signal selection change
 
    \param[in] orc_Selected   New selected items
    \param[in] orc_Deselected Last selected items
-
-   \created     20.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::selectionChanged(const QItemSelection & orc_Selected,
                                                       const QItemSelection & orc_Deselected)
 {
@@ -983,17 +901,14 @@ void C_SdNdeDataPoolListsTreeWidget::selectionChanged(const QItemSelection & orc
    Q_EMIT this->SigSelectionChanged(m_GetSelectedIndices().size(), true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: handle list paste
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     26.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::keyPressEvent(QKeyEvent * const opc_Event)
 {
    bool q_CallOrig = true;
@@ -1089,17 +1004,14 @@ void C_SdNdeDataPoolListsTreeWidget::keyPressEvent(QKeyEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle expand request
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle expand request
 
    \param[in] opc_Item  Affected tree item widget
    \param[in] oq_Expand true: expand
                         false collapse
-
-   \created     16.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_OnExpandRequestedHeader(const C_SdNdeDataPoolListHeaderWidget * const opc_Item,
                                                                const bool oq_Expand)
 {
@@ -1115,17 +1027,14 @@ void C_SdNdeDataPoolListsTreeWidget::m_OnExpandRequestedHeader(const C_SdNdeData
    m_OnExpandRequestedIndex(s32_It, oq_Expand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle expand request
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle expand request
 
    \param[in] os32_Index Index
    \param[in] oq_Expand  true: expand
                          false collapse
-
-   \created     25.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_OnExpandRequestedIndex(const sint32 os32_Index, const bool oq_Expand)
 {
    if (oq_Expand == true)
@@ -1140,16 +1049,13 @@ void C_SdNdeDataPoolListsTreeWidget::m_OnExpandRequestedIndex(const sint32 os32_
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set up new tree item widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set up new tree item widget
 
    \param[in,out] opc_Item   Tree item widget to set up
    \param[in]     os32_Index According index
-
-   \created     25.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_InitialItemConfigure(QTreeWidgetItem * const opc_Item, const sint32 os32_Index)
 {
    C_SdNdeDataPoolListHeaderWidget * const pc_ListItem = new C_SdNdeDataPoolListHeaderWidget(NULL, this,
@@ -1215,16 +1121,13 @@ void C_SdNdeDataPoolListsTreeWidget::m_InitialItemConfigure(QTreeWidgetItem * co
    //lint -e{429}  no memory leak because setItemWidget takes ownership
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Move item in tree
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Move item in tree
 
    \param[in] oru32_SourceIndices Source index
    \param[in] oru32_TargetIndices Target index
-
-   \created     27.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_Move(const std::vector<uint32> & oru32_SourceIndices,
                                             const std::vector<uint32> & oru32_TargetIndices)
 {
@@ -1232,13 +1135,10 @@ void C_SdNdeDataPoolListsTreeWidget::m_Move(const std::vector<uint32> & oru32_So
                                    oru32_SourceIndices, oru32_TargetIndices);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init from data pool data
-
-   \created     25.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init from data pool data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_InitFromData(void)
 {
    //QElapsedTimer c_Timer;
@@ -1291,27 +1191,21 @@ void C_SdNdeDataPoolListsTreeWidget::m_InitFromData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update address values
-
-   \created     30.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update address values
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_UpdateAddress(void)
 {
    this->UpdateUI();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show custom context menu
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show custom context menu
 
    \param[in] orc_Pos Local context menu position
-
-   \created     03.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 {
    const QModelIndex c_Current = this->indexAt(orc_Pos);
@@ -1322,13 +1216,10 @@ void C_SdNdeDataPoolListsTreeWidget::m_OnCustomContextMenuRequested(const QPoint
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init context menu entries
-
-   \created     03.02.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init context menu entries
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_SetupContextMenu(void)
 {
    this->mpc_ContextMenu = new C_OgeContextMenu(this);
@@ -1373,15 +1264,12 @@ void C_SdNdeDataPoolListsTreeWidget::m_SetupContextMenu(void)
            &C_SdNdeDataPoolListsTreeWidget::m_OnCustomContextMenuRequested);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle collapse event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle collapse event
 
    \param[in] orc_Index Collapsed item
-
-   \created     07.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_OnCollapse(const QModelIndex & orc_Index) const
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -1394,15 +1282,12 @@ void C_SdNdeDataPoolListsTreeWidget::m_OnCollapse(const QModelIndex & orc_Index)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle expand event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle expand event
 
    \param[in] orc_Index Expanded item
-
-   \created     07.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_OnExpand(const QModelIndex & orc_Index) const
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -1415,17 +1300,14 @@ void C_SdNdeDataPoolListsTreeWidget::m_OnExpand(const QModelIndex & orc_Index) c
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle error change signal of any data set item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle error change signal of any data set item
 
    \param[in] oru32_NodeIndex     Node index
    \param[in] oru32_DataPoolIndex Data pool index
    \param[in] oru32_ListIndex     List index
-
-   \created     24.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_HandleDataSetErrorChange(const uint32 & oru32_NodeIndex,
                                                                 const uint32 & oru32_DataPoolIndex,
                                                                 const uint32 & oru32_ListIndex) const
@@ -1446,28 +1328,22 @@ void C_SdNdeDataPoolListsTreeWidget::m_HandleDataSetErrorChange(const uint32 & o
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle size change signal of any list item
-
-   \created     27.02.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle size change signal of any list item
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_HandleSizeChange(void)
 {
    Q_EMIT this->SigSizeChange();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle table selction change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle table selction change
 
    \param[in] oru32_ListIndex Source list
    \param[in] oru32_Count     Number of selected items
-
-   \created     27.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_HandleTableSelection(const uint32 & oru32_ListIndex, const uint32 & oru32_Count)
 {
    if (oru32_Count > 0)
@@ -1478,16 +1354,13 @@ void C_SdNdeDataPoolListsTreeWidget::m_HandleTableSelection(const uint32 & oru32
    Q_EMIT this->SigSelectionChanged(oru32_Count, false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get selected indices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get selected indices
 
    \return
    Selected indices
-
-   \created     27.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint32> C_SdNdeDataPoolListsTreeWidget::m_GetSelectedIndices(void) const
 {
    std::vector<uint32> c_Retval;
@@ -1506,9 +1379,8 @@ std::vector<uint32> C_SdNdeDataPoolListsTreeWidget::m_GetSelectedIndices(void) c
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Forward signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Forward signal
 
    \param[in] orq_AddActive      Push button add active
    \param[in] orq_CutActive      Push button cut active
@@ -1517,10 +1389,8 @@ std::vector<uint32> C_SdNdeDataPoolListsTreeWidget::m_GetSelectedIndices(void) c
    \param[in] orq_DeleteActive   Push button delete active
    \param[in] orq_MoveDownActive Push button move down active
    \param[in] orq_MoveUpActive   Push button move up active
-
-   \created     27.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_OnButtonChange(const bool & orq_AddActive, const bool & orq_CutActive,
                                                       const bool & orq_CopyActive, const bool & orq_PasteActive,
                                                       const bool & orq_DeleteActive, const bool & orq_MoveDownActive,
@@ -1530,13 +1400,10 @@ void C_SdNdeDataPoolListsTreeWidget::m_OnButtonChange(const bool & orq_AddActive
                                 orq_MoveDownActive, orq_MoveUpActive);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Recheck if actions statuses are still up to date
-
-   \created     27.02.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Recheck if actions statuses are still up to date
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_CheckActions(void)
 {
    const std::vector<uint32> c_SelectedIndices = m_GetSelectedIndices();
@@ -1588,19 +1455,16 @@ void C_SdNdeDataPoolListsTreeWidget::m_CheckActions(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get active table
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get active table
 
    \param[in] orq_IgnoreSelectedItems Optional indicator if selected item size should be ignored
 
    \return
    NULL No active table
    else Active table
-
-   \created     01.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListTableWidget * C_SdNdeDataPoolListsTreeWidget::m_GetActiveTable(const bool & orq_IgnoreSelectedItems)
 const
 {
@@ -1643,19 +1507,16 @@ const
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get active table tree widget item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get active table tree widget item
 
    \param[in] orq_IgnoreSelectedItems Optional indicator if selected item size should be ignored
 
    \return
    NULL No active table tree widget item
    Else Active table tree widget item
-
-   \created     13.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QTreeWidgetItem * C_SdNdeDataPoolListsTreeWidget::m_GetActiveTableTreeWidget(const bool & orq_IgnoreSelectedItems) const
 {
    QTreeWidgetItem * pc_Retval = NULL;
@@ -1697,17 +1558,14 @@ QTreeWidgetItem * C_SdNdeDataPoolListsTreeWidget::m_GetActiveTableTreeWidget(con
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt target position of drop action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt target position of drop action
 
    \param[in]     orc_SelectedIndices       Selected indices
    \param[in]     ore_DropIndicatorPosition Drop indicator position
    \param[in,out] ors32_TargetPosition      Target position (Requirement: valid initialization)
-
-   \created     14.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::mh_AdaptDropTargetIndex(const std::vector<uint32> & orc_SelectedIndices,
                                                              const QAbstractItemView::DropIndicatorPosition & ore_DropIndicatorPosition,
                                                              sint32 & ors32_TargetPosition)
@@ -1746,29 +1604,23 @@ void C_SdNdeDataPoolListsTreeWidget::mh_AdaptDropTargetIndex(const std::vector<u
    ors32_TargetPosition = std::max(ors32_TargetPosition, 0L);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle change detected
-
-   \created     14.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle change detected
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_HandleChanged(void)
 {
    Q_EMIT this->SigChanged();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle data set size change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle data set size change
 
    \param[in] oru32_NodeIndex         Node index
    \param[in] oru32_DataPoolIndex     Data pool index
    \param[in] oru32_DataPoolListIndex List index
-
-   \created     20.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_UpdateDataSetCount(const uint32 & oru32_NodeIndex,
                                                           const uint32 & oru32_DataPoolIndex,
                                                           const uint32 & oru32_ListIndex) const
@@ -1790,7 +1642,7 @@ void C_SdNdeDataPoolListsTreeWidget::m_UpdateDataSetCount(const uint32 & oru32_N
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_ScrollBarRangeChanged(const sintn osn_Min, const sintn osn_Max) const
 {
    // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar
@@ -1804,16 +1656,13 @@ void C_SdNdeDataPoolListsTreeWidget::m_ScrollBarRangeChanged(const sintn osn_Min
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get index of element after highest selected element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get index of element after highest selected element
 
    \return
    Index of element after highest selected element
-
-   \created     23.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SdNdeDataPoolListsTreeWidget::m_GetOneAfterHighestSelected(void) const
 {
    uint32 u32_Retval = 0;
@@ -1838,29 +1687,23 @@ uint32 C_SdNdeDataPoolListsTreeWidget::m_GetOneAfterHighestSelected(void) const
    return u32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Forward signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Forward signal
 
    \param[in] orq_Error Changed error status
-
-   \created     24.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_OnErrorChangePossible(const bool & orq_Error)
 {
    Q_EMIT this->SigErrorChange(orq_Error);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Disable all table selections
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Disable all table selections
 
    \param[in] ors32_Exception Optional parameter to allow one table to not have its selection cleared
-
-   \created     31.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_ClearTableSelection(const sint32 & ors32_Exception) const
 {
    for (sint32 s32_It = 0; s32_It < this->topLevelItemCount(); ++s32_It)
@@ -1888,15 +1731,12 @@ void C_SdNdeDataPoolListsTreeWidget::m_ClearTableSelection(const sint32 & ors32_
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle exclusive list selection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle exclusive list selection
 
    \param[in] oru32_ListIndex List index
-
-   \created     08.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_HandleExclusiveListSelection(const uint32 & oru32_ListIndex) const
 {
    for (sint32 s32_It = 0; s32_It < this->topLevelItemCount(); ++s32_It)
@@ -1916,13 +1756,10 @@ void C_SdNdeDataPoolListsTreeWidget::m_HandleExclusiveListSelection(const uint32
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Store user settings
-
-   \created     23.01.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Store user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_StoreUserSettings(void) const
 {
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
@@ -2007,13 +1844,10 @@ void C_SdNdeDataPoolListsTreeWidget::m_StoreUserSettings(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Restore user settings
-
-   \created     23.01.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Restore user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeWidget::m_RestoreUserSettings(void)
 {
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);

@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       openSYDE protocol driver
@@ -14,15 +14,9 @@
    - inbetween calls rescind CPU time to other threads
    - "wait" until we get a response or reach the timeout
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     12.05.2017  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCPROTOCOLDRIVEROSYH
 #define C_OSCPROTOCOLDRIVEROSYH
 
@@ -57,6 +51,9 @@ private:
 
    //timeouts:
    stw_types::uint32 mu32_TimeoutPollingMs; ///< timeout used when "polling" services
+
+   //maximum service size including header (used in WriteMemoryByAddress):
+   stw_types::uint16 mu16_MaxServiceSize;
 
    void m_LogServiceError(const stw_scl::C_SCLString & orc_Service, const stw_types::sint32 os32_ReturnCode,
                           const stw_types::uint8 ou8_NrCode) const;
@@ -137,6 +134,8 @@ private:
    static const stw_types::uint16 mhu16_OSY_DI_ECU_SERIAL_NUMBER           = 0xF18CU;
    static const stw_types::uint16 mhu16_OSY_DI_SYS_SUPPLIER_ECU_HW_NUMBER  = 0xF192U;
    static const stw_types::uint16 mhu16_OSY_DI_SYS_SUPPLIER_ECU_HW_VERSION = 0xF193U;
+   static const stw_types::uint16 mhu16_OSY_DI_LIST_OF_FEATURES            = 0xA800U;
+   static const stw_types::uint16 mhu16_OSY_DI_MAX_NUMBER_OF_BLOCK_LENGTH  = 0xA801U;
    static const stw_types::uint16 mhu16_OSY_DI_DATARATE_1                  = 0xA810U;
    static const stw_types::uint16 mhu16_OSY_DI_DATARATE_2                  = 0xA811U;
    static const stw_types::uint16 mhu16_OSY_DI_DATARATE_3                  = 0xA812U;
@@ -229,11 +228,21 @@ public:
       stw_scl::C_SCLString c_Name;     ///< Data pool name
    };
 
+   ///list of features supported by server
+   class C_ListOfFeatures
+   {
+   public:
+      bool q_FlashloaderCanWriteToNvm; ///< set to 1 in Flashloader to show that "Writing to NVM" is supported
+      bool q_MaxNumberOfBlockLengthAvailable; ///< 1: MaxNumberOfBlockLength can be read
+   };
+
    C_OSCProtocolDriverOsy(void);
    virtual ~C_OSCProtocolDriverOsy(void);
 
    void SetTimeoutPolling(const stw_types::uint32 ou32_TimeoutPollingMs);
    void ResetTimeoutPolling(void);
+   void SetMaxServiceSize(const stw_types::uint16 ou16_MaxServiceSize);
+
    void InitializeTunnelCanMessage(PR_OsyTunnelCanMessageReceived const opr_OsyTunnelCanMessageReceived,
                                    void * const opv_Instance);
 
@@ -261,6 +270,10 @@ public:
                                            stw_types::uint8 * const opu8_NrCode = NULL);
    stw_types::sint32 OsyReadHardwareVersionNumber(stw_scl::C_SCLString & orc_HardwareVersionNumber,
                                                   stw_types::uint8 * const opu8_NrCode = NULL);
+   stw_types::sint32 OsyReadListOfFeatures(C_ListOfFeatures & orc_ListOfFeatures,
+                                           stw_types::uint8 * const opu8_NrCode = NULL);
+   stw_types::sint32 OsyReadMaxNumberOfBlockLength(stw_types::uint16 & oru16_MaxNumberOfBlockLength,
+                                                   stw_types::uint8 * const opu8_NrCode = NULL);
    stw_types::sint32 OsyReadDeviceName(stw_scl::C_SCLString & orc_DeviceName,
                                        stw_types::uint8 * const opu8_NrCode = NULL);
    stw_types::sint32 OsyReadApplicationName(stw_scl::C_SCLString & orc_ApplicationName,

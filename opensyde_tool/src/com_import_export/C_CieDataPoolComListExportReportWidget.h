@@ -1,17 +1,11 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Dialog for export report to DBC file (header)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     18.06.2018  STW/D.Pohl (copied and adapted from data pool list import)
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_CIEDATAPOOLCOMLISTEXPORTREPORTWIDGET_H
 #define C_CIEDATAPOOLCOMLISTEXPORTREPORTWIDGET_H
 
@@ -24,12 +18,12 @@ namespace Ui
 {
 class C_CieDataPoolComListExportReportWidget;
 }
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_CieDataPoolComListExportReportWidget :
    public QWidget
 {
@@ -69,7 +63,7 @@ private:
    C_CieDataPoolComListExportReportWidget & operator =(const C_CieDataPoolComListExportReportWidget &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

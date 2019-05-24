@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Graphics scene for system view update (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.06.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <cmath>
@@ -30,7 +23,7 @@
 #include "C_GiSvNodeSyvUpdate.h"
 #include "C_GiBiConnectableItem.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -38,57 +31,48 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const stw_types::float64 C_SyvUpScene::mhf64_BusAnimationTolerance = 0.001;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     ou32_ViewIndex View index
    \param[in,out] opc_Parent     Optional pointer to parent
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvUpScene::C_SyvUpScene(const uint32 ou32_ViewIndex, QObject * const opc_Parent) :
    C_SyvTopologyBaseScene(ou32_ViewIndex, opc_Parent)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvUpScene::~C_SyvUpScene()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update connected status
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update connected status
 
    \param[in] oq_Active      Flag if connected
    \param[in] oq_SignalNodes Optional flag to signal nodes
-
-   \created     13.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpScene::SetConnected(const bool oq_Active, const bool oq_SignalNodes) const
 {
    const QList<QGraphicsItem *> c_Items = this->items();
@@ -119,15 +103,12 @@ void C_SyvUpScene::SetConnected(const bool oq_Active, const bool oq_SignalNodes)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal if update in progress
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal if update in progress
 
    \param[in] oq_Active Flag if update in progress
-
-   \created     13.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpScene::SetUpdating(const bool oq_Active) const
 {
    const QList<QGraphicsItem *> c_Items = this->items();
@@ -149,16 +130,13 @@ void C_SyvUpScene::SetUpdating(const bool oq_Active) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update device information
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update device information
 
    \param[in] orc_NodeIndexes       Node indices
    \param[in] orc_DeviceInformation Device info
-
-   \created     13.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpScene::UpdateDeviceInformation(const std::vector<uint32> & orc_NodeIndexes,
                                            const std::vector<C_SyvUpDeviceInfo> & orc_DeviceInformation) const
 {
@@ -193,13 +171,10 @@ void C_SyvUpScene::UpdateDeviceInformation(const std::vector<uint32> & orc_NodeI
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start connection animation
-
-   \created     21.03.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start connection animation
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpScene::StartConnectionAnimation(void) const
 {
    const QList<QGraphicsItem *> c_Items = this->items();
@@ -228,15 +203,12 @@ void C_SyvUpScene::StartConnectionAnimation(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start progress animation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start progress animation
 
    \param[out] ou32_NodeIndex SD node index
-
-   \created     09.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpScene::StartProgressAnimation(const uint32 ou32_NodeIndex) const
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
@@ -403,17 +375,14 @@ void C_SyvUpScene::StartProgressAnimation(const uint32 ou32_NodeIndex) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Stop all progress animations
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Stop all progress animations
 
    \param[in] oq_Abort                    Flag if action aborted
    \param[in] ou32_FailedApplicationIndex If aborted and currently updating this is the currently updated application
    \param[in] oq_StopUpdateingState       Flag to stop updating state
-
-   \created     12.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpScene::StopProgressAnimation(const bool oq_Abort, const uint32 ou32_FailedApplicationIndex,
                                          const bool oq_StopUpdateingState) const
 {
@@ -475,15 +444,12 @@ void C_SyvUpScene::StopProgressAnimation(const bool oq_Abort, const uint32 ou32_
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set no response state for node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set no response state for node
 
    \param[in] ou32_NodeIndex Node index
-
-   \created     14.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpScene::SetNoResponse(const uint32 ou32_NodeIndex) const
 {
    const QList<QGraphicsItem *> c_Items = this->items();
@@ -505,16 +471,13 @@ void C_SyvUpScene::SetNoResponse(const uint32 ou32_NodeIndex) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all not responding node indices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all not responding node indices
 
    \return
    All not responding node indices
-
-   \created     21.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint32> C_SyvUpScene::GetActiveNoResponseNodeIndices(void) const
 {
    const QList<QGraphicsItem *> c_Items = this->items();
@@ -540,16 +503,13 @@ std::vector<uint32> C_SyvUpScene::GetActiveNoResponseNodeIndices(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all none third party node indices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all none third party node indices
 
    \return
    All none third party node indices
-
-   \created     21.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint32> C_SyvUpScene::GetActiveNoneThirdPartyNodeIndices(void) const
 {
    const QList<QGraphicsItem *> c_Items = this->items();
@@ -564,7 +524,8 @@ std::vector<uint32> C_SyvUpScene::GetActiveNoneThirdPartyNodeIndices(void) const
          //Nodes
          //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
          const C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<const C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
-         if (((pc_Node != NULL) && (pc_Node->GetIndex() >= 0)) && (pc_Node->IsStwDeviceAndActive() == true))
+         if ((((pc_Node != NULL) && (pc_Node->GetIndex() >= 0)) && (pc_Node->IsActiveInView() == true)) &&
+             (pc_Node->IsStwDevice() == true))
          {
             c_Retval.push_back(static_cast<uint32>(pc_Node->GetIndex()));
          }
@@ -575,86 +536,98 @@ std::vector<uint32> C_SyvUpScene::GetActiveNoneThirdPartyNodeIndices(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if any item can be added to the scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Trigger update icon check for all nodes
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpScene::CheckUpdateDisabledState(void) const
+{
+   const QList<QGraphicsItem *> c_Items = this->items();
+
+   for (QList<QGraphicsItem *>::const_iterator c_ItItem = c_Items.begin(); c_ItItem != c_Items.end(); ++c_ItItem)
+   {
+      QGraphicsItem * const pc_CurItemParent = C_SebUtil::h_GetHighestParent(*c_ItItem);
+      if (pc_CurItemParent != NULL)
+      {
+         //Nodes
+         //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+         C_GiSvNodeSyvUpdate * const pc_Node = dynamic_cast<C_GiSvNodeSyvUpdate *>(pc_CurItemParent);
+         if (((pc_Node != NULL) && (pc_Node->GetIndex() >= 0)) && (pc_Node->IsActiveInView() == true))
+         {
+            pc_Node->UpdateIcons();
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if any item can be added to the scene
 
    \return
    true     Items can be added
    false    Items cannot be added
-
-   \created     08.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvUpScene::IsAnyItemAddable(void) const
 {
    return false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if the graphics item is movable on the scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if the graphics item is movable on the scene
 
    \return
    true     Item is movable
    false    Item is not movable
-
-   \created     08.02.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvUpScene::IsItemMovable(const QGraphicsItem * const opc_Item) const
 {
    Q_UNUSED(opc_Item)
    return false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if the graphics item is selectable on the scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if the graphics item is selectable on the scene
 
    \return
    true     Item is selectable
    false    Item is not selectable
-
-   \created     08.02.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvUpScene::IsItemSelectable(const QGraphicsItem * const opc_Item) const
 {
    Q_UNUSED(opc_Item)
    return false;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebBaseContextMenuManager * C_SyvUpScene::m_GetContextMenuManager(void)
 {
    return NULL;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoBaseManager * C_SyvUpScene::m_GetUndoManager(void)
 {
    return NULL;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiNode * C_SyvUpScene::m_CreateNode(const sint32 & ors32_Index, const uint64 & oru64_ID, const float64 & orf64_Width,
                                       const float64 & orf64_Height, QGraphicsItem * const opc_Parent)
 {
    return new C_GiSvNodeSyvUpdate(this->mu32_ViewIndex, ors32_Index, oru64_ID, orf64_Width, orf64_Height, opc_Parent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse double click event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse double click event slot
 
    Here: handle item edit
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     15.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    QGraphicsItem * const pc_Item = this->itemAt(opc_Event->scenePos(), QTransform());
@@ -687,15 +660,12 @@ void C_SyvUpScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Ev
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new node to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new node to scene and connect signals
 
    \param[in,out] opc_NodeGraphicsItem Pointer to new node
-
-   \created     22.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpScene::m_AddNodeToScene(C_GiNode * const opc_NodeGraphicsItem)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -708,9 +678,8 @@ void C_SyvUpScene::m_AddNodeToScene(C_GiNode * const opc_NodeGraphicsItem)
    C_SyvTopologyBaseScene::m_AddNodeToScene(opc_NodeGraphicsItem);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle bus progress animation start
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle bus progress animation start
 
    \param[in] rc_Calc        Routes
    \param[in] ou32_NodeIndex Node index
@@ -718,10 +687,8 @@ void C_SyvUpScene::m_AddNodeToScene(C_GiNode * const opc_NodeGraphicsItem)
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     12.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvUpScene::m_StartProgressAnimationBusses(const C_SyvRoRouteCalculation & rc_Calc,
                                                     const uint32 ou32_NodeIndex) const
 {
@@ -892,9 +859,8 @@ sint32 C_SyvUpScene::m_StartProgressAnimationBusses(const C_SyvRoRouteCalculatio
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculate animation path
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculate animation path
 
    \param[in]  orc_PointStart          Animation start point
    \param[in]  orc_PointEnd            Animation end point
@@ -905,10 +871,8 @@ sint32 C_SyvUpScene::m_StartProgressAnimationBusses(const C_SyvRoRouteCalculatio
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     20.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvUpScene::mh_GetAnimationPath(const QPointF & orc_PointStart, const QPointF & orc_PointEnd,
                                          const std::vector<QPointF> & orc_UIInteractionPoints, QPolygonF & orc_Path,
                                          bool & orq_Inverse)

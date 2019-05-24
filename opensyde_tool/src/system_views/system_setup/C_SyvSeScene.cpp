@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Graphics scene for system view setup (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.06.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QApplication>
@@ -34,7 +27,7 @@
 #include "C_GiSvPcBusConnector.h"
 #include "C_PuiSvHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_opensyde_gui;
@@ -42,28 +35,25 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     ou32_ViewIndex View index
    \param[in,out] opc_Parent     Optional pointer to parent
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvSeScene::C_SyvSeScene(const uint32 ou32_ViewIndex, QObject * const opc_Parent) :
    C_SyvTopologyBaseScene(ou32_ViewIndex, opc_Parent),
    mq_EditMode(false),
@@ -82,28 +72,22 @@ C_SyvSeScene::C_SyvSeScene(const uint32 ou32_ViewIndex, QObject * const opc_Pare
    connect(this, &C_SyvSeScene::selectionChanged, this, &C_SyvSeScene::m_SelectionChanged);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvSeScene::~C_SyvSeScene(void)
 {
    this->PrepareToClose();
    //lint -e{1579}  never took ownership of selected bus connector
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function to prepare closing the scene
-
-   \created     24.01.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function to prepare closing the scene
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeScene::PrepareToClose(void)
 {
    //Clean up all created dialogs
@@ -116,15 +100,12 @@ void C_SyvSeScene::PrepareToClose(void)
    this->mc_Dialogs.clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the state of the edit mode
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the state of the edit mode
 
    \param[in]     oq_Active      Flag for setting the edit mode
-
-   \created     23.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeScene::SetEditMode(const bool oq_Active)
 {
    const QList<QGraphicsItem *> & rc_Items = this->items();
@@ -157,13 +138,10 @@ void C_SyvSeScene::SetEditMode(const bool oq_Active)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save data
-
-   \created     28.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeScene::Save(void) const
 {
    const QList<QGraphicsItem *> & rc_Items = this->items();
@@ -200,13 +178,10 @@ void C_SyvSeScene::Save(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reloads all view relevant data again
-
-   \created     29.06.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reloads all view relevant data again
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeScene::ReloadViewData(void)
 {
    bool q_ConnectionFound = false;
@@ -316,27 +291,21 @@ void C_SyvSeScene::ReloadViewData(void)
    QApplication::restoreOverrideCursor();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clear undo stack
-
-   \created     04.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clear undo stack
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeScene::ClearUndoStack(void)
 {
    this->mc_UndoManager.clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the view connected state of all nodes to the parameter oq_Connected
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the view connected state of all nodes to the parameter oq_Connected
 
    \param[in]     oq_Connected     Flag for view connection of all nodes
-
-   \created     29.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeScene::SetAllNodesConnected(const bool oq_Connected)
 {
    const QList<QGraphicsItem *> & rc_Items = this->items();
@@ -369,33 +338,27 @@ void C_SyvSeScene::SetAllNodesConnected(const bool oq_Connected)
    QApplication::restoreOverrideCursor();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if any item can be added to the scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if any item can be added to the scene
 
    \return
    true     Items can be added
    false    Items cannot be added
-
-   \created     03.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvSeScene::IsAnyItemAddable(void) const
 {
    return false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if the graphics item is movable on the scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if the graphics item is movable on the scene
 
    \return
    true     Item is movable
    false    Item is not movable
-
-   \created     24.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvSeScene::IsItemMovable(const QGraphicsItem * const opc_Item) const
 {
    bool q_Return = false;
@@ -408,17 +371,14 @@ bool C_SyvSeScene::IsItemMovable(const QGraphicsItem * const opc_Item) const
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if the graphics item is selectable on the scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if the graphics item is selectable on the scene
 
    \return
    true     Item is selectable
    false    Item is not selectable
-
-   \created     24.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvSeScene::IsItemSelectable(const QGraphicsItem * const opc_Item) const
 {
    bool q_Return = false;
@@ -431,50 +391,44 @@ bool C_SyvSeScene::IsItemSelectable(const QGraphicsItem * const opc_Item) const
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Allow interaction
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Allow interaction
 
    \return
    True  Drag move is available
    False Drag move is not available
-
-   \created     28.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvSeScene::IsSceneRubberBandAvailable() const
 {
    return this->mq_EditMode;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebBaseContextMenuManager * C_SyvSeScene::m_GetContextMenuManager(void)
 {
    return &this->mc_ContextMenuManager;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoBaseManager * C_SyvSeScene::m_GetUndoManager(void)
 {
    return &this->mc_UndoManager;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiNode * C_SyvSeScene::m_CreateNode(const sint32 & ors32_Index, const uint64 & oru64_ID, const float64 & orf64_Width,
                                       const float64 & orf64_Height, QGraphicsItem * const opc_Parent)
 {
    return new C_GiSvNodeSyvSetup(this->mu32_ViewIndex, ors32_Index, oru64_ID, orf64_Width, orf64_Height, opc_Parent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new node to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new node to scene and connect signals
 
    \param[in,out] opc_NodeGraphicsItem Pointer to new node
-
-   \created     20.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeScene::m_AddNodeToScene(C_GiNode * const opc_NodeGraphicsItem)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -490,15 +444,12 @@ void C_SyvSeScene::m_AddNodeToScene(C_GiNode * const opc_NodeGraphicsItem)
    C_SyvTopologyBaseScene::m_AddNodeToScene(opc_NodeGraphicsItem);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new PC bus connector item to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new PC bus connector item to scene and connect signals
 
    \param[in,out] opc_PcBusConnectorGraphicsItem  PC bus connector item
-
-   \created     03.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeScene::m_AddPcBusConnectorToScene(C_GiSvPcBusConnector * const opc_PcBusConnectorGraphicsItem)
 {
    connect(opc_PcBusConnectorGraphicsItem, &C_GiSvPcBusConnector::SigStartConnect, this,
@@ -513,15 +464,12 @@ void C_SyvSeScene::m_AddPcBusConnectorToScene(C_GiSvPcBusConnector * const opc_P
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new text element to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new text element to scene and connect signals
 
    \param[in,out] opc_Item  Text element
-
-   \created     10.01.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeScene::m_AddTextElementToScene(C_GiBiTextElement * const opc_Item)
 {
    opc_Item->SetEditable(false);
@@ -529,17 +477,14 @@ void C_SyvSeScene::m_AddTextElementToScene(C_GiBiTextElement * const opc_Item)
    C_SebTopologyBaseScene::m_AddTextElementToScene(opc_Item);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse double click event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse double click event slot
 
    Here: handle item edit
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     26.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    QGraphicsItem * const pc_Item = this->itemAt(opc_Event->scenePos(), QTransform());
@@ -572,15 +517,12 @@ void C_SyvSeScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Ev
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle item edit
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle item edit
 
    \param[in] opc_GraphicsItem Edit item
-
-   \created     26.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeScene::m_Edit(QGraphicsItem * const opc_GraphicsItem) const
 {
    if (opc_GraphicsItem != NULL)
@@ -595,13 +537,10 @@ void C_SyvSeScene::m_Edit(QGraphicsItem * const opc_GraphicsItem) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle selection change
-
-   \created     28.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle selection change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeScene::m_SelectionChanged(void)
 {
    //Reset selected bus connector
@@ -675,18 +614,15 @@ void C_SyvSeScene::m_SelectionChanged(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle bus connection start connect event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle bus connection start connect event
 
    \param[in]     ore_ConnectState Connect state
    \param[in,out] opc_Item         Connected generic item
    \param[in]     opc_Type         Bus type
    \param[in,out] opc_Connector    Source
-
-   \created     03.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeScene::m_OnPcBusConnectionStartConnect(const C_GiLiBusConnectorBase::E_ConnectState & ore_ConnectState,
                                                    QGraphicsItem * const opc_Item,
                                                    const C_OSCSystemBus::E_Type * const opc_Type,
@@ -767,13 +703,10 @@ void C_SyvSeScene::m_OnPcBusConnectionStartConnect(const C_GiLiBusConnectorBase:
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle bus connection stop connect event
-
-   \created     03.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle bus connection stop connect event
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeScene::m_OnPcBusConnectionStopConnect(void) const
 {
    //Update system view data
@@ -782,13 +715,10 @@ void C_SyvSeScene::m_OnPcBusConnectionStopConnect(void) const
    m_RestoreCursors();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle connection change
-
-   \created     03.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle connection change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeScene::m_OnConnectionChanged(void)
 {
    QString c_Dummy;
@@ -801,4 +731,6 @@ void C_SyvSeScene::m_OnConnectionChanged(void)
    Q_EMIT this->SigChanged();
    //Trigger error check!
    Q_EMIT this->SigErrorCheck();
+   //Trigger connection changed signal
+   Q_EMIT this->SigConnectionChange();
 }

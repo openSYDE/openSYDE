@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Model for database message selection (implementation)
 
    Model for database message selection
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.01.2019  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QFileInfo>
@@ -28,62 +21,53 @@
 #include "C_SdTooltipUtil.h"
 #include "C_CamMosDatabaseSelectionModel.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_CamMosDatabaseSelectionModel::mhc_IconDatabase = "://images/IconDatabaseBlue.svg";
 const QString C_CamMosDatabaseSelectionModel::mhc_IconMessage = "://images/IconMessage.svg";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     21.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosDatabaseSelectionModel::C_CamMosDatabaseSelectionModel(QObject * const opc_Parent) :
    C_TblTreModel(opc_Parent)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     21.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosDatabaseSelectionModel::~C_CamMosDatabaseSelectionModel(void)
 {
    delete (this->mpc_InvisibleRootItem);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize table content from data
-
-   \created     21.01.2019  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize table content from data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionModel::Init(void)
 {
    this->beginResetModel();
@@ -96,9 +80,8 @@ void C_CamMosDatabaseSelectionModel::Init(void)
    this->endResetModel();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get selected data elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get selected data elements
 
    array:
    0: database name
@@ -108,10 +91,8 @@ void C_CamMosDatabaseSelectionModel::Init(void)
 
    \return
    Current selected data elements
-
-   \created     21.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<std::array<QString,
                        2> > C_CamMosDatabaseSelectionModel::GetDataElements(const QModelIndex & orc_Index) const
 {
@@ -156,36 +137,30 @@ std::vector<std::array<QString,
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get tree column count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get tree column count
 
    \param[in] orc_Parent Parent
 
    \return
    Column count
-
-   \created     21.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_CamMosDatabaseSelectionModel::columnCount(const QModelIndex & orc_Parent) const
 {
    Q_UNUSED(orc_Parent)
    return 1;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get item index by item name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get item index by item name
 
    \param[in] orc_ItemText Item display text
 
    \return
    Model index
-
-   \created     21.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QModelIndex C_CamMosDatabaseSelectionModel::GetIndexForItem(const QString & orc_ItemText) const
 {
    QModelIndex c_Retval;
@@ -202,18 +177,15 @@ QModelIndex C_CamMosDatabaseSelectionModel::GetIndexForItem(const QString & orc_
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert model index to generic item representation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert model index to generic item representation
 
    \param[in] orc_ItemIndex Model index
 
    \return
    Generic item representation
-
-   \created     21.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint32> C_CamMosDatabaseSelectionModel::GetGenericRepresentationForIndex(const QModelIndex & orc_ItemIndex)
 const
 {
@@ -236,15 +208,12 @@ const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize tree structure for data pool lists
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize tree structure for data pool lists
 
    Requires: call of C_CamDbHandler::h_GetInstance()->FindAllMessages();
-
-   \created     21.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionModel::m_Init(void)
 {
    const QMap<QString, C_CamDbDbc> & rc_DBCFiles = C_CamDbHandler::h_GetInstance()->GetDBCFiles();
@@ -259,26 +228,26 @@ void C_CamMosDatabaseSelectionModel::m_Init(void)
    {
       if (c_ItDbc->GetActive())
       {
-         const QMap<QString, C_CamDbDbcMessageId> & rc_Messages = c_ItDbc->GetFoundMessages();
+         const std::vector<QString> c_Messages = c_ItDbc->GetFoundMessages();
          //Database
          C_TblTreItem * const pc_DatabaseItem = this->m_CreateAndFillDatabaseNode(
             c_ItDbc.key(), this->mpc_InvisibleRootItem);
-         if (rc_Messages.size() == 0UL)
+         if (c_Messages.size() == 0UL)
          {
             //Special handling for no messages
-            pc_DatabaseItem->c_Name = QString(C_GtGetText::h_GetText("%1 (No mapped messages)")).arg(pc_DatabaseItem->c_Name);
+            pc_DatabaseItem->c_Name = QString(C_GtGetText::h_GetText("%1 (No mapped messages)")).arg(
+               pc_DatabaseItem->c_Name);
          }
          else
          {
             //Reserve
-            pc_DatabaseItem->ReserveChildrenSpace(rc_Messages.size());
+            pc_DatabaseItem->ReserveChildrenSpace(c_Messages.size());
             //Each message
-            for (QMap<QString, C_CamDbDbcMessageId>::const_iterator c_ItMessage = rc_Messages.begin();
-                 c_ItMessage != rc_Messages.end(); ++c_ItMessage)
+            for (std::vector<QString>::const_iterator c_ItMessage = c_Messages.begin();
+                 c_ItMessage != c_Messages.end(); ++c_ItMessage)
             {
                const C_CieConverter::C_CIECanMessage * const pc_Message =
-                  C_CamDbHandler::h_GetInstance()->GetDbcMessage(
-                     c_ItDbc.key(), c_ItMessage.key());
+                  C_CamDbHandler::h_GetInstance()->GetDbcMessage(c_ItDbc.key(), *c_ItMessage);
                if (pc_Message != NULL)
                {
                   const C_OSCCanMessage c_OSCMessage = C_CamGenSigUtil::h_ConvertDBCToOSY(*pc_Message);
@@ -303,7 +272,8 @@ void C_CamMosDatabaseSelectionModel::m_Init(void)
          if (rc_Messages.size() == 0UL)
          {
             //Special handling for no messages
-            pc_DatabaseItem->c_Name = QString(C_GtGetText::h_GetText("%1 (No mapped messages)")).arg(pc_DatabaseItem->c_Name);
+            pc_DatabaseItem->c_Name = QString(C_GtGetText::h_GetText("%1 (No mapped messages)")).arg(
+               pc_DatabaseItem->c_Name);
          }
          else
          {
@@ -325,19 +295,16 @@ void C_CamMosDatabaseSelectionModel::m_Init(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create and fill tree node for database item (without messages)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create and fill tree node for database item (without messages)
 
    \param[in]     orc_File       File to create node for
    \param[in,out] opc_ParentItem Parent item to insert this node
 
    \return
    Database tree node
-
-   \created     22.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_TblTreItem * C_CamMosDatabaseSelectionModel::m_CreateAndFillDatabaseNode(const QString & orc_File,
                                                                            C_TblTreItem * const opc_ParentItem)
 {
@@ -356,16 +323,13 @@ C_TblTreItem * C_CamMosDatabaseSelectionModel::m_CreateAndFillDatabaseNode(const
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create and fill tree node for message item (without signals)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create and fill tree node for message item (without signals)
 
    \param[in]     orc_Message    Message to create node for
    \param[in,out] opc_ParentItem Parent item to insert this node
-
-   \created     21.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionModel::m_CreateAndFillMessageNode(const C_OSCCanMessage & orc_Message,
                                                                 C_TblTreItem * const opc_ParentItem)
 {
@@ -384,16 +348,13 @@ void C_CamMosDatabaseSelectionModel::m_CreateAndFillMessageNode(const C_OSCCanMe
    opc_ParentItem->AddChild(pc_MessageItem);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Append all items from the vector orc_SmallVectorToAdd to the vector orc_BigVectorToAppendTo
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Append all items from the vector orc_SmallVectorToAdd to the vector orc_BigVectorToAppendTo
 
    \param[in,out] orc_BigVectorToAppendTo All current items which will get expanded
    \param[in]     orc_SmallVectorToAdd    New items
-
-   \created     21.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionModel::mh_CombineIndices(std::vector<std::array<QString,
                                                                               2> > & orc_BigVectorToAppendTo,
                                                        const std::vector<std::array<QString,

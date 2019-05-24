@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Core communication driver protocol class (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.12.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSYCOMDRIVERH
 #define C_OSYCOMDRIVERH
 
@@ -72,6 +66,7 @@ public:
 
    stw_types::sint32 ReConnectNode(const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerId) const;
    stw_types::sint32 DisconnectNode(const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerId) const;
+   void DisconnectNodes(void) const;
 
    virtual void PrepareForDestruction(void);
 

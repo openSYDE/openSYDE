@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       System view PC item data element (implementation)
 
    System view PC item data element
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.06.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -27,29 +20,26 @@
 #include "CSCLChecksums.h"
 #include "constants.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     21.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSvPc::C_PuiSvPc(void) :
    C_PuiBsBox(),
    mq_Connected(false),
@@ -59,17 +49,14 @@ C_PuiSvPc::C_PuiSvPc(void) :
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
 
    \param[in,out] oru32_HashValue Hash value with init [in] value and result [out] value
-
-   \created     21.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvPc::CalcHash(uint32 & oru32_HashValue) const
 {
    stw_scl::C_SCLChecksums::CalcCRC32(&this->me_CANDllType, sizeof(this->me_CANDllType), oru32_HashValue);
@@ -83,76 +70,61 @@ void C_PuiSvPc::CalcHash(uint32 & oru32_HashValue) const
    C_PuiBsBox::CalcHash(oru32_HashValue);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get connected flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get connected flag
 
    \return
    Current connected flag
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_PuiSvPc::GetConnected(void) const
 {
    return this->mq_Connected;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get bus index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get bus index
 
    \return
    Current bus index
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_types::uint32 C_PuiSvPc::GetBusIndex(void) const
 {
    return this->mu32_BusIndex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get connection UI data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get connection UI data
 
    \return
    Current connection UI data
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_PuiBsLineBase & C_PuiSvPc::GetConnectionData(void) const
 {
    return this->mc_ConnectionData;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set connection UI data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set connection UI data
 
    \param[in] orc_Value New connection UI data
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvPc::SetConnectionData(const C_PuiBsLineBase & orc_Value)
 {
    this->mc_ConnectionData = orc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set connected state of pc in view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set connected state of pc in view
 
    \param[in] oq_Connected       Flag if pc is connected
    \param[in] ou32_BusIndex      Bus index PC is connected to
    \param[in] orq_ForceSimpleSet Optional flag to indicate if this function is used as a simple set or a logic operation
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvPc::SetConnected(const bool oq_Connected, const uint32 ou32_BusIndex, const bool & orq_ForceSimpleSet)
 {
    this->mq_Connected = oq_Connected;
@@ -162,30 +134,24 @@ void C_PuiSvPc::SetConnected(const bool oq_Connected, const uint32 ou32_BusIndex
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get CAN Dll type. (PEAK = 0,Vector = 1, Other = 2)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get CAN Dll type. (PEAK = 0,Vector = 1, Other = 2)
 
    \return   CAN Dll type
-
-   \created     07.02.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSvPc::E_CANDllType C_PuiSvPc::GetCANDllType() const
 {
    return this->me_CANDllType;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the CAN DLL path
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the CAN DLL path
 
    \return
    CAN DLL path
-
-   \created     05.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_PuiSvPc::GetCANDll(void) const
 {
    QString c_Return;
@@ -209,30 +175,24 @@ QString C_PuiSvPc::GetCANDll(void) const
    return c_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get custom CAN DLL Path
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get custom CAN DLL Path
 
    \return Custom CAN DLL Path string
-
-   \created     07.02.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_PuiSvPc::GetCustomCANDllPath() const
 {
    return this->mc_CustomCANDllPath;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the absolute CAN DLL path
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the absolute CAN DLL path
 
    \return
    Absolute CAN DLL path
-
-   \created     07.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_PuiSvPc::GetCANDllAbsolute(void) const
 {
    QString c_Retval = this->GetCANDll();
@@ -250,47 +210,38 @@ QString C_PuiSvPc::GetCANDllAbsolute(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set DLL type. See get for type definition.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set DLL type. See get for type definition.
 
    \param[in]     ors32_CanDllType   CAN DLL type
-
-   \created     07.02.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvPc::SetCANDllType(const C_PuiSvPc::E_CANDllType oe_Type)
 {
    this->me_CANDllType = oe_Type;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set path for the CAN DLL
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set path for the CAN DLL
 
    \param[in]     orc_DllPath   Path for the CAN DLL
-
-   \created     05.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvPc::SetCustomCANDllPath(const QString & orc_Path)
 {
    this->mc_CustomCANDllPath = orc_Path;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set UI box
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set UI box
 
    \param[in] orc_Box New UI box
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvPc::SetBox(const C_PuiBsBox & orc_Box)
 {
    this->c_UIPosition = orc_Box.c_UIPosition;
@@ -299,15 +250,12 @@ void C_PuiSvPc::SetBox(const C_PuiBsBox & orc_Box)
    this->f64_ZOrder = orc_Box.f64_ZOrder;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sync view bus index to added bus index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sync view bus index to added bus index
 
    \param[in] ou32_Index Added bus index
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvPc::OnSyncBusAdded(const uint32 ou32_Index)
 {
    if (ou32_Index < this->mu32_BusIndex)
@@ -331,15 +279,12 @@ void C_PuiSvPc::OnSyncBusAdded(const uint32 ou32_Index)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sync view bus index to deleted bus index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sync view bus index to deleted bus index
 
    \param[in] ou32_Index Deleted bus index
-
-   \created     22.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvPc::OnSyncBusDeleted(const uint32 ou32_Index)
 {
    if (ou32_Index < this->mu32_BusIndex)
@@ -356,17 +301,14 @@ void C_PuiSvPc::OnSyncBusDeleted(const uint32 ou32_Index)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility function to check if disconnect was only triggered indirectly
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility function to check if disconnect was only triggered indirectly
 
    \return
    False All valid state
    True  Disconnect was not triggered properly
-
-   \created     04.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_PuiSvPc::CheckIndirectDisconnection(void) const
 {
    bool q_Retval;

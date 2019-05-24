@@ -1,3 +1,13 @@
+//----------------------------------------------------------------------------------------------------------------------
+/*!
+   \file
+   \brief       Translate L2 CAN message to L7 interpretation
+
+   Translate L2 CAN message to Generic Driver protocol L7 interpretation
+
+   \copyright   Copyright 2007 Sensor-Technik Wiedemann GmbH. All rights reserved.
+*/
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CCMONProtocolGDH
 #define CCMONProtocolGDH
 

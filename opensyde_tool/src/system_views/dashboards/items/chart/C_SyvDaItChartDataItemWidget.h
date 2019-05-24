@@ -1,30 +1,24 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for showing information and offering configuration of one chart data series (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.08.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVDAITCHARTDATAITEMWIDGET_H
 #define C_SYVDAITCHARTDATAITEMWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QPixmap>
 
 #include "stwtypes.h"
 #include "C_OgeWiWithToolTip.h"
 #include "C_PuiSvDbNodeDataPoolListElementId.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
 {
 class C_SyvDaItChartDataItemWidget;
@@ -32,9 +26,9 @@ class C_SyvDaItChartDataItemWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_SyvDaItChartDataItemWidget :
    public stw_opensyde_gui_elements::C_OgeWiWithToolTip
 {
@@ -52,7 +46,7 @@ public:
    void UpdateIndex(const stw_types::uint32 ou32_DataPoolElementConfigIndex);
 
    void UpdateValue(const QString & orc_Value) const;
-   void UpdateError(const QString & orc_ErrorText, const bool oq_IsTransmissionError);
+   void UpdateError(const QString & orc_ErrorText, const bool oq_IsTransmissionError, const bool oq_ErrorActive);
    void ResetError(void);
    void UpdateTransparence(const stw_types::sintn osn_Value) const;
 
@@ -111,7 +105,7 @@ private:
    C_SyvDaItChartDataItemWidget & operator =(const C_SyvDaItChartDataItemWidget &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

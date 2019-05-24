@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       openSYDE protocol IP driver for Windows
 
    For details cf. documentation in .h file.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     26.04.2017  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <winsock.h> //Windows WinSock
@@ -29,14 +22,14 @@
 #include "C_OSCIpDispatcherWinSock.h"
 #include "CSCLString.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_scl;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
 //export a few WinSock constants here
 //Purpose: the definitions in the Windows header violate a lot of coding rules.
@@ -47,59 +40,53 @@ static uintn m_WsInvalidSocket(void)
    return INVALID_SOCKET; //lint !e1960
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 static sint32 m_WsFionBio(void)
 {
    return FIONBIO; //lint !e1960 !e970 !e1924 !e569
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 static sint32 m_WsFionRead(void)
 {
    return FIONREAD; //lint !e1960 !e970 !e1924
 }
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 std::map<C_OSCIpDispatcherWinSock::C_BufferIdentifier,
          std::list<std::vector<stw_types::uint8> > > C_OSCIpDispatcherWinSock::mhc_TcpBuffer;
 C_TGLCriticalSection C_OSCIpDispatcherWinSock::mhc_LockBuffer;
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Constructor
 
    Initialize elements
-
-   \created     07.01.2019  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCIpDispatcherWinSock::C_TcpConnection::C_TcpConnection(void)
 {
    un_Socket = m_WsInvalidSocket();
    (void)std::memset(&au8_IpAddress[0], 0U, 4U);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if current smaller than orc_Cmp
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if current smaller than orc_Cmp
 
    \param[in] orc_Cmp Compared instance
 
    \return
    Current smaller than orc_Cmp
    Else false
-
-   \created     16.04.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OSCIpDispatcherWinSock::C_BufferIdentifier::operator <(
    const C_OSCIpDispatcherWinSock::C_BufferIdentifier & orc_Cmp) const
 {
@@ -150,15 +137,12 @@ bool C_OSCIpDispatcherWinSock::C_BufferIdentifier::operator <(
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set up class
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set up class
 
    Initialize class elements
-
-   \created     26.04.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCIpDispatcherWinSock::C_OSCIpDispatcherWinSock(void) :
    C_OSCIpDispatcher()
 {
@@ -171,15 +155,12 @@ C_OSCIpDispatcherWinSock::C_OSCIpDispatcherWinSock(void) :
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up class
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clean up class
 
    Release allocated resources
-
-   \created     26.04.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCIpDispatcherWinSock::~C_OSCIpDispatcherWinSock(void)
 {
    //make sure to release resources in case the user forgot to
@@ -192,9 +173,8 @@ C_OSCIpDispatcherWinSock::~C_OSCIpDispatcherWinSock(void)
    (void)WSACleanup(); //spec: one call of cleanup per call of startup; final call performs actual cleanup
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize TCP communication
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize TCP communication
 
    Jobs to perform:
    - create one non-blocking TCP client socket
@@ -209,10 +189,8 @@ C_OSCIpDispatcherWinSock::~C_OSCIpDispatcherWinSock(void)
 
    \return
    C_NO_ERR   Connection created
-
-   \created     27.04.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherWinSock::InitTcp(const uint8 (&orau8_Ip)[4], uint32 & oru32_Handle)
 {
    C_TcpConnection c_NewConnection;
@@ -225,9 +203,8 @@ sint32 C_OSCIpDispatcherWinSock::InitTcp(const uint8 (&orau8_Ip)[4], uint32 & or
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility: get IP of all local interfaces
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility: get IP of all local interfaces
 
    Gets list of IP addresses of all local IP interfaces.
    Does not report "localhost".
@@ -236,10 +213,8 @@ sint32 C_OSCIpDispatcherWinSock::InitTcp(const uint8 (&orau8_Ip)[4], uint32 & or
    \return
    C_NO_ERR     IPs listed
    C_NOACT      could not get IP information
-
-   \created     19.05.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherWinSock::m_GetAllInstalledInterfaceIps(void)
 {
    uint32 u32_Size = 0U;
@@ -282,9 +257,8 @@ sint32 C_OSCIpDispatcherWinSock::m_GetAllInstalledInterfaceIps(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility: connect TCP socket to server
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility: connect TCP socket to server
 
    Jobs to perform:
    - connect already created client socket to port 13400 of the specified server node
@@ -297,10 +271,8 @@ sint32 C_OSCIpDispatcherWinSock::m_GetAllInstalledInterfaceIps(void)
    \return
    C_NO_ERR   connected ...
    C_BUSY     connection failed
-
-   \created     05.01.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherWinSock::m_ConnectTcp(C_TcpConnection & orc_Connection) const
 {
    bool q_Error = false;
@@ -420,9 +392,8 @@ sint32 C_OSCIpDispatcherWinSock::m_ConnectTcp(C_TcpConnection & orc_Connection) 
    return (q_Error == true) ? C_BUSY : C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility: configure UDP socket
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility: configure UDP socket
 
    \param[in]   oq_ServerPort    true: set up server socket
                                  false: set up client socket
@@ -432,10 +403,8 @@ sint32 C_OSCIpDispatcherWinSock::m_ConnectTcp(C_TcpConnection & orc_Connection) 
    \return
    C_NO_ERR   socket set up
    C_NOACT    could not set up socket
-
-   \created     22.02.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherWinSock::m_ConfigureUdpSocket(const bool oq_ServerPort, const uint32 ou32_IpToBindTo,
                                                       SOCKET & orun_Socket) const
 {
@@ -524,18 +493,15 @@ sint32 C_OSCIpDispatcherWinSock::m_ConfigureUdpSocket(const bool oq_ServerPort, 
    return (q_Error == true) ? C_NOACT : C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility: compose textual representation of IP
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility: compose textual representation of IP
 
    Format: xxx.xxx.xxx.xxx
 
    \return
    test representation of IP
-
-   \created     27.02.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_OSCIpDispatcherWinSock::mh_IpToText(const uint8 (&orau8_Ip)[4])
 {
    C_SCLString c_Text;
@@ -544,9 +510,8 @@ C_SCLString C_OSCIpDispatcherWinSock::mh_IpToText(const uint8 (&orau8_Ip)[4])
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize UDP communication
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize UDP communication
 
    Jobs to perform:
    * create non-blocking UDP "server" sockets on each local interface
@@ -558,10 +523,8 @@ C_SCLString C_OSCIpDispatcherWinSock::mh_IpToText(const uint8 (&orau8_Ip)[4])
    \return
    C_NO_ERR   connected ...
    C_NOACT    connection failed
-
-   \created     27.04.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherWinSock::InitUdp(void)
 {
    bool q_Error = false;
@@ -609,9 +572,8 @@ sint32 C_OSCIpDispatcherWinSock::InitUdp(void)
    return (q_Error == true) ? C_NOACT : C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checks the connection of the TCP socket
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks the connection of the TCP socket
 
    \param[in]   ou32_Handle   handle obtained by InitTcp()
 
@@ -620,7 +582,7 @@ sint32 C_OSCIpDispatcherWinSock::InitUdp(void)
    C_NOACT    is not connected
    C_RANGE    invalid handle
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherWinSock::IsTcpConnected(const uint32 ou32_Handle)
 {
    sint32 s32_Return = C_NOACT;
@@ -668,9 +630,8 @@ sint32 C_OSCIpDispatcherWinSock::IsTcpConnected(const uint32 ou32_Handle)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reconnect TCP socket
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reconnect TCP socket
 
    This function can be used by a client to reconnect after the connection was lost (e.g. dropped by server).
    If there is still an active connection the function shall close it before reconnecting.
@@ -686,7 +647,7 @@ sint32 C_OSCIpDispatcherWinSock::IsTcpConnected(const uint32 ou32_Handle)
    C_BUSY     connection failed
    C_RANGE    invalid handle
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherWinSock::ReConnectTcp(const uint32 ou32_Handle)
 {
    sint32 s32_Return;
@@ -716,9 +677,8 @@ sint32 C_OSCIpDispatcherWinSock::ReConnectTcp(const uint32 ou32_Handle)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Close TCP communication
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Close TCP communication
 
    Jobs to perform:
    - close opened TCP client socket
@@ -728,10 +688,8 @@ sint32 C_OSCIpDispatcherWinSock::ReConnectTcp(const uint32 ou32_Handle)
    \return
    C_NO_ERR   disconnected ...
    C_RANGE    handle invalid
-
-   \created     27.04.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherWinSock::CloseTcp(const uint32 ou32_Handle)
 {
    sint32 s32_Return;
@@ -764,19 +722,16 @@ sint32 C_OSCIpDispatcherWinSock::CloseTcp(const uint32 ou32_Handle)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Close UDP communication
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Close UDP communication
 
    Jobs to perform:
    - close opened UDP client sockets
 
    \return
    C_NO_ERR   disconnected ...
-
-   \created     27.04.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherWinSock::CloseUdp(void)
 {
    for (uint32 u32_Interface = 0U; u32_Interface < mc_SocketsUdpClient.size(); u32_Interface++)
@@ -795,9 +750,8 @@ sint32 C_OSCIpDispatcherWinSock::CloseUdp(void)
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Send package on TCP socket
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Send package on TCP socket
 
    Jobs to perform:
    - send specified data to configured TCP socket
@@ -810,10 +764,8 @@ sint32 C_OSCIpDispatcherWinSock::CloseUdp(void)
    C_CONFIG   required socket not initialized
    C_RD_WR    error sending data
    C_RANGE    handle invalid
-
-   \created     27.04.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherWinSock::SendTcp(const uint32 ou32_Handle, const std::vector<uint8> & orc_Data)
 {
    sint32 s32_Return;
@@ -871,9 +823,8 @@ sint32 C_OSCIpDispatcherWinSock::SendTcp(const uint32 ou32_Handle, const std::ve
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Read data from TCP socket
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read data from TCP socket
 
    Jobs to perform:
    - check whether TCP receive buffer contains required number of data bytes
@@ -891,10 +842,8 @@ sint32 C_OSCIpDispatcherWinSock::SendTcp(const uint32 ou32_Handle, const std::ve
    C_NOACT    not enough bytes
    C_RD_WR    error reading data
    C_RANGE    handle invalid
-
-   \created     27.04.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherWinSock::ReadTcp(const uint32 ou32_Handle, std::vector<uint8> & orc_Data)
 {
    sint32 s32_Return;
@@ -954,9 +903,8 @@ sint32 C_OSCIpDispatcherWinSock::ReadTcp(const uint32 ou32_Handle, std::vector<u
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Read data from TCP socket
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read data from TCP socket
 
    Jobs to perform:
    - check whether TCP receive buffer contains required number of data bytes
@@ -981,10 +929,8 @@ sint32 C_OSCIpDispatcherWinSock::ReadTcp(const uint32 ou32_Handle, std::vector<u
    C_RD_WR    error reading data
    C_RANGE    handle invalid
    C_WARN     data is not for the server with the node identifier and bus identifier
-
-   \created     16.04.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherWinSock::ReadTcp(const uint32 ou32_Handle, const uint8 ou8_ClientBusIdentifier,
                                          const uint8 ou8_ClientNodeIdentifier, const uint8 ou8_ServerBusIdentifier,
                                          const uint8 ou8_ServerNodeIdentifier, std::vector<uint8> & orc_Data)
@@ -1053,9 +999,8 @@ sint32 C_OSCIpDispatcherWinSock::ReadTcp(const uint32 ou32_Handle, const uint8 o
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Read data from TCP buffer of dispatcher
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read data from TCP buffer of dispatcher
 
    Jobs to perform:
    - Check if the identifier are matching (starting at byte 0). The header must be already read separately.
@@ -1073,10 +1018,8 @@ sint32 C_OSCIpDispatcherWinSock::ReadTcp(const uint32 ou32_Handle, const uint8 o
    \return
    C_NO_ERR   data read successfully
    C_NOACT    no data for these identifier
-
-   \created     16.04.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherWinSock::ReadTcpBuffer(const uint8 ou8_ClientBusIdentifier,
                                                const uint8 ou8_ClientNodeIdentifier,
                                                const uint8 ou8_ServerBusIdentifier,
@@ -1112,9 +1055,8 @@ sint32 C_OSCIpDispatcherWinSock::ReadTcpBuffer(const uint8 ou8_ClientBusIdentifi
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Send broadcast package on UDP request socket
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Send broadcast package on UDP request socket
 
    Jobs to perform:
    - send specified data as broadcast using the configured UDP request socket
@@ -1125,10 +1067,8 @@ sint32 C_OSCIpDispatcherWinSock::ReadTcpBuffer(const uint8 ou8_ClientBusIdentifi
    C_NO_ERR   data sent successfully
    C_CONFIG   required socket not initialized
    C_RD_WR    error sending data
-
-   \created     04.05.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherWinSock::SendUdp(const std::vector<uint8> & orc_Data)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -1172,9 +1112,8 @@ sint32 C_OSCIpDispatcherWinSock::SendUdp(const std::vector<uint8> & orc_Data)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Read package from UDP socket
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read package from UDP socket
 
    Jobs to perform:
    Go through all set up UDP "server" sockets and try to read incoming datagram from UDP socket.
@@ -1190,10 +1129,8 @@ sint32 C_OSCIpDispatcherWinSock::SendUdp(const std::vector<uint8> & orc_Data)
    C_NO_ERR   datagram read successfully
    C_CONFIG   required socket not initialized
    C_NOACT    no data received
-
-   \created     04.05.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCIpDispatcherWinSock::ReadUdp(std::vector<uint8> & orc_Data, uint8 (&orau8_Ip)[4])
 {
    sint32 s32_Return = C_NOACT;

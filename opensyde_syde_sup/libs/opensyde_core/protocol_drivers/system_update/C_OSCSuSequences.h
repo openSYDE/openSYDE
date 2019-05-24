@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       openSYDE: Sequences for system update.
@@ -8,32 +8,26 @@
 
    Provides functions to perform the flashing sequence.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     08.11.2017  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCSUSEQUENCESH
 #define C_OSCSUSEQUENCESH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 #include "CSCLString.h"
 #include "C_OSCSystemDefinition.h"
 #include "C_OSCComSequencesBase.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 class C_OSCSuSequences :
    public C_OSCComSequencesBase
@@ -64,6 +58,8 @@ public:
    public:
       ///list of files to flash (keep size to 0 to not flash any files)
       std::vector<stw_scl::C_SCLString> c_FilesToFlash;
+      ///list of parameter files to write to NVM (keep size to 0 to not write any files)
+      std::vector<stw_scl::C_SCLString> c_FilesToWriteToNvm;
    };
 
    ///set of information used to identify one application
@@ -92,7 +88,7 @@ public:
       eACTIVATE_FLASHLOADER_OSY_BC_ENTER_PRE_PROGRAMMING_ERROR,
       eACTIVATE_FLASHLOADER_XFL_BC_FLASH_ERROR,
       eACTIVATE_FLASHLOADER_OSY_XFL_BC_PING_START,
-      eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERRROR,
+      eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERROR,
       eACTIVATE_FLASHLOADER_OSY_SET_SESSION_ERROR,
       eACTIVATE_FLASHLOADER_XFL_WAKEUP_ERROR,
       eACTIVATE_FLASHLOADER_ROUTING_START,
@@ -101,7 +97,7 @@ public:
 
       eREAD_DEVICE_INFO_START, //supports aborting
       eREAD_DEVICE_INFO_OSY_START,
-      eREAD_DEVICE_INFO_OSY_RECONNECT_ERRROR,
+      eREAD_DEVICE_INFO_OSY_RECONNECT_ERROR,
       eREAD_DEVICE_INFO_OSY_SET_SESSION_START,
       eREAD_DEVICE_INFO_OSY_SET_SESSION_ERROR,
       eREAD_DEVICE_INFO_OSY_DEVICE_NAME_START,
@@ -139,7 +135,7 @@ public:
 
       eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_START,      //starting to write hex file
       eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_START, //supports aborting
-      eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_ERASE_ERRROR,
+      eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_ERASE_ERROR,
       eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_START, //supports aborting
       eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_ERROR,
       eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_START,
@@ -149,12 +145,25 @@ public:
 
       eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_START,         //starting to write file based file
       eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_START, //supports aborting
-      eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_ERRROR,
+      eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_ERROR,
       eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_START, //supports aborting
       eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_ERROR,
       eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_START,
       eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_ERROR,
       eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_FINISHED,
+
+      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_START,          //reported once for each node (if there are > 0 NVM files)
+      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_RECONNECT_ERROR,
+      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_READ_FEATURE_ERROR, // problem getting the available features
+      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR, // problem with available features of flashloader
+      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_SESSION_ERROR,
+      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_MAX_SIZE_ERROR, //problem getting maximum block size from device
+      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_START, //reported once for each file; supports aborting
+      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_ERROR, //problem opening input file
+      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_START, //reported once for each file; supports aborting
+      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_ERROR, //problem writing file data to device
+      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FILE_FINISHED,  //reported for each finished file
+      eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FINISHED,       //reported once for each node (if there are > 0 NVM files)
 
       eUPDATE_SYSTEM_OSY_NODE_FINISHED,
       eUPDATE_SYSTEM_ABORTED,
@@ -212,7 +221,7 @@ protected:
    virtual stw_types::sint32 m_XflReportProgress(const stw_types::uint8 ou8_Progress,
                                                  const stw_scl::C_SCLString & orc_Text);
 
-   stw_types::uint32 mu32_CurrentNode;
+   stw_types::uint32 mu32_CurrentNode; ///< index of currently addressed node within System Definition
    stw_types::uint32 mu32_CurrentFile;
 
 private:
@@ -234,6 +243,8 @@ private:
    stw_types::sint32 m_FlashOneFileOpenSydeFile(const stw_scl::C_SCLString & orc_FileToFlash,
                                                 const stw_types::uint32 ou32_RequestDownloadTimeout,
                                                 const stw_types::uint32 ou32_TransferDataTimeout);
+   stw_types::sint32 m_WriteNvmOpenSyde(const std::vector<stw_scl::C_SCLString> & orc_FilesToWrite);
+
    stw_types::sint32 m_WriteFingerPrintOsy(void);
 
    stw_types::sint32 m_FlashNodeXfl(const std::vector<stw_scl::C_SCLString> & orc_FilesToFlash);
@@ -246,14 +257,17 @@ private:
    bool m_IsNodeActive(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_BusIndex,
                        C_OSCNodeProperties::E_FlashLoaderProtocol & ore_ProtocolType,
                        C_OSCProtocolDriverOsyNode & orc_NodeId) const;
-   bool m_IsNodeRequired(const stw_types::uint32 ou32_NodeIndex) const;
 
    stw_types::sint32 m_ReconnectToTargetServer(const bool oq_RestartRouting = false,
                                                const stw_types::uint32 ou32_NodeIndex = 0U);
    stw_types::sint32 m_DisconnectFromTargetServer(const bool oq_DisconnectOnIp2IpRouting = true);
+
+   static stw_types::sint32 mh_CopyFile(const stw_scl::C_SCLString & orc_SourceFile,
+                                        const stw_scl::C_SCLString & orc_TargetFile,
+                                        stw_scl::C_SCLString * const opc_ErrorPath = NULL);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

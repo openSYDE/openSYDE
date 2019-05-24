@@ -1,6 +1,6 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \file        precomp_headers.h
+   \file
    \brief       short description (header)
 
    To use this precompiled-header in a QtCreator project add the following to your .pro file:
@@ -11,7 +11,7 @@
    Contains a list of header files to be pre-compiled.
    see http://doc.qt.io/qt-5/qmake-precompiledheaders.html for details
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef PRECOMP_HEADERS_H
 #define PRECOMP_HEADERS_H
 

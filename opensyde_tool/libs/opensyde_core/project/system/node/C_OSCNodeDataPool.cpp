@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data class for a complete data pool (implementation)
 
    Data class for a complete data pool
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.12.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <map>
@@ -26,30 +19,27 @@
 #include "C_OSCNodeDataPool.h"
 #include "CSCLChecksums.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_core;
 using namespace stw_errors;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     22.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPool::C_OSCNodeDataPool(void) :
    e_Type(eDIAG),
    c_Name("NewDataPool"),
@@ -69,18 +59,15 @@ C_OSCNodeDataPool::C_OSCNodeDataPool(void) :
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
    It is not endian-safe, so it should only be used on the same system it is created on.
 
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
-
-   \created     21.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPool::CalcHash(uint32 & oru32_HashValue) const
 {
    stw_scl::C_SCLChecksums::CalcCRC32(&this->e_Type, sizeof(this->e_Type), oru32_HashValue);
@@ -100,19 +87,16 @@ void C_OSCNodeDataPool::CalcHash(uint32 & oru32_HashValue) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over data pool definition
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the hash value over data pool definition
 
    The hash value is a 32 bit CRC value.
    Only essential data are covered.
    It is endian-safe, so it may be used on systems with different endianness.
 
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
-
-   \created     30.08.2017  STW/U.Roesch
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPool::CalcDefinitionHash(uint32 & oru32_HashValue) const
 {
    uint8 au8_Data[4];
@@ -150,16 +134,13 @@ void C_OSCNodeDataPool::CalcDefinitionHash(uint32 & oru32_HashValue) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Move list in data pool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Move list in data pool
 
    \param[in] oru32_Start  Start index
    \param[in] oru32_Target Target index
-
-   \created     26.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPool::MoveList(const stw_types::uint32 & oru32_Start, const stw_types::uint32 & oru32_Target)
 {
    if ((oru32_Start < this->c_Lists.size()) && (oru32_Target < this->c_Lists.size()))
@@ -174,13 +155,10 @@ void C_OSCNodeDataPool::MoveList(const stw_types::uint32 & oru32_Start, const st
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Recalculate data pool list addresses
-
-   \created     26.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Recalculate data pool list addresses
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPool::RecalculateAddress(void)
 {
    uint32 u32_Offset = this->u32_NvMStartAddress;
@@ -194,16 +172,13 @@ void C_OSCNodeDataPool::RecalculateAddress(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get number of bytes occupied by variables
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get number of bytes occupied by variables
 
    \return
    Number of bytes occupied by variables
-
-   \created     22.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_OSCNodeDataPool::GetNumBytesUsed(void) const
 {
    uint32 u32_Retval = 0;
@@ -216,31 +191,25 @@ uint32 C_OSCNodeDataPool::GetNumBytesUsed(void) const
    return u32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get number of bytes not occupied by variables
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get number of bytes not occupied by variables
 
    \return
    Number of bytes not occupied by variables
-
-   \created     22.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeDataPool::GetFreeBytes(void) const
 {
    return static_cast<sint32>(static_cast<sint64>(u32_NvMSize) - static_cast<sint64>(GetNumBytesUsed()));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get number of bytes occupied by lists
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get number of bytes occupied by lists
 
    \return
    Number of bytes occupied by lists
-
-   \created     22.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_OSCNodeDataPool::GetListsSize(void) const
 {
    uint32 u32_Retval = 0;
@@ -253,9 +222,8 @@ uint32 C_OSCNodeDataPool::GetListsSize(void) const
    return u32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check error for specified list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check error for specified list
 
    \param[in]  oru_ListIndex             Node data pool list index
    \param[out] opq_NameConflict          Name conflict
@@ -272,10 +240,8 @@ uint32 C_OSCNodeDataPool::GetListsSize(void) const
    C_CONFIG   Name conflict
    C_NOACT    Name not usable as variable
    C_RANGE    Usage over 100 percent
-
-   \created     23.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeDataPool::CheckErrorList(const uint32 & oru_ListIndex, bool * const opq_NameConflict,
                                        bool * const opq_NameInvalid, bool * const opq_UsageInvalid,
                                        bool * const opq_OutOfDataPool, bool * const opq_DataSetsInvalid,
@@ -482,19 +448,16 @@ void C_OSCNodeDataPool::CheckErrorList(const uint32 & oru_ListIndex, bool * cons
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get hash for element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get hash for element
 
    \param[in] ou32_ListIndex    List index
    \param[in] ou32_ElementIndex Element index
 
    \return
    Hash for element
-
-   \created     20.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_OSCNodeDataPool::m_GetElementHash(const uint32 ou32_ListIndex, const uint32 ou32_ElementIndex) const
 {
    uint32 u32_Retval = 0xFFFFFFFFUL;

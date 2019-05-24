@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Table model for dashboard table widget (implementation)
 
    Table model for dashboard table widget
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     29.08.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -36,7 +29,7 @@
 #include "C_SyvDaItTaModel.h"
 #include "C_GiSvDaTableBase.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -44,71 +37,59 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 //Cast to integer on some level so this is the allowed maximum
 const uint32 C_SyvDaItTaModel::hu32_MaxElements = static_cast<uint32>(std::numeric_limits<sintn>::max());
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Data   Data storage
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     29.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItTaModel::C_SyvDaItTaModel(C_PuiSvDbDataElementHandler * const opc_Data, QObject * const opc_Parent) :
    QAbstractTableModel(opc_Parent),
    mpc_Data(opc_Data)
 {
-   //Default icons
-   this->mc_IconParameter = C_SdUtil::h_InitStaticIcon(":/images/system_definition/IconParameter.svg");
-   this->mc_IconSignal = C_SdUtil::h_InitStaticIcon(":/images/system_definition/IconSignal.svg");
-   this->mc_IconVariable = C_SdUtil::h_InitStaticIcon(":/images/system_definition/IconVariable.svg");
+   // Default icons
+   mc_IconParameter = ":/images/system_definition/IconParameter.svg";
+   mc_IconSignal = ":/images/system_definition/IconSignal.svg";
+   mc_IconVariable = ":/images/system_definition/IconVariable.svg";
 
-   //Warning icons
-   this->mc_IconParameterWarning = C_SdUtil::h_InitStaticIcon(
-      "://images/system_definition/IconParameterWarning.svg");
-   this->mc_IconVariableWarning = C_SdUtil::h_InitStaticIcon(
-      "://images/system_definition/IconVariableWarning.svg");
-   this->mc_IconSignalWarning = C_SdUtil::h_InitStaticIcon(
-      "://images/system_definition/IconSignalWarning.svg");
+   // Warning icons
+   mc_IconParameterWarning =  "://images/system_definition/IconParameterWarning.svg";
+   mc_IconSignalWarning = "://images/system_definition/IconSignalWarning.svg";
+   mc_IconVariableWarning = "://images/system_definition/IconVariableWarning.svg";
 
-   //Error icons
-   this->mc_IconParameterError = C_SdUtil::h_InitStaticIcon(
-      "://images/system_definition/IconParameterError.svg");
-   this->mc_IconVariableError = C_SdUtil::h_InitStaticIcon(
-      "://images/system_definition/IconVariableError.svg");
-   this->mc_IconSignalError = C_SdUtil::h_InitStaticIcon(
-      "://images/system_definition/IconSignalError.svg");
+   // Error icons
+   mc_IconParameterError = "://images/system_definition/IconParameterError.svg";
+   mc_IconSignalError = "://images/system_definition/IconSignalError.svg";
+   mc_IconVariableError = "://images/system_definition/IconVariableError.svg";
 
    //Register to allow data changed signal
    qRegisterMetaType<QVector<sintn> >();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply style
 
    \param[in] oe_Style    New style type
    \param[in] oq_DarkMode Flag if dark mode is active
-
-   \created     05.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode)
 {
    switch (oe_Style)
@@ -160,13 +141,10 @@ void C_SyvDaItTaModel::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Sty
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize min & max values and names for data elements
-
-   \created     01.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize min & max values and names for data elements
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::InitMinMaxAndName(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -290,13 +268,10 @@ void C_SyvDaItTaModel::InitMinMaxAndName(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get newest values
-
-   \created     01.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get newest values
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::UpdateValue(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -347,34 +322,27 @@ void C_SyvDaItTaModel::UpdateValue(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update the error icon
-
-   \created     09.08.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update the error icon
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::UpdateError(void)
 {
    if (this->rowCount() > 0)
    {
       QVector<sintn> c_Roles;
-      c_Roles.push_back(static_cast<sintn>(Qt::DecorationRole));
-      Q_EMIT dataChanged(this->index(0, 0), this->index(this->rowCount() - 1, 0), c_Roles);
-      //QVector<sintn>() << static_cast<sintn>(Qt::DecorationRole));
+      c_Roles.push_back(msn_USER_ROLE_ICON);
+      Q_EMIT (this->dataChanged(this->index(0, 0), this->index(this->rowCount() - 1, 0), c_Roles));
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update of the color transparence value configured by the actual timeout state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update of the color transparence value configured by the actual timeout state
 
    \param[in] ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
    \param[in] osn_Value                       Value for transparence (0..255)
-
-   \created     05.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -398,7 +366,8 @@ void C_SyvDaItTaModel::UpdateTransparence(const uint32 ou32_DataElementIndex, co
                      this->index(static_cast<sintn>(u32_ItConfig), h_EnumToColumn(C_SyvDaItTaModel::eVALUE));
                   this->mc_Transparency[u32_ItConfig] = osn_Value;
                   //lint -e{1793} Qt example
-                  Q_EMIT dataChanged(c_Index, c_Index, QVector<sintn>() << static_cast<sintn>(Qt::ForegroundRole));
+                  Q_EMIT this->dataChanged(c_Index, c_Index,
+                                           QVector<sintn>() << static_cast<sintn>(Qt::ForegroundRole));
                }
             }
          }
@@ -406,16 +375,13 @@ void C_SyvDaItTaModel::UpdateTransparence(const uint32 ou32_DataElementIndex, co
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get item indices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get item indices
 
    \param[in] orc_Indices     Model indices
    \param[in] orc_ItemIndices Item indices
-
-   \created     10.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::GetUniqueRows(const QModelIndexList & orc_Indices, std::vector<uint32> & orc_ItemIndices) const
 {
    //Step 1: extract rows
@@ -434,9 +400,8 @@ void C_SyvDaItTaModel::GetUniqueRows(const QModelIndexList & orc_Indices, std::v
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get header data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get header data
 
    \param[in] osn_Section    Section
    \param[in] oe_Orientation Orientation
@@ -444,10 +409,8 @@ void C_SyvDaItTaModel::GetUniqueRows(const QModelIndexList & orc_Indices, std::v
 
    \return
    Header string
-
-   \created     29.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_SyvDaItTaModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
                                       const sintn osn_Role) const
 {
@@ -499,18 +462,15 @@ QVariant C_SyvDaItTaModel::headerData(const sintn osn_Section, const Qt::Orienta
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get table row count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get table row count
 
    \param[in] orc_Parent Parent
 
    \return
    Row count
-
-   \created     29.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SyvDaItTaModel::rowCount(const QModelIndex & orc_Parent) const
 {
    sintn sn_Retval = 0;
@@ -540,18 +500,15 @@ sintn C_SyvDaItTaModel::rowCount(const QModelIndex & orc_Parent) const
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get table column count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get table column count
 
    \param[in] orc_Parent Parent
 
    \return
    Column count
-
-   \created     29.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SyvDaItTaModel::columnCount(const QModelIndex & orc_Parent) const
 {
    sintn sn_Retval = 0;
@@ -563,19 +520,16 @@ sintn C_SyvDaItTaModel::columnCount(const QModelIndex & orc_Parent) const
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data at index
 
    \param[in] orc_Index Index
    \param[in] osn_Role  Data role
 
    \return
    Data
-
-   \created     29.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
 {
    QVariant c_Retval;
@@ -664,7 +618,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                         break;
                      }
                   }
-                  else if (osn_Role == static_cast<sintn>(Qt::DecorationRole))
+                  else if (osn_Role == msn_USER_ROLE_ICON)
                   {
                      const C_OSCNodeDataPool * pc_DataPool;
                      switch (e_Col)
@@ -677,18 +631,25 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                         {
                            bool q_IsTransmissionError;
                            QString c_Error;
+                           QStringList c_Icons;
+                           c_Icons.push_back(QString::number(16));
                            if (pc_TableWidget->GetViewActive(*pc_DataElementId) == false)
                            {
                               switch (pc_DataPool->e_Type)
                               {
+                              // first string is normal icon, second string selected icon
+                              // (no selected color specified here, so just use same icon)
                               case C_OSCNodeDataPool::eDIAG:
-                                 c_Retval = this->mc_IconVariableWarning;
+                                 c_Icons.append(this->mc_IconVariableWarning);
+                                 c_Retval = c_Icons;
                                  break;
                               case C_OSCNodeDataPool::eNVM:
-                                 c_Retval = this->mc_IconParameterWarning;
+                                 c_Icons.append(this->mc_IconParameterWarning);
+                                 c_Retval = c_Icons;
                                  break;
                               case C_OSCNodeDataPool::eCOM:
-                                 c_Retval = this->mc_IconSignalWarning;
+                                 c_Icons.append(this->mc_IconSignalWarning);
+                                 c_Retval = c_Icons;
                                  break;
                               default:
                                  break;
@@ -699,14 +660,22 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                            {
                               switch (pc_DataPool->e_Type)
                               {
+                              // first string is normal icon, second string selected icon
+                              // (no selected color specified here, so just use same icon)
                               case C_OSCNodeDataPool::eDIAG:
-                                 c_Retval = this->mc_IconVariableError;
+                                 c_Icons.append(this->mc_IconVariableError);
+                                 c_Icons.append(this->mc_IconVariableError);
+                                 c_Retval = c_Icons;
                                  break;
                               case C_OSCNodeDataPool::eNVM:
-                                 c_Retval = this->mc_IconParameterError;
+                                 c_Icons.append(this->mc_IconParameterError);
+                                 c_Icons.append(this->mc_IconParameterError);
+                                 c_Retval = c_Icons;
                                  break;
                               case C_OSCNodeDataPool::eCOM:
-                                 c_Retval = this->mc_IconSignalError;
+                                 c_Icons.append(this->mc_IconSignalError);
+                                 c_Icons.append(this->mc_IconSignalError);
+                                 c_Retval = c_Icons;
                                  break;
                               default:
                                  break;
@@ -716,14 +685,22 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                            {
                               switch (pc_DataPool->e_Type)
                               {
+                              // first string is normal icon, second string selected icon
+                              // (no selected color specified here, so just use same icon)
                               case C_OSCNodeDataPool::eDIAG:
-                                 c_Retval = this->mc_IconVariable;
+                                 c_Icons.append(this->mc_IconVariable);
+                                 c_Icons.append(this->mc_IconVariable);
+                                 c_Retval = c_Icons;
                                  break;
                               case C_OSCNodeDataPool::eNVM:
-                                 c_Retval = this->mc_IconParameter;
+                                 c_Icons.append(this->mc_IconParameter);
+                                 c_Icons.append(this->mc_IconParameter);
+                                 c_Retval = c_Icons;
                                  break;
                               case C_OSCNodeDataPool::eCOM:
-                                 c_Retval = this->mc_IconSignal;
+                                 c_Icons.append(this->mc_IconSignal);
+                                 c_Icons.append(this->mc_IconSignal);
+                                 c_Retval = c_Icons;
                                  break;
                               default:
                                  break;
@@ -943,23 +920,30 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                      break;
                   }
                }
-               else if (osn_Role == static_cast<sintn>(Qt::DecorationRole))
+               else if (osn_Role == msn_USER_ROLE_ICON)
                {
+                  QStringList c_Icons;
                   switch (e_Col)
                   {
                   case C_SyvDaItTaModel::eNAME:
                      break;
                   case C_SyvDaItTaModel::eICON:
+                     c_Icons.push_back(QString::number(16));
                      switch (pc_DataElementId->GetInvalidTypePlaceholder())
                      {
+                     // first string is normal icon, second string selected icon
+                     //(no selected color specified here, so just use same icon)
                      case C_OSCNodeDataPool::eDIAG:
-                        c_Retval = this->mc_IconVariableWarning;
+                        c_Icons.append(this->mc_IconVariableWarning);
+                        c_Retval = c_Icons;
                         break;
                      case C_OSCNodeDataPool::eNVM:
-                        c_Retval = this->mc_IconParameterWarning;
+                        c_Icons.append(this->mc_IconParameterWarning);
+                        c_Retval = c_Icons;
                         break;
                      case C_OSCNodeDataPool::eCOM:
-                        c_Retval = this->mc_IconSignalWarning;
+                        c_Icons.append(this->mc_IconSignalWarning);
+                        c_Retval = c_Icons;
                         break;
                      default:
                         break;
@@ -980,16 +964,13 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new data element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new data element
 
    \param[in] orc_Indices           Item(s) after that the new element should be added (usually only one item)
    \param[in] orc_DataPoolElementId New data element ID
-
-   \created     21.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::AddItem(const QModelIndexList & orc_Indices,
                                const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId)
 {
@@ -1076,16 +1057,13 @@ void C_SyvDaItTaModel::AddItem(const QModelIndexList & orc_Indices,
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Remove items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove items
 
    \param[in]  orc_Indices             Items to remove
    \param[out] orc_RemovedDataElements Removed data elements
-
-   \created     21.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaModel::RemoveItems(const QModelIndexList & orc_Indices,
                                    std::vector<C_PuiSvDbNodeDataPoolListElementId> & orc_RemovedDataElements)
 {
@@ -1154,9 +1132,8 @@ void C_SyvDaItTaModel::RemoveItems(const QModelIndexList & orc_Indices,
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Column to enum conversion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Column to enum conversion
 
    \param[in]  ors32_Column     Column
    \param[out] opc_DataSetIndex Optional: If column is a data set, this contains the data set index
@@ -1164,10 +1141,8 @@ void C_SyvDaItTaModel::RemoveItems(const QModelIndexList & orc_Indices,
 
    \return
    Enum value
-
-   \created     29.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItTaModel::E_Columns C_SyvDaItTaModel::h_ColumnToEnum(const sint32 & ors32_Column)
 {
    C_SyvDaItTaModel::E_Columns e_Retval = eICON;
@@ -1192,19 +1167,16 @@ C_SyvDaItTaModel::E_Columns C_SyvDaItTaModel::h_ColumnToEnum(const sint32 & ors3
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Enum to column conversion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Enum to column conversion
 
    \param[in] ore_Value Enum value
 
    \return
    Column
    -1 Error
-
-   \created     29.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDaItTaModel::h_EnumToColumn(const C_SyvDaItTaModel::E_Columns & ore_Value)
 {
    sint32 s32_Retval;
@@ -1231,19 +1203,16 @@ sint32 C_SyvDaItTaModel::h_EnumToColumn(const C_SyvDaItTaModel::E_Columns & ore_
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get ID for element index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get ID for element index
 
    \param[in]  ou32_Index Element index
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     11.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_PuiSvDbNodeDataPoolListElementId * C_SyvDaItTaModel::GetDataPoolElementIndex(const uint32 ou32_Index) const
 {
    const C_PuiSvDbNodeDataPoolListElementId * pc_Retval = NULL;
@@ -1265,15 +1234,12 @@ const C_PuiSvDbNodeDataPoolListElementId * C_SyvDaItTaModel::GetDataPoolElementI
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get value in percent
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get value in percent
 
    \param[in] ou32_Index Data element index
-
-   \created     01.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 float32 C_SyvDaItTaModel::GetPercentage(const uint32 ou32_Index) const
 {
    float32 f32_Retval = 0.0F;
@@ -1309,15 +1275,12 @@ float32 C_SyvDaItTaModel::GetPercentage(const uint32 ou32_Index) const
    return f32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get value encoded into QVariant
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get value encoded into QVariant
 
    \param[in] ou32_Index Data element index
-
-   \created     01.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaItTaModel::GetValue(const uint32 ou32_Index) const
 {
    QString c_Retval = "";

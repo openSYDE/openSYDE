@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for handling system view
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     11.07.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QApplication>
@@ -25,6 +18,7 @@
 #include "C_SyvHandlerWidget.h"
 #include "ui_C_SyvHandlerWidget.h"
 
+#include "C_PopUtil.h"
 #include "C_GtGetText.h"
 #include "C_HeHandler.h"
 #include "C_PuiProject.h"
@@ -33,42 +27,35 @@
 
 #include "constants.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const uint32 C_SyvHandlerWidget::mhu32_USER_INPUT_FUNC_APPLY = 0U;
-const uint32 C_SyvHandlerWidget::mhu32_USER_INPUT_FUNC_EDIT = 1U;
-const uint32 C_SyvHandlerWidget::mhu32_USER_INPUT_FUNC_SETTINGS = 2U;
-const uint32 C_SyvHandlerWidget::mhu32_USER_INPUT_FUNC_CONNECT = 3U;
-const uint32 C_SyvHandlerWidget::mhu32_USER_INPUT_FUNC_DISCONNECT = 4U;
-const uint32 C_SyvHandlerWidget::mhu32_USER_INPUT_FUNC_CONNECTING = 5U;
-const uint32 C_SyvHandlerWidget::mhu32_USER_INPUT_FUNC_DEVICECONFIG = 6U;
+const uint32 C_SyvHandlerWidget::mhu32_USER_INPUT_FUNC_SETTINGS = 1U;
+const uint32 C_SyvHandlerWidget::mhu32_USER_INPUT_FUNC_DEVICECONFIG = 2U;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     11.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvHandlerWidget::C_SyvHandlerWidget(QWidget * const opc_Parent) :
    C_NagUseCaseWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvHandlerWidget),
@@ -91,76 +78,50 @@ C_SyvHandlerWidget::C_SyvHandlerWidget(QWidget * const opc_Parent) :
    c_ButtonProperties.c_ToolTipContent = C_GtGetText::h_GetText("Save project data to file.");
    this->mc_VecUserInputFuncNames.append(c_ButtonProperties);
 
-   // Function index 1: mhu32_USER_INPUT_FUNC_EDIT
-   c_ButtonProperties.c_ButtonText = C_GtGetText::h_GetText("Edit");
-   c_ButtonProperties.c_ToolTipHeading = C_GtGetText::h_GetText("Edit");
-   c_ButtonProperties.c_ToolTipContent = C_GtGetText::h_GetText("Edit content.");
-   this->mc_VecUserInputFuncNames.append(c_ButtonProperties);
-
-   // Function index 2: mhu32_USER_INPUT_FUNC_SETTINGS
+   // Function index 1: mhu32_USER_INPUT_FUNC_SETTINGS
    c_ButtonProperties.c_ButtonText = C_GtGetText::h_GetText("Dashboard Configuration");
    c_ButtonProperties.c_ToolTipHeading = C_GtGetText::h_GetText("Configure Dashboard");
    c_ButtonProperties.c_ToolTipContent = C_GtGetText::h_GetText("Edit Dashboard transmission settings.");
    this->mc_VecUserInputFuncNames.append(c_ButtonProperties);
 
-   // Function index 3: mhu32_USER_INPUT_FUNC_CONNECT
-   c_ButtonProperties.c_ButtonText = C_GtGetText::h_GetText("Connect");
-   c_ButtonProperties.c_ToolTipHeading = C_GtGetText::h_GetText("Connect");
-   c_ButtonProperties.c_ToolTipContent = C_GtGetText::h_GetText("Go Online - Connect to active System nodes.");
-   this->mc_VecUserInputFuncNames.append(c_ButtonProperties);
-
-   // Function index 4: mhu32_USER_INPUT_FUNC_DISCONNECT
-   c_ButtonProperties.c_ButtonText = C_GtGetText::h_GetText("Disconnect");
-   c_ButtonProperties.c_ToolTipHeading = C_GtGetText::h_GetText("Disconnect");
-   c_ButtonProperties.c_ToolTipContent = C_GtGetText::h_GetText("Disconnect from system. (Go Offline)");
-   this->mc_VecUserInputFuncNames.append(c_ButtonProperties);
-
-   // Function index 5: mhu32_USER_INPUT_FUNC_CONNECTING
-   c_ButtonProperties.c_ButtonText = C_GtGetText::h_GetText("Connecting ...");
-   c_ButtonProperties.c_ToolTipHeading = C_GtGetText::h_GetText("Connecting...");
-   c_ButtonProperties.c_ToolTipContent = C_GtGetText::h_GetText("Trying to connect to system.");
-   this->mc_VecUserInputFuncNames.append(c_ButtonProperties);
-
-   // Function index 6: mhu32_USER_INPUT_FUNC_DEVICECONFIG
+   // Function index 2: mhu32_USER_INPUT_FUNC_DEVICECONFIG
    c_ButtonProperties.c_ButtonText = C_GtGetText::h_GetText("Device Configuration");
    c_ButtonProperties.c_ToolTipHeading = C_GtGetText::h_GetText("Device Configuration");
    c_ButtonProperties.c_ToolTipContent = C_GtGetText::h_GetText(
-      "Scan for devices, assign and configure device interface properties like node id, bitrate, ...");
+      "Scan for devices, assign and configure device interface properties like node ID, bitrate, ...");
    this->mc_VecUserInputFuncNames.append(c_ButtonProperties);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     11.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvHandlerWidget::~C_SyvHandlerWidget()
 {
+   //Necessary for use-case switch
+   if (this->mc_Interaction.isNull() == false)
+   {
+      this->mc_Interaction->setVisible(false);
+   }
+
    delete mpc_Ui;
    //lint -e{1740}  no memory leak because of the parent of mpc_DashboardsWidget and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function for toolbar
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function for toolbar
 
    Saves the project.
 
    \param[in]  ou32_FuncNumber   Number of function
-
-   \created     20.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvHandlerWidget::UserInputFunc(const uint32 ou32_FuncNumber)
 {
    //Default
    Q_EMIT this->SigEnableUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, true);
-   Q_EMIT this->SigEnableUserInputFunc(mhu32_USER_INPUT_FUNC_EDIT, true);
-   Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_CONNECTING, false);
 
    switch (ou32_FuncNumber)
    {
@@ -170,90 +131,14 @@ void C_SyvHandlerWidget::UserInputFunc(const uint32 ou32_FuncNumber)
           (this->mpc_DashboardsWidget->GetConnectActive() == true))
       {
          Q_EMIT this->SigEnableUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, false);
-         Q_EMIT this->SigEnableUserInputFunc(mhu32_USER_INPUT_FUNC_EDIT, false);
       }
 
       this->Save();
-      break;
-   case mhu32_USER_INPUT_FUNC_EDIT:
-      if ((this->mpc_SetupWidget != NULL) ||
-          (this->mpc_DashboardsWidget != NULL))
-      {
-         bool q_Edit = false;
-         if (this->mpc_SetupWidget != NULL)
-         {
-            q_Edit = !this->mpc_SetupWidget->GetEditMode();
-            this->mpc_SetupWidget->SetEditMode(q_Edit);
-         }
-         if (this->mpc_DashboardsWidget != NULL)
-         {
-            q_Edit = !this->mpc_DashboardsWidget->GetEditMode();
-            this->mpc_DashboardsWidget->SetEditMode(q_Edit);
-         }
-         Q_EMIT this->SigShowBackgroundOfUserInputFunc(mhu32_USER_INPUT_FUNC_EDIT, q_Edit);
-         if (q_Edit == true)
-         {
-            QIcon c_IconEdit("://images/IconEditSelected.svg");
-            c_IconEdit.addPixmap(QPixmap("://images/IconEditDisabled.svg"), QIcon::Disabled);
-            Q_EMIT this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_EDIT, c_IconEdit);
-         }
-         else
-         {
-            QIcon c_IconEdit("://images/IconEditActive.svg");
-            c_IconEdit.addPixmap(QPixmap("://images/IconEditDisabled.svg"), QIcon::Disabled);
-            Q_EMIT this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_EDIT, c_IconEdit);
-         }
-      }
       break;
    case mhu32_USER_INPUT_FUNC_SETTINGS:
       if (this->mpc_DashboardsWidget != NULL)
       {
          this->mpc_DashboardsWidget->OpenSettings();
-      }
-      break;
-   case mhu32_USER_INPUT_FUNC_CONNECT:
-      if (this->mpc_DashboardsWidget != NULL)
-      {
-         //Leave eidt mode
-         if (this->mpc_DashboardsWidget->GetEditMode() == true)
-         {
-            this->mpc_DashboardsWidget->SetEditMode(false);
-            Q_EMIT this->SigShowBackgroundOfUserInputFunc(mhu32_USER_INPUT_FUNC_EDIT, false);
-            QIcon c_IconEdit("://images/IconEditActive.svg");
-            c_IconEdit.addPixmap(QPixmap("://src/images/IconEditDisabled.svg"), QIcon::Disabled);
-            Q_EMIT this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_EDIT, c_IconEdit);
-         }
-         //Deactivate edit & config
-         Q_EMIT this->SigEnableUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, false);
-         Q_EMIT this->SigEnableUserInputFunc(mhu32_USER_INPUT_FUNC_EDIT, false);
-         Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_CONNECTING, true);
-         Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_CONNECT, false);
-         //While connecting display updated tool bar
-         QApplication::processEvents();
-         if (this->mpc_DashboardsWidget->SetConnectActive(true) == C_NO_ERR)
-         {
-            //Success
-            Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_DISCONNECT, true);
-         }
-         else
-         {
-            //Failure
-            //Reactivate edit & config
-            Q_EMIT this->SigEnableUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, true);
-            Q_EMIT this->SigEnableUserInputFunc(mhu32_USER_INPUT_FUNC_EDIT, true);
-            Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_DISCONNECT, false);
-            Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_CONNECT, true);
-         }
-         //Hide connecting
-         Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_CONNECTING, false);
-      }
-      break;
-   case mhu32_USER_INPUT_FUNC_DISCONNECT:
-      if (this->mpc_DashboardsWidget != NULL)
-      {
-         this->mpc_DashboardsWidget->SetConnectActive(false);
-         Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_DISCONNECT, false);
-         Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_CONNECT, true);
       }
       break;
    case mhu32_USER_INPUT_FUNC_DEVICECONFIG:
@@ -267,9 +152,8 @@ void C_SyvHandlerWidget::UserInputFunc(const uint32 ou32_FuncNumber)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the actual mode of the system view handler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the actual mode of the system view handler
 
    Do not call this function internally. Use the signal SigChangeMode to
    inform the entire application about the change.
@@ -277,10 +161,8 @@ void C_SyvHandlerWidget::UserInputFunc(const uint32 ou32_FuncNumber)
    \param[in]     os32_SubMode     Actual sub mode
    \param[in]     ou32_Index       The view index
    \param[in]     ou32_Flag        Flag for special functionality
-
-   \created     20.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_Index, const uint32 ou32_Flag)
 {
    //Change cursor
@@ -290,18 +172,9 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
    QIcon c_IconApply("://images/IconSave.svg");
    c_IconApply.addPixmap(QPixmap("://images/IconSaveDisabled.svg"), QIcon::Disabled);
    Q_EMIT this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_APPLY, c_IconApply); //QIcon(":images/IconSave.svg"));
-   QIcon c_IconEdit("://images/IconEditActive.svg");
-   c_IconEdit.addPixmap(QPixmap("://images/IconEditDisabled.svg"), QIcon::Disabled);
-   Q_EMIT this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_EDIT, c_IconEdit); //QIcon(":images/IconEditActive.svg"));
    QIcon c_IconSettings("://images/SettingsIcon.svg");
    c_IconSettings.addPixmap(QPixmap("://images/SettingsIconDisabled.svg"), QIcon::Disabled);
    Q_EMIT this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, c_IconSettings);
-   Q_EMIT this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_CONNECT,
-                                           QIcon(":/images/system_views/ConnectInactive.svg"));
-   Q_EMIT this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_DISCONNECT,
-                                           QIcon(":/images/system_views/ConnectActive.svg"));
-   Q_EMIT this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_CONNECTING,
-                                           QIcon(":/images/system_views/ConnectInactive.svg"));
 
    // if the submode is setup it can be the initial call or a kind of refresh because
    // of the start screen
@@ -313,10 +186,6 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
 
       // Deactivate all buttons in the first step
       Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, false);
-      Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_CONNECT, false);
-      Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_DISCONNECT, false);
-      Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_CONNECTING, false);
-      Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_EDIT, false);
       Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_DEVICECONFIG, false);
 
       // delete or remove from the layout the other widgets if necessary
@@ -325,8 +194,6 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
          disconnect(this->mpc_SetupWidget, &C_SyvSeSetupWidget::SigChanged, this, &C_SyvHandlerWidget::m_DataChanged);
          disconnect(this->mpc_SetupWidget, &C_SyvSeSetupWidget::SigCheckViewError, this,
                     &C_SyvHandlerWidget::m_ErrorChanged);
-         disconnect(this->mpc_SetupWidget, &C_SyvSeSetupWidget::SigEditModeClosed,
-                    this, &C_SyvHandlerWidget::m_ActivateEditButton);
          disconnect(this->mpc_SetupWidget, &C_SyvSeSetupWidget::SigEnableConfiguration,
                     this, &C_SyvHandlerWidget::m_EnableConfiguration);
          this->mpc_Ui->pc_VerticalLayout->removeWidget(this->mpc_SetupWidget);
@@ -344,12 +211,21 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
       }
       if (this->mpc_DashboardsWidget != NULL)
       {
+         //Necessary for submode switch
+         if (this->mc_Interaction.isNull() == false)
+         {
+            this->mc_Interaction->setVisible(false);
+         }
          disconnect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigChanged, this,
                     &C_SyvHandlerWidget::m_DataChanged);
-         disconnect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigEditModeClosed,
-                    this, &C_SyvHandlerWidget::m_ActivateEditButton);
-         disconnect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigSetPushButtonIcon,
-                    this, &C_SyvHandlerWidget::SigSetPushButtonIcon);
+         disconnect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigNumberDashboardsChanged, this,
+                    &C_SyvHandlerWidget::m_DashboardCountChanged);
+         disconnect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigSetDarkModePushButtonIcon,
+                    this, &C_SyvHandlerWidget::m_SetPushButtonDarkIconSvg);
+         disconnect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigSetConnectPushButtonIcon,
+                    this, &C_SyvHandlerWidget::m_SetConnectPushButtonIcon);
+         disconnect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigSetConfigurationAvailable,
+                    this, &C_SyvHandlerWidget::m_SetConfigurationAvailable);
          disconnect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigBlockDragAndDrop,
                     this, &C_SyvHandlerWidget::SigBlockDragAndDrop);
          this->mpc_Ui->pc_VerticalLayout->removeWidget(this->mpc_DashboardsWidget);
@@ -357,9 +233,9 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
          this->mpc_DashboardsWidget = NULL;
 
          // Clear the model of the element selector dialog. The model must refreshed in case of an other
-		 // or changed view
-		 // Do not clean it up in destructor of dashboard widget. The order of children destructor and this clean up
-		 // can cause problems.
+         // or changed view
+         // Do not clean it up in destructor of dashboard widget. The order of children destructor and this clean up
+         // can cause problems.
          C_TblTreDataElementModel::h_CleanUp();
       }
 
@@ -368,15 +244,11 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
       {
          //Handle buttons
          Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_APPLY, true);
-         Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_EDIT, true);
          Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_DEVICECONFIG, true);
 
-         Q_EMIT this->SigEnableUserInputFunc(mhu32_USER_INPUT_FUNC_EDIT, true);
          QIcon c_IconDevice("://images/system_views/Device.svg");
          c_IconDevice.addPixmap(QPixmap("://images/system_views/DeviceDisabled.svg"), QIcon::Disabled);
          Q_EMIT this->SigSetIconForUserInputFunc(mhu32_USER_INPUT_FUNC_DEVICECONFIG, c_IconDevice);
-         Q_EMIT this->SigShowBackgroundOfUserInputFunc(mhu32_USER_INPUT_FUNC_EDIT, false);
-         Q_EMIT this->SigSetPushButtonIcon("");
 
          this->mpc_SetupWidget = new C_SyvSeSetupWidget(ou32_Index, this);
          if (this->mpc_SetupWidget != NULL)
@@ -384,8 +256,6 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
             connect(this->mpc_SetupWidget, &C_SyvSeSetupWidget::SigChanged, this, &C_SyvHandlerWidget::m_DataChanged);
             connect(this->mpc_SetupWidget, &C_SyvSeSetupWidget::SigCheckViewError, this,
                     &C_SyvHandlerWidget::m_ErrorChanged);
-            connect(this->mpc_SetupWidget, &C_SyvSeSetupWidget::SigEditModeClosed,
-                    this, &C_SyvHandlerWidget::m_ActivateEditButton);
             connect(this->mpc_SetupWidget, &C_SyvSeSetupWidget::SigEnableConfiguration,
                     this, &C_SyvHandlerWidget::m_EnableConfiguration);
             this->mpc_Ui->pc_VerticalLayout->addWidget(this->mpc_SetupWidget);
@@ -395,17 +265,12 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
 
             this->mpc_SetupWidget->LoadScene();
             this->mpc_SetupWidget->show();
-
-            this->m_ActivateEditButton();
          }
       }
       if (os32_SubMode == ms32_SUBMODE_SYSVIEW_UPDATE)
       {
          //Handle buttons
          Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_APPLY, true);
-
-         Q_EMIT this->SigShowBackgroundOfUserInputFunc(mhu32_USER_INPUT_FUNC_EDIT, false);
-         Q_EMIT this->SigSetPushButtonIcon("");
 
          this->mpc_UpdateWidget = new C_SyvUpUpdateWidget(ou32_Index, this->parentWidget(), this);
          if (this->mpc_UpdateWidget != NULL)
@@ -424,26 +289,32 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
       }
       if (os32_SubMode == ms32_SUBMODE_SYSVIEW_DASHBOARD)
       {
+         this->mc_Interaction = new C_SyvDaDashboardInteraction();
+         this->mc_Interaction->SetPushButtonConnectSvg("://images/system_views/IconDisconnected.svg", false);
+         connect(this->mc_Interaction, &C_SyvDaDashboardInteraction::SigPushButtonDarkModePressed, this,
+                 &C_SyvHandlerWidget::OnPushButtonIconPress);
+         connect(this->mc_Interaction, &C_SyvDaDashboardInteraction::SigPushButtonConnectPressed, this,
+                 &C_SyvHandlerWidget::m_OnPushButtonConnectPress);
+         Q_EMIT this->SigSetInteractionWidget(this->mc_Interaction);
          //Handle buttons
          Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_APPLY, true);
-         Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_EDIT, true);
          Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, true);
-         Q_EMIT this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_CONNECT, true);
 
-         Q_EMIT this->SigEnableUserInputFunc(mhu32_USER_INPUT_FUNC_EDIT, true);
          Q_EMIT this->SigEnableUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, true);
-
-         Q_EMIT this->SigShowBackgroundOfUserInputFunc(mhu32_USER_INPUT_FUNC_EDIT, false);
 
          this->mpc_DashboardsWidget = new C_SyvDaDashboardsWidget(ou32_Index, this->parentWidget(), this);
          if (this->mpc_DashboardsWidget != NULL)
          {
             connect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigChanged, this,
                     &C_SyvHandlerWidget::m_DataChanged);
-            connect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigEditModeClosed,
-                    this, &C_SyvHandlerWidget::m_ActivateEditButton);
-            connect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigSetPushButtonIcon,
-                    this, &C_SyvHandlerWidget::SigSetPushButtonIcon);
+            connect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigNumberDashboardsChanged, this,
+                    &C_SyvHandlerWidget::m_DashboardCountChanged);
+            connect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigSetDarkModePushButtonIcon,
+                    this, &C_SyvHandlerWidget::m_SetPushButtonDarkIconSvg);
+            connect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigSetConnectPushButtonIcon,
+                    this, &C_SyvHandlerWidget::m_SetConnectPushButtonIcon);
+            connect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigSetConfigurationAvailable,
+                    this, &C_SyvHandlerWidget::m_SetConfigurationAvailable);
             connect(this->mpc_DashboardsWidget, &C_SyvDaDashboardsWidget::SigBlockDragAndDrop,
                     this, &C_SyvHandlerWidget::SigBlockDragAndDrop);
             this->mpc_Ui->pc_VerticalLayout->addWidget(this->mpc_DashboardsWidget);
@@ -455,8 +326,6 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
             //Do error check AFTER connections are up
             this->mpc_DashboardsWidget->CheckError();
             this->mpc_DashboardsWidget->show();
-
-            this->m_ActivateEditButton();
          }
       }
 
@@ -468,13 +337,10 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
    QApplication::restoreOverrideCursor();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save data
-
-   \created     28.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvHandlerWidget::Save(void)
 {
    QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -488,36 +354,35 @@ void C_SyvHandlerWidget::Save(void)
    {
       this->mpc_DashboardsWidget->Save();
    }
-
-   //Check if valid save
-   if (C_PuiProject::h_GetInstance()->IsEmptyProject() == true)
+   if (C_PopUtil::h_CheckCriticalNamingConflict(this, true) == false)
    {
-      // open project save
-      this->SaveAs();
-   }
-   else
-   {
-      //Save to file
-      C_PopErrorHandling::mh_ProjectSaveErr(C_PuiProject::h_GetInstance()->Save(), this);
+      //Check if valid save
+      if (C_PuiProject::h_GetInstance()->IsEmptyProject() == true)
+      {
+         // open project save
+         this->SaveAs();
+      }
+      else
+      {
+         //Save to file
+         C_PopErrorHandling::mh_ProjectSaveErr(C_PuiProject::h_GetInstance()->Save(), this);
 
-      this->mq_DataChanged = false;
+         this->mq_DataChanged = false;
+      }
    }
    QApplication::restoreOverrideCursor();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function to prepare closing the widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function to prepare closing the widget
 
    Prepare each widget for close and do specific actions to prepare the widget for close action
 
    \return
    true     Preparation successful. Can be closed.
    false    Preparation not finished. Can not be closed.
-
-   \created     22.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvHandlerWidget::PrepareToClose(void)
 {
    bool q_Return = true;
@@ -533,6 +398,7 @@ bool C_SyvHandlerWidget::PrepareToClose(void)
    {
       //Save necessary for user settings
       this->mpc_DashboardsWidget->Save();
+      q_Return = this->mpc_DashboardsWidget->PrepareToClose();
    }
 
    if (this->mpc_UpdateWidget != NULL)
@@ -543,19 +409,16 @@ bool C_SyvHandlerWidget::PrepareToClose(void)
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle for global key press event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle for global key press event
 
    \param[in,out] opc_Event Event identification and information
 
    \return
    True  Handled
    False Not handled
-
-   \created     27.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvHandlerWidget::GlobalUserKeyPress(QKeyEvent * const opc_Event)
 {
    bool q_Retval = false;
@@ -601,13 +464,10 @@ bool C_SyvHandlerWidget::GlobalUserKeyPress(QKeyEvent * const opc_Event)
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle generic push button icon press
-
-   \created     02.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle generic push button icon press
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvHandlerWidget::OnPushButtonIconPress(void)
 {
    if (this->mpc_DashboardsWidget != NULL)
@@ -616,45 +476,94 @@ void C_SyvHandlerWidget::OnPushButtonIconPress(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-void C_SyvHandlerWidget::m_ActivateEditButton(void)
-{
-   Q_EMIT this->SigShowBackgroundOfUserInputFunc(mhu32_USER_INPUT_FUNC_EDIT, false);
-}
-
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvHandlerWidget::m_DataChanged(void)
 {
    this->mq_DataChanged = true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Forward error changed signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle dashboard count change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvHandlerWidget::m_DashboardCountChanged(void)
+{
+   Q_EMIT this->SigTriggerUpdateTitle();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Forward error changed signal
 
    \param[in] ou32_Index Item index
-
-   \created     11.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvHandlerWidget::m_ErrorChanged(const uint32 ou32_Index)
 {
    Q_EMIT this->SigErrorChanged(ou32_Index);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvHandlerWidget::m_EnableConfiguration(const bool oq_State)
 {
    Q_EMIT this->SigEnableUserInputFunc(mhu32_USER_INPUT_FUNC_DEVICECONFIG, oq_State);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Call specific help pages
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set icon path for dark mode push button
 
-   \created     30.10.2018  STW/S.Singer
+   \param[in] orc_Path Push button icon path
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvHandlerWidget::m_SetPushButtonDarkIconSvg(const QString & orc_Path)
+{
+   if (this->mc_Interaction.isNull() == false)
+   {
+      this->mc_Interaction->SetPushButtonDarkSvg(orc_Path);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set push button connect SVG icon path
+
+   \param[in] orc_IconPath     Push button connect SVG icon path
+   \param[in] oq_ShowAnimation Flag to request show of animation
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvHandlerWidget::m_SetConnectPushButtonIcon(const QString & orc_IconPath, const bool oq_DisplayAnimation)
+{
+   if (this->mc_Interaction.isNull() == false)
+   {
+      this->mc_Interaction->SetPushButtonConnectSvg(orc_IconPath, oq_DisplayAnimation);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle connect push button press
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvHandlerWidget::m_OnPushButtonConnectPress(void)
+{
+   if (this->mpc_DashboardsWidget != NULL)
+   {
+      this->mpc_DashboardsWidget->OnPushButtonConnectPress();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle configuration available state
+
+   \param[in] oq_State requested state for configuration option
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvHandlerWidget::m_SetConfigurationAvailable(const bool oq_State)
+{
+   Q_EMIT this->SigEnableUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, oq_State);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Call specific help pages
+*/
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvHandlerWidget::CallHelp(void)
 {
    //get sub mode

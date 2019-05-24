@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Node data pool list table drawing delegate (implementation)
 
    Node data pool list table drawing delegate
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     08.02.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -32,38 +25,36 @@
 #include "C_OgeSpxFactorTable.h"
 #include "C_GtGetText.h"
 #include "C_OgeWiUtil.h"
+#include "C_TblTreDelegateUtil.h"
 #include "C_SdNdeDataPoolContentUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     08.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListTableDelegate::C_SdNdeDataPoolListTableDelegate(QObject * const opc_Parent) :
    QStyledItemDelegate(opc_Parent),
    mpc_Model(NULL),
@@ -87,9 +78,8 @@ C_SdNdeDataPoolListTableDelegate::C_SdNdeDataPoolListTableDelegate(QObject * con
            &C_SdNdeDataPoolListTableDelegate::m_OnSetModelData);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten create editor event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten create editor event slot
 
    Here: Create appropriate editor widget
 
@@ -99,10 +89,8 @@ C_SdNdeDataPoolListTableDelegate::C_SdNdeDataPoolListTableDelegate(QObject * con
 
    \return
    Editor widget
-
-   \created     14.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QWidget * C_SdNdeDataPoolListTableDelegate::createEditor(QWidget * const opc_Parent,
                                                          const QStyleOptionViewItem & orc_Option,
                                                          const QModelIndex & orc_Index) const
@@ -232,36 +220,30 @@ QWidget * C_SdNdeDataPoolListTableDelegate::createEditor(QWidget * const opc_Par
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten destroy editor event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten destroy editor event slot
 
    Here: Register destruction
 
    \param[in,out] opc_Editor Editor widget
    \param[in]     orc_Index  Correlating index
-
-   \created     18.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableDelegate::destroyEditor(QWidget * const opc_Editor, const QModelIndex & orc_Index) const
 {
    QStyledItemDelegate::destroyEditor(opc_Editor, orc_Index);
    Q_EMIT this->SigDestroyEditor();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten set editor data event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten set editor data event slot
 
    Here: Pass relevant data
 
    \param[in,out] opc_Editor Editor widget
    \param[in]     orc_Index  Correlating index
-
-   \created     14.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex & orc_Index) const
 {
    if (((opc_Editor != NULL) && (orc_Index.isValid() == true)) && (this->mpc_Model != NULL))
@@ -372,19 +354,16 @@ void C_SdNdeDataPoolListTableDelegate::setEditorData(QWidget * const opc_Editor,
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten set model data event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten set model data event slot
 
    Here: Pass relevant data
 
    \param[in,out] opc_Editor Editor widget
    \param[in,out] opc_Model  Model object
    \param[in]     orc_Index  Correlating index
-
-   \created     14.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel * const opc_Model,
                                                     const QModelIndex & orc_Index) const
 {
@@ -500,19 +479,16 @@ void C_SdNdeDataPoolListTableDelegate::setModelData(QWidget * const opc_Editor, 
    //lint -e{1763} Qt interface
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paint item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paint item
 
    Here: special handling for boolean & deactivated cells
 
    \param[in,out] opc_Painter Painter
    \param[in]     orc_Option  Option
    \param[in]     orc_Index   Index
-
-   \created     17.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableDelegate::paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
                                              const QModelIndex & orc_Index) const
 {
@@ -625,40 +601,34 @@ void C_SdNdeDataPoolListTableDelegate::paint(QPainter * const opc_Painter, const
    {
       //Original
       QStyledItemDelegate::paint(opc_Painter, orc_Option, orc_Index);
+      C_TblTreDelegateUtil::h_PaintIcon(opc_Painter, orc_Option, orc_Index);
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set model for column look up
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set model for column look up
 
    \param[in] opc_Model  Model for column look up
-
-   \created     20.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableDelegate::SetModel(C_SdNdeDataPoolListTableModel * const opc_Value)
 {
    this->mpc_Model = opc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set current undo stack
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set current undo stack
 
    \param[in,out] opc_Value Current undo stack
-
-   \created     07.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableDelegate::SetUndoStack(QUndoStack * const opc_Value)
 {
    this->mpc_UndoStack = opc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create widget to use for editing this value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create widget to use for editing this value
 
    \param[in,out] opc_Parent Parent widget
    \param[in]     orc_Index  Correlating index
@@ -666,10 +636,8 @@ void C_SdNdeDataPoolListTableDelegate::SetUndoStack(QUndoStack * const opc_Value
 
    \return
    Editor widget
-
-   \created     15.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QWidget * C_SdNdeDataPoolListTableDelegate::m_CreateEditor(QWidget * const opc_Parent, const QModelIndex & orc_Index,
                                                            const C_SdNdeDataPoolListTableModel::E_Columns oe_Col) const
 {
@@ -718,13 +686,10 @@ QWidget * C_SdNdeDataPoolListTableDelegate::m_CreateEditor(QWidget * const opc_P
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Change data / state based on call of destroyEditor
-
-   \created     18.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Change data / state based on call of destroyEditor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableDelegate::m_OnDestroyEditor(void)
 {
    --this->ms32_EditCount;
@@ -734,15 +699,12 @@ void C_SdNdeDataPoolListTableDelegate::m_OnDestroyEditor(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Change data / state based on call of createEditor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Change data / state based on call of createEditor
 
    \param[in] orc_Index Edited index
-
-   \created     18.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableDelegate::m_OnCreateEditor(const QModelIndex & orc_Index)
 {
    if ((this->mq_ChangeInProgress == false) || (this->mc_Edit != orc_Index))
@@ -757,15 +719,12 @@ void C_SdNdeDataPoolListTableDelegate::m_OnCreateEditor(const QModelIndex & orc_
    ++this->ms32_EditCount;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register name change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register name change
 
    \param[in] orc_Text New text
-
-   \created     07.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableDelegate::m_OnNameChange(const QString & orc_Text) const
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -779,15 +738,12 @@ void C_SdNdeDataPoolListTableDelegate::m_OnNameChange(const QString & orc_Text) 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle auto min / max change event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle auto min / max change event
 
    \param[in] orq_Checked Flag if auto min max checked
-
-   \created     07.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableDelegate::m_OnAutoMinMaxChange(const bool & orq_Checked)
 {
    if ((this->mpc_Model != NULL) && (this->mq_ChangeInProgress == false))
@@ -801,13 +757,10 @@ void C_SdNdeDataPoolListTableDelegate::m_OnAutoMinMaxChange(const bool & orq_Che
    this->mq_ChangeDetected = true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Change data / state based on call of setModelData
-
-   \created     07.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Change data / state based on call of setModelData
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableDelegate::m_OnSetModelData(void)
 {
    if (this->mq_ChangeInProgress == false)
@@ -816,15 +769,12 @@ void C_SdNdeDataPoolListTableDelegate::m_OnSetModelData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle value type change event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle value type change event
 
    \param[in] orsn_Index New value type index
-
-   \created     07.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableDelegate::m_OnValueTypeChange(const sintn & orsn_Index)
 {
    if ((this->mpc_Model != NULL) && (this->mq_ChangeInProgress == false))
@@ -835,15 +785,12 @@ void C_SdNdeDataPoolListTableDelegate::m_OnValueTypeChange(const sintn & orsn_In
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle array size change event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle array size change event
 
    \param[in] orsn_NewSize New size
-
-   \created     07.06.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableDelegate::m_OnArraySizeChange(const sintn & orsn_NewSize)
 {
    if ((this->mpc_Model != NULL) && (this->mq_ChangeInProgress == false))
@@ -859,13 +806,10 @@ void C_SdNdeDataPoolListTableDelegate::m_OnArraySizeChange(const sintn & orsn_Ne
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Prepare state for new editor
-
-   \created     08.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Prepare state for new editor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableDelegate::m_PrepareForNewOne(void)
 {
    this->mq_Inital = true;
@@ -876,13 +820,10 @@ void C_SdNdeDataPoolListTableDelegate::m_PrepareForNewOne(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up left over actions for last editor
-
-   \created     08.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clean up left over actions for last editor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableDelegate::m_CleanUpLastOne(void)
 {
    if (((this->mq_ChangeDetected == false) && (this->mpc_UndoStack != NULL)) && (this->ms32_UndoStartIndex > -1))

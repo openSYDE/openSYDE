@@ -1,5 +1,3 @@
-//20.04.10:  AST  moved common functions for all protocol types here from CCMONProtocol.cpp
-
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -32,8 +30,6 @@ using namespace stw_scl;
    \return
    C_NO_ERR  -> data added to INI file (or: nothing to save)
    else      -> error writing data
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_CMONProtocolBase::SaveParamsToIni(C_SCLIniFile & orc_IniFile, const C_SCLString & orc_Section)
@@ -56,8 +52,6 @@ sint32 C_CMONProtocolBase::SaveParamsToIni(C_SCLIniFile & orc_IniFile, const C_S
    \return
    C_NO_ERR  -> data read from INI file (or: nothing to read)
    else      -> error reading data
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_CMONProtocolBase::LoadParamsFromIni(C_SCLIniFile & orc_IniFile, const C_SCLString & orc_Section)
@@ -75,8 +69,6 @@ sint32 C_CMONProtocolBase::LoadParamsFromIni(C_SCLIniFile & orc_IniFile, const C
 
    \return
    extracted value
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 uint16 C_CMONProtocolBase::m_BytesToWordLowHigh(const uint8 oau8_Bytes[2])
@@ -92,8 +84,6 @@ uint16 C_CMONProtocolBase::m_BytesToWordLowHigh(const uint8 oau8_Bytes[2])
 
    \return
    extracted value
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 uint16 C_CMONProtocolBase::m_BytesToWordHighLow(const uint8 oau8_Bytes[2])
@@ -109,8 +99,6 @@ uint16 C_CMONProtocolBase::m_BytesToWordHighLow(const uint8 oau8_Bytes[2])
 
    \return
    extracted value
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 uint32 C_CMONProtocolBase::m_BytesToDwordLowHigh(const uint8 oau8_Bytes[4])
@@ -129,8 +117,6 @@ uint32 C_CMONProtocolBase::m_BytesToDwordLowHigh(const uint8 oau8_Bytes[4])
 
    \return
    extracted value
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 uint32 C_CMONProtocolBase::m_BytesToDwordHighLow(const uint8 oau8_Bytes[4])
@@ -154,8 +140,6 @@ uint32 C_CMONProtocolBase::m_BytesToDwordHighLow(const uint8 oau8_Bytes[4])
 
    \return
    value in string format
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolBase::m_GetValueDecHex(const uint32 ou32_Value) const
@@ -187,8 +171,6 @@ C_SCLString C_CMONProtocolBase::m_GetValueDecHex(const uint32 ou32_Value) const
 
    \return
    value in string format
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolBase::m_GetWordAsStringFormat(const uint16 ou16_Value) const
@@ -220,8 +202,6 @@ C_SCLString C_CMONProtocolBase::m_GetWordAsStringFormat(const uint16 ou16_Value)
 
    \return
    value in string format
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_CMONProtocolBase::m_GetByteAsStringFormat(const uint8 ou8_Value) const

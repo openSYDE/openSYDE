@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Importing data from Vector DBC file (implementation)
 
    cf. .cpp file header for details
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     23.10.2017  STW/U.Roesch
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_CIEIMPORTDBCH
 #define C_CIEIMPORTDBCH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "CSCLString.h"
 #include "CSCLStringList.h"
 #include "stwtypes.h"
@@ -26,12 +20,12 @@
 
 #include "DBC.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_CieImportDbc
 {
@@ -50,6 +44,8 @@ private:
    static stw_types::sint32 mh_GetNode(const Vector::DBC::Node & orc_DbcNode, C_CieConverter::C_CIENode & orc_Node);
    static stw_types::sint32 mh_GetMessage(const Vector::DBC::Message & orc_DbcMessage,
                                           C_CieConverter::C_CIENode & orc_Node);
+   static stw_types::sint32 mh_PrepareMessage(const Vector::DBC::Message & orc_DbcMessage,
+                                              C_CieConverter::C_CIENodeMessage & orc_Message);
    static stw_types::sint32 mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal,
                                          C_CieConverter::C_CIENodeMessage & orc_Message);
    static stw_types::sint32 mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSignal,
@@ -65,10 +61,10 @@ public:
    static stw_types::sint32 h_ImportNetwork(const stw_scl::C_SCLString & orc_File,
                                             C_CieConverter::C_CIECommDefinition & orc_Definition,
                                             stw_scl::C_SCLStringList & orc_WarningMessages,
-                                            stw_scl::C_SCLString & orc_ErrorMessage);
+                                            stw_scl::C_SCLString & orc_ErrorMessage, const bool oq_AddUnmappedMessages);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

@@ -1,21 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for editing message properties
 
    Widget for editing message properties
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.03.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -34,7 +28,7 @@
 #include "C_SdUtil.h"
 #include "C_OgeWiCustomMessage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui;
@@ -45,7 +39,7 @@ using namespace stw_errors;
 using namespace stw_scl;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const sint32 ms32_TX_TYPE_INDEX_CYCLIC = 0;
 const sint32 ms32_TX_TYPE_INDEX_ON_CHANGE = 1;
 const sint32 ms32_TX_TYPE_INDEX_SPONTANEOUS = 2;
@@ -53,27 +47,24 @@ const sint32 ms32_TX_TYPE_INDEX_SPONTANEOUS = 2;
 const uint8 mu8_DIRECTION_INDEX_TRANSMIT = 0;
 const uint8 mu8_DIRECTION_INDEX_RECEIVE = 1;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     24.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessagePropertiesWidget::C_SdBueMessagePropertiesWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueMessagePropertiesWidget),
@@ -137,28 +128,22 @@ C_SdBueMessagePropertiesWidget::C_SdBueMessagePropertiesWidget(QWidget * const o
            &C_SdBueMessagePropertiesWidget::m_SyncLaterToCycle);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     24.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessagePropertiesWidget::~C_SdBueMessagePropertiesWidget(void)
 {
    delete mpc_Ui;
    //lint -e{1740}  no memory leak because the ownership of these objects was never transfered to this class
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     29.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::InitStaticNames(void) const
 {
    QLineEdit * pc_LineEdit;
@@ -249,32 +234,26 @@ void C_SdBueMessagePropertiesWidget::InitStaticNames(void) const
                                                                              "will still be sent after this time."));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set message sync manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set message sync manager
 
    \param[in,out] opc_Value Message sync manager
-
-   \created     25.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::SetMessageSyncManager(
    stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value)
 {
    this->mpc_MessageSyncManager = opc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Message id setter
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Message id setter
 
    Sets the private message id of widget
 
    \param[in] orc_MessageId Message identification indices
-
-   \created     29.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::SetMessageId(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 {
    this->mc_MessageId = orc_MessageId;
@@ -283,15 +262,12 @@ void C_SdBueMessagePropertiesWidget::SetMessageId(const C_OSCCanMessageIdentific
    this->m_LoadFromData();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load bus information
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load bus information
 
    Load bus information from core data using bus index
-
-   \created     29.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_LoadFromData(void)
 {
    const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
@@ -404,15 +380,12 @@ void C_SdBueMessagePropertiesWidget::m_LoadFromData(void)
    m_ConnectAllChanges();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle extended id checkbox change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle extended id checkbox change
 
    \param[in] orq_Extended Extended ID active
-
-   \created     30.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnExtendedChange(const bool & orq_Extended) const
 {
    if (this->me_ComProtocol == C_OSCCanProtocol::eCAN_OPEN_SAFETY)
@@ -434,15 +407,12 @@ void C_SdBueMessagePropertiesWidget::m_OnExtendedChange(const bool & orq_Extende
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle checkbox tx method change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle checkbox tx method change
 
    \param[in] ors32_State Check box state
-
-   \created     30.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnTxMethodChange(const sint32 & ors32_State) const
 {
    switch (ors32_State)
@@ -506,15 +476,12 @@ void C_SdBueMessagePropertiesWidget::m_OnTxMethodChange(const sint32 & ors32_Sta
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle dlc change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle dlc change
 
    \param[in] orsn_NewValue New dlc value
-
-   \created     26.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnDlcChange(const sintn & orsn_NewValue) const
 {
    if (orsn_NewValue == 1)
@@ -527,18 +494,15 @@ void C_SdBueMessagePropertiesWidget::m_OnDlcChange(const sintn & orsn_NewValue) 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Transform tx method type to index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Transform tx method type to index
 
    \param[in] ore_TxMethod Tx method type
 
    \return
    Combo box index
-
-   \created     25.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueMessagePropertiesWidget::h_TxMethodToIndex(const C_OSCCanMessage::E_TxMethodType & ore_TxMethod)
 {
    sint32 s32_Retval;
@@ -561,18 +525,15 @@ sint32 C_SdBueMessagePropertiesWidget::h_TxMethodToIndex(const C_OSCCanMessage::
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Transform index to tx method type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Transform index to tx method type
 
    \param[in] ors32_Index Index
 
    \return
    Tx method type
-
-   \created     25.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCCanMessage::E_TxMethodType C_SdBueMessagePropertiesWidget::h_IndexToTxMethod(const sint32 & ors32_Index)
 {
    C_OSCCanMessage::E_TxMethodType e_Retval;
@@ -592,13 +553,10 @@ C_OSCCanMessage::E_TxMethodType C_SdBueMessagePropertiesWidget::h_IndexToTxMetho
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle name change
-
-   \created     26.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle name change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnNameChanged(void)
 {
    this->m_TrimmMessageName();
@@ -609,13 +567,10 @@ void C_SdBueMessagePropertiesWidget::m_OnNameChanged(void)
    Q_EMIT this->SigRecheckError();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle id change
-
-   \created     28.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle id change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnIdChanged(void)
 {
    m_OnPropertiesChanged();
@@ -624,13 +579,10 @@ void C_SdBueMessagePropertiesWidget::m_OnIdChanged(void)
    Q_EMIT this->SigRecheckError();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle dlc change
-
-   \created     26.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle dlc change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnDlcChanged(void)
 {
    m_OnPropertiesChanged();
@@ -638,13 +590,10 @@ void C_SdBueMessagePropertiesWidget::m_OnDlcChanged(void)
    Q_EMIT this->SigRecheckError();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle cycle time change
-
-   \created     22.03.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle cycle time change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnCycleTimeChanged(void)
 {
    m_OnPropertiesChanged();
@@ -660,26 +609,20 @@ void C_SdBueMessagePropertiesWidget::m_OnCycleTimeChanged(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle tx method change
-
-   \created     16.01.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle tx method change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnTxMethodChanged()
 {
    m_OnPropertiesChanged();
    Q_EMIT this->SigRecheckError();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle early time change
-
-   \created     16.01.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle early time change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnEarlyOrLaterTimeChanged(void)
 {
    m_OnPropertiesChanged();
@@ -687,13 +630,10 @@ void C_SdBueMessagePropertiesWidget::m_OnEarlyOrLaterTimeChanged(void)
    Q_EMIT this->SigRecheckError();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle any property change
-
-   \created     26.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle any property change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnPropertiesChanged(void)
 {
    if (this->mpc_MessageSyncManager != NULL)
@@ -756,13 +696,10 @@ void C_SdBueMessagePropertiesWidget::m_OnPropertiesChanged(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register message direction change
-
-   \created     26.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register message direction change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnDirectionChanged(void)
 {
    if (this->mpc_MessageSyncManager != NULL)
@@ -806,13 +743,10 @@ void C_SdBueMessagePropertiesWidget::m_OnDirectionChanged(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle transmitter change
-
-   \created     26.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle transmitter change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnTxChanged(void)
 {
    if (this->mc_InterfaceIndexes.size() == this->mc_NodeIndexes.size())
@@ -870,17 +804,14 @@ void C_SdBueMessagePropertiesWidget::m_OnTxChanged(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle receiver changed
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle receiver changed
 
    \param[in] ou32_NodeIndex      Node index (ID)
    \param[in] ou32_InterfaceIndex Interface index (ID)
    \param[in] oq_Checked          Flag if checked
-
-   \created     26.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnRxChanged(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
                                                    const bool oq_Checked)
 {
@@ -966,17 +897,14 @@ void C_SdBueMessagePropertiesWidget::m_OnRxChanged(const uint32 ou32_NodeIndex, 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle auto receive timeout flag changed (bus mode)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle auto receive timeout flag changed (bus mode)
 
    \param[in] ou32_NodeIndex      Node index (ID)
    \param[in] ou32_InterfaceIndex Interface index (ID)
    \param[in] oq_UseAuto          Flag if automatic receive timeout
-
-   \created     22.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnRxTimeoutFlagChanged(const uint32 ou32_NodeIndex,
                                                               const uint32 ou32_InterfaceIndex, const bool oq_UseAuto)
 {
@@ -986,17 +914,14 @@ void C_SdBueMessagePropertiesWidget::m_OnRxTimeoutFlagChanged(const uint32 ou32_
                                                                                 oq_UseAuto) == C_NO_ERR);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle receive timeout value changed (bus mode)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle receive timeout value changed (bus mode)
 
    \param[in] ou32_NodeIndex      Node index (ID)
    \param[in] ou32_InterfaceIndex Interface index (ID)
    \param[in] ou32_TimeoutValue   Receive timeout value
-
-   \created     22.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnRxTimeoutValueChanged(const uint32 ou32_NodeIndex,
                                                                const uint32 ou32_InterfaceIndex,
                                                                const uint32 ou32_TimeoutValue)
@@ -1007,13 +932,10 @@ void C_SdBueMessagePropertiesWidget::m_OnRxTimeoutValueChanged(const uint32 ou32
                                                                         ou32_TimeoutValue) == C_NO_ERR);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle auto receive timeout flag changed (node mode)
-
-   \created     23.03.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle auto receive timeout flag changed (node mode)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnSingleTimeoutFlagChange(void)
 {
    const bool oq_AutoTimeout = this->mpc_Ui->pc_CheckBoxAutoTimeout->isChecked();
@@ -1040,13 +962,10 @@ void C_SdBueMessagePropertiesWidget::m_OnSingleTimeoutFlagChange(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle receive timeout value changed (node mode)
-
-   \created     23.03.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle receive timeout value changed (node mode)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnSingleTimeoutValueChange(void)
 {
    m_RegisterChange();
@@ -1057,13 +976,10 @@ void C_SdBueMessagePropertiesWidget::m_OnSingleTimeoutValueChange(void)
               C_NO_ERR);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reconnect update signals for fields which are affected by protocol changes
-
-   \created     27.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reconnect update signals for fields which are affected by protocol changes
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_ConnectProtocolSpecificFields(void)
 {
    connect(this->mpc_Ui->pc_CheckBoxExtendedType, &C_OgeChxProperties::toggled, this,
@@ -1080,13 +996,10 @@ void C_SdBueMessagePropertiesWidget::m_ConnectProtocolSpecificFields(void)
            &C_SdBueMessagePropertiesWidget::m_OnTxMethodChanged);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Disconnect update signals for fields which are affected by protocol changes
-
-   \created     27.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Disconnect update signals for fields which are affected by protocol changes
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_DisconnectProtocolSpecificFields(void)
 {
    disconnect(this->mpc_Ui->pc_CheckBoxExtendedType, &C_OgeChxProperties::toggled, this,
@@ -1103,13 +1016,10 @@ void C_SdBueMessagePropertiesWidget::m_DisconnectProtocolSpecificFields(void)
               &C_SdBueMessagePropertiesWidget::m_OnTxMethodChanged);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reconnect update signals for fields which are affected by node changes
-
-   \created     08.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reconnect update signals for fields which are affected by node changes
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_ConnectNodeSpecificFields(void)
 {
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
@@ -1124,13 +1034,10 @@ void C_SdBueMessagePropertiesWidget::m_ConnectNodeSpecificFields(void)
            &C_SdBueMessagePropertiesWidget::m_OnRxTimeoutValueChanged);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Disconnect update signals for fields which are affected by node changes
-
-   \created     08.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Disconnect update signals for fields which are affected by node changes
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_DisconnectNodeSpecificFields(void)
 {
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
@@ -1145,13 +1052,10 @@ void C_SdBueMessagePropertiesWidget::m_DisconnectNodeSpecificFields(void)
               &C_SdBueMessagePropertiesWidget::m_OnRxTimeoutValueChanged);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reconnect update signals for fields which signal changes
-
-   \created     13.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reconnect update signals for fields which signal changes
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_ConnectAllChanges(void)
 {
    m_ConnectProtocolSpecificFields();
@@ -1184,13 +1088,10 @@ void C_SdBueMessagePropertiesWidget::m_ConnectAllChanges(void)
            &C_SdBueMessagePropertiesWidget::m_OnSingleTimeoutValueChange);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Disconnect update signals for fields which signal changes
-
-   \created     13.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Disconnect update signals for fields which signal changes
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_DisconnectAllChanges(void)
 {
    m_DisconnectProtocolSpecificFields();
@@ -1223,13 +1124,10 @@ void C_SdBueMessagePropertiesWidget::m_DisconnectAllChanges(void)
               &C_SdBueMessagePropertiesWidget::m_OnSingleTimeoutValueChange);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle connection change (without signal dis-/reconnection)
-
-   \created     08.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle connection change (without signal dis-/reconnection)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_ReloadNodes(void)
 {
    if (this->mq_ModeSingleNode == false)
@@ -1241,7 +1139,7 @@ void C_SdBueMessagePropertiesWidget::m_ReloadNodes(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_UpdateTxSelection(
    const std::vector<C_OSCCanMessageIdentificationIndices> & orc_MatchingMessageIds) const
 {
@@ -1297,7 +1195,7 @@ void C_SdBueMessagePropertiesWidget::m_UpdateTxSelection(
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_UpdateRxAfterTxSelection(
    const std::vector<C_OSCCanMessageIdentificationIndices> & orc_MatchingMessageIds, const bool oq_SkipDisconnect)
 {
@@ -1443,13 +1341,10 @@ void C_SdBueMessagePropertiesWidget::m_UpdateRxAfterTxSelection(
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle critical message state
-
-   \created     26.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle critical message state
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_HandleCriticalMessagesAndRx(const bool oq_HandleSignals)
 {
    if (this->mpc_MessageSyncManager != NULL)
@@ -1479,40 +1374,31 @@ void C_SdBueMessagePropertiesWidget::m_HandleCriticalMessagesAndRx(const bool oq
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sync cycle spin box to later spin box
-
-   \created     16.01.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sync cycle spin box to later spin box
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_SyncCycleToLater(void) const
 {
    this->mpc_Ui->pc_SpinBoxCycleTime->setValue(this->mpc_Ui->pc_SpinBoxLater->value());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sync later spin box to cycle spin box
-
-   \created     16.01.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sync later spin box to cycle spin box
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_SyncLaterToCycle(void) const
 {
    this->mpc_Ui->pc_SpinBoxLater->setValue(this->mpc_Ui->pc_SpinBoxCycleTime->value());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the node 'mode' of the widget with all necessary indexes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the node 'mode' of the widget with all necessary indexes
 
    \param[in] ou32_NodeIndex      Node index
    \param[in] ou32_InterfaceIndex Interface index
-
-   \created     25.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::SetNodeDataPool(const stw_types::uint32 ou32_NodeIndex,
                                                      const stw_types::uint32 ou32_InterfaceIndex)
 {
@@ -1523,15 +1409,12 @@ void C_SdBueMessagePropertiesWidget::SetNodeDataPool(const stw_types::uint32 ou3
    this->mpc_Ui->pc_GroupBoxNodeEdit->setVisible(true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the bus 'mode' of the widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the bus 'mode' of the widget
 
    \param[in] ou32_BusIndex Bus index
-
-   \created     25.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::SetBusId(const uint32 ou32_BusIndex)
 {
    this->mu32_BusIndex = ou32_BusIndex;
@@ -1540,13 +1423,10 @@ void C_SdBueMessagePropertiesWidget::SetBusId(const uint32 ou32_BusIndex)
    this->mpc_Ui->pc_GroupBoxNodeEdit->setVisible(false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle connection change
-
-   \created     26.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle connection change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::OnConnectionChange(void)
 {
    if (this->mpc_MessageSyncManager != NULL)
@@ -1578,15 +1458,12 @@ void C_SdBueMessagePropertiesWidget::OnConnectionChange(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set new com protocol
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new com protocol
 
    \param[in] ore_Value New value
-
-   \created     26.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::SetComProtocol(const C_OSCCanProtocol::E_Type & ore_Value)
 {
    m_DisconnectAllChanges();
@@ -1646,29 +1523,23 @@ void C_SdBueMessagePropertiesWidget::SetComProtocol(const C_OSCCanProtocol::E_Ty
    m_ConnectAllChanges();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Selects the node name in the text edit for fast editing
-
-   \created     02.06.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Selects the node name in the text edit for fast editing
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::SelectName(void) const
 {
    this->mpc_Ui->pc_LineEditName->setFocus();
    this->mpc_Ui->pc_LineEditName->selectAll();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current message id
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current message id
 
    \return
    Current matching message ids
-
-   \created     26.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> C_SdBueMessagePropertiesWidget::
 GetMatchingMessageIds(void) const
 {
@@ -1680,14 +1551,11 @@ GetMatchingMessageIds(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check bus name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check bus name
    - check input
-
-   \created     29.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_CheckMessageName(void) const
 {
    const QString c_Name = this->mpc_Ui->pc_LineEditName->text();
@@ -1726,14 +1594,11 @@ void C_SdBueMessagePropertiesWidget::m_CheckMessageName(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check bus id
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check bus id
    - check input
-
-   \created     28.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_CheckMessageId(void) const
 {
    const uint32 u32_Id = static_cast<uint32>(this->mpc_Ui->pc_SpinBoxId->value());
@@ -1775,13 +1640,10 @@ void C_SdBueMessagePropertiesWidget::m_CheckMessageId(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check delay time
-
-   \created     16.01.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check delay time
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_CheckEarlyTime(void) const
 {
    bool q_Valid = true;
@@ -1828,29 +1690,23 @@ void C_SdBueMessagePropertiesWidget::m_CheckEarlyTime(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trimm bus name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trimm bus name
 
    Remove whitespaces at the beginning and end of the string
-
-   \created     29.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_TrimmMessageName(void) const
 {
    this->mpc_Ui->pc_LineEditName->setText(this->mpc_Ui->pc_LineEditName->text().trimmed());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register Change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register Change
 
    Function where ui elements register a change. Change will be sent via a signal
-
-   \created     29.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_RegisterChange(void)
 {
    //signal

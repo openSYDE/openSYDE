@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Dialog for export report to DBC file (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     18.06.2018  STW/D.Pohl (copied and adapted from data pool list import)
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QFileInfo>
@@ -28,7 +21,7 @@
 #include "ui_C_CieDataPoolComListExportReportWidget.h"
 #include "C_CieExportDbc.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -37,37 +30,31 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_scl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_CieDataPoolComListExportReportWidget::mhc_HTML_TABLE_HEADER_START =
    "<td align=\"left\" valign=\"top\" style=\"padding: 5px 18px 5px 0px;white-space:pre;font-weight:bold;\">";
 const QString C_CieDataPoolComListExportReportWidget::mhc_HTML_TABLE_DATA_START =
    "<td align=\"left\" valign=\"top\" style=\"padding: 5px 18px 5px 0px;white-space:pre;\">";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] orc_Parent          Reference to parent
-   \param[in]     ou32_NodeIndex      Node index
-   \param[in]     ou32_DataPoolIndex  Data pool index
-   \param[in]     ou32_InterfaceIndex Interface index
    \param[in]     orc_FilePath        Loaded file path
-
-   \created     18.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CieDataPoolComListExportReportWidget::C_CieDataPoolComListExportReportWidget(
    stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, QString & orc_FilePath) :
    QWidget(&orc_Parent),
@@ -95,36 +82,29 @@ C_CieDataPoolComListExportReportWidget::C_CieDataPoolComListExportReportWidget(
            &C_CieDataPoolComListExportReportWidget::m_OkClicked);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     18.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CieDataPoolComListExportReportWidget::~C_CieDataPoolComListExportReportWidget(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     13.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolComListExportReportWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelHeadingReport->setText(C_GtGetText::h_GetText("Details"));
    this->mpc_Ui->pc_BushButtonOk->setText(C_GtGetText::h_GetText("OK"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set message data for report.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set message data for report.
 
    \param[in] orc_NodeMapping              key is openSYDE name, value is DBC symbol name
    \param[in] orc_ExportStatistic          number of messages and signals of network
@@ -133,10 +113,8 @@ void C_CieDataPoolComListExportReportWidget::InitStaticNames(void) const
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     18.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieDataPoolComListExportReportWidget::SetMessageData(const std::map<C_SCLString,
                                                                              C_SCLString> & orc_NodeMapping,
                                                               const C_CieExportDbc::C_ExportStatistic & orc_ExportStatistic,
@@ -158,17 +136,14 @@ sint32 C_CieDataPoolComListExportReportWidget::SetMessageData(const std::map<C_S
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     13.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolComListExportReportWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
@@ -194,28 +169,22 @@ void C_CieDataPoolComListExportReportWidget::keyPressEvent(QKeyEvent * const opc
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of OK button click
-
-   \created     18.06.2018  STW/D.Pohl
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of OK button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolComListExportReportWidget::m_OkClicked(void)
 {
    this->mrc_ParentDialog.accept();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Build up report for DBC export to file.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Build up report for DBC export to file.
 
    \return
    C_NO_ERR Operation success (default)
-
-   \created     18.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieDataPoolComListExportReportWidget::m_BuildReport(void)
 {
    // get nodes

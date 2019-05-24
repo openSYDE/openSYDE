@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Model component for message generator table (implementation)
 
    Model component for message generator table
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     26.11.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QBitArray>
@@ -32,34 +25,31 @@
 #include "C_CamGenTableModel.h"
 #include "C_CamProClipBoardHelper.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     26.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamGenTableModel::C_CamGenTableModel(QObject * const opc_Parent) :
    C_TblModelAction(opc_Parent)
 {
@@ -67,15 +57,12 @@ C_CamGenTableModel::C_CamGenTableModel(QObject * const opc_Parent) :
            &C_CamGenTableModel::ReloadAll);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update message key column
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update message key column
 
    \param[in] ou32_MessageIndex Message index
-
-   \created     15.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableModel::UpdateMessageKey(const uint32 ou32_MessageIndex)
 {
    QVector<sintn> c_Roles;
@@ -86,15 +73,12 @@ void C_CamGenTableModel::UpdateMessageKey(const uint32 ou32_MessageIndex)
    Q_EMIT this->dataChanged(this->index(ou32_MessageIndex, s32_Col), this->index(ou32_MessageIndex, s32_Col), c_Roles);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update message data column
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update message data column
 
    \param[in] ou32_MessageIndex Message index
-
-   \created     14.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableModel::UpdateMessageData(const uint32 ou32_MessageIndex)
 {
    QVector<sintn> c_Roles;
@@ -105,26 +89,22 @@ void C_CamGenTableModel::UpdateMessageData(const uint32 ou32_MessageIndex)
    Q_EMIT this->dataChanged(this->index(ou32_MessageIndex, s32_Col), this->index(ou32_MessageIndex, s32_Col), c_Roles);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Request trigger of model function for update cyclic message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Request trigger of model function for update cyclic message
 
    Reason: have one central point for each check which has to be done when changing an existing message
 
    \param[in] ou32_MessageIndex Message index
    \param[in] oq_Active         Change of cyclic message state
-
-   \created     15.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableModel::TriggerModelUpdateCyclicMessage(const uint32 ou32_MessageIndex, const bool oq_Active)
 {
    this->m_CheckAndHandleRegisterCyclicMessage(ou32_MessageIndex, oq_Active);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get header data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get header data
 
    \param[in] osn_Section    Section
    \param[in] oe_Orientation Orientation
@@ -132,10 +112,8 @@ void C_CamGenTableModel::TriggerModelUpdateCyclicMessage(const uint32 ou32_Messa
 
    \return
    Header string
-
-   \created     26.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_CamGenTableModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
                                         const sintn osn_Role) const
 {
@@ -192,31 +170,31 @@ QVariant C_CamGenTableModel::headerData(const sintn osn_Section, const Qt::Orien
             c_Retval = C_GtGetText::h_GetText("CAN message sent as remote transmission frame");
             break;
          case eNAME:
-            c_Retval = C_GtGetText::h_GetText("CAN message name");
+            c_Retval = C_GtGetText::h_GetText("CAN message name.");
             break;
          case eID:
-            c_Retval = C_GtGetText::h_GetText("CAN message ID");
+            c_Retval = C_GtGetText::h_GetText("CAN message ID.");
             break;
          case eDLC:
-            c_Retval = C_GtGetText::h_GetText("CAN message DLC");
+            c_Retval = C_GtGetText::h_GetText("CAN message DLC.");
             break;
          case eDATA:
-            c_Retval = C_GtGetText::h_GetText("CAN message Data");
+            c_Retval = C_GtGetText::h_GetText("CAN message data.");
             break;
          case eCYCLIC_TRIGGER:
-            c_Retval = C_GtGetText::h_GetText("CAN message Cyclic Trigger");
+            c_Retval = C_GtGetText::h_GetText("CAN message cyclic trigger.");
             break;
          case eCYCLIC_TIME:
-            c_Retval = C_GtGetText::h_GetText("CAN message Cyclic Time");
+            c_Retval = C_GtGetText::h_GetText("CAN message cyclic time in ms.");
             break;
          case eMANUAL_TRIGGER:
-            c_Retval = C_GtGetText::h_GetText("CAN message Manual Send Trigger");
+            c_Retval = C_GtGetText::h_GetText("CAN message manual send trigger.");
             break;
          case eXTD:
-            c_Retval = C_GtGetText::h_GetText("CAN message ID uses extended format");
+            c_Retval = C_GtGetText::h_GetText("CAN message ID uses extended format.");
             break;
          case eKEY:
-            c_Retval = C_GtGetText::h_GetText("Key to press to trigger sending of message");
+            c_Retval = C_GtGetText::h_GetText("Key to press to trigger sending of message.");
             break;
          }
       }
@@ -228,18 +206,15 @@ QVariant C_CamGenTableModel::headerData(const sintn osn_Section, const Qt::Orien
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get table column count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get table column count
 
    \param[in] orc_Parent Parent
 
    \return
    Column count
-
-   \created     26.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_CamGenTableModel::columnCount(const QModelIndex & orc_Parent) const
 {
    stw_types::sintn sn_Retval = 0;
@@ -251,19 +226,16 @@ sintn C_CamGenTableModel::columnCount(const QModelIndex & orc_Parent) const
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data at index
 
    \param[in] orc_Index Index
    \param[in] osn_Role  Data role
 
    \return
    Data
-
-   \created     26.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
 {
    QVariant c_Retval;
@@ -580,9 +552,8 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set data at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set data at index
 
    \param[in] orc_Index Index
    \param[in] orc_Value New data
@@ -591,10 +562,8 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
    \return
    true  success
    false failure
-
-   \created     29.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_CamGenTableModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value, const sintn osn_Role)
 {
    bool q_Retval = false;
@@ -750,18 +719,15 @@ bool C_CamGenTableModel::setData(const QModelIndex & orc_Index, const QVariant &
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get flags for item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get flags for item
 
    \param[in] orc_Index Item
 
    \return
    Flags for item
-
-   \created     29.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 Qt::ItemFlags C_CamGenTableModel::flags(const QModelIndex & orc_Index) const
 {
    Qt::ItemFlags c_Retval = Qt::ItemIsSelectable;
@@ -815,15 +781,12 @@ Qt::ItemFlags C_CamGenTableModel::flags(const QModelIndex & orc_Index) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle copy items action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle copy items action
 
    \param[in] orc_SelectedIndices Selected row indices (Expected: unique)
-
-   \created     26.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableModel::CopySelectedItems(const std::vector<uint32> & orc_SelectedIndices) const
 {
    std::vector<C_CamProMessageData> c_Messages;
@@ -839,18 +802,15 @@ void C_CamGenTableModel::CopySelectedItems(const std::vector<uint32> & orc_Selec
    C_CamProClipBoardHelper::h_SaveMessages(c_Messages);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Column to enum conversion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Column to enum conversion
 
    \param[in] os32_Column Column
 
    \return
    Enum value
-
-   \created     26.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamGenTableModel::E_Columns C_CamGenTableModel::h_ColumnToEnum(const sint32 os32_Column)
 {
    C_CamGenTableModel::E_Columns e_Retval;
@@ -893,19 +853,16 @@ C_CamGenTableModel::E_Columns C_CamGenTableModel::h_ColumnToEnum(const sint32 os
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Enum to column conversion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Enum to column conversion
 
    \param[in] oe_Value Enum value
 
    \return
    Column
    -1 Error
-
-   \created     26.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamGenTableModel::h_EnumToColumn(const C_CamGenTableModel::E_Columns oe_Value)
 {
    sint32 s32_Retval = -1;
@@ -946,19 +903,16 @@ sint32 C_CamGenTableModel::h_EnumToColumn(const C_CamGenTableModel::E_Columns oe
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle add specific new items action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle add specific new items action
 
    \param[in] orc_SelectedIndex Selected indices
    \param[in] orc_Messages      Messages to add
 
    \return
    Index of new item
-
-   \created     18.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint32> C_CamGenTableModel::AddSpecificNewItems(const std::vector<uint32> & orc_SelectedIndex,
                                                             const std::vector<C_CamProMessageData> & orc_Messages)
 {
@@ -968,18 +922,15 @@ std::vector<uint32> C_CamGenTableModel::AddSpecificNewItems(const std::vector<ui
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle add new item action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle add new item action
 
    \param[in] ou32_SelectedIndex Index to insert item at
 
    \return
    Index of new item
-
-   \created     28.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_CamGenTableModel::m_AddNewItem(const uint32 ou32_SelectedIndex)
 {
    uint32 u32_Retval;
@@ -1005,18 +956,15 @@ uint32 C_CamGenTableModel::m_AddNewItem(const uint32 ou32_SelectedIndex)
    return u32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle paste items action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle paste items action
 
    \param[in] ou32_SelectedIndex Index to insert item at
 
    \return
    Indices of new items
-
-   \created     28.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint32> C_CamGenTableModel::m_PasteItems(const uint32 ou32_SelectedIndex)
 {
    std::vector<uint32> c_Retval;
@@ -1028,68 +976,56 @@ std::vector<uint32> C_CamGenTableModel::m_PasteItems(const uint32 ou32_SelectedI
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get size of item container
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get size of item container
 
    \return
    Size of item container
-
-   \created     27.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_CamGenTableModel::m_GetSizeItems(void) const
 {
    return C_CamProHandler::h_GetInstance()->GetMessages().size();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete specific item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete specific item
 
    Warning: not expected to fail
 
    \param[in] ou32_Index Index to delete
-
-   \created     27.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableModel::m_DeleteItem(const uint32 ou32_Index)
 {
    tgl_assert(C_CamProHandler::h_GetInstance()->DeleteMessage(ou32_Index) == C_NO_ERR);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Move specific item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Move specific item
 
    For implementation: First delete ou32_SourceIndex then insert ou32_TargetIndex
    Warning: not expected to fail
 
    \param[in] ou32_SourceIndex Source index
    \param[in] ou32_TargetIndex Target index
-
-   \created     27.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableModel::m_MoveItem(const uint32 ou32_SourceIndex, const uint32 ou32_TargetIndex) const
 {
    tgl_assert(C_CamProHandler::h_GetInstance()->MoveMessage(ou32_SourceIndex, ou32_TargetIndex) == C_NO_ERR);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add specified new messages
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add specified new messages
 
    \param[in] ou32_SelectedIndex Selected row index
    \param[in] orc_Data           New messages
 
    \return
    Indices of new items
-
-   \created     27.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint32> C_CamGenTableModel::m_AddNewMessages(const uint32 ou32_SelectedIndex,
                                                          const std::vector<C_CamProMessageData> & orc_Data)
 {
@@ -1120,18 +1056,15 @@ std::vector<uint32> C_CamGenTableModel::m_AddNewMessages(const uint32 ou32_Selec
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle cyclic change request
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle cyclic change request
 
    Add check if necessary
 
    \param[in] ou32_MessageIndex Message index
    \param[in] oq_Active         Flag if cyclic message is active
-
-   \created     15.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableModel::m_CheckAndHandleRegisterCyclicMessage(const uint32 ou32_MessageIndex, const bool oq_Active)
 {
    const C_CamProMessageData * const pc_Message = C_CamProHandler::h_GetInstance()->GetMessageConst(ou32_MessageIndex);

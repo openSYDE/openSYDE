@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Properties dialog for datapool properties
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.01.2017  STW/S.Singer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_SdNdeDatapoolProperties.h"
@@ -30,8 +23,11 @@
 #include "TGLUtils.h"
 #include "constants.h"
 #include "C_OgeWiCustomMessage.h"
+#include "C_OSCNodeDataPoolId.h"
+#include "C_PuiSdSharedDatapools.h"
+#include "C_SdNdeDataPoolUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui;
@@ -41,21 +37,20 @@ using namespace stw_types;
 using namespace stw_scl;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -64,21 +59,22 @@ using namespace stw_tgl;
    \param[in,out] opc_OSCDataPool           Pointer to the actual core datapool object
    \param[in,out] pc_UiDataPool             Pointer to the actual UI datapool object
    \param[in]     oe_DatapoolType           Data pool type
-   \param[in]     os32_DataPoolIndex        Flag for new datapool
+   \param[in]     os32_DataPoolIndex        Flag for new datapool (-1 is new datapool, >= 0 is existing datapool)
    \param[in]     oru32_NodeIndex           Node index
    \param[in]     oq_SelectName             Selects the datapool name for instant editing
    \param[in]     oq_ShowApplicationSection Flag to show or hide application section
-
-   \created     12.08.2016  STW/S.Singer
+   \param[in]     opc_SharedDatapoolId      In case of a new shared Datapool, the Id is the shared Datapool of the new
+                                            Datapool. In case of an edited or stand alone Datapool the pointer is NULL
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDatapoolProperties::C_SdNdeDatapoolProperties(C_OgePopUpDialog & orc_Parent, const QString & orc_Name,
                                                      C_OSCNodeDataPool * const opc_OSCDataPool,
                                                      C_PuiSdNodeDataPool * const pc_UiDataPool,
                                                      C_OSCCanProtocol::E_Type * const ope_ComProtocolType,
                                                      const C_OSCNodeDataPool::E_Type oe_DatapoolType,
                                                      const sint32 os32_DataPoolIndex, const uint32 & oru32_NodeIndex,
-                                                     const bool oq_SelectName, const bool oq_ShowApplicationSection) :
+                                                     const bool oq_SelectName, const bool oq_ShowApplicationSection,
+                                                     const C_OSCNodeDataPoolId * const opc_SharedDatapoolId) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdNdeDatapoolProperties()),
    mpc_ParentDialog(&orc_Parent),
@@ -89,6 +85,10 @@ C_SdNdeDatapoolProperties::C_SdNdeDatapoolProperties(C_OgePopUpDialog & orc_Pare
    mu32_NodeIndex(oru32_NodeIndex),
    ms32_DataPoolIndex(os32_DataPoolIndex)
 {
+   bool q_IsShared;
+
+   std::vector<QString> c_DatapoolGroup;
+
    // init UI
    mpc_Ui->setupUi(this);
 
@@ -106,9 +106,6 @@ C_SdNdeDatapoolProperties::C_SdNdeDatapoolProperties(C_OgePopUpDialog & orc_Pare
 
    //BEFORE load
    InitStaticNames();
-
-   //apply datapool style
-   this->m_ApplyType();
 
    if (this->mpc_OSCDataPool != NULL)
    {
@@ -193,6 +190,96 @@ C_SdNdeDatapoolProperties::C_SdNdeDatapoolProperties(C_OgePopUpDialog & orc_Pare
    //Application section
    this->mpc_Ui->pc_GroupBoxApplication->setVisible(oq_ShowApplicationSection);
 
+   // Share Datapool configuration
+   if (this->ms32_DataPoolIndex >= 0)
+   {
+      const C_PuiSdSharedDatapools & rc_SharedDatapools = C_PuiSdHandler::h_GetInstance()->GetSharedDatapoolsConst();
+      uint32 u32_SharedDatapoolGroup;
+      C_OSCNodeDataPoolId c_DpId(this->mu32_NodeIndex,
+                                 static_cast<uint32>(this->ms32_DataPoolIndex));
+
+      q_IsShared = rc_SharedDatapools.IsSharedDatapool(c_DpId, &u32_SharedDatapoolGroup);
+
+      if (q_IsShared == true)
+      {
+         // Scenario 1: Edit of a shared Datapool
+         C_SdNdeDataPoolUtil::GetSharedDatapoolGroup(u32_SharedDatapoolGroup, c_DpId, this->mu32_NodeIndex,
+                                                     c_DatapoolGroup);
+      }
+   }
+   else if (opc_SharedDatapoolId != NULL)
+   {
+      const C_PuiSdSharedDatapools & rc_SharedDatapools = C_PuiSdHandler::h_GetInstance()->GetSharedDatapoolsConst();
+      uint32 u32_SharedDatapoolGroup;
+      const bool q_ShareGroupExists = rc_SharedDatapools.IsSharedDatapool(*opc_SharedDatapoolId,
+                                                                          &u32_SharedDatapoolGroup);
+
+      if (q_ShareGroupExists == true)
+      {
+         // Scenario 2: New shared Datapool and the shared Datapool was already shared with an other Datapool
+         // The group exist. We want all group member. The second parameter for ignoring a concrete Datapool must be
+         // invalid. The new Datapool is not registered in shared Datapools yet.
+         C_SdNdeDataPoolUtil::GetSharedDatapoolGroup(u32_SharedDatapoolGroup,
+                                                     C_OSCNodeDataPoolId(0xFFFFFFFFU, 0xFFFFFFFFU),
+                                                     this->mu32_NodeIndex,
+                                                     c_DatapoolGroup);
+      }
+      else
+      {
+         // Scenario 3: New shared Datapool. The shared Datapool was stand alone yet
+         // The group does not exist and both Datapools are not registered yet.
+         // The list entry must be created manually
+         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+            opc_SharedDatapoolId->u32_NodeIndex);
+
+         tgl_assert(pc_Node != NULL);
+         if ((pc_Node != NULL) &&
+             (opc_SharedDatapoolId->u32_DataPoolIndex < pc_Node->c_DataPools.size()))
+         {
+            QString c_Text = "";
+            if (opc_SharedDatapoolId->u32_NodeIndex != this->mu32_NodeIndex)
+            {
+               // Add node as namespace
+               c_Text += QString(pc_Node->c_Properties.c_Name.c_str()) + QString("::");
+            }
+
+            c_Text += pc_Node->c_DataPools[opc_SharedDatapoolId->u32_DataPoolIndex].c_Name.c_str();
+
+            c_DatapoolGroup.push_back(c_Text);
+         }
+      }
+
+      // New shared Datapool. Deactivate the break relation button
+      this->mpc_Ui->pc_BushButtonBreakRelation->setEnabled(false);
+
+      q_IsShared = true;
+   }
+   else
+   {
+      // New Datapool is not shared
+      q_IsShared = false;
+   }
+
+   //apply datapool style
+   this->m_ApplyType(q_IsShared);
+
+   if (q_IsShared == true)
+   {
+      uint32 u32_DatapoolCounter;
+
+      // Fill the lists with the shared Datapools
+      for (u32_DatapoolCounter = 0U; u32_DatapoolCounter < c_DatapoolGroup.size(); ++u32_DatapoolCounter)
+      {
+         this->mpc_Ui->pc_ListWidgetSharedDatapoolInfo->addItem(c_DatapoolGroup[u32_DatapoolCounter]);
+      }
+
+      // Adapt the labels of all shared information
+      this->mpc_Ui->pc_LabelVersion->setText(this->mpc_Ui->pc_LabelVersion->text() +
+                                             C_GtGetText::h_GetText(" (Shared property)"));
+      this->mpc_Ui->pc_LabelDatapoolSize->setText(this->mpc_Ui->pc_LabelDatapoolSize->text() +
+                                                  C_GtGetText::h_GetText(" (Shared property)"));
+   }
+
    // connects
    connect(this->mpc_Ui->pc_BushButtonOk, &QPushButton::clicked, this, &C_SdNdeDatapoolProperties::m_OkClicked);
    connect(this->mpc_Ui->pc_BushButtonCancel, &QPushButton::clicked,
@@ -208,30 +295,26 @@ C_SdNdeDatapoolProperties::C_SdNdeDatapoolProperties(C_OgePopUpDialog & orc_Pare
            &C_SdNdeDatapoolProperties::m_OnComTypeChange);
    connect(this->mpc_Ui->pc_CheckBoxSafety, &C_OgeChxTristateTransparentToggle::toggled, this,
            &C_SdNdeDatapoolProperties::m_OnSafetyChange);
+   connect(this->mpc_Ui->pc_BushButtonBreakRelation, &C_OgePubConfigure::clicked, this,
+           &C_SdNdeDatapoolProperties::m_BreakSharedRelation);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     12.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDatapoolProperties::~C_SdNdeDatapoolProperties(void)
 {
    delete mpc_Ui;
    //lint -e{1740}  no memory leak because of the parent of mpc_ParentDialog and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     28.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDatapoolProperties::InitStaticNames(void)
 {
    this->mpc_ParentDialog->SetSubTitle(C_GtGetText::h_GetText("Properties"));
@@ -249,6 +332,9 @@ void C_SdNdeDatapoolProperties::InitStaticNames(void)
    this->mpc_Ui->pc_LabelDatapoolSize->setText(C_GtGetText::h_GetText("Datapool Size"));
    this->mpc_Ui->pc_LabelDataPoolUsage->setText(C_GtGetText::h_GetText("Resulting Datapool Usage"));
    this->mpc_Ui->pc_LabelDataPoolReservation->setText(C_GtGetText::h_GetText("Resulting Node NVM Reservation"));
+   this->mpc_Ui->pc_LabelDatapoolShareConfiguration->setText(C_GtGetText::h_GetText(
+                                                                "Share Configuration with other Datapools:"));
+   this->mpc_Ui->pc_BushButtonBreakRelation->setText(C_GtGetText::h_GetText("Break Relation"));
 
    //Tool tips
    this->mpc_Ui->pc_LabelName->SetToolTipInformation(C_GtGetText::h_GetText("Name"),
@@ -297,19 +383,20 @@ void C_SdNdeDatapoolProperties::InitStaticNames(void)
       C_GtGetText::h_GetText("Resulting Node NVM Reservation"),
       C_GtGetText::h_GetText("Resulting node NVM reservation in percent based on Datapool reservation "
                              "\nsizes of all Datapools declared on this node."));
+
+   this->mpc_Ui->pc_LabelDatapoolShareConfiguration->SetToolTipInformation(
+      C_GtGetText::h_GetText("Shared Datapool Configuration"),
+      C_GtGetText::h_GetText("The Datapool is a shared Datapool. All connected Datapools are in the list below."));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     02.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDatapoolProperties::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
@@ -335,97 +422,117 @@ void C_SdNdeDatapoolProperties::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Ok button click
-
-   \created     16.08.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Ok button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDatapoolProperties::m_OkClicked(void)
 {
-   if (this->mpc_OSCDataPool != NULL)
+   std::vector<C_SCLString> c_ExistingDatapoolNames;
+   //Check name
+   if (this->m_CheckDatapoolNameNotDuplicate(&c_ExistingDatapoolNames) == false)
    {
-      QString c_Version = this->mpc_Ui->pc_LineEditVersion_2->text();
-      //adapt data
-      this->mpc_OSCDataPool->c_Name = this->mpc_Ui->pc_LineEditDatapoolName->text().toStdString().c_str();
-      this->mpc_OSCDataPool->c_Comment = this->mpc_Ui->pc_CommentText->toPlainText().toStdString().c_str();
-      this->mpc_OSCDataPool->q_IsSafety = this->mpc_Ui->pc_CheckBoxSafety->isChecked();
-      this->mpc_OSCDataPool->u32_NvMSize = static_cast<uint32>(this->mpc_Ui->pc_SpinBoxSize->value());
-
-      m_HandleDataPoolSafetyAdaptation();
-
-      //Application
-      if (this->mpc_Ui->pc_ComboBoxApplication->currentIndex() > 0)
+      //No accept allowed
+      const QString c_Description = QString(C_GtGetText::h_GetText(
+                                               "A Datapool with the name \"%1\" already exists. Choose another name.")).
+                                    arg(
+         this->mpc_Ui->pc_LineEditDatapoolName->text());
+      QString c_Details;
+      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+      c_Message.SetHeading(C_GtGetText::h_GetText("Datapool naming"));
+      c_Message.SetDescription(c_Description);
+      c_Details.append(C_GtGetText::h_GetText("Used Datapool names:\n"));
+      for (uint32 u32_ItExistingName = 0UL; u32_ItExistingName < c_ExistingDatapoolNames.size(); ++u32_ItExistingName)
       {
-         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-         if (pc_Node != NULL)
+         const C_SCLString & rc_Name = c_ExistingDatapoolNames[u32_ItExistingName];
+         c_Details.append(QString("\"%1\"\n").arg(rc_Name.c_str()));
+      }
+      c_Message.SetDetails(c_Details);
+      c_Message.Execute();
+   }
+   else
+   {
+      //Save possible, continue
+      if (this->mpc_OSCDataPool != NULL)
+      {
+         QString c_Version = this->mpc_Ui->pc_LineEditVersion_2->text();
+         //adapt data
+         this->mpc_OSCDataPool->c_Name = this->mpc_Ui->pc_LineEditDatapoolName->text().toStdString().c_str();
+         this->mpc_OSCDataPool->c_Comment = this->mpc_Ui->pc_CommentText->toPlainText().toStdString().c_str();
+         this->mpc_OSCDataPool->q_IsSafety = this->mpc_Ui->pc_CheckBoxSafety->isChecked();
+         this->mpc_OSCDataPool->u32_NvMSize = static_cast<uint32>(this->mpc_Ui->pc_SpinBoxSize->value());
+
+         m_HandleDataPoolSafetyAdaptation();
+
+         //Application
+         if (this->mpc_Ui->pc_ComboBoxApplication->currentIndex() > 0)
          {
-            sint32 s32_ApplicationIndex = -1;
-            sint32 s32_Counter = 0;
-            //Map combo box index to data block index
-            for (uint32 u32_ItDataBlock = 0; u32_ItDataBlock < pc_Node->c_Applications.size(); ++u32_ItDataBlock)
+            const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+            if (pc_Node != NULL)
             {
-               const C_OSCNodeApplication & rc_DataBlock = pc_Node->c_Applications[u32_ItDataBlock];
-               if (rc_DataBlock.e_Type == C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION)
+               sint32 s32_ApplicationIndex = -1;
+               sint32 s32_Counter = 0;
+               //Map combo box index to data block index
+               for (uint32 u32_ItDataBlock = 0; u32_ItDataBlock < pc_Node->c_Applications.size(); ++u32_ItDataBlock)
                {
-                  if (static_cast<sint32>(this->mpc_Ui->pc_ComboBoxApplication->currentIndex() - 1) == s32_Counter)
+                  const C_OSCNodeApplication & rc_DataBlock = pc_Node->c_Applications[u32_ItDataBlock];
+                  if (rc_DataBlock.e_Type == C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION)
                   {
-                     s32_ApplicationIndex = static_cast<sint32>(u32_ItDataBlock);
+                     if (static_cast<sint32>(this->mpc_Ui->pc_ComboBoxApplication->currentIndex() - 1) == s32_Counter)
+                     {
+                        s32_ApplicationIndex = static_cast<sint32>(u32_ItDataBlock);
+                     }
+                     //Important iterator step for counter
+                     ++s32_Counter;
                   }
-                  //Important iterator step for counter
-                  ++s32_Counter;
                }
+               this->mpc_OSCDataPool->s32_RelatedDataBlockIndex = s32_ApplicationIndex;
             }
-            this->mpc_OSCDataPool->s32_RelatedDataBlockIndex = s32_ApplicationIndex;
          }
-      }
-      else
-      {
-         //Invalid application
-         this->mpc_OSCDataPool->s32_RelatedDataBlockIndex = -1;
-      }
-
-      //Parse version
-      //Format: v99.99r99;0
-      tgl_assert(c_Version.size() <= 9);
-      if (c_Version.size() <= 9)
-      {
-         const QRegExp c_Separators("(\\.|r)");
-         const QStringList c_Parts = c_Version.remove(0, 1).split(c_Separators);
-         tgl_assert(c_Parts.size() == 3);
-         if (c_Parts.size() == 3)
+         else
          {
-            this->mpc_OSCDataPool->au8_Version[0] = static_cast<uint8>(c_Parts[0].toInt());
-            this->mpc_OSCDataPool->au8_Version[1] = static_cast<uint8>(c_Parts[1].toInt());
-            this->mpc_OSCDataPool->au8_Version[2] = static_cast<uint8>(c_Parts[2].toInt());
+            //Invalid application
+            this->mpc_OSCDataPool->s32_RelatedDataBlockIndex = -1;
          }
-      }
 
-      if (me_DatapoolType == C_OSCNodeDataPool::eCOM)
-      {
-         if (this->mpe_ComProtocolType != NULL)
+         //Parse version
+         //Format: v99.99r99;0
+         tgl_assert(c_Version.size() <= 9);
+         if (c_Version.size() <= 9)
          {
-            const C_OSCCanProtocol::E_Type e_Protocol = this->m_GetSelectedProtocol();
-
-            *this->mpe_ComProtocolType = e_Protocol;
+            const QRegExp c_Separators("(\\.|r)");
+            const QStringList c_Parts = c_Version.remove(0, 1).split(c_Separators);
+            tgl_assert(c_Parts.size() == 3);
+            if (c_Parts.size() == 3)
+            {
+               this->mpc_OSCDataPool->au8_Version[0] = static_cast<uint8>(c_Parts[0].toInt());
+               this->mpc_OSCDataPool->au8_Version[1] = static_cast<uint8>(c_Parts[1].toInt());
+               this->mpc_OSCDataPool->au8_Version[2] = static_cast<uint8>(c_Parts[2].toInt());
+            }
          }
-      }
 
-      if (this->mpc_ParentDialog != NULL)
-      {
-         this->mpc_ParentDialog->accept();
+         if (me_DatapoolType == C_OSCNodeDataPool::eCOM)
+         {
+            if (this->mpe_ComProtocolType != NULL)
+            {
+               const C_OSCCanProtocol::E_Type e_Protocol = this->m_GetSelectedProtocol();
+
+               *this->mpe_ComProtocolType = e_Protocol;
+            }
+         }
+
+         if (this->mpc_ParentDialog != NULL)
+         {
+            this->mpc_ParentDialog->accept();
+         }
       }
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Cancel button
-
-   \created     16.08.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Cancel button
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDatapoolProperties::m_CancelClicked(void)
 {
    if (this->mpc_ParentDialog != NULL)
@@ -434,22 +541,28 @@ void C_SdNdeDatapoolProperties::m_CancelClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply datapool type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply datapool type
    - Load correct picture
    - show correct interaction elements
 
-   \created     19.01.2017  STW/S.Singer
+    \param[in]    oq_SharedDatapool    Flag if Datapool is a shared Datapool
 */
-//-----------------------------------------------------------------------------
-void C_SdNdeDatapoolProperties::m_ApplyType(void)
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDatapoolProperties::m_ApplyType(const bool oq_SharedDatapool)
 {
    QString c_Pic;
 
    if (this->me_DatapoolType == C_OSCNodeDataPool::eDIAG)
    {
-      c_Pic = "://images/system_definition/IconDataPoolBig.svg";
+      if (oq_SharedDatapool == true)
+      {
+         c_Pic = "://images/system_definition/IconDataPoolBigShared.svg";
+      }
+      else
+      {
+         c_Pic = "://images/system_definition/IconDataPoolBig.svg";
+      }
       this->mpc_Ui->pc_ComProtGroup->setVisible(false);
       this->mpc_Ui->pc_SizeGroup->setVisible(false);
       this->mpc_Ui->pc_SizeInfoUsageGroup->setVisible(false);
@@ -458,13 +571,27 @@ void C_SdNdeDatapoolProperties::m_ApplyType(void)
    }
    else if (this->me_DatapoolType == C_OSCNodeDataPool::eNVM)
    {
-      c_Pic = "://images/system_definition/IconDataPoolBig.svg";
+      if (oq_SharedDatapool == true)
+      {
+         c_Pic = "://images/system_definition/IconDataPoolBigShared.svg";
+      }
+      else
+      {
+         c_Pic = "://images/system_definition/IconDataPoolBig.svg";
+      }
       this->mpc_Ui->pc_ComProtGroup->setVisible(false);
       this->mpc_Ui->pc_LabDatapoolType->setText(C_GtGetText::h_GetText("NVM"));
    }
    else
    {
-      c_Pic = "://images/system_definition/IconDataPoolBig.svg";
+      if (oq_SharedDatapool == true)
+      {
+         c_Pic = "://images/system_definition/IconDataPoolBigShared.svg";
+      }
+      else
+      {
+         c_Pic = "://images/system_definition/IconDataPoolBig.svg";
+      }
       this->mpc_Ui->pc_SizeGroup->setVisible(false);
       this->mpc_Ui->pc_SizeInfoUsageGroup->setVisible(false);
       this->mpc_Ui->pc_SizeInfoReservedGroup->setVisible(false);
@@ -473,6 +600,9 @@ void C_SdNdeDatapoolProperties::m_ApplyType(void)
       this->mpc_Ui->pc_LabDatapoolType->setText(C_GtGetText::h_GetText("COMM"));
    }
 
+   this->mpc_Ui->pc_GroupBoxShareConfiguration->setVisible(oq_SharedDatapool);
+   this->mpc_Ui->pc_GroupBoxShareConfigurationList->setVisible(oq_SharedDatapool);
+
    //set pic
    this->mpc_Ui->pc_LabDatapoolImage->SetSvg(c_Pic);
 
@@ -480,13 +610,10 @@ void C_SdNdeDatapoolProperties::m_ApplyType(void)
    this->setMinimumHeight(0);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load code generation flag and application data
-
-   \created     03.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load code generation flag and application data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDatapoolProperties::m_LoadCodeGenerationAndApplication(void) const
 {
    sint32 s32_DataBlockIndex = 0;
@@ -522,7 +649,7 @@ void C_SdNdeDatapoolProperties::m_LoadCodeGenerationAndApplication(void) const
    this->mpc_Ui->pc_ComboBoxApplication->setCurrentIndex(s32_DataBlockIndex);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDatapoolProperties::m_SpinBoxChanged(const stw_types::sintn osn_Value) const
 {
    Q_UNUSED(osn_Value)
@@ -530,7 +657,7 @@ void C_SdNdeDatapoolProperties::m_SpinBoxChanged(const stw_types::sintn osn_Valu
    this->m_UpdateSizePrediction();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDatapoolProperties::m_UpdateSizePrediction(void) const
 {
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
@@ -614,15 +741,12 @@ void C_SdNdeDatapoolProperties::m_UpdateSizePrediction(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check datapool name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check datapool name
    - check input
    - show/hide invalid icon
-
-   \created     23.01.2017  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDatapoolProperties::m_CheckDatapoolName(void) const
 {
    QString c_Content;
@@ -636,24 +760,10 @@ void C_SdNdeDatapoolProperties::m_CheckDatapoolName(void) const
       c_Content += C_GtGetText::h_GetText("- is empty or contains invalid characters\n");
    }
 
-   if (this->ms32_DataPoolIndex >= 0)
+   if (this->m_CheckDatapoolNameNotDuplicate(NULL) == false)
    {
-      const uint32 u32_DataPoolIndex = static_cast<uint32>(this->ms32_DataPoolIndex);
-      if (C_PuiSdHandler::h_GetInstance()->CheckNodeDataPoolNameAvailable(this->mu32_NodeIndex,
-                                                                          c_Name, &u32_DataPoolIndex) == false)
-      {
-         q_NameIsValid = false;
-         c_Content += C_GtGetText::h_GetText("- is already in use\n");
-      }
-   }
-   else
-   {
-      if (C_PuiSdHandler::h_GetInstance()->CheckNodeDataPoolNameAvailable(this->mu32_NodeIndex,
-                                                                          c_Name) == false)
-      {
-         q_NameIsValid = false;
-         c_Content += C_GtGetText::h_GetText("- is already in use\n");
-      }
+      q_NameIsValid = false;
+      c_Content += C_GtGetText::h_GetText("- is already in use\n");
    }
 
    //set invalid text property
@@ -669,7 +779,45 @@ void C_SdNdeDatapoolProperties::m_CheckDatapoolName(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check for duplicate data pool name
+
+   \param[in,out] opc_ExistingDatapoolNames Optional parameter to list all OTHER existing datapool names
+
+   \return
+   True  Name valid
+   False Name in conflict
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdNdeDatapoolProperties::m_CheckDatapoolNameNotDuplicate(
+   std::vector<C_SCLString> * const opc_ExistingDatapoolNames) const
+{
+   bool q_NameIsValid = true;
+   const stw_scl::C_SCLString c_Name = this->mpc_Ui->pc_LineEditDatapoolName->text().toStdString().c_str();
+
+   if (this->ms32_DataPoolIndex >= 0)
+   {
+      const uint32 u32_DataPoolIndex = static_cast<uint32>(this->ms32_DataPoolIndex);
+      if (C_PuiSdHandler::h_GetInstance()->CheckNodeDataPoolNameAvailable(this->mu32_NodeIndex,
+                                                                          c_Name, &u32_DataPoolIndex,
+                                                                          opc_ExistingDatapoolNames) == false)
+      {
+         q_NameIsValid = false;
+      }
+   }
+   else
+   {
+      if (C_PuiSdHandler::h_GetInstance()->CheckNodeDataPoolNameAvailable(this->mu32_NodeIndex,
+                                                                          c_Name, NULL,
+                                                                          opc_ExistingDatapoolNames) == false)
+      {
+         q_NameIsValid = false;
+      }
+   }
+   return q_NameIsValid;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDatapoolProperties::m_InitSpinBox(void) const
 {
    if (this->mpc_OSCDataPool != NULL)
@@ -693,7 +841,7 @@ void C_SdNdeDatapoolProperties::m_InitSpinBox(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDatapoolProperties::m_InitComboBoxProtocols(const bool oq_NewDataPool,
                                                         const C_OSCCanProtocol::E_Type oe_ComProtocolType) const
 {
@@ -784,7 +932,7 @@ void C_SdNdeDatapoolProperties::m_InitComboBoxProtocols(const bool oq_NewDataPoo
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDatapoolProperties::m_IsProtocolSelectable(const C_OSCCanProtocol::E_Type oe_ComProtocolType) const
 {
    bool q_Return = true;
@@ -806,16 +954,13 @@ bool C_SdNdeDatapoolProperties::m_IsProtocolSelectable(const C_OSCCanProtocol::E
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get selected protocol
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get selected protocol
 
    \return
    Currently selected protocol
-
-   \created     12.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCCanProtocol::E_Type C_SdNdeDatapoolProperties::m_GetSelectedProtocol(void) const
 {
    C_OSCCanProtocol::E_Type e_Retval;
@@ -836,13 +981,10 @@ C_OSCCanProtocol::E_Type C_SdNdeDatapoolProperties::m_GetSelectedProtocol(void) 
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle com type change
-
-   \created     12.01.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle com type change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDatapoolProperties::m_OnComTypeChange(void) const
 {
    const C_OSCCanProtocol::E_Type e_Type = m_GetSelectedProtocol();
@@ -850,15 +992,12 @@ void C_SdNdeDatapoolProperties::m_OnComTypeChange(void) const
    this->mpc_Ui->pc_LineEditDatapoolName->setText(C_PuiSdUtil::h_ConvertProtocolTypeToDatapoolNameString(e_Type));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle on safety flag state change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle on safety flag state change
 
    \param[in] oq_IsSafety Is safety activated
-
-   \created     07.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDatapoolProperties::m_OnSafetyChange(const bool oq_IsSafety) const
 {
    if (oq_IsSafety == true)
@@ -885,13 +1024,10 @@ void C_SdNdeDatapoolProperties::m_OnSafetyChange(const bool oq_IsSafety) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle all required actions for change of data pool to contain safety data
-
-   \created     07.05.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle all required actions for change of data pool to contain safety data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDatapoolProperties::m_HandleDataPoolSafetyAdaptation(void)
 {
    if ((this->mpc_OSCDataPool != NULL) && (this->mpc_OSCDataPool->q_IsSafety == true))
@@ -904,6 +1040,43 @@ void C_SdNdeDatapoolProperties::m_HandleDataPoolSafetyAdaptation(void)
             C_OSCNodeDataPoolListElement & rc_CurElement = rc_CurList.c_Elements[u32_ItElement];
             rc_CurElement.e_Access = C_OSCNodeDataPoolListElement::eACCESS_RO;
          }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Breaks the relation of the shared Datapool to the connected Datapools
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDatapoolProperties::m_BreakSharedRelation(void)
+{
+   if (this->ms32_DataPoolIndex >= 0)
+   {
+      C_PuiSdSharedDatapools & rc_SharedDatapools = C_PuiSdHandler::h_GetInstance()->GetSharedDatapools();
+      C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eQUESTION);
+
+      c_Message.SetHeading(C_GtGetText::h_GetText("Break Shared Datapool Relation"));
+      c_Message.SetDescription(C_GtGetText::h_GetText("Do you really want to delete the relation to other Datapool(s)\n"
+                                                      "This is not revertible.\n\n"
+                                                      "After relation break, the Datapool acts like a stand-alone Datapool."));
+
+      if (c_Message.Execute() == C_OgeWiCustomMessage::eYES)
+      {
+         rc_SharedDatapools.RemoveSharedDatapool(C_OSCNodeDataPoolId(this->mu32_NodeIndex,
+                                                                     static_cast<uint32>(this->ms32_DataPoolIndex)));
+
+         this->mpc_Ui->pc_BushButtonBreakRelation->setEnabled(false);
+         this->mpc_Ui->pc_ListWidgetSharedDatapoolInfo->clear();
+
+         // Reinit the labels and the ui
+         this->InitStaticNames();
+         this->m_UpdateSizePrediction();
+
+         this->m_ApplyType(false);
+         // The parent dialog must be resized to the minimum.This will cause an automatic adaption of the dialog
+         // to the correct size
+         this->mpc_ParentDialog->setMinimumHeight(0);
+         this->mpc_ParentDialog->setMaximumHeight(0);
       }
    }
 }

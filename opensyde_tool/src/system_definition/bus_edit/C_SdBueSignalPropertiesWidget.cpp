@@ -1,21 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for editing signal properties
 
    Widget for editing signal properties
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.03.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -35,7 +29,7 @@
 #include "C_SdBueSignalPropertiesWidget.h"
 #include "ui_C_SdBueSignalPropertiesWidget.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_scl;
 using namespace stw_tgl;
@@ -46,7 +40,7 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const sint32 ms32_TYPE_INDEX_UNSIGNED = 0;
 const sint32 ms32_TYPE_INDEX_SIGNED = 1;
 const sint32 ms32_TYPE_INDEX_FLOATING_32 = 2;
@@ -55,27 +49,24 @@ const sint32 ms32_TYPE_INDEX_FLOATING_64 = 3;
 const sint32 ms32_BYTE_ORDER_INDEX_INTEL = 0;
 const sint32 ms32_BYTE_ORDER_INDEX_MOTOROLA = 1;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     24.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueSignalPropertiesWidget::C_SdBueSignalPropertiesWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueSignalPropertiesWidget),
@@ -122,28 +113,22 @@ C_SdBueSignalPropertiesWidget::C_SdBueSignalPropertiesWidget(QWidget * const opc
            &C_SdBueSignalPropertiesWidget::m_HandleValueLengthChange);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     24.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueSignalPropertiesWidget::~C_SdBueSignalPropertiesWidget(void)
 {
    delete mpc_Ui;
    //lint -e{1740}  no memory leak because of the mpc_MessageSyncManager because of handling it on an other position
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     29.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::InitStaticNames(void) const
 {
    QString c_PhysicalValueInfo;
@@ -262,33 +247,27 @@ void C_SdBueSignalPropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelMessage->SetToolTipInformation(C_GtGetText::h_GetText("Message"), c_InfoText);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set message sync manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set message sync manager
 
    \param[in,out] opc_Value Message sync manager
-
-   \created     25.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::SetMessageSyncManager(
    stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value)
 {
    this->mpc_MessageSyncManager = opc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal ID setter
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal ID setter
 
    Sets the private signal id of widget
 
    \param[in] orc_MessageId    Message identification indices
    \param[in] ou32_SignalIndex New signal id
-
-   \created     29.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::SetSignalId(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                 const uint32 ou32_SignalIndex)
 {
@@ -299,15 +278,12 @@ void C_SdBueSignalPropertiesWidget::SetSignalId(const C_OSCCanMessageIdentificat
    this->m_LoadFromData();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On change of signal position in message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On change of signal position in message
 
    \param[in] orq_SignalErrorChange Optional flag to suppress error signal
-
-   \created     27.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::ReloadPosition(const bool & orq_SignalErrorChange)
 {
    const C_OSCCanSignal * const pc_OSCSignal = C_PuiSdHandler::h_GetInstance()->GetCanSignal(this->mc_MessageId,
@@ -329,45 +305,36 @@ void C_SdBueSignalPropertiesWidget::ReloadPosition(const bool & orq_SignalErrorC
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current message id
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current message id
 
    \return
    Current message id
-
-   \created     27.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_opensyde_core::C_OSCCanMessageIdentificationIndices C_SdBueSignalPropertiesWidget::GetMessageId(void) const
 {
    return mc_MessageId;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current signal index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current signal index
 
    \return
    Current signal index
-
-   \created     27.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SdBueSignalPropertiesWidget::GetSignalIndex(void) const
 {
    return this->mu32_SignalIndex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set protocol specific settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set protocol specific settings
 
    \param[in] ore_Type Current protcol
-
-   \created     27.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::SetProtocol(const C_OSCCanProtocol::E_Type & ore_Type)
 {
    if (ore_Type == C_OSCCanProtocol::eECES)
@@ -388,28 +355,22 @@ void C_SdBueSignalPropertiesWidget::SetProtocol(const C_OSCCanProtocol::E_Type &
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Selects the node name in the text edit for fast editing
-
-   \created     02.06.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Selects the node name in the text edit for fast editing
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::SelectName(void) const
 {
    this->mpc_Ui->pc_LineEditName->setFocus();
    this->mpc_Ui->pc_LineEditName->selectAll();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load bus information
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load bus information
 
    Load bus information from core data using bus index
-
-   \created     29.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_LoadFromData(void)
 {
    const C_OSCCanMessage * const pc_OSCMessage = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
@@ -568,15 +529,12 @@ void C_SdBueSignalPropertiesWidget::m_LoadFromData(void)
            &C_SdBueSignalPropertiesWidget::m_HandleValueType);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle toggle of auto min max check box
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle toggle of auto min max check box
 
    \param[in] orq_AutoMinMaxActive Flag for auto min max active
-
-   \created     31.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_HandleAutoMinMaxCheckBox(const bool & orq_AutoMinMaxActive)
 {
    if (orq_AutoMinMaxActive == true)
@@ -607,15 +565,12 @@ void C_SdBueSignalPropertiesWidget::m_HandleAutoMinMaxCheckBox(const bool & orq_
    m_CheckMinMaxAndInitValue();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle value type change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle value type change
 
    \param[in] ors32_Index Current index
-
-   \created     31.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_HandleValueType(const sint32 & ors32_Index)
 {
    if (ors32_Index == ms32_TYPE_INDEX_UNSIGNED)
@@ -653,43 +608,34 @@ void C_SdBueSignalPropertiesWidget::m_HandleValueType(const sint32 & ors32_Index
    */
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle change of bit length
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle change of bit length
 
    \param[in] ors32_Value New spin box value
-
-   \created     31.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_HandleValueLengthChange(const sint32 & ors32_Value)
 {
    Q_UNUSED(ors32_Value)
    m_UpdateAutoMinMax();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger update of auto min max
-
-   \created     31.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger update of auto min max
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_UpdateAutoMinMax(void)
 {
    m_HandleAutoMinMaxCheckBox(this->mpc_Ui->pc_CheckBoxAutoMinMax->isChecked());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt value to signal length
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt value to signal length
 
    \param[in]     ou16_BitLength Current bit length
    \param[in,out] orc_Content    Content to restrict
-
-   \created     04.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::mh_AdaptValueToSignalLength(const uint16 ou16_BitLength,
                                                                 C_OSCNodeDataPoolContent & orc_Content)
 {
@@ -714,9 +660,8 @@ void C_SdBueSignalPropertiesWidget::mh_AdaptValueToSignalLength(const uint16 ou1
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load generic content
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load generic content
 
    \param[in,out] opc_Widget     Spin box
    \param[in]     orc_Content    Value
@@ -725,10 +670,8 @@ void C_SdBueSignalPropertiesWidget::mh_AdaptValueToSignalLength(const uint16 ou1
    \param[in]     ou16_BitLength Signal bit length
    \param[in]     opc_Min        Optional minimum
    \param[in]     opc_Max        Optional maximum
-
-   \created     27.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueSignalPropertiesWidget::m_LoadGeneric(C_OgeWiSpinBoxGroup * const opc_Widget,
                                                     const C_OSCNodeDataPoolContent & orc_Content,
                                                     const float64 of64_Factor, const float64 of64_Offset,
@@ -797,9 +740,8 @@ sint32 C_SdBueSignalPropertiesWidget::m_LoadGeneric(C_OgeWiSpinBoxGroup * const 
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set content to minimum allowed value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set content to minimum allowed value
 
    \param[in,out] orc_Content    Content to set
    \param[in]     ou16_BitLength Signal bit length
@@ -807,10 +749,8 @@ sint32 C_SdBueSignalPropertiesWidget::m_LoadGeneric(C_OgeWiSpinBoxGroup * const 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     24.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueSignalPropertiesWidget::mh_InitMin(C_OSCNodeDataPoolContent & orc_Content, const uint16 ou16_BitLength)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -966,9 +906,8 @@ sint32 C_SdBueSignalPropertiesWidget::mh_InitMin(C_OSCNodeDataPoolContent & orc_
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set content to maximum allowed value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set content to maximum allowed value
 
    \param[in,out] orc_Content    Content to set
    \param[in]     ou16_BitLength Signal bit length
@@ -976,10 +915,8 @@ sint32 C_SdBueSignalPropertiesWidget::mh_InitMin(C_OSCNodeDataPoolContent & orc_
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     24.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueSignalPropertiesWidget::mh_InitMax(C_OSCNodeDataPoolContent & orc_Content, const uint16 ou16_BitLength)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -1142,18 +1079,15 @@ sint32 C_SdBueSignalPropertiesWidget::mh_InitMax(C_OSCNodeDataPoolContent & orc_
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save generic content
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save generic content
 
    \param[in]     opc_Widget  Spin box
    \param[in,out] orc_Content Value
    \param[in]     of64_Factor Scaling factor
    \param[in]     of64_Offset Scaling offset
-
-   \created     27.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueSignalPropertiesWidget::m_SaveGeneric(const C_OgeWiSpinBoxGroup * const opc_Widget,
                                                     C_OSCNodeDataPoolContent & orc_Content, const float64 of64_Factor,
                                                     const float64 of64_Offset) const
@@ -1172,16 +1106,13 @@ sint32 C_SdBueSignalPropertiesWidget::m_SaveGeneric(const C_OgeWiSpinBoxGroup * 
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Current type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Current type
 
    \return
    Get current type
-
-   \created     24.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolContent::E_Type C_SdBueSignalPropertiesWidget::m_GetCurrentType(void) const
 {
    C_OSCNodeDataPoolContent::E_Type e_Retval;
@@ -1237,13 +1168,10 @@ C_OSCNodeDataPoolContent::E_Type C_SdBueSignalPropertiesWidget::m_GetCurrentType
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reinitialize min max and init based on stored values
-
-   \created     24.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reinitialize min max and init based on stored values
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_ReInitMinMaxAndInit(const float64 * const opf64_Factor,
                                                           const float64 * const opf64_Offset) const
 {
@@ -1294,15 +1222,12 @@ void C_SdBueSignalPropertiesWidget::m_ReInitMinMaxAndInit(const float64 * const 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check signal name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check signal name
 
    \param[in] orq_SignalErrorChange Optional flag to suppress error signal
-
-   \created     29.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_CheckSignalName(const bool & orq_SignalErrorChange)
 {
    const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
@@ -1350,15 +1275,12 @@ void C_SdBueSignalPropertiesWidget::m_CheckSignalName(const bool & orq_SignalErr
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check position values
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check position values
 
    \param[in] orq_SignalErrorChange Optional flag to suppress error signal
-
-   \created     29.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_CheckMessagePosition(const bool & orq_SignalErrorChange)
 {
    const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
@@ -1399,15 +1321,12 @@ void C_SdBueSignalPropertiesWidget::m_CheckMessagePosition(const bool & orq_Sign
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check min, max or init value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check min, max or init value
 
    \param[in] orq_SignalErrorChange Optional flag to suppress error signal
-
-   \created     29.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_CheckMinMaxAndInitValue(const bool & orq_SignalErrorChange)
 {
    const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
@@ -1461,29 +1380,23 @@ void C_SdBueSignalPropertiesWidget::m_CheckMinMaxAndInitValue(const bool & orq_S
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trimm bus name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trimm bus name
 
    Remove whitespaces at the beginning and end of the string
-
-   \created     29.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_TrimmMessageName(void) const
 {
    this->mpc_Ui->pc_LineEditName->setText(this->mpc_Ui->pc_LineEditName->text().trimmed());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register Change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register Change
 
    Function where ui elements register a change. Change will be sent via a signal
-
-   \created     29.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_RegisterChange(void)
 {
    m_SaveToData();
@@ -1491,22 +1404,19 @@ void C_SdBueSignalPropertiesWidget::m_RegisterChange(void)
    Q_EMIT this->SigChanged();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_OnTextChanged(void)
 {
    this->m_SaveToData();
    this->m_CheckSignalName(false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register name change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register name change
 
    Function where ui elements register a change. Change will be sent via a signal
-
-   \created     27.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_RegisterNameChange(void)
 {
    this->m_TrimmMessageName();
@@ -1515,13 +1425,10 @@ void C_SdBueSignalPropertiesWidget::m_RegisterNameChange(void)
    Q_EMIT this->SigNameChanged(this->mc_MessageId, this->mu32_SignalIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register scaling change
-
-   \created     24.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register scaling change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_RegisterScalingChange(void)
 {
    const float64 f64_Factor = this->mpc_Ui->pc_DoubleSpinBoxFactor->value();
@@ -1533,15 +1440,12 @@ void C_SdBueSignalPropertiesWidget::m_RegisterScalingChange(void)
    m_RegisterChange();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register position change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register position change
 
    Function where ui elements register a change. Change will be sent via a signal
-
-   \created     27.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_RegisterPositionChange(void)
 {
    m_RegisterChange();
@@ -1551,15 +1455,12 @@ void C_SdBueSignalPropertiesWidget::m_RegisterPositionChange(void)
    Q_EMIT this->SigPositionChanged(this->mc_MessageId, this->mu32_SignalIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register min, max or init value change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register min, max or init value change
 
    Function where ui elements register a change. Change will be sent via a signal
-
-   \created     27.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_RegisterMinMaxAndInitChange(void)
 {
    m_RegisterChange();
@@ -1567,13 +1468,10 @@ void C_SdBueSignalPropertiesWidget::m_RegisterMinMaxAndInitChange(void)
    m_ReInitMinMaxAndInit();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save data
-
-   \created     29.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_SaveToData(void)
 {
    if (this->mpc_MessageSyncManager != NULL)
@@ -1680,13 +1578,10 @@ void C_SdBueSignalPropertiesWidget::m_SaveToData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reconnect signals for position change
-
-   \created     27.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reconnect signals for position change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_ConnectPositionUpdate(void)
 {
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
@@ -1701,13 +1596,10 @@ void C_SdBueSignalPropertiesWidget::m_ConnectPositionUpdate(void)
    this->mq_PositionUpdate = true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Disconnect signals for position change
-
-   \created     27.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Disconnect signals for position change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_DisconnectPositionUpdate(void)
 {
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Base item filer (implementation)
 
    Base item filer
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.07.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPixmap>
@@ -26,7 +19,7 @@
 #include "TGLUtils.h"
 #include "C_PuiBsElementsFiler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_scl;
 using namespace stw_tgl;
 using namespace stw_types;
@@ -34,32 +27,28 @@ using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     21.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiBsElementsFiler::C_PuiBsElementsFiler(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load text elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load text elements
 
    \param[in,out] orc_Elements  Base data elements
    \param[in,out] orc_XMLParser XML parser with the "current" element set to the any element
@@ -67,10 +56,8 @@ C_PuiBsElementsFiler::C_PuiBsElementsFiler(void)
    \return
    C_NO_ERR    information loaded
    C_CONFIG    error loading information
-
-   \created     21.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiBsElementsFiler::h_LoadBaseElements(C_PuiBsElements & orc_Elements, C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -121,16 +108,13 @@ sint32 C_PuiBsElementsFiler::h_LoadBaseElements(C_PuiBsElements & orc_Elements, 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save boundaries
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save boundaries
 
    \param[in]     orc_Elements  Base data elements
    \param[in,out] orc_XMLParser XML parser with the "current" element set to any element
-
-   \created     21.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElementsFiler::h_SaveBaseElements(const C_PuiBsElements & orc_Elements, C_OSCXMLParserBase & orc_XMLParser)
 {
    //Text elements
@@ -154,9 +138,8 @@ void C_PuiBsElementsFiler::h_SaveBaseElements(const C_PuiBsElements & orc_Elemen
    orc_XMLParser.SelectNodeParent(); //back up
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load text elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load text elements
 
    \param[in,out] orc_TextElements Text element data elements
    \param[in,out] orc_XMLParser    XML parser with the "current" element set to the "text-elements" element
@@ -164,10 +147,8 @@ void C_PuiBsElementsFiler::h_SaveBaseElements(const C_PuiBsElements & orc_Elemen
    \return
    C_NO_ERR    information loaded
    C_CONFIG    error loading information
-
-   \created     09.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiBsElementsFiler::h_LoadTextElements(std::vector<C_PuiBsTextElement> & orc_TextElements,
                                                 C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -196,16 +177,13 @@ sint32 C_PuiBsElementsFiler::h_LoadTextElements(std::vector<C_PuiBsTextElement> 
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save text elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save text elements
 
    \param[in]     orc_TextElements Text element data elements
    \param[in,out] orc_XMLParser    XML parser with the "current" element set to the "text-elements" element
-
-   \created     09.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElementsFiler::h_SaveTextElements(const std::vector<C_PuiBsTextElement> & orc_TextElements,
                                               C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -216,9 +194,8 @@ void C_PuiBsElementsFiler::h_SaveTextElements(const std::vector<C_PuiBsTextEleme
       tgl_assert(orc_XMLParser.SelectNodeParent() == "text-elements"); //back up
    }
 }
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load boundaries
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load boundaries
 
    \param[in,out] orc_Boundaries Boundary data elements
    \param[in,out] orc_XMLParser  XML parser with the "current" element set to the "boundaries" element
@@ -226,10 +203,8 @@ void C_PuiBsElementsFiler::h_SaveTextElements(const std::vector<C_PuiBsTextEleme
    \return
    C_NO_ERR    information loaded
    C_CONFIG    error loading information
-
-   \created     09.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiBsElementsFiler::h_LoadBoundaries(std::vector<C_PuiBsBoundary> & orc_Boundaries,
                                               C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -258,16 +233,13 @@ sint32 C_PuiBsElementsFiler::h_LoadBoundaries(std::vector<C_PuiBsBoundary> & orc
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save boundaries
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save boundaries
 
    \param[in]     orc_Boundaries Boundary data elements
    \param[in,out] orc_XMLParser  XML parser with the "current" element set to the "boundaries" element
-
-   \created     09.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElementsFiler::h_SaveBoundaries(const std::vector<C_PuiBsBoundary> & orc_Boundaries,
                                             C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -279,9 +251,8 @@ void C_PuiBsElementsFiler::h_SaveBoundaries(const std::vector<C_PuiBsBoundary> &
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load images
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load images
 
    \param[in,out] orc_Images    Image data elements
    \param[in,out] orc_XMLParser XML parser with the "current" element set to the "images" element
@@ -289,10 +260,8 @@ void C_PuiBsElementsFiler::h_SaveBoundaries(const std::vector<C_PuiBsBoundary> &
    \return
    C_NO_ERR    information loaded
    C_CONFIG    error loading information
-
-   \created     09.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiBsElementsFiler::h_LoadImages(std::vector<C_PuiBsImage> & orc_Images, C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -320,16 +289,13 @@ sint32 C_PuiBsElementsFiler::h_LoadImages(std::vector<C_PuiBsImage> & orc_Images
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save images
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save images
 
    \param[in]     orc_Images    Image data elements
    \param[in,out] orc_XMLParser XML parser with the "current" element set to the "images" element
-
-   \created     09.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElementsFiler::h_SaveImages(const std::vector<C_PuiBsImage> & orc_Images,
                                         C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -341,9 +307,8 @@ void C_PuiBsElementsFiler::h_SaveImages(const std::vector<C_PuiBsImage> & orc_Im
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load line arrows
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load line arrows
 
    \param[in,out] orc_LineArrows Line arrow data elements
    \param[in,out] orc_XMLParser  XML parser with the "current" element set to the "line-arrows" element
@@ -351,10 +316,8 @@ void C_PuiBsElementsFiler::h_SaveImages(const std::vector<C_PuiBsImage> & orc_Im
    \return
    C_NO_ERR    information loaded
    C_CONFIG    error loading information
-
-   \created     09.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiBsElementsFiler::h_LoadLineArrows(std::vector<C_PuiBsLineArrow> & orc_LineArrows,
                                               C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -383,16 +346,13 @@ sint32 C_PuiBsElementsFiler::h_LoadLineArrows(std::vector<C_PuiBsLineArrow> & or
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save line arrows
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save line arrows
 
    \param[in]     orc_LineArrows Line arrow data elements
    \param[in,out] orc_XMLParser  XML parser with the "current" element set to the "line-arrows" element
-
-   \created     09.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElementsFiler::h_SaveLineArrows(const std::vector<C_PuiBsLineArrow> & orc_LineArrows,
                                             C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -404,9 +364,8 @@ void C_PuiBsElementsFiler::h_SaveLineArrows(const std::vector<C_PuiBsLineArrow> 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load box base attributes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load box base attributes
 
    \param[in,out] orc_BoxBase   Box base data element
    \param[in,out] orc_XMLParser XML parser with the "current" element set to the "box" element
@@ -414,10 +373,8 @@ void C_PuiBsElementsFiler::h_SaveLineArrows(const std::vector<C_PuiBsLineArrow> 
    \return
    C_NO_ERR    information loaded
    C_CONFIG    error loading information
-
-   \created     13.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiBsElementsFiler::h_LoadBoxBase(C_PuiBsBox & orc_BoxBase, C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -457,16 +414,13 @@ sint32 C_PuiBsElementsFiler::h_LoadBoxBase(C_PuiBsBox & orc_BoxBase, C_OSCXMLPar
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save box base attributes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save box base attributes
 
    \param[in]     orc_BoxBase   Box base data element
    \param[in,out] orc_XMLParser XML parser with the "current" element set to the "box" element
-
-   \created     13.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElementsFiler::h_SaveBoxBase(const C_PuiBsBox & orc_BoxBase,
                                          stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -488,9 +442,8 @@ void C_PuiBsElementsFiler::h_SaveBoxBase(const C_PuiBsBox & orc_BoxBase,
    orc_XMLParser.SelectNodeParent();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load line base attributes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load line base attributes
 
    \param[in,out] orc_LineBase  Line base data element
    \param[in,out] orc_XMLParser XML parser with the "current" element set to the "line" element
@@ -498,10 +451,8 @@ void C_PuiBsElementsFiler::h_SaveBoxBase(const C_PuiBsBox & orc_BoxBase,
    \return
    C_NO_ERR    information loaded
    C_CONFIG    error loading information
-
-   \created     13.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiBsElementsFiler::h_LoadLineBase(C_PuiBsLineBase & orc_LineBase, C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -563,16 +514,13 @@ sint32 C_PuiBsElementsFiler::h_LoadLineBase(C_PuiBsLineBase & orc_LineBase, C_OS
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save line base attributes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save line base attributes
 
    \param[in]     orc_LineBase  Line base data element
    \param[in,out] orc_XMLParser XML parser with the "current" element set to the "line" element
-
-   \created     13.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElementsFiler::h_SaveLineBase(const C_PuiBsLineBase & orc_LineBase,
                                           stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -602,9 +550,8 @@ void C_PuiBsElementsFiler::h_SaveLineBase(const C_PuiBsLineBase & orc_LineBase,
    orc_XMLParser.SelectNodeParent(); //back to "line"
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load text element attributes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load text element attributes
 
    \param[in,out] opc_TextElement Text element data element
    \param[in,out] orc_XMLParser   XML parser with the "current" element set to the "text-element" element
@@ -612,10 +559,8 @@ void C_PuiBsElementsFiler::h_SaveLineBase(const C_PuiBsLineBase & orc_LineBase,
    \return
    C_NO_ERR    information loaded
    C_CONFIG    error loading information
-
-   \created     13.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_types::sint32 C_PuiBsElementsFiler::h_LoadTextElement(C_PuiBsTextElement * const opc_TextElement,
                                                           stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -687,16 +632,13 @@ stw_types::sint32 C_PuiBsElementsFiler::h_LoadTextElement(C_PuiBsTextElement * c
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save text element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save text element
 
    \param[in]     opc_TextElement Text element data element
    \param[in,out] orc_XMLParser   XML parser with the "current" element set to the "text-element" element
-
-   \created     13.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElementsFiler::h_SaveTextElement(const C_PuiBsTextElement * const opc_TextElement,
                                              stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -722,16 +664,13 @@ void C_PuiBsElementsFiler::h_SaveTextElement(const C_PuiBsTextElement * const op
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load color attributes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load color attributes
 
    \param[in,out] orc_Color     Color data element
    \param[in,out] orc_XMLParser XML parser with the "current" element set to a color element
-
-   \created     13.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElementsFiler::h_LoadColor(QColor & orc_Color, const stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_Color = QColor(orc_XMLParser.GetAttributeSint32("r"),
@@ -740,16 +679,13 @@ void C_PuiBsElementsFiler::h_LoadColor(QColor & orc_Color, const stw_opensyde_co
                       orc_XMLParser.GetAttributeSint32("a"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save color attributes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save color attributes
 
    \param[in]     orc_Color     Color data element
    \param[in,out] orc_XMLParser XML parser with the "current" element set to a color element
-
-   \created     13.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElementsFiler::h_SaveColor(const QColor & orc_Color, stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_XMLParser.SetAttributeUint32("r", orc_Color.red());
@@ -758,9 +694,8 @@ void C_PuiBsElementsFiler::h_SaveColor(const QColor & orc_Color, stw_opensyde_co
    orc_XMLParser.SetAttributeUint32("a", orc_Color.alpha());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load boundary attributes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load boundary attributes
 
    \param[in,out] orc_Boundary      Boundary data element
    \param[in,out] orc_XMLParser XML parser with the "current" element set to the "boundary" element
@@ -768,10 +703,8 @@ void C_PuiBsElementsFiler::h_SaveColor(const QColor & orc_Color, stw_opensyde_co
    \return
    C_NO_ERR    information loaded
    C_CONFIG    error loading information
-
-   \created     13.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_types::sint32 C_PuiBsElementsFiler::mh_LoadBoundary(C_PuiBsBoundary & orc_Boundary,
                                                         stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -853,16 +786,13 @@ stw_types::sint32 C_PuiBsElementsFiler::mh_LoadBoundary(C_PuiBsBoundary & orc_Bo
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save boundary
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save boundary
 
    \param[in]     orc_Boundary  Boundary data element
    \param[in,out] orc_XMLParser XML parser with the "current" element set to the "boundary" element
-
-   \created     13.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElementsFiler::mh_SaveBoundary(const C_PuiBsBoundary & orc_Boundary,
                                            stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -890,9 +820,8 @@ void C_PuiBsElementsFiler::mh_SaveBoundary(const C_PuiBsBoundary & orc_Boundary,
    orc_XMLParser.SelectNodeParent(); //back to "boundary"
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load image attributes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load image attributes
 
    \param[in,out] orc_Image     Image data element
    \param[in,out] orc_XMLParser XML parser with the "current" element set to the "image" element
@@ -900,10 +829,8 @@ void C_PuiBsElementsFiler::mh_SaveBoundary(const C_PuiBsBoundary & orc_Boundary,
    \return
    C_NO_ERR    information loaded
    C_CONFIG    error loading information
-
-   \created     13.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_types::sint32 C_PuiBsElementsFiler::mh_LoadImage(C_PuiBsImage & orc_Image,
                                                      stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -932,16 +859,13 @@ stw_types::sint32 C_PuiBsElementsFiler::mh_LoadImage(C_PuiBsImage & orc_Image,
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save image
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save image
 
    \param[in]     orc_Image     Image data element
    \param[in,out] orc_XMLParser XML parser with the "current" element set to the "image" element
-
-   \created     13.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElementsFiler::mh_SaveImage(const C_PuiBsImage & orc_Image,
                                         stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -956,9 +880,8 @@ void C_PuiBsElementsFiler::mh_SaveImage(const C_PuiBsImage & orc_Image,
    orc_XMLParser.SelectNodeParent(); //back to "image"
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load line arrow attributes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load line arrow attributes
 
    \param[in,out] orc_LineArrow Line arrow data element
    \param[in,out] orc_XMLParser XML parser with the "current" element set to the "line-arrow" element
@@ -966,10 +889,8 @@ void C_PuiBsElementsFiler::mh_SaveImage(const C_PuiBsImage & orc_Image,
    \return
    C_NO_ERR    information loaded
    C_CONFIG    error loading information
-
-   \created     13.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_types::sint32 C_PuiBsElementsFiler::mh_LoadLineArrow(C_PuiBsLineArrow & orc_LineArrow,
                                                          stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -1023,16 +944,13 @@ stw_types::sint32 C_PuiBsElementsFiler::mh_LoadLineArrow(C_PuiBsLineArrow & orc_
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save line arrow
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save line arrow
 
    \param[in]     orc_LineArrow Line arrow data element
    \param[in,out] orc_XMLParser XML parser with the "current" element set to the "line-arrow" element
-
-   \created     13.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElementsFiler::mh_SaveLineArrow(const C_PuiBsLineArrow & orc_LineArrow,
                                             stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -1053,48 +971,39 @@ void C_PuiBsElementsFiler::mh_SaveLineArrow(const C_PuiBsLineArrow & orc_LineArr
    orc_XMLParser.SelectNodeParent(); //back to "image"
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load font style attributes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load font style attributes
 
    \param[in,out] orc_FontStyle Font style data element
    \param[in,out] orc_XMLParser XML parser with the "current" element set to a color element
-
-   \created     13.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElementsFiler::mh_LoadFontStyle(QFont & orc_FontStyle,
                                             const stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_FontStyle.fromString(orc_XMLParser.GetNodeContent().c_str());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save font style attributes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save font style attributes
 
    \param[in]     orc_FontStyle Font style data element
    \param[in,out] orc_XMLParser XML parser with the "current" element set to a color element
-
-   \created     13.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElementsFiler::mh_SaveFontStyle(const QFont & orc_FontStyle,
                                             stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser)
 {
    orc_XMLParser.SetNodeContent(orc_FontStyle.toString().toStdString().c_str());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert pixmap to string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert pixmap to string
 
    \param[in]     orc_Pixmap Pixmap
    \param[out]    orc_String Byte string
-
-   \created     13.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElementsFiler::mh_PixmapToString(const QPixmap & orc_Pixmap, QString & orc_String)
 {
    QByteArray c_PixmapAsByteArray;
@@ -1111,16 +1020,13 @@ void C_PuiBsElementsFiler::mh_PixmapToString(const QPixmap & orc_Pixmap, QString
    orc_String = QString::fromUtf8(c_PixmapAsByteArray.toBase64());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert string to pixmap
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert string to pixmap
 
    \param[in]     orc_String Byte string
    \param[out]    orc_Pixmap Pixmap
-
-   \created     13.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiBsElementsFiler::mh_StringToPixmap(const QString & orc_String, QPixmap & orc_Pixmap)
 {
    orc_Pixmap.loadFromData(QByteArray::fromBase64(orc_String.toUtf8()), "PNG");

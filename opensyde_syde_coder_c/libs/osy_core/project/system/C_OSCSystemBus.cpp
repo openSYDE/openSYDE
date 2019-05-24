@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Store bus
 
    Data container class for all information describing a bus.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     02.09.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -41,10 +34,7 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     02.09.2016  STW/M.Echtler
+/*! \brief   Default constructor
 */
 //-----------------------------------------------------------------------------
 C_OSCSystemBus::C_OSCSystemBus(void) :
@@ -58,12 +48,9 @@ C_OSCSystemBus::C_OSCSystemBus(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     02.09.2016  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 C_OSCSystemBus::~C_OSCSystemBus(void)
@@ -71,15 +58,12 @@ C_OSCSystemBus::~C_OSCSystemBus(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
    It is not endian-safe, so it should only be used on the same system it is created on.
 
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
-
-   \created     21.03.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCSystemBus::CalcHash(uint32 & oru32_HashValue) const
@@ -93,8 +77,7 @@ void C_OSCSystemBus::CalcHash(uint32 & oru32_HashValue) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Compare bus names for greater
+/*! \brief   Compare bus names for greater
 
    Buses are compared by name.
    Primary sorting criteria: Name length: Shortest first
@@ -106,8 +89,6 @@ void C_OSCSystemBus::CalcHash(uint32 & oru32_HashValue) const
    \return
    true:  Bus 1 smaller than Bus 2
    false: Else
-
-   \created     05.09.2016  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 bool C_OSCSystemBus::h_CompareNameGreater(const C_OSCSystemBus & orc_Bus1, const C_OSCSystemBus & orc_Bus2)
@@ -126,14 +107,11 @@ bool C_OSCSystemBus::h_CompareNameGreater(const C_OSCSystemBus & orc_Bus1, const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Check if bus ID invalid
+/*! \brief   Check if bus ID invalid
 
    \return
    true  Error
    false No error
-
-   \created     10.04.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 bool C_OSCSystemBus::CheckErrorBusId(void) const

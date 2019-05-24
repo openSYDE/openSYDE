@@ -1,33 +1,27 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       List widget for topology widgets (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     31.07.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_NAGTOPLIST_H
 #define C_NAGTOPLIST_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_NagTopListModel.h"
 #include "C_NagTopListDelegate.h"
 #include "C_OgeListViewToolTipBase.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_NagTopList :
    public stw_opensyde_gui_elements::C_OgeListViewToolTipBase
@@ -38,7 +32,7 @@ public:
    C_NagTopList(QWidget * const opc_Parent = NULL);
 
    void SetTypeNode(const bool oq_IsNode);
-   void SetSelectedIndex(const stw_types::sint32 os32_Selected);
+   void SetSelectedIndexAndScroll(const stw_types::sint32 os32_Selected);
    void SetContent(const std::vector<QString> & orc_Content);
    void SetError(const std::vector<bool> & orc_Error);
 
@@ -56,7 +50,7 @@ private:
    void m_HandleClicked(const QModelIndex & orc_Index);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

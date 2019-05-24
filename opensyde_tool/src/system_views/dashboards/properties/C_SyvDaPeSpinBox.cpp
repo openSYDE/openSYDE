@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for system view dashboard spin box properties (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     12.09.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -26,38 +19,35 @@
 #include "C_GiSvDaSpinBoxBase.h"
 #include "C_OgeCbxText.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const sintn C_SyvDaPeSpinBox::mhsn_INDEX_STYLE_TYPE1 = 0;
 const sintn C_SyvDaPeSpinBox::mhsn_INDEX_STYLE_TYPE2 = 1;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent  Optional pointer to parent
    \param[in]     oq_DarkMode Flag for dark mode
-
-   \created     12.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeSpinBox::C_SyvDaPeSpinBox(C_SyvDaPeBase & orc_Parent, const bool oq_DarkMode) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvDaPeSpinBox),
@@ -84,27 +74,21 @@ C_SyvDaPeSpinBox::C_SyvDaPeSpinBox(C_SyvDaPeBase & orc_Parent, const bool oq_Dar
    connect(&this->mrc_ParentDialog, &C_SyvDaPeBase::SigRefresh, this, &C_SyvDaPeSpinBox::m_UpdatePreview);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     12.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeSpinBox::~C_SyvDaPeSpinBox(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     12.09.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeSpinBox::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelShowUnit->setText(C_GtGetText::h_GetText("Show Unit"));
@@ -113,45 +97,36 @@ void C_SyvDaPeSpinBox::InitStaticNames(void) const
    this->mpc_Ui->pc_ComboBoxType->addItem(C_GtGetText::h_GetText("Type 2"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get show unit flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get show unit flag
 
    \return
    Current show unit flag
-
-   \created     12.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaPeSpinBox::GetShowUnit(void) const
 {
    return this->mpc_Ui->pc_CheckBoxUnit->isChecked();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set show unit flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set show unit flag
 
    \param[in] oq_Value New show unit flag
-
-   \created     11.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeSpinBox::SetShowUnit(const bool oq_Value) const
 {
    this->mpc_Ui->pc_CheckBoxUnit->setChecked(oq_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get type
 
    \return
    Current type
-
-   \created     12.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbSpinBox::E_Type C_SyvDaPeSpinBox::GetType(void) const
 {
    C_PuiSvDbSpinBox::E_Type e_Retval;
@@ -169,15 +144,12 @@ C_PuiSvDbSpinBox::E_Type C_SyvDaPeSpinBox::GetType(void) const
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set type
 
    \param[in] oe_Type New type
-
-   \created     12.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeSpinBox::SetType(const C_PuiSvDbSpinBox::E_Type oe_Type) const
 {
    switch (oe_Type)
@@ -191,13 +163,10 @@ void C_SyvDaPeSpinBox::SetType(const C_PuiSvDbSpinBox::E_Type oe_Type) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update of preview click
-
-   \created     05.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update of preview click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeSpinBox::m_UpdatePreview(void)
 {
    //Also include the fix offset to the right

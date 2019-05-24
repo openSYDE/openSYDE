@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Utility class for sequences required for device configuration. (implementation)
 
@@ -14,17 +13,11 @@
 
    Technical details are logged using C_OSCLoggingHandler.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     23.11.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwerrors.h"
@@ -37,32 +30,29 @@
 #include "C_PuiSdHandler.h"
 #include "C_SyvComDriverUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_scl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     23.11.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDcDeviceInformation::C_SyvDcDeviceInformation(void) :
    c_DeviceName(""),
    q_DeviceNameValid(false),
@@ -75,67 +65,55 @@ C_SyvDcDeviceInformation::C_SyvDcDeviceInformation(void) :
    (void)std::memset(&au8_IpAddress[0], 0U, sizeof(au8_IpAddress));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets a device name and its valid flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets a device name and its valid flag
 
    \param[in]     orc_DeviceName    New device name
-
-   \created     27.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcDeviceInformation::SetDeviceName(const C_SCLString & orc_DeviceName)
 {
    this->c_DeviceName = orc_DeviceName;
    this->q_DeviceNameValid = true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets a serial number and its valid flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets a serial number and its valid flag
 
    \param[in]     orau8_SerialNumer   New serial number
-
-   \created     27.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcDeviceInformation::SetSerialNumber(const uint8 (&orau8_SerialNumber)[6])
 {
    (void)std::memcpy(this->au8_SerialNumber, orau8_SerialNumber, sizeof(this->au8_SerialNumber));
    this->q_SerialNumberValid = true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets a node id and its valid flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets a node id and its valid flag
 
    \param[in]     ou8_NodeId      New node id
-
-   \created     27.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcDeviceInformation::SetNodeId(const uint8 ou8_NodeId)
 {
    this->u8_NodeId = ou8_NodeId;
    this->q_NodeIdValid = true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets a ip address and its valid flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets a ip address and its valid flag
 
    \param[in]     orau8_IpAddress      New node id
-
-   \created     27.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcDeviceInformation::SetIpAddress(const uint8 (&orau8_IpAddress)[4])
 {
    (void)memcpy(&this->au8_IpAddress[0], &orau8_IpAddress[0], sizeof(this->au8_IpAddress));
    this->q_IpAddressValid = true;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_SyvDcDeviceInformation::h_SerialNumberToString(const uint8 (&orau8_SerialNumer)[6])
 {
@@ -147,7 +125,7 @@ C_SCLString C_SyvDcDeviceInformation::h_SerialNumberToString(const uint8 (&orau8
    return c_Result;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDcDeviceInformation::h_SerialNumberFromStringToArray(const C_SCLString & orc_SerialNumber,
                                                                uint8 * const opu8_SerialNumer)
 {
@@ -187,30 +165,24 @@ bool C_SyvDcDeviceInformation::h_SerialNumberFromStringToArray(const C_SCLString
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     23.11.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDcDeviceConfiguation::C_SyvDcDeviceConfiguation(void) :
    au8_SerialNumber()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief    Assignment operator.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Assignment operator.
 
    \param[in]  orc_Source    instance to assign
 
    \return
    reference to new instance
-
-   \created     29.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDcDeviceConfiguation & C_SyvDcDeviceConfiguation::operator =(const C_SyvDcDeviceConfiguation & orc_Source)
 {
    if (this != &orc_Source)
@@ -226,13 +198,10 @@ C_SyvDcDeviceConfiguation & C_SyvDcDeviceConfiguation::operator =(const C_SyvDcD
    return (*this);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     23.11.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDcSequences::C_SyvDcSequences(void) :
    C_OSCComSequencesBase(false),
    mpc_CanDllDispatcher(NULL),
@@ -247,13 +216,10 @@ C_SyvDcSequences::C_SyvDcSequences(void) :
    mpc_Thread = new C_SyvComDriverThread(&C_SyvDcSequences::mh_ThreadFunc, this);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     23.11.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDcSequences::~C_SyvDcSequences(void)
 {
    if (this->mpc_Thread != NULL)
@@ -288,9 +254,8 @@ C_SyvDcSequences::~C_SyvDcSequences(void)
    delete mpc_EthernetDispatcher;
    mpc_EthernetDispatcher = NULL;
 }
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all members
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all members
 
    \param[in]  ou32_ViewIndex    Index of current used view
 
@@ -303,10 +268,8 @@ C_SyvDcSequences::~C_SyvDcSequences(void)
    C_COM         CAN initialization failed or no active node
    C_CHECKSUM    Internal buffer overflow detected
    C_RANGE       Routing configuration failed
-
-   \created     14.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::InitDcSequences(const uint32 ou32_ViewIndex)
 {
    sint32 s32_Return;
@@ -322,7 +285,7 @@ sint32 C_SyvDcSequences::InitDcSequences(const uint32 ou32_ViewIndex)
 
    if (s32_Return == C_NO_ERR)
    {
-      s32_Return = C_OSCComSequencesBase::Init(C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst(),
+      s32_Return = C_OSCComSequencesBase::Init(C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinition(),
                                                u32_ActiveBusIndex, c_ActiveNodes, this->mpc_CanDllDispatcher,
                                                this->mpc_EthernetDispatcher);
    }
@@ -330,9 +293,8 @@ sint32 C_SyvDcSequences::InitDcSequences(const uint32 ou32_ViewIndex)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Gets all configuration information for a node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Gets all configuration information for a node
 
    Preconditions as input part for orc_Config:
    - au8_SerialNumber must be set
@@ -346,10 +308,8 @@ sint32 C_SyvDcSequences::InitDcSequences(const uint32 ou32_ViewIndex)
    C_NO_ERR    filling device configuration finished
    C_RANGE     device configuration is invalid
    C_CONFIG    system definition does not match to the input parameters
-
-   \created     05.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::FillDeviceConfig(C_SyvDcDeviceConfiguation & orc_Config,
                                           C_OSCNodeProperties::E_FlashLoaderProtocol & ore_Flashloader) const
 {
@@ -469,9 +429,8 @@ sint32 C_SyvDcSequences::FillDeviceConfig(C_SyvDcDeviceConfiguation & orc_Config
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Starts thread to bring devices in flashloader state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Starts thread to bring devices in flashloader state
 
    Supports openSYDE CAN-TP and STW Flashloader protocols.
 
@@ -482,10 +441,8 @@ sint32 C_SyvDcSequences::FillDeviceConfig(C_SyvDcDeviceConfiguation & orc_Config
    \return
    C_NO_ERR   started sequence
    C_BUSY     previously started sequence still going on
-
-   \created     23.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::ScanCanEnterFlashloader(const uint32 ou32_UsedBitrate)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -503,9 +460,8 @@ sint32 C_SyvDcSequences::ScanCanEnterFlashloader(const uint32 ou32_UsedBitrate)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Starts thread to send flashloader request messages
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Starts thread to send flashloader request messages
 
    Supports openSYDE CAN-TP and STW Flashloader protocols.
 
@@ -518,10 +474,8 @@ sint32 C_SyvDcSequences::ScanCanEnterFlashloader(const uint32 ou32_UsedBitrate)
    \return
    C_NO_ERR   started sequence
    C_BUSY     previously started sequence still going on
-
-   \created     06.12.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::ScanCanSendFlashloaderRequest(const uint32 ou32_ScanTime, const bool oq_ScanEndless)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -540,19 +494,16 @@ sint32 C_SyvDcSequences::ScanCanSendFlashloaderRequest(const uint32 ou32_ScanTim
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the flag for stopping ScanCanSendFlashloaderRequest
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the flag for stopping ScanCanSendFlashloaderRequest
 
    When ScanCanSendFlashloaderRequest is still running an the flag mq_RunScanSendFlashloaderRequestEndless
    is not set to false, the function sets it to true.
    The ScanCanSendFlashloaderRequest will then be stopped when the scan time is over too.
 
    This function is thread safe
-
-   \created     06.12.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcSequences::StopScanCanSendFlashloaderRequest(void)
 {
    this->mc_CriticalSection.Acquire();
@@ -560,19 +511,16 @@ void C_SyvDcSequences::StopScanCanSendFlashloaderRequest(void)
    this->mc_CriticalSection.Release();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Starts thread to read information from STW Flashloader devices.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Starts thread to read information from STW Flashloader devices.
 
    Result of sequence can be get by calling GetDeviceInfosResult
 
    \return
    C_NO_ERR   started sequence
    C_BUSY     previously started sequence still going on
-
-   \created     23.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::ScanCanGetInfoFromStwFlashloaderDevices(void)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -589,9 +537,8 @@ sint32 C_SyvDcSequences::ScanCanGetInfoFromStwFlashloaderDevices(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Starts thread to read information from openSYDE devices.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Starts thread to read information from openSYDE devices.
 
    Supports openSYDE CAN-TP protocol.
    Result of sequence can be get by calling GetDeviceInfosResult
@@ -599,10 +546,8 @@ sint32 C_SyvDcSequences::ScanCanGetInfoFromStwFlashloaderDevices(void)
    \return
    C_NO_ERR   started sequence
    C_BUSY     previously started sequence still going on
-
-   \created     23.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::ScanCanGetInfoFromOpenSydeDevices(void)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -619,19 +564,16 @@ sint32 C_SyvDcSequences::ScanCanGetInfoFromOpenSydeDevices(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Starts thread to read information from openSYDE nodes.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Starts thread to read information from openSYDE nodes.
 
    Result of sequence can be get by calling GetDeviceInfosResult
 
    \return
    C_NO_ERR   started sequence
    C_BUSY     previously started sequence still going on
-
-   \created     23.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::ScanEthGetInfoFromOpenSydeDevices(void)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -648,9 +590,8 @@ sint32 C_SyvDcSequences::ScanEthGetInfoFromOpenSydeDevices(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Precheck of the openSYDE devices configuration
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Precheck of the openSYDE devices configuration
 
    Function returns immediately with the result. It will not be run in the separate thread.
 
@@ -671,19 +612,16 @@ sint32 C_SyvDcSequences::ScanEthGetInfoFromOpenSydeDevices(void)
    C_NOACT     no device configurations exist
    C_RANGE     device configuration is invalid
    C_CONFIG    no com driver installed
-
-   \created     05.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::CheckOpenSydeDevicesConfig(const std::vector<C_SyvDcDeviceConfiguation> & orc_DeviceConfig)
 const
 {
    return this->m_CheckConfOpenSydeDevices(orc_DeviceConfig);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Starts thread to write new configuration to STW Flashloader devices.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Starts thread to write new configuration to STW Flashloader devices.
 
    This function shall be called after calling CheckCanOpenSydeDevicesConfig and before ConfCanOpenSydeDevices.
    When the calling order is
@@ -697,10 +635,8 @@ const
    \return
    C_NO_ERR   started sequence
    C_BUSY     previously started sequence still going on
-
-   \created     23.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::ConfCanStwFlashloaderDevices(const std::vector<C_SyvDcDeviceConfiguation> & orc_DeviceConfig)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -719,9 +655,8 @@ sint32 C_SyvDcSequences::ConfCanStwFlashloaderDevices(const std::vector<C_SyvDcD
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Starts thread to write new configuration to openSYDE devices via CAN-TP.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Starts thread to write new configuration to openSYDE devices via CAN-TP.
 
    This function shall be called after calling CheckCanOpenSydeDevicesConfig and ConfCanStwFlashloaderDevices.
    When the calling order is
@@ -738,10 +673,8 @@ sint32 C_SyvDcSequences::ConfCanStwFlashloaderDevices(const std::vector<C_SyvDcD
    \return
    C_NO_ERR   started sequence
    C_BUSY     previously started sequence still going on
-
-   \created     23.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::ConfCanOpenSydeDevices(const std::vector<C_SyvDcDeviceConfiguation> & orc_DeviceConfig,
                                                 const bool oq_ConfigureAllInterfaces)
 {
@@ -762,9 +695,8 @@ sint32 C_SyvDcSequences::ConfCanOpenSydeDevices(const std::vector<C_SyvDcDeviceC
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Starts thread to write new configuration to openSYDE devices via ETH-TP.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Starts thread to write new configuration to openSYDE devices via ETH-TP.
 
    \param[in]     orc_DeviceConfig             Configuration for all openSYDE devices and its
                                                communication interfaces
@@ -774,10 +706,8 @@ sint32 C_SyvDcSequences::ConfCanOpenSydeDevices(const std::vector<C_SyvDcDeviceC
    \return
    C_NO_ERR   started sequence
    C_BUSY     previously started sequence still going on
-
-   \created     23.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::ConfEthOpenSydeDevices(const std::vector<C_SyvDcDeviceConfiguation> & orc_DeviceConfig,
                                                 const bool oq_ConfigureAllInterfaces)
 {
@@ -798,9 +728,8 @@ sint32 C_SyvDcSequences::ConfEthOpenSydeDevices(const std::vector<C_SyvDcDeviceC
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sends the service broadcast requestProgramming
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sends the service broadcast requestProgramming
 
    \param[out]    orq_NotAccepted   true: at least one "not accepted" response was received
                                     false: no "not accepted" response was received
@@ -812,10 +741,8 @@ sint32 C_SyvDcSequences::ConfEthOpenSydeDevices(const std::vector<C_SyvDcDeviceC
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_CONFIG   no transport protocol installed or broadcast protocol not initialized
-
-   \created     07.12.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::SendOsyBroadcastRequestProgramming(bool & orq_NotAccepted) const
 {
    sint32 s32_Return = C_NO_ERR;
@@ -843,9 +770,8 @@ sint32 C_SyvDcSequences::SendOsyBroadcastRequestProgramming(bool & orq_NotAccept
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Resets all STW flashloader devices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Resets all STW flashloader devices
 
    Function returns immediately with the result. It will not be run in the separate thread.
 
@@ -859,10 +785,8 @@ sint32 C_SyvDcSequences::SendOsyBroadcastRequestProgramming(bool & orq_NotAccept
    C_BUSY      Previously started sequence still going on
    C_COM       Error on sending reset request
    C_CONFIG    No com driver installed
-
-   \created     06.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::ResetCanStwFlashloaderDevices(void)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -888,9 +812,8 @@ sint32 C_SyvDcSequences::ResetCanStwFlashloaderDevices(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Resets all CAN openSYDE devices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Resets all CAN openSYDE devices
 
    Function returns immediately with the result. It will not be run in the separate thread.
 
@@ -904,10 +827,8 @@ sint32 C_SyvDcSequences::ResetCanStwFlashloaderDevices(void)
    C_BUSY     previously started sequence still going on
    C_COM      could not send request
    C_CONFIG   no dispatcher installed or broadcast protocol not initialized
-
-   \created     06.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::ResetCanOpenSydeDevices(const bool oq_ToFlashloader) const
 {
    sint32 s32_Return = C_NO_ERR;
@@ -943,19 +864,16 @@ sint32 C_SyvDcSequences::ResetCanOpenSydeDevices(const bool oq_ToFlashloader) co
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Resets all Ethernet openSYDE devices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Resets all Ethernet openSYDE devices
 
    Function returns immediately with the result. It will not be run in the separate thread.
 
    \return
    C_NO_ERR    Devices reset
    C_BUSY      previously started sequence still going on
-
-   \created     06.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::ResetEthOpenSydeDevices(const bool oq_ToFlashloader) const
 {
    sint32 s32_Return = C_NO_ERR;
@@ -977,6 +895,9 @@ sint32 C_SyvDcSequences::ResetEthOpenSydeDevices(const bool oq_ToFlashloader) co
          u8_ResetType = C_OSCProtocolDriverOsyTpBase::hu8_OSY_RESET_TYPE_KEY_OFF_ON;
       }
 
+      // Disconnect from all nodes before reset if still connected. Because of broadcast no active connection necessary
+      this->mpc_ComDriver->DisconnectNodes();
+
       s32_Return = this->mpc_ComDriver->SendOsyBroadcastEcuReset(u8_ResetType);
       if (s32_Return == C_NO_ERR)
       {
@@ -991,9 +912,8 @@ sint32 C_SyvDcSequences::ResetEthOpenSydeDevices(const bool oq_ToFlashloader) co
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the new CAN bitrate
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the new CAN bitrate
 
    \param[in] ou32_Bitrate      Bitrate in kBit/s
 
@@ -1002,10 +922,8 @@ sint32 C_SyvDcSequences::ResetEthOpenSydeDevices(const bool oq_ToFlashloader) co
    C_BUSY      previously started sequence still going on
    C_COM       Error on reading bitrate
    C_CONFIG    No dispatcher installed
-
-   \created     07.12.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::InitCanAndSetCanBitrate(const stw_types::uint32 ou32_Bitrate)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -1030,9 +948,8 @@ sint32 C_SyvDcSequences::InitCanAndSetCanBitrate(const stw_types::uint32 ou32_Bi
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Starts thread to read back information from configured nodes via CAN.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Starts thread to read back information from configured nodes via CAN.
 
    Result of sequence can be get by calling GetDeviceInfosResult
 
@@ -1043,10 +960,8 @@ sint32 C_SyvDcSequences::InitCanAndSetCanBitrate(const stw_types::uint32 ou32_Bi
    \return
    C_NO_ERR   started sequence
    C_BUSY     previously started sequence still going on
-
-   \created     23.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::ReadBackCan(const std::vector<C_OSCProtocolDriverOsyNode> & orc_OpenSydeIds,
                                      const std::vector<C_OSCProtocolDriverOsyNode> & orc_StwIds)
 {
@@ -1069,9 +984,8 @@ sint32 C_SyvDcSequences::ReadBackCan(const std::vector<C_OSCProtocolDriverOsyNod
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Starts thread to read back information from configured nodes via Ethernet.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Starts thread to read back information from configured nodes via Ethernet.
 
    Result of sequence can be get by calling GetDeviceInfosResult
 
@@ -1080,10 +994,8 @@ sint32 C_SyvDcSequences::ReadBackCan(const std::vector<C_OSCProtocolDriverOsyNod
    \return
    C_NO_ERR   started sequence
    C_BUSY     previously started sequence still going on
-
-   \created     23.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::ReadBackEth(const std::vector<C_OSCProtocolDriverOsyNode> & orc_OpenSydeIds)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -1103,9 +1015,8 @@ sint32 C_SyvDcSequences::ReadBackEth(const std::vector<C_OSCProtocolDriverOsyNod
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get result of previously started service execution
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get result of previously started service execution
 
    Can be used to extract the results of one service execution after it has finished.
 
@@ -1115,10 +1026,8 @@ sint32 C_SyvDcSequences::ReadBackEth(const std::vector<C_OSCProtocolDriverOsyNod
    \return
    C_NO_ERR       result code read
    C_BUSY         previously started polled communication still going on
-
-   \created     23.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::GetResults(sint32 & ors32_Result) const
 {
    sint32 s32_Return = C_NO_ERR;
@@ -1135,19 +1044,16 @@ sint32 C_SyvDcSequences::GetResults(sint32 & ors32_Result) const
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the device information result
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the device information result
 
    \param[out]    orc_DeviceInfo       Vector for sequence results
 
    \return
    C_NO_ERR       result code read
    C_BUSY         previously started polled communication still going on
-
-   \created     23.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::GetDeviceInfosResult(std::vector<C_SyvDcDeviceInformation> & orc_DeviceInfo) const
 {
    sint32 s32_Return = C_NO_ERR;
@@ -1165,74 +1071,61 @@ sint32 C_SyvDcSequences::GetDeviceInfosResult(std::vector<C_SyvDcDeviceInformati
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle reports from STW Flashloader driver
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle reports from STW Flashloader driver
 
-   The functions we use for the device configuration are not known to produce such report.
-   So report those as error.
+   The functions we use for the device configuration is not necessary.
+   "Sending FLASH request" would spam the log file.
 
    \param[in]    ou8_Progress   reported progress of operation (0..100)
    \param[in]    orc_Text       reported information
 
    \return
    C_NO_ERR       continue with procedure
-
-   \created     12.02.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_XflReportProgress(const uint8 ou8_Progress, const C_SCLString & orc_Text)
 {
    (void)ou8_Progress;
-   osc_write_log_error("Configure STW Flashloader device", "Unexpected progress report:\"" + orc_Text + "\"");
+   (void)orc_Text;
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reports the progress of the STW flashloader configuration sequence
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reports the progress of the STW flashloader configuration sequence
 
    \param[in]     ou32_Progress     Progress of sequence
-
-   \created     08.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcSequences::m_RunConfCanStwFlashloaderDevicesProgress(const uint32 ou32_Progress)
 {
-   Q_EMIT this->SigRunConfCanStwFlashloaderDevicesProgress(ou32_Progress);
+   Q_EMIT (this->SigRunConfCanStwFlashloaderDevicesProgress(ou32_Progress));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reports the progress of the openSYDE CAN configuration sequence
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reports the progress of the openSYDE CAN configuration sequence
 
    \param[in]     ou32_Progress     Progress of sequence
-
-   \created     08.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcSequences::m_RunConfCanOpenSydeDevicesProgress(const uint32 ou32_Progress)
 {
-   Q_EMIT this->SigRunConfCanOpenSydeDevicesProgress(ou32_Progress);
+   Q_EMIT (this->SigRunConfCanOpenSydeDevicesProgress(ou32_Progress));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reports the progress of the openSYDE Ethernet configuration sequence
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reports the progress of the openSYDE Ethernet configuration sequence
 
    \param[in]     ou32_Progress     Progress of sequence
-
-   \created     08.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcSequences::m_RunConfEthOpenSydeDevicesProgress(const uint32 ou32_Progress)
 {
-   Q_EMIT this->SigRunConfEthOpenSydeDevicesProgress(ou32_Progress);
+   Q_EMIT (this->SigRunConfEthOpenSydeDevicesProgress(ou32_Progress));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reports the state of a concrete step of STW flashloader configuration sequence
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reports the state of a concrete step of STW flashloader configuration sequence
 
    \param[in]     ou32_Step         Step of node configuration
                                     - hu32_SETNODEID
@@ -1240,10 +1133,8 @@ void C_SyvDcSequences::m_RunConfEthOpenSydeDevicesProgress(const uint32 ou32_Pro
                                     - hu32_SETIPADDRESS
    \param[in]     os32_Result       Result of service
    \param[in]     orc_Server        Configured server
-
-   \created     11.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcSequences::m_RunConfCanStwFlashloaderDevicesState(const uint32 ou32_Step, const sint32 os32_Result,
                                                               const C_OSCProtocolDriverOsyNode & orc_Server) const
 {
@@ -1251,9 +1142,8 @@ void C_SyvDcSequences::m_RunConfCanStwFlashloaderDevicesState(const uint32 ou32_
                                                         orc_Server.u8_NodeIdentifier);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reports the state of a concrete step of openSYDE configuration sequence
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reports the state of a concrete step of openSYDE configuration sequence
 
    \param[in]     ou32_Step               Step of node configuration
                                           - hu32_SETNODEID
@@ -1264,10 +1154,8 @@ void C_SyvDcSequences::m_RunConfCanStwFlashloaderDevicesState(const uint32 ou32_
                                              Node ID and Bus ID of the configured interface,
                                              must not be the connected interface
    \param[in]     ou32_InterfaceNumber    Number of interface
-
-   \created     11.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcSequences::m_RunConfOpenSydeDevicesState(const uint32 ou32_Step, const sint32 os32_Result,
                                                      const C_OSCProtocolDriverOsyNode & orc_Server,
                                                      const C_OSCSystemBus::E_Type oe_InterfaceType,
@@ -1278,7 +1166,7 @@ void C_SyvDcSequences::m_RunConfOpenSydeDevicesState(const uint32 ou32_Step, con
                                                static_cast<uint8>(oe_InterfaceType), ou8_InterfaceNumber);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcSequences::mh_ThreadFunc(void * const opv_Instance)
 {
    //lint -e{925}  This class is the only one which registers itself at the caller of this function. It must match.
@@ -1291,7 +1179,7 @@ void C_SyvDcSequences::mh_ThreadFunc(void * const opv_Instance)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcSequences::m_ThreadFunc(void)
 {
    if (this->mpc_ComDriver != NULL)
@@ -1338,9 +1226,8 @@ void C_SyvDcSequences::m_ThreadFunc(void)
    this->mpc_Thread->requestInterruption();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Bring devices in flashloader state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Bring devices in flashloader state
 
    Supports openSYDE CAN-TP and STW Flashloader protocols.
    Sending of services depends from if openSYDE or STW flashloader devices are active.
@@ -1366,10 +1253,8 @@ void C_SyvDcSequences::m_ThreadFunc(void)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_RANGE    Broadcast protocol not initialized
    C_COM      could not send request
-
-   \created     24.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_RunScanCanEnterFlashloader(const uint32 ou32_CanBitrate)
 {
    sint32 s32_Return = C_CONFIG;
@@ -1441,9 +1326,8 @@ sint32 C_SyvDcSequences::m_RunScanCanEnterFlashloader(const uint32 ou32_CanBitra
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sending of "Flash" and "PreProgrammingSession" request
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sending of "Flash" and "PreProgrammingSession" request
 
    Sending the STW flashloader request "FLASH" and the openSYDE broadcast service PreProgrammingSession
    till at least the scan time is over and the flag mq_RunScanSendFlashloaderRequestEndless is set to false.
@@ -1455,10 +1339,8 @@ sint32 C_SyvDcSequences::m_RunScanCanEnterFlashloader(const uint32 ou32_CanBitra
    C_CONFIG   no transport protocol installed or no dispatcher installed
               no com driver installed
    C_COM      could not send request
-
-   \created     06.12.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_RunScanCanSendFlashloaderRequest(const uint32 ou32_ScanTime)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -1516,9 +1398,8 @@ sint32 C_SyvDcSequences::m_RunScanCanSendFlashloaderRequest(const uint32 ou32_Sc
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Read information from STW Flashloader devices.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read information from STW Flashloader devices.
 
    Assumptions:
    * All devices are in flashloader mode.
@@ -1543,10 +1424,8 @@ sint32 C_SyvDcSequences::m_RunScanCanSendFlashloaderRequest(const uint32 ou32_Sc
    C_COM      error on sending
    C_NOACT    error response from server
    C_CONFIG   no com driver installed
-
-   \created     29.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_RunScanCanGetInfoFromStwFlashloaderDevices(void)
 {
    sint32 s32_Return = C_CONFIG;
@@ -1599,7 +1478,7 @@ sint32 C_SyvDcSequences::m_RunScanCanGetInfoFromStwFlashloaderDevices(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_RunScanCanGetInfoFromStwFlashloaderDevice(const uint8 ou8_LocalId)
 {
    sint32 s32_Return = C_CONFIG;
@@ -1688,9 +1567,8 @@ sint32 C_SyvDcSequences::m_RunScanCanGetInfoFromStwFlashloaderDevice(const uint8
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Read information from openSYDE devices.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read information from openSYDE devices.
 
    Supports openSYDE CAN-TP protocol.
 
@@ -1712,10 +1590,8 @@ sint32 C_SyvDcSequences::m_RunScanCanGetInfoFromStwFlashloaderDevice(const uint8
    C_CONFIG   no dispatcher installed
               no com driver installed
    C_RANGE    Broadcast protocol not initialized
-
-   \created     27.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_RunScanCanGetInfoFromOpenSydeDevices(void)
 {
    sint32 s32_Return = C_CONFIG;
@@ -1807,9 +1683,8 @@ sint32 C_SyvDcSequences::m_RunScanCanGetInfoFromOpenSydeDevices(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Read information from openSYDE devices via Ethernet
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read information from openSYDE devices via Ethernet
 
    Bring devices into flashloader and read device information.
    Supports openSYDE ETH-TP protocol.
@@ -1830,10 +1705,8 @@ sint32 C_SyvDcSequences::m_RunScanCanGetInfoFromOpenSydeDevices(void)
    C_COM      could not send request
    C_CONFIG   no dispatcher installed
               no com driver installed
-
-   \created     02.03.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_RunScanEthGetInfoFromOpenSydeDevices(void)
 {
    sint32 s32_Return = C_CONFIG;
@@ -1910,9 +1783,8 @@ sint32 C_SyvDcSequences::m_RunScanEthGetInfoFromOpenSydeDevices(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Configure openSYDE devices via Ethernet
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Configure openSYDE devices via Ethernet
 
    Write new configuration to openSYDE devices via ETH-TP.
    For all interfaces that have a connected bus:
@@ -1953,11 +1825,8 @@ sint32 C_SyvDcSequences::m_RunScanEthGetInfoFromOpenSydeDevices(void)
                no com driver installed
    C_TIMEOUT   no response within timeout
    C_OVERFLOW  multiple responses received
-
-
-   \created     05.03.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_RunConfEthOpenSydeDevices(void)
 {
    sint32 s32_Return = C_CONFIG;
@@ -2054,6 +1923,10 @@ sint32 C_SyvDcSequences::m_RunConfEthOpenSydeDevices(void)
                               this->m_RunConfOpenSydeDevicesState(hu32_SETNODEID, s32_Return, c_ServerIdOfCurBus,
                                                                   rc_InterfaceSettings.e_InterfaceType,
                                                                   rc_InterfaceSettings.u8_InterfaceNumber);
+
+                              this->m_RunConfOpenSydeDevicesState(hu32_SETIPADDRESS, s32_Return, c_ServerIdOfCurBus,
+                                                                  rc_InterfaceSettings.e_InterfaceType,
+                                                                  rc_InterfaceSettings.u8_InterfaceNumber);
                            }
                         }
                      }
@@ -2073,9 +1946,8 @@ sint32 C_SyvDcSequences::m_RunConfEthOpenSydeDevices(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Configure openSYDE devices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Configure openSYDE devices
 
    Utility function used by the CAN and Ethernet sequences.
    Contains the final part of the sequence which is identical for CAN and Ethernet:
@@ -2105,10 +1977,8 @@ sint32 C_SyvDcSequences::m_RunConfEthOpenSydeDevices(void)
    C_WARN      negative response received
    C_COM       could not send request
    C_TIMEOUT   no response within timeout (was SetNodeIdentifiersForBroadcasts() called ?)
-
-   \created     06.03.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_ConfigureNodes(const bool oq_ViaCan,
                                           std::vector<C_OSCProtocolDriverOsyNode> & orc_UsedServerIds)
 {
@@ -2340,9 +2210,8 @@ sint32 C_SyvDcSequences::m_ConfigureNodes(const bool oq_ViaCan,
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Write new configuration to STW Flashloader devices.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Write new configuration to STW Flashloader devices.
 
    Assumptions:
    * All devices are in flashloader mode.
@@ -2360,10 +2229,8 @@ sint32 C_SyvDcSequences::m_ConfigureNodes(const bool oq_ViaCan,
    C_NOACT     no device configurations exist
    C_RANGE     device configuration is invalid
    C_CONFIG    no com driver installed
-
-   \created     30.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_RunConfCanStwFlashloaderDevices(void)
 {
    sint32 s32_Return = C_CONFIG;
@@ -2502,9 +2369,8 @@ sint32 C_SyvDcSequences::m_RunConfCanStwFlashloaderDevices(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Write new configuration to openSYDE devices via CAN-TP.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Write new configuration to openSYDE devices via CAN-TP.
 
    For all interfaces that have a connected bus:
    * Node-IDs and Bus-IDs
@@ -2550,10 +2416,8 @@ sint32 C_SyvDcSequences::m_RunConfCanStwFlashloaderDevices(void)
                no com driver installed
    C_TIMEOUT   no response within timeout (was SetNodeIdentifiersForBroadcasts() called ?)
    C_OVERFLOW  multiple responses received
-
-   \created     01.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_RunConfCanOpenSydeDevices(void)
 {
    sint32 s32_Return = C_CONFIG;
@@ -2673,9 +2537,8 @@ sint32 C_SyvDcSequences::m_RunConfCanOpenSydeDevices(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checks the current set device configurations for correctness for openSYDE devices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks the current set device configurations for correctness for openSYDE devices
 
    All connected interfaces of the node must be in the device configuration.
    Bus and node ids must be valid.
@@ -2687,10 +2550,8 @@ sint32 C_SyvDcSequences::m_RunConfCanOpenSydeDevices(void)
    C_NOACT     no device configurations exist
    C_RANGE     device configuration is invalid
    C_CONFIG    no com driver installed
-
-   \created     01.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_CheckConfOpenSydeDevices(
    const std::vector<C_SyvDcDeviceConfiguation> & orc_DeviceConfiguration) const
 {
@@ -2835,9 +2696,8 @@ sint32 C_SyvDcSequences::m_CheckConfOpenSydeDevices(
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the bitrate for all connected and configured CAN interfaces of the server
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the bitrate for all connected and configured CAN interfaces of the server
 
    \param[in]  orc_ServerId          Server id for communication
    \param[in]  orc_DeviceConfig      Configuration for the server
@@ -2853,10 +2713,8 @@ sint32 C_SyvDcSequences::m_CheckConfOpenSydeDevices(
    C_WARN      error response (negative response code placed in *opu8_NrCode)
    C_RD_WR     unexpected content in response (here: wrong data identifier ID)
    C_COM       communication driver reported error
-
-   \created     04.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_SetCanOpenSydeBitrate(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                  const C_SyvDcDeviceConfiguation & orc_DeviceConfig) const
 {
@@ -2959,9 +2817,8 @@ sint32 C_SyvDcSequences::m_SetCanOpenSydeBitrate(const C_OSCProtocolDriverOsyNod
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the ip address for all connected and configured ethernet interfacs of the server
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the ip address for all connected and configured ethernet interfacs of the server
 
    \param[in]  orc_ServerId          Server id for communication
    \param[in]  orc_DeviceConfig      Configuration for the server
@@ -2977,10 +2834,8 @@ sint32 C_SyvDcSequences::m_SetCanOpenSydeBitrate(const C_OSCProtocolDriverOsyNod
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong routine identifier ID)
    C_COM      communication driver reported error
-
-   \created     dd.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_SetEthOpenSydeIpAddress(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                                    const C_SyvDcDeviceConfiguation & orc_DeviceConfig) const
 {
@@ -3061,9 +2916,8 @@ sint32 C_SyvDcSequences::m_SetEthOpenSydeIpAddress(const C_OSCProtocolDriverOsyN
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets node and bus ids for all configured communication interfaces except the interface of orc_ServerId
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets node and bus ids for all configured communication interfaces except the interface of orc_ServerId
 
    \param[in]  orc_ServerId          Server id for communication
    \param[in]  orc_DeviceConfig      Configuration for the server
@@ -3078,10 +2932,8 @@ sint32 C_SyvDcSequences::m_SetEthOpenSydeIpAddress(const C_OSCProtocolDriverOsyN
    C_WARN     error response (negative response code placed in *opu8_NrCode)
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      communication driver reported error
-
-   \created     05.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_SetOpenSydeNodeIds(const C_OSCProtocolDriverOsyNode & orc_ServerId,
                                               const C_SyvDcDeviceConfiguation & orc_DeviceConfig) const
 {
@@ -3173,9 +3025,8 @@ sint32 C_SyvDcSequences::m_SetOpenSydeNodeIds(const C_OSCProtocolDriverOsyNode &
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Read back information from configured nodes via CAN.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read back information from configured nodes via CAN.
 
    Assumptions:
    * The com driver passed as parameter is initialized and has set up protocol
@@ -3198,10 +3049,8 @@ sint32 C_SyvDcSequences::m_SetOpenSydeNodeIds(const C_OSCProtocolDriverOsyNode &
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_RANGE    Broadcast protocol not initialized
    C_COM      could not send request
-
-   \created     06.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_ReadBackCan(void)
 {
    sint32 s32_Return = C_CONFIG;
@@ -3224,17 +3073,14 @@ sint32 C_SyvDcSequences::m_ReadBackCan(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Read back information from configured nodes via Ethernet.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read back information from configured nodes via Ethernet.
 
    Assumptions:
    * The com driver passed as parameter is initialized and has set up protocol instances for all openSYDE nodes
 
    Sequence:
-   * Bring nodes to flashloader with direct services
-   ** Request programming service
-   ** Sending ECU reset with type hu8_OSY_RESET_TYPE_RESET_TO_FLASHLOADER
+   * Reconnect to nodes
    * Sequence of m_ReadBack
 
    As a result we'll have the serial numbers, Node-IDs, device-names of all devices
@@ -3249,10 +3095,8 @@ sint32 C_SyvDcSequences::m_ReadBackCan(void)
    C_WARN      Error response received
    C_TIMEOUT   Expected response not received within timeout
    C_COM       communication driver reported error
-
-   \created     15.03.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_ReadBackEth(void)
 {
    sint32 s32_Return = C_CONFIG;
@@ -3266,13 +3110,18 @@ sint32 C_SyvDcSequences::m_ReadBackEth(void)
    {
       uint32 u32_DeviceCounter;
 
+      //wait a little after previous reset (all nodes should now be in the default session of the flashloader)
+      stw_tgl::TGL_Sleep(mhu32_RESET_WAIT_TIME_MS);
+
       // * for all openSYDE nodes:
-      // Reset all openSYDE nodes by direct reset service and bring them into flashloader again
+      // Connect to the devices again and prepare them for the read back function
       for (u32_DeviceCounter = 0U; u32_DeviceCounter < this->mc_OpenSydeIds.size(); ++u32_DeviceCounter)
       {
+         // Get the information of the device
+
          stw_opensyde_core::C_OSCProtocolDriverOsyNode & rc_OsyServerId = this->mc_OpenSydeIds[u32_DeviceCounter];
 
-         //first time we need to explicitly contact the node: reconnect (required for Ethernet)
+         // we need to explicitly contact the node after the reset: reconnect (required for Ethernet)
          s32_Return = this->mpc_ComDriver->ReConnectNode(rc_OsyServerId);
 
          if (s32_Return != C_NO_ERR)
@@ -3285,83 +3134,36 @@ sint32 C_SyvDcSequences::m_ReadBackEth(void)
          }
          else
          {
-            // Bring the device into the flashloader
-            s32_Return = this->mpc_ComDriver->SendOsyRequestProgramming(rc_OsyServerId);
+            s32_Return = this->mpc_ComDriver->SendOsySetPreProgrammingMode(rc_OsyServerId, false);
 
-            if (s32_Return != C_NO_ERR)
+            if (s32_Return == C_NOACT)
             {
-               osc_write_log_error("Read back ETH devices",
-                                   "openSYDE request programming service failed with error: " +
-                                   C_SCLString::IntToStr(s32_Return));
+               // Node has no openSYDE protocol, protocol was not installed properly
+               // Ethernet is only possible with openSYDE
+               s32_Return = C_RANGE;
             }
-            else
-            {
-               s32_Return = this->mpc_ComDriver->SendOsyEcuReset(rc_OsyServerId,
-                                                                 C_OSCProtocolDriverOsyTpBase::hu8_OSY_RESET_TYPE_RESET_TO_FLASHLOADER);
-
-               if (s32_Return != C_NO_ERR)
-               {
-                  osc_write_log_error("Read back ETH devices",
-                                      "openSYDE service ECU reset failed with error: " + C_SCLString::IntToStr(
-                                         s32_Return));
-               }
-            }
-         }
-      }
-
-      //wait a little (all nodes should now be in the default session of the flashloader)
-      stw_tgl::TGL_Sleep(mhu32_RESET_WAIT_TIME_MS);
-
-      // Connect to the devices again and prepare them for the read back function
-      for (u32_DeviceCounter = 0U; u32_DeviceCounter < this->mc_OpenSydeIds.size(); ++u32_DeviceCounter)
-      {
-         // Get the information of the device
-         if (s32_Return == C_NO_ERR)
-         {
-            stw_opensyde_core::C_OSCProtocolDriverOsyNode & rc_OsyServerId = this->mc_OpenSydeIds[u32_DeviceCounter];
-
-            // Same procedure as with CAN.
-            // No STW IDs are possible.
-            this->mc_StwIds.clear();
-
-            //second time we need to explicitly contact the node after the reset: reconnect (required for Ethernet)
-            s32_Return = this->mpc_ComDriver->ReConnectNode(rc_OsyServerId);
 
             if (s32_Return != C_NO_ERR)
             {
                C_SCLString c_Text;
-               c_Text.PrintFormatted("Could not reconnect to node with ID %d on bus with ID %d. Error code: %d",
-                                     rc_OsyServerId.u8_NodeIdentifier,
-                                     rc_OsyServerId.u8_BusIdentifier, s32_Return);
+               c_Text.PrintFormatted("openSYDE setting preprogramming mode failed on node with ID %d on bus with ID"
+                                     " %d with error: %d", rc_OsyServerId.u8_NodeIdentifier,
+                                     rc_OsyServerId.u8_BusIdentifier,
+                                     s32_Return);
                osc_write_log_error("Configure openSYDE devices", c_Text);
             }
-            else
-            {
-               s32_Return = this->mpc_ComDriver->SendOsySetPreProgrammingMode(rc_OsyServerId, false);
+         }
 
-               if (s32_Return == C_NOACT)
-               {
-                  // Node has no openSYDE protocol, protocol was not installed properly
-                  // Ethernet is only possible with openSYDE
-                  s32_Return = C_RANGE;
-               }
+         if (s32_Return != C_NO_ERR)
+         {
+            osc_write_log_error("Read back ETH devices",
+                                "Read back failed with error: " + C_SCLString::IntToStr(
+                                   s32_Return));
+         }
 
-               if (s32_Return != C_NO_ERR)
-               {
-                  C_SCLString c_Text;
-                  c_Text.PrintFormatted("openSYDE setting preprogramming mode failed on node with ID %d on bus with ID"
-                                        " %d with error: %d", rc_OsyServerId.u8_NodeIdentifier,
-                                        rc_OsyServerId.u8_BusIdentifier, s32_Return);
-                  osc_write_log_error("Configure openSYDE devices", c_Text);
-               }
-            }
-
-            if (s32_Return != C_NO_ERR)
-            {
-               osc_write_log_error("Read back ETH devices",
-                                   "Read back failed with error: " + C_SCLString::IntToStr(
-                                      s32_Return));
-            }
+         if (s32_Return != C_NO_ERR)
+         {
+            break;
          }
       }
 
@@ -3379,9 +3181,8 @@ sint32 C_SyvDcSequences::m_ReadBackEth(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Read back information from configured nodes.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read back information from configured nodes.
 
    Sequence:
    * uses "directed" services to read information from all nodes
@@ -3405,10 +3206,8 @@ sint32 C_SyvDcSequences::m_ReadBackEth(void)
    C_WARN     error response
    C_RD_WR    unexpected content in response (here: wrong data identifier ID)
    C_COM      error on creating temporary needed protocol
-
-   \created     06.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcSequences::m_ReadBack(void)
 {
    sint32 s32_Return = C_CONFIG;

@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Interpreted parameter set file reader/writer (implementation)
 
    Interpreted parameter set file reader/writer
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     12.10.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -48,8 +41,7 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Load parameter set node
+/*! \brief   Load parameter set node
 
    Load parameter set node data from XML file
    pre-condition: the passed XML parser has the active node set to "opensyde-parameter-sets"
@@ -61,8 +53,6 @@ using namespace stw_opensyde_core;
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
-
-   \created     12.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 stw_types::sint32 C_OSCParamSetInterpretedNodeFiler::h_LoadInterpretedNode(C_OSCParamSetInterpretedNode & orc_Node,
@@ -83,8 +73,7 @@ stw_types::sint32 C_OSCParamSetInterpretedNodeFiler::h_LoadInterpretedNode(C_OSC
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Save parameter set node
+/*! \brief   Save parameter set node
 
    Save parameter set node to XML file
    pre-condition: the passed XML parser has the active node set to "opensyde-parameter-sets"
@@ -92,8 +81,6 @@ stw_types::sint32 C_OSCParamSetInterpretedNodeFiler::h_LoadInterpretedNode(C_OSC
 
    \param[in]     orc_Node      data storage
    \param[in,out] orc_XMLParser XML with specified node active
-
-   \created     12.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCParamSetInterpretedNodeFiler::h_SaveInterpretedNode(const C_OSCParamSetInterpretedNode & orc_Node,
@@ -113,10 +100,7 @@ void C_OSCParamSetInterpretedNodeFiler::h_SaveInterpretedNode(const C_OSCParamSe
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     12.10.2017  STW/M.Echtler
+/*! \brief   Default constructor
 */
 //-----------------------------------------------------------------------------
 C_OSCParamSetInterpretedNodeFiler::C_OSCParamSetInterpretedNodeFiler(void)
@@ -124,8 +108,7 @@ C_OSCParamSetInterpretedNodeFiler::C_OSCParamSetInterpretedNodeFiler(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Load data pools
+/*! \brief   Load data pools
 
    Load data pools data from XML file
    pre-condition: the passed XML parser has the active node set to "node"
@@ -138,8 +121,6 @@ C_OSCParamSetInterpretedNodeFiler::C_OSCParamSetInterpretedNodeFiler(void)
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
-
-   \created     13.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadDataPools(
@@ -207,8 +188,7 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadDataPools(
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Save data pools
+/*! \brief   Save data pools
 
    Save data pools to XML file
    pre-condition: the passed XML parser has the active node set to "node"
@@ -216,8 +196,6 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadDataPools(
 
    \param[in]     orc_Node      data storage
    \param[in,out] orc_XMLParser XML with specified node active
-
-   \created     13.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCParamSetInterpretedNodeFiler::mh_SaveDataPools(
@@ -236,8 +214,7 @@ void C_OSCParamSetInterpretedNodeFiler::mh_SaveDataPools(
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Load data pool
+/*! \brief   Load data pool
 
    Load data pool data from XML file
    pre-condition: the passed XML parser has the active node set to "datapool"
@@ -249,8 +226,6 @@ void C_OSCParamSetInterpretedNodeFiler::mh_SaveDataPools(
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
-
-   \created     13.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadDataPool(C_OSCParamSetInterpretedDataPool & orc_DataPool,
@@ -262,8 +237,7 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadDataPool(C_OSCParamSetInterpret
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Save data pool
+/*! \brief   Save data pool
 
    Save data pool to XML file
    pre-condition: the passed XML parser has the active node set to "datapool"
@@ -271,8 +245,6 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadDataPool(C_OSCParamSetInterpret
 
    \param[in]     orc_Node      data storage
    \param[in,out] orc_XMLParser XML with specified node active
-
-   \created     13.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCParamSetInterpretedNodeFiler::mh_SaveDataPool(const C_OSCParamSetInterpretedDataPool & orc_DataPool,
@@ -282,8 +254,7 @@ void C_OSCParamSetInterpretedNodeFiler::mh_SaveDataPool(const C_OSCParamSetInter
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Load lists
+/*! \brief   Load lists
 
    Load lists data from XML file
    pre-condition: the passed XML parser has the active node set to "datapool"
@@ -295,8 +266,6 @@ void C_OSCParamSetInterpretedNodeFiler::mh_SaveDataPool(const C_OSCParamSetInter
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
-
-   \created     13.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadLists(std::vector<C_OSCParamSetInterpretedList> & orc_Lists,
@@ -342,8 +311,7 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadLists(std::vector<C_OSCParamSet
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Save lists
+/*! \brief   Save lists
 
    Save lists to XML file
    pre-condition: the passed XML parser has the active node set to "datapool"
@@ -351,8 +319,6 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadLists(std::vector<C_OSCParamSet
 
    \param[in]     orc_Node      data storage
    \param[in,out] orc_XMLParser XML with specified node active
-
-   \created     13.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCParamSetInterpretedNodeFiler::mh_SaveLists(const std::vector<C_OSCParamSetInterpretedList> & orc_Lists,
@@ -371,8 +337,7 @@ void C_OSCParamSetInterpretedNodeFiler::mh_SaveLists(const std::vector<C_OSCPara
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Load list
+/*! \brief   Load list
 
    Load list data from XML file
    pre-condition: the passed XML parser has the active node set to "list"
@@ -384,8 +349,6 @@ void C_OSCParamSetInterpretedNodeFiler::mh_SaveLists(const std::vector<C_OSCPara
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
-
-   \created     13.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadList(C_OSCParamSetInterpretedList & orc_List,
@@ -413,8 +376,7 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadList(C_OSCParamSetInterpretedLi
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Save list
+/*! \brief   Save list
 
    Save list to XML file
    pre-condition: the passed XML parser has the active node set to "list"
@@ -422,8 +384,6 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadList(C_OSCParamSetInterpretedLi
 
    \param[in]     orc_Node      data storage
    \param[in,out] orc_XMLParser XML with specified node active
-
-   \created     13.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCParamSetInterpretedNodeFiler::mh_SaveList(const C_OSCParamSetInterpretedList & orc_List,
@@ -434,8 +394,7 @@ void C_OSCParamSetInterpretedNodeFiler::mh_SaveList(const C_OSCParamSetInterpret
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Load elements
+/*! \brief   Load elements
 
    Load elements data from XML file
    pre-condition: the passed XML parser has the active node set to "list"
@@ -447,8 +406,6 @@ void C_OSCParamSetInterpretedNodeFiler::mh_SaveList(const C_OSCParamSetInterpret
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
-
-   \created     12.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadElements(std::vector<C_OSCParamSetInterpretedElement> & orc_Elements,
@@ -496,8 +453,7 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadElements(std::vector<C_OSCParam
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Save elements
+/*! \brief   Save elements
 
    Save elements to XML file
    pre-condition: the passed XML parser has the active node set to "list"
@@ -505,8 +461,6 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadElements(std::vector<C_OSCParam
 
    \param[in]     orc_Node      data storage
    \param[in,out] orc_XMLParser XML with specified node active
-
-   \created     13.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCParamSetInterpretedNodeFiler::mh_SaveElements(
@@ -525,8 +479,7 @@ void C_OSCParamSetInterpretedNodeFiler::mh_SaveElements(
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Load element
+/*! \brief   Load element
 
    Load element data from XML file
    pre-condition: the passed XML parser has the active node set to "element"
@@ -539,8 +492,6 @@ void C_OSCParamSetInterpretedNodeFiler::mh_SaveElements(
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
-
-   \created     13.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadElement(C_OSCParamSetInterpretedElement & orc_Element,
@@ -580,8 +531,7 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadElement(C_OSCParamSetInterprete
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Save element
+/*! \brief   Save element
 
    Save element to XML file
    pre-condition: the passed XML parser has the active node set to "element"
@@ -589,8 +539,6 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadElement(C_OSCParamSetInterprete
 
    \param[in]     orc_Node      data storage
    \param[in,out] orc_XMLParser XML with specified node active
-
-   \created     13.10.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCParamSetInterpretedNodeFiler::mh_SaveElement(const C_OSCParamSetInterpretedElement & orc_Element,

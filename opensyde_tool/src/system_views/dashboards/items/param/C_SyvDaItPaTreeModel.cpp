@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Parameter tree model (implementation)
 
    Parameter tree model
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.06.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "TGLUtils.h"
@@ -30,14 +23,14 @@
 #include "C_SyvDaItPaTreeModel.h"
 #include "C_SdNdeDataPoolContentUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvDaItPaTreeModel::mhc_IconAllNode = "";
 const QString C_SyvDaItPaTreeModel::mhc_IconNode = ":/images/system_definition/IconNode.svg";
 const QString C_SyvDaItPaTreeModel::mhc_IconDatapool = ":/images/system_definition/IconDataPoolSmall.svg";
@@ -45,28 +38,25 @@ const QString C_SyvDaItPaTreeModel::mhc_IconList = ":/images/system_definition/I
 const QString C_SyvDaItPaTreeModel::mhc_IconParameter = ":/images/system_definition/IconParameter.svg";
 const QString C_SyvDaItPaTreeModel::mhc_ECUValueInitString = "N/A";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent     Optional pointer to parent
    \param[in]     ou32_ViewIndex View index
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaTreeModel::C_SyvDaItPaTreeModel(QObject * const opc_Parent) :
    C_TblTreModel(opc_Parent),
    mpc_DataWidget(NULL),
@@ -77,15 +67,12 @@ C_SyvDaItPaTreeModel::C_SyvDaItPaTreeModel(QObject * const opc_Parent) :
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     06.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaTreeModel::~C_SyvDaItPaTreeModel(void)
 {
    //Clean up if necessary
@@ -93,17 +80,14 @@ C_SyvDaItPaTreeModel::~C_SyvDaItPaTreeModel(void)
    //lint -e{1540} Never took ownership of mpc_DataWidget
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if model is empty
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if model is empty
 
    \return
    True  Empty
    False Not empty
-
-   \created     09.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItPaTreeModel::IsEmpty(void) const
 {
    bool q_Retval;
@@ -119,13 +103,10 @@ bool C_SyvDaItPaTreeModel::IsEmpty(void) const
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reload set data column
-
-   \created     16.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reload set data column
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::ReloadSetValues(void)
 {
    QVector<sintn> c_Roles;
@@ -139,69 +120,54 @@ void C_SyvDaItPaTreeModel::ReloadSetValues(void)
    Q_EMIT this->dataChanged(this->index(0, s32_ColTree), this->index(this->rowCount() - 1, s32_ColTree), c_Roles);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set dark flag value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set dark flag value
 
    \param[in] oq_Value New dark flag value
-
-   \created     10.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::SetDark(const bool oq_Value)
 {
    this->mq_DarkMode = oq_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set edit mode status
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set edit mode status
 
    \param[in] oq_EditMode Edit mode active
-
-   \created     05.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::SetEditMode(const bool oq_EditMode)
 {
    this->mq_EditMode = oq_EditMode;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set connection status
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set connection status
 
    \param[in] oq_Connected Connection active
-
-   \created     05.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::SetConnected(const bool oq_Connected)
 {
    this->mq_Connected = oq_Connected;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set action status
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set action status
 
    \param[in] oq_Active Action active
-
-   \created     05.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::SetActionActive(const bool oq_Active)
 {
    this->mq_ActionActive = oq_Active;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete all elements
-
-   \created     26.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete all elements
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::DeleteSpecified(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -219,13 +185,10 @@ void C_SyvDaItPaTreeModel::DeleteSpecified(const std::vector<C_OSCNodeDataPoolLi
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reset all stored ECU values
-
-   \created     26.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reset all stored ECU values
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::ClearECUValues(void)
 {
    QVector<sintn> c_RolesDisplay;
@@ -263,13 +226,10 @@ void C_SyvDaItPaTreeModel::ClearECUValues(void)
    Q_EMIT this->dataChanged(this->index(0, s32_ColSet), this->index(this->rowCount() - 1, s32_ColSet), c_RolesStyle);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set set values same as device values
-
-   \created     26.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set set values same as device values
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::ApplyEcuValues(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -315,24 +275,32 @@ void C_SyvDaItPaTreeModel::ApplyEcuValues(const std::vector<C_OSCNodeDataPoolLis
          //Do not apply if not all are read
          if (q_AllRead == true)
          {
+            QVector<sintn> c_Roles;
+            const sintn sn_Col = C_SyvDaItPaTreeModel::h_EnumToColumn(C_SyvDaItPaTreeModel::eSET);
+            c_Roles.push_back(static_cast<sintn>(Qt::DisplayRole));
+            c_Roles.push_back(static_cast<sintn>(Qt::FontRole));
             pc_ParamWidget->SetParamItem(c_Copy);
+            //Update set value column
+            Q_EMIT this->dataChanged(this->index(0, sn_Col), this->index(this->rowCount() - 1, sn_Col), c_Roles);
          }
       }
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check all Set values in range
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check all Set values in range
+
+   \param[in] orc_ListIds  Subset of lists to check range for
+   \param[in] orc_ListIds2 Additional subset of lists to check range for
 
    \return
    True  In range
    False Not in range
-
-   \created     26.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
-bool C_SyvDaItPaTreeModel::CheckRange(void) const
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvDaItPaTreeModel::CheckRange(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds,
+                                      const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListId> & orc_ListIds2)
+const
 {
    bool q_Retval = true;
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -348,30 +316,60 @@ bool C_SyvDaItPaTreeModel::CheckRange(void) const
             const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Param->c_DataPoolElementsConfig[u32_ItConfig];
             if ((rc_Config.c_ElementId.GetIsValid() == true) && (u32_ItConfig < pc_Param->c_ListValues.size()))
             {
-               const C_OSCNodeDataPoolContent * const pc_SetVal = m_GetSetValue(u32_ItConfig);
-               if (pc_SetVal != NULL)
+               bool q_IsInteresting = false;
+               //Check if the list is part of the first interesting elements
+               for (uint32 u32_ItInterestingElements = 0UL;
+                    (u32_ItInterestingElements < orc_ListIds.size()) && (q_IsInteresting == false);
+                    ++u32_ItInterestingElements)
                {
-                  const C_OSCNodeDataPoolListElement * const pc_OSCElement =
-                     C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(rc_Config.c_ElementId.u32_NodeIndex,
-                                                                                rc_Config.c_ElementId.u32_DataPoolIndex,
-                                                                                rc_Config.c_ElementId.u32_ListIndex,
-                                                                                rc_Config.c_ElementId.u32_ElementIndex);
-                  if (pc_OSCElement != NULL)
+                  const C_OSCNodeDataPoolListElementId & rc_ListId = orc_ListIds[u32_ItInterestingElements];
+                  if (((rc_ListId.u32_NodeIndex == rc_Config.c_ElementId.u32_NodeIndex) &&
+                       (rc_ListId.u32_DataPoolIndex == rc_Config.c_ElementId.u32_DataPoolIndex)) &&
+                      (rc_ListId.u32_ListIndex == rc_Config.c_ElementId.u32_ListIndex))
                   {
-                     //With arrays the check has to be exactly like this
-                     if ((pc_OSCElement->c_MinValue <= *pc_SetVal) && (*pc_SetVal <= pc_OSCElement->c_MaxValue))
-                     {
-                        //No change
-                     }
-                     else
-                     {
-                        q_Retval = false;
-                     }
+                     q_IsInteresting = true;
                   }
                }
-               else
+               //Check if the list is part of the second interesting elements
+               for (uint32 u32_ItInterestingElements = 0UL;
+                    (u32_ItInterestingElements < orc_ListIds2.size()) && (q_IsInteresting == false);
+                    ++u32_ItInterestingElements)
                {
-                  q_Retval = false;
+                  const C_OSCNodeDataPoolListId & rc_ListId = orc_ListIds2[u32_ItInterestingElements];
+                  if (((rc_ListId.u32_NodeIndex == rc_Config.c_ElementId.u32_NodeIndex) &&
+                       (rc_ListId.u32_DataPoolIndex == rc_Config.c_ElementId.u32_DataPoolIndex)) &&
+                      (rc_ListId.u32_ListIndex == rc_Config.c_ElementId.u32_ListIndex))
+                  {
+                     q_IsInteresting = true;
+                  }
+               }
+               if (q_IsInteresting)
+               {
+                  const C_OSCNodeDataPoolContent * const pc_SetVal = m_GetSetValue(u32_ItConfig);
+                  if (pc_SetVal != NULL)
+                  {
+                     const C_OSCNodeDataPoolListElement * const pc_OSCElement =
+                        C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(rc_Config.c_ElementId.u32_NodeIndex,
+                                                                                   rc_Config.c_ElementId.u32_DataPoolIndex,
+                                                                                   rc_Config.c_ElementId.u32_ListIndex,
+                                                                                   rc_Config.c_ElementId.u32_ElementIndex);
+                     if (pc_OSCElement != NULL)
+                     {
+                        //With arrays the check has to be exactly like this
+                        if ((pc_OSCElement->c_MinValue <= *pc_SetVal) && (*pc_SetVal <= pc_OSCElement->c_MaxValue))
+                        {
+                           //No change
+                        }
+                        else
+                        {
+                           q_Retval = false;
+                        }
+                     }
+                  }
+                  else
+                  {
+                     q_Retval = false;
+                  }
                }
             }
          }
@@ -380,17 +378,14 @@ bool C_SyvDaItPaTreeModel::CheckRange(void) const
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check all lists have read values
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check all lists have read values
 
    \return
    True  Read
    False Not read
-
-   \created     26.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItPaTreeModel::CheckAllListsRead(void) const
 {
    bool q_Retval = true;
@@ -406,17 +401,14 @@ bool C_SyvDaItPaTreeModel::CheckAllListsRead(void) const
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle value preparation
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle value preparation
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     26.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::PrepareChangedValues(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds) const
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -481,17 +473,14 @@ void C_SyvDaItPaTreeModel::PrepareChangedValues(const std::vector<C_OSCNodeDataP
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Resets the NVM changed flag for all relevant elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Resets the NVM changed flag for all relevant elements
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     31.01.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::RemoveValuesChangedFlag(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
 const
 {
@@ -548,16 +537,13 @@ const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all available indices (first column only)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all available indices (first column only)
 
    \return
    All available indices (first column only)
-
-   \created     28.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QModelIndexList C_SyvDaItPaTreeModel::GetAllAvailableIndixesForOneColumn(void) const
 {
    QModelIndexList c_Retval;
@@ -625,19 +611,16 @@ QModelIndexList C_SyvDaItPaTreeModel::GetAllAvailableIndixesForOneColumn(void) c
    //lint -e{1763} Its a const iterator!
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get the index for the specified item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get the index for the specified item
 
    \param[in] orc_Id            ID
    \param[in] oru32_ValidLayers Number of valid layers for the ID
 
    \return
    Model index, might be invalid
-
-   \created     28.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QModelIndex C_SyvDaItPaTreeModel::GetIndexForItem(const C_OSCNodeDataPoolListElementId & orc_Id,
                                                   const uint32 & oru32_ValidLayers) const
 {
@@ -740,16 +723,13 @@ QModelIndex C_SyvDaItPaTreeModel::GetIndexForItem(const C_OSCNodeDataPoolListEle
    //lint -e{1763} Its a const iterator!
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all list IDs
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all list IDs
 
    \return
    All list IDs
-
-   \created     26.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeModel::GetAllListIds(void) const
 {
    std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> c_Retval;
@@ -776,19 +756,16 @@ std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeMo
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if all specified lists are read
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if all specified lists are read
 
    \param[in] orc_ListIds List IDs to check
 
    \return
    True  Read
    False Not read
-
-   \created     27.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItPaTreeModel::CheckListsRead(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds) const
 {
    bool q_Retval = true;
@@ -826,18 +803,15 @@ bool C_SyvDaItPaTreeModel::CheckListsRead(const std::vector<C_OSCNodeDataPoolLis
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all list IDs for the specified model index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all list IDs for the specified model index
 
    \param[in] orc_Index Model index to evaluate
 
    \return
    All list IDs for the specified model index
-
-   \created     27.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeModel::GetListIdsForIndex(const QModelIndex & orc_Index)
 const
 {
@@ -852,16 +826,13 @@ const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all changed list IDs
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all changed list IDs
 
    \return
    All changed list IDs
-
-   \created     26.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeModel::GetChangedListElementIds(void)
 const
 {
@@ -915,16 +886,13 @@ const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all invalid list IDs
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all invalid list IDs
 
    \return
    All invalid list IDs
-
-   \created     11.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<C_OSCNodeDataPoolListId> C_SyvDaItPaTreeModel::GetInvalidListIds(void) const
 {
    std::vector<C_OSCNodeDataPoolListId> c_Retval;
@@ -978,13 +946,10 @@ std::vector<C_OSCNodeDataPoolListId> C_SyvDaItPaTreeModel::GetInvalidListIds(voi
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update ECU values for specified ID
-
-   \created     26.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update ECU values for specified ID
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::UpdateECUValues(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -997,8 +962,8 @@ void C_SyvDaItPaTreeModel::UpdateECUValues(void)
       {
          for (uint32 u32_Index = 0UL; u32_Index < pc_ParamData->c_DataPoolElementsConfig.size(); ++u32_Index)
          {
-            std::vector<float64> c_Values;
-            if (pc_ParamWidget->GetLastValue2(u32_Index, c_Values) == C_NO_ERR)
+            C_OSCNodeDataPoolContent c_Content;
+            if (pc_ParamWidget->GetLastValue(u32_Index, c_Content) == C_NO_ERR)
             {
                const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_ParamData->c_DataPoolElementsConfig[u32_Index];
                if (rc_Config.c_ElementId.GetIsValid() == true)
@@ -1022,26 +987,18 @@ void C_SyvDaItPaTreeModel::UpdateECUValues(void)
                      //Just check
                      if (pc_OSCElement != NULL)
                      {
-                        C_OSCNodeDataPoolContent c_Tmp = pc_OSCElement->c_MinValue;
                         std::vector<QString> & rc_ValueStrings = this->mc_ECUValuesString[u32_Index];
-                        //Apply value to content (expected interface)
-                        for (uint32 u32_ItVal = 0UL; u32_ItVal < c_Values.size(); ++u32_ItVal)
-                        {
-                           C_SdNdeDataPoolContentUtil::h_SetScaledValueInContent(c_Values[u32_ItVal], c_Tmp,
-                                                                                 pc_OSCElement->f64_Factor,
-                                                                                 pc_OSCElement->f64_Offset, u32_ItVal);
-                        }
-                        this->mc_ECUValues[u32_Index] = c_Tmp;
+                        this->mc_ECUValues[u32_Index] = c_Content;
                         //Handle string
                         if ((pc_UiElement->q_InterpretAsString == true) && (rc_ValueStrings.size() > 0UL))
                         {
                            rc_ValueStrings[0] =
-                              C_SdNdeDataPoolUtil::h_ConvertToString(c_Tmp);
+                              C_SdNdeDataPoolUtil::h_ConvertToString(c_Content);
                         }
                         else
                         {
                            rc_ValueStrings.clear();
-                           C_SdNdeDataPoolContentUtil::h_GetValuesAsScaledString(c_Tmp,
+                           C_SdNdeDataPoolContentUtil::h_GetValuesAsScaledString(c_Content,
                                                                                  pc_OSCElement->f64_Factor,
                                                                                  pc_OSCElement->f64_Offset,
                                                                                  rc_ValueStrings);
@@ -1055,16 +1012,13 @@ void C_SyvDaItPaTreeModel::UpdateECUValues(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update CRC status
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update CRC status
 
    \param[in] orc_ListId LIST ID
    \param[in] oq_Status  New CRC status
-
-   \created     27.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::SetCRCStatus(const C_OSCNodeDataPoolListId & orc_ListId, const bool oq_Status)
 {
    C_OSCNodeDataPoolListElementId c_TmpId;
@@ -1086,16 +1040,13 @@ void C_SyvDaItPaTreeModel::SetCRCStatus(const C_OSCNodeDataPoolListId & orc_List
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get set values for specified list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get set values for specified list
 
    \param[in]  orc_ListId     List ID
    \param[out] orc_ListValues Set values
-
-   \created     26.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::GetListSetValues(const C_OSCNodeDataPoolListElementId & orc_ListId,
                                             std::vector<C_OSCNodeDataPoolContent> & orc_ListValues) const
 {
@@ -1130,16 +1081,13 @@ void C_SyvDaItPaTreeModel::GetListSetValues(const C_OSCNodeDataPoolListElementId
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize
 
    \param[in] opc_DataWidget Data storage
    \param[in] ou32_ViewIndex View index
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::Init(C_PuiSvDbDataElementHandler * const opc_DataWidget)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -1260,9 +1208,8 @@ void C_SyvDaItPaTreeModel::Init(C_PuiSvDbDataElementHandler * const opc_DataWidg
    this->endResetModel();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get header data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get header data
 
    \param[in] osn_Section    Section
    \param[in] oe_Orientation Orientation
@@ -1270,10 +1217,8 @@ void C_SyvDaItPaTreeModel::Init(C_PuiSvDbDataElementHandler * const opc_DataWidg
 
    \return
    Header string
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_SyvDaItPaTreeModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
                                           const sintn osn_Role) const
 {
@@ -1372,13 +1317,20 @@ QVariant C_SyvDaItPaTreeModel::headerData(const sintn osn_Section, const Qt::Ori
       }
       else if (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
       {
+         const QString c_PhysicalValueInfo = C_GtGetText::h_GetText("The raw value of a data element is the value as it is transmitted in the network."
+                                                                    "\nThe physical value of a data element is the value of the physical quantity (e.g. speed, "
+                                                                    "\nrpm, temperature, etc.) that represents the data element."
+                                                                    "\nThe following conversion formula is used to transform the raw value "
+                                                                    "\nto a physical value or in the reverse direction:"
+                                                                    "\n\n[Physical value] = ([Raw value] * [Factor]) + [Offset]");
+         QString c_InfoText;
          switch (e_Col)
          {
          case eTREE:
             c_Retval = "";
             break;
          case eCOMMENT:
-            c_Retval = "";
+            c_Retval = C_GtGetText::h_GetText("Comment for this data element.");
             break;
          case eDEVICE_VALUE:
             c_Retval = C_GtGetText::h_GetText("Device value (= actual value), read from system NVM."
@@ -1392,7 +1344,8 @@ QVariant C_SyvDaItPaTreeModel::headerData(const sintn osn_Section, const Qt::Ori
                                               "\n\nExecute \"Write\" command to write set values to device in parametrization step");
             break;
          case eUNIT:
-            c_Retval = "";
+            c_InfoText = C_GtGetText::h_GetText("Unit of the signals physical quantity\n\n");
+            c_Retval = c_InfoText.append(c_PhysicalValueInfo);
             break;
          case eACTION_READ:
             c_Retval = C_GtGetText::h_GetText("Triggers the read of actual device values from System NVM.");
@@ -1433,37 +1386,31 @@ QVariant C_SyvDaItPaTreeModel::headerData(const sintn osn_Section, const Qt::Ori
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get tree column count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get tree column count
 
    \param[in] orc_Parent Parent
 
    \return
    Column count
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SyvDaItPaTreeModel::columnCount(const QModelIndex & orc_Parent) const
 {
    Q_UNUSED(orc_Parent)
    return 12;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data at index
 
    \param[in] orc_Index Index
    \param[in] osn_Role  Data role
 
    \return
    Data
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
 {
    QVariant c_Retval = C_TblTreModel::data(orc_Index, osn_Role);
@@ -1781,75 +1728,70 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
 
          C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
          const E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
+         QStringList c_Icons;
          switch (e_Col)
          {
          case eACTION_READ:
             if (u32_ValidLayers < 4)
             {
-               QStringList c_Icons;
+               c_Icons.push_back(QString::number(16));
                c_Icons.append("://images/system_views/IconTableRead.svg");
                c_Icons.append("://images/system_views/IconTableReadDisabled.svg");
-               c_Retval = c_Icons;
             }
             break;
          case eACTION_WRITE:
             if (u32_ValidLayers < 4)
             {
-               QStringList c_Icons;
+               c_Icons.push_back(QString::number(16));
                c_Icons.append("://images/system_views/IconTableWrite.svg");
                c_Icons.append("://images/system_views/IconTableWriteDisabled.svg");
-               c_Retval = c_Icons;
             }
             break;
          case eACTION_APPLY:
             if (u32_ValidLayers < 4)
             {
-               QStringList c_Icons;
+               c_Icons.push_back(QString::number(16));
                c_Icons.append("://images/system_views/IconTableCopyColumn.svg");
                c_Icons.append("://images/system_views/IconTableCopyColumnDisabled.svg");
-               c_Retval = c_Icons;
             }
             break;
          case eACTION_LOAD:
             if (u32_ValidLayers < 4)
             {
-               QStringList c_Icons;
+               c_Icons.push_back(QString::number(16));
                c_Icons.append("://images/IconImportFile.svg");
                c_Icons.append("://images/IconImportFileDisabled.svg");
-               c_Retval = c_Icons;
             }
             break;
          case eACTION_SAVE:
             if (u32_ValidLayers < 4)
             {
-               QStringList c_Icons;
+               c_Icons.push_back(QString::number(16));
                c_Icons.append("://images/IconExportFile.svg");
                c_Icons.append("://images/IconExportFileDisabled.svg");
-               c_Retval = c_Icons;
             }
             break;
          case eACTION_RECORD:
             if (u32_ValidLayers < 4)
             {
-               QStringList c_Icons;
+               c_Icons.push_back(QString::number(16));
                c_Icons.append("://images/system_views/IconTableRecord.svg");
                c_Icons.append("://images/system_views/IconTableRecordDisabled.svg");
-               c_Retval = c_Icons;
             }
             break;
          case eACTION_REMOVE:
             if (u32_ValidLayers < 4)
             {
-               QStringList c_Icons;
+               c_Icons.push_back(QString::number(16));
                c_Icons.append("://images/main_page_and_navi_bar/Icon_delete.svg");
                c_Icons.append("://images/main_page_and_navi_bar/Icon_delete_disabled.svg");
-               c_Retval = c_Icons;
             }
             break;
          default:
             //Use default value = empty
             break;
          }
+         c_Retval = c_Icons;
       }
       else if (osn_Role == static_cast<sintn>(Qt::FontRole))
       {
@@ -1880,15 +1822,32 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                {
                   const uint32 u32_Index = GetParamIndexId(c_Id);
                   const C_OSCNodeDataPoolContent * const pc_Value = m_GetSetValue(u32_Index);
-                  if ((((u32_Index < this->mc_ECUValuesReadStatus.size()) && (u32_Index < this->mc_ECUValues.size())) &&
-                       (pc_Value != NULL)) && (this->mc_ECUValuesReadStatus[u32_Index] == true))
+                  const C_OSCNodeDataPoolListElement * const pc_Element =
+                     C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id);
+                  if ((pc_Element != NULL) && (pc_Value != NULL))
                   {
-                     if (*pc_Value == this->mc_ECUValues[u32_Index])
+                     //Check error
+                     if ((*pc_Value >= pc_Element->c_MinValue) && (*pc_Value >= pc_Element->c_MinValue))
                      {
-                        //Use default font
+                        //No error
+                        if (((u32_Index < this->mc_ECUValuesReadStatus.size()) &&
+                             (u32_Index < this->mc_ECUValues.size())) &&
+                            (this->mc_ECUValuesReadStatus[u32_Index] == true))
+                        {
+                           if (*pc_Value == this->mc_ECUValues[u32_Index])
+                           {
+                              //Use default font
+                           }
+                           else
+                           {
+                              //Mark as change
+                              c_Font.setBold(true);
+                           }
+                        }
                      }
                      else
                      {
+                        //Error
                         c_Font.setBold(true);
                      }
                   }
@@ -2047,6 +2006,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
    {
       QColor c_DefaultNonInteractive;
       QColor c_Default;
+      const QColor c_Error = mc_STYLE_GUIDE_COLOR_24;
       const E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
       if (this->mq_DarkMode == true)
       {
@@ -2086,7 +2046,23 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                   if ((u32_Index < pc_ParamData->c_DataSetSelectionIndices.size()) &&
                       (pc_ParamData->c_DataSetSelectionIndices[u32_Index] < 0L))
                   {
-                     c_Retval = c_Default;
+                     const C_OSCNodeDataPoolListElement * const pc_Element =
+                        C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id);
+                     //Check error
+                     if ((pc_Element != NULL) && (u32_Index < pc_ParamData->c_ListValues.size()))
+                     {
+                        const C_OSCNodeDataPoolContent & rc_Value = pc_ParamData->c_ListValues[u32_Index];
+                        if ((rc_Value >= pc_Element->c_MinValue) && (rc_Value >= pc_Element->c_MinValue))
+                        {
+                           //No error
+                           c_Retval = c_Default;
+                        }
+                        else
+                        {
+                           //Error
+                           c_Retval = c_Error;
+                        }
+                     }
                   }
                }
             }
@@ -2097,9 +2073,8 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set data at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set data at index
 
    \param[in] orc_Index Index
    \param[in] orc_Value New data
@@ -2108,10 +2083,8 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
    \return
    true  success
    false failure
-
-   \created     26.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItPaTreeModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value, const sintn osn_Role)
 {
    bool q_Retval = false;
@@ -2221,18 +2194,15 @@ bool C_SyvDaItPaTreeModel::setData(const QModelIndex & orc_Index, const QVariant
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get item flags
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get item flags
 
    \param[in] orc_Index Index
 
    \return
    Item flags
-
-   \created     26.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 Qt::ItemFlags C_SyvDaItPaTreeModel::flags(const QModelIndex & orc_Index) const
 {
    Qt::ItemFlags c_Retval = C_TblTreModel::flags(orc_Index);
@@ -2461,18 +2431,15 @@ Qt::ItemFlags C_SyvDaItPaTreeModel::flags(const QModelIndex & orc_Index) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Column to enum conversion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Column to enum conversion
 
    \param[in]  ors32_Column Column
 
    \return
    Enum value
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaTreeModel::E_Columns C_SyvDaItPaTreeModel::h_ColumnToEnum(const sint32 & ors32_Column)
 {
    C_SyvDaItPaTreeModel::E_Columns e_Retval;
@@ -2522,19 +2489,16 @@ C_SyvDaItPaTreeModel::E_Columns C_SyvDaItPaTreeModel::h_ColumnToEnum(const sint3
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Enum to column conversion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Enum to column conversion
 
    \param[in] ore_Value Enum value
 
    \return
    Column
    -1 Error
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDaItPaTreeModel::h_EnumToColumn(const C_SyvDaItPaTreeModel::E_Columns & ore_Value)
 {
    sint32 s32_Retval;
@@ -2585,9 +2549,8 @@ sint32 C_SyvDaItPaTreeModel::h_EnumToColumn(const C_SyvDaItPaTreeModel::E_Column
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Decode model index into data structure index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Decode model index into data structure index
 
    \param[in]  orc_Index         Index to decode
    \param[out] orc_Id            ID (Warning: only valid as defined by valid layers)
@@ -2598,10 +2561,8 @@ sint32 C_SyvDaItPaTreeModel::h_EnumToColumn(const C_SyvDaItPaTreeModel::E_Column
                                  3: list
                                  4: element
                                  Else: undefined
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::h_DecodeIndex(const QModelIndex & orc_Index, C_OSCNodeDataPoolListElementId & orc_Id,
                                          uint32 & oru32_ValidLayers)
 {
@@ -2689,18 +2650,15 @@ void C_SyvDaItPaTreeModel::h_DecodeIndex(const QModelIndex & orc_Index, C_OSCNod
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get element config index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get element config index
 
    \param[in] orc_Id ID to search for
 
    \return
    Element config index
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SyvDaItPaTreeModel::GetParamIndexId(const C_OSCNodeDataPoolListElementId & orc_Id) const
 {
    uint32 u32_Retval = 0UL;
@@ -2729,16 +2687,13 @@ uint32 C_SyvDaItPaTreeModel::GetParamIndexId(const C_OSCNodeDataPoolListElementI
    return u32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility function to handle unique list ID vector operations
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility function to handle unique list ID vector operations
 
    \param[in,out] orc_Vec    Existing list IDs and vector to adapt if necessary
    \param[in]     orc_ListId New list ID
-
-   \created     26.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::h_AppendOnlyUniqueListId(std::vector<C_OSCNodeDataPoolListElementId> & orc_Vec,
                                                     const C_OSCNodeDataPoolListElementId & orc_ListId)
 {
@@ -2761,16 +2716,13 @@ void C_SyvDaItPaTreeModel::h_AppendOnlyUniqueListId(std::vector<C_OSCNodeDataPoo
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get template with the type description for the current selection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get template with the type description for the current selection
 
    \return
    Template with the type description for the current selection
-
-   \created     03.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaItPaTreeModel::h_GetSelectedItemTypeTemplate(const QModelIndex & orc_Index)
 {
    QString c_Retval;
@@ -2804,19 +2756,16 @@ QString C_SyvDaItPaTreeModel::h_GetSelectedItemTypeTemplate(const QModelIndex & 
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all list IDs for the specified item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all list IDs for the specified item
 
    \param[in] orc_Id           ID to look for
    \param[in] ou32_ValidLayers Number of valid layers in ID
 
    \return
    All list IDs for the specified item
-
-   \created     05.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeModel::GetListIdsForId(
    const C_OSCNodeDataPoolListElementId & orc_Id, const uint32 ou32_ValidLayers) const
 {
@@ -2904,9 +2853,8 @@ std::vector<C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeModel::GetListIdsForI
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all element IDs for the specified item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all element IDs for the specified item
 
    Only valid for lists and above layers
 
@@ -2915,10 +2863,8 @@ std::vector<C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeModel::GetListIdsForI
 
    \return
    All element IDs for the specified item
-
-   \created     16.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeModel::GetElementIdsForId(
    const C_OSCNodeDataPoolListElementId & orc_Id, const uint32 ou32_ValidLayers)
 const
@@ -2955,15 +2901,12 @@ const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all node tree node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all node tree node
 
    \param[in,out] opc_TreeNode   Tree node to initialize
-
-   \created     06.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::mh_InitAllNode(C_TblTreItem * const opc_TreeNode, const uint32 ou32_ViewIndex)
 {
    if (opc_TreeNode != NULL)
@@ -2984,17 +2927,14 @@ void C_SyvDaItPaTreeModel::mh_InitAllNode(C_TblTreItem * const opc_TreeNode, con
    //lint -e{429}  no memory leak because we never took ownership
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize node tree node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize node tree node
 
    \param[in,out] opc_TreeNode   Tree node to initialize
    \param[in]     ou32_NodeIndex Node index (identifier)
    \param[in]     ou32_ViewIndex View index
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::mh_InitNode(C_TblTreItem * const opc_TreeNode, const uint32 ou32_NodeIndex,
                                        const uint32 ou32_ViewIndex)
 {
@@ -3027,18 +2967,15 @@ void C_SyvDaItPaTreeModel::mh_InitNode(C_TblTreItem * const opc_TreeNode, const 
    //lint -e{429}  no memory leak because we never took ownership
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize data pool tree node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize data pool tree node
 
    \param[in,out] opc_TreeNode       Tree node to initialize
    \param[in]     ou32_NodeIndex     Node index (identifier)
    \param[in]     ou32_DataPoolIndex Data pool index (identifier)
    \param[in]     oq_Enabled         Info if element should be enabled
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::mh_InitDataPool(C_TblTreItem * const opc_TreeNode, const uint32 ou32_NodeIndex,
                                            const uint32 ou32_DataPoolIndex, const bool oq_Enabled)
 {
@@ -3065,19 +3002,16 @@ void C_SyvDaItPaTreeModel::mh_InitDataPool(C_TblTreItem * const opc_TreeNode, co
    //lint -e{429}  no memory leak because we never took ownership
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize list tree node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize list tree node
 
    \param[in,out] opc_TreeNode       Tree node to initialize
    \param[in]     ou32_NodeIndex     Node index (identifier)
    \param[in]     ou32_DataPoolIndex Data pool index (identifier)
    \param[in]     ou32_ListIndex     List index (identifier)
    \param[in]     oq_Enabled         Info if element should be enabled
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::mh_InitList(C_TblTreItem * const opc_TreeNode, const uint32 ou32_NodeIndex,
                                        const uint32 ou32_DataPoolIndex, const uint32 ou32_ListIndex,
                                        const bool oq_Enabled)
@@ -3106,9 +3040,8 @@ void C_SyvDaItPaTreeModel::mh_InitList(C_TblTreItem * const opc_TreeNode, const 
    //lint -e{429}  no memory leak because we never took ownership
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize element tree node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize element tree node
 
    \param[in,out] opc_TreeNode       Tree node to initialize
    \param[in]     ou32_NodeIndex     Node index (identifier)
@@ -3116,10 +3049,8 @@ void C_SyvDaItPaTreeModel::mh_InitList(C_TblTreItem * const opc_TreeNode, const 
    \param[in]     ou32_ListIndex     List index (identifier)
    \param[in]     ou32_ElementIndex  Element index (identifier)
    \param[in]     oq_Enabled         Info if element should be enabled
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::mh_InitElement(C_TblTreItem * const opc_TreeNode, const uint32 ou32_NodeIndex,
                                           const uint32 ou32_DataPoolIndex, const uint32 ou32_ListIndex,
                                           const uint32 ou32_ElementIndex, const bool oq_Enabled)
@@ -3149,19 +3080,16 @@ void C_SyvDaItPaTreeModel::mh_InitElement(C_TblTreItem * const opc_TreeNode, con
    //lint -e{429}  no memory leak because we never took ownership
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get value to use for set (wrapper to handle data set or direct value)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get value to use for set (wrapper to handle data set or direct value)
 
    \param[in] ou32_DataIndex Data index in param item
 
    \return
    NULL Value not found
    Else Valid value
-
-   \created     27.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_OSCNodeDataPoolContent * C_SyvDaItPaTreeModel::m_GetSetValue(const uint32 ou32_DataIndex) const
 {
    const C_OSCNodeDataPoolContent * pc_Retval = NULL;
@@ -3201,19 +3129,16 @@ const C_OSCNodeDataPoolContent * C_SyvDaItPaTreeModel::m_GetSetValue(const uint3
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if index contains changed elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if index contains changed elements
 
    \param[in] orc_Index  Index to check
 
    \return
    True  Change
    False No change
-
-   \created     28.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItPaTreeModel::m_IsChanged(const QModelIndex & orc_Index) const
 {
    bool q_Retval = false;
@@ -3327,19 +3252,16 @@ bool C_SyvDaItPaTreeModel::m_IsChanged(const QModelIndex & orc_Index) const
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if list CRC is valid
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if list CRC is valid
 
    \param[in] orc_Id List ID to check
 
    \return
    True  Not valid
    False Valid
-
-   \created     28.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItPaTreeModel::m_CheckListCRCIsChanged(const C_OSCNodeDataPoolListElementId & orc_Id) const
 {
    bool q_Retval = false;
@@ -3391,19 +3313,16 @@ bool C_SyvDaItPaTreeModel::m_CheckListCRCIsChanged(const C_OSCNodeDataPoolListEl
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if element was changed
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if element was changed
 
    \param[in] orc_Id Element ID to check
 
    \return
    True  Change
    False No change
-
-   \created     28.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItPaTreeModel::m_CheckElementIsChanged(const C_OSCNodeDataPoolListElementId & orc_Id) const
 {
    bool q_Retval = false;
@@ -3454,9 +3373,8 @@ bool C_SyvDaItPaTreeModel::m_CheckElementIsChanged(const C_OSCNodeDataPoolListEl
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get list index in internal CRC structure
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get list index in internal CRC structure
 
    \param[in]  orc_Id      List ID
    \param[out] oru32_Index Index in internal CRC structure
@@ -3464,10 +3382,8 @@ bool C_SyvDaItPaTreeModel::m_CheckElementIsChanged(const C_OSCNodeDataPoolListEl
    \return
    True  Found
    False Not found
-
-   \created     28.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItPaTreeModel::m_GetListIndex(const C_OSCNodeDataPoolListElementId & orc_Id, uint32 & oru32_Index) const
 {
    bool q_Found = false;

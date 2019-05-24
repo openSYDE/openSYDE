@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       A collection of useful functions for graphics items (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     11.08.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QGraphicsItem>
@@ -22,40 +15,37 @@
 #include "stwtypes.h"
 #include "C_GiCustomFunctions.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 using namespace stw_types;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const float64 C_GiCustomFunctions::hf64_SceneMinBorderSize = 6.0;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Standard function implementation of overloaded itemChange method
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Standard function implementation of overloaded itemChange method
 
    Checks the new position of the item. It have to be bigger or equal than 0.
 
-   \param[in,out] ope_Change        Indicator what changed
+   \param[in,out] oe_Change         Indicator what changed
    \param[in,out] orc_Value         Value corresponding to change
    \param[in]     opc_GraphicsItem  Pointer to the actual graphics item
    \param[out]    opq_Changed       Optional flag if the function has the result adapted
 
    \return
    Adapted orc_Value
-
-   \created     11.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_GiCustomFunctions::h_ItemChange(const QGraphicsItem::GraphicsItemChange oe_Change,
                                            const QVariant & orc_Value, const QGraphicsItem * const opc_GraphicsItem,
                                            bool * const opq_Changed)
@@ -96,16 +86,13 @@ QVariant C_GiCustomFunctions::h_ItemChange(const QGraphicsItem::GraphicsItemChan
    return c_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checks and adapt a position for the zero points
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks and adapt a position for the zero points
 
    \param[in,out] orc_Pos    Position which will be checked and adapted
    \param[in]     orc_Offset Optional parameter for offset
-
-   \created     20.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiCustomFunctions::h_AdaptMouseRangePos(QPointF & orc_Pos, const QPointF & orc_Offset)
 {
    const float64 f64_MinX = orc_Offset.x() + C_GiCustomFunctions::hf64_SceneMinBorderSize;

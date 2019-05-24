@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Raw parameter set file reader/writer (implementation)
 
    Raw parameter set file reader/writer
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     12.10.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <cstdio>
@@ -26,50 +19,51 @@
 #include "C_OSCChecksummedXML.h"
 #include "C_OSCParamSetRawNodeFiler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_scl;
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load parameter set node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load parameter set node
 
    Load parameter set node data from XML file
    pre-condition: the passed XML parser has the active node set to "node"
    post-condition: the passed XML parser has the active node set to the same "node"
 
-   \param[out]    orc_Node      data storage
-   \param[in,out] orc_XMLParser XML with specified node active
+   \param[out]    orc_Node                   data storage
+   \param[in,out] orc_XMLParser              XML with specified node active
+   \param[in,out] orq_MissingOptionalContent Flag for indication of optional content missing
+                                             Warning: flag is never set to false if optional content is present
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
-
-   \created     12.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_types::sint32 C_OSCParamSetRawNodeFiler::h_LoadRawNode(C_OSCParamSetRawNode & orc_Node,
-                                                           C_OSCXMLParserBase & orc_XMLParser)
+                                                           C_OSCXMLParserBase & orc_XMLParser,
+                                                           bool & orq_MissingOptionalContent)
 {
    stw_types::sint32 s32_Retval = C_OSCParamSetFilerBase::h_LoadNodeName(orc_Node.c_Name, orc_XMLParser);
    if (s32_Retval == C_NO_ERR)
    {
-      s32_Retval = C_OSCParamSetFilerBase::h_LoadDataPoolInfos(orc_Node.c_DataPools, orc_XMLParser);
+      s32_Retval = C_OSCParamSetFilerBase::h_LoadDataPoolInfos(orc_Node.c_DataPools, orc_XMLParser,
+                                                               orq_MissingOptionalContent);
       if (s32_Retval == C_NO_ERR)
       {
          s32_Retval = C_OSCParamSetRawNodeFiler::mh_LoadEntries(orc_Node.c_Entries, orc_XMLParser);
@@ -79,9 +73,8 @@ stw_types::sint32 C_OSCParamSetRawNodeFiler::h_LoadRawNode(C_OSCParamSetRawNode 
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save parameter set node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save parameter set node
 
    Save parameter set node to XML file
    pre-condition: the passed XML parser has the active node set to "node"
@@ -89,10 +82,8 @@ stw_types::sint32 C_OSCParamSetRawNodeFiler::h_LoadRawNode(C_OSCParamSetRawNode 
 
    \param[in]     orc_Node      data storage
    \param[in,out] orc_XMLParser XML with specified node active
-
-   \created     12.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCParamSetRawNodeFiler::h_SaveRawNode(const C_OSCParamSetRawNode & orc_Node, C_OSCXMLParserBase & orc_XMLParser)
 {
    C_OSCParamSetFilerBase::h_SaveNodeName(orc_Node.c_Name, orc_XMLParser);
@@ -100,21 +91,17 @@ void C_OSCParamSetRawNodeFiler::h_SaveRawNode(const C_OSCParamSetRawNode & orc_N
    C_OSCParamSetRawNodeFiler::mh_SaveEntries(orc_Node.c_Entries, orc_XMLParser);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     12.10.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCParamSetRawNodeFiler::C_OSCParamSetRawNodeFiler(void) :
    C_OSCParamSetFilerBase()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load parameter set entries
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load parameter set entries
 
    Load parameter set entries data from XML file
    pre-condition: the passed XML parser has the active node set to "node"
@@ -126,10 +113,8 @@ C_OSCParamSetRawNodeFiler::C_OSCParamSetRawNodeFiler(void) :
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
-
-   \created     12.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCParamSetRawNodeFiler::mh_LoadEntries(std::vector<C_OSCParamSetRawEntry> & orc_Entries,
                                                  C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -172,9 +157,8 @@ sint32 C_OSCParamSetRawNodeFiler::mh_LoadEntries(std::vector<C_OSCParamSetRawEnt
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save parameter set entries
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save parameter set entries
 
    Save parameter set entries to XML file
    pre-condition: the passed XML parser has the active node set to "node"
@@ -182,10 +166,8 @@ sint32 C_OSCParamSetRawNodeFiler::mh_LoadEntries(std::vector<C_OSCParamSetRawEnt
 
    \param[in]     orc_Node      data storage
    \param[in,out] orc_XMLParser XML with specified node active
-
-   \created     12.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCParamSetRawNodeFiler::mh_SaveEntries(const std::vector<C_OSCParamSetRawEntry> & orc_Entries,
                                                C_OSCXMLParserBase & orc_XMLParser)
 {
@@ -207,9 +189,8 @@ void C_OSCParamSetRawNodeFiler::mh_SaveEntries(const std::vector<C_OSCParamSetRa
    tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load parameter set entry
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load parameter set entry
 
    Load parameter set entry data from XML file
    pre-condition: the passed XML parser has the active node set to "raw-entry"
@@ -221,10 +202,8 @@ void C_OSCParamSetRawNodeFiler::mh_SaveEntries(const std::vector<C_OSCParamSetRa
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
-
-   \created     12.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCParamSetRawNodeFiler::mh_LoadEntry(C_OSCParamSetRawEntry & orc_Entry, C_OSCXMLParserBase & orc_XMLParser)
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -300,9 +279,8 @@ sint32 C_OSCParamSetRawNodeFiler::mh_LoadEntry(C_OSCParamSetRawEntry & orc_Entry
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save parameter set entry
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save parameter set entry
 
    Save parameter set entry to XML file
    pre-condition: the passed XML parser has the active node set to "raw-entry"
@@ -310,10 +288,8 @@ sint32 C_OSCParamSetRawNodeFiler::mh_LoadEntry(C_OSCParamSetRawEntry & orc_Entry
 
    \param[in]     orc_Node      data storage
    \param[in,out] orc_XMLParser XML with specified node active
-
-   \created     12.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCParamSetRawNodeFiler::mh_SaveEntry(const C_OSCParamSetRawEntry & orc_Entry,
                                              C_OSCXMLParserBase & orc_XMLParser)
 {

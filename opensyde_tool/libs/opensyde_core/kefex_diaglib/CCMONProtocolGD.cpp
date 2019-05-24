@@ -1,30 +1,16 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       CAN message to text conversion class for the Generic Driver protocol
 
    Converts a CAN message structure to text. The interpretation is based on the Generic Driver CAN protocol
    specification.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.04.2010  STW/A.Stangl
-   \endimplementation
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author              Description
-   20.04.2010        STW/A.Stangl        file created (moved code here from CCMONProtocol.cpp)
-   05.04.2007        STW/F.Hiltensberger Updated block transfer protocol interpretation
-   \endhistory
+   \copyright   Copyright 2010 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -36,14 +22,14 @@
 #include "CCMONProtocolGD.h"
 #include "CSCLString.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_cmon_protocol;
 using namespace stw_scl;
 using namespace stw_can;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 #define GD_REQUEST_SRR_WO_HS         0xC5
 #define GD_REQUEST_SRR_HS            0xC3
 #define GD_REQUEST_ECRR_WO_HS        0xCA
@@ -72,28 +58,25 @@ using namespace stw_can;
 #define GD_TRANS_TIMEOUT             0x03
 #define GD_TRANS_IDLE                0x04
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert CAN message to text representation.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert CAN message to text representation.
 
    \param[in]     orc_Msg              message to convert
 
    \return
    Text interpretation of CAN message ("" if the message can not be interpreted)
-
-   \created     xx.xx.200x  STW/F.Hiltensberger
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolGD::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) const
 {
    bool q_IsRequest;
@@ -618,20 +601,17 @@ C_SCLString C_CMONProtocolGD::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) c
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get name of protocol as string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get name of protocol as string
 
    \return
    Text representation of protocol name
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_CMONProtocolGD::GetProtocolName(void) const
 {
    return "WD Generic Driver";
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 

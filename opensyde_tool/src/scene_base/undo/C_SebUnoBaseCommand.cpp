@@ -1,56 +1,46 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Base class for all topology undo commands (implementation)
 
    Base class for all topology undo commands
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     18.11.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_SebUnoBaseCommand.h"
 #include "C_SebScene.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace std;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Scene  Pointer to currently active scene
    \param[in]     orc_IDs    Affected unique IDs
    \param[in]     orc_Text   Command description
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     18.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoBaseCommand::C_SebUnoBaseCommand(QGraphicsScene * const opc_Scene, const vector<uint64> & orc_IDs,
                                          const QString & orc_Text, QUndoCommand * const opc_Parent) :
    QUndoCommand(orc_Text, opc_Parent),
@@ -59,16 +49,13 @@ C_SebUnoBaseCommand::C_SebUnoBaseCommand(QGraphicsScene * const opc_Scene, const
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy constructor
 
    \param[in]     opc_Prev   Original command
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     06.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoBaseCommand::C_SebUnoBaseCommand(const C_SebUnoBaseCommand * const opc_Prev, QUndoCommand * const opc_Parent) :
    QUndoCommand(opc_Prev->text(), opc_Parent),
    mpc_Scene(opc_Prev->mpc_Scene),
@@ -76,31 +63,25 @@ C_SebUnoBaseCommand::C_SebUnoBaseCommand(const C_SebUnoBaseCommand * const opc_P
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     18.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoBaseCommand::~C_SebUnoBaseCommand(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get pointers for connected items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get pointers for connected items
 
    \return
    array with items:
    NULL: not found
    else: pointer to item
-
-   \created     21.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 vector<QGraphicsItem *> C_SebUnoBaseCommand::m_GetSceneItems(void)
 {
    vector<QGraphicsItem *> c_Retval;
@@ -112,19 +93,16 @@ vector<QGraphicsItem *> C_SebUnoBaseCommand::m_GetSceneItems(void)
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get pointer for connected item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get pointer for connected item
 
    \param[in] oru64_ID Unique ID
 
    \return
    NULL: not found
    else: pointer to item
-
-   \created     21.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QGraphicsItem * C_SebUnoBaseCommand::m_GetSceneItem(const uint64 & oru64_ID)
 {
    QGraphicsItem * pc_Retval;
@@ -143,19 +121,16 @@ QGraphicsItem * C_SebUnoBaseCommand::m_GetSceneItem(const uint64 & oru64_ID)
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if merge possible (=same IDs affected)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if merge possible (=same IDs affected)
 
    \param[in] opc_Command Command to merge with
 
    \return
    true: merge possible
    false: do not attempt merge
-
-   \created     08.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SebUnoBaseCommand::m_MergePossible(const C_SebUnoBaseCommand * const opc_Command) const
 {
    bool q_Retval = true;
@@ -180,13 +155,10 @@ bool C_SebUnoBaseCommand::m_MergePossible(const C_SebUnoBaseCommand * const opc_
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get all unique IDs
-
-   \created     24.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get all unique IDs
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const std::vector<uint64> C_SebUnoBaseCommand::GetIDs(void) const
 {
    return this->mc_IDs;

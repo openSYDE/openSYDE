@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Specific tabbar implementation for drag functionality of C_SyvDaDashboardSelectorTabWidget
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     28.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QMouseEvent>
@@ -23,29 +16,26 @@
 #include "stwtypes.h"
 #include "C_SyvDaDashboardSelectorTabBar.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     28.04.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaDashboardSelectorTabBar::C_SyvDaDashboardSelectorTabBar(QWidget * const opc_Parent) :
    QTabBar(opc_Parent),
    mq_MouseClicked(false),
@@ -57,28 +47,22 @@ C_SyvDaDashboardSelectorTabBar::C_SyvDaDashboardSelectorTabBar(QWidget * const o
    this->setExpanding(false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     20.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaDashboardSelectorTabBar::~C_SyvDaDashboardSelectorTabBar()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Shows the screenshot as cursor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Shows the screenshot as cursor
 
    \param[in] orc_Screenshot   Actual screenshot of the widget
-
-   \created     28.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabBar::SetScreenshot(const QPixmap & orc_Screenshot)
 {
    this->setCursor(QCursor(orc_Screenshot, 0, 0));
@@ -128,15 +112,12 @@ void C_SyvDaDashboardSelectorTabBar::SetScreenshot(const QPixmap & orc_Screensho
       */
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse press event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     28.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabBar::mousePressEvent(QMouseEvent * const opc_Event)
 {
    const sintn sn_Index = this->tabAt(opc_Event->pos());
@@ -153,15 +134,12 @@ void C_SyvDaDashboardSelectorTabBar::mousePressEvent(QMouseEvent * const opc_Eve
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse release event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse release event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     28.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabBar::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
    if (this->mq_MouseClicked == true)
@@ -187,15 +165,12 @@ void C_SyvDaDashboardSelectorTabBar::mouseMoveEvent(QMouseEvent * const opc_Even
    QTabBar::mouseMoveEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse release event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse release event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     28.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabBar::mouseReleaseEvent(QMouseEvent * const opc_Event)
 {
    bool q_RequestSelectionChange = false;
@@ -221,17 +196,14 @@ void C_SyvDaDashboardSelectorTabBar::mouseReleaseEvent(QMouseEvent * const opc_E
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten resize event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten resize event slot
 
-   Here: Q_EMIT signal
+   Here: Q_EMIT this->signal
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     05.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabBar::resizeEvent(QResizeEvent * const opc_Event)
 {
    QTabBar::resizeEvent(opc_Event);

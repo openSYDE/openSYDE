@@ -1,7 +1,6 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
-   \file        stwcompid.c
+   \file
    \brief       Utility functions concerning the STW company-ID
 
    This module provides functionality to convert the STW company-ID
@@ -9,22 +8,10 @@
    It is written in plain ANSI-C and can thus be used in most C / C++
     projects.
 
-   \implementation
    project
-   copyright   STW (c) 1999-200x
-   license     use only under terms of contract / confidential
-
-   created     03.11.2008  STW/A.Stangl
-   \endimplementation
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   12.11.2008        STW/A.Stangl  added conditional package definitions for Borland C++ Builder
-   03.11.2008        STW/A.Stangl  file created
-   \endhistory
+   \copyright   Copyright 2008 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------ */
 #include <string.h>
@@ -37,7 +24,6 @@
 //maybe we want this module to be put into a VCL package ...
 #pragma package(smart_init)
 #endif
-
 
 #ifdef __cplusplus
 using namespace stw_types;
@@ -60,8 +46,7 @@ namespace stw_company_id
 /* -- Implementation ------------------------------------------------------ */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert company-ID string to byte-array to send to server
+/*! \brief   Convert company-ID string to byte-array to send to server
 
    Convert 2, 3, 5 character company-ID to 2-byte array to send to server.
    Checks for valid content.
@@ -76,21 +61,6 @@ namespace stw_company_id
    \return
    C_NO_ERR   converted company-id
    C_CONFIG   invalid company-id
-
-   \created     22.04.2008  STW/A.Stangl
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   15.04.2014        STW/A.Stangl  code is now endian-safe
-   10.12.2008        STW/S.Renn    added explicit cast to uint8 after encoding
-                                   an id-byte due to compiler warning
-   03.11.2008        STW/A.Stangl  Rewritten: now plain ANSI-C
-   27.10.2008        STW/A.Stangl  3 char IDs: range is A..Z/1..6 not A..Z/0..5
-                                    (decided in big Comp-ID meeting on 24.10.2008)
-   25.04.2008        STW/A.Stangl  moved here from TFXFLMain
-   22.04.2008        STW/A.Stangl  function created
-   \endhistory
 */
 //-----------------------------------------------------------------------------
 sintn CID_string_to_bytes(const charn * const opcn_String, uint8 * const opu8_Bytes, uint8 * const opu8_NumBytes)
@@ -182,8 +152,7 @@ sintn CID_string_to_bytes(const charn * const opcn_String, uint8 * const opu8_By
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Convert company-ID byte-array to a displayable string
+/*! \brief   Convert company-ID byte-array to a displayable string
 
    Convert 2, 3 or 5 character company-ID from binary form to an AnsiString
    No check for valid ASCII character is performed.
@@ -195,18 +164,6 @@ sintn CID_string_to_bytes(const charn * const opcn_String, uint8 * const opu8_By
    \return
    C_NO_ERR   converted company-id
    C_CONFIG   invalid length
-
-   \created     25.04.2008  STW/A.Stangl
-
-   \internal
-   \history
-   Date(dd.mm.yyyy)  Author        Description
-   15.04.2014        STW/A.Stangl  code is now endian-safe
-   03.11.2008        STW/A.Stangl  Rewritten: now plain ANSI-C
-   27.10.2008        STW/A.Stangl  3 char IDs: range is A..Z/1..6 not A..Z/0..5
-                                    (decided in big Comp-ID meeting on 24.10.2008)
-   25.04.2008        STW/A.Stangl  function created
-   \endhistory
 */
 //-----------------------------------------------------------------------------
 sintn CID_bytes_to_string(const uint8 * const opu8_Bytes, const uint8 ou8_NumBytes, charn * const opcn_String)
@@ -259,7 +216,6 @@ sintn CID_bytes_to_string(const uint8 * const opu8_Bytes, const uint8 ou8_NumByt
    }
    return sn_Return;
 }
-
 
 //-----------------------------------------------------------------------------
 

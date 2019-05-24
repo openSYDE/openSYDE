@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Header for C_CAN base class.
 
    Header to an abstract base class for interfacing with different CAN communication driver architectures.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.05.2010  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2010 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CCANBASEH
 #define CCANBASEH
 
-/* -- Includes ------------------------------------------------------------ */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 #include "stw_can.h"
 
@@ -26,7 +20,7 @@
 namespace stw_can
 {
 
-/* -- Defines ------------------------------------------------------------- */
+/* -- Defines ------------------------------------------------------------------------------------------------------- */
 #ifndef STWCAN_PACKAGE
 #ifdef __BORLANDC__
 //maybe we want this module to be put into a VCL package ...
@@ -36,7 +30,7 @@ namespace stw_can
 #endif
 #endif
 
-/* -- Types --------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 ///Abstract base class defining fundamental interface for all CAN drivers
 //lint -sem(stw_can::C_CAN_Base::m_InitClassBase,initializer)
 class STWCAN_PACKAGE C_CAN_Base
@@ -165,11 +159,11 @@ public:
    bool GetXTDAvailable(void) const;
 };
 
-/* -- Global Variables ---------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Function Prototypes ------------------------------------------------- */
+/* -- Function Prototypes ------------------------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------ */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 }
 

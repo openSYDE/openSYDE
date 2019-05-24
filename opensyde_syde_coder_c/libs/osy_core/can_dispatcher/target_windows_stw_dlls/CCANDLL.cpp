@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       C_CAN_DLL class implementation.
 
@@ -12,17 +11,11 @@
    The public functions are directly rerouted to the corresponding DLL functions.
    A return value of STWERRORS::C_NOACT signals that the requested function is not available in the loaded DLL.
 
-   For a detailled description of the underlying DLL-functions cf. the STW-comm-DLL specification.
+   For a detailed description of the underlying DLL-functions cf. the STW-comm-DLL specification.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-200x
-   license     use only under terms of contract / confidential
-
-   created     xx.xx.200x  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2008 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h" //pre-compiled headers

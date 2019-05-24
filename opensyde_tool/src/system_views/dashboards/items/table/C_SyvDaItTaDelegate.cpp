@@ -1,72 +1,63 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Table drawing delegate for dashboard table widget (implementation)
 
    Table drawing delegate for dashboard table widget
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     29.08.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
+
+#include <QSvgRenderer>
 
 #include "stwtypes.h"
 #include "constants.h"
+#include "C_SyvDaItTaModel.h"
 #include "C_SdNdeDataPoolUtil.h"
 #include "C_SyvDaItTaDelegate.h"
+#include "C_TblTreDelegateUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     29.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItTaDelegate::C_SyvDaItTaDelegate(QObject * const opc_Parent) :
    QStyledItemDelegate(opc_Parent)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply style
 
    \param[in] oe_Style    New style type
    \param[in] oq_DarkMode Flag if dark mode is active
-
-   \created     29.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaDelegate::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode)
 {
    switch (oe_Style)
@@ -151,19 +142,16 @@ void C_SyvDaItTaDelegate::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paint item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paint item
 
    Here: special handling for bar column
 
    \param[in,out] opc_Painter Painter
    \param[in]     orc_Option  Option
    \param[in]     orc_Index   Index
-
-   \created     29.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItTaDelegate::paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
                                 const QModelIndex & orc_Index) const
 {
@@ -173,7 +161,8 @@ void C_SyvDaItTaDelegate::paint(QPainter * const opc_Painter, const QStyleOption
                                                      this->mc_BackgroundColorSelection);
    //Draw element
    QStyledItemDelegate::paint(opc_Painter, orc_Option, orc_Index);
-   if (orc_Index.column() == 3)
+   // progress bar
+   if (orc_Index.column() == C_SyvDaItTaModel::h_EnumToColumn(C_SyvDaItTaModel::eBAR))
    {
       //Padding
       const sintn sn_OffsetX = 7;
@@ -193,5 +182,9 @@ void C_SyvDaItTaDelegate::paint(QPainter * const opc_Painter, const QStyleOption
       opc_Painter->drawRect(c_RectBar);
       opc_Painter->restore();
    }
+
+   // icon
+   C_TblTreDelegateUtil::h_PaintIcon(opc_Painter, orc_Option, orc_Index);
+
    //TODO draw hover border
 }

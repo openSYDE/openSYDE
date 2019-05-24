@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Common scene utility functions (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QFile>
@@ -24,34 +17,31 @@
 #include "stwtypes.h"
 #include "C_SebUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get highest parent
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get highest parent
 
    \param[in,out] opc_Item Item to get highest parent from
 
    \return
    Highest parent
-
-   \created     13.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QGraphicsItem * C_SebUtil::h_GetHighestParent(QGraphicsItem * const opc_Item)
 {
    QGraphicsItem * pc_Parent;
@@ -78,18 +68,15 @@ QGraphicsItem * C_SebUtil::h_GetHighestParent(QGraphicsItem * const opc_Item)
    return pc_ReturnItem;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get highest parent
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get highest parent
 
    \param[in,out] opc_Item Item to get highest parent from
 
    \return
    Highest parent
-
-   \created     13.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const QGraphicsItem * C_SebUtil::h_GetHighestParent(const QGraphicsItem * const opc_Item)
 {
    const QGraphicsItem * pc_Parent;
@@ -116,9 +103,8 @@ const QGraphicsItem * C_SebUtil::h_GetHighestParent(const QGraphicsItem * const 
    return pc_ReturnItem;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checks the file for existence of the file and file format
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks the file for existence of the file and file format
 
    Supported image formats:
    - jpg
@@ -130,10 +116,8 @@ const QGraphicsItem * C_SebUtil::h_GetHighestParent(const QGraphicsItem * const 
 
    \return
    true     File exist and is an image
-
-   \created     08.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SebUtil::h_CheckFilePathForImage(QString & orc_FilePath)
 {
    bool q_Return = false;
@@ -159,16 +143,13 @@ bool C_SebUtil::h_CheckFilePathForImage(QString & orc_FilePath)
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add offset for line item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add offset for line item
 
    \param[in] orc_LineBase Line base item to add offset for
    \param[in] orc_Offset   Offset for all items
-
-   \created     14.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUtil::h_AddLineOffset(C_PuiBsLineBase & orc_LineBase, const QPointF & orc_Offset)
 {
    for (uint32 u32_ItElem = 0; u32_ItElem < orc_LineBase.c_UIInteractionPoints.size(); ++u32_ItElem)
@@ -177,13 +158,10 @@ void C_SebUtil::h_AddLineOffset(C_PuiBsLineBase & orc_LineBase, const QPointF & 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     20.04.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUtil::C_SebUtil()
 {
 }

@@ -1,28 +1,23 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Max performance view (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     28.08.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_CAMMETTREEVIEW_H
 #define C_CAMMETTREEVIEW_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <mutex>
 #include <QTimer>
 #include <QThread>
 #include <QTreeView>
 #include <QAction>
+#include <QSortFilterProxyModel>
 
 #include "C_CamMetTreeModel.h"
 #include "C_CamMetTreeDelegate.h"
@@ -33,12 +28,12 @@
 #include "C_OgeTreeViewToolTipBase.h"
 #include "C_OgeContextMenu.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_CamMetTreeView :
    public stw_opensyde_gui_elements::C_OgeTreeViewToolTipBase,
@@ -84,6 +79,7 @@ private:
    std::mutex mc_MutexUpdate;
    QThread mc_ThreadGUIBuffer;
    QTimer mc_TimerHandleMessages;
+   QSortFilterProxyModel mc_SortProxyModel;
    stw_opensyde_gui_logic::C_CamMetTreeModel mc_Model;
    stw_opensyde_gui_logic::C_CamMetTreeDelegate mc_Delegate;
    stw_opensyde_gui_logic::C_CamMetTreeGUIBuffer mc_GUIBuffer;
@@ -94,6 +90,8 @@ private:
    QAction * mpc_ActionExpandAll;
    QAction * mpc_ActionCollapseAll;
    bool mq_UniqueMessageMode;
+   bool mq_IsRunning;
+   const bool mq_AllowSorting;
 
    void m_SetupContextMenu(void);
    void m_OnCustomContextMenuRequested(const QPoint & orc_Pos);
@@ -112,9 +110,10 @@ private:
    std::vector<stw_types::sint32> m_GetCurrentColumnPositionIndices(void) const;
    void m_SetColumnPositionIndices(const std::vector<stw_types::sint32> & orc_NewColPositionIndices);
    bool m_ColumnsSortedAsExpected(const std::vector<stw_types::sint32> & orc_NewColPositionIndices) const;
+   void m_HandleSorting(void);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

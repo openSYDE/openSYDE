@@ -1,3 +1,13 @@
+//----------------------------------------------------------------------------------------------------------------------
+/*!
+   \file
+   \brief       Translate L2 CAN message to L7 interpretation
+
+   Translate L2 CAN message to KEFEX protocol L7 interpretation
+
+   \copyright   Copyright 2003 Sensor-Technik Wiedemann GmbH. All rights reserved.
+*/
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CCMONProtocolKEFEXH
 #define CCMONProtocolKEFEXH
 

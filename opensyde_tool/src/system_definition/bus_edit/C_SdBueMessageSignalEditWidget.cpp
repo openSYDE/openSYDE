@@ -1,21 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for editing messages and / or signals
 
    Widget for editing messages and / or signals
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.03.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwerrors.h"
@@ -25,36 +19,33 @@
 #include "ui_C_SdBueMessageSignalEditWidget.h"
 #include "C_GtGetText.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     24.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageSignalEditWidget::C_SdBueMessageSignalEditWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueMessageSignalEditWidget)
@@ -113,15 +104,12 @@ C_SdBueMessageSignalEditWidget::C_SdBueMessageSignalEditWidget(QWidget * const o
            &C_SdBueMessageSignalEditWidget::SigDeleteSignal);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     24.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageSignalEditWidget::~C_SdBueMessageSignalEditWidget(void)
 {
    //Store splitter position
@@ -139,15 +127,12 @@ C_SdBueMessageSignalEditWidget::~C_SdBueMessageSignalEditWidget(void)
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set message sync manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set message sync manager
 
    \param[in,out] opc_Value Message sync manager
-
-   \created     25.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::SetMessageSyncManager(
    stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value) const
 {
@@ -156,15 +141,12 @@ void C_SdBueMessageSignalEditWidget::SetMessageSyncManager(
    this->mpc_Ui->pc_MsgLayoutViewerWidget->SetMessageSyncManager(opc_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set new com protocol
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new com protocol
 
    \param[in] ore_Value New value
-
-   \created     26.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::SetComProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Value) const
 {
    this->mpc_Ui->pc_MsgPropertiesWidget->SetComProtocol(ore_Value);
@@ -172,15 +154,12 @@ void C_SdBueMessageSignalEditWidget::SetComProtocol(const stw_opensyde_core::C_O
    this->mpc_Ui->pc_MsgLayoutViewerWidget->SetComProtocol(ore_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Select message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Select message
 
    \param[in] orc_MessageId Message identification indices
-
-   \created     21.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::SelectMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId) const
 {
    this->mpc_Ui->pc_MsgLayoutViewerWidget->SelectMessage(orc_MessageId);
@@ -191,16 +170,13 @@ void C_SdBueMessageSignalEditWidget::SelectMessage(const C_OSCCanMessageIdentifi
    this->mpc_Ui->pc_MsgPropertiesWidget->SetMessageId(orc_MessageId);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Select signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Select signal
 
    \param[in] orc_MessageId     Message identification indices
    \param[in] oru32_SignalIndex Signal index
-
-   \created     21.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::SelectSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                   const uint32 & oru32_SignalIndex) const
 {
@@ -212,43 +188,34 @@ void C_SdBueMessageSignalEditWidget::SelectSignal(const C_OSCCanMessageIdentific
    this->mpc_Ui->pc_SigPropertiesWidget->SetSignalId(orc_MessageId, oru32_SignalIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the node 'mode' of the widget with all necessary indexes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the node 'mode' of the widget with all necessary indexes
 
    \param[in] ou32_NodeIndex      Node index
    \param[in] ou32_InterfaceIndex Interface index
-
-   \created     25.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::SetNodeDataPool(const stw_types::uint32 ou32_NodeIndex,
                                                      const stw_types::uint32 ou32_InterfaceIndex) const
 {
    this->mpc_Ui->pc_MsgPropertiesWidget->SetNodeDataPool(ou32_NodeIndex, ou32_InterfaceIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the bus 'mode' of the widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the bus 'mode' of the widget
 
    \param[in] ou32_BusIndex Bus index
-
-   \created     25.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::SetBusId(const uint32 ou32_BusIndex) const
 {
    this->mpc_Ui->pc_MsgPropertiesWidget->SetBusId(ou32_BusIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle connection change
-
-   \created     26.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle connection change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::OnConnectionChange(void) const
 {
    //Only relevant if visible
@@ -258,15 +225,12 @@ void C_SdBueMessageSignalEditWidget::OnConnectionChange(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On change of signal count in message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On change of signal count in message
 
    \param[in] orc_MessageId Message identification indices
-
-   \created     26.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::OnSignalCountOfMessageChanged(
    const C_OSCCanMessageIdentificationIndices & orc_MessageId) const
 {
@@ -290,26 +254,20 @@ void C_SdBueMessageSignalEditWidget::OnSignalCountOfMessageChanged(
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     04.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_SignalLabel->setText(C_GtGetText::h_GetText("Signal Properties"));
    this->mpc_Ui->pc_MessageLabel->setText(C_GtGetText::h_GetText("Message Properties"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Selecting the name of the actual element
-
-   \created     08.06.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Selecting the name of the actual element
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::SelectName(void) const
 {
    if (this->isVisible() == true)
@@ -329,18 +287,15 @@ void C_SdBueMessageSignalEditWidget::SelectName(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get last selection info
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get last selection info
 
    \param[out] orq_MessageSelected Set flag if there is a selected message
    \param[out] orc_MessageName     Selected message name if any
    \param[out] orq_SignalSelected  Flag if signal selected
    \param[out] orc_SignalName      Selected signal name if any
-
-   \created     27.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::GetLastSelection(bool & orq_MessageSelected, QString & orc_MessageName,
                                                       bool & orq_SignalSelected, QString & orc_SignalName) const
 {
@@ -377,17 +332,14 @@ void C_SdBueMessageSignalEditWidget::GetLastSelection(bool & orq_MessageSelected
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten show event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten show event slot
 
    Here: Load splitter position
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     22.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::showEvent(QShowEvent * const opc_Event)
 {
    const sint32 s32_FirstSegmentWidth = C_UsHandler::h_GetInstance()->GetSdBusEditLayoutSplitterX();
@@ -396,67 +348,52 @@ void C_SdBueMessageSignalEditWidget::showEvent(QShowEvent * const opc_Event)
    QWidget::showEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Any message id is invalid
-
-   \created     25.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Any message id is invalid
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::m_OnMessageIdChange(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 {
    this->mpc_Ui->pc_MsgLayoutViewerWidget->SelectMessage(orc_MessageId);
    Q_EMIT this->SigMessageIdChanged();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   The specified message data was changed
-
-   \created     25.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   The specified message data was changed
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::m_OnMessageNameChange(void)
 {
    Q_EMIT this->SigMessageNameChanged();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   The specified message data was changed
-
-   \created     26.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   The specified message data was changed
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::m_OnMessageDlcChange(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 const
 {
    this->mpc_Ui->pc_MsgLayoutViewerWidget->SelectMessage(orc_MessageId);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On change of signal position in message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On change of signal position in message
 
    \param[in] orc_MessageId Message identification indices
    \param[in] ou32_SignalIndex   Index of signal of message
-
-   \created     27.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::m_OnSignalUpdatedViaProperties(
    const C_OSCCanMessageIdentificationIndices & orc_MessageId, const uint32 ou32_SignalIndex) const
 {
    this->mpc_Ui->pc_MsgLayoutViewerWidget->SelectSignal(orc_MessageId, ou32_SignalIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On change of signal position in message
-
-   \created     27.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On change of signal position in message
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::m_OnSignalUpdatedViaSelector(void)
 {
    C_OSCCanMessageIdentificationIndices c_MessageId;
@@ -471,15 +408,12 @@ void C_SdBueMessageSignalEditWidget::m_OnSignalUpdatedViaSelector(void)
    Q_EMIT this->SigChanged();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On change of active signal via selector widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On change of active signal via selector widget
 
    \param[in] ou32_SignalIndex Active signal index
-
-   \created     27.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::m_OnSignalActivated(const uint32 ou32_SignalIndex)
 {
    C_OSCCanMessageIdentificationIndices c_MessageId;
@@ -490,16 +424,13 @@ void C_SdBueMessageSignalEditWidget::m_OnSignalActivated(const uint32 ou32_Signa
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On change of signal name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On change of signal name
 
    \param[in] orc_MessageId      Message identification indices
    \param[in] ou32_SignalIndex   Index of signal of message
-
-   \created     27.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::m_OnSignalNameChanged(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                            const uint32 ou32_SignalIndex)
 {
@@ -507,16 +438,13 @@ void C_SdBueMessageSignalEditWidget::m_OnSignalNameChanged(const C_OSCCanMessage
    Q_EMIT this->SigSignalNameChanged(orc_MessageId);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On change of signal name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On change of signal name
 
    \param[in] orc_MessageId Message identification indices
    \param[in] ou32_SignalIndex   Index of signal of message
-
-   \created     08.06.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::m_OnSignalTypeChanged(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                            const uint32 ou32_SignalIndex)
 const
@@ -525,41 +453,32 @@ const
    this->mpc_Ui->pc_MsgLayoutViewerWidget->SelectSignal(orc_MessageId, ou32_SignalIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger global error check (icons only)
-
-   \created     28.04.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger global error check (icons only)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::m_RecheckErrorGlobal(void)
 {
    Q_EMIT this->SigRecheckErrorGlobal();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger recheck of error values for tree
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger recheck of error values for tree
 
    \param[in] orc_MessageId Message identification indices
-
-   \created     28.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::m_RecheckError(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 {
    Q_EMIT this->SigRecheckError(orc_MessageId);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current active message id
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current active message id
 
    \param[out] orc_MessageId Message identification indices
-
-   \created     02.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueMessageSignalEditWidget::m_GetMessageId(C_OSCCanMessageIdentificationIndices & orc_MessageId) const
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -584,13 +503,10 @@ sint32 C_SdBueMessageSignalEditWidget::m_GetMessageId(C_OSCCanMessageIdentificat
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register any change
-
-   \created     09.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register any change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::m_OnChange(void)
 {
    Q_EMIT this->SigChanged();

@@ -1,23 +1,16 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       C_CAN class implementation.
 
    CAN driver class providing an API interface for CAN access under
    Windows using the STW CAN DLL drivers.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     xx.xx.2002  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2002 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h" //pre-compiled headers
 
 #ifdef __BORLANDC__ //putting the pragmas in the config-header will not work
@@ -34,24 +27,24 @@
 #include "TGLTime.h"
 #include "TGLUtils.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_can;
 using namespace stw_scl;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 C_CAN::C_CAN(const uint8 ou8_CommChannel) :
    C_CAN_Dispatcher(ou8_CommChannel),
@@ -62,7 +55,7 @@ C_CAN::C_CAN(const uint8 ou8_CommChannel) :
 {
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_CAN::C_CAN(void) :
    C_CAN_Dispatcher(),
@@ -73,7 +66,7 @@ C_CAN::C_CAN(void) :
 {
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //sequence of shutting down: 1. close can; 2. close DLL; 3. delete instance
 C_CAN::~C_CAN(void)
 {
@@ -100,7 +93,7 @@ C_CAN::~C_CAN(void)
    }
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN::CAN_DLL_Info(STW_CAN_DLL_INFO & orc_Info) const
 {
@@ -120,9 +113,8 @@ sint32 C_CAN::CAN_DLL_Info(STW_CAN_DLL_INFO & orc_Info) const
    return mpc_CAN->CANext_DLL_Info(mu8_CommChannel, orc_Info);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Close CAN bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Close CAN bus
 
    Will invoke DLL's "CAN_Exit" function.
 
@@ -134,7 +126,7 @@ sint32 C_CAN::CAN_DLL_Info(STW_CAN_DLL_INFO & orc_Info) const
    CAN_COMP_ERR_DLL_NOT_OPENED       DLL was not yet loaded
    C_CONFIG                          channel other than 0 configured but not supported by loaded DLL
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CAN::CAN_Exit(void)
 {
    sint32 s32_Return;
@@ -161,9 +153,8 @@ sint32 C_CAN::CAN_Exit(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reset CAN bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reset CAN bus
 
    Will invoke DLL's "CAN_Reset" function.
 
@@ -176,7 +167,7 @@ sint32 C_CAN::CAN_Exit(void)
    CAN_COMP_ERR_DLL_NOT_OPENED       DLL was not yet loaded
    C_CONFIG                          channel other than 0 configured but not supported by loaded DLL
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CAN::CAN_Reset(void)
 {
    if ((mq_DLLOpened == false) || (mpc_CAN == NULL))
@@ -196,9 +187,8 @@ sint32 C_CAN::CAN_Reset(void)
    return mpc_CAN->CANext_Init(mu8_CommChannel);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize CAN bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize CAN bus
 
    Depending on availability the "Ext" or regular DLL functions are used ("Ext" has priority).
    Will use the DLL's "Init" function for initialization.
@@ -211,7 +201,7 @@ sint32 C_CAN::CAN_Reset(void)
    CAN_COMP_ERR_DLL_NOT_OPENED       DLL was not yet loaded
    C_CONFIG                          channel other than 0 configured but not supported by loaded DLL
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CAN::CAN_Init(void)
 {
    sint32 s32_Return;
@@ -255,9 +245,8 @@ sint32 C_CAN::CAN_Init(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize CAN bus to specific bitrate
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize CAN bus to specific bitrate
 
    Depending on availability the "Ext" or regular DLL functions are used ("Ext" has priority).
    Will use the DLL's "CAN_Bitrate" function for initialization.
@@ -272,7 +261,7 @@ sint32 C_CAN::CAN_Init(void)
    CAN_COMP_ERR_DLL_NOT_OPENED       DLL was not yet loaded
    C_CONFIG                          channel other than 0 configured but not supported by loaded DLL
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CAN::CAN_Init(const sint32 os32_BitrateKBitS)
 {
    sint32 s32_Return;
@@ -315,9 +304,8 @@ sint32 C_CAN::CAN_Init(const sint32 os32_BitrateKBitS)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show DLL's configuration dialog
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show DLL's configuration dialog
 
    Depending on availability the "Ext" or regular DLL functions are used ("Ext" has priority).
    Execute's the DLL's blocking configuration dialog.
@@ -333,7 +321,7 @@ sint32 C_CAN::CAN_Init(const sint32 os32_BitrateKBitS)
    CAN_COMP_ERR_DLL_NOT_OPENED       DLL was not yet loaded
    C_CONFIG                          channel other than 0 configured but not supported by loaded DLL
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CAN::CAN_InteractiveSetup(void) const
 {
    if ((mq_DLLOpened == false) || (mpc_CAN == NULL))
@@ -352,7 +340,7 @@ sint32 C_CAN::CAN_InteractiveSetup(void) const
    return mpc_CAN->CAN_InterfaceSetup(NULL);
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN::m_SendMsgToDLL(const T_STWCAN_Msg_TX & orc_Message) const
 {
@@ -400,7 +388,7 @@ sint32 C_CAN::m_SendMsgToDLL(const T_STWCAN_Msg_TX & orc_Message) const
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN::m_ReadMsgFromDLL(T_STWCAN_Msg_RX & orc_Message) const
 {
@@ -449,9 +437,8 @@ sint32 C_CAN::m_ReadMsgFromDLL(T_STWCAN_Msg_RX & orc_Message) const
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Send CAN message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Send CAN message
 
    Send one CAN message using the DLL functions.
    Depending on availability the "Ext" or regular DLL functions are used ("Ext" has priority).
@@ -464,7 +451,7 @@ sint32 C_CAN::m_ReadMsgFromDLL(T_STWCAN_Msg_RX & orc_Message) const
    CAN_COMP_ERR_DLL_NOT_OPENED       DLL was not yet loaded
    C_CONFIG                          channel other than 0 configured but not supported by loaded DLL
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CAN::CAN_Send_Msg(const T_STWCAN_Msg_TX & orc_Message)
 {
    if ((mq_DLLOpened == false) || (mpc_CAN == NULL))
@@ -478,9 +465,8 @@ sint32 C_CAN::CAN_Send_Msg(const T_STWCAN_Msg_TX & orc_Message)
    return m_SendMsgToDLL(orc_Message);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Read CAN message
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read CAN message
 
    Read one CAN message using the DLL functions.
    Depending on availability the "Ext" or regular DLL functions are used ("Ext" has priority).
@@ -493,7 +479,7 @@ sint32 C_CAN::CAN_Send_Msg(const T_STWCAN_Msg_TX & orc_Message)
    CAN_COMP_ERR_DLL_NOT_OPENED       DLL was not yet loaded
    C_CONFIG                          channel other than 0 configured but not supported by loaded DLL
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CAN::m_CAN_Read_Msg(T_STWCAN_Msg_RX & orc_Message)
 {
    if ((mq_DLLOpened == false) || (mpc_CAN == NULL))
@@ -508,7 +494,7 @@ sint32 C_CAN::m_CAN_Read_Msg(T_STWCAN_Msg_RX & orc_Message)
    return m_ReadMsgFromDLL(orc_Message);
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN::CAN_Read_Msg_Timeout(const uint32 ou32_MaxWaitTimeMS, T_STWCAN_Msg_RX & orc_Message) const
 {
@@ -535,9 +521,8 @@ sint32 C_CAN::CAN_Read_Msg_Timeout(const uint32 ou32_MaxWaitTimeMS, T_STWCAN_Msg
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get DLL's opinion about system time
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get DLL's opinion about system time
 
    Will invoke DLL's "Get_System_Time" function.
 
@@ -552,7 +537,7 @@ sint32 C_CAN::CAN_Read_Msg_Timeout(const uint32 ou32_MaxWaitTimeMS, T_STWCAN_Msg
    CAN_COMP_ERR_DLL_NOT_OPENED       DLL was not yet loaded
    C_CONFIG                          channel other than 0 configured but not supported by loaded DLL
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CAN::CAN_Get_System_Time(uint64 & oru64_SystemTimeUs) const
 {
    if ((mq_DLLOpened == false) || (mpc_CAN == NULL))
@@ -568,7 +553,7 @@ sint32 C_CAN::CAN_Get_System_Time(uint64 & oru64_SystemTimeUs) const
    return C_NO_ERR;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN::CAN_Get_Supported_Bitrates(C_SCLString & orc_Unit, SCLDynamicArray<uint32> & orc_Bitrates,
                                          uint32 & oru32_MultiplicationFactor) const
@@ -626,7 +611,7 @@ sint32 C_CAN::CAN_Get_Supported_Bitrates(C_SCLString & orc_Unit, SCLDynamicArray
    return C_NO_ERR;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN::CAN_Status(T_STWCAN_Status & orc_Status) const
 {
@@ -646,7 +631,7 @@ sint32 C_CAN::CAN_Status(T_STWCAN_Status & orc_Status) const
    return mpc_CAN->CANext_Status(mu8_CommChannel, orc_Status);
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN::DLL_Close(void)
 {
@@ -666,7 +651,7 @@ sint32 C_CAN::DLL_Close(void)
    return CAN_COMP_ERR_DLL_ALREADY_CLOSED;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN::DLL_Open(void)
 {
@@ -709,7 +694,7 @@ sint32 C_CAN::DLL_Open(void)
    return C_NO_ERR;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN::DLL_Open(const C_SCLString & orc_FileName)
 {
@@ -717,7 +702,7 @@ sint32 C_CAN::DLL_Open(const C_SCLString & orc_FileName)
    return DLL_Open();
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN::CANTAPI_Connect(const uint8 * const opu8_Number, const uint32 ou32_TimeOut)
 {
@@ -736,7 +721,7 @@ sint32 C_CAN::CANTAPI_Connect(const uint8 * const opu8_Number, const uint32 ou32
    return C_NO_ERR;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN::CANTAPI_Disconnect(const uint32 ou32_TimeOut)
 {
@@ -748,7 +733,7 @@ sint32 C_CAN::CANTAPI_Disconnect(const uint32 ou32_TimeOut)
    return mpc_CAN->CANTAPI_Disconnect(ou32_TimeOut);
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN::SER_Get_TX_Buf_Count(uint32 & oru32_NumBytes, uint32 & oru32_MaxBufSize) const
 {
@@ -759,7 +744,7 @@ sint32 C_CAN::SER_Get_TX_Buf_Count(uint32 & oru32_NumBytes, uint32 & oru32_MaxBu
    return mpc_CAN->SER_Get_TX_Buf_Count(oru32_NumBytes, oru32_MaxBufSize);
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN::SER_Send_Bytes(const uint8 * const opu8_Data, const uint32 ou32_NumBytes)
 {
@@ -770,7 +755,7 @@ sint32 C_CAN::SER_Send_Bytes(const uint8 * const opu8_Data, const uint32 ou32_Nu
    return mpc_CAN->SER_Send_Bytes(opu8_Data, ou32_NumBytes);
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN::SER_Get_RX_Buf_Count(uint32 & oru32_NumBytes, uint32 & oru32_MaxBufSize) const
 {
@@ -781,7 +766,7 @@ sint32 C_CAN::SER_Get_RX_Buf_Count(uint32 & oru32_NumBytes, uint32 & oru32_MaxBu
    return mpc_CAN->SER_Get_RX_Buf_Count(oru32_NumBytes, oru32_MaxBufSize);
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_CAN::SER_Read_Bytes(uint8 * const opu8_Data, uint32 & oru32_NumBytes)
 {
@@ -792,32 +777,32 @@ sint32 C_CAN::SER_Read_Bytes(uint8 * const opu8_Data, uint32 & oru32_NumBytes)
    return mpc_CAN->SER_Read_Bytes(opu8_Data, oru32_NumBytes);
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_CAN::SetDLLName(const C_SCLString & orc_DLLName)
 {
    mc_DLLName = orc_DLLName;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_CAN::GetDLLName(void) const
 {
    return mc_DLLName;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_CAN::SetLimitRXID(const uint32 ou32_LimitRXID)
 {
    mu32_RXID = ou32_LimitRXID;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 uint32 C_CAN::GetLimitRXID(void) const
 {
    return mu32_RXID;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------

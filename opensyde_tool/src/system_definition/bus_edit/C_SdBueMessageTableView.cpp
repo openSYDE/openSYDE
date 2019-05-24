@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Message table view (implementation)
 
    Message table view
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     03.05.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QHeaderView>
@@ -30,36 +23,33 @@
 #include "C_SdNdeSingleHeaderView.h"
 #include "constants.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     03.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageTableView::C_SdBueMessageTableView(QWidget * const opc_Parent) :
    //Do not use common base class because of spacing issue at bottom
    QTableView(opc_Parent)
@@ -127,73 +117,58 @@ C_SdBueMessageTableView::C_SdBueMessageTableView(QWidget * const opc_Parent) :
            &C_SdBueMessageTableView::m_ScrollBarRangeChanged);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     07.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageTableView::~C_SdBueMessageTableView(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set message sync manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set message sync manager
 
    \param[in,out] opc_Value Message sync manager
-
-   \created     03.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageTableView::SetMessageSyncManager(
    stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value)
 {
    this->mc_Model.SetMessageSyncManager(opc_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal data changes to table
-
-   \created     03.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal data changes to table
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageTableView::UpdateData(void)
 {
    this->mc_Model.UpdateData();
    this->sortByColumn(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eINDEX), Qt::AscendingOrder);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the number of rows
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the number of rows
 
    \return
    Count of items in table
-
-   \created     07.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SdBueMessageTableView::GetCountRows(void) const
 {
    return this->mc_Model.rowCount();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse move event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse move event slot
 
    Here: Track mouse hover
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     05.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageTableView::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
    sint32 s32_HoveredRow = -1;
@@ -211,17 +186,14 @@ void C_SdBueMessageTableView::mouseMoveEvent(QMouseEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse leave event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse leave event slot
 
    Here: Handle hover effect change
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     18.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageTableView::leaveEvent(QEvent * const opc_Event)
 {
    QTableView::leaveEvent(opc_Event);
@@ -231,17 +203,14 @@ void C_SdBueMessageTableView::leaveEvent(QEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse double click event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse double click event slot
 
    Here: Send selection signal
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     05.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageTableView::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
 {
    const QModelIndex c_ClickedIndexProxy = this->indexAt(opc_Event->pos());
@@ -261,7 +230,7 @@ void C_SdBueMessageTableView::mouseDoubleClickEvent(QMouseEvent * const opc_Even
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageTableView::m_ScrollBarRangeChanged(const sintn osn_Min, const sintn osn_Max) const
 {
    // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar
@@ -275,13 +244,10 @@ void C_SdBueMessageTableView::m_ScrollBarRangeChanged(const sintn osn_Min, const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init default columns
-
-   \created     12.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init default columns
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageTableView::m_InitColumns(void)
 {
    this->setColumnWidth(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eINDEX), 40);

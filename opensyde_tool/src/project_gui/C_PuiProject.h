@@ -1,40 +1,34 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Complete project information (header)
 
    Complete project information (note: main module description should be in .cpp file)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     15.09.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_PUIPROJECT_H
 #define C_PUIPROJECT_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>
 #include "C_OSCProject.h"
 #include "stwtypes.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_PuiProject :
    public stw_opensyde_core::C_OSCProject
 {
 public:
-   stw_types::sint32 Save(const bool oq_ForceSaveAll = false);
-   stw_types::sint32 Load(void);
+   stw_types::sint32 Save(const bool oq_ForceSaveAll = false, const bool oq_UseDeprecatedFileFormatV2 = false);
+   stw_types::sint32 Load(stw_types::uint16 * const opu16_FileVersion);
    bool HasHashChanged(void) const;
    void SetPath(const QString & orc_Path);
    static QString h_GetDefaultPath(void);
@@ -62,10 +56,13 @@ private:
 
    stw_types::uint32 m_CalcHashProject(void) const;
    static void mh_AdaptProjectPathToSystemViews(const QString & orc_ProjectPath, QString & orc_SystemViewsPath);
+   static void mh_AdaptProjectPathToSystemViewsV1(const QString & orc_ProjectPath, QString & orc_SystemViewsPath);
+   static void mh_AdaptProjectPathToSystemDefinitionV2(const QString & orc_ProjectPath,
+                                                       QString & orc_SystemDefintionPath);
    void m_InitialProjectLoad(void);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

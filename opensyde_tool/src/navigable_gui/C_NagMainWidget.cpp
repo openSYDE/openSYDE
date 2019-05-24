@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for main start view with use case buttons
 
    This widget is designed in a ui file.
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.07.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
@@ -44,7 +37,7 @@
 #include "C_OSCProjectFiler.h"
 #include "C_Uti.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
@@ -52,29 +45,26 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     06.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_NagMainWidget::C_NagMainWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_NagMainWidget)
@@ -102,31 +92,25 @@ C_NagMainWidget::C_NagMainWidget(QWidget * const opc_Parent) :
    connect(this->mpc_Ui->pc_TableView, &C_PopFileTableView::clicked, this, &C_NagMainWidget::m_OnIndexClicked);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     06.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_NagMainWidget::~C_NagMainWidget()
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overrided paint event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overrided paint event
 
    Draws the background element
 
    \param[in,out] opc_Event  Pointer to paint event
-
-   \created     06.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::paintEvent(QPaintEvent * const opc_Event)
 {
    QPainter c_Painter(this);
@@ -141,17 +125,14 @@ void C_NagMainWidget::paintEvent(QPaintEvent * const opc_Event)
    QWidget::paintEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle edit leave
 
    \param[in,out] opc_Event   Event identification and information
-
-   \created     22.08.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::keyPressEvent(QKeyEvent * const opc_Event)
 {
    if ((opc_Event->key() == static_cast<sintn>(Qt::Key_Escape)) &&
@@ -170,17 +151,19 @@ void C_NagMainWidget::keyPressEvent(QKeyEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initializes all visible strings on the widget
-
-   \created     07.07.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initializes all visible strings on the widget
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::InitText(void) const
 {
+   QString c_String;
+
+   //fake padding with Spaces.
+   c_String = "    ";
+   c_String.append(C_GtGetText::h_GetText("SYSTEM DEFINITION"));
+   this->mpc_Ui->pc_BtnSysDef->setText(c_String);
    this->mpc_Ui->pc_BtnSysView->setText(C_GtGetText::h_GetText("SYSTEM COMMISSIONING"));
-   this->mpc_Ui->pc_BtnSysDef->setText(C_GtGetText::h_GetText("SYSTEM DEFINITION"));
    this->mpc_Ui->pc_BtnAbout->setText(C_GtGetText::h_GetText("About"));
    this->mpc_Ui->pc_BtnNewProj->setText(C_GtGetText::h_GetText("New Project"));
    this->mpc_Ui->pc_BtnOpenProj->setText(C_GtGetText::h_GetText("Open Project"));
@@ -218,13 +201,10 @@ void C_NagMainWidget::InitText(void) const
                                                       "number gets saved on next project save."));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initializes paths of disabled icons.
-
-   \created     25.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initializes paths of disabled icons.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::m_InitIcons(void) const
 {
    // modes
@@ -251,13 +231,10 @@ void C_NagMainWidget::m_InitIcons(void) const
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_BtnAbout, "NoIcon", true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize GUI elements.
-
-   \created     27.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize GUI elements.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::m_InitGUIElements(void) const
 {
    // stw logo
@@ -299,40 +276,30 @@ void C_NagMainWidget::m_InitGUIElements(void) const
    this->mpc_Ui->pc_LineEditVersion->setVisible(false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot function for updating current project informations.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for updating current project informations.
 
    Update project name, project version and tooltip content.
-
-   \created     30.07.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::m_UpdateCurrProjInfo(void)
 {
+   const QFont c_Font = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_SEMIBOLD_24);
+   const QFontMetrics c_FontMetrics(c_Font);
    const QString c_Name = C_PuiProject::h_GetInstance()->GetName();
 
    if (c_Name.compare("") != 0)
    {
-      QFont c_Font = mc_STYLE_GUIDE_FONT_SEMIBOLD_24;
-      c_Font.setPixelSize(c_Font.pointSize());
-      QFontMetrics c_FontMetrics(c_Font);
+      //Current project
+      const QString c_TooltipContent =
+         QString(C_GtGetText::h_GetText(
+                    "Author: %1 \nCreated: %2 \nLast Modified: %3 (by %4) \nUsed openSYDE version: %5")).
+         arg(C_PuiProject::h_GetInstance()->c_Author.c_str()).
+         arg(C_PuiProject::h_GetTimeFormatted(C_PuiProject::h_GetInstance()->c_CreationTime).c_str()).
+         arg(C_PuiProject::h_GetTimeFormatted(C_PuiProject::h_GetInstance()->c_ModificationTime).c_str()).
+         arg(C_PuiProject::h_GetInstance()->c_Editor.c_str()).
+         arg(C_Uti::h_ConvertVersionToSTWStyle(C_PuiProject::h_GetInstance()->c_OpenSYDEVersion.c_str()));
 
-      QString c_TooltipContent = QString(
-         C_GtGetText::h_GetText("Author: %1 \nCreated: %2 \nLast Modified: %3 \nUsed openSYDE version: %4")).
-                                 arg(C_PuiProject::h_GetInstance()->c_Author.c_str()).
-                                 arg(C_PuiProject::h_GetTimeFormatted(
-                                        C_PuiProject::h_GetInstance()->c_CreationTime).c_str()).
-                                 arg(C_PuiProject::h_GetTimeFormatted(
-                                        C_PuiProject::h_GetInstance()->c_ModificationTime).c_str()).
-                                 arg(C_Uti::h_ConvertVersionToSTWStyle(
-                                        C_PuiProject::h_GetInstance()->c_OpenSYDEVersion.c_str()));
-      this->mpc_Ui->pc_LabelVersion->setText(c_FontMetrics.elidedText(
-                                                C_PuiProject::h_GetInstance()->c_Version.c_str(), Qt::ElideLeft,
-                                                120));
-      this->mpc_Ui->pc_LabelVersion->SetToolTipInformation(C_GtGetText::h_GetText("Project Version"),
-                                                           C_PuiProject::h_GetInstance()->c_Version.c_str());
-      this->mpc_Ui->pc_LineEditVersion->setText(C_PuiProject::h_GetInstance()->c_Version.c_str());
       this->mpc_Ui->pc_LabelCurProjName->setText(c_FontMetrics.elidedText(c_Name, Qt::ElideRight,
                                                                           this->mpc_Ui->pc_LabelCurProjName->
                                                                           maximumWidth()));
@@ -342,20 +309,25 @@ void C_NagMainWidget::m_UpdateCurrProjInfo(void)
    }
    else
    {
+      //New project
       this->mpc_Ui->pc_LabelCurProjName->setText(C_GtGetText::h_GetText("New project"));
-      this->mpc_Ui->pc_LabelVersion->setText("0.01r0b0");
-      this->mpc_Ui->pc_LabelCurProjName->SetToolTipInformation("New project", "This project is not yet saved.");
+      this->mpc_Ui->pc_LabelCurProjName->SetToolTipInformation(C_GtGetText::h_GetText(
+                                                                  "New project"),
+                                                               C_GtGetText::h_GetText("This project is not yet saved."));
       Q_EMIT (this->SigNewApplicationName(QString("openSYDE - ") + QString(C_GtGetText::h_GetText("New project"))));
    }
+   //Always use version from current project
+   this->mpc_Ui->pc_LabelVersion->setText(c_FontMetrics.elidedText(C_PuiProject::h_GetInstance()->c_Version.c_str(),
+                                                                   Qt::ElideLeft, 120));
+   this->mpc_Ui->pc_LabelVersion->SetToolTipInformation(C_GtGetText::h_GetText("Project Version"),
+                                                        C_PuiProject::h_GetInstance()->c_Version.c_str());
+   this->mpc_Ui->pc_LineEditVersion->setText(C_PuiProject::h_GetInstance()->c_Version.c_str());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot function for updating recent projects.
-
-   \created     31.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for updating recent projects.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::UpdateRecentProjects(void)
 {
    std::vector<QString> c_Files;
@@ -386,26 +358,20 @@ void C_NagMainWidget::UpdateRecentProjects(void)
    m_UpdateCurrProjInfo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot function for button system definition click
-
-   \created     07.07.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for button system definition click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::m_SysDefClicked()
 {
    Q_EMIT this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_TOPOLOGY, 0,
                               C_GtGetText::h_GetText("Network Topology"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot function for button system view click
-
-   \created     07.07.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for button system view click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::m_SysViewClicked()
 {
    QString c_SubMode;
@@ -416,13 +382,10 @@ void C_NagMainWidget::m_SysViewClicked()
    Q_EMIT this->SigChangeMode(ms32_MODE_SYSVIEW, ms32_SUBMODE_SYSVIEW_SETUP, 0, c_SubMode, c_SubSubMode);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot function for button settings click
-
-   \created     07.07.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for button settings click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::m_AboutClicked()
 {
    QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
@@ -440,13 +403,10 @@ void C_NagMainWidget::m_AboutClicked()
    //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot function for new project button click.
-
-   \created     26.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for new project button click.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::m_OnNewProj(void)
 {
    if (C_PopUtil::h_AskUserToContinue(this) == true)
@@ -461,13 +421,10 @@ void C_NagMainWidget::m_OnNewProj(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot function for open project button click.
-
-   \created     26.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for open project button click.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::m_OnOpenProj(void)
 {
    if (C_PopUtil::h_AskUserToContinue(this) == true)
@@ -490,25 +447,23 @@ void C_NagMainWidget::m_OnOpenProj(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Open a project.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Open a project.
 
    \param[in]     orc_FilePath      path to project file
-
-   \created     01.08.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::LoadProject(const QString & orc_FilePath)
 {
    if (orc_FilePath.compare("") != 0)
    {
+      uint16 u16_Version;
       stw_types::sint32 s32_Result;
 
       Q_EMIT this->SigBeforeOtherProjectLoad();
       C_PuiProject::h_GetInstance()->SetPath(orc_FilePath);
-      s32_Result = C_PuiProject::h_GetInstance()->Load();
-      C_PopErrorHandling::mh_ProjectLoadErr(s32_Result, C_PuiProject::h_GetInstance()->GetPath(), this);
+      s32_Result = C_PuiProject::h_GetInstance()->Load(&u16_Version);
+      C_PopErrorHandling::mh_ProjectLoadErr(s32_Result, C_PuiProject::h_GetInstance()->GetPath(), this, u16_Version);
 
       if (s32_Result == C_NO_ERR)
       {
@@ -540,10 +495,10 @@ void C_NagMainWidget::LoadProject(const QString & orc_FilePath)
             }
          }
 
-         s32_Result = C_PuiProject::h_GetInstance()->Load();
+         s32_Result = C_PuiProject::h_GetInstance()->Load(&u16_Version);
 
          // very unlikely, but the previous project could be corrupt -> check it and load empty project else
-         C_PopErrorHandling::mh_ProjectLoadErr(s32_Result, C_PuiProject::h_GetInstance()->GetPath(), this);
+         C_PopErrorHandling::mh_ProjectLoadErr(s32_Result, C_PuiProject::h_GetInstance()->GetPath(), this, u16_Version);
          if (s32_Result == C_NO_ERR)
          {
             C_UsHandler::h_GetInstance()->AddToRecentProjects(C_PuiProject::h_GetInstance()->GetPath());
@@ -561,13 +516,10 @@ void C_NagMainWidget::LoadProject(const QString & orc_FilePath)
    this->UpdateRecentProjects();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot function for save project as button click.
-
-   \created     26.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for save project as button click.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::OnSaveProjAs(void)
 {
    QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
@@ -585,13 +537,10 @@ void C_NagMainWidget::OnSaveProjAs(void)
    //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On edit action
-
-   \created     30.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On edit action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::m_OnEdit(void) const
 {
    this->mpc_Ui->pc_LabelVersion->setVisible(false);
@@ -601,13 +550,10 @@ void C_NagMainWidget::m_OnEdit(void) const
    this->mpc_Ui->pc_LineEditVersion->setFocus();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On edit action finished
-
-   \created     30.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On edit action finished
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::m_OnEditFinished(void)
 {
    const QString c_NewVersion = this->mpc_Ui->pc_LineEditVersion->text();
@@ -629,13 +575,10 @@ void C_NagMainWidget::m_OnEditFinished(void)
    this->m_UpdateCurrProjInfo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot function for clear button click
-
-   \created     31.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for clear button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::m_OnClear(void)
 {
    // ask user to confirm
@@ -657,13 +600,10 @@ void C_NagMainWidget::m_OnClear(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot function for table click
-
-   \created     31.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for table click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_NagMainWidget::m_OnIndexClicked(const QModelIndex & orc_ModelIndex)
 {

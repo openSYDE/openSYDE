@@ -1,21 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Complete line with all functionality (header)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     28.09.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_GILILINEGROUP_H
 #define C_GILILINEGROUP_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QGraphicsItemGroup>
 #include <QTimer>
 
@@ -26,12 +20,12 @@
 #include "C_GiLiInteractionPoint.h"
 #include "C_PuiBsLineBase.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_GiLiLineGroup :
    public C_GiBiConnectableItem,
@@ -52,6 +46,7 @@ public:
    virtual void RestoreDefaultCursor(void) override;
    virtual void SetTemporaryCursor(const QCursor & orc_TemporaryCursor) override;
    virtual void SetDefaultCursor(const QCursor & orc_Value) override;
+   virtual void CopyStyle(const QGraphicsItem * const opc_GuidelineItem);
 
    // Wrapper calls for C_GiLiLine
    virtual void SetWidth(const stw_types::sint32 & ors32_Width);
@@ -73,9 +68,13 @@ public:
    virtual void SetResizing(const bool & orq_ResizeActive);
    virtual void FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Closest) const;
    void FindClosestConnection(const QPointF & orc_ScenePoint, stw_types::sint32 & ors32_Index) const;
-   void UpdatePoint(const stw_types::sint32 & ors32_Index, const QPointF & orc_Pos);
+   void UpdatePoint(const stw_types::sint32 & ors32_Index, const QPointF & orc_Pos,
+                    const bool oq_BlockTriggerOfChangedSignal = false);
+   QPointF GetPointScenePos(const stw_types::sint32 os32_Index) const;
    void GetPointPos(const stw_types::sint32 & ors32_Index, QPointF & orc_Pos) const;
    bool CheckBendPointAt(const QPointF & orc_ScenePoint) const;
+
+   virtual void TriggerSigChangedGraphic(void);
 
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
    //lint -save -e1960
@@ -141,9 +140,10 @@ private:
    static bool m_Near(const stw_types::float64 of64_Exact, const stw_types::float64 of64_Eval);
 
    QPointF mc_LastKnownPosition;
+   bool mq_BlockChangeSignal;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif // C_LINEGRAPHICSITEMGROUP_H

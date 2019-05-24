@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Central handling for errors (implementation)
 
    Central handling for errors
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     15.07.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QEventLoop>
@@ -28,8 +21,9 @@
 #include "C_PopErrorHandling.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_OgeWiCustomMessage.h"
+#include "C_OSCSystemDefinitionFiler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_types;
 using namespace stw_errors;
@@ -38,36 +32,33 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load with error handling
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load with error handling
 
-   \param[in]   ors32_Err     Load error
-   \param[in]   orc_Path      path of project to load
-   \param[in]   opc_Parent    parent widget
-
-   \created     15.07.2016  STW/M.Echtler
+   \param[in] ors32_Err                    Load error
+   \param[in] orc_Path                     path of project to load
+   \param[in] opc_Parent                   parent widget
+   \param[in] ou16_SystemDefinitionVersion System definition version
 */
-//-----------------------------------------------------------------------------
-
+//----------------------------------------------------------------------------------------------------------------------
 void C_PopErrorHandling::mh_ProjectLoadErr(const sint32 & ors32_Err, const QString & orc_Path,
-                                           QWidget * const opc_Parent)
+                                           QWidget * const opc_Parent, const uint16 ou16_SystemDefinitionVersion)
 {
    if (ors32_Err != C_NO_ERR)
    {
-      C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::E_Type::eERROR);
+      C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::eERROR);
       c_Message.SetHeading(C_GtGetText::h_GetText("Project load"));
       c_Message.SetDescription(orc_Path);
       switch (ors32_Err)
@@ -107,18 +98,28 @@ void C_PopErrorHandling::mh_ProjectLoadErr(const sint32 & ors32_Err, const QStri
          break;
       }
    }
+   else
+   {
+      if ((ou16_SystemDefinitionVersion < C_OSCSystemDefinitionFiler::hu16_FILE_VERSION_LATEST) &&
+          (orc_Path.isEmpty() == false))
+      {
+         //Handle version update
+         C_OgeWiCustomMessage c_Message(opc_Parent, C_OgeWiCustomMessage::eINFORMATION);
+         c_Message.SetHeading(C_GtGetText::h_GetText("Project load"));
+         c_Message.SetDescription(C_GtGetText::h_GetText(
+                                     "Loading an older project version. On the next save the project is updated to the new project version."));
+         c_Message.Execute();
+      }
+   }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save with error handling
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save with error handling
 
    \param[in]   ors32_Err     Save error
    \param[in]   opc_Parent    parent widget
-
-   \created     15.07.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_PopErrorHandling::mh_ProjectSaveErr(const sint32 & ors32_Err, QWidget * const opc_Parent)
 {
@@ -148,15 +149,12 @@ void C_PopErrorHandling::mh_ProjectSaveErr(const sint32 & ors32_Err, QWidget * c
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle gettext initialize error
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle gettext initialize error
 
    \param[in]   ors32_Err   Error
-
-   \created     29.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PopErrorHandling::mh_GetTextInitializeErr(const sint32 & ors32_Err)
 {
    if (ors32_Err != C_NO_ERR)
@@ -187,13 +185,10 @@ void C_PopErrorHandling::mh_GetTextInitializeErr(const sint32 & ors32_Err)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Constructor
-
-   \created     15.07.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PopErrorHandling::C_PopErrorHandling()
 {
 }

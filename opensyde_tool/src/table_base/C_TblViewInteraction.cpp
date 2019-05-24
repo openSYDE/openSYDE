@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Table view base class for link interaction wrapping (implementation)
 
    Table view base class for link interaction wrapping
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.12.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QMouseEvent>
@@ -26,31 +19,28 @@
 #include "constants.h"
 #include "C_TblViewInteraction.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_TblViewInteraction::C_TblViewInteraction(QWidget * const opc_Parent) :
    C_TblViewToolTipBase(opc_Parent)
 {
@@ -62,26 +52,22 @@ C_TblViewInteraction::C_TblViewInteraction(QWidget * const opc_Parent) :
    connect(this, &C_TblViewInteraction::clicked, this, &C_TblViewInteraction::m_CheckItemClicked);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse move event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse move event slot
 
    Here: handle mouse cursor changes
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblViewInteraction::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
    C_TblViewToolTipBase::mouseMoveEvent(opc_Event);
    m_HandleGlobalMousePos(opc_Event->globalPos());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten event slot
 
    Here: handle mouse cursor changes
 
@@ -90,10 +76,8 @@ void C_TblViewInteraction::mouseMoveEvent(QMouseEvent * const opc_Event)
    \return
    True  Event was recognized and processed
    False Event ignored
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_TblViewInteraction::event(QEvent * const opc_Event)
 {
    if (opc_Event->type() == QEvent::Leave)
@@ -120,9 +104,8 @@ bool C_TblViewInteraction::event(QEvent * const opc_Event)
    return C_TblViewToolTipBase::event(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten event filter slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten event filter slot
 
    Here: handle mouse cursor changes
 
@@ -132,10 +115,8 @@ bool C_TblViewInteraction::event(QEvent * const opc_Event)
    \return
    True  Event was recognized and processed
    False Event ignored
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_TblViewInteraction::eventFilter(QObject * const opc_Object, QEvent * const opc_Event)
 {
    if ((opc_Object != this) && (opc_Object != NULL))
@@ -148,15 +129,12 @@ bool C_TblViewInteraction::eventFilter(QObject * const opc_Object, QEvent * cons
    return C_TblViewToolTipBase::eventFilter(opc_Object, opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle global position change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle global position change
 
    \param[in] orc_GlobalPos Global position
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblViewInteraction::m_HandleGlobalMousePos(const QPoint & orc_GlobalPos)
 {
    if ((this->horizontalHeader()->isVisible() == true) &&
@@ -195,15 +173,12 @@ void C_TblViewInteraction::m_HandleGlobalMousePos(const QPoint & orc_GlobalPos)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check clicked item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check clicked item
 
    \param[in] orc_Index Clicked item index
-
-   \created     13.12.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblViewInteraction::m_CheckItemClicked(const QModelIndex & orc_Index) const
 {
    if (orc_Index.data(msn_USER_ROLE_INTERACTION_IS_LINK).toBool() == true)

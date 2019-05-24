@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief      Parse / write XML file with CRC protection
@@ -20,15 +20,9 @@
    - XML header tag
    - value of the CRC attribute and name
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     14.07.2016  STW/A.Stangl (refactored from existing CDLSecureXML)
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCCHECKSUMMEDXMLH
 #define C_OSCCHECKSUMMEDXMLH
 

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data pool list data set base class for add and delete commands (implementation)
 
    Data pool list data set base class for add and delete commands
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.01.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -26,27 +19,26 @@
 #include "C_SdNdeDataPoolListTableModel.h"
 #include "C_SdNdeDataPoolListDataSetView.h"
 #include "C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand.h"
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     oru32_NodeIndex                  Node index
    \param[in]     oru32_DataPoolIndex              Node data pool index
@@ -55,10 +47,8 @@ using namespace stw_opensyde_core;
    \param[in]     orc_Indices                      Node data pool list indices
    \param[in]     orc_Text                         Optional command text for informational display
    \param[in,out] opc_Parent                       Optional pointer to parent
-
-   \created     25.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand(
    const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex, const uint32 & oru32_DataPoolListIndex,
    C_SdNdeDataPoolListModelViewManager * const opc_DataPoolListModelViewManager,
@@ -71,13 +61,10 @@ C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::C_SdNdeUnoDasDataPoolListAddDelet
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add from internal data
-
-   \created     27.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add from internal data
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::Add(void)
 {
    if (this->mpc_DataPoolListModelViewManager != NULL)
@@ -139,13 +126,10 @@ void C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::Add(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save and delete
-
-   \created     27.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save and delete
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::Delete(void)
 {
    if (this->mpc_DataPoolListModelViewManager != NULL)
@@ -217,30 +201,24 @@ void C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::Delete(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set indices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set indices
 
    \param[in] orc_Value Value
-
-   \created     27.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::SetIndices(const std::vector<stw_types::uint32> & orc_Value)
 {
    mc_Indices = orc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set initial data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set initial data
 
    \param[in] orc_OSCNames         Initial Data set names
    \param[in] orc_OSCDataSetValues Initial Data set values
-
-   \created     27.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::SetInitialData(
    const std::vector<C_OSCNodeDataPoolDataSet> & orc_OSCNames,
    const std::vector<std::vector<C_OSCNodeDataPoolContent> > & orc_OSCDataSetValues)
@@ -249,26 +227,20 @@ void C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::SetInitialData(
    this->mc_OSCDataSetValues = orc_OSCDataSetValues;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sort indices descending
-
-   \created     10.02.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sort indices descending
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::m_SortDescending(void)
 {
    C_SdUtil::h_SortIndicesDescendingAndSync<C_OSCNodeDataPoolDataSet, std::vector<C_OSCNodeDataPoolContent> >(
       this->mc_Indices, this->mc_OSCNames, this->mc_OSCDataSetValues);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sort indices ascending
-
-   \created     13.02.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sort indices ascending
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand::m_SortAscending(void)
 {
    C_SdUtil::h_SortIndicesAscendingAndSync<C_OSCNodeDataPoolDataSet, std::vector<C_OSCNodeDataPoolContent> >(

@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       GUI Integration class for system update sequences
 
@@ -12,17 +11,11 @@
    Intermediate results are signaled to the GUI via Qt signals. A signal is also triggered when
    the functions finish. The results are passed along with the signals.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     18.12.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -39,7 +32,7 @@
 #include "C_OSCLoggingHandler.h"
 #include "DLLocalize.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_scl;
@@ -47,25 +40,22 @@ using namespace stw_tgl;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     18.12.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvUpSequences::C_SyvUpSequences(void) :
    C_OSCSuSequences(),
    mpc_CanDllDispatcher(NULL),
@@ -79,13 +69,10 @@ C_SyvUpSequences::C_SyvUpSequences(void) :
    mpc_Thread = new C_SyvComDriverThread(&C_SyvUpSequences::mh_ThreadFunc, this);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     18.12.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvUpSequences::~C_SyvUpSequences(void)
 {
    if (this->mpc_Thread != NULL)
@@ -122,9 +109,8 @@ C_SyvUpSequences::~C_SyvUpSequences(void)
    delete mpc_EthernetDispatcher;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all members
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all members
 
    \param[in]  ou32_ViewIndex    Index of current used view
 
@@ -137,10 +123,8 @@ C_SyvUpSequences::~C_SyvUpSequences(void)
    C_COM         CAN initialization failed or no active node
    C_CHECKSUM    Internal buffer overflow detected
    C_RANGE       Routing configuration failed
-
-   \created     18.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvUpSequences::InitUpSequences(const uint32 ou32_ViewIndex)
 {
    sint32 s32_Return;
@@ -157,7 +141,7 @@ sint32 C_SyvUpSequences::InitUpSequences(const uint32 ou32_ViewIndex)
 
    if (s32_Return == C_NO_ERR)
    {
-      s32_Return = C_OSCComSequencesBase::Init(C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst(),
+      s32_Return = C_OSCComSequencesBase::Init(C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinition(),
                                                u32_ActiveBusIndex, c_ActiveNodes, this->mpc_CanDllDispatcher,
                                                this->mpc_EthernetDispatcher);
    }
@@ -165,9 +149,8 @@ sint32 C_SyvUpSequences::InitUpSequences(const uint32 ou32_ViewIndex)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reinitialize the CAN dispatcher
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reinitialize the CAN dispatcher
 
    The instance must be initialized with InitUpSequences before.
    InitUpSequences will initialize the dispatcher too.
@@ -177,10 +160,8 @@ sint32 C_SyvUpSequences::InitUpSequences(const uint32 ou32_ViewIndex)
    C_NO_ERR    CAN dispatcher initialized
    C_CONFIG    View is invalid or initialization was not finished
    C_COM       CAN initialization failed
-
-   \created     03.08.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvUpSequences::ReinitDispatcher(void)
 {
    sint32 s32_Return = C_CONFIG;
@@ -225,15 +206,12 @@ sint32 C_SyvUpSequences::ReinitDispatcher(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Close the CAN dispatcher without cleaning up the instance
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Close the CAN dispatcher without cleaning up the instance
 
    It can be reopened with ReinitDispatcher
-
-   \created     03.08.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpSequences::CloseDispatcher(void)
 {
    if ((this->IsInitialized() == true) &&
@@ -243,9 +221,8 @@ void C_SyvUpSequences::CloseDispatcher(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Creating temporary folder
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Creating temporary folder
 
    \param[in]     orc_TargetPath          Path for temporary folder
    \param[in,out] orc_ApplicationsToWrite Vector with all file paths which will be adapted as output
@@ -264,10 +241,8 @@ void C_SyvUpSequences::CloseDispatcher(void)
    C_BUSY      could not erase pre-existing target path (note: can result in partially erased target path)
    C_RD_WR     could not copy file
    C_TIMEOUT   could not create target directory
-
-   \created     21.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvUpSequences::SyvUpCreateTemporaryFolder(const C_SCLString & orc_TargetPath,
                                                     std::vector<C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
                                                     QString & orc_ErrorPath) const
@@ -290,9 +265,8 @@ sint32 C_SyvUpSequences::SyvUpCreateTemporaryFolder(const C_SCLString & orc_Targ
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get result of previously started service execution
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get result of previously started service execution
 
    Can be used to extract the results of one service execution after it has finished.
 
@@ -302,10 +276,8 @@ sint32 C_SyvUpSequences::SyvUpCreateTemporaryFolder(const C_SCLString & orc_Targ
    \return
    C_NO_ERR       result code read
    C_BUSY         previously started polled communication still going on
-
-   \created     18.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvUpSequences::GetResults(sint32 & ors32_Result) const
 {
    sint32 s32_Return = C_NO_ERR;
@@ -322,9 +294,8 @@ sint32 C_SyvUpSequences::GetResults(sint32 & ors32_Result) const
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the last position in the update sequence
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the last position in the update sequence
 
    Which file of which node was the last update object
 
@@ -334,10 +305,8 @@ sint32 C_SyvUpSequences::GetResults(sint32 & ors32_Result) const
    \return
    C_NO_ERR       result code read
    C_BUSY         previously started polled communication still going on
-
-   \created     27.04.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvUpSequences::GetLastUpdatePosition(uint32 & oru32_NodeIndex, uint32 & oru32_FileIndex) const
 {
    sint32 s32_Return = C_NO_ERR;
@@ -355,19 +324,16 @@ sint32 C_SyvUpSequences::GetLastUpdatePosition(uint32 & oru32_NodeIndex, uint32 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the reported results of StartReadDeviceInformation for openSYDE nodes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the reported results of StartReadDeviceInformation for openSYDE nodes
 
    If the both vectors have a different size an tgl assert will be reported.
    After reading the information, the vectors will be cleared.
 
    \param[out]    orc_OsyNodeIndexes         All node indexes
    \param[out]    orc_OsyDeviceInformation   All device information associated to the node index in the same order
-
-   \created     19.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpSequences::GetOsyDeviceInformation(std::vector<uint32> & orc_OsyNodeIndexes,
                                                std::vector<C_OSCSuSequences::C_OsyDeviceInformation> & orc_OsyDeviceInformation)
 {
@@ -384,19 +350,16 @@ void C_SyvUpSequences::GetOsyDeviceInformation(std::vector<uint32> & orc_OsyNode
    this->mpc_Lock->Release();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the reported results of StartReadDeviceInformation for STW Flashloader nodes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the reported results of StartReadDeviceInformation for STW Flashloader nodes
 
    If the both vectors have a different size an tgl assert will be reported.
    After reading the information, the vectors will be cleared.
 
    \param[out]    orc_XflNodeIndexes         All node indexes
    \param[out]    orc_XflDeviceInformation   All device information associated to the node index in the same order
-
-   \created     13.02.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpSequences::GetXflDeviceInformation(std::vector<uint32> & orc_XflNodeIndexes,
                                                std::vector<C_OSCSuSequences::C_XflDeviceInformation> & orc_XflDeviceInformation)
 {
@@ -413,18 +376,15 @@ void C_SyvUpSequences::GetXflDeviceInformation(std::vector<uint32> & orc_XflNode
    this->mpc_Lock->Release();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the name of the current step
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the name of the current step
 
    \param[in]     oe_Step         Step of node configuration
 
    \return
    Name of the specific step
-
-   \created     19.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvUpSequences::GetStepName(const E_ProgressStep oe_Step) const
 {
    QString c_Text;
@@ -461,7 +421,7 @@ QString C_SyvUpSequences::GetStepName(const E_ProgressStep oe_Step) const
    case eACTIVATE_FLASHLOADER_OSY_XFL_BC_PING_START:
       c_Text = C_GtGetText::h_GetText("Activate Flashloader: Ping devices start");
       break;
-   case eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERRROR:
+   case eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERROR:
       c_Text = C_GtGetText::h_GetText("Activate Flashloader: Reconnect error");
       break;
    case eACTIVATE_FLASHLOADER_OSY_SET_SESSION_ERROR:
@@ -476,13 +436,16 @@ QString C_SyvUpSequences::GetStepName(const E_ProgressStep oe_Step) const
    case eACTIVATE_FLASHLOADER_ROUTING_ERROR:
       c_Text = C_GtGetText::h_GetText("Activate Flashloader: Error on start routing");
       break;
+   case eACTIVATE_FLASHLOADER_ROUTING_AVAILABLE_FEATURE_ERROR:
+      c_Text = C_GtGetText::h_GetText("Activate Flashloader: Error on start routing due to available features");
+      break;
    case eACTIVATE_FLASHLOADER_FINISHED:
       c_Text = C_GtGetText::h_GetText("Activate Flashloader: Finished");
       break;
    case eREAD_DEVICE_INFO_START:
       c_Text = C_GtGetText::h_GetText("Read Device Information: Start");
       break;
-   case eREAD_DEVICE_INFO_OSY_RECONNECT_ERRROR:
+   case eREAD_DEVICE_INFO_OSY_RECONNECT_ERROR:
       c_Text = C_GtGetText::h_GetText("Read Device Information: Error on reconnecting");
       break;
    case eREAD_DEVICE_INFO_OSY_SET_SESSION_START:
@@ -597,7 +560,7 @@ QString C_SyvUpSequences::GetStepName(const E_ProgressStep oe_Step) const
    case eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_START:
       c_Text = C_GtGetText::h_GetText("Update System: Node flash area of HEX file start");
       break;
-   case eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_ERASE_ERRROR:
+   case eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_ERASE_ERROR:
       c_Text = C_GtGetText::h_GetText("Update System: Node flash area of HEX file erase error");
       break;
    case eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_START:
@@ -624,7 +587,7 @@ QString C_SyvUpSequences::GetStepName(const E_ProgressStep oe_Step) const
    case eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_START:
       c_Text = C_GtGetText::h_GetText("Update System: Preparation of Node flash area of file system file start");
       break;
-   case eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_ERRROR:
+   case eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_ERROR:
       c_Text = C_GtGetText::h_GetText("Update System: Preparation of Node flash area of file system file erase error");
       break;
    case eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_START:
@@ -641,6 +604,42 @@ QString C_SyvUpSequences::GetStepName(const E_ProgressStep oe_Step) const
       break;
    case eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_FINISHED:
       c_Text = C_GtGetText::h_GetText("Update System: Node flash of file system file finished");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_START:
+      c_Text = C_GtGetText::h_GetText("Update System: Node NVM write start");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_RECONNECT_ERROR:
+      c_Text = C_GtGetText::h_GetText("Update System: Node NVM write reconnect to server error");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_READ_FEATURE_ERROR:
+      c_Text = C_GtGetText::h_GetText("Update System: Node NVM write read of available features error");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR:
+      c_Text = C_GtGetText::h_GetText("Update System: Node NVM write available features error");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_SESSION_ERROR:
+      c_Text = C_GtGetText::h_GetText("Update System: Node NVM write session error");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_MAX_SIZE_ERROR:
+      c_Text = C_GtGetText::h_GetText("Update System: Node NVM write read back of maximum block length error");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_START:
+      c_Text = C_GtGetText::h_GetText("Update System: Node NVM write read back of parameter set image file start");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_ERROR:
+      c_Text = C_GtGetText::h_GetText("Update System: Node NVM write read back of parameter set image file error");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_START:
+      c_Text = C_GtGetText::h_GetText("Update System: Node NVM write write of parameter set image file start");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_ERROR:
+      c_Text = C_GtGetText::h_GetText("Update System: Node NVM write write of parameter set image file error");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FILE_FINISHED:
+      c_Text = C_GtGetText::h_GetText("Update System: Node NVM write of parameter set image file finished");
+      break;
+   case eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FINISHED:
+      c_Text = C_GtGetText::h_GetText("Update System: Node NVM write of parameter set image files finished");
       break;
    case eUPDATE_SYSTEM_ABORTED:
       c_Text = C_GtGetText::h_GetText("Update System: Aborted");
@@ -680,17 +679,14 @@ QString C_SyvUpSequences::GetStepName(const E_ProgressStep oe_Step) const
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Starts thread to activate flashloader
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Starts thread to activate flashloader
 
    \return
    C_NO_ERR   started sequence
    C_BUSY     previously started sequence still going on
-
-   \created     18.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvUpSequences::StartActivateFlashloader(void)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -709,17 +705,14 @@ sint32 C_SyvUpSequences::StartActivateFlashloader(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Starts thread to read device information
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Starts thread to read device information
 
    \return
    C_NO_ERR   started sequence
    C_BUSY     previously started sequence still going on
-
-   \created     18.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvUpSequences::StartReadDeviceInformation(void)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -742,9 +735,8 @@ sint32 C_SyvUpSequences::StartReadDeviceInformation(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Starts thread to update system
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Starts thread to update system
 
    \param[in]  orc_ApplicationsToWrite   list of files to flash per node; must have the same size as the system definition
                                    contains nodes
@@ -753,10 +745,8 @@ sint32 C_SyvUpSequences::StartReadDeviceInformation(void)
    \return
    C_NO_ERR   started sequence
    C_BUSY     previously started sequence still going on
-
-   \created     18.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvUpSequences::StartUpdateSystem(const std::vector<C_DoFlash> & orc_ApplicationsToWrite,
                                            const std::vector<uint32> & orc_NodesOrder)
 {
@@ -780,17 +770,14 @@ sint32 C_SyvUpSequences::StartUpdateSystem(const std::vector<C_DoFlash> & orc_Ap
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Starts thread to reset system
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Starts thread to reset system
 
    \return
    C_NO_ERR   started sequence
    C_BUSY     previously started sequence still going on
-
-   \created     18.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvUpSequences::StartResetSystem(void)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -809,23 +796,19 @@ sint32 C_SyvUpSequences::StartResetSystem(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Aborts the current sequence
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Aborts the current sequence
 
    No problem with thread safety because of a bool value.
-
-   \created     18.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpSequences::AbortCurrentProgress(void)
 {
    this->mq_AbortFlag = true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reports some information about the current sequence
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reports some information about the current sequence
 
    Give textual information to logging engine
 
@@ -838,10 +821,8 @@ void C_SyvUpSequences::AbortCurrentProgress(void)
    Flag for aborting sequence
    - true   abort sequence
    - false  continue sequence
-
-   \created     18.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvUpSequences::m_ReportProgress(const E_ProgressStep oe_Step, const sint32 os32_Result,
                                         const uint8 ou8_Progress, const C_SCLString & orc_Information)
 {
@@ -864,9 +845,8 @@ bool C_SyvUpSequences::m_ReportProgress(const E_ProgressStep oe_Step, const sint
    return this->mq_AbortFlag;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reports some information about the current sequence for a specific server
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reports some information about the current sequence for a specific server
 
    \param[in]     oe_Step           Step of node update
    \param[in]     os32_Result       Result of service
@@ -879,10 +859,8 @@ bool C_SyvUpSequences::m_ReportProgress(const E_ProgressStep oe_Step, const sint
    Flag for aborting sequence
    - true   abort sequence
    - false  continue sequence
-
-   \created     18.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvUpSequences::m_ReportProgress(const E_ProgressStep oe_Step, const sint32 os32_Result,
                                         const uint8 ou8_Progress, const C_OSCProtocolDriverOsyNode & orc_Server,
                                         const C_SCLString & orc_Information)
@@ -910,19 +888,16 @@ bool C_SyvUpSequences::m_ReportProgress(const E_ProgressStep oe_Step, const sint
    return this->mq_AbortFlag;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reports information read from openSYDE server node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reports information read from openSYDE server node
 
    Called by ReadDeviceInformation() after it has read information from an openSYDE node.
    Here: save device information
 
    \param[in]     orc_Info          Information read from node
    \param[in]     ou32_NodeIndex   Index of node within mpc_SystemDefinition
-
-   \created     18.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpSequences::m_ReportOpenSydeFlashloaderInformationRead(const C_OsyDeviceInformation & orc_Info,
                                                                   const uint32 ou32_NodeIndex)
 {
@@ -933,22 +908,19 @@ void C_SyvUpSequences::m_ReportOpenSydeFlashloaderInformationRead(const C_OsyDev
    this->mc_ReportOsyDeviceInformation.push_back(orc_Info);
    this->mpc_Lock->Release();
 
-   Q_EMIT this->SigReportOpenSydeFlashloaderInformationRead();
+   Q_EMIT (this->SigReportOpenSydeFlashloaderInformationRead());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reports information read from STW Flashloader server node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reports information read from STW Flashloader server node
 
    Called by ReadDeviceInformation() after it has read information from an STW Flashloader node.
    Here: save device information
 
    \param[in]     orc_Info          Information read from node
    \param[in]     ou32_NodeIndex   Index of node within mpc_SystemDefinition
-
-   \created     13.02.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpSequences::m_ReportStwFlashloaderInformationRead(const C_XflDeviceInformation & orc_Info,
                                                              const uint32 ou32_NodeIndex)
 {
@@ -959,10 +931,10 @@ void C_SyvUpSequences::m_ReportStwFlashloaderInformationRead(const C_XflDeviceIn
    this->mc_ReportXflDeviceInformation.push_back(orc_Info);
    this->mpc_Lock->Release();
 
-   Q_EMIT this->SigReportStwFlashloaderInformationRead();
+   Q_EMIT (this->SigReportStwFlashloaderInformationRead());
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpSequences::mh_ThreadFunc(void * const opv_Instance)
 {
    //lint -e{925}  This class is the only one which registers itself at the caller of this function. It must match.
@@ -975,15 +947,12 @@ void C_SyvUpSequences::mh_ThreadFunc(void * const opv_Instance)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   The functions executed by the system's threading engine
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   The functions executed by the system's threading engine
 
    Calls the function configured via me_Sequence
-
-   \created     18.12.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpSequences::m_ThreadFunc(void)
 {
    if (this->mpc_ComDriver != NULL)
@@ -1024,7 +993,7 @@ void C_SyvUpSequences::m_ThreadFunc(void)
    this->mpc_Thread->requestInterruption();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_SyvUpSequences::mh_WriteLog(const C_OSCSuSequences::E_ProgressStep oe_Step,
                                    const stw_scl::C_SCLString & orc_Text)
@@ -1032,35 +1001,50 @@ void C_SyvUpSequences::mh_WriteLog(const C_OSCSuSequences::E_ProgressStep oe_Ste
    // Decide if error or info
    switch (oe_Step)
    {
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_REQUEST_PROGRAMMING_ERROR:   // Is an error too
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_ECU_RESET_ERROR:             // Is an error too
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_ENTER_PRE_PROGRAMMING_ERROR: // Is an error too
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERRROR:               // Is an error too
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_SET_SESSION_ERROR:              // Is an error too
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_ECU_RESET_ERROR:                // Is an error too
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_BC_FLASH_ERROR:                 // Is an error too
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_WAKEUP_ERROR:                   // Is an error too
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_ROUTING_ERROR:                      // Is an error too
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_SET_SESSION_ERROR:                  // Is an error too
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_DEVICE_NAME_ERROR:                  // Is an error too
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_SECURITY_ERROR:        // Is an error too
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_ERROR:                 // Is an error too
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR:             // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_ERROR:                   // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_SIGNATURE_ERROR:              // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_COMM_ERROR:     // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_FILE_ERROR:     // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_MATCH_ERROR:    // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_SESSION_ERROR:       // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_FILE_ERROR:          // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_NAME_NOT_READABLE:    // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_ERROR:                // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_ERASE_ERRROR:      // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_ERROR:    // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_ERROR:        // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_ERRROR:        // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_ERROR:        // Is an error too
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_ERROR:            // Is an error too
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_REQUEST_PROGRAMMING_ERROR:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_ECU_RESET_ERROR:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_ECU_RESET_ERROR:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_ENTER_PRE_PROGRAMMING_ERROR:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_BC_FLASH_ERROR:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERROR:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_SET_SESSION_ERROR:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_WAKEUP_ERROR:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_ROUTING_ERROR:
+   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_ROUTING_AVAILABLE_FEATURE_ERROR:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_RECONNECT_ERROR:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_SET_SESSION_ERROR:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_DEVICE_NAME_ERROR:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_SECURITY_ERROR:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_ERROR:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_WAKEUP_ERROR:
+   case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_READING_INFORMATION_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_SIGNATURE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_RECONNECT_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_COMM_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_FILE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_MATCH_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_SESSION_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_FILE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_NOT_OK:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_NAME_NOT_READABLE:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_ERASE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_RECONNECT_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_READ_FEATURE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_SESSION_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_MAX_SIZE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_ERROR:
+   case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_ERROR:
+   case C_OSCSuSequences::eRESET_SYSTEM_OSY_NODE_ERROR:
       osc_write_log_error("Update Node", orc_Text);
       break;
    default:
@@ -1069,4 +1053,4 @@ void C_SyvUpSequences::mh_WriteLog(const C_OSCSuSequences::E_ProgressStep oe_Ste
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------

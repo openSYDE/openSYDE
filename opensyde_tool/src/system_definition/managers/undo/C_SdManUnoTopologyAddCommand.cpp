@@ -1,45 +1,37 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Add undo command (implementation)
 
    Add undo command
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.11.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_SdManUnoTopologyAddCommand.h"
 #include "C_SdTopologyScene.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor for adding a generic element
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor for adding a generic element
 
    \param[in,out] opc_Scene                         Pointer to currently active scene
    \param[in]     orc_IDs                           Affected unique IDs
@@ -48,10 +40,8 @@ using namespace stw_opensyde_gui;
    \param[in]     orc_AdditionalInformation         Additional string information
    \param[in,out] opc_Parent                        Optional pointer to parent
    \param[in]     orq_ForceUseAdditionalInformation Optional flag to force use of additional string information
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyAddCommand::C_SdManUnoTopologyAddCommand(QGraphicsScene * const opc_Scene,
                                                            const std::vector<stw_types::uint64> & orc_IDs,
                                                            const E_ElementType & ore_Type, const QPointF & orc_NewPos,
@@ -71,9 +61,8 @@ C_SdManUnoTopologyAddCommand::C_SdManUnoTopologyAddCommand(QGraphicsScene * cons
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor for adding a bus connector
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor for adding a bus connector
 
    \param[in,out] opc_Scene                 Pointer to currently active scene
    \param[in]     orc_IDs                   Affected unique IDs
@@ -84,10 +73,8 @@ C_SdManUnoTopologyAddCommand::C_SdManUnoTopologyAddCommand(QGraphicsScene * cons
    \param[in]     oru8_InterfaceNumber      Interface number for bus connector creation
    \param[in]     oru8_NodeId               New node id
    \param[in,out] opc_Parent                Optional pointer to parent
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyAddCommand::C_SdManUnoTopologyAddCommand(QGraphicsScene * const opc_Scene,
                                                            const std::vector<stw_types::uint64> & orc_IDs,
                                                            const E_ElementType & ore_Type, const QPointF & orc_NewPos,
@@ -108,24 +95,18 @@ C_SdManUnoTopologyAddCommand::C_SdManUnoTopologyAddCommand(QGraphicsScene * cons
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     22.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyAddCommand::~C_SdManUnoTopologyAddCommand(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add elements without previous knowledge
-
-   \created     23.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add elements without previous knowledge
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyAddCommand::m_AddNew(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2

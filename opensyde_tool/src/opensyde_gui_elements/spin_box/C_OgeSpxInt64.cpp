@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Spin box for int64 values (implementation)
 
    Spin box for int64 values
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     15.02.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -24,35 +17,32 @@
 #include "TGLUtils.h"
 #include "C_OgeSpxInt64.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent     Optional pointer to parent
    \param[in]     orq_IsUnsigned Indicator if this spin box should handle unsigned 64 bit or signed 64 bit
-
-   \created     15.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeSpxInt64::C_OgeSpxInt64(QWidget * const opc_Parent, const bool & orq_IsUnsigned) :
    QAbstractSpinBox(opc_Parent),
    mq_IsUnsigned(orq_IsUnsigned),
@@ -71,32 +61,26 @@ C_OgeSpxInt64::C_OgeSpxInt64(QWidget * const opc_Parent, const bool & orq_IsUnsi
    connect(this->lineEdit(), &QLineEdit::editingFinished, this, &C_OgeSpxInt64::SigValueChanged);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get spin box internal used variable state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get spin box internal used variable state
 
    \return
    true:  Internal variable is unsigned
    false: Internal variable is signed
-
-   \created     15.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OgeSpxInt64::GetIsUnsigned(void) const
 {
    return mq_IsUnsigned;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set new internal value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new internal value
 
    \param[in] orc_Value           New value
    \param[in] oq_AllowValueUpdate Flag to suppress or request value update signals
-
-   \created     15.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64::SetValue(const QVariant & orc_Value, const bool oq_AllowValueUpdate)
 {
    QString c_ValueStr;
@@ -159,15 +143,12 @@ void C_OgeSpxInt64::SetValue(const QVariant & orc_Value, const bool oq_AllowValu
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set single step width
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set single step width
 
    \param[in] ou64_Step Single step width
-
-   \created     14.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64::SetStepWidth(const uint64 ou64_Step)
 {
    if (ou64_Step > 0)
@@ -176,64 +157,52 @@ void C_OgeSpxInt64::SetStepWidth(const uint64 ou64_Step)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set new minimum value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new minimum value
 
    Warning: No action if new value over maximum
 
    \param[in] orc_Minimum New minimum
-
-   \created     07.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64::SetMinimum(const QVariant & orc_Minimum)
 {
    this->mc_Minimum = m_PrepareValue(orc_Minimum);
    Q_EMIT this->SigMinMaxChanged();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set new maximum value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new maximum value
 
    Warning: No action if new value below minimum
 
    \param[in] orc_Maximum New maximum
-
-   \created     07.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64::SetMaximum(const QVariant & orc_Maximum)
 {
    this->mc_Maximum = m_PrepareValue(orc_Maximum);
    Q_EMIT this->SigMinMaxChanged();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set suffix
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set suffix
 
    \param[in] orc_Value New suffix
-
-   \created     27.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64::SetSuffix(const QString & orc_Value)
 {
    this->mc_Suffix = orc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get internal value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get internal value
 
    \return
    Internal value
-
-   \created     15.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_OgeSpxInt64::GetValue(void) const
 {
    QVariant c_Retval;
@@ -257,75 +226,60 @@ QVariant C_OgeSpxInt64::GetValue(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get minimum value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get minimum value
 
    \return
    Current minimum value
-
-   \created     14.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_OgeSpxInt64::GetMinimum(void) const
 {
    return this->mc_Minimum;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get maximum value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get maximum value
 
    \return
    Current maximum value
-
-   \created     14.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_OgeSpxInt64::GetMaximum(void) const
 {
    return this->mc_Maximum;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get suffix
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get suffix
 
    \return
    Current suffix
-
-   \created     14.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_OgeSpxInt64::GetSuffix(void) const
 {
    return this->mc_Suffix;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get step width
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get step width
 
    \return
    Current step width
-
-   \created     14.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint64 C_OgeSpxInt64::GetStepWidth(void) const
 {
    return this->mu64_StepWidth;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do x steps
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do x steps
 
    \param[in] osn_Steps Step count to do
-
-   \created     17.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64::stepBy(const sintn osn_Steps)
 {
    QVariant c_Tmp = this->GetValue();
@@ -439,9 +393,8 @@ void C_OgeSpxInt64::stepBy(const sintn osn_Steps)
    this->SetValue(c_Tmp, true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Validate current input string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Validate current input string
 
    \param[in,out] orc_Input Input string
    \param[in,out] orc_Pos   Position
@@ -450,10 +403,8 @@ void C_OgeSpxInt64::stepBy(const sintn osn_Steps)
    Invalid      Unusable
    Intermediate Might be valid on next user input
    Acceptable   Completely valid
-
-   \created     17.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QValidator::State C_OgeSpxInt64::validate(QString & orc_Input, sintn & orc_Pos) const
 {
    QValidator::State e_Retval;
@@ -513,18 +464,15 @@ QValidator::State C_OgeSpxInt64::validate(QString & orc_Input, sintn & orc_Pos) 
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Return allowed step actions
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Return allowed step actions
 
    \return
    StepDownEnabled                 Down action allowed
    StepUpEnabled                   Up action allowed
    StepUpEnabled | StepDownEnabled Up and down actions allowed
-
-   \created     17.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QAbstractSpinBox::StepEnabled C_OgeSpxInt64::stepEnabled(void) const
 {
    QAbstractSpinBox::StepEnabled c_Retval;
@@ -564,15 +512,12 @@ QAbstractSpinBox::StepEnabled C_OgeSpxInt64::stepEnabled(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set unsigned or signed state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set unsigned or signed state
 
    \param[in] orq_Value Flag if is unsigned
-
-   \created     31.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64::SetIsUnsigned(const bool & orq_Value)
 {
    this->mq_IsUnsigned = orq_Value;
@@ -581,15 +526,12 @@ void C_OgeSpxInt64::SetIsUnsigned(const bool & orq_Value)
    this->SetValue(this->GetValue(), true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapt value to range
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapt value to range
 
    \param[in,out] orc_Value Value to check and adapt
-
-   \created     07.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64::m_ApplyMinMax(QVariant & orc_Value) const
 {
    bool q_IsUnderMinimum;
@@ -610,17 +552,14 @@ void C_OgeSpxInt64::m_ApplyMinMax(QVariant & orc_Value) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if value in range
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if value in range
 
    \param[in]  orc_Value          Value to check
    \param[out] orq_IsUnderMinimum Indicator if value under allowed range
    \param[out] orq_IsOverMaximum  Indicator if value over allowed range
-
-   \created     07.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64::m_CheckMinMax(const QVariant & orc_Value, bool & orq_IsUnderMinimum, bool & orq_IsOverMaximum) const
 {
    orq_IsUnderMinimum = false;
@@ -649,13 +588,10 @@ void C_OgeSpxInt64::m_CheckMinMax(const QVariant & orc_Value, bool & orq_IsUnder
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reset min and max value
-
-   \created     31.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reset min and max value
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxInt64::m_ResetMinMax(void)
 {
    //Init default min max and default value
@@ -674,18 +610,15 @@ void C_OgeSpxInt64::m_ResetMinMax(void)
    Q_EMIT this->SigMinMaxChanged();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert value in expected internal storage format
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert value in expected internal storage format
 
    \param[in] orc_Value Numeric QVariant
 
    \return
    QVariant in expected format
-
-   \created     16.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_OgeSpxInt64::m_PrepareValue(const QVariant & orc_Value) const
 {
    QVariant c_Retval;

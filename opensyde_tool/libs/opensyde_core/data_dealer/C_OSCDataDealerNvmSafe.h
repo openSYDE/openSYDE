@@ -1,38 +1,34 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Encapsulates safety relevant sequences for NVM access. (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.10.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCDATADEALERNVMSAFE_H
 #define C_OSCDATADEALERNVMSAFE_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <set>
 
 #include "C_OSCDataDealerNvm.h"
+#include "C_OSCParamSetHandler.h"
 #include "C_OSCParamSetRawNode.h"
 #include "C_OSCParamSetRawEntry.h"
 #include "C_OSCParamSetInterpretedList.h"
+#include "C_OSCParamSetInterpretedFileInfoData.h"
 #include "C_OSCNodeDataPoolListId.h"
 #include "C_OSCNodeDataPoolListElementId.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 ///openSYDE safe NVM data dealer
 class C_OSCDataDealerNvmSafe :
@@ -52,25 +48,24 @@ public:
    stw_types::sint32 NvmSafeWriteCrcs(stw_types::uint8 * const opu8_NrCode);
 
    //Create file process
-   static void h_NvmSafeClearInternalContent(void);
+   void NvmSafeClearInternalContent(void);
    stw_types::sint32 NvmSafeReadParameterValues(const std::vector<C_OSCNodeDataPoolListId> & orc_ListIds,
                                                 stw_types::uint8 * const opu8_NrCode);
-   static stw_types::sint32 h_NvmSafeCreateCleanFileWithoutCRC(const stw_scl::C_SCLString & orc_Path);
-   static stw_types::sint32 h_NvmSafeReadFileWithoutCRC(const stw_scl::C_SCLString & orc_Path);
+   stw_types::sint32 NvmSafeCreateCleanFileWithoutCRC(const stw_scl::C_SCLString & orc_Path, const stw_opensyde_core::C_OSCParamSetInterpretedFileInfoData & orc_FileInfo =
+                                                         stw_opensyde_core::C_OSCParamSetInterpretedFileInfoData());
+   stw_types::sint32 NvmSafeReadFileWithoutCRC(const stw_scl::C_SCLString & orc_Path);
    stw_types::sint32 NvmSafeCheckParameterFileContents(const stw_scl::C_SCLString & orc_Path,
                                                        std::vector<C_OSCNodeDataPoolListId> & orc_DataPoolLists);
-   static stw_types::sint32 h_NvmSafeUpdateCRCForFile(const stw_scl::C_SCLString & orc_Path);
+   stw_types::sint32 NvmSafeUpdateCRCForFile(const stw_scl::C_SCLString & orc_Path);
 
    //Write file process
-   static stw_types::sint32 h_NvmSafeReadFileWithCRC(const stw_scl::C_SCLString & orc_Path);
+   stw_types::sint32 NvmSafeReadFileWithCRC(const stw_scl::C_SCLString & orc_Path);
    stw_types::sint32 NvmSafeWriteParameterSetFile(const stw_scl::C_SCLString & orc_Path,
                                                   stw_types::sint32 & ors32_ResultDetail);
 
 private:
    static void mh_CreateInterpretedList(const C_OSCNodeDataPoolList & orc_List,
                                         C_OSCParamSetInterpretedList & orc_InterpretedList);
-   static void mh_AppendBytes(const std::vector<stw_types::uint8> & orc_Source,
-                              std::vector<stw_types::uint8> & orc_Target);
    stw_types::sint32 m_CheckParameterFileContent(const C_OSCParamSetRawNode & orc_Node);
    stw_types::sint32 m_CreateRawEntryAndPrepareInterpretedData(C_OSCNodeDataPoolList & orc_List,
                                                                C_OSCParamSetRawEntry & orc_Entry,
@@ -93,13 +88,14 @@ private:
    };
 
    E_CreateParameterSetFileState me_CreateParameterSetWorkflowState;
-   static E_ParameterSetFileState mhe_ParameterSetFileState;
-   static stw_scl::C_SCLString mhc_ParameterSetFilePath;
+   E_ParameterSetFileState me_ParameterSetFileState;
+   stw_scl::C_SCLString mc_ParameterSetFilePath;
    C_OSCNode mc_NodeCopy;
+   C_OSCParamSetHandler mc_ImageFileHandler;
    std::set<C_OSCNodeDataPoolListId> mc_ChangedLists;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

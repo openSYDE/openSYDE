@@ -1,84 +1,70 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Label for error frame label (implementation)
 
    Label for error frame label
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.06.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_Uti.h"
 #include "C_OgeLabFrameError.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     20.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeLabFrameError::C_OgeLabFrameError(QWidget * const opc_Parent) :
    C_OgeLabToolTipBase(opc_Parent)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set new text content
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new text content
 
-   \param[in] orc_Text New text
-
-   \created     15.05.2018  STW/M.Echtler
+   \param[in] orc_Text    New text
+   \param[in] orc_Tooltip New tooltip
 */
-//-----------------------------------------------------------------------------
-void C_OgeLabFrameError::SetCompleteText(const QString & orc_Text)
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeLabFrameError::SetCompleteText(const QString & orc_Text, const QString & orc_Tooltip)
 {
    this->mc_Text = orc_Text;
+   this->SetToolTipInformation("", orc_Tooltip, stw_opensyde_gui::C_NagToolTip::eERROR);
    m_OnSizeChange();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Current size
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Current size
 
    \return
    Current size
-
-   \created     15.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QSize C_OgeLabFrameError::sizeHint(void) const
 {
    const QFontMetrics c_Metrics = mh_GetFontMetrics();
@@ -87,16 +73,13 @@ QSize C_OgeLabFrameError::sizeHint(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Minimum size
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Minimum size
 
    \return
    Minimum size
-
-   \created     15.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QSize C_OgeLabFrameError::minimumSizeHint(void) const
 {
    const QFontMetrics c_Metrics = mh_GetFontMetrics();
@@ -105,47 +88,38 @@ QSize C_OgeLabFrameError::minimumSizeHint(void) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten resize event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten resize event slot
 
    Here: Handle label adaptations
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     15.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeLabFrameError::resizeEvent(QResizeEvent * const opc_Event)
 {
    m_OnSizeChange(&opc_Event->size());
    QLabel::resizeEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten show event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten show event slot
 
    Here: Handle label adaptations
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     15.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeLabFrameError::showEvent(QShowEvent * const opc_Event)
 {
    QLabel::showEvent(opc_Event);
    m_OnSizeChange();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle size change
-
-   \created     15.05.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle size change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeLabFrameError::m_OnSizeChange(const QSize * const opc_SizeToUse)
 {
    const QFontMetrics c_Metrics = mh_GetFontMetrics();
@@ -163,22 +137,15 @@ void C_OgeLabFrameError::m_OnSizeChange(const QSize * const opc_SizeToUse)
    }
 
    this->setText(c_DisplayedString);
-   if (c_DisplayedString.compare(this->mc_Text) != 0)
-   {
-      this->SetToolTipInformation("", this->mc_Text, stw_opensyde_gui::C_NagToolTip::eERROR);
-   }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get required font metrics
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get required font metrics
 
    \return
    Required font metrics
-
-   \created     15.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QFontMetrics C_OgeLabFrameError::mh_GetFontMetrics(void)
 {
    QFont c_Font("Segoe UI");

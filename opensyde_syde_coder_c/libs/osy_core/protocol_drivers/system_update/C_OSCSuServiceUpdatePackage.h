@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       openSYDE: Service Update Package
@@ -8,15 +8,9 @@
    Provides functions to create and unpack service update packages
    in openSYDE
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.03.2018  STW/D.Pohl
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCSUSERVICEUPDATEPACKAGEH
 #define C_OSCSUSERVICEUPDATEPACKAGEH
 
@@ -48,7 +42,7 @@ public:
                                             const stw_types::uint32 ou32_ActiveBusIndex,
                                             const std::vector<stw_types::uint8> & orc_ActiveNodes,
                                             const std::vector<stw_types::uint32> & orc_NodesUpdateOrder,
-                                            const std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite, stw_scl::C_SCLStringList & orc_WarningMessages, stw_scl::C_SCLString & orc_ErrorMessage);
+                                            const std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite, stw_scl::C_SCLStringList & orc_WarningMessages, stw_scl::C_SCLString & orc_ErrorMessage, const bool oq_SaveInCompatibilityFormat = false);
 
    static stw_types::sint32 h_UnpackPackage(const stw_scl::C_SCLString & orc_PackagePath,
                                             const stw_scl::C_SCLString & orc_TargetUnzipPath,

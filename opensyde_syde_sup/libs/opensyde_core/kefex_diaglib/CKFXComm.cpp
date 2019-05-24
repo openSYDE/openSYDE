@@ -1,7 +1,3 @@
-//22.07.10   AST    Moved C_KFXCommunicationKEFEX to a .cpp file of its own
-//19.07.10   AST    Added explicit calls to C_KFX_Protocol::Cycle (cf. KEFEX Ticket #146)
-//11.05.09   AST    All index parameters are uint32 in preparation for upcoming protocols (e.g. CANopen)
-
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -166,8 +162,6 @@ void C_KFXCommunicationBase::GetProtocolFeatures(T_KFXProtocolFeatures * const o
 
    \return
    Text representation of protocol name
-
-   \created     xx.xx.200x  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_KFXCommunicationBase::GetProtocolName(void)

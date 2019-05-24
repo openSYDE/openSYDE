@@ -1,21 +1,14 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Connects the openSYDE protocol driver to a node.
 
    Its main job is to place incoming data into the data pool.
    The application is responsible to not "::Cycle" and poll at the same time from different threads.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.07.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -44,12 +37,9 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Set up class
+/*! \brief   Set up class
 
    Initializes class elements
-
-   \created     21.07.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_OSCDataDealer::C_OSCDataDealer(void) :
@@ -60,16 +50,13 @@ C_OSCDataDealer::C_OSCDataDealer(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Set up class
+/*! \brief   Set up class
 
    Initializes class elements
 
    \param[in]     opc_Node          Pointer to node of data dealer
    \param[in]     ou32_NodeIndex    Index of node of data dealer
    \param[in]     opc_DiagProtocol  Pointer to used diagnostic protocol
-
-   \created     21.07.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_OSCDataDealer::C_OSCDataDealer(C_OSCNode * const opc_Node, const uint32 ou32_NodeIndex,
@@ -82,10 +69,7 @@ C_OSCDataDealer::C_OSCDataDealer(C_OSCNode * const opc_Node, const uint32 ou32_N
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up class
-
-   \created     29.08.2017  STW/B.Bayer
+/*! \brief   Clean up class
 */
 //-----------------------------------------------------------------------------
 C_OSCDataDealer::~C_OSCDataDealer(void)
@@ -95,14 +79,11 @@ C_OSCDataDealer::~C_OSCDataDealer(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Initializing the data dealer if the default constructor was used
+/*! \brief   Initializing the data dealer if the default constructor was used
 
    \param[in]     opc_Node                      Pointer to node of data dealer
    \param[in]     ou32_NodeIndex                Index of node of data dealer
    \param[in]     opc_DiagProtocol              Pointer to used diagnostic protocol
-
-   \created     21.07.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCDataDealer::Initialize(C_OSCNode * const opc_Node, const uint32 ou32_NodeIndex,
@@ -115,13 +96,10 @@ void C_OSCDataDealer::Initialize(C_OSCNode * const opc_Node, const uint32 ou32_N
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the associated node index
+/*! \brief   Returns the associated node index
 
    \return
    Node index
-
-   \created     29.08.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 uint32 C_OSCDataDealer::GetNodeIndex(void) const
@@ -130,8 +108,7 @@ uint32 C_OSCDataDealer::GetNodeIndex(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Read data from server's data pool
+/*! \brief   Read data from server's data pool
 
    Read data pool data from server and place in local data pool.
    * reads data from server using the installed diagnostic protocol
@@ -153,8 +130,6 @@ uint32 C_OSCDataDealer::GetNodeIndex(void) const
    C_RD_WR     protocol driver reported protocol violation
    C_WARN      error response received
    C_OVERFLOW  size of data received from server does not match size of specified data pool element
-
-   \created     18.08.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDataDealer::DataPoolRead(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
@@ -221,8 +196,7 @@ sint32 C_OSCDataDealer::DataPoolRead(const uint8 ou8_DataPoolIndex, const uint16
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Write data to server's data pool
+/*! \brief   Write data to server's data pool
 
    Write data from local data pool data to server's data pool.
    * check whether data pool value lies within defined min/max ranges
@@ -246,8 +220,6 @@ sint32 C_OSCDataDealer::DataPoolRead(const uint8 ou8_DataPoolIndex, const uint16
    C_RD_WR     protocol driver reported protocol violation
    C_WARN      error response received
    C_COM       communication driver reported error
-
-   \created     21.08.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDataDealer::DataPoolWrite(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
@@ -309,8 +281,7 @@ sint32 C_OSCDataDealer::DataPoolWrite(const uint8 ou8_DataPoolIndex, const uint1
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Read data from server's NVM
+/*! \brief   Read data from server's NVM
 
    Read NVM data from server and place in local data pool.
    * gets required offset address and size from local data pool description
@@ -335,8 +306,6 @@ sint32 C_OSCDataDealer::DataPoolWrite(const uint8 ou8_DataPoolIndex, const uint1
    C_RD_WR     protocol driver reported protocol violation
    C_WARN      error response reveived
    C_COM       expected server response not received because of communication error
-
-   \created     18.08.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDataDealer::NvmRead(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
@@ -386,8 +355,7 @@ sint32 C_OSCDataDealer::NvmRead(const uint8 ou8_DataPoolIndex, const uint16 ou16
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Write data to server's NVM
+/*! \brief   Write data to server's NVM
 
    Write data from local data pool data to server's NVM.
    * check whether data pool value lies within defined min/max ranges
@@ -418,8 +386,6 @@ sint32 C_OSCDataDealer::NvmRead(const uint8 ou8_DataPoolIndex, const uint16 ou16
    C_RD_WR     protocol driver reported protocol violation
    C_WARN      error response reveived
    C_COM       expected server response not received because of communication error
-
-   \created     18.08.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCDataDealer::NvmWrite(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
@@ -472,8 +438,7 @@ sint32 C_OSCDataDealer::NvmWrite(const uint8 ou8_DataPoolIndex, const uint16 ou1
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Handler for reception of async response
+/*! \brief   Handler for reception of async response
 
    Called by the DataDealer after it has placed the data in the data pool content structure associated with
     the installed node.
@@ -483,8 +448,6 @@ sint32 C_OSCDataDealer::NvmWrite(const uint8 ou8_DataPoolIndex, const uint16 ou1
    \param[in]  ou8_DataPoolIndex   data pool index that data was received for
    \param[in]  ou16_ListIndex      list index that data was received for
    \param[in]  ou16_ElementIndex   element index that data was received for
-
-   \created     22.08.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_OSCDataDealer::m_OnReadDataPoolEventReceived(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
@@ -498,8 +461,7 @@ void C_OSCDataDealer::m_OnReadDataPoolEventReceived(const uint8 ou8_DataPoolInde
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Handler for reception of async error response
+/*! \brief   Handler for reception of async error response
 
    Called by the DataDealer after it has received an error response for a cyclic transmission.
 
@@ -509,8 +471,6 @@ void C_OSCDataDealer::m_OnReadDataPoolEventReceived(const uint8 ou8_DataPoolInde
    \param[in]  ou16_ListIndex      list index that data was received for
    \param[in]  ou16_ElementIndex   element index that data was received for
    \param[in]  ou8_ErrorCode       received error code
-
-   \created     22.08.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_OSCDataDealer::m_OnReadDataPoolEventErrorReceived(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
@@ -524,8 +484,7 @@ void C_OSCDataDealer::m_OnReadDataPoolEventErrorReceived(const uint8 ou8_DataPoo
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Handler for reception of async response
+/*! \brief   Handler for reception of async response
 
    Called by the DataDealer after it has placed the data in the data pool content structure associated with
     the installed node.
@@ -535,8 +494,6 @@ void C_OSCDataDealer::m_OnReadDataPoolEventErrorReceived(const uint8 ou8_DataPoo
    \param[in]  ou8_DataPoolIndex   data pool index that data was received for
    \param[in]  ou16_ListIndex      list index that data was received for
    \param[in]  ou16_ElementIndex   element index that data was received for
-
-   \created     22.08.2017  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void C_OSCDataDealer::m_OnReadDataPoolNvmEventReceived(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
@@ -550,10 +507,7 @@ void C_OSCDataDealer::m_OnReadDataPoolNvmEventReceived(const uint8 ou8_DataPoolI
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Initialization of the data dealer
-
-   \created     21.07.2017  STW/B.Bayer
+/*! \brief   Initialization of the data dealer
 */
 //-----------------------------------------------------------------------------
 void C_OSCDataDealer::m_Init(void)
@@ -566,8 +520,7 @@ void C_OSCDataDealer::m_Init(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Handling an async received read datapool data event
+/*! \brief   Handling an async received read datapool data event
 
    Target of C_OSCDiagProtocolBase::PR_DataPoolReadEventReceived.
 
@@ -582,8 +535,6 @@ void C_OSCDataDealer::m_Init(void)
    \param[in]     ou8_ListIndex        List index
    \param[in]     ou8_ElementIndex     Element index
    \param[in]     orc_Value            Value of element stored in uint8 vector
-
-   \created     21.07.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCDataDealer::mh_ReadDataPoolDataEventReceived(void * const opv_Instance, const uint8 ou8_DataPoolIndex,
@@ -601,8 +552,7 @@ void C_OSCDataDealer::mh_ReadDataPoolDataEventReceived(void * const opv_Instance
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Handling an async received read datapool data event
+/*! \brief   Handling an async received read datapool data event
 
    Target of C_OSCDiagProtocolBase::PR_DataPoolReadEventReceived.
 
@@ -616,8 +566,6 @@ void C_OSCDataDealer::mh_ReadDataPoolDataEventReceived(void * const opv_Instance
    \param[in]     ou8_ListIndex        List index
    \param[in]     ou8_ElementIndex     Element index
    \param[in]     orc_Value            Value of element stored in uint8 vector
-
-   \created     21.07.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCDataDealer::m_ReadDataPoolDataEventReceived(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
@@ -680,8 +628,7 @@ void C_OSCDataDealer::m_ReadDataPoolDataEventReceived(const uint8 ou8_DataPoolIn
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Handling an async received negative read datapool data event
+/*! \brief   Handling an async received negative read datapool data event
 
    Target of C_OSCDiagProtocolBase::PR_DataPoolReadEventErrorReceived.
 
@@ -695,8 +642,6 @@ void C_OSCDataDealer::m_ReadDataPoolDataEventReceived(const uint8 ou8_DataPoolIn
    \param[in]     ou8_DataPoolIndex    Datapool index
    \param[in]     ou8_ListIndex        List index
    \param[in]     ou8_ElementIndex     Element index
-
-   \created     21.07.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCDataDealer::mh_ReadDataPoolDataEventErrorReceived(void * const opv_Instance, const uint8 ou8_DataPoolIndex,
@@ -714,8 +659,7 @@ void C_OSCDataDealer::mh_ReadDataPoolDataEventErrorReceived(void * const opv_Ins
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Handling an async received negative read datapool data event
+/*! \brief   Handling an async received negative read datapool data event
 
    Target of C_OSCDiagProtocolBase::PR_DataPoolReadEventErrorReceived.
 
@@ -724,8 +668,6 @@ void C_OSCDataDealer::mh_ReadDataPoolDataEventErrorReceived(void * const opv_Ins
 
    Here:
    Check whether this is something we know about and inform application.
-
-   \created     21.07.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCDataDealer::m_ReadDataPoolDataEventErrorReceived(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,

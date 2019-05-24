@@ -1,23 +1,16 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for save-as dialog (implementation)
 
    Widget for save-as dialog. Most functionality copied/moved from
    C_PopSaveAsWidget.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     26.07.2018  STW/G.Scupin
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -36,7 +29,7 @@
 #include "C_PopSaveAsDialogWidget.h"
 #include "ui_C_PopSaveAsDialogWidget.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
@@ -44,29 +37,28 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_errors;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
+const stw_types::sintn C_PopSaveAsDialogWidget::mhsn_VERSION_INDEX_V2 = 1;
+const stw_types::sintn C_PopSaveAsDialogWidget::mhsn_VERSION_INDEX_V3 = 0;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] orc_Parent Reference to parent
-
-   \created     26.07.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PopSaveAsDialogWidget::C_PopSaveAsDialogWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_PopSaveAsDialogWidget),
@@ -91,25 +83,19 @@ C_PopSaveAsDialogWidget::C_PopSaveAsDialogWidget(stw_opensyde_gui_elements::C_Og
    connect(this->mpc_Ui->pc_PushButtonCancel, &C_OgePubCancel::clicked, this, &C_PopSaveAsDialogWidget::m_OnCancel);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     26.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PopSaveAsDialogWidget::~C_PopSaveAsDialogWidget(void)
 {
    delete this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     26.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PopSaveAsDialogWidget::InitStaticNames(void) const
 {
    this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("PROJECT OPERATION"));
@@ -117,36 +103,45 @@ void C_PopSaveAsDialogWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelHeadingPreview->setText(C_GtGetText::h_GetText("Location"));
    this->mpc_Ui->pc_LabelName->setText(C_GtGetText::h_GetText("Project Name"));
    this->mpc_Ui->pc_LabelPath->setText(C_GtGetText::h_GetText("Path"));
+   this->mpc_Ui->pc_LabelVersion->setText(C_GtGetText::h_GetText("File Format"));
+   this->mpc_Ui->pc_ComboBoxVersion->addItem(C_GtGetText::h_GetText("V3 (default)"));
+   this->mpc_Ui->pc_ComboBoxVersion->addItem(C_GtGetText::h_GetText("V2"));
    this->mpc_Ui->pc_LineEditName->setPlaceholderText(C_GtGetText::h_GetText(""));
    this->mpc_Ui->pc_LineEditPath->setPlaceholderText(C_GtGetText::h_GetText(""));
    this->mpc_Ui->pc_PushButtonBrowse->setText(C_GtGetText::h_GetText("..."));
    this->mpc_Ui->pc_PushButtonSave->setText(C_GtGetText::h_GetText("Save"));
    this->mpc_Ui->pc_PushButtonCancel->setText(C_GtGetText::h_GetText("Cancel"));
+   //Tool tips
+   this->mpc_Ui->pc_LabelName->SetToolTipInformation(C_GtGetText::h_GetText("Project Name"),
+                                                     C_GtGetText::h_GetText(
+                                                        "Project name to choose. This will also be used as the default folder name your project is saved in."));
+   this->mpc_Ui->pc_LabelPath->SetToolTipInformation(C_GtGetText::h_GetText("Path"),
+                                                     C_GtGetText::h_GetText(
+                                                        "Path to create the new folder for the new project in"));
+   this->mpc_Ui->pc_LabelVersion->SetToolTipInformation(C_GtGetText::h_GetText("File Format"),
+                                                        C_GtGetText::h_GetText(
+                                                           "File format to use when saving this project.\n"
+                                                           "V3 (default): Project split into multiple files to improve support for multi user edit of any system definition properties\n"
+                                                           "V2: Compatibility mode for previous versions of provided tools (not recommended as this does not save all supported project properties)"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle save user settings operation
-
-   \created     25.10.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle save user settings operation
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PopSaveAsDialogWidget::SaveUserSettings() const
 {
-   C_UsHandler::h_GetInstance()->SetCurrentSaveAsPath(this->mpc_Ui->pc_LineEditPath->GetCompletePath());
+   C_UsHandler::h_GetInstance()->SetCurrentSaveAsPath(this->mpc_Ui->pc_LineEditPath->GetPath());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     26.07.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PopSaveAsDialogWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
@@ -173,19 +168,17 @@ void C_PopSaveAsDialogWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle default project name
-
-   \created     01.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle default project name
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PopSaveAsDialogWidget::m_InitDefaultProjectName(void) const
 {
    const QString c_ProjectPath = C_PuiProject::h_GetInstance()->GetPath();
+   const QFileInfo c_ProjectFileInfo(c_ProjectPath);
    QString c_Proposal;
 
-   this->mpc_Ui->pc_LineEditPath->SetPath(m_GetValidPath(C_UsHandler::h_GetInstance()->GetCurrentSaveAsPath()));
+   this->mpc_Ui->pc_LineEditPath->SetPath(m_GetValidPath(c_ProjectFileInfo.absoluteDir().absolutePath()));
 
    if (c_ProjectPath.compare("") == 0)
    {
@@ -193,26 +186,23 @@ void C_PopSaveAsDialogWidget::m_InitDefaultProjectName(void) const
    }
    else
    {
-      QFileInfo c_Project(c_ProjectPath);
       //Translation: 1: Project name
-      c_Proposal = QString("Copy_of_%1").arg(c_Project.baseName());
+      c_Proposal = QString("Copy_of_%1").arg(C_PuiProject::h_GetInstance()->GetName());
    }
    this->mpc_Ui->pc_LineEditName->setText(c_Proposal);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save project to file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save project to file
 
-   \param[in] orc_File File
+   \param[in] orc_File                     File
+   \param[in] oq_UseDeprecatedFileFormatV2 Flag to enable saving using the deprecated V2 file format
 
    \return
    see C_PuiProject::h_GetInstance()->Save(...) for return values
-
-   \created     26.07.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
-sint32 C_PopSaveAsDialogWidget::m_SaveToFile(const QString & orc_File) const
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PopSaveAsDialogWidget::m_SaveToFile(const QString & orc_File, const bool oq_UseDeprecatedFileFormatV2) const
 {
    sint32 s32_Return;
 
@@ -221,10 +211,11 @@ sint32 C_PopSaveAsDialogWidget::m_SaveToFile(const QString & orc_File) const
 
    // try to save and return errors else
    C_PuiProject::h_GetInstance()->SetPath(orc_File);
-   s32_Return = C_PuiProject::h_GetInstance()->Save(true);
+   s32_Return = C_PuiProject::h_GetInstance()->Save(true, oq_UseDeprecatedFileFormatV2);
    C_PopErrorHandling::mh_ProjectSaveErr(s32_Return, this->parentWidget());
 
-   if (s32_Return == C_NO_ERR)
+   //Only use new path if not saved in deprecated format
+   if ((s32_Return == C_NO_ERR) && (oq_UseDeprecatedFileFormatV2 == false))
    {
       // use real path for active project and recent projects
       const QString c_Path = C_PuiProject::h_GetInstance()->GetPath();
@@ -240,18 +231,15 @@ sint32 C_PopSaveAsDialogWidget::m_SaveToFile(const QString & orc_File) const
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Replace empty path if necessary
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Replace empty path if necessary
 
    \param[in] orc_Path Some path
 
    \return
    Non empty path
-
-   \created     26.07.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_PopSaveAsDialogWidget::m_GetValidPath(const QString & orc_Path) const
 {
    QString c_Retval = orc_Path;
@@ -263,16 +251,13 @@ QString C_PopSaveAsDialogWidget::m_GetValidPath(const QString & orc_Path) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle browse event
-
-   \created     26.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle browse event
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PopSaveAsDialogWidget::m_OnBrowse(void)
 {
-   QString c_Folder = m_GetValidPath(this->mpc_Ui->pc_LineEditPath->GetCompletePath());
+   QString c_Folder = m_GetValidPath(this->mpc_Ui->pc_LineEditPath->GetPath());
 
    const QString c_Path =
       QFileDialog::getExistingDirectory(this, C_GtGetText::h_GetText("Select Project Location"), c_Folder,
@@ -284,18 +269,15 @@ void C_PopSaveAsDialogWidget::m_OnBrowse(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Ok button click
-
-   \created     26.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Ok button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PopSaveAsDialogWidget::m_OnSave(void)
 {
    QApplication::setOverrideCursor(Qt::WaitCursor);
 
-   const QString c_BasePath = this->mpc_Ui->pc_LineEditPath->GetCompletePath();
+   const QString c_BasePath = this->mpc_Ui->pc_LineEditPath->GetPath();
    const QString c_Name = this->mpc_Ui->pc_LineEditName->text();
 
    if ((c_BasePath.compare("") != 0) && (c_Name.compare("") != 0))
@@ -308,8 +290,17 @@ void C_PopSaveAsDialogWidget::m_OnSave(void)
 
          if (c_Dir.exists() == false)
          {
+            bool q_UseV2;
             c_Dir.mkdir(c_Path);
-            if (m_SaveToFile(c_FilePathAndName) == C_NO_ERR)
+            if (this->mpc_Ui->pc_ComboBoxVersion->currentIndex() == C_PopSaveAsDialogWidget::mhsn_VERSION_INDEX_V2)
+            {
+               q_UseV2 = true;
+            }
+            else
+            {
+               q_UseV2 = false;
+            }
+            if (m_SaveToFile(c_FilePathAndName, q_UseV2) == C_NO_ERR)
             {
                // accept dialog if successfully saved
                this->mrc_ParentDialog.accept();
@@ -332,7 +323,7 @@ void C_PopSaveAsDialogWidget::m_OnSave(void)
          C_OgeWiCustomMessage c_Box(this, C_OgeWiCustomMessage::E_Type::eERROR);
          c_Box.SetHeading(C_GtGetText::h_GetText("Project save"));
          c_Box.SetDescription(C_GtGetText::h_GetText(
-                                 "Project is name invalid. Only alphanumeric characters + \"_\" are allowed."));
+                                 "Project name is invalid. Only alphanumeric characters + \"_\" are allowed."));
          c_Box.Execute();
       }
    }
@@ -350,14 +341,10 @@ void C_PopSaveAsDialogWidget::m_OnSave(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Cancel button click
-
-
-   \created     26.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Cancel button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PopSaveAsDialogWidget::m_OnCancel(void)
 {
    this->mrc_ParentDialog.reject();

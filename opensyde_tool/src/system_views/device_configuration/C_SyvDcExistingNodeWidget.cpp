@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for an existing node entry (implementation)
 
    Widget for an existing node entry
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.12.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QMimeData>
 #include <QDragMoveEvent>
 #include <QDragEnterEvent>
@@ -32,7 +25,7 @@
 #include "ui_C_SyvDcExistingNodeWidget.h"
 #include "C_Uti.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
@@ -40,32 +33,29 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvDcExistingNodeWidget::mhc_MimeData = "stw_opensyde_connected_node";
 const QString C_SyvDcExistingNodeWidget::mhc_MimeDataDevice = "stw_opensyde_connected_node_device";
 const QString C_SyvDcExistingNodeWidget::mhc_MimeDataDeviceValid = "stw_opensyde_connected_node_device_valid";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     06.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDcExistingNodeWidget::C_SyvDcExistingNodeWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvDcExistingNodeWidget),
@@ -93,24 +83,20 @@ C_SyvDcExistingNodeWidget::C_SyvDcExistingNodeWidget(QWidget * const opc_Parent)
            &C_SyvDcExistingNodeWidget::m_OnDisconnectRequest);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     06.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDcExistingNodeWidget::~C_SyvDcExistingNodeWidget(void)
 {
    delete mpc_Ui;
    //lint -e{1740} Never took ownership of mpc_ListWidgetItem
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set indices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set indices
 
    \param[in] ou32_ViewIndex View index
    \param[in] ou32_NodeIndex Node index
@@ -120,10 +106,8 @@ C_SyvDcExistingNodeWidget::~C_SyvDcExistingNodeWidget(void)
    \return
    C_NO_ERR    Initialization successful
    C_CONFIG    Node configuration invalid (too many connections to a bus)
-
-   \created     08.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcExistingNodeWidget::SetIndex(const stw_types::uint32 ou32_ViewIndex,
                                            const stw_types::uint32 ou32_NodeIndex, const sint32 os32_ItemIndex,
                                            QListWidgetItem * const opc_Item, const bool oq_ShowAssignment)
@@ -148,79 +132,64 @@ sint32 C_SyvDcExistingNodeWidget::SetIndex(const stw_types::uint32 ou32_ViewInde
    return m_Init();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Compare if widget matches to index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Compare if widget matches to index
 
    \param[in] ou32_NodeIndex Node index
 
    \return
    True  Match
    False No match
-
-   \created     12.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDcExistingNodeWidget::CompareIndex(const uint32 ou32_NodeIndex) const
 {
    return (this->mu32_NodeIndex == ou32_NodeIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do assiment for specified serial number
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do assiment for specified serial number
 
    \param[in] orc_SerialNumber Serial number
-
-   \created     12.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeWidget::ConnectSerialNumber(const QString & orc_SerialNumber) const
 {
    this->mpc_Ui->pc_WidgetSerialNumber->SetContent(true, orc_SerialNumber);
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_WidgetSerialNumber, "Assigned", true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Disconnect assiment for specified  serial number
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Disconnect assiment for specified  serial number
 
    \param[in] orc_SerialNumber Serial number
-
-   \created     12.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeWidget::DisconnectSerialNumber(const QString & orc_SerialNumber) const
 {
    this->mpc_Ui->pc_WidgetSerialNumber->SetContent(false, orc_SerialNumber);
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_WidgetSerialNumber, "Assigned", false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if node has serial number assigned
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if node has serial number assigned
 
    \return
    True  Assigned
    False Not assigned
-
-   \created     12.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDcExistingNodeWidget::IsAssigned(void) const
 {
    return this->mpc_Ui->pc_WidgetSerialNumber->IsAssigned();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Append all configs for this node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Append all configs for this node
 
    \param[in,out] orc_Configs All configs
-
-   \created     13.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeWidget::AppendDeviceConfig(std::vector<C_SyvDcDeviceConfiguation> & orc_Configs) const
 {
    C_SyvDcDeviceConfiguation c_Config;
@@ -250,16 +219,13 @@ void C_SyvDcExistingNodeWidget::AppendDeviceConfig(std::vector<C_SyvDcDeviceConf
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Prepares the widget for starting drag and drop of connected nodes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Prepares the widget for starting drag and drop of connected nodes
 
    \param[in]     orc_DeviceName         Device name (device type)
    \param[in]     oq_DeviceNameValid     Flag if device name is valid
-
-   \created     06.02.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeWidget::StartDrag(const QString & orc_DeviceName, const bool oq_DeviceNameValid) const
 {
    // Allow only matching devices or devices with unknown device names because of same node ids
@@ -269,30 +235,24 @@ void C_SyvDcExistingNodeWidget::StartDrag(const QString & orc_DeviceName, const 
    this->mpc_Ui->pc_GroupBoxSerialNumber->setVisible(q_Visible);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handles the stop of drag and drop of connected nodes
-
-   \created     06.02.2019  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handles the stop of drag and drop of connected nodes
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeWidget::StopDrag(void) const
 {
    this->mpc_Ui->pc_GroupBoxSerialNumber->setVisible(true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    Here: draw background
    (Not automatically drawn in any QWidget derivative)
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     11.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeWidget::paintEvent(QPaintEvent * const opc_Event)
 {
    C_OgeWiUtil::h_DrawBackground(this);
@@ -300,17 +260,14 @@ void C_SyvDcExistingNodeWidget::paintEvent(QPaintEvent * const opc_Event)
    QWidget::paintEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten drag enter event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten drag enter event slot
 
    Here: Accept drag
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     11.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeWidget::dragEnterEvent(QDragEnterEvent * const opc_Event)
 {
    const QMimeData * const pc_Mime = opc_Event->mimeData();
@@ -331,17 +288,14 @@ void C_SyvDcExistingNodeWidget::dragEnterEvent(QDragEnterEvent * const opc_Event
    QWidget::dragEnterEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten drag move event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten drag move event slot
 
    Here: Accept drag
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     11.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeWidget::dragMoveEvent(QDragMoveEvent * const opc_Event)
 {
    const QMimeData * const pc_Mime = opc_Event->mimeData();
@@ -353,34 +307,28 @@ void C_SyvDcExistingNodeWidget::dragMoveEvent(QDragMoveEvent * const opc_Event)
    QWidget::dragMoveEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten drag leave event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten drag leave event slot
 
    Here: Accept drag
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     13.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeWidget::dragLeaveEvent(QDragLeaveEvent * const opc_Event)
 {
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_WidgetSerialNumber, "Hovered", false);
    QWidget::dragLeaveEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten drop event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten drop event slot
 
    Here: Accept drop
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     11.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeWidget::dropEvent(QDropEvent * const opc_Event)
 {
    const QMimeData * const pc_Mime = opc_Event->mimeData();
@@ -427,17 +375,14 @@ void C_SyvDcExistingNodeWidget::dropEvent(QDropEvent * const opc_Event)
    QWidget::dropEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init from data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init from data
 
    \return
    C_NO_ERR    Initialization successful
    C_CONFIG    Node configuration invalid (too many connections to a bus)
-
-   \created     08.12.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvDcExistingNodeWidget::m_Init(void)
 {
    const sintn sn_Height = 72;
@@ -448,11 +393,10 @@ sint32 C_SyvDcExistingNodeWidget::m_Init(void)
    if (((pc_Node != NULL) && (pc_View != NULL)) && (pc_View->GetPcData().GetConnected() == true))
    {
       QString c_Ids;
-      //Translation: 1: Node index, 2: Node name
-      this->mpc_Ui->pc_LabelName->setText(QString(C_GtGetText::h_GetText("Node %1 - %2")).arg(this->ms32_ItemIndex).arg(
-                                             pc_Node->c_Properties.
-                                             c_Name
-                                             .c_str()));
+      //Translation: 1: Node name
+      this->mpc_Ui->pc_LabelName->setText(QString(C_GtGetText::h_GetText("%1")).arg(
+                                             pc_Node->c_Properties.c_Name.c_str()));
+
       for (uint32 u32_ItInt = 0; u32_ItInt < pc_Node->c_Properties.c_ComInterfaces.size(); ++u32_ItInt)
       {
          const C_OSCNodeComInterfaceSettings & rc_Interface = pc_Node->c_Properties.c_ComInterfaces[u32_ItInt];
@@ -508,13 +452,10 @@ sint32 C_SyvDcExistingNodeWidget::m_Init(void)
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Forward request disconnect serial number
-
-   \created     12.12.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Forward request disconnect serial number
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeWidget::m_OnDisconnectRequest(const QString & orc_SerialNumber)
 {
    Q_EMIT this->SigDisconnect(this->mu32_NodeIndex, orc_SerialNumber);

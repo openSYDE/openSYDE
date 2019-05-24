@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
-   \brief       Widget for HEX file details (implementation)
+   \brief       Widget for Data Block file details (implementation)
 
-   Widget for HEX file details
+   Widget for Data Block file details that displays HEX file information.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.06.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QDateTime>
@@ -27,42 +20,41 @@
 #include "C_GtGetText.h"
 #include "C_PuiProject.h"
 #include "C_SyvUpHexFileView.h"
+#include "C_ImpUtil.h"
 #include "ui_C_SyvUpHexFileView.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
+using namespace stw_scl;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvUpHexFileView::mhc_StartTD = "<td style=\"padding: 0 9px 0 0;\">";
 const QString C_SyvUpHexFileView::mhc_ContinueTD = "<td style=\"padding: 0 9px 0 9px;\">";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] orc_Parent Reference to parent
    \param[in]     orc_File   The file to look at
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvUpHexFileView::C_SyvUpHexFileView(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
                                        const QString & orc_File) :
    QWidget(&orc_Parent),
@@ -88,43 +80,34 @@ C_SyvUpHexFileView::C_SyvUpHexFileView(stw_opensyde_gui_elements::C_OgePopUpDial
    connect(this->mpc_Ui->pc_PushButtonOk, &QPushButton::clicked, this, &C_SyvUpHexFileView::m_OkClicked);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     25.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvUpHexFileView::~C_SyvUpHexFileView(void)
 {
    delete this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     25.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpHexFileView::InitStaticNames(void) const
 {
-   this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("HEX File"));
+   this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("Data Block File"));
    this->mpc_Ui->pc_LabelHeadingPreview->setText(C_GtGetText::h_GetText("File Information"));
    this->mpc_Ui->pc_PushButtonOk->setText(C_GtGetText::h_GetText("OK"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpHexFileView::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
@@ -150,63 +133,51 @@ void C_SyvUpHexFileView::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load all HEX information
-
-   \created     25.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load all HEX information
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpHexFileView::m_LoadInfo(void) const
 {
    QString c_Text = "<html><body>";
-   const QFileInfo c_InvalidFileInfo(this->mc_File);
    C_OsyHexFile c_HexFile;
    uint32 u32_Result;
+   const QString c_Path = C_ImpUtil::h_GetAbsolutePathFromProject(this->mc_File); //Application is relative to project
 
-   stw_scl::C_SCLString c_Path;
-   if (c_InvalidFileInfo.isAbsolute() == true)
+   u32_Result = c_HexFile.LoadFromFile(c_Path.toStdString().c_str());
+   if (u32_Result == stw_hex_file::NO_ERR)
    {
-      c_Path = this->mc_File.toStdString().c_str();
+      mh_AddFileSection(c_Path, c_Text);
+      mh_AddDataInformation(c_HexFile, c_Text);
+      mh_AddApplicationInformation(c_HexFile, c_Text);
    }
    else
    {
-      c_Path = (C_PuiProject::h_GetInstance()->GetFolderPath() + '/' + this->mc_File).toStdString().c_str();
-   }
-   //Application is relative to project files
-   u32_Result = c_HexFile.LoadFromFile(c_Path.c_str());
-   if (u32_Result == stw_hex_file::NO_ERR)
-   {
-      mh_AddFileSection(c_Path.c_str(), c_Text);
-      mh_AddDataInformation(c_HexFile, c_Text);
-      mh_AddApplicationInformation(c_HexFile, c_Text);
+      c_Text += C_GtGetText::h_GetText("Could not read ");
+      c_Text += c_Path;
+      c_Text += ".<br>";
+      c_Text += C_GtGetText::h_GetText("Please make sure it is an existing and valid HEX file.");
    }
    c_Text += "</body></html>";
    this->mpc_Ui->pc_TextEditContent->setHtml(c_Text);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Ok button click
-
-   \created     25.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Ok button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpHexFileView::m_OkClicked(void)
 {
    this->mrc_ParentDialog.accept();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle file information section
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle file information section
 
    \param[in]     orc_Path    HEX file path
    \param[in,out] orc_Content Text to append to
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpHexFileView::mh_AddFileSection(const QString & orc_Path, QString & orc_Content)
 {
    const QFileInfo c_FileInfo(orc_Path);
@@ -240,18 +211,15 @@ void C_SyvUpHexFileView::mh_AddFileSection(const QString & orc_Path, QString & o
    orc_Content += "</table>";
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get MD5 checksum for file encoded in hex
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get MD5 checksum for file encoded in hex
 
    \param[in] orc_Path File path
 
    \return
    MD5 checksum for file encoded in hex
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvUpHexFileView::mh_GetMD5Hex(const QString & orc_Path)
 {
    QString c_Retval;
@@ -269,16 +237,13 @@ QString C_SyvUpHexFileView::mh_GetMD5Hex(const QString & orc_Path)
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add data information
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add data information
 
    \param[in]     orc_HexFile Hex file info
    \param[in,out] orc_Content Text to append to
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpHexFileView::mh_AddDataInformation(C_OsyHexFile & orc_HexFile, QString & orc_Content)
 {
    const uint32 u32_Bytes = orc_HexFile.ByteCount();
@@ -307,19 +272,16 @@ void C_SyvUpHexFileView::mh_AddDataInformation(C_OsyHexFile & orc_HexFile, QStri
    orc_Content += "</table>";
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add application information
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add application information
 
    \param[in]     orc_HexFile Hex file info
    \param[in,out] orc_Content Text to append to
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpHexFileView::mh_AddApplicationInformation(C_OsyHexFile & orc_HexFile, QString & orc_Content)
 {
-   stw_scl::SCLDynamicArray<stw_diag_lib::C_XFLECUInformation> c_InfoBlocks;
+   SCLDynamicArray<stw_diag_lib::C_XFLECUInformation> c_InfoBlocks;
    orc_HexFile.GetECUInformationBlocks(c_InfoBlocks, 0UL, false, false, false);
    orc_Content += "<h3>" + QString(C_GtGetText::h_GetText("File Information Blocks")) + "</h3>";
    orc_Content += "<table>";

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for showing a concrete instance of C_SyvDaDashboardWidget in a seperated window
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     03.07.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVDATEAROFFWIDGET_H
 #define C_SYVDATEAROFFWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 
 #include "stwtypes.h"
@@ -25,7 +18,7 @@
 #include "C_OgeWiDashboardTab.h"
 #include "C_SyvComDriverDiag.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace Ui
 {
@@ -34,9 +27,9 @@ class C_SyvDaTearOffWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SyvDaTearOffWidget :
    public QWidget
@@ -81,6 +74,7 @@ Q_SIGNALS:
    void SigDataPoolWrite(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint8 ou8_DataPoolIndex,
                          const stw_types::uint16 ou16_ListIndex, const stw_types::uint16 ou16_ElementIndex);
    void SigDataPoolRead(const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Index);
+   void SigNvmReadList(const stw_opensyde_core::C_OSCNodeDataPoolListId & orc_Id);
 
    void SigWidgetComeBack(C_SyvDaTearOffWidget * const opc_Widget);
    void SigMySig(void);
@@ -88,6 +82,7 @@ Q_SIGNALS:
 protected:
    // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
    //lint -save -e1960
+   virtual void paintEvent(QPaintEvent * const opc_Event) override;
    virtual void closeEvent(QCloseEvent * const opc_Event) override;
    //lint -restore
 

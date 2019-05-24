@@ -1,35 +1,31 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       System view filer (header)
+   \brief       System view filer (V2 format) (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.06.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_PUISVHANDLERFILER_H
 #define C_PUISVHANDLERFILER_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
+#include <QDir>
 #include "stwtypes.h"
+#include "C_OSCNode.h"
 #include "C_OSCXMLParser.h"
 #include "C_PuiSvData.h"
 #include "C_PuiSvDbWidgetBase.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_PuiSvHandlerFiler
 {
@@ -37,9 +33,12 @@ public:
    C_PuiSvHandlerFiler(void);
 
    static stw_types::sint32 h_LoadViews(std::vector<C_PuiSvData> & orc_Views,
-                                        stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
-   static void h_SaveViews(const std::vector<C_PuiSvData> & orc_Views,
-                           stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
+                                        const std::vector<stw_opensyde_core::C_OSCNode> & orc_OSCNodes,
+                                        stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser,
+                                        const QDir * const opc_BasePath);
+   static stw_types::sint32 h_SaveViews(const std::vector<C_PuiSvData> & orc_Views,
+                                        stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser,
+                                        const QDir * const opc_BasePath);
    static stw_types::sint32 h_LoadDashboard(C_PuiSvDashboard & orc_Dashboard,
                                             stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser,
                                             const bool oq_IgnoreMostErrorCases = false);
@@ -51,17 +50,27 @@ public:
    static void h_SaveReadRails(const QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
                                           C_PuiSvReadDataConfiguration> & orc_Rails,
                                stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
+   static QString h_GetViewFileName(const QString & orc_ViewName);
 
 private:
    static stw_types::sint32 mh_LoadNodeActiveFlags(std::vector<stw_types::uint8> & orc_NodeActiveFlags,
                                                    stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
    static stw_types::sint32 mh_LoadNodeUpdateInformation(std::vector<C_PuiSvNodeUpdate> & orc_NodeUpdateInformation,
-                                                         stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
+                                                         stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser,
+                                                         const std::vector<stw_opensyde_core::C_OSCNode> & orc_OSCNodes);
+   static void mh_LoadNodeUpdateInformationPaths(std::vector<QString> & orc_Paths, const QString & orc_XMLTagBaseName,
+                                                 stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
    static stw_types::sint32 mh_LoadOneNodeUpdateInformation(C_PuiSvNodeUpdate & orc_NodeUpdateInformation,
-                                                            stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
+                                                            stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser,
+                                                            const stw_opensyde_core::C_OSCNode & orc_Node);
+   static void mh_LoadNodeUpdateInformationParam(std::vector<C_PuiSvNodeUpdateParamInfo> & orc_Info,
+                                                 stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
    static stw_types::sint32 mh_LoadDashboards(std::vector<C_PuiSvDashboard> & orc_Dashboards,
                                               stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
-   static stw_types::sint32 mh_LoadView(C_PuiSvData & orc_View, stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
+   static stw_types::sint32 mh_LoadViewFile(C_PuiSvData & orc_View, const QString & orc_FilePath,
+                                            const std::vector<stw_opensyde_core::C_OSCNode> & orc_OSCNodes);
+   static stw_types::sint32 mh_LoadView(C_PuiSvData & orc_View, stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser,
+                                        const std::vector<stw_opensyde_core::C_OSCNode> & orc_OSCNodes);
    static stw_types::sint32 mh_LoadPc(C_PuiSvPc & orc_Pc, stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
    static stw_types::sint32 mh_LoadCharts(std::vector<C_PuiSvDbChart> & orc_Widgets,
                                           stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
@@ -119,8 +128,14 @@ private:
                                       stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
    static void mh_SaveNodeUpdateInformation(const std::vector<C_PuiSvNodeUpdate> & orc_NodeUpdateInformation,
                                             stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
+   static void mh_SaveNodeUpdateInformationPaths(const std::vector<QString> & orc_Paths,
+                                                 const QString & orc_XMLTagBaseName,
+                                                 stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
+   static void mh_SaveNodeUpdateInformationParamInfo(const std::vector<C_PuiSvNodeUpdateParamInfo> & orc_Info,
+                                                     stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
    static void mh_SaveDashboards(const std::vector<C_PuiSvDashboard> & orc_Dashboards,
                                  stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
+   static stw_types::sint32 mh_SaveViewFile(const C_PuiSvData & orc_View, const QString & orc_FilePath);
    static void mh_SaveView(const C_PuiSvData & orc_View, stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
    static void mh_SavePc(const C_PuiSvPc & orc_Pc, stw_opensyde_core::C_OSCXMLParserBase & orc_XMLParser);
    static void mh_SaveCharts(const std::vector<C_PuiSvDbChart> & orc_Widgets,
@@ -165,7 +180,7 @@ private:
    static C_PuiSvData::E_DeviceConfigurationMode mh_StringToDeviceConfigMode(const QString & orc_Input);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

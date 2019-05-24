@@ -1,18 +1,11 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       C_CMONProtocols protocol adaption for openSYDE (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.09.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -41,10 +34,7 @@ using namespace stw_cmon_protocol;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     06.09.2018  STW/B.Bayer
+/*! \brief   Default constructor
 */
 //-----------------------------------------------------------------------------
 C_OSCComLoggerProtocols::C_OSCComLoggerProtocols(void) :
@@ -55,8 +45,7 @@ C_OSCComLoggerProtocols::C_OSCComLoggerProtocols(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Converts a CAN message to a protocol specific string
+/*! \brief   Converts a CAN message to a protocol specific string
 
    If the message does not match the configured protocol, an empty string will be returned.
    No 'Layer 2 protocol' string conversion will be made if an protocol is selected.
@@ -66,8 +55,6 @@ C_OSCComLoggerProtocols::C_OSCComLoggerProtocols(void) :
    \return
    Protocol specific string of CAN message
    Empty string in case of no matching message to the configured protocol
-
-   \created     06.09.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_OSCComLoggerProtocols::MessageToStringProtocolOnly(const T_STWCAN_Msg_RX & orc_Msg) const
@@ -83,12 +70,9 @@ C_SCLString C_OSCComLoggerProtocols::MessageToStringProtocolOnly(const T_STWCAN_
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Adds an openSYDE system definition configuration for analyzing
+/*! \brief   Adds an openSYDE system definition configuration for analyzing
 
    \param[in]     opc_SysDefConfig               Pointer to openSYDE system definition configuration
-
-   \created     09.10.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCComLoggerProtocols::AddOsySysDef(const C_OSCComMessageLoggerOsySysDefConfig * const opc_SysDefConfig)
@@ -97,12 +81,9 @@ void C_OSCComLoggerProtocols::AddOsySysDef(const C_OSCComMessageLoggerOsySysDefC
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Removes an openSYDE system definition configuration
+/*! \brief   Removes an openSYDE system definition configuration
 
    \param[in]     opc_SysDefConfig               Pointer to openSYDE system definition configuration
-
-   \created     09.10.2018  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCComLoggerProtocols::RemoveOsySysDef(const C_OSCComMessageLoggerOsySysDefConfig * const opc_SysDefConfig)

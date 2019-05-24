@@ -15,12 +15,8 @@ TEMPLATE = app
 
 DESTDIR = ../result/tool
 
-VERSION = 1.03.1
-
-DEFINES += APPLICATION_VERSION=\\\"$$VERSION\\\"
-
-# Try out optimization for debugging (additional, not replacing!)
-QMAKE_CXXFLAGS_DEBUG *= -Og
+#version info:
+RC_FILE = ../src/resources.rc
 
 SOURCES += ../src/main.cpp\
     ../libs/opensyde_core/xml_parser/C_OSCXMLParser.cpp \
@@ -401,7 +397,6 @@ SOURCES += ../src/main.cpp\
     ../src/system_views/system_update/C_SyvUpOverviewWidget.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabPropertiesSubHeading.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabFrameError.cpp \
-    ../src/opensyde_gui_elements/C_OgeErrorFrame.cpp \
     ../src/opensyde_gui_elements/widget/C_OgeWiEditBackground.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubTextOnlyEdit.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubTextWithBorderEdit.cpp \
@@ -586,8 +581,9 @@ SOURCES += ../src/main.cpp\
     ../libs/opensyde_core/data_dealer/C_OSCDataDealerNvm.cpp \
     ../libs/opensyde_core/data_dealer/C_OSCDataDealerNvmSafe.cpp \
     ../libs/opensyde_core/exports/C_OSCExportNode.cpp \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolListElementId.cpp \
+    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolId.cpp \
     ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolListId.cpp \
+    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolListElementId.cpp \
     ../libs/opensyde_core/data_dealer/paramset/C_OSCParamSetDataPoolInfo.cpp \
     ../libs/opensyde_core/exports/C_OSCExportCommunicationStack.cpp \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbParam.cpp \
@@ -664,7 +660,7 @@ SOURCES += ../src/main.cpp\
     ../src/system_views/system_update/C_SyvUpUpdatePackageWidget.cpp \
     ../src/system_views/system_update/C_SyvUpUpdatePackageListWidget.cpp \
     ../src/system_views/system_update/C_SyvUpUpdatePackageListNodeWidget.cpp \
-    ../src/system_views/system_update/C_SyvUpUpdatePackageListNodeAppWidget.cpp \
+    ../src/system_views/system_update/C_SyvUpUpdatePackageListNodeItemWidget.cpp \
     ../src/system_views/system_update/C_SyvUpSummaryWidget.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabStateInfo.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubUpdate.cpp \
@@ -747,7 +743,6 @@ SOURCES += ../src/main.cpp\
     ../src/system_views/dashboards/items/param/C_SyvDaItPaTreeDelegate.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabDescriptionMessage.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabContextMenuBase.cpp \
-    ../src/opensyde_gui_elements/line_edit/C_OgeLeFilePath.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubSvgIconOnly.cpp \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedToolTipContent.cpp \
     ../libs/dbc_driver_library/src/Vector/DBC/Attribute.cpp \
@@ -792,7 +787,7 @@ SOURCES += ../src/main.cpp\
     ../src/opensyde_gui_elements/splitter/C_OgeSpiHorizontalNavigation.cpp \
     ../src/opensyde_gui_elements/splitter/C_OgeSpiBase.cpp \
     ../src/opensyde_gui_elements/splitter/C_OgeSpiVerticalNavi.cpp \
-    ../src/opensyde_gui_elements/splitter/C_OgeSpiVertical.cpp \
+    ../src/opensyde_gui_elements/splitter/C_OgeSpiStandard.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubNavigationHover.cpp \
     ../src/scene_base/C_SebStyle.cpp \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeDark.cpp \
@@ -835,7 +830,7 @@ SOURCES += ../src/main.cpp\
     ../libs/opensyde_core/project/system/C_OSCTargetSupportPackageFiler.cpp \
     ../src/implementation/C_ImpUtil.cpp \
     ../src/system_definition/node_edit/data_blocks/C_SdNdeDbProperties.cpp \
-    ../src/opensyde_gui_elements/line_edit/C_OgeLeFilePathWrapper.cpp \
+    ../src/opensyde_gui_elements/line_edit/C_OgeLeFilePath.cpp \
     ../src/system_definition/node_edit/data_blocks/C_SdNdeDbDataPoolEntry.cpp \
     ../libs/opensyde_core/C_OSCZipFile.cpp \
     ../src/implementation/C_ImpCodeGenerationReportWidget.cpp \
@@ -852,7 +847,47 @@ SOURCES += ../src/main.cpp\
     ../src/util/C_UtiFindNameHelper.cpp \
     ../src/opensyde_gui_elements/combo_box/C_OgeCbxResizingView.cpp \
     ../src/table_base/C_TblModelAction.cpp \
-    ../src/system_definition/C_SdTooltipUtil.cpp
+    ../src/system_definition/C_SdTooltipUtil.cpp \
+    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCNodeDataPoolFilerV2.cpp \
+    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCNodeFilerV2.cpp \
+    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCSystemDefinitionFilerV2.cpp \
+    ../libs/opensyde_core/project/system/node/C_OSCNodeCommFiler.cpp \
+    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorAddWidget.cpp \
+    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCSystemBusFilerV2.cpp \
+    ../src/project_gui/system_definition/C_PuiSdHandlerFilerV2.cpp \
+    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorAddListWidget.cpp \
+    ../src/project_gui/system_definition/C_PuiSdSharedDatapools.cpp \
+    ../src/project_gui/system_views/C_PuiSvHandlerFilerV1.cpp \
+    ../libs/opensyde_core/data_dealer/paramset/C_OSCParamSetInterpretedData.cpp \
+    ../libs/opensyde_core/data_dealer/paramset/C_OSCParamSetInterpretedFileInfoData.cpp \
+    ../src/project_gui/system_views/C_PuiSvNodeUpdateParamInfo.cpp \
+    ../src/system_views/system_update/C_SyvUpParamSetFileInfoPopUp.cpp \
+    ../src/system_views/system_update/C_SyvUpParamSetFileInfo.cpp \
+    ../src/system_views/system_update/C_SyvUpParamSetFileInfoComparisonDescription.cpp \
+    ../src/system_views/system_update/C_SyvUpSummaryWidgetSmall.cpp \
+    ../src/system_views/system_update/C_SyvUpInformationWidget.cpp \
+    ../src/system_views/system_update/C_SyvUpUpdatePackageNodeWidget.cpp \
+    ../src/system_views/system_update/C_SyvUpParamSetFileAddPopUp.cpp \
+    ../src/system_views/system_update/C_SyvUpPackageListNodeItemDatablockWidget.cpp \
+    ../src/system_views/system_update/C_SyvUpPackageListNodeItemFileWidget.cpp \
+    ../src/system_views/system_update/C_SyvUpPackageListNodeItemParamSetWidget.cpp \
+    ../src/system_views/system_update/C_SyvUpPackageListNodeParamSetsWidget.cpp \
+    ../src/system_views/system_update/C_SyvUpPackageListNodeDatablocksWidget.cpp \
+    ../src/system_views/system_update/C_SyvUpPackageListNodeFilesWidget.cpp \
+    ../src/opensyde_gui_elements/push_button/C_OgePubSystemCommissioningEdit.cpp \
+    ../src/opensyde_gui_elements/push_button/C_OgePubSvgIconWithTextBase.cpp \
+    ../src/opensyde_gui_elements/check_box/C_OgeChxSystemCommisioningEdit.cpp \
+    ../src/system_views/dashboards/C_SyvDaDashboardInteraction.cpp \
+    ../src/system_views/communication/C_SyvComDriverDiagConnect.cpp \
+    ../src/project_gui/system_definition/C_PuiSdHandlerBusLogic.cpp \
+    ../src/project_gui/system_definition/C_PuiSdHandlerNodeLogic.cpp \
+    ../src/project_gui/system_definition/C_PuiSdHandlerData.cpp \
+    ../src/opensyde_gui_elements/line_edit/C_OgeLeIpAddress.cpp \
+    ../src/system_views/system_update/C_SyvUpFileSizeInformation.cpp \
+    ../src/table_base/tree_base/C_TblTreDelegateUtil.cpp \
+    ../src/user_settings/C_UsSystemViewNode.cpp \
+    ../src/opensyde_gui_elements/C_OgeTreeToolTipBase.cpp \
+    ../src/opensyde_gui_elements/C_OgeTreeWidgetToolTipBase.cpp
 
 PRECOMPILED_HEADER = ../src/precompiled_headers/gui/precomp_headers.h
 
@@ -1240,7 +1275,6 @@ HEADERS  += \
     ../src/system_views/system_update/C_SyvUpOverviewWidget.h \
     ../src/opensyde_gui_elements/label/C_OgeLabPropertiesSubHeading.h \
     ../src/opensyde_gui_elements/label/C_OgeLabFrameError.h \
-    ../src/opensyde_gui_elements/C_OgeErrorFrame.h \
     ../src/opensyde_gui_elements/widget/C_OgeWiEditBackground.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubTextOnlyEdit.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubTextWithBorderEdit.h \
@@ -1427,8 +1461,9 @@ HEADERS  += \
     ../libs/opensyde_core/data_dealer/C_OSCDataDealerNvm.h \
     ../libs/opensyde_core/data_dealer/C_OSCDataDealerNvmSafe.h \
     ../libs/opensyde_core/exports/C_OSCExportNode.h \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolListElementId.h \
+    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolId.h \
     ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolListId.h \
+    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolListElementId.h \
     ../libs/opensyde_core/data_dealer/paramset/C_OSCParamSetDataPoolInfo.h \
     ../libs/opensyde_core/exports/C_OSCExportCommunicationStack.h \
     ../src/project_gui/system_views/dashboard/C_PuiSvDbParam.h \
@@ -1507,7 +1542,7 @@ HEADERS  += \
     ../src/system_views/system_update/C_SyvUpUpdatePackageWidget.h \
     ../src/system_views/system_update/C_SyvUpUpdatePackageListWidget.h \
     ../src/system_views/system_update/C_SyvUpUpdatePackageListNodeWidget.h \
-    ../src/system_views/system_update/C_SyvUpUpdatePackageListNodeAppWidget.h \
+    ../src/system_views/system_update/C_SyvUpUpdatePackageListNodeItemWidget.h \
     ../src/system_views/system_update/C_SyvUpSummaryWidget.h \
     ../src/opensyde_gui_elements/label/C_OgeLabStateInfo.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubUpdate.h \
@@ -1616,7 +1651,6 @@ HEADERS  += \
     ../src/system_views/dashboards/items/param/C_SyvDaItPaTreeDelegate.h \
     ../src/opensyde_gui_elements/label/C_OgeLabDescriptionMessage.h \
     ../src/opensyde_gui_elements/label/C_OgeLabContextMenuBase.h \
-    ../src/opensyde_gui_elements/line_edit/C_OgeLeFilePath.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubSvgIconOnly.h \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedToolTipContent.h \
     ../src/opensyde_gui_elements/text_browser/C_OgeTebContextMenuBase.h \
@@ -1645,7 +1679,7 @@ HEADERS  += \
     ../src/opensyde_gui_elements/splitter/C_OgeSpiHorizontalNavigation.h \
     ../src/opensyde_gui_elements/splitter/C_OgeSpiBase.h \
     ../src/opensyde_gui_elements/splitter/C_OgeSpiVerticalNavi.h \
-    ../src/opensyde_gui_elements/splitter/C_OgeSpiVertical.h \
+    ../src/opensyde_gui_elements/splitter/C_OgeSpiStandard.h \
     ../src/opensyde_gui_elements/push_button/C_OgePubNavigationHover.h \
     ../src/scene_base/C_SebStyle.h \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeDark.h \
@@ -1689,7 +1723,7 @@ HEADERS  += \
     ../libs/opensyde_core/project/system/C_OSCTargetSupportPackageFiler.h \
     ../src/implementation/C_ImpUtil.h \
     ../src/system_definition/node_edit/data_blocks/C_SdNdeDbProperties.h \
-    ../src/opensyde_gui_elements/line_edit/C_OgeLeFilePathWrapper.h \
+    ../src/opensyde_gui_elements/line_edit/C_OgeLeFilePath.h \
     ../src/system_definition/node_edit/data_blocks/C_SdNdeDbDataPoolEntry.h \
     ../libs/opensyde_core/C_OSCZipFile.h \
     ../src/implementation/C_ImpCodeGenerationReportWidget.h \
@@ -1706,7 +1740,47 @@ HEADERS  += \
     ../src/util/C_UtiFindNameHelper.h \
     ../src/opensyde_gui_elements/combo_box/C_OgeCbxResizingView.h \
     ../src/table_base/C_TblModelAction.h \
-    ../src/system_definition/C_SdTooltipUtil.h
+    ../src/system_definition/C_SdTooltipUtil.h \
+    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCNodeDataPoolFilerV2.h \
+    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCNodeFilerV2.h \
+    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCSystemDefinitionFilerV2.h \
+    ../libs/opensyde_core/project/system/node/C_OSCNodeCommFiler.h \
+    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorAddWidget.h \
+    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCSystemBusFilerV2.h \
+    ../src/project_gui/system_definition/C_PuiSdHandlerFilerV2.h \
+    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorAddListWidget.h \
+    ../src/project_gui/system_definition/C_PuiSdSharedDatapools.h \
+    ../src/project_gui/system_views/C_PuiSvHandlerFilerV1.h \
+    ../libs/opensyde_core/data_dealer/paramset/C_OSCParamSetInterpretedData.h \
+    ../libs/opensyde_core/data_dealer/paramset/C_OSCParamSetInterpretedFileInfoData.h \
+    ../src/project_gui/system_views/C_PuiSvNodeUpdateParamInfo.h \
+    ../src/system_views/system_update/C_SyvUpParamSetFileInfoPopUp.h \
+    ../src/system_views/system_update/C_SyvUpParamSetFileInfo.h \
+    ../src/system_views/system_update/C_SyvUpParamSetFileInfoComparisonDescription.h \
+    ../src/system_views/system_update/C_SyvUpSummaryWidgetSmall.h \
+    ../src/system_views/system_update/C_SyvUpInformationWidget.h \
+    ../src/system_views/system_update/C_SyvUpUpdatePackageNodeWidget.h \
+    ../src/system_views/system_update/C_SyvUpParamSetFileAddPopUp.h \
+    ../src/system_views/system_update/C_SyvUpPackageListNodeItemDatablockWidget.h \
+    ../src/system_views/system_update/C_SyvUpPackageListNodeItemFileWidget.h \
+    ../src/system_views/system_update/C_SyvUpPackageListNodeItemParamSetWidget.h \
+    ../src/system_views/system_update/C_SyvUpPackageListNodeParamSetsWidget.h \
+    ../src/system_views/system_update/C_SyvUpPackageListNodeDatablocksWidget.h \
+    ../src/system_views/system_update/C_SyvUpPackageListNodeFilesWidget.h \
+    ../src/opensyde_gui_elements/push_button/C_OgePubSystemCommissioningEdit.h \
+    ../src/opensyde_gui_elements/push_button/C_OgePubSvgIconWithTextBase.h \
+    ../src/opensyde_gui_elements/check_box/C_OgeChxSystemCommisioningEdit.h \
+    ../src/system_views/dashboards/C_SyvDaDashboardInteraction.h \
+    ../src/system_views/communication/C_SyvComDriverDiagConnect.h \
+    ../src/project_gui/system_definition/C_PuiSdHandlerBusLogic.h \
+    ../src/project_gui/system_definition/C_PuiSdHandlerNodeLogic.h \
+    ../src/project_gui/system_definition/C_PuiSdHandlerData.h \
+    ../src/opensyde_gui_elements/line_edit/C_OgeLeIpAddress.h \
+    ../src/system_views/system_update/C_SyvUpFileSizeInformation.h \
+    ../src/table_base/tree_base/C_TblTreDelegateUtil.h \
+    ../src/user_settings/C_UsSystemViewNode.h \
+    ../src/opensyde_gui_elements/C_OgeTreeToolTipBase.h \
+    ../src/opensyde_gui_elements/C_OgeTreeWidgetToolTipBase.h
 
 FORMS    += \
     ../src/system_definition/C_SdTopologyWidget.ui \
@@ -1797,7 +1871,7 @@ FORMS    += \
     ../src/system_views/device_configuration/C_SyvDcConnectedNodeWidget.ui \
     ../src/system_views/system_update/C_SyvUpUpdatePackageWidget.ui \
     ../src/system_views/system_update/C_SyvUpUpdatePackageListNodeWidget.ui \
-    ../src/system_views/system_update/C_SyvUpUpdatePackageListNodeAppWidget.ui \
+    ../src/system_views/system_update/C_SyvUpUpdatePackageListNodeItemWidget.ui \
     ../src/system_views/system_update/C_SyvUpSummaryWidget.ui \
     ../src/system_definition/node_edit/C_SdNdeIpAddressConfigurationWidget.ui \
     ../src/system_views/system_update/C_SyvUpProgressLog.ui \
@@ -1827,7 +1901,14 @@ FORMS    += \
     ../src/system_definition/node_edit/data_blocks/C_SdNdeDbProperties.ui \
     ../src/system_definition/node_edit/data_blocks/C_SdNdeDbDataPoolEntry.ui \
     ../src/implementation/C_ImpCodeGenerationReportWidget.ui \
-    ../src/system_views/dashboards/items/param/C_SyvDaItPaImportReport.ui
+    ../src/system_views/dashboards/items/param/C_SyvDaItPaImportReport.ui \
+    ../src/system_definition/node_edit/C_SdNdeDataPoolSelectorAddWidget.ui \
+    ../src/system_views/system_update/C_SyvUpParamSetFileInfoPopUp.ui \
+    ../src/system_views/system_update/C_SyvUpSummaryWidgetSmall.ui \
+    ../src/system_views/system_update/C_SyvUpInformationWidget.ui \
+    ../src/system_views/system_update/C_SyvUpUpdatePackageNodeWidget.ui \
+    ../src/system_views/system_update/C_SyvUpParamSetFileAddPopUp.ui \
+    ../src/system_views/dashboards/C_SyvDaDashboardInteraction.ui
 
 INCLUDEPATH += ../src \
                ../src/com_import_export \
@@ -1920,6 +2001,7 @@ INCLUDEPATH += ../src \
                ../libs/opensyde_core/project/system \
                ../libs/opensyde_core/project/system/node \
                ../libs/opensyde_core/project/system/node/can \
+               ../libs/opensyde_core/project/system/FileLoadersV2 \
                ../libs/opensyde_core/protocol_drivers \
                ../libs/opensyde_core/protocol_drivers/routing \
                ../libs/opensyde_core/protocol_drivers/communication \
@@ -1945,13 +2027,14 @@ LIBS += -L../libs/gettext -lintl \
 LIBS += -lws2_32   #WinSock
 LIBS += -lIphlpapi #IP helper API
 
-#Icon
-win32: RC_ICONS += ../src/images/openSYDE_logo.ico
+#add windows API libraries
+LIBS += -lversion
 
 QMAKE_TARGET_COMPANY = STW
 QMAKE_TARGET_PRODUCT = openSYDE
 #QMAKE_TARGET_DESCRIPTION = TODO
-QMAKE_TARGET_COPYRIGHT = STW (c) 1999-2018
+#See C coding rules v4.00r0
+QMAKE_TARGET_COPYRIGHT = STW (c) 2018
 
 DISTFILES +=
 

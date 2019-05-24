@@ -1,3 +1,13 @@
+//----------------------------------------------------------------------------------------------------------------------
+/*!
+   \file
+   \brief       Translate L2 CAN message to L7 interpretation
+
+   Translate L2 CAN message to CANopen protocol L7 interpretation
+
+   \copyright   Copyright 2006 Sensor-Technik Wiedemann GmbH. All rights reserved.
+*/
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CCMONProtocolCANOPENH
 #define CCMONProtocolCANOPENH
 

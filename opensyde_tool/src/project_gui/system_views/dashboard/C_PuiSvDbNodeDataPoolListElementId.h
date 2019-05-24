@@ -1,33 +1,27 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Utility class to store all indices to identify a data element in the system view (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     30.08.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_PUISVDBNODEDATAPOOLLISTELEMENTID_H
 #define C_PUISVDBNODEDATAPOOLLISTELEMENTID_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>
 #include "C_OSCNodeDataPool.h"
 #include "C_OSCNodeDataPoolListElementId.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_PuiSvDbNodeDataPoolListElementId :
    public stw_opensyde_core::C_OSCNodeDataPoolListElementId
@@ -52,9 +46,9 @@ public:
                                       const QString & orc_InvalidNamePlaceholder = "");
 
    //lint -e{1511} Hiding of original operators is intended
-   virtual bool operator < (const C_OSCNodeDataPoolListId & orc_Cmp) const;
+   virtual bool operator < (const C_OSCNodeDataPoolId & orc_Cmp) const;
    //lint -e{1511} Hiding of original operators is intended
-   virtual bool operator == (const C_OSCNodeDataPoolListId & orc_Cmp) const;
+   virtual bool operator == (const C_OSCNodeDataPoolId & orc_Cmp) const;
 
    virtual void CalcHash(stw_types::uint32 & oru32_HashValue) const override;
    void MarkInvalid(const stw_opensyde_core::C_OSCNodeDataPool::E_Type oe_InvalidTypePlaceholder,
@@ -77,7 +71,7 @@ private:
    QString mc_InvalidNamePlaceholder;                                      ///< Name used in case of invalid
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

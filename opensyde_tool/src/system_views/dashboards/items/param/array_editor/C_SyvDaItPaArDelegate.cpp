@@ -1,65 +1,54 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Node data pool list array edit drawing delegate (implementation)
 
    Node data pool list array edit drawing delegate
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.11.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
 #include "C_SdNdeDataPoolUtil.h"
 #include "C_SyvDaItPaArDelegate.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     06.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaArDelegate::C_SyvDaItPaArDelegate(QObject * const opc_Parent) :
    QStyledItemDelegate(opc_Parent),
    mpc_Model(NULL)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten create editor event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten create editor event slot
 
    Here: Create appropiate editor widget
 
@@ -69,10 +58,8 @@ C_SyvDaItPaArDelegate::C_SyvDaItPaArDelegate(QObject * const opc_Parent) :
 
    \return
    Editor widget
-
-   \created     06.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QWidget * C_SyvDaItPaArDelegate::createEditor(QWidget * const opc_Parent, const QStyleOptionViewItem & orc_Option,
                                               const QModelIndex & orc_Index) const
 {
@@ -86,18 +73,15 @@ QWidget * C_SyvDaItPaArDelegate::createEditor(QWidget * const opc_Parent, const 
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten set editor data event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten set editor data event slot
 
    Here: Pass relevant data
 
    \param[in,out] opc_Editor Editor widget
    \param[in]     orc_Index  Correlating index
-
-   \created     06.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaArDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex & orc_Index) const
 {
    if ((opc_Editor != NULL) && (orc_Index.isValid() == true))
@@ -106,19 +90,16 @@ void C_SyvDaItPaArDelegate::setEditorData(QWidget * const opc_Editor, const QMod
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten set model data event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten set model data event slot
 
    Here: Pass relevant data
 
    \param[in,out] opc_Editor Editor widget
    \param[in,out] opc_Model  Model object
    \param[in]     orc_Index  Correlating index
-
-   \created     06.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaArDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel * const opc_Model,
                                          const QModelIndex & orc_Index) const
 {
@@ -128,23 +109,19 @@ void C_SyvDaItPaArDelegate::setModelData(QWidget * const opc_Editor, QAbstractIt
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set model for column look up
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set model for column look up
 
    \param[in] opc_Model  Model for column look up
-
-   \created     06.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaArDelegate::SetModel(const C_SyvDaItPaArModel * const opc_Value)
 {
    this->mpc_Model = opc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create widget to use for editing this value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create widget to use for editing this value
 
    \param[in,out] opc_Parent    Parent widget
    \param[in]     orc_Index     Correlating index
@@ -152,10 +129,8 @@ void C_SyvDaItPaArDelegate::SetModel(const C_SyvDaItPaArModel * const opc_Value)
 
    \return
    Editor widget
-
-   \created     06.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QWidget * C_SyvDaItPaArDelegate::m_CreateEditor(QWidget * const opc_Parent, const QModelIndex & orc_Index) const
 {
    QWidget * pc_Retval = NULL;

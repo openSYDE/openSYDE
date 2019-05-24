@@ -1,21 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       List for showing all nodes of the update package
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     09.02.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVUPUPDATEPACKAGELISTWIDGET_H
 #define C_SYVUPUPDATEPACKAGELISTWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <QAction>
 
@@ -23,17 +17,19 @@
 
 #include "C_OgeHorizontalListWidget.h"
 #include "C_SyvUpUpdatePackageListDelegate.h"
+#include "C_SyvUpUpdatePackageNodeWidget.h"
+#include "C_SyvUpUpdatePackageListNodeItemWidget.h"
 
 #include "C_OgeContextMenu.h"
 #include "C_OSCSuSequences.h"
 #include "C_SyvUpDeviceInfo.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SyvUpUpdatePackageListWidget :
    public stw_opensyde_gui_elements::C_OgeHorizontalListWidget
@@ -65,8 +61,9 @@ public:
 
    void CreateServiceUpdatePackage(void);
 
-   stw_types::sint32 CheckAllPaths(stw_types::uint32 & oru32_CountMissingFiles, stw_types::uint32 & oru32_CountFiles,
-                                   std::vector<QString> * const opc_InvalidNodes) const;
+   stw_types::sint32 CheckAllPaths(stw_types::uint32 & oru32_CountFiles, QStringList * const opc_FlashwareWarningsApps,
+                                   QStringList * const opc_MissingDataBlocks, QStringList * const opc_MissingParamFiles,
+                                   QStringList * const opc_MissingFiles) const;
 
    stw_types::sint32 GetUpdatePackage(
       std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
@@ -103,36 +100,45 @@ private:
    void m_OnCustomContextMenuRequested(const QPoint & orc_Pos);
    void m_OnCustomContextMenuHide(void);
    void m_SetupContextMenu(void);
-   void m_AddFileButton(C_SyvUpUpdatePackageListNodeWidget * const opc_Sender);
-   void m_AddFile(void);
+   void m_AddFileAction(void);
+   void m_AddNewFile(const QString & orc_DialogCaption, const QString & orc_DialogFilter);
    void m_SelectFile(void);
    void m_RevertFile(void);
    void m_RemoveFile(void);
-   void m_ViewHexFile(void);
+   void m_ViewFileInfo(void);
+   void m_RemoveAllSectionFiles(void);
    void m_RemoveAllNodeFiles(void);
+   void m_HideShowOptionalSections(void);
+   void m_ShowInExplorer(void) const;
 
    void m_AdaptFile(const QString & orc_Path);
    QString m_GetDialogPath(void);
 
    C_SyvUpUpdatePackageListDelegate mc_Delegate;
    stw_opensyde_gui_elements::C_OgeContextMenu * mpc_ContextMenu;
-   C_SyvUpUpdatePackageListNodeWidget * mpc_SelectedNode;
-   C_SyvUpUpdatePackageListNodeAppWidget * mpc_SelectedApp;
+   C_SyvUpUpdatePackageNodeWidget * mpc_SelectedNode;
+   C_SyvUpUpdatePackageListNodeWidget * mpc_SelectedSection;
+   C_SyvUpUpdatePackageListNodeItemWidget * mpc_SelectedApp;
    QAction * mpc_AddFileAction;
    QAction * mpc_SelectFileAction;
    QAction * mpc_RevertFileAction;
    QAction * mpc_RemoveFileAction;
-   QAction * mpc_ShowHEXFileInfoAction;
+   QAction * mpc_ShowFileInfoAction;
+   QAction * mpc_RemoveAllSectionFilesAction;
    QAction * mpc_RemoveAllNodeFilesAction;
+   QAction * mpc_HideShowOptionalSectionsAction;
+   QAction * mpc_ShowInExplorerAction;
 
    QString mc_LastPath;
 
    stw_types::uint32 mu32_ViewIndex;
    bool mq_Connected;
+   bool mq_EmptyOptionalSectionsVisible;
+
    static const QString mhc_CONFIG_FILE_TYPE;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

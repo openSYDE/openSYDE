@@ -1,34 +1,28 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Base class widget for use case specific widgets
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     11.07.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 #ifndef C_NAGUSECASEWIDGET_H
 #define C_NAGUSECASEWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 #include <QVector>
 
 #include "stwtypes.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_NagToolBarButtonProperties
 {
@@ -88,8 +82,9 @@ Q_SIGNALS:
                        const stw_types::sint32 os32_SubMode = 0, const stw_types::uint32 ou32_Index = 0U);
    void SigErrorChanged(const stw_types::uint32 ou32_Index);
    void SigStartViewClicked(void);
+   void SigTriggerUpdateTitle(void);
    void SigNameChanged(const QString & orc_Name, const QString & orc_SubItemName);
-   void SigSetPushButtonIcon(const QString & orc_IconPath);
+   void SigSetInteractionWidget(QWidget * const opc_Widget) const;
    void SigSearch(void);
    void SigNewUserSettings(void);
    void SigBlockDragAndDrop(const bool oq_Block);
@@ -103,7 +98,7 @@ private:
    C_NagUseCaseWidget & operator =(const C_NagUseCaseWidget &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

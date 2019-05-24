@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for showing entire CAN trace and its buttons (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     15.11.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_CAMMETWIDGET_H
 #define C_CAMMETWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 #include <QTimer>
 
@@ -28,7 +22,7 @@
 #include "C_SyvComMessageMonitor.h"
 #include "C_CamProFilterData.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
 {
 class C_CamMetWidget;
@@ -36,9 +30,9 @@ class C_CamMetWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_CamMetWidget :
    public stw_opensyde_gui_elements::C_OgeWiOnlyBackground
@@ -78,6 +72,8 @@ public:
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
+
+   void SetCANBitrate(const stw_types::sint32 os32_Value);
 
 Q_SIGNALS:
    void SigStartLogging(void);
@@ -129,9 +125,10 @@ private:
    QTimer mc_StatusBarTimer;
    QTimer mc_DatabaseTimer;
    bool mq_OsySysDef;
+   stw_types::sint32 ms32_CANBitrate;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

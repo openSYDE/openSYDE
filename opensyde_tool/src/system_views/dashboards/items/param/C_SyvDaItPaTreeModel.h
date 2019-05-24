@@ -1,32 +1,26 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Parameter tree model (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.06.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVDAITPATREEMODEL_H
 #define C_SYVDAITPATREEMODEL_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_TblTreModel.h"
 #include "C_PuiSvDbDataElementHandler.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SyvDaItPaTreeModel :
    public C_TblTreModel
@@ -60,7 +54,8 @@ public:
    void DeleteSpecified(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ListIds);
    void ClearECUValues(void);
    void ApplyEcuValues(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ListIds);
-   bool CheckRange(void) const;
+   bool CheckRange(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ListIds,
+                   const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListId> & orc_ListIds2) const;
    bool CheckAllListsRead(void) const;
    void PrepareChangedValues(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ListIds) const;
    void RemoveValuesChangedFlag(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ListIds)
@@ -154,7 +149,7 @@ private:
                        stw_types::uint32 & oru32_Index) const;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

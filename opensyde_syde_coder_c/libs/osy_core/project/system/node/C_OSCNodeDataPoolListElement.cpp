@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data class for an element in a list in a data pool (implementation)
 
    Data class for an element in a list in a data pool
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.12.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -43,10 +36,7 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     22.12.2016  STW/M.Echtler
+/*! \brief   Default constructor
 */
 //-----------------------------------------------------------------------------
 C_OSCNodeDataPoolListElement::C_OSCNodeDataPoolListElement(void) :
@@ -73,15 +63,12 @@ C_OSCNodeDataPoolListElement::C_OSCNodeDataPoolListElement(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
    It is not endian-safe, so it should only be used on the same system it is created on.
 
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
-
-   \created     21.03.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCNodeDataPoolListElement::CalcHash(uint32 & oru32_HashValue) const
@@ -107,13 +94,10 @@ void C_OSCNodeDataPoolListElement::CalcHash(uint32 & oru32_HashValue) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get size in bytes
+/*! \brief   Get size in bytes
 
    \return
    size of element in bytes
-
-   \created     26.01.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 uint32 C_OSCNodeDataPoolListElement::GetSizeByte(void) const
@@ -122,14 +106,11 @@ uint32 C_OSCNodeDataPoolListElement::GetSizeByte(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Change internal type
+/*! \brief   Change internal type
 
    Change type of all variables which are of variable type
 
    \param[in] ore_Value New type value
-
-   \created     09.01.2016  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCNodeDataPoolListElement::SetType(const C_OSCNodeDataPoolContent::E_Type & ore_Value)
@@ -145,12 +126,9 @@ void C_OSCNodeDataPoolListElement::SetType(const C_OSCNodeDataPoolContent::E_Typ
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Change array status
+/*! \brief   Change array status
 
    \param[in] oq_Array New value
-
-   \created     26.01.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCNodeDataPoolListElement::SetArray(const bool oq_Array)
@@ -166,15 +144,12 @@ void C_OSCNodeDataPoolListElement::SetArray(const bool oq_Array)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Resize current array
+/*! \brief   Resize current array
 
    \param[in] oru32_Size New size value
 
    \return
    Type mismatch: Exception C_CONFIG
-
-   \created     23.12.2016  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCNodeDataPoolListElement::SetArraySize(const uint32 & oru32_Size)
@@ -190,13 +165,10 @@ void C_OSCNodeDataPoolListElement::SetArraySize(const uint32 & oru32_Size)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get internal type
+/*! \brief   Get internal type
 
    \return
    Internal type
-
-   \created     17.02.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 C_OSCNodeDataPoolContent::E_Type C_OSCNodeDataPoolListElement::GetType(void) const
@@ -205,13 +177,10 @@ C_OSCNodeDataPoolContent::E_Type C_OSCNodeDataPoolListElement::GetType(void) con
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get array status
+/*! \brief   Get array status
 
    \return
    Array status
-
-   \created     17.02.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 bool C_OSCNodeDataPoolListElement::GetArray(void) const
@@ -220,13 +189,10 @@ bool C_OSCNodeDataPoolListElement::GetArray(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get current array size
+/*! \brief   Get current array size
 
    \return
    Current array size
-
-   \created     17.02.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 uint32 C_OSCNodeDataPoolListElement::GetArraySize(void) const
@@ -235,8 +201,7 @@ uint32 C_OSCNodeDataPoolListElement::GetArraySize(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Checks the current value for its range
+/*! \brief   Checks the current value for its range
 
    The function checks c_Value against the minimum (c_MinValue) and maximum (c_MaxValue)
 
@@ -244,8 +209,6 @@ uint32 C_OSCNodeDataPoolListElement::GetArraySize(void) const
    C_NO_ERR   Current value is valid
    C_RANGE    Current value is invalid
    C_CONFIG   Wrong types are set in minimum or maximum
-
-   \created     18.10.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolListElement::CheckValueRange(void) const
@@ -281,8 +244,7 @@ sint32 C_OSCNodeDataPoolListElement::CheckValueRange(void) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Checks the current NVM value for its range
+/*! \brief   Checks the current NVM value for its range
 
    The function checks c_NvmValue against the minimum (c_MinValue) and maximum (c_MaxValue)
 
@@ -290,8 +252,6 @@ sint32 C_OSCNodeDataPoolListElement::CheckValueRange(void) const
    C_NO_ERR   Current value is valid
    C_RANGE    Current value is invalid
    C_CONFIG   Wrong types are set in minimum or maximum
-
-   \created     08.11.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 sint32 C_OSCNodeDataPoolListElement::CheckNvmValueRange(void) const

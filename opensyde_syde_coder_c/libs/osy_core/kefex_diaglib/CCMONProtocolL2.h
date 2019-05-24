@@ -1,3 +1,11 @@
+//----------------------------------------------------------------------------------------------------------------------
+/*!
+   \file
+   \brief       Translate L2 CAN message to textual representation
+
+   \copyright   Copyright 2003 Sensor-Technik Wiedemann GmbH. All rights reserved.
+*/
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CCMONProtocolL2H
 #define CCMONProtocolL2H
 

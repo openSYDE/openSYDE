@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Data class for application related information (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.12.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCNODEAPPLICATION_H
 #define C_OSCNODEAPPLICATION_H
 
@@ -39,7 +33,6 @@ public:
    enum E_Type ///< possible application types
    {
       eBINARY = 0,              ///< Type for address based flash access devices. E.g.: Intel Hex file.
-      eFILE_CONTAINER,          ///< Type for file based flash access devices. File container may contain 0..* files.
       ePROGRAMMABLE_APPLICATION ///< Type for user programmable applications
    };
 

@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for node edit
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     31.01.2017  STW/S.Singer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QVBoxLayout>
@@ -31,37 +24,34 @@
 #include "C_GtGetText.h"
 #include "C_OgeWiUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in]     ou32_NodeIndex    Node index
    \param[in]     osn_TabIndex      Tab index to show
    \param[in,out] opc_parent        Optional pointer to parent
-
-   \created     31.01.2017  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeNodeEditWidget::C_SdNdeNodeEditWidget(const uint32 ou32_NodeIndex, const sintn osn_TabIndex,
                                              QWidget * const opc_Parent) :
    QWidget(opc_Parent),
@@ -76,6 +66,10 @@ C_SdNdeNodeEditWidget::C_SdNdeNodeEditWidget(const uint32 ou32_NodeIndex, const 
    this->mpc_Ui->pc_WidgetApplications->SetNodeIndex(this->mu32_NodeIndex);
 
    InitStaticNames();
+
+   // splitter
+   this->mpc_Ui->pc_Splitter->setStretchFactor(0, 0);
+   this->mpc_Ui->pc_Splitter->setStretchFactor(1, 1);
 
    this->mpc_Ui->pc_NodePropWidget->SetNodeId(this->mu32_NodeIndex);
    this->mpc_Ui->pc_DataPoolEditWidget->SetNode(this->mu32_NodeIndex);
@@ -139,24 +133,16 @@ C_SdNdeNodeEditWidget::C_SdNdeNodeEditWidget(const uint32 ou32_NodeIndex, const 
            &C_SdNdeNodeEditWidget::m_OpenDataPool);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     31.01.2017  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeNodeEditWidget::~C_SdNdeNodeEditWidget()
 {
    //Store splitter position
-   const QList<sintn> c_Sizes = this->mpc_Ui->pc_Splitter->sizes();
-
-   if (c_Sizes.size() > 0)
-   {
-      C_UsHandler::h_GetInstance()->SetSdNodeEditSplitterX(c_Sizes.at(0));
-   }
+   this->m_SaveUserSettings();
 
    //Other
    if (this->mpc_Ui->pc_TabWidgetPageNavi->count() >= 2)
@@ -173,13 +159,10 @@ C_SdNdeNodeEditWidget::~C_SdNdeNodeEditWidget()
    //lint -e{1740}  no memory leak because of the parent of mpc_ComIfDescriptionWidget and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     27.03.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_TabWidgetPageNavi->setTabText(0, C_GtGetText::h_GetText("Properties"));
@@ -188,46 +171,37 @@ void C_SdNdeNodeEditWidget::InitStaticNames(void) const
    //Tool tips
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Information about the save state of the node. Resets the data changed flag.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the save state of the node. Resets the data changed flag.
 
    \return
    true     Node was changed
    false    Node was not changed
-
-   \created     10.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeNodeEditWidget::WasChanged(void) const
 {
    return this->mq_DataChanged;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Saves the actual data into the core but not in the files
-
-   \created     23.03.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Saves the actual data into the core but not in the files
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::Save(void) const
 {
    this->mpc_Ui->pc_NodePropWidget->SaveToData();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Activates specific functionality
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Activates specific functionality
 
    mu32_FLAG_EDIT_NAME           Opens the properties and selects the name for editing
    mu32_FLAG_OPEN_PROPERTIES     Opens the properties
 
    \param[in]     ou32_Flag       Flag for specific functionality
-
-   \created     02.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::SetFlag(const uint32 ou32_Flag) const
 {
    if ((ou32_Flag == mu32_FLAG_EDIT_NAME) ||
@@ -243,9 +217,8 @@ void C_SdNdeNodeEditWidget::SetFlag(const uint32 ou32_Flag) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function to open a concrete datapool, datapool list or dataelement
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function to open a concrete datapool, datapool list or dataelement
 
    \param[in] os32_MainIndex          Datapool index (os32_Flag is 0,1,2) or Application index (os32_Flag is 3)
    \param[in] os32_ListIndex          Optional list index (if not used set to -1)
@@ -256,10 +229,8 @@ void C_SdNdeNodeEditWidget::SetFlag(const uint32 ou32_Flag) const
                                       1: os32_ElementIndex is index of datapool data element with associated CAN signal
                                       2: os32_ElementIndex is index of CAN message
                                       3: os32_MainIndex is index of application / data block
-
-   \created     16.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::OpenDetail(const sint32 os32_MainIndex, const sint32 os32_ListIndex,
                                        const sint32 os32_ElementIndex, const sint32 os32_Flag)
 {
@@ -277,15 +248,16 @@ void C_SdNdeNodeEditWidget::OpenDetail(const sint32 os32_MainIndex, const sint32
 
       if (os32_Flag == 1)
       {
-         this->mpc_ComIfDescriptionWidget->SelectSignal(this->mu32_NodeIndex, static_cast<uint32>(os32_MainIndex),
-                                                        static_cast<uint32>(os32_ListIndex),
-                                                        static_cast<uint32>(os32_ElementIndex));
+         this->mpc_ComIfDescriptionWidget->SelectSignalSearch(this->mu32_NodeIndex, static_cast<uint32>(os32_MainIndex),
+                                                              static_cast<uint32>(os32_ListIndex),
+                                                              static_cast<uint32>(os32_ElementIndex));
       }
       else if (os32_Flag == 2)
       {
-         this->mpc_ComIfDescriptionWidget->SelectMessage(this->mu32_NodeIndex, static_cast<uint32>(os32_MainIndex),
-                                                         static_cast<uint32>(os32_ListIndex),
-                                                         static_cast<uint32>(os32_ElementIndex));
+         this->mpc_ComIfDescriptionWidget->SelectMessageSearch(this->mu32_NodeIndex,
+                                                               static_cast<uint32>(os32_MainIndex),
+                                                               static_cast<uint32>(os32_ListIndex),
+                                                               static_cast<uint32>(os32_ElementIndex));
       }
       else
       {
@@ -304,32 +276,26 @@ void C_SdNdeNodeEditWidget::OpenDetail(const sint32 os32_MainIndex, const sint32
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the actual tab index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the actual tab index
 
    \return
    Tab index
-
-   \created     19.05.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SdNdeNodeEditWidget::GetTabIndex(void) const
 {
    return this->mpc_Ui->pc_TabWidgetPageNavi->currentIndex();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten show event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten show event slot
 
    Here: Load splitter position
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     22.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::showEvent(QShowEvent * const opc_Event)
 {
    const sint32 s32_FirstSegmentWidth = C_UsHandler::h_GetInstance()->GetSdNodeEditSplitterX();
@@ -338,29 +304,54 @@ void C_SdNdeNodeEditWidget::showEvent(QShowEvent * const opc_Event)
    QWidget::showEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten hide event slot
+
+   Here: Save splitter position
+
+   \param[in,out] opc_Event Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::hideEvent(QHideEvent * const opc_Event)
+{
+   this->m_SaveUserSettings();
+   QWidget::hideEvent(opc_Event);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save splitter user settings
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::m_SaveUserSettings() const
+{
+   const QList<sintn> c_Sizes = this->mpc_Ui->pc_Splitter->sizes();
+
+   if (c_Sizes.size() > 0)
+   {
+      C_UsHandler::h_GetInstance()->SetSdNodeEditSplitterX(c_Sizes.at(0));
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::m_DataChanged(void)
 {
    this->mq_DataChanged = true;
    Q_EMIT this->SigChanged();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Forward signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Forward signal
 
    \param[in] oru32_BusIndex Bus index
    \param[in] orc_BusName  Bus name
-
-   \created     23.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::m_OnSwitchToBus(const uint32 & oru32_BusIndex, const QString & orc_BusName)
 {
    Q_EMIT this->SigSwitchToBus(oru32_BusIndex, orc_BusName);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::m_EditComDataPool(const uint32 ou32_DataPoolIndex, const uint32 ou32_ListIndex)
 {
    sintn sn_Index;
@@ -410,9 +401,8 @@ void C_SdNdeNodeEditWidget::m_EditComDataPool(const uint32 ou32_DataPoolIndex, c
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for tab change of pc_TabWidgetPageNavi
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for tab change of pc_TabWidgetPageNavi
 
    Adapt the visibility of the tab options
 
@@ -422,10 +412,8 @@ void C_SdNdeNodeEditWidget::m_EditComDataPool(const uint32 ou32_DataPoolIndex, c
    The changed widget of the current tab must be reseted to the preferred size
 
    \param[in]     osn_Index         Index of selected tab
-
-   \created     23.01.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::m_CurrentTabChanged(const sintn osn_Index) const
 {
    sintn sn_Counter;
@@ -460,39 +448,30 @@ void C_SdNdeNodeEditWidget::m_CurrentTabChanged(const sintn osn_Index) const
    this->mpc_Ui->pc_TabWidgetPageNavi->widget(osn_Index)->adjustSize();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger reload of data pools tab
-
-   \created     04.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger reload of data pools tab
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::m_ReloadDataPools(void) const
 {
    this->mpc_Ui->pc_DataPoolEditWidget->SetNode(this->mu32_NodeIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger check of data pool interaction availability
-
-   \created     04.04.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger check of data pool interaction availability
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::m_CheckDataPoolInteraction(void) const
 {
    this->mpc_Ui->pc_DataPoolEditWidget->CheckDataPoolInteraction();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show data pool properties
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show data pool properties
 
    \param[in] ou32_DataPoolIndex Data pool index
-
-   \created     08.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::m_OpenDataPool(const uint32 ou32_DataPoolIndex)
 {
    this->OpenDetail(ou32_DataPoolIndex, -1, -1, 0);

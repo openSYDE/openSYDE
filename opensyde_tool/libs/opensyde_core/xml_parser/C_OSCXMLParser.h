@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief      Wrapper class for tinyxml2
@@ -9,31 +9,25 @@
    Based on an pre-existing implementation for rapidxml.
    Documented and modfied to fit into openSYDE structure and conventions.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     07.09.2016  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCXMLPARSERH
 #define C_OSCXMLPARSERH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <list>
 #include "tinyxml2.h"
 #include "stwtypes.h"
 #include "CSCLString.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 ///one XML attribute with its value
 class C_OSCXMLAttribute
@@ -43,7 +37,7 @@ public:
    stw_scl::C_SCLString c_Value; ///< value of attribute
 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 ///General xml handling
 class C_OSCXMLParserBase
@@ -117,7 +111,7 @@ public:
    std::vector<C_OSCXMLAttribute> GetAttributes(void) const;
 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 ///file based parsing
 class C_OSCXMLParser :
@@ -136,7 +130,7 @@ public:
    virtual stw_types::sint32 SaveToFile(const stw_scl::C_SCLString & orc_FileName);
 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 ///string based parsing
 class C_OSCXMLParserString :
@@ -156,7 +150,7 @@ public:
    void SaveToString(stw_scl::C_SCLString & orc_String) const;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

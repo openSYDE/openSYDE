@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       OpenSYDE utility functions (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.02.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_UTI_H
 #define C_UTI_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <vector>
 #include <QColor>
@@ -29,12 +23,12 @@
 #include "constants.h"
 #include "CSCLString.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_Uti
 {
@@ -58,6 +52,7 @@ public:
                                   const Qt::KeyboardModifier & ore_CheckKeyModifier);
    static bool h_CheckStyleState(const QStyle::State & orc_ActiveState, const QStyle::StateFlag & ore_CheckState);
    static QString h_GetExePath(void);
+   static QString h_GetApplicationVersion(const bool oq_UseSTWFormat = true);
    static QString h_CheckAndReplaceWithExePathIfNecessary(const QString & orc_Path);
    static QString h_GetLink(const QString & orc_DisplayedText,
                             const QColor & orc_Color = stw_opensyde_gui::mc_STYLE_GUIDE_COLOR_LINK,
@@ -68,11 +63,11 @@ public:
                                  const stw_types::uint32 ou32_Buffer);
    static QString h_IpAddressToString(const stw_types::uint8 (&orau8_IpAddress)[4]);
    static QFont h_GetFontPixel(const QFont & orc_Font);
-   static QString h_ConcatPathIfNecessary(const QString & orc_BaseDir,
-                                          const QString & orc_RelativeOrAbsolutePath);
    static QString h_ConvertVersionToSTWStyle(const QString & orc_Version);
+   static QString h_ConcatPathIfNecessary(const QString & orc_BaseDir, const QString & orc_RelativeOrAbsolutePath);
    static stw_scl::C_SCLString h_GetUniqueName(const std::map<stw_scl::C_SCLString, bool> & orc_ExistingStrings,
-                                               const stw_scl::C_SCLString & orc_ProposedName);
+                                               const stw_scl::C_SCLString & orc_ProposedName,
+                                               const stw_scl::C_SCLString & orc_SkipName = "");
    static QString h_GetUniqueNameQ(const std::map<stw_scl::C_SCLString, bool> & orc_ExistingStrings,
                                    const QString & orc_ProposedName);
    static void h_GetNumberAtStringEnd(const stw_scl::C_SCLString & orc_ProposedName,
@@ -91,7 +86,7 @@ private:
    C_Uti(void);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

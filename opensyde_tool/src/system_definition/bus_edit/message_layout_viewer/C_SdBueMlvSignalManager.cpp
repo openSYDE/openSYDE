@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Managing the graphics items for a signal in the message layout viewer (implementation)
 
    detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwerrors.h"
@@ -28,38 +21,35 @@
 #include "C_SdNdeDataPoolContentUtil.h"
 #include "C_SdUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     opc_SyncManager         Message sync manager
    \param[in]     orc_MessageId           Message identification indices
    \param[in]     ou16_MaximumCountBits   Maximumt count of bits bounded by DLC
    \param[in]     of64_Space              Space configuration between signals
    \param[in]     opc_Parent              Optional parent
-
-   \created     06.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvSignalManager::C_SdBueMlvSignalManager(C_PuiSdNodeCanMessageSyncManager * const opc_SyncManager,
                                                  const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                  const uint16 ou16_MaximumCountBits, const float64 of64_Space,
@@ -78,31 +68,25 @@ C_SdBueMlvSignalManager::C_SdBueMlvSignalManager(C_PuiSdNodeCanMessageSyncManage
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     06.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvSignalManager::~C_SdBueMlvSignalManager()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Loads the signal informations and initialize the signal manager and its sub items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Loads the signal informations and initialize the signal manager and its sub items
 
    \param[in]     ou32_SignalIndex        Index of the signal
    \param[in]     orc_ColorConfiguration  Color configuration
 
    Shall be used first when the signals are connected
-
-   \created     13.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalManager::LoadSignal(const uint32 ou32_SignalIndex,
                                          const C_SignalItemColors & orc_ColorConfiguration)
 {
@@ -144,23 +128,19 @@ void C_SdBueMlvSignalManager::LoadSignal(const uint32 ou32_SignalIndex,
    this->m_UpdateItemConfiguration();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the name of the signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the name of the signal
 
    \param[in]     orc_Name          Name of the signal
-
-   \created     06.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalManager::SetName(const QString & orc_Name)
 {
    this->mc_Name = orc_Name;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the position of the first bit of the signal for resizing
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the position of the first bit of the signal for resizing
 
    The last bit must be set already.
 
@@ -169,10 +149,8 @@ void C_SdBueMlvSignalManager::SetName(const QString & orc_Name)
    \return
    true  Signal was changed
    false Signal was not changed
-
-   \created     06.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdBueMlvSignalManager::SetStartBit(const uint16 ou16_Position)
 {
    bool q_Return = true;
@@ -219,9 +197,8 @@ bool C_SdBueMlvSignalManager::SetStartBit(const uint16 ou16_Position)
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the position of the last bit of the signal for resizing
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the position of the last bit of the signal for resizing
 
    The start bit must be set already.
 
@@ -230,10 +207,8 @@ bool C_SdBueMlvSignalManager::SetStartBit(const uint16 ou16_Position)
    \return
    true  Signal was changed
    false Signal was not changed
-
-   \created     06.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdBueMlvSignalManager::SetLastBit(const uint16 ou16_Position)
 {
    bool q_Return = true;
@@ -280,15 +255,12 @@ bool C_SdBueMlvSignalManager::SetLastBit(const uint16 ou16_Position)
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the ZOrder value for all visible items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the ZOrder value for all visible items
 
    \param[in]     of64_ZOrder      New ZOrder value
-
-   \created     19.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalManager::SetZOrder(const float64 of64_ZOrder) const
 {
    sintn sn_Counter;
@@ -299,16 +271,13 @@ void C_SdBueMlvSignalManager::SetZOrder(const float64 of64_ZOrder) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the ZOrder value for all visible items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the ZOrder value for all visible items
 
    \return
    Actual ZOrder value
-
-   \created     19.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 float64 C_SdBueMlvSignalManager::GetZOrder(void) const
 {
    float64 f64_Return = 0.0;
@@ -321,15 +290,12 @@ float64 C_SdBueMlvSignalManager::GetZOrder(void) const
    return f64_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adapts the visualization to show the selection state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adapts the visualization to show the selection state
 
    \param[in]     oq_Selected     input parameter description
-
-   \created     17.01.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalManager::SetSelected(const bool oq_Selected)
 {
    sint32 s32_Counter;
@@ -340,19 +306,16 @@ void C_SdBueMlvSignalManager::SetSelected(const bool oq_Selected)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Moves the signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Moves the signal
 
    \param[in]     os32_Offset          Move distance
 
    \return
    true  Signal was moved
    false Signal was not moved
-
-   \created     13.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdBueMlvSignalManager::MoveSignal(const sint32 os32_Offset)
 {
    bool q_Return = false;
@@ -394,109 +357,88 @@ bool C_SdBueMlvSignalManager::MoveSignal(const sint32 os32_Offset)
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the signal name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the signal name
 
    \return
    Name of signal
-
-   \created     30.07.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SdBueMlvSignalManager::GetName(void) const
 {
    return this->mc_Name;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the start bit position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the start bit position
 
    \return
    Start bit
-
-   \created     11.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint16 C_SdBueMlvSignalManager::GetStartBit(void) const
 {
    return this->mc_Signal.u16_ComBitStart;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the last bit position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the last bit position
 
    \return
    Last bit
-
-   \created     11.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint16 C_SdBueMlvSignalManager::GetLastBit(void) const
 {
    return this->mu16_LastBit;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the length
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the length
 
    \return
    Length
-
-   \created     11.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint16 C_SdBueMlvSignalManager::GetLength(void) const
 {
    return this->mc_Signal.u16_ComBitLength;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the signal index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the signal index
 
    \return
    Signal index
-
-   \created     07.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SdBueMlvSignalManager::GetSignalIndex(void) const
 {
    return this->mu32_SignalIndex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the background color
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the background color
 
    \return
    Color configuration
-
-   \created     07.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvSignalManager::GetColorConfiguration(void) const
 {
    return this->mc_ColorConfiguration;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the interaction mode dependent of the mouse position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the interaction mode dependent of the mouse position
 
    \return
    eIAM_NONE
    eIAM_RESIZELEFT
    eIAM_RESIZERIGHT
    eIAM_MOVE
-
-   \created     11.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvSignalManager::E_InterActionMode C_SdBueMlvSignalManager::GetInteractionMode(const QPointF & orc_MousePos)
 const
 {
@@ -545,45 +487,36 @@ const
    return e_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns flag if mouse is hovering over signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns flag if mouse is hovering over signal
 
    \return
    true   Mouse is hovering above signal
    false  Mouse is not hovering above signal
-
-   \created     16.01.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdBueMlvSignalManager::IsHovered(void) const
 {
    return this->mq_Hovered;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   generate custom tool tip
-
-   \created     16.01.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   generate custom tool tip
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalManager::GenerateHint(void)
 {
    this->SetDefaultToolTipHeading(this->mc_Name);
    this->SetDefaultToolTipContent(C_SdUtil::h_GetToolTipContentSignal(this->mc_MessageId, this->mu32_SignalIndex));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the size and position of all sub items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the size and position of all sub items
 
    \param[in]     of64_SingleItemWidth      New item width
    \param[in]     of64_SingleItemHeight     New item height
-
-   \created     06.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalManager::Update(const float64 of64_SingleItemWidth, const float64 of64_SingleItemHeight)
 {
    QVector<C_SdBueMlvSignalItem *>::const_iterator pc_ItItem;
@@ -595,16 +528,13 @@ void C_SdBueMlvSignalManager::Update(const float64 of64_SingleItemWidth, const f
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Deletes all sub items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Deletes all sub items
 
    Deleting the items not in the destructor. The destructor may be called later when the sub items are deleted
    by their parents already.
-
-   \created     07.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalManager::ClearItems(void)
 {
    QVector<C_SdBueMlvSignalItem *>::iterator pc_ItItem;
@@ -618,13 +548,10 @@ void C_SdBueMlvSignalManager::ClearItems(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Saves the actual state of the signal in its message in the core
-
-   \created     13.04.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Saves the actual state of the signal in its message in the core
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalManager::SaveSignal(void) const
 {
    if (this->mpc_MessageSyncManager != NULL)
@@ -634,57 +561,48 @@ void C_SdBueMlvSignalManager::SaveSignal(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the position of a signal bit in the data bytes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the position of a signal bit in the data bytes
 
    \param[in]     ou16_SignalBitPosition   Signal bit position starting at 0
 
    \return
    Data bytes bit position
-
-   \created     13.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint16 C_SdBueMlvSignalManager::GetDataBytesBitPosOfSignalBit(const uint16 ou16_SignalBitPosition) const
 {
    return this->mc_Signal.GetDataBytesBitPosOfSignalBit(ou16_SignalBitPosition);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the position of a signal bit in the data bytes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the position of a signal bit in the data bytes
 
    \param[in]     ou16_StartBit            New start bit for the signal
    \param[in]     ou16_SignalBitPosition   Signal bit position starting at 0
 
    \return
    Data bytes bit position
-
-   \created     19.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint16 C_SdBueMlvSignalManager::GetDataBytesBitPosOfSignalBit(const uint16 ou16_StartBit,
                                                               const uint16 ou16_SignalBitPosition) const
 {
    return this->mc_Signal.GetDataBytesBitPosOfSignalBit(ou16_StartBit, ou16_SignalBitPosition);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the positions of all signal bits in the data bytes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the positions of all signal bits in the data bytes
 
    \param[out]     orc_SetPositions   Signal bit positions
-
-   \created     13.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalManager::GetDataBytesBitPositionsOfSignal(std::set<uint16> & orc_SetPositions) const
 {
    this->mc_Signal.GetDataBytesBitPositionsOfSignal(orc_SetPositions);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalManager::m_UpdateItemConfiguration(void)
 {
    C_SdBueMlvSignalItem * pc_Item;
@@ -884,7 +802,7 @@ void C_SdBueMlvSignalManager::m_UpdateItemConfiguration(void)
    this->m_SetError(!q_AllRowsVisible);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalManager::m_SignalItemHovered(const bool oq_Hover)
 {
    sintn sn_Counter;
@@ -902,7 +820,7 @@ void C_SdBueMlvSignalManager::m_SignalItemHovered(const bool oq_Hover)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalManager::m_SetNewLength(const sint16 os16_Lenth)
 {
    if (os16_Lenth > 0)
@@ -915,7 +833,7 @@ void C_SdBueMlvSignalManager::m_SetNewLength(const sint16 os16_Lenth)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalManager::m_SetError(const bool oq_Active)
 {
    sintn sn_Counter;

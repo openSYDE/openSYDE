@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       openSYDE protocol transport-protocol abstract class definition
@@ -10,15 +10,9 @@
    All elements and functionality common to all transport protocols are contained here.
    Elements and functionality that is specific to the transport protocol needs to be implemented there.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.02.2016  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCPROTOCOLDRIVEROSYTPBASE
 #define C_OSCPROTOCOLDRIVEROSYTPBASE
 

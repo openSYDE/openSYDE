@@ -1,112 +1,90 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Base class widget for use case specific widgets
 
    The base class for all use case widgets, which will be shown with
    C_NagUseCaseViewWidget.
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     11.07.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_NagUseCaseWidget.h"
 #include "C_OgePopUpDialog.h"
 #include "C_PopSaveAsDialogWidget.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     11.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_NagUseCaseWidget::C_NagUseCaseWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     11.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_NagUseCaseWidget::~C_NagUseCaseWidget()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function to set the parent of the widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function to set the parent of the widget
 
    The function is virtual to offer specific widgets the possibility to react
    if the parent was changed
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     13.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagUseCaseWidget::SetParentHook(QWidget * const opc_Parent)
 {
    this->setParent(opc_Parent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the vector with the function names
-
-   \created     12.07.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the vector with the function names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVector<C_NagToolBarButtonProperties> C_NagUseCaseWidget::GetVecToolBarFuncNames(void) const
 {
    return this->mc_VecUserInputFuncNames;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function for toolbar
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function for toolbar
 
    \param[in]  ou32_FuncNumber   Number of function
-
-   \created     12.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagUseCaseWidget::UserInputFunc(const uint32 ou32_FuncNumber)
 {
    // empty implementation if the derived class doesn't need function
@@ -114,24 +92,20 @@ void C_NagUseCaseWidget::UserInputFunc(const uint32 ou32_FuncNumber)
    Q_UNUSED(ou32_FuncNumber)
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Optional function to save data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Optional function to save data
 
    Default implementation: The widget has nothing to save. The concrete
    implementation must override this function if necessary.
-
-   \created     08.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagUseCaseWidget::Save(void)
 {
    // nothing to do here
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Optional function to open a concrete destination or information
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Optional function to open a concrete destination or information
 
    The concrete implementation is widget specific
 
@@ -140,10 +114,8 @@ void C_NagUseCaseWidget::Save(void)
    \param[in] os32_SubSubIndex      Third index
    \param[in] os32_SubSubSubIndex   Fourth index
    \param[in] os32_Flag             Optional flag for further information
-
-   \created     16.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagUseCaseWidget::OpenDetail(const sint32 os32_Index, const sint32 os32_SubIndex, const sint32 os32_SubSubIndex,
                                     const sint32 os32_SubSubSubIndex, const stw_types::sint32 os32_Flag)
 {
@@ -156,9 +128,8 @@ void C_NagUseCaseWidget::OpenDetail(const sint32 os32_Index, const sint32 os32_S
    Q_UNUSED(os32_Flag)
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Optional function to prepare closing the widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Optional function to prepare closing the widget
 
    Default implementation: The widget has nothing to prepare. The concrete
    implementation must override this function if necessary.
@@ -166,19 +137,16 @@ void C_NagUseCaseWidget::OpenDetail(const sint32 os32_Index, const sint32 os32_S
    \return
    true     Preparation successful. Can be closed.
    false    Preparation not finished. Can not be closed.
-
-   \created     22.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_NagUseCaseWidget::PrepareToClose(void)
 {
    // nothing to do here
    return true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Optional function to set the actual mode of concrete handler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Optional function to set the actual mode of concrete handler
 
    Do not call this function internally. Use the signal SigChangeMode to
    inform the entire application about the change.
@@ -186,10 +154,8 @@ bool C_NagUseCaseWidget::PrepareToClose(void)
    \param[in]     os32_SubMode     Actual sub mode
    \param[in]     ou32_Index       Index for node or bus
    \param[in]     ou32_Flag        Flag for special functionality
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagUseCaseWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_Index, const uint32 ou32_Flag)
 {
    // empty implementation if the derived class doesn't need function
@@ -199,19 +165,16 @@ void C_NagUseCaseWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
    Q_UNUSED(ou32_Flag)
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle for global key press event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle for global key press event
 
    \param[in,out] opc_Event Event identification and information
 
    \return
    True  Handled
    False Not handled
-
-   \created     27.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_NagUseCaseWidget::GlobalUserKeyPress(QKeyEvent * const opc_Event)
 {
    // nothing to do here
@@ -220,25 +183,19 @@ bool C_NagUseCaseWidget::GlobalUserKeyPress(QKeyEvent * const opc_Event)
    return false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle generic push button icon press
-
-   \created     02.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle generic push button icon press
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagUseCaseWidget::OnPushButtonIconPress(void)
 {
    // nothing to do here
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle save as action
-
-   \created     11.01.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle save as action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagUseCaseWidget::SaveAs(void)
 {
    QPointer<stw_opensyde_gui_elements::C_OgePopUpDialog> const c_New =

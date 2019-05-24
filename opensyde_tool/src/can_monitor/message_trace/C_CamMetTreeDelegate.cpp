@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Max performance delegate (implementation)
 
    Max performance delegate
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     29.08.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QBitArray>
@@ -30,14 +23,15 @@
 #include "C_OSCCanSignal.h"
 #include "C_TblDelegateUtil.h"
 #include "C_CamMetTreeDelegate.h"
+#include "TGLUtils.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QColor C_CamMetTreeDelegate::mhc_HighlightBackgroundColor = mc_STYLE_GUIDE_COLOR_27;
 const QColor C_CamMetTreeDelegate::mhc_HighlightForegroundColor = mc_STYLE_GUIDE_COLOR_0;
 const QColor C_CamMetTreeDelegate::mhc_HighlightBorderColor = mc_STYLE_GUIDE_COLOR_7;
@@ -46,52 +40,46 @@ const QColor C_CamMetTreeDelegate::mhc_DefaultBackgroundColor = Qt::transparent;
 const QFont C_CamMetTreeDelegate::mhc_HighlightFont = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_12);
 const QFont C_CamMetTreeDelegate::mhc_DefaultFont = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_12);
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     29.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMetTreeDelegate::C_CamMetTreeDelegate(QObject * const opc_Parent) :
    QStyledItemDelegate(opc_Parent)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paint item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paint item
 
    Here: notify model to unlock data requests (performance)
 
    \param[in,out] opc_Painter Painter
    \param[in]     orc_Option  Option
    \param[in]     orc_Index   Index
-
-   \created     29.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeDelegate::paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
                                  const QModelIndex & orc_Index) const
 {
    const QRect c_PaddedCellRect = orc_Option.rect.adjusted(3, 1, -3, -2);
    const bool q_Selected = orc_Option.state.testFlag(QStyle::State_Selected);
 
-   Q_EMIT this->SigStartAccept();
+   Q_EMIT (this->SigStartAccept());
    //Evaluate data AFTER unlocking the data
    //Always draw cell (should only be background if any additional paint operations are done)
    QStyledItemDelegate::paint(opc_Painter, orc_Option, orc_Index);
@@ -105,23 +93,26 @@ void C_CamMetTreeDelegate::paint(QPainter * const opc_Painter, const QStyleOptio
                                             C_CamMetTreeDelegate::mhc_HighlightFont, 19, 25) == true)
    {
       //Don't do anything else
+      //Make sure text is not painted twice
+      tgl_assert(orc_Index.data(static_cast<sintn>(Qt::DisplayRole)).toString().isEmpty());
    }
    else if (mh_PaintChildCell(opc_Painter, c_PaddedCellRect, orc_Index, q_Selected) == true)
    {
       //Don't do anything else
+      // Make sure text is not painted twice
+      tgl_assert(orc_Index.data(static_cast<sintn>(Qt::DisplayRole)).toString().isEmpty());
    }
    else
    {
-      //Nothing to do
+      //Nothing to do (original paint already painted everything we want to be painted)
    }
    C_CamMetTreeDelegate::mh_PaintSelectedCellIcon(opc_Painter, c_PaddedCellRect, orc_Index,
                                                   q_Selected);
-   Q_EMIT this->SigEndAccept();
+   Q_EMIT (this->SigEndAccept());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overloaded size hint
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overloaded size hint
 
    Adapt the size to get an even number of pixels for each item.
    Reason: Drawing of the points for the branches. Only with an even number of pixel it works out
@@ -131,10 +122,8 @@ void C_CamMetTreeDelegate::paint(QPainter * const opc_Painter, const QStyleOptio
 
    \return
    Current required size
-
-   \created     28.11.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QSize C_CamMetTreeDelegate::sizeHint(const QStyleOptionViewItem & orc_Option, const QModelIndex & orc_Index) const
 {
    QSize c_Size = QStyledItemDelegate::sizeHint(orc_Option, orc_Index);
@@ -144,9 +133,8 @@ QSize C_CamMetTreeDelegate::sizeHint(const QStyleOptionViewItem & orc_Option, co
    return c_Size;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paint icon
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paint icon
 
    Warning: no support for other icon positions
 
@@ -154,10 +142,8 @@ QSize C_CamMetTreeDelegate::sizeHint(const QStyleOptionViewItem & orc_Option, co
    \param[in]     orc_CellRect Cell rectangle to draw in
    \param[in]     orc_Index    Index
    \param[in]     oq_Selected  Flag if item is selected
-
-   \created     29.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeDelegate::mh_PaintSelectedCellIcon(QPainter * const opc_Painter, const QRect & orc_CellRect,
                                                     const QModelIndex & orc_Index, const bool oq_Selected)
 {
@@ -181,9 +167,8 @@ void C_CamMetTreeDelegate::mh_PaintSelectedCellIcon(QPainter * const opc_Painter
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paint child section
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paint child section
 
    \param[in,out] opc_Painter  Painter
    \param[in]     orc_CellRect Cell rectangle to draw in
@@ -193,10 +178,8 @@ void C_CamMetTreeDelegate::mh_PaintSelectedCellIcon(QPainter * const opc_Painter
    \return
    True  Section painted
    False Section empty
-
-   \created     28.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_CamMetTreeDelegate::mh_PaintChildCell(QPainter * const opc_Painter, const QRect & orc_CellRect,
                                              const QModelIndex & orc_Index, const bool oq_Selected)
 {
@@ -285,18 +268,15 @@ bool C_CamMetTreeDelegate::mh_PaintChildCell(QPainter * const opc_Painter, const
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get maximum length of strings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get maximum length of strings
 
    \param[in] orc_Names Strings to evaluate
 
    \return
    Maximum length of strings
-
-   \created     26.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamMetTreeDelegate::mh_GetMaxLength(const QStringList & orc_Names)
 {
    sint32 s32_Retval = 0;
@@ -311,16 +291,13 @@ sint32 C_CamMetTreeDelegate::mh_GetMaxLength(const QStringList & orc_Names)
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get vector of all restricted column sizes
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get vector of all restricted column sizes
 
    \return
    Vector of all restricted column sizes
-
-   \created     28.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<sint32> C_CamMetTreeDelegate::mh_GetChildColWidths(void)
 {
    std::vector<sint32> c_Retval;
@@ -338,16 +315,13 @@ std::vector<sint32> C_CamMetTreeDelegate::mh_GetChildColWidths(void)
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get alignment flags for top items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get alignment flags for top items
 
    \return
    Alignment flags for top items
-
-   \created     01.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<QFlags<Qt::AlignmentFlag> > C_CamMetTreeDelegate::mh_GetTopAlignmentFlags(void)
 {
    std::vector<QFlags<Qt::AlignmentFlag> > c_Retval;
@@ -359,16 +333,13 @@ std::vector<QFlags<Qt::AlignmentFlag> > C_CamMetTreeDelegate::mh_GetTopAlignment
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get spaces between top items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get spaces between top items
 
    \return
    Spaces between top items
-
-   \created     01.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<QString> C_CamMetTreeDelegate::mh_GetTopSpaces(void)
 {
    std::vector<QString> c_Retval;

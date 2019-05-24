@@ -1,23 +1,16 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Hover widget in material design
 
    The widget offers the possibility to show different widgets with hover widget with
    the same desing and layout.
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     28.07.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
@@ -32,13 +25,13 @@
 #include "ui_C_OgeWiHover.h"
 #include "constants.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_types;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 static const sintn msn_SHADOW_WIDTH = 8;
 
 static const sintn msn_MAXIMIZED_HEIGHT_MINIMUM = 300U + (2 * msn_SHADOW_WIDTH);
@@ -63,19 +56,18 @@ static const uint32 mu32_RESIZE_ALL_BOTTOMRIGHT = 6U;
 static const uint32 mu32_RESIZE_HOR_LEFT = 7U;
 static const uint32 mu32_RESIZE_VER_TOP = 8U;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -84,10 +76,8 @@ static const uint32 mu32_RESIZE_VER_TOP = 8U;
    \param[in]     oq_Search           Flag if search function shall be active or not
    \param[in,out] opc_ContainerWidget Optional widget for resize restriction
    \param[in,out] opc_Parent          Optional pointer to parent
-
-   \created     28.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeWiHover::C_OgeWiHover(QWidget & orc_Widget, QString oc_Title, const bool oq_Search,
                            QWidget * const opc_ContainerWidget, QWidget * const opc_Parent) :
    QWidget(opc_Parent),
@@ -144,83 +134,65 @@ C_OgeWiHover::C_OgeWiHover(QWidget & orc_Widget, QString oc_Title, const bool oq
    //lint -e{429}  no memory leak because of the parent of pc_Shadow and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     28.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeWiHover::~C_OgeWiHover()
 {
    delete mpc_Ui;
    //lint -e{1740} Cleaned up via Qt parent mechanism
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     28.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiHover::InitStaticNames() const
 {
    this->mpc_Ui->pc_LabelTitle->setText(C_GtGetText::h_GetText("Default Title"));
    this->mpc_Ui->pc_LineEditSearch->setPlaceholderText(C_GtGetText::h_GetText("Search"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns actual state about maximized or minimized
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns actual state about maximized or minimized
 
    \return     Actual maximized state of widget
-
-   \created     18.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OgeWiHover::GetMaximized(void) const
 {
    return this->mq_Maximized;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns maximized height
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns maximized height
 
    \return     Actual maximized height
-
-   \created     18.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_OgeWiHover::GetMaximizedHeight(void) const
 {
    return this->msn_Height;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the maximized height
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the maximized height
 
    \param[in]  osn_Height  New maximized height
-
-   \created     18.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiHover::SetMaximizedHeight(const sintn osn_Height)
 {
    this->msn_Height = osn_Height;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the widget in minimized mode without animation
-
-   \created     18.10.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the widget in minimized mode without animation
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiHover::SetMinimize(void)
 {
    this->mq_Maximized = false;
@@ -236,15 +208,12 @@ void C_OgeWiHover::SetMinimize(void)
    this->m_AdaptBtnIcon(true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply current dark mode setting
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply current dark mode setting
 
    \param[in] oq_Active Dark mode active
-
-   \created     03.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiHover::ApplyDarkMode(const bool oq_Active)
 {
    QColor c_Color;
@@ -273,13 +242,10 @@ void C_OgeWiHover::ApplyDarkMode(const bool oq_Active)
    //lint -e{429}  no memory leak because of the parent of pc_Shadow and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot function for button minimizing and maximizing click
-
-   \created     01.08.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for button minimizing and maximizing click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiHover::m_MinmaxClicked()
 {
    m_UpdateParentSize();
@@ -296,13 +262,10 @@ void C_OgeWiHover::m_MinmaxClicked()
    this->mc_TimerAnimation.start();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot function for animation timer
-
-   \created     01.08.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot function for animation timer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiHover::m_AnimationTimerEvent()
 {
    QSize c_Size;
@@ -400,19 +363,16 @@ void C_OgeWiHover::m_AnimationTimerEvent()
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiHover::m_SearchChanged(const QString & orc_Text)
 {
    Q_EMIT this->SigSearchChanged(orc_Text);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update parent size variable
-
-   \created     03.08.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update parent size variable
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiHover::m_UpdateParentSize(void)
 {
    if (this->mpc_ContainerWidget != NULL)
@@ -441,7 +401,7 @@ void C_OgeWiHover::m_UpdateParentSize(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiHover::m_AdaptBtnIcon(const bool oq_BtnWidgetMax) const
 {
    QImage c_Image;
@@ -472,7 +432,7 @@ void C_OgeWiHover::m_AdaptBtnIcon(const bool oq_BtnWidgetMax) const
    this->mpc_Ui->pc_BtnMinMax->setIcon(QPixmap::fromImage(c_Image));
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_OgeWiHover::mhu32_GetResizeMode(const QPoint & orc_Pos, const QSize & orc_Size, const bool oq_Maximized)
 {
    uint32 u32_ResizeMode = mu32_RESIZE_NONE;
@@ -530,7 +490,7 @@ uint32 C_OgeWiHover::mhu32_GetResizeMode(const QPoint & orc_Pos, const QSize & o
    return u32_ResizeMode;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiHover::mh_AdaptMouseRangePos(QPoint & orc_Pos, const QSize & orc_Range, const QPoint & orc_TopLeft,
                                          const sintn osn_OffsetX, const sintn osn_OffsetY)
 {
@@ -560,15 +520,12 @@ void C_OgeWiHover::mh_AdaptMouseRangePos(QPoint & orc_Pos, const QSize & orc_Ran
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle cursor in default state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle cursor in default state
 
    \param[in] orc_Pos Current cursor position (local)
-
-   \created     28.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiHover::m_HandleBasicCursorState(const QPoint & orc_Pos)
 {
    const uint32 u32_ResizeMode = mhu32_GetResizeMode(orc_Pos, this->size(), this->mq_Maximized);
@@ -598,17 +555,14 @@ void C_OgeWiHover::m_HandleBasicCursorState(const QPoint & orc_Pos)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse press event slot
 
    For moving or resizing.
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     29.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiHover::mousePressEvent(QMouseEvent * const opc_Event)
 {
    this->mc_OldPosition = this->mapToParent(opc_Event->pos());
@@ -640,17 +594,14 @@ void C_OgeWiHover::mousePressEvent(QMouseEvent * const opc_Event)
    this->setFocus();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse move event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse move event slot
 
    For moving or resizing.
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     29.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiHover::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
    if (this->mu32_MouseMode == mu32_MOUSE_MODE_MOVE)
@@ -667,15 +618,12 @@ void C_OgeWiHover::mouseMoveEvent(QMouseEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse release event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse release event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     29.07.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiHover::mouseReleaseEvent(QMouseEvent * const opc_Event)
 {
    Q_UNUSED(opc_Event)
@@ -685,15 +633,12 @@ void C_OgeWiHover::mouseReleaseEvent(QMouseEvent * const opc_Event)
    m_HandleBasicCursorState(opc_Event->pos());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overrided resize event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overrided resize event
 
    \param[in,out] opc_event  Pointer to resize event
-
-   \created     21.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiHover::resizeEvent(QResizeEvent * const opc_Event)
 {
    // for maximizing and minimizing animation
@@ -704,15 +649,12 @@ void C_OgeWiHover::resizeEvent(QResizeEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Moves the widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Moves the widget
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     04.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiHover::m_MoveWidget(const QMouseEvent * const opc_Event)
 {
    QPoint c_MousePos = this->mapToParent(opc_Event->pos());
@@ -764,15 +706,12 @@ void C_OgeWiHover::m_MoveWidget(const QMouseEvent * const opc_Event)
    this->mc_OldPosition = c_MousePos;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Resizes the widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Resizes the widget
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     04.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiHover::m_ResizeWidget(const QMouseEvent * const opc_Event)
 {
    QPoint c_MousePos = this->mapToParent(opc_Event->pos());

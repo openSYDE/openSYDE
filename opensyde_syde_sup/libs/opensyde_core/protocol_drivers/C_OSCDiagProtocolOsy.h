@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       openSYDE: Diagnostic protocol driver for openSYDE protocol
@@ -15,32 +15,26 @@
      - unexpected content will lead to error
    - event-driven responses will be reported via function pointers (see Cycle())
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     02.03.2017  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCDIAGPROTOCOLOSYH
 #define C_OSCDIAGPROTOCOLOSYH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 #include "C_OSCDiagProtocolBase.h"
 #include "C_OSCProtocolDriverOsy.h"
 #include "CSCLString.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///interface class
 class C_OSCDiagProtocolOsy :
    public C_OSCDiagProtocolBase,
@@ -123,7 +117,7 @@ public:
                                                 stw_types::uint8 * const opu8_NrCode);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

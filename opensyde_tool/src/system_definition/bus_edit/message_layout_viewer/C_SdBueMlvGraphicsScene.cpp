@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Graphics scene for the message layout viewer (implementation)
 
    detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     04.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <cstdlib>
@@ -37,14 +30,14 @@
 #include "C_GtGetText.h"
 #include "C_OSCCanMessage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_tgl;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_Space = 2.0;
 const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_ZOrderBelowAllItems = -1.0;
 const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_ZOrderDefault = 0.0;
@@ -121,25 +114,22 @@ const C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::mhac_
    {64U, QColor(55, 54, 57), mc_STYLE_GUIDE_COLOR_10, mc_STYLE_GUIDE_COLOR_10}
 };
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent              Optional pointer to parent
-
-   \created     04.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvGraphicsScene::C_SdBueMlvGraphicsScene(QObject * const opc_Parent) :
    QGraphicsScene(opc_Parent),
    mpc_ContextMenu(NULL),
@@ -171,46 +161,37 @@ C_SdBueMlvGraphicsScene::C_SdBueMlvGraphicsScene(QObject * const opc_Parent) :
    this->m_SetupContextMenu();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     04.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvGraphicsScene::~C_SdBueMlvGraphicsScene(void)
 {
    //lint -e{1540}  no memory leak because of the parent of mpc_BorderItemUpperLeft and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set message sync manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set message sync manager
 
    Must be set before using any signal functions
 
    \param[in,out] opc_Value Message sync manager
-
-   \created     27.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::SetMessageSyncManager(
    stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value)
 {
    this->mpc_MessageSyncManager = opc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set new com protocol
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new com protocol
 
    \param[in] ore_Value New value
-
-   \created     27.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::SetComProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Value)
 {
    this->me_Protocol = ore_Value;
@@ -218,15 +199,12 @@ void C_SdBueMlvGraphicsScene::SetComProtocol(const stw_opensyde_core::C_OSCCanPr
    this->Clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the actual message to work with
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the actual message to work with
 
    \param[in]  orc_MessageId   Message identification indices
-
-   \created     21.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::SetMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 {
    const C_OSCCanMessage * const pc_Message =
@@ -298,15 +276,12 @@ void C_SdBueMlvGraphicsScene::SetMessage(const C_OSCCanMessageIdentificationIndi
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Select signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Select signal
 
    \param[in] oru32_SignalIndex     Signal index
-
-   \created     17.01.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::SetSignal(const uint32 ou32_SignalIndex)
 {
    sint32 s32_Counter;
@@ -318,13 +293,10 @@ void C_SdBueMlvGraphicsScene::SetSignal(const uint32 ou32_SignalIndex)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Removes all signals
-
-   \created     27.04.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Removes all signals
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::Clear(void)
 {
    QVector<C_SdBueMlvSignalManager *>::iterator pc_ItOldItem;
@@ -337,15 +309,12 @@ void C_SdBueMlvGraphicsScene::Clear(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check scene if tool tip for current position is necessary
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check scene if tool tip for current position is necessary
 
    \param[in] orc_ScenePos Scene position to check for tool tip
-
-   \created     16.01.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::DisplayToolTip(const QPointF & orc_ScenePos)
 {
    //Check if item is hovered
@@ -407,17 +376,14 @@ void C_SdBueMlvGraphicsScene::DisplayToolTip(const QPointF & orc_ScenePos)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse press event slot
 
    Moving and resizing the signal
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     10.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    this->mc_LastMousePos = opc_Event->scenePos();
@@ -449,15 +415,12 @@ void C_SdBueMlvGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent * const o
    QGraphicsScene::mousePressEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse move event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse move event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     10.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    const sint32 s32_ActGridIndex = this->m_GetGridIndex(opc_Event->scenePos());
@@ -612,15 +575,12 @@ void C_SdBueMlvGraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const op
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse release event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse release event slot
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     10.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    if ((this->mq_SignalChanged == true) &&
@@ -647,21 +607,18 @@ void C_SdBueMlvGraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent * const
    QGraphicsScene::mouseReleaseEvent(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten context menu event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten context menu event
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     02.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * const opc_Event)
 {
    this->m_OnCustomContextMenuRequested(opc_Event);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_InitBorderItems(void)
 {
    uint8 u8_Counter;
@@ -693,7 +650,7 @@ void C_SdBueMlvGraphicsScene::m_InitBorderItems(void)
    //lint -e{429}  no memory leak because of the parent of pc_Item by addItem and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_InitEmptyItems(void)
 {
    uint8 u8_Counter;
@@ -712,7 +669,7 @@ void C_SdBueMlvGraphicsScene::m_InitEmptyItems(void)
    this->m_UpdateEmptyItems();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_InitProtocolItems(void)
 {
    this->mapc_ECeSHints[0] = new C_SdBueMlvBaseItem(QColor(0, 0, 0, 0),
@@ -738,15 +695,12 @@ void C_SdBueMlvGraphicsScene::m_InitProtocolItems(void)
    //lint -e{429}  no memory leak because of the parent of mapc_ECeSHints by addItem and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adds a signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adds a signal
 
    \param[in]     ou32_SignalIndex    Index of the signal
-
-   \created     06.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_AddSignal(const uint32 ou32_SignalIndex)
 {
    C_SdBueMlvSignalManager * pc_Item;
@@ -801,7 +755,7 @@ void C_SdBueMlvGraphicsScene::m_AddSignal(const uint32 ou32_SignalIndex)
    this->m_AddSignalToGridMapping(pc_Item);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_RemoveSignal(const uint32 ou32_SignalIndex)
 {
    QVector<C_SdBueMlvSignalManager *>::iterator pc_ItItem;
@@ -843,7 +797,7 @@ void C_SdBueMlvGraphicsScene::m_RemoveSignal(const uint32 ou32_SignalIndex)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_UpdateAll(void)
 {
    this->m_UpdateBorderItems();
@@ -852,7 +806,7 @@ void C_SdBueMlvGraphicsScene::m_UpdateAll(void)
    this->m_UpdateProtocolItems();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_UpdateBorderItems(void)
 {
    QVector<C_SdBueMlvBorderItem *>::const_iterator pc_ItItem;
@@ -889,7 +843,7 @@ void C_SdBueMlvGraphicsScene::m_UpdateBorderItems(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_UpdateEmptyItems(void)
 {
    sint32 s32_PosHorizontal;
@@ -917,7 +871,7 @@ void C_SdBueMlvGraphicsScene::m_UpdateEmptyItems(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_UpdateSignalManager(void)
 {
    QVector<C_SdBueMlvSignalManager *>::const_iterator pc_ItItem;
@@ -930,7 +884,7 @@ void C_SdBueMlvGraphicsScene::m_UpdateSignalManager(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_UpdateConcreteSignalManager(C_SdBueMlvSignalManager * const opc_Item)
 {
    // update the size of the item
@@ -942,7 +896,7 @@ void C_SdBueMlvGraphicsScene::m_UpdateConcreteSignalManager(C_SdBueMlvSignalMana
    this->mq_SignalChanged = true;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_UpdateProtocolItems(void)
 {
    QSizeF c_Size;
@@ -963,7 +917,7 @@ void C_SdBueMlvGraphicsScene::m_UpdateProtocolItems(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_AddSignalToGridMapping(C_SdBueMlvSignalManager * const opc_Item)
 {
    uint16 u16_Counter;
@@ -992,7 +946,7 @@ void C_SdBueMlvGraphicsScene::m_AddSignalToGridMapping(C_SdBueMlvSignalManager *
    //lint -e{429}  no memory leak because of the parent of pc_Item by addItem and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_UpdateSignalInGridMapping(C_SdBueMlvSignalManager * const opc_Item)
 {
    uint16 u16_Counter;
@@ -1034,7 +988,7 @@ void C_SdBueMlvGraphicsScene::m_UpdateSignalInGridMapping(C_SdBueMlvSignalManage
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_RemoveSignalFromGridMapping(C_SdBueMlvSignalManager * const opc_Item)
 {
    uint16 u16_Counter;
@@ -1045,7 +999,7 @@ void C_SdBueMlvGraphicsScene::m_RemoveSignalFromGridMapping(C_SdBueMlvSignalMana
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_RemoveSignalFromGridMappingPosition(C_SdBueMlvSignalManager * const opc_Item,
                                                                     const uint16 ou16_Pos)
 {
@@ -1068,7 +1022,7 @@ void C_SdBueMlvGraphicsScene::m_RemoveSignalFromGridMappingPosition(C_SdBueMlvSi
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_CheckGridMappingPositionForError(const uint16 ou16_Pos)
 {
    if (this->mac_SetGridState[ou16_Pos].size() > 1)
@@ -1093,19 +1047,19 @@ void C_SdBueMlvGraphicsScene::m_CheckGridMappingPositionForError(const uint16 ou
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_AddItemSlot(C_SdBueMlvSignalItem * const opc_Item)
 {
    this->addItem(opc_Item);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_RemoveItemSlot(C_SdBueMlvSignalItem * const opc_Item)
 {
    this->removeItem(opc_Item);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetNextNotUsedColors(void)
 {
    sintn sn_ColorCounter;
@@ -1149,7 +1103,7 @@ C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetNextNo
    return c_ColorConfig;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetConcreteColors(const uint8 ou8_Index)
 {
    uint32 u32_ColorCounter;
@@ -1171,7 +1125,7 @@ C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetConcre
    return c_ColorConfig;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_SetColorsUsed(const C_SdBueMlvSignalManager::C_SignalItemColors & orc_Colors,
                                               const bool oq_Used)
 {
@@ -1188,7 +1142,7 @@ void C_SdBueMlvGraphicsScene::m_SetColorsUsed(const C_SdBueMlvSignalManager::C_S
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_SceneRectChanged(void)
 {
    // update the size values of a signgle item
@@ -1199,7 +1153,7 @@ void C_SdBueMlvGraphicsScene::m_SceneRectChanged(void)
    this->m_UpdateAll();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_SearchClickedItem(const QPointF & orc_Pos)
 {
    const sint32 s32_Counter = this->m_GetGridIndex(orc_Pos);
@@ -1238,7 +1192,7 @@ void C_SdBueMlvGraphicsScene::m_SearchClickedItem(const QPointF & orc_Pos)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_BringActualSignalToTop(void)
 {
    sint32 s32_Counter;
@@ -1256,7 +1210,7 @@ void C_SdBueMlvGraphicsScene::m_BringActualSignalToTop(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_ChangeCursor(const Qt::CursorShape oe_Cursor)
 {
    // forward this signal only if no interaction mode is active
@@ -1266,7 +1220,7 @@ void C_SdBueMlvGraphicsScene::m_ChangeCursor(const Qt::CursorShape oe_Cursor)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SdBueMlvGraphicsScene::m_GetGridIndex(const QPointF & orc_Pos) const
 {
    sint32 s32_Counter;
@@ -1292,20 +1246,17 @@ sint32 C_SdBueMlvGraphicsScene::m_GetGridIndex(const QPointF & orc_Pos) const
    return s32_Counter;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_HandleHideToolTip(void)
 {
    this->mpc_HoveredSignal = NULL;
    Q_EMIT this->SigHideToolTip();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init context menu entries
-
-   \created     02.06.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init context menu entries
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_SetupContextMenu(void)
 {
    this->mpc_ContextMenu = new stw_opensyde_gui_elements::C_OgeContextMenu();
@@ -1328,15 +1279,12 @@ void C_SdBueMlvGraphicsScene::m_SetupContextMenu(void)
                                                        this, &C_SdBueMlvGraphicsScene::m_ActionDelete);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show custom context menu
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show custom context menu
 
    \param[in] orc_Pos Local context menu position
-
-   \created     02.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_OnCustomContextMenuRequested(const QGraphicsSceneContextMenuEvent * const opc_Event)
 {
    bool q_Enabled = false;
@@ -1357,7 +1305,7 @@ void C_SdBueMlvGraphicsScene::m_OnCustomContextMenuRequested(const QGraphicsScen
    this->mpc_ContextMenu->popup(opc_Event->screenPos());
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_ActionAdd(void)
 {
    sint32 s32_Counter = this->m_GetGridIndex(this->mc_LastMousePos);
@@ -1370,7 +1318,7 @@ void C_SdBueMlvGraphicsScene::m_ActionAdd(void)
    Q_EMIT this->SigAddSignal(this->mc_MessageId, static_cast<uint16>(s32_Counter));
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_ActionCopy(void)
 {
    if (this->mpc_ActualSignal != NULL)
@@ -1379,7 +1327,7 @@ void C_SdBueMlvGraphicsScene::m_ActionCopy(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_ActionPaste(void)
 {
    sint32 s32_Counter = this->m_GetGridIndex(this->mc_LastMousePos);
@@ -1395,7 +1343,7 @@ void C_SdBueMlvGraphicsScene::m_ActionPaste(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_ActionCut(void)
 {
    if (this->mpc_ActualSignal != NULL)
@@ -1404,7 +1352,7 @@ void C_SdBueMlvGraphicsScene::m_ActionCut(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_ActionDelete(void)
 {
    if (this->mpc_ActualSignal != NULL)

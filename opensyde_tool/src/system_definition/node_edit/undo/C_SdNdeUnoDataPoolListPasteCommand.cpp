@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data pool list paste undo command (implementation)
 
    Data pool list paste undo command
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.01.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -28,7 +21,7 @@
 #include "constants.h"
 #include "C_OgeWiCustomMessage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
@@ -36,30 +29,27 @@ using namespace stw_opensyde_core;
 using namespace stw_errors;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     oru32_NodeIndex             Node index
    \param[in]     oru32_DataPoolIndex         Node data pool index
    \param[in,out] opc_DataPoolListsTreeWidget Data pool lists tree widget to perform actions on
    \param[in,out] opc_Parent                  Optional pointer to parent
-
-   \created     25.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoDataPoolListPasteCommand::C_SdNdeUnoDataPoolListPasteCommand(const uint32 & oru32_NodeIndex,
                                                                        const uint32 & oru32_DataPoolIndex,
                                                                        stw_opensyde_gui::C_SdNdeDataPoolListsTreeWidget * const opc_DataPoolListsTreeWidget,
@@ -70,19 +60,16 @@ C_SdNdeUnoDataPoolListPasteCommand::C_SdNdeUnoDataPoolListPasteCommand(const uin
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initial setup of paste command (Check clipboard for valid data)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initial setup of paste command (Check clipboard for valid data)
 
    \param[in] oru32_FirstIndex First new index
 
    \return
    true:  Worked
    false: Discarded
-
-   \created     27.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeUnoDataPoolListPasteCommand::InitialSetup(const uint32 & oru32_FirstIndex)
 {
    std::vector<C_OSCNodeDataPoolList> c_OSCContent;
@@ -142,26 +129,20 @@ bool C_SdNdeUnoDataPoolListPasteCommand::InitialSetup(const uint32 & oru32_First
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Redo add
-
-   \created     27.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Redo add
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListPasteCommand::redo(void)
 {
    this->Add();
    C_SdNdeUnoDataPoolListAddDeleteBaseCommand::redo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Undo add
-
-   \created     27.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Undo add
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListPasteCommand::undo(void)
 {
    C_SdNdeUnoDataPoolListAddDeleteBaseCommand::undo();

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Model component for filter item table (implementation)
 
    Model component for filter item table.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     07.12.2018  STW/G.Landsgesell
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QIcon>
@@ -29,40 +22,36 @@
 #include "C_CamProHandler.h"
 #include "C_CamDbHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     07.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosFilterTableModel::C_CamMosFilterTableModel(QObject * const opc_Parent) :
    C_TblModelAction(opc_Parent)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get header data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get header data
 
    \param[in] osn_Section    Section
    \param[in] oe_Orientation Orientation
@@ -70,10 +59,8 @@ C_CamMosFilterTableModel::C_CamMosFilterTableModel(QObject * const opc_Parent) :
 
    \return
    Header string
-
-   \created     07.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_CamMosFilterTableModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
                                               const sintn osn_Role) const
 {
@@ -136,18 +123,15 @@ QVariant C_CamMosFilterTableModel::headerData(const sintn osn_Section, const Qt:
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get table column count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get table column count
 
    \param[in] orc_Parent Parent
 
    \return
    Column count
-
-   \created     07.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_CamMosFilterTableModel::columnCount(const QModelIndex & orc_Parent) const
 {
    stw_types::sintn sn_Retval = 0;
@@ -159,19 +143,16 @@ sintn C_CamMosFilterTableModel::columnCount(const QModelIndex & orc_Parent) cons
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data at index
 
    \param[in] orc_Index Index
    \param[in] osn_Role  Data role
 
    \return
    Data
-
-   \created     07.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_CamMosFilterTableModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
 {
    QVariant c_Retval;
@@ -310,24 +291,20 @@ QVariant C_CamMosFilterTableModel::data(const QModelIndex & orc_Index, const sin
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle copy items action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle copy items action
 
    \param[in] orc_SelectedIndices Selected row indices (Expected: unique)
-
-   \created     07.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterTableModel::CopySelectedItems(const std::vector<uint32> & orc_SelectedIndices) const
 {
    // nothing needs to be done here
    Q_UNUSED(orc_SelectedIndices)
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set data at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set data at index
 
    \param[in] orc_Index Index
    \param[in] orc_Value New data
@@ -336,10 +313,8 @@ void C_CamMosFilterTableModel::CopySelectedItems(const std::vector<uint32> & orc
    \return
    true  success
    false failure
-
-   \created     07.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_CamMosFilterTableModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value, const sintn osn_Role)
 {
    bool q_Retval = false;
@@ -422,18 +397,15 @@ bool C_CamMosFilterTableModel::setData(const QModelIndex & orc_Index, const QVar
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get flags for item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get flags for item
 
    \param[in] orc_Index Item
 
    \return
    Flags for item
-
-   \created     07.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 Qt::ItemFlags C_CamMosFilterTableModel::flags(const QModelIndex & orc_Index) const
 {
    Qt::ItemFlags c_Retval = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
@@ -458,18 +430,15 @@ Qt::ItemFlags C_CamMosFilterTableModel::flags(const QModelIndex & orc_Index) con
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Column to enum conversion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Column to enum conversion
 
    \param[in] os32_Column Column
 
    \return
    Enum value
-
-   \created     07.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosFilterTableModel::E_Columns C_CamMosFilterTableModel::h_ColumnToEnum(const sint32 os32_Column)
 {
    C_CamMosFilterTableModel::E_Columns e_Retval;
@@ -497,19 +466,16 @@ C_CamMosFilterTableModel::E_Columns C_CamMosFilterTableModel::h_ColumnToEnum(con
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Enum to column conversion
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Enum to column conversion
 
    \param[in] oe_Value Enum value
 
    \return
    Column
    -1 Error
-
-   \created     07.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamMosFilterTableModel::h_EnumToColumn(const C_CamMosFilterTableModel::E_Columns oe_Value)
 {
    sint32 s32_Retval = -1;
@@ -535,18 +501,15 @@ sint32 C_CamMosFilterTableModel::h_EnumToColumn(const C_CamMosFilterTableModel::
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Search in all loaded databases for messages with given CAN ID.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Search in all loaded databases for messages with given CAN ID.
 
    \param[in]     u32_CanId        message CAN ID
 
    \return
    string <Database>::<MessageName> (empty string if not found)
-
-   \created     22.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_CamMosFilterTableModel::h_SearchMessageInDatabases(const uint32 u32_CanId)
 {
    QString c_Return = "";
@@ -565,46 +528,37 @@ QString C_CamMosFilterTableModel::h_SearchMessageInDatabases(const uint32 u32_Ca
    return c_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data of filter items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data of filter items
 
    \return
    list of filter items
-
-   \created     10.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QList<C_CamProFilterItemData> C_CamMosFilterTableModel::GetFilterItemsData() const
 {
    return this->mc_FilterItemsData;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set data of filter items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set data of filter items
 
    \param[in]     orc_FilterItemsData   list of filter items
-
-   \created     10.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterTableModel::SetFilterItemsData(const QList<C_CamProFilterItemData> & orc_FilterItemsData)
 {
    this->mc_FilterItemsData = orc_FilterItemsData;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief Set IDs of specific filter item.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief Set IDs of specific filter item.
 
    \param[in]     ou32_Index        index of selected filter item
-   \param[in]     ou_NewStartId     new start ID
-   \param[in]     ou_NewEndId       new end ID
-
-   \created     11.12.2018  STW/G.Landsgesell
+   \param[in]     ou32_NewStartId   new start ID
+   \param[in]     ou32_NewEndId     new end ID
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterTableModel::SetFilterItemIDs(const uint32 ou32_Index, const uint32 ou32_NewStartId,
                                                 const uint32 ou32_NewEndId)
 {
@@ -634,16 +588,13 @@ void C_CamMosFilterTableModel::SetFilterItemIDs(const uint32 ou32_Index, const u
    Q_EMIT (this->dataChanged(this->index(ou32_Index, s32_Column), this->index(ou32_Index, s32_Column), c_Roles));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set extended ID flag of specific filter item.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set extended ID flag of specific filter item.
 
    \param[in]     ou32_Index        index of selected filter item
-   \param[in]     ou_NewExtendedId  new extended ID (1 or 0 for extended or not)
-
-   \created     12.12.2018  STW/G.Landsgesell
+   \param[in]     oq_Extended       extended ID flag
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterTableModel::SetFilterItemExtended(const uint32 ou32_Index, const bool oq_Extended)
 {
    QVector<sintn> c_Roles;
@@ -659,18 +610,15 @@ void C_CamMosFilterTableModel::SetFilterItemExtended(const uint32 ou32_Index, co
    Q_EMIT (this->dataChanged(this->index(ou32_Index, s32_Column), this->index(ou32_Index, s32_Column), c_Roles));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle add new item action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle add new item action
 
    \param[in] ou32_SelectedIndex Index to insert item at
 
    \return
    Index of new item
-
-   \created     07.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_CamMosFilterTableModel::m_AddNewItem(const uint32 ou32_SelectedIndex)
 {
    // add new filter item
@@ -698,18 +646,15 @@ uint32 C_CamMosFilterTableModel::m_AddNewItem(const uint32 ou32_SelectedIndex)
    return u32_Index;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle paste items action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle paste items action
 
    \param[in] ou32_SelectedIndex Index to insert item at
 
    \return
    Indices of new items
-
-   \created     07.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint32> C_CamMosFilterTableModel::m_PasteItems(const uint32 ou32_SelectedIndex)
 {
    const std::vector<uint32> c_Retval;
@@ -719,50 +664,41 @@ std::vector<uint32> C_CamMosFilterTableModel::m_PasteItems(const uint32 ou32_Sel
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get size of item container
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get size of item container
 
    \return
    Size of item container
-
-   \created     07.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_CamMosFilterTableModel::m_GetSizeItems() const
 {
    return this->mc_FilterItemsData.size();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete specific item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete specific item
 
    Warning: not expected to fail
 
    \param[in] ou32_Index Index to delete
-
-   \created     07.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterTableModel::m_DeleteItem(const uint32 ou32_Index)
 {
    this->mc_FilterItemsData.removeAt(ou32_Index);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Move specific item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Move specific item
 
    For implementation: First delete ou32_SourceIndex then insert ou32_TargetIndex
    Warning: not expected to fail
 
    \param[in] ou32_SourceIndex Source index
    \param[in] ou32_TargetIndex Target index
-
-   \created     07.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterTableModel::m_MoveItem(const uint32 ou32_SourceIndex, const uint32 ou32_TargetIndex) const
 {
    // nothing needs to be done here

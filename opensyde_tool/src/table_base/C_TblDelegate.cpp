@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Delegate (interaction) component base for any table (implementation)
 
    Delegate (interaction) component base for any table
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     29.11.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QSvgRenderer>
@@ -31,7 +24,7 @@
 #include "C_SdNdeDataPoolContentUtil.h"
 #include "C_CamOgeWiSpinBoxGroupTable.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -40,36 +33,32 @@ using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     29.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_TblDelegate::C_TblDelegate(QObject * const opc_Parent) :
    QStyledItemDelegate(opc_Parent),
    mq_InitialSelection(true)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten create editor event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten create editor event slot
 
    Here: Create appropriate editor widget
 
@@ -79,10 +68,8 @@ C_TblDelegate::C_TblDelegate(QObject * const opc_Parent) :
 
    \return
    Editor widget
-
-   \created     29.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QWidget * C_TblDelegate::createEditor(QWidget * const opc_Parent, const QStyleOptionViewItem & orc_Option,
                                       const QModelIndex & orc_Index) const
 {
@@ -143,16 +130,13 @@ QWidget * C_TblDelegate::createEditor(QWidget * const opc_Parent, const QStyleOp
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten set editor data event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten set editor data event slot
 
    \param[in,out] opc_Editor Editor widget
    \param[in]     orc_Index  Correlating index
-
-   \created     29.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex & orc_Index) const
 {
    C_TblEditLineEditBase * pc_LineEdit;
@@ -194,19 +178,16 @@ void C_TblDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten set model data event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten set model data event slot
 
    Here: Pass relevant data
 
    \param[in,out] opc_Editor Editor widget
    \param[in,out] opc_Model  Model object
    \param[in]     orc_Index  Correlating index
-
-   \created     29.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel * const opc_Model,
                                  const QModelIndex & orc_Index) const
 {
@@ -252,19 +233,16 @@ void C_TblDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overridden paint method.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overridden paint method.
 
    Here: Center icon and deactivate icon highlighting.
 
    \param[in]     opc_Painter       pointer to painter
    \param[in]     orc_Option        style option
    \param[in]     orc_Index         model index
-
-   \created     28.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblDelegate::paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
                           const QModelIndex & orc_Index) const
 {
@@ -290,69 +268,57 @@ void C_TblDelegate::paint(QPainter * const opc_Painter, const QStyleOptionViewIt
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create generic combo box interaction element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create generic combo box interaction element
 
    \param[in,out] opc_Parent Optional pointer to parent
 
    \return
    Generic combo box interaction element
-
-   \created     30.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QComboBox * C_TblDelegate::m_CreateComboBox(QWidget * const opc_Parent) const
 {
    return new C_CamOgeCbxTableSmall(opc_Parent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create generic line edit interaction element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create generic line edit interaction element
 
    \param[in,out] opc_Parent Optional pointer to parent
 
    \return
    Generic line edit interaction element
-
-   \created     30.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_TblEditLineEditBase * C_TblDelegate::m_CreateLineEdit(QWidget * const opc_Parent) const
 {
    return new C_CamOgeLeTableEdit(opc_Parent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create generic spin box interaction element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create generic spin box interaction element
 
    \param[in,out] opc_Parent Optional pointer to parent
 
    \return
    Generic spin box interaction element
-
-   \created     16.01.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeWiSpinBoxGroup * C_TblDelegate::m_CreateSpinBox(QWidget * const opc_Parent) const
 {
    return new C_CamOgeWiSpinBoxGroupTable(opc_Parent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get interaction element value as enum from index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get interaction element value as enum from index
 
    \param[in] orc_Index Index
 
    \return
    Interaction element value as enum from index
-
-   \created     30.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 E_UserRoleInteractionElementValue C_TblDelegate::mh_GetInteractionElementValue(const QModelIndex & orc_Index)
 {
    E_UserRoleInteractionElementValue e_Retval;
@@ -374,9 +340,8 @@ E_UserRoleInteractionElementValue C_TblDelegate::mh_GetInteractionElementValue(c
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create widget to use for editing this value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create widget to use for editing this value
 
    \param[in,out] opc_Parent           Parent widget
    \param[in]     orc_Index            Correlating index
@@ -388,10 +353,8 @@ E_UserRoleInteractionElementValue C_TblDelegate::mh_GetInteractionElementValue(c
 
    \return
    Editor widget
-
-   \created     15.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QWidget * C_TblDelegate::m_CreateGenericEditor(QWidget * const opc_Parent, const QModelIndex & orc_Index,
                                                const C_OSCNodeDataPoolContent & orc_Min,
                                                const C_OSCNodeDataPoolContent & orc_Max, const float64 of64_Factor,
@@ -412,16 +375,13 @@ QWidget * C_TblDelegate::m_CreateGenericEditor(QWidget * const opc_Parent, const
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set value to widget used for editing this value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set value to widget used for editing this value
 
    \param[in,out] opc_Editor Editor widget
    \param[in]     orc_Index  Correlating index
-
-   \created     15.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblDelegate::m_SetGenericEditorDataVariable(QWidget * const opc_Editor, const QModelIndex & orc_Index) const
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -439,17 +399,14 @@ void C_TblDelegate::m_SetGenericEditorDataVariable(QWidget * const opc_Editor, c
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set model value from widget used to edit this value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set model value from widget used to edit this value
 
    \param[in,out] opc_Editor Editor widget
    \param[in,out] opc_Model  Model object
    \param[in]     orc_Index  Correlating index
-
-   \created     15.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblDelegate::mh_SetModelGenericDataVariable(QWidget * const opc_Editor, QAbstractItemModel * const opc_Model,
                                                    const QModelIndex & orc_Index)
 {

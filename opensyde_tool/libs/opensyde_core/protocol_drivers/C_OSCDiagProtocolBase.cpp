@@ -1,50 +1,40 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       openSYDE: Diagnostic protocol driver abstract base class
 
    For details cf. documentation in .h file.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     02.03.2017  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <iostream>
 #include "C_OSCDiagProtocolBase.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
-//-----------------------------------------------------------------------------
-/*!
-   \brief   constructor
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   constructor
 
    Set up class
-
-   \created     21.03.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCDiagProtocolBase::C_OSCDiagProtocolBase(void) :
    mpr_OnDataPoolReadEventReceived(NULL),
    mpr_OnDataPoolReadEventErrorReceived(NULL),
@@ -52,23 +42,19 @@ C_OSCDiagProtocolBase::C_OSCDiagProtocolBase(void) :
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   constructor
 
    Tear down class
-
-   \created     17.03.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCDiagProtocolBase::~C_OSCDiagProtocolBase(void)
 {
    mpv_OnAsyncInstance = NULL;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialization of the protocol
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialization of the protocol
 
    Setting all callbacks for the async messages
 
@@ -76,10 +62,8 @@ C_OSCDiagProtocolBase::~C_OSCDiagProtocolBase(void)
    \param[in]  opr_DataPoolReadEventErrorReceived  function to be called if an async DataPoolReadEvent error message
                                                    is received
    \param[in]  opv_Instance                        instance pointer to pass back when invoking read event callback
-
-   \created     21.07.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCDiagProtocolBase::Initialize(const PR_DataPoolReadEventReceived opr_DataPoolReadEventReceived,
                                        const PR_DataPoolReadEventErrorReceived opr_DataPoolReadEventErrorReceived,
                                        void * const opv_Instance)

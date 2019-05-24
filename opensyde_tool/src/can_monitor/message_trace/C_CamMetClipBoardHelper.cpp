@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Utility class to copy a message and its detected signals to the clipboard as text (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     20.11.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -22,31 +15,25 @@
 
 #include "C_CamMetClipBoardHelper.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copies the CAN message in text form to the clipboard
-
-   \param[in]     oq_DisplayAsHex                  Flag for display style for CAN ID and CAN data
-   \param[in]     oq_DisplayTimestampRelative      Flag for display style for timestamp
-   \param[in]     orc_MessageData                  Vector with pointer to all message data and the flag if the
-                                                   signals should be visible too
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copies the CAN message in text form to the clipboard
 
    Style of copied information:
    - Without name
@@ -62,12 +49,12 @@ using namespace stw_opensyde_core;
    |- SignalName        200 Unit     C8 (RAW)   Comment
    |- NextSignalName    200 Unit     C8 (RAW)   Comment
 
-   \param[in]     orc_MessageData      CAN message data with detected signals
-   \param[in]     oq_Extended          Flag if the CAN signals shall be copied in separate lines
-
-   \created     20.11.2018  STW/B.Bayer
+   \param[in]     oq_DisplayAsHex                  Flag for display style for CAN ID and CAN data
+   \param[in]     oq_DisplayTimestampRelative      Flag for display style for timestamp
+   \param[in]     orc_MessageData                  Vector with pointer to all message data and the flag if the
+                                                   signals should be visible too
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMetClipBoardHelper::h_StoreCanMessages(const bool oq_DisplayAsHex, const bool oq_DisplayTimestampRelative,
                                                  const std::vector<C_CamMetClipBoardHelperCanMessageData> & orc_MessageData)
 {
@@ -235,13 +222,10 @@ void C_CamMetClipBoardHelper::h_StoreCanMessages(const bool oq_DisplayAsHex, con
    C_CamMetClipBoardHelper::mh_SetClipBoard(c_Text);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     20.11.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMetClipBoardHelper::C_CamMetClipBoardHelper(void) :
    C_UtiClipBoardHelper()
 {

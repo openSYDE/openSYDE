@@ -1,24 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Base class of SYDEsup (implementation)
 
    This is the base class and contains most functionality of SYDEsup.
-   SYDEsup is a console application for updating your system with a service
-   update package created with openSYDE.
+   SYDEsup is a console application for updating your system with a Service
+   Update Package created with openSYDE.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.08.2018  STW/G.Landsgesell
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <iostream>
@@ -36,7 +29,7 @@
 #include "TGLFile.h"
 #include "C_SUPSuSequences.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_scl;
@@ -44,32 +37,28 @@ using namespace stw_tgl;
 using namespace stw_opensyde_core;
 using namespace stw_can;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     24.08.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
-C_SYDEsup::C_SYDEsup()
+//----------------------------------------------------------------------------------------------------------------------
+C_SYDEsup::C_SYDEsup(void)
 {
    mq_Quiet = false;
 }
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get options from command line
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get options from command line
 
    Parse command line parameters.
    If required parameters are not present print a list of options to the console.
@@ -87,29 +76,43 @@ C_SYDEsup::C_SYDEsup()
 
    \return
    eOK                        initialization worked
-   eERR_PARSE_COMMAND_LINE    missing command line parameters or help requested
-
-   \created     27.08.18  STW/G.Landsgesell
+   eERR_PARSE_COMMAND_LINE    missing or invalid command line parameters or help requested
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SYDEsup::E_Result C_SYDEsup::ParseCommandLine(const sintn osn_Argc, charn * const oapcn_Argv[])
 {
    C_SYDEsup::E_Result e_Return = eOK;
    sintn sn_Result;
    bool q_ParseError = false;
    bool q_ShowHelp = false;
+   const C_SCLString c_Version = h_GetApplicationVersion(oapcn_Argv[0]);
+
    mq_Quiet = false;
 
    const struct option ac_Options[] =
    {
       /* name, has_arg, flag, val */
-      { "help",         no_argument,         NULL,    'h' },
-      { "quiet",        no_argument,         NULL,    'q' },
-      { "packagefile",  required_argument,   NULL,    'p' },
-      { "caninterface", required_argument,   NULL,    'i' },
-      { "unzipdir",     required_argument,   NULL,    'z' },
-      { "logdir",       required_argument,   NULL,    'l' },
-      { NULL,           0,                   NULL,    0   }
+      {
+         "help",         no_argument,         NULL,    'h'
+      },
+      {
+         "quiet",        no_argument,         NULL,    'q'
+      },
+      {
+         "packagefile",  required_argument,   NULL,    'p'
+      },
+      {
+         "caninterface", required_argument,   NULL,    'i'
+      },
+      {
+         "unzipdir",     required_argument,   NULL,    'z'
+      },
+      {
+         "logdir",       required_argument,   NULL,    'l'
+      },
+      {
+         NULL,           0,                   NULL,    0
+      }
    };
 
    mc_SUPFilePath = "";
@@ -157,32 +160,42 @@ C_SYDEsup::E_Result C_SYDEsup::ParseCommandLine(const sintn osn_Argc, charn * co
    if (q_ShowHelp == true)
    {
       //print directly to console; no need for logging this user feedback
-      this->m_PrintInformation(h_GetApplicationVersion(oapcn_Argv[0]));
-      std::cout << "SYDEsup is a console application for updating your system "
-         "with a Service Update Package created with openSYDE.\n\n";
+      this->m_PrintInformation(c_Version);
+      std::cout << "SYDEsup is a console application for updating your system with a Service Update Package created "
+         "with openSYDE, the toolset and framework by STW (Sensor-Technik Wiedemann GmbH). "
+         "For further information take a look at openSYDE user manual.\n" << &std::endl;
       e_Return = eERR_PARSE_COMMAND_LINE;
    }
    else if ((mc_SUPFilePath == "") || (q_ParseError == true))
    {
       //print directly to console; no need for logging this user feedback
-      this->m_PrintInformation(h_GetApplicationVersion(oapcn_Argv[0]));
-      std::cout << "Error: Invalid or missing command line parameters.\n\n";
+      this->m_PrintInformation(c_Version);
+      std::cout << "Error: Invalid or missing command line parameters.\n" << &std::endl;
       e_Return = eERR_PARSE_COMMAND_LINE;
    }
    else
    {
       // Initialize optional parameters
-      this->m_InitOptionalParameters();
-      // log version
-      h_WriteLog("SYDEsup Version", ("Version: " + h_GetApplicationVersion(oapcn_Argv[0])).c_str());
+      e_Return = this->m_InitOptionalParameters();
+      // only error here is not-existing unzip directory
+
+      if (e_Return != eOK)
+      {
+         this->m_PrintInformation(c_Version);
+         std::cout << "Error: " << this->mc_UnzipPath.c_str() << " is no existing directory.\n" << &std::endl;
+      }
+      else
+      {
+         // log version
+         h_WriteLog("SYDEsup Version", "Version: " + c_Version);
+      }
    }
 
    return e_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update to the given Service Update Package.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update to the given Service Update Package.
 
    Previous call to ParseCommandLineParameters required
    (or alternative method to set mc_SUPFilePath and mc_CanDLLPath).
@@ -210,6 +223,7 @@ C_SYDEsup::E_Result C_SYDEsup::ParseCommandLine(const sintn osn_Argc, charn * co
    eERR_PACKAGE_UNZIP
    eERR_PACKAGE_CORE_C_NOACT
    eERR_PACKAGE_NOT_FOUND
+   eERR_PACKAGE_WRONG_EXTENSION
 
    // result from check if DLL file exists
    eERR_DLL_NOT_FOUND
@@ -253,14 +267,12 @@ C_SYDEsup::E_Result C_SYDEsup::ParseCommandLine(const sintn osn_Argc, charn * co
    // general results
    eOK
    eERR_UNKNOWN
-
-   \created     27.08.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SYDEsup::E_Result C_SYDEsup::Update(void) const
 {
    E_Result e_Result = eOK;
-   sint32 s32_Return;
+   sint32 s32_Return = C_NO_ERR;
    C_OSCSystemDefinition c_SystemDefinition;
    uint32 u32_ActiveBusIndex = 0;
    C_SCLStringList c_WarningMessages;
@@ -275,40 +287,48 @@ C_SYDEsup::E_Result C_SYDEsup::Update(void) const
    std::vector<uint32> c_NodesUpdateOrder;
    std::vector<C_OSCSuSequences::C_DoFlash> c_ApplicationsToWrite;
 
-   // unpack Service Update Package which was created with openSYDE (also checks if paths are valid)
-   s32_Return = C_OSCSuServiceUpdatePackage::h_UnpackPackage(mc_SUPFilePath, mc_UnzipPath,
-                                                             c_SystemDefinition, u32_ActiveBusIndex,
-                                                             c_ActiveNodes, c_NodesUpdateOrder,
-                                                             c_ApplicationsToWrite,
-                                                             c_WarningMessages, c_ErrorMessage);
-
-   // report success or translate errors
-   switch (s32_Return) // here s32_Return is result of h_UnpackPackage
+   // check file ending
+   if (TGL_ExtractFileExtension(this->mc_SUPFilePath) != ".syde_sup")
    {
-   case C_NO_ERR:
-      h_WriteLog("Unzip Package", "Service update package unzipped to \"\\" + mc_UnzipPath + "\\\".");
-      break;
-   case C_BUSY:
-      e_Result = eERR_PACKAGE_ERASE_TARG_PATH;
-      break;
-   case C_RANGE:
-      e_Result = eERR_PACKAGE_CORE_C_RANGE;
-      break;
-   case C_OVERFLOW:
-      e_Result = eERR_PACKAGE_CORE_C_OVERFLOW;
-      break;
-   case C_RD_WR:
-      e_Result = eERR_PACKAGE_UNZIP;
-      break;
-   case C_NOACT:
-      e_Result = eERR_PACKAGE_CORE_C_NOACT;
-      break;
-   case C_CONFIG:
-      e_Result = eERR_PACKAGE_NOT_FOUND;
-      break;
-   default:
-      e_Result = eERR_UNKNOWN;
-      break;
+      e_Result = eERR_PACKAGE_WRONG_EXTENSION;
+   }
+   else
+   {
+      // unpack Service Update Package which was created with openSYDE (also checks if paths are valid)
+      s32_Return = C_OSCSuServiceUpdatePackage::h_UnpackPackage(mc_SUPFilePath, mc_UnzipPath,
+                                                                c_SystemDefinition, u32_ActiveBusIndex,
+                                                                c_ActiveNodes, c_NodesUpdateOrder,
+                                                                c_ApplicationsToWrite,
+                                                                c_WarningMessages, c_ErrorMessage);
+
+      // report success or translate errors
+      switch (s32_Return) // here s32_Return is result of h_UnpackPackage
+      {
+      case C_NO_ERR:
+         h_WriteLog("Unzip Package", "Service Update Package unzipped to \"" + mc_UnzipPath + "\".");
+         break;
+      case C_BUSY:
+         e_Result = eERR_PACKAGE_ERASE_TARG_PATH;
+         break;
+      case C_RANGE:
+         e_Result = eERR_PACKAGE_CORE_C_RANGE;
+         break;
+      case C_OVERFLOW:
+         e_Result = eERR_PACKAGE_CORE_C_OVERFLOW;
+         break;
+      case C_RD_WR:
+         e_Result = eERR_PACKAGE_UNZIP;
+         break;
+      case C_NOACT:
+         e_Result = eERR_PACKAGE_CORE_C_NOACT;
+         break;
+      case C_CONFIG:
+         e_Result = eERR_PACKAGE_NOT_FOUND;
+         break;
+      default:
+         e_Result = eERR_UNKNOWN;
+         break;
+      }
    }
 
    // go on if previous step was successful
@@ -465,7 +485,7 @@ C_SYDEsup::E_Result C_SYDEsup::Update(void) const
       case C_NO_ERR:
          std::cout << "\n";
          h_WriteLog("System Update", "System update successful!");
-         std::cout << "\n";
+         std::cout << &std::endl;
          q_ResetSystem = true;
          break;
       case C_BUSY:
@@ -486,6 +506,12 @@ C_SYDEsup::E_Result C_SYDEsup::Update(void) const
       case C_CONFIG:
          e_Result = eERR_UPDATE_SYSDEF;
          break;
+      case C_CHECKSUM:
+         e_Result = eERR_UPDATE_CHECKSUM;
+         break;
+      case C_RANGE:
+         e_Result = eERR_UPDATE_NO_NVM;
+         break;
       default:
          e_Result = eERR_UNKNOWN;
          break;
@@ -501,9 +527,8 @@ C_SYDEsup::E_Result C_SYDEsup::Update(void) const
    return e_Result;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Write to log file and print to console.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Write to log file and print to console.
 
    Write detailed information with logging engine to log file but
    only print concise details to console.
@@ -511,17 +536,15 @@ C_SYDEsup::E_Result C_SYDEsup::Update(void) const
    \param[in]     orc_Activity    Activity
    \param[in]     orc_Text        Information text
    \param[in]     orq_IsError     True: log as error; false: log as information
-
-   \created     29.08.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SYDEsup::h_WriteLog(const stw_scl::C_SCLString & orc_Activity, const stw_scl::C_SCLString & orc_Text,
                            const bool & orq_IsError, const bool & orq_Quiet)
 {
    if (orq_IsError == true)
    {
       osc_write_log_error(orc_Activity, orc_Text);
-      std::cout << "Error: " << orc_Text.c_str() << "\n";
+      std::cout << "Error: " << orc_Text.c_str() << &std::endl;
    }
    else
    {
@@ -529,14 +552,13 @@ void C_SYDEsup::h_WriteLog(const stw_scl::C_SCLString & orc_Activity, const stw_
       // do not write information if user wants me to be quiet
       if (orq_Quiet == false)
       {
-         std::cout << orc_Text.c_str() << "\n";
+         std::cout << orc_Text.c_str() << &std::endl;
       }
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get resource version number of a file as an C_SCLString
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get resource version number of a file as an C_SCLString
 
    Extracts the windows version number of the specified file and returns it
     in the commonly used STW format: "Vx.yyrz".
@@ -547,10 +569,8 @@ void C_SYDEsup::h_WriteLog(const stw_scl::C_SCLString & orc_Activity, const stw_
 
    \return
    string with version information ("V?.??r?" on error)
-
-   \created     20.05.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SYDEsup::h_GetApplicationVersion(const C_SCLString & orc_FileName)
 {
    VS_FIXEDFILEINFO * pt_Info;
@@ -582,44 +602,32 @@ C_SCLString C_SYDEsup::h_GetApplicationVersion(const C_SCLString & orc_FileName)
    return c_Version;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Print information about command line parameters and application version to console.
-
-   \created     31.08.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Print information about command line parameters and application version to console.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SYDEsup::m_PrintInformation(const C_SCLString & orc_Version) const
 {
    // show version
-   std::cout << "Version: " << orc_Version.c_str() << "\n\n";
+   std::cout << "Version: " << orc_Version.c_str() << "\n" << &std::endl;
 
    // show parameter help
-   std::cout << "Command line parameters:\n\n";
-   std::cout <<
-      "Parameter   Alternative notation   Description                          Default         Example\n";
-   std::cout <<
-      "-----------------------------------------------------------------------------------------------------------------\n";
-   std::cout <<
-      "-h          --help                 Print help                                           -h\n";
-   std::cout <<
-      "-q          --quiet                Print less console output                            -q\n";
-   std::cout <<
-      "-p          --packagefile          Path to Service Update Package file  <none>          -p d:\\MyPackage.syde_sup\n";
-   std::cout <<
-      "-i          --caninterface         CAN interface (Path to CAN DLL)      <none>          -i d:\\MyCan.dll\n";
-   std::cout <<
-      "-z          --unzipdir             Directory where files get unzipped   <packagefile>   -z d:\\MyUnzipDir\n";
-   std::cout <<
-      "-l          --logdir               Directory for log files              .\\Logs          -l d:\\MyLogDir\n";
-   std::cout << "\n";
-   std::cout << "The package file parameter \"-p\" is mandatory, all others are optional. \n"
-      "If the active bus in the given Service Update Package is of CAN type, a CAN interface must be provided.\n\n";
+   std::cout << "Command line parameters:\n\n"
+      "Flag   Alternative      Description                                   Default         Example\n"
+      "---------------------------------------------------------------------------------------------------------------\n"
+      "-h     --help           Print help                                                    -h\n"
+      "-q     --quiet          Print less console output                                     -q\n"
+      "-p     --packagefile    Path to Service Update Package file           <none>          -p d:\\MyPackage.syde_sup\n"
+      "-i     --caninterface   CAN interface (Path to CAN DLL)               <none>          -i d:\\MyCan.dll\n"
+      "-z     --unzipdir       Existing directory where files get unzipped   <packagefile>   -z d:\\MyUnzipDir\n"
+      "-l     --logdir         Directory for log files                       .\\Logs          -l d:\\MyLogDir\n\n"
+      "The package file parameter \"-p\" is mandatory, all others are optional. \n"
+      "If the active bus in the given Service Update Package is of CAN type, a CAN interface must be provided.\n" <<
+      &std::endl;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Define log file location.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Define log file location.
 
    Create log file name depending on date and time and set log file path
    to WorkingDirectory/Logs/log-file-name.syde_log.
@@ -627,10 +635,8 @@ void C_SYDEsup::m_PrintInformation(const C_SCLString & orc_Version) const
 
    \return
    log file name and location.
-
-   \created     28.08.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_SYDEsup::m_GetLogFileLocation(void) const
 {
    C_SCLString c_LogFilePath;
@@ -655,23 +661,36 @@ C_SCLString C_SYDEsup::m_GetLogFileLocation(void) const
    return c_LogFilePath;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize optional parameters unzip path and logging path
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize optional parameters unzip path and logging path
 
    Check if path exists and replace it with default location if necessary.
    Set logging file.
 
-   \created     28.08.2018  STW/G.Landsgesell
+   \return
+   eOK                        initialization worked
+   eERR_PARSE_COMMAND_LINE    unzip directory is provided but does not exist
 */
-//-----------------------------------------------------------------------------
-void C_SYDEsup::m_InitOptionalParameters()
+//----------------------------------------------------------------------------------------------------------------------
+C_SYDEsup::E_Result C_SYDEsup::m_InitOptionalParameters()
 {
+   E_Result e_Return = eOK;
+
    // unzip path:
-   if (TGL_DirectoryExists(mc_UnzipPath) == false)
+   if (mc_UnzipPath == "")
    {
-      // default location is update package file path "converted" to directory
-      mc_UnzipPath =  TGL_ChangeFileExtension(mc_SUPFilePath, ""); // note: unzipping checks if this location is valid
+      // default location is Service Update Package file path "converted" to directory
+      mc_UnzipPath = TGL_ChangeFileExtension(mc_SUPFilePath, ""); // note: unzipping checks if this location is valid
+   }
+   else if (TGL_DirectoryExists(mc_UnzipPath) == true)
+   {
+      // unzip to sub directory with name of update package
+      mc_UnzipPath = mc_UnzipPath + "\\" + TGL_ChangeFileExtension(TGL_ExtractFileName(mc_SUPFilePath), "");
+   }
+   else
+   {
+      // User provided not-existing directory, which is an invalid command line parameter
+      e_Return = E_Result::eERR_PARSE_COMMAND_LINE;
    }
 
    // log path (gets created, so just check for non empty):
@@ -687,20 +706,19 @@ void C_SYDEsup::m_InitOptionalParameters()
    // log to file
    mc_LogFile = this->m_GetLogFileLocation();
    C_OSCLoggingHandler::h_SetCompleteLogFileLocation(mc_LogFile);
-   std::cout << "The following output also is logged to the file: " << mc_LogFile.c_str() << "\n\n";
+   std::cout << "The following output also is logged to the file: " << mc_LogFile.c_str() << "\n" << &std::endl;
    C_OSCLoggingHandler::h_SetWriteToConsoleActive(false);
    C_OSCLoggingHandler::h_SetWriteToFileActive(true);
+
+   return e_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Print error description from error result
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Print error description from error result
 
    \param[in]     ore_Result     error enum
-
-   \created     31.08.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SYDEsup::m_PrintStringFromError(const E_Result & ore_Result) const
 {
    C_SCLString c_Activity;
@@ -730,7 +748,7 @@ void C_SYDEsup::m_PrintStringFromError(const E_Result & ore_Result) const
       break;
    case eERR_PACKAGE_UNZIP: //C_RD_WR
       c_Activity = "Unzip Package";
-      c_Error = "Could not unzip update package from disk to target path.";
+      c_Error = "Could not unzip Service Update Package.";
       break;
    case eERR_PACKAGE_CORE_C_NOACT: //C_NOACT
       c_Activity = "Unzip Package";
@@ -739,7 +757,11 @@ void C_SYDEsup::m_PrintStringFromError(const E_Result & ore_Result) const
       break;
    case eERR_PACKAGE_NOT_FOUND: //C_CONFIG
       c_Activity = "Unzip Package";
-      c_Error = "Could not find update package archive.";
+      c_Error = "Could not find Service Update Package.";
+      break;
+   case eERR_PACKAGE_WRONG_EXTENSION:
+      c_Activity = "Unzip Package";
+      c_Error = "Service Update Package has wrong file extension. File extension must be *.syde_sup.";
       break;
 
    // result from check if DLL file exists
@@ -799,10 +821,10 @@ void C_SYDEsup::m_PrintStringFromError(const E_Result & ore_Result) const
       break;
    case eERR_SEQUENCE_C_CONFIG: //C_CONFIG
       c_Activity = "Initialize Sequence";
-      c_Error = "Invalid system definition for parameters or\n"
-                "active bus index refers to a bus that is not part of the system definition or\n"
-                "length of active nodes vector is not identical to number of nodes in system definition or\n"
-                "no STW Flashloader devices and no openSYDE devices are active or\n"
+      c_Error = "Invalid system definition for parameters or "
+                "active bus index refers to a bus that is not part of the system definition or "
+                "length of active nodes vector is not identical to number of nodes in system definition or "
+                "no STW Flashloader devices and no openSYDE devices are active or "
                 "no STW Flashloader devices on active bus and no openSYDE devices are active, but STW Flashloader on"
                 "other buses are active";
       break;
@@ -832,21 +854,22 @@ void C_SYDEsup::m_PrintStringFromError(const E_Result & ore_Result) const
       break;
    case eERR_UPDATE_C_OVERFLOW: //C_OVERFLOW
       c_Activity = "Update System";
-      c_Error = "Size of applications to write differs from size of nodes.\n"
+      c_Error = "Size of applications to write differs from size of nodes. "
                 "Or for address based targets: device name of device does not match name contained in HEX file.";
       break;
    case eERR_UPDATE_C_RD_RW: //C_RD_RW
       c_Activity = "Update System";
-      c_Error = "File referenced by application does not exist or\n"
-                "for address based targets: one of the files is not a valid Intel or Motorola HEX file or\n"
-                "for address based targets: could not split up HEX file in individual areas";
+      c_Error = "File referenced does not exist. "
+                "Or for address based targets: file is not a valid Intel or Motorola HEX file or "
+                "could not split up HEX file in individual areas. "
+                "Or for parameter writing: one of the files is not a valid .psi_syde file.";
       break;
    case eERR_UPDATE_C_NOACT: //C_NOACT
       c_Activity = "Update System";
-      c_Error = "There exists an application-to-write for a node that was not set as active or\n"
-                "there exists an application-to-write for a node that has no position in the update order or\n"
-                "there exists an application-to-write for a node that has more than one position in the update order or\n"
-                "for address based targets: could not extract device name from HEX file.";
+      c_Error = "There exist flash or NVM files for a node that was not set as active or "
+                "there exist flash or NVM files for a node that has no position in the update order or "
+                "there exist flash or NVM files for a node that has more than one position in the update order. "
+                "Or for address based targets: could not extract device name from HEX file.";
       break;
    case eERR_UPDATE_C_COM: //C_COM
       c_Activity = "Update System";
@@ -854,8 +877,18 @@ void C_SYDEsup::m_PrintStringFromError(const E_Result & ore_Result) const
       break;
    case eERR_UPDATE_SYSDEF: //C_CONFIG
       c_Activity = "Update System";
-      c_Error = "System definition is NULL (Init() not called) or \n"
-                "for address based targets: no signature block found in HEX file.";
+      c_Error = "System definition is NULL (Init() not called). "
+                "Or for address based targets: no signature block found in HEX file. "
+                "Or for parameter writing: one of the files contains data for zero or more than one device "
+                "(expected: data for exactly one device).";
+      break;
+   case eERR_UPDATE_CHECKSUM: // C_CHECKSUM
+      c_Activity = "Update System";
+      c_Error = "For parameter writing one of the files has an invalid checksum.";
+      break;
+   case eERR_UPDATE_NO_NVM: // C_RANGE
+      c_Activity = "Update System";
+      c_Error = "At least one feature of the openSYDE Flashloader is not available for NVM writing.";
       break;
 
    // general results (comment is corresponding core return value)
@@ -877,24 +910,21 @@ void C_SYDEsup::m_PrintStringFromError(const E_Result & ore_Result) const
    {
       h_WriteLog(c_Activity, c_Error, true);
       std::cout << "\n";
-      h_WriteLog("System Update", "Could not update system!", true);
-      std::cout << "See log file for information: " << mc_LogFile.c_str() << "\n";
-      std::cout << "\n";
+      h_WriteLog("System Update", "Could not update system! Tool result code: " +
+                 C_SCLString::IntToStr(static_cast<sintn>(ore_Result)), true);
+      std::cout << "See openSYDE user manual or log file for information: " << mc_LogFile.c_str() << "\n" << &std::endl;
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Conclude (reset system and close CAN DLL)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Conclude (reset system and close CAN DLL)
 
    \param[in]     orc_CanDispatcher    CAN dispatcher
    \param[in]     orc_Sequence         system update sequence
    \param[in]     orq_CanLoaded        true: orc_CanDispatcher.CAN_Open() successfully called; false: else
    \param[in]     orq_ResetSystem      true: Flashloader activation failed or system update succeeded; false: else
-
-   \created     04.09.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SYDEsup::m_Conclude(C_CAN & orc_CanDispatcher, C_SUPSuSequences & orc_Sequence, const bool & orq_CanLoaded,
                            const bool & orq_ResetSystem) const
 {

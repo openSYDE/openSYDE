@@ -1,58 +1,48 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Popup widget for filter ID selection from database (implementation)
 
    Popup widget for filter ID selection from database
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     18.01.2019  STW/G.Landsgesell
-   \endimplementation
+   \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_GtGetText.h"
 #include "C_CamMosDatabaseSelectionPopup.h"
 #include "ui_C_CamMosDatabaseSelectionPopup.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] orc_Parent          Reference to parent
    \param[in]     oq_AllowMultiSelect Flag to allow multi select for the message selection
-
-   \created     18.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosDatabaseSelectionPopup::C_CamMosDatabaseSelectionPopup(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
                                                                const bool oq_AllowMultiSelect) :
    QWidget(&orc_Parent),
@@ -116,25 +106,19 @@ C_CamMosDatabaseSelectionPopup::C_CamMosDatabaseSelectionPopup(stw_opensyde_gui_
            &C_CamMosDatabaseSelectionPopup::m_UpdateSelection);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     18.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosDatabaseSelectionPopup::~C_CamMosDatabaseSelectionPopup(void)
 {
    delete this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     18.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionPopup::InitStaticNames(void) const
 {
    this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("Message"));
@@ -143,7 +127,8 @@ void C_CamMosDatabaseSelectionPopup::InitStaticNames(void) const
 
    this->mpc_Ui->pc_LineEditSearch->setPlaceholderText(C_GtGetText::h_GetText("Filter"));
    this->mpc_Ui->pc_LabelSearchNoElementsFound->setText(C_GtGetText::h_GetText("No messages found."));
-   this->mpc_Ui->pc_LabelInitialSignalNoElements->setText(C_GtGetText::h_GetText("No messages defined. No active database."));
+   this->mpc_Ui->pc_LabelInitialSignalNoElements->setText(C_GtGetText::h_GetText(
+                                                             "No messages defined. No active database."));
    this->mpc_Ui->pc_GroupBoxSearchNoElementsFound->setTitle("");
    this->mpc_Ui->pc_GroupBoxInitialSignalNoElements->setTitle("");
 
@@ -151,21 +136,17 @@ void C_CamMosDatabaseSelectionPopup::InitStaticNames(void) const
    this->mpc_Ui->pc_PushButtonCancel->setText(C_GtGetText::h_GetText("Cancel"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save the user settings
-
-   \created     19.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save the user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionPopup::SaveUserSettings(void) const
 {
    this->mpc_Ui->pc_TreeView->SaveExpandedIndices();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get selected data elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get selected data elements
 
    array:
    0: database name
@@ -173,27 +154,22 @@ void C_CamMosDatabaseSelectionPopup::SaveUserSettings(void) const
 
    \return
    Current selected data elements
-
-   \created     06.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<std::array<QString, 2> > C_CamMosDatabaseSelectionPopup::GetSelectedDataElements(void)
 const
 {
    return this->mpc_Ui->pc_TreeView->GetSelectedDataElements();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     18.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionPopup::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
@@ -219,25 +195,19 @@ void C_CamMosDatabaseSelectionPopup::keyPressEvent(QKeyEvent * const opc_KeyEven
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Ok button click
-
-   \created     18.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Ok button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionPopup::m_OkClicked(void)
 {
    this->mrc_ParentDialog.accept();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle view hiding / replacement
-
-   \created     28.08.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle view hiding / replacement
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionPopup::m_HandleHiding(void) const
 {
    if (this->mpc_Ui->pc_TreeView->IsEmpty() == true)
@@ -262,27 +232,21 @@ void C_CamMosDatabaseSelectionPopup::m_HandleHiding(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Cancel button
-
-   \created     06.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Cancel button
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionPopup::m_CancelClicked(void)
 {
    this->mrc_ParentDialog.reject();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Filter for string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Filter for string
 
    \param[in] orc_Text String
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionPopup::m_OnSearch(const QString & orc_Text) const
 {
    this->mpc_Ui->pc_TreeView->Search(orc_Text);
@@ -309,15 +273,12 @@ void C_CamMosDatabaseSelectionPopup::m_OnSearch(const QString & orc_Text) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update number of selected items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update number of selected items
 
    \param[in] osn_SelectionCount Number of selected items
-
-   \created     25.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionPopup::m_UpdateSelection(const sintn osn_SelectionCount) const
 {
    if (this->mpc_Ui->pc_TreeView->IsEmpty() == true)
@@ -346,13 +307,10 @@ void C_CamMosDatabaseSelectionPopup::m_UpdateSelection(const sintn osn_Selection
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Setup context menu entries
-
-   \created     06.11.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Setup context menu entries
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionPopup::m_SetupContextMenu(const bool & orq_MultiSelect)
 {
    this->mpc_ContextMenu = new C_OgeContextMenu(this);
@@ -379,15 +337,12 @@ void C_CamMosDatabaseSelectionPopup::m_SetupContextMenu(const bool & orq_MultiSe
            &C_CamMosDatabaseSelectionPopup::m_OnCustomContextMenuRequested);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show custom context menu
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show custom context menu
 
    \param[in] orc_Pos Local context menu position
-
-   \created     06.11.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionPopup::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 {
    QPoint c_PosGlobal = this->mapToGlobal(orc_Pos);

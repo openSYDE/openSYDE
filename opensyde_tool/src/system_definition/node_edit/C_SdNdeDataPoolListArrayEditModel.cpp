@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Node data pool list array edit model (implementation)
 
    Node data pool list array edit model
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     08.02.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <iostream>
@@ -30,36 +23,33 @@
 #include "C_SdNdeUnoUtil.h"
 #include "C_SdNdeDataPoolContentUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui;
 using namespace stw_errors;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     08.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListArrayEditModel::C_SdNdeDataPoolListArrayEditModel(QObject * const opc_Parent) :
    QAbstractTableModel(opc_Parent),
    mu32_NodeIndex(0),
@@ -71,9 +61,8 @@ C_SdNdeDataPoolListArrayEditModel::C_SdNdeDataPoolListArrayEditModel(QObject * c
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Specify associated list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Specify associated list
 
    \param[in] oru32_NodeIndex     Node index
    \param[in] oru32_DataPoolIndex Node data pool index
@@ -82,10 +71,8 @@ C_SdNdeDataPoolListArrayEditModel::C_SdNdeDataPoolListArrayEditModel(QObject * c
    \param[in] ore_ArrayEditType   Enum for node data pool list element variable
    \param[in] oru32_DataSetIndex  If min or max use 0
                                   Else use data set index
-
-   \created     07.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListArrayEditModel::SetElement(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
                                                    const uint32 & oru32_ListIndex, const uint32 & oru32_ElementIndex,
                                                    const C_SdNdeDataPoolUtil::E_ArrayEditType & ore_ArrayEditType,
@@ -101,9 +88,8 @@ void C_SdNdeDataPoolListArrayEditModel::SetElement(const uint32 & oru32_NodeInde
    endResetModel();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if equal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if equal
 
    \param[in] oru32_NodeIndex     Node index
    \param[in] oru32_DataPoolIndex Node data pool index
@@ -116,10 +102,8 @@ void C_SdNdeDataPoolListArrayEditModel::SetElement(const uint32 & oru32_NodeInde
    \return
    True  Match
    False No match
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolListArrayEditModel::Equals(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
                                                const uint32 & oru32_ListIndex, const uint32 & oru32_ElementIndex,
                                                const C_SdNdeDataPoolUtil::E_ArrayEditType & ore_ArrayEditType,
@@ -140,9 +124,8 @@ bool C_SdNdeDataPoolListArrayEditModel::Equals(const uint32 & oru32_NodeIndex, c
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get header data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get header data
 
    \param[in] osn_Section    Section
    \param[in] oe_Orientation Orientation
@@ -150,10 +133,8 @@ bool C_SdNdeDataPoolListArrayEditModel::Equals(const uint32 & oru32_NodeIndex, c
 
    \return
    Header string
-
-   \created     09.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_SdNdeDataPoolListArrayEditModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
                                                        const sintn osn_Role) const
 {
@@ -192,18 +173,15 @@ QVariant C_SdNdeDataPoolListArrayEditModel::headerData(const sintn osn_Section, 
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get table row count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get table row count
 
    \param[in] orc_Parent Parent
 
    \return
    Row count
-
-   \created     09.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SdNdeDataPoolListArrayEditModel::rowCount(const QModelIndex & orc_Parent) const
 {
    sintn sn_Retval = 0;
@@ -216,18 +194,15 @@ sintn C_SdNdeDataPoolListArrayEditModel::rowCount(const QModelIndex & orc_Parent
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get table column count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get table column count
 
    \param[in] orc_Parent Parent
 
    \return
    Column count
-
-   \created     09.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_SdNdeDataPoolListArrayEditModel::columnCount(const QModelIndex & orc_Parent) const
 {
    stw_types::sintn sn_Retval = 0;
@@ -245,19 +220,16 @@ sintn C_SdNdeDataPoolListArrayEditModel::columnCount(const QModelIndex & orc_Par
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data at index
 
    \param[in] orc_Index Index
    \param[in] osn_Role  Data role
 
    \return
    Data
-
-   \created     09.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_SdNdeDataPoolListArrayEditModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
 {
    QVariant c_Retval;
@@ -380,9 +352,8 @@ QVariant C_SdNdeDataPoolListArrayEditModel::data(const QModelIndex & orc_Index, 
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set data at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set data at index
 
    \param[in] orc_Index Index
    \param[in] orc_Value New data
@@ -391,10 +362,8 @@ QVariant C_SdNdeDataPoolListArrayEditModel::data(const QModelIndex & orc_Index, 
    \return
    true  success
    false failure
-
-   \created     09.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolListArrayEditModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value,
                                                 const sintn osn_Role)
 {
@@ -413,7 +382,7 @@ bool C_SdNdeDataPoolListArrayEditModel::setData(const QModelIndex & orc_Index, c
                                        u32_Index, orc_Value);
 
             //lint -e{1793} Qt example
-            Q_EMIT dataChanged(orc_Index, orc_Index, QVector<stw_types::sintn>() << osn_Role);
+            Q_EMIT this->dataChanged(orc_Index, orc_Index, QVector<stw_types::sintn>() << osn_Role);
             Q_EMIT this->SigErrorChangePossible(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex,
                                                 this->mu32_ElementIndex, this->me_ArrayEditType,
                                                 this->mu32_DataSetIndex);
@@ -424,18 +393,15 @@ bool C_SdNdeDataPoolListArrayEditModel::setData(const QModelIndex & orc_Index, c
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get flags for item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get flags for item
 
    \param[in] orc_Index Item
 
    \return
    Flags for item
-
-   \created     09.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 Qt::ItemFlags C_SdNdeDataPoolListArrayEditModel::flags(const QModelIndex & orc_Index) const
 {
    Qt::ItemFlags c_Retval;
@@ -451,31 +417,25 @@ Qt::ItemFlags C_SdNdeDataPoolListArrayEditModel::flags(const QModelIndex & orc_I
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Signal model update
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Signal model update
 
    \param[in] oru32_Row      Changed row
    \param[in] ore_ChangeType Change type
-
-   \created     10.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListArrayEditModel::HandleDataChange(const uint32 & oru32_Column)
 {
-   Q_EMIT dataChanged(this->index(0, oru32_Column), this->index(0, oru32_Column));
+   Q_EMIT this->dataChanged(this->index(0, oru32_Column), this->index(0, oru32_Column));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get type of current data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get type of current data
 
    \return
    Type of current data
-
-   \created     20.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeDataPoolContent::E_Type C_SdNdeDataPoolListArrayEditModel::GetType(void) const
 {
    C_OSCNodeDataPoolContent::E_Type e_Retval = C_OSCNodeDataPoolContent::eUINT8;
@@ -491,17 +451,14 @@ C_OSCNodeDataPoolContent::E_Type C_SdNdeDataPoolListArrayEditModel::GetType(void
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get osc node data pool list element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get osc node data pool list element
 
    \return
    OSC node data pool list element
    Else NULL
-
-   \created     20.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_OSCNodeDataPoolListElement * C_SdNdeDataPoolListArrayEditModel::GetOSCElement(void) const
 {
    return C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(this->mu32_NodeIndex,
@@ -510,28 +467,22 @@ const C_OSCNodeDataPoolListElement * C_SdNdeDataPoolListArrayEditModel::GetOSCEl
                                                                      this->mu32_ElementIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get array edit type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get array edit type
 
    \return
    Current array edit type
-
-   \created     14.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolUtil::E_ArrayEditType C_SdNdeDataPoolListArrayEditModel::GetArrayEditType() const
 {
    return this->me_ArrayEditType;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register model data reset
-
-   \created     18.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register model data reset
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListArrayEditModel::Reset(void)
 {
    this->beginResetModel();

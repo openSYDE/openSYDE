@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data pool list elements table item (implementation)
 
    Data pool list elements table item
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     03.02.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QHeaderView>
@@ -42,7 +35,7 @@
 #include "C_OgeWiCustomMessage.h"
 #include "C_UsHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
@@ -51,29 +44,26 @@ using namespace stw_opensyde_gui_elements;
 using namespace stw_errors;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     03.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListTableView::C_SdNdeDataPoolListTableView(QWidget * const opc_Parent) :
    C_TblViewScroll(opc_Parent),
    mu32_NodeIndex(0),
@@ -148,15 +138,12 @@ C_SdNdeDataPoolListTableView::C_SdNdeDataPoolListTableView(QWidget * const opc_P
            &C_SdNdeDataPoolListTableView::m_OnColumnResize);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListTableView::~C_SdNdeDataPoolListTableView(void)
 {
    m_HandleColumnStateSave();
@@ -168,17 +155,14 @@ C_SdNdeDataPoolListTableView::~C_SdNdeDataPoolListTableView(void)
    //lint -e{1540}  no memory leak because of the parent and the Qt memory management or never took ownership
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Specify associated list
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Specify associated list
 
    \param[in] oru32_NodeIndex     Node index
    \param[in] oru32_DataPoolIndex Node data pool index
    \param[in] oru32_ListIndex     Node data pool list index
-
-   \created     07.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::SetList(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
                                            const uint32 & oru32_ListIndex)
 {
@@ -193,9 +177,8 @@ void C_SdNdeDataPoolListTableView::SetList(const uint32 & oru32_NodeIndex, const
    Reset();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if equal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if equal
 
    \param[in] oru32_NodeIndex     Node index
    \param[in] oru32_DataPoolIndex Node data pool index
@@ -204,10 +187,8 @@ void C_SdNdeDataPoolListTableView::SetList(const uint32 & oru32_NodeIndex, const
    \return
    True  Match
    False No match
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolListTableView::Equals(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
                                           const uint32 & oru32_ListIndex) const
 {
@@ -225,13 +206,10 @@ bool C_SdNdeDataPoolListTableView::Equals(const uint32 & oru32_NodeIndex, const 
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy tree item to clipboard
-
-   \created     25.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy tree item to clipboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::Copy(void) const
 {
    std::vector<C_OSCNodeDataPoolListElement> c_OSCContentVec;
@@ -260,26 +238,20 @@ void C_SdNdeDataPoolListTableView::Copy(void) const
    C_SdClipBoardHelper::h_StoreDataPoolListElementsToClipBoard(c_OSCContentVec, c_UIContentVec);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy tree item to clipboard and delete it afterwards
-
-   \created     27.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy tree item to clipboard and delete it afterwards
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::Cut(void)
 {
    Copy();
    Delete();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paste tree item
-
-   \created     25.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paste tree item
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::Paste(void)
 {
    const uint32 u32_LastIndex = m_GetOneAfterHighestSelected();
@@ -289,13 +261,10 @@ void C_SdNdeDataPoolListTableView::Paste(void)
                                 u32_LastIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete tree item
-
-   \created     26.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete tree item
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::Delete(void)
 {
    std::vector<uint32> c_Indices = m_GetSelectedIndices();
@@ -304,27 +273,21 @@ void C_SdNdeDataPoolListTableView::Delete(void)
                                          c_Indices);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Insert triggered via action
-
-   \created     08.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Insert triggered via action
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::InsertAction(void)
 {
    Insert(true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Insert tree item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Insert tree item
 
    \param[in] orq_SetFocus Optional flag if inital focus should be set
-
-   \created     27.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::Insert(const bool & orq_SetFocus)
 {
    if (mq_AllowAdd == true)
@@ -366,13 +329,10 @@ void C_SdNdeDataPoolListTableView::Insert(const bool & orq_SetFocus)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Move selected item up by one slot
-
-   \created     27.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Move selected item up by one slot
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::DoMoveUp(void)
 {
    if (this->mq_AllowMoveUp == true)
@@ -405,13 +365,10 @@ void C_SdNdeDataPoolListTableView::DoMoveUp(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Move selected item down by one slot
-
-   \created     27.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Move selected item down by one slot
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::DoMoveDown(void)
 {
    if (this->mq_AllowMoveDown == true)
@@ -453,13 +410,10 @@ void C_SdNdeDataPoolListTableView::DoMoveDown(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Enter name edit
-
-   \created     06.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Enter name edit
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::EditInitial(void)
 {
    const std::vector<uint32> c_Selection = this->m_GetSelectedIndices();
@@ -479,15 +433,12 @@ void C_SdNdeDataPoolListTableView::EditInitial(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set undo stack
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set undo stack
 
    \param[in,out] opc_Value Undo stack
-
-   \created     09.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::SetUndoStack(C_SdNdeUnoDataPoolManager * const opc_Value)
 {
    this->mc_UndoManager.SetUndoStack(opc_Value);
@@ -495,34 +446,27 @@ void C_SdNdeDataPoolListTableView::SetUndoStack(C_SdNdeUnoDataPoolManager * cons
    this->mc_Delegate.SetUndoStack(opc_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Forward signal
-
-   \created     27.02.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Forward signal
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::OnErrorChangePossible(void)
 {
    Q_EMIT this->SigErrorChangePossible();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Forward signal
-
-   \created     24.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Forward signal
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::OnSizeChangePossible(void)
 {
    m_HandleColumnStateSave();
    Q_EMIT this->SigSizeChangePossible();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do data change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do data change
 
    \param[in]     oru32_NodeIndex                Node index
    \param[in]     oru32_DataPoolIndex            Node data pool index
@@ -533,10 +477,8 @@ void C_SdNdeDataPoolListTableView::OnSizeChangePossible(void)
    \param[in]     ore_DataChangeType             Data change type
    \param[in]     oru32_ArrayIndex               Optional array index
    \param[in]     ors32_DataSetIndex             Optional data set index
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::OnDataChangeElements(const uint32 & oru32_DataPoolListElementIndex,
                                                         const QVariant & orc_NewData,
                                                         const C_SdNdeDataPoolUtil::E_ElementDataChangeType & ore_DataChangeType, const uint32 & oru32_ArrayIndex,
@@ -547,17 +489,14 @@ void C_SdNdeDataPoolListTableView::OnDataChangeElements(const uint32 & oru32_Dat
                                              ore_DataChangeType, oru32_ArrayIndex, ors32_DataSetIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: handle list paste
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     26.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::keyPressEvent(QKeyEvent * const opc_Event)
 {
    bool q_CallOrig = true;
@@ -629,17 +568,14 @@ void C_SdNdeDataPoolListTableView::keyPressEvent(QKeyEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten drop event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten drop event slot
 
    Here: Move elements
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     09.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::dropEvent(QDropEvent * const opc_Event)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -725,18 +661,15 @@ void C_SdNdeDataPoolListTableView::dropEvent(QDropEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten selection changed event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten selection changed event slot
 
    Here: Register selection change
 
    \param[in] orc_Selected   Selected items
    \param[in] orc_Deselected Deselected items
-
-   \created     27.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::selectionChanged(const QItemSelection & orc_Selected,
                                                     const QItemSelection & orc_Deselected)
 {
@@ -749,17 +682,14 @@ void C_SdNdeDataPoolListTableView::selectionChanged(const QItemSelection & orc_S
    m_CheckActions(c_SelectedIndices);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten start drag event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten start drag event
 
    Here: start drag manually (for custom preview)
 
    \param[in] oc_SupportedActions Supported actions
-
-   \created     30.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::startDrag(const Qt::DropActions oc_SupportedActions)
 {
    const QModelIndexList c_SelectedItems = this->selectedIndexes();
@@ -776,29 +706,23 @@ void C_SdNdeDataPoolListTableView::startDrag(const Qt::DropActions oc_SupportedA
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set model view manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set model view manager
 
    \param[in,out] opc_Value Model view manager
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::SetModelViewManager(C_SdNdeDataPoolListModelViewManager * const opc_Value)
 {
    this->mpc_ModelViewManager = opc_Value;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Function to select a concrete dataelement
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function to select a concrete dataelement
 
    \param[in] os32_DataElementIndex   Data element index
-
-   \created     16.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::SelectDataElement(const sint32 os32_DataElementIndex)
 {
    this->clearSelection();
@@ -806,16 +730,13 @@ void C_SdNdeDataPoolListTableView::SelectDataElement(const sint32 os32_DataEleme
    this->setFocus();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Select data elements in a specific range
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Select data elements in a specific range
 
    \param[in] ou32_FirstRow First row to select
    \param[in] ou32_LastRow  Last row to select
-
-   \created     22.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::SelectRange(const uint32 ou32_FirstRow, const uint32 ou32_LastRow) const
 {
    const QModelIndex c_TopLeft = this->model()->index(ou32_FirstRow, 0);
@@ -825,31 +746,25 @@ void C_SdNdeDataPoolListTableView::SelectRange(const uint32 ou32_FirstRow, const
    this->selectionModel()->select(c_Selection, QItemSelectionModel::Select);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if table is selected
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if table is selected
 
    \return
    True  Selected
    False Not selected
-
-   \created     31.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDataPoolListTableView::IsSelected(void) const
 {
    return (this->selectedIndexes().size() > 0);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update selection for new data set column
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update selection for new data set column
 
    \param[in] os32_DataSetColumn Index of new data set
-
-   \created     04.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::UpdateSelectionForNewDataSetColumn(const sint32 os32_DataSetColumn)
 {
    const QModelIndexList c_SelectedIndices = this->selectedIndexes();
@@ -882,13 +797,10 @@ void C_SdNdeDataPoolListTableView::UpdateSelectionForNewDataSetColumn(const sint
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register model data reset
-
-   \created     06.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register model data reset
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::Reset(void)
 {
    m_UpdateModelView();
@@ -896,15 +808,12 @@ void C_SdNdeDataPoolListTableView::Reset(void)
    m_CheckContextMenuText();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set selected variable names
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set selected variable names
 
    \param[in] orc_VariableNames New selected variable names
-
-   \created     25.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::SetSelectedVariableNames(const std::vector<QString> & orc_VariableNames)
 {
    if (this->mpc_ModelViewManager != NULL)
@@ -939,16 +848,13 @@ void C_SdNdeDataPoolListTableView::SetSelectedVariableNames(const std::vector<QS
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get selected variable names
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get selected variable names
 
    \return
    Current selected variable names
-
-   \created     25.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<QString> C_SdNdeDataPoolListTableView::GetSelectedVariableNames(void) const
 {
    std::vector<QString> c_Retval;
@@ -971,15 +877,12 @@ std::vector<QString> C_SdNdeDataPoolListTableView::GetSelectedVariableNames(void
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete specified indices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete specified indices
 
    \param[in] orc_Indices Indices
-
-   \created     09.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::m_DeleteIndices(const std::vector<uint32> & orc_Indices)
 {
    std::vector<uint32> c_Indices = orc_Indices;
@@ -989,16 +892,13 @@ void C_SdNdeDataPoolListTableView::m_DeleteIndices(const std::vector<uint32> & o
                                          c_Indices);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Move item in tree
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Move item in tree
 
    \param[in] oru32_SourceIndices Source index
    \param[in] oru32_TargetIndices Target index
-
-   \created     27.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::m_Move(const std::vector<uint32> & oru32_SourceIndices,
                                           const std::vector<uint32> & oru32_TargetIndices)
 {
@@ -1006,16 +906,13 @@ void C_SdNdeDataPoolListTableView::m_Move(const std::vector<uint32> & oru32_Sour
                                        this->mpc_ModelViewManager,
                                        oru32_SourceIndices, oru32_TargetIndices, false);
 }
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get selected indices
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get selected indices
 
    \return
    Selected indices
-
-   \created     27.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<uint32> C_SdNdeDataPoolListTableView::m_GetSelectedIndices(void) const
 {
    std::vector<uint32> c_Retval;
@@ -1032,13 +929,10 @@ std::vector<uint32> C_SdNdeDataPoolListTableView::m_GetSelectedIndices(void) con
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init context menu entries
-
-   \created     20.02.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init context menu entries
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::m_SetupContextMenu(void)
 {
    this->mpc_ContextMenu = new C_OgeContextMenu(this);
@@ -1087,27 +981,21 @@ void C_SdNdeDataPoolListTableView::m_SetupContextMenu(void)
            &C_SdNdeDataPoolListTableView::m_OnCustomContextMenuRequested);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show custom context menu
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show custom context menu
 
    \param[in] orc_Pos Local context menu position
-
-   \created     20.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 {
    this->mpc_ContextMenu->popup(this->viewport()->mapToGlobal(orc_Pos));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle column size change so hide necessary columns
-
-   \created     22.02.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle column size change so hide necessary columns
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::m_HandleColumnChange(void)
 {
    if (this->mpc_ModelViewManager != NULL)
@@ -1140,15 +1028,12 @@ void C_SdNdeDataPoolListTableView::m_HandleColumnChange(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Recheck if actions statuses are still up to date
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Recheck if actions statuses are still up to date
 
    \param[in] orc_SelectedIndices Selected indices
-
-   \created     27.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::m_CheckActions(const std::vector<uint32> & orc_SelectedIndices)
 {
    if (orc_SelectedIndices.size() > 0)
@@ -1255,13 +1140,10 @@ void C_SdNdeDataPoolListTableView::m_CheckActions(const std::vector<uint32> & or
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update model
-
-   \created     20.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update model
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::m_UpdateModelView(void)
 {
    if (this->mpc_ModelViewManager != NULL)
@@ -1282,15 +1164,12 @@ void C_SdNdeDataPoolListTableView::m_UpdateModelView(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle link clicked
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle link clicked
 
    \param[in] oc_Index Index of clicked link
-
-   \created     21.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::m_HandleLinkClicked(const QModelIndex & orc_Index)
 {
    if (orc_Index.isValid() == true)
@@ -1379,13 +1258,10 @@ void C_SdNdeDataPoolListTableView::m_HandleLinkClicked(const QModelIndex & orc_I
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reinitialize context menu text
-
-   \created     23.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reinitialize context menu text
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::m_CheckContextMenuText(void)
 {
    if (this->mpc_ActionAdd != NULL)
@@ -1414,15 +1290,12 @@ void C_SdNdeDataPoolListTableView::m_CheckContextMenuText(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   React to column resize
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   React to column resize
 
    Currently deactivated but kept if necessary in future
-
-   \created     30.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::m_OnColumnResize(void)
 {
    tgl_assert(this->mpc_ModelViewManager != NULL);
@@ -1455,16 +1328,13 @@ void C_SdNdeDataPoolListTableView::m_OnColumnResize(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get index of element after highest selected element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get index of element after highest selected element
 
    \return
    Index of element after highest selected element
-
-   \created     23.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SdNdeDataPoolListTableView::m_GetOneAfterHighestSelected(void)
 {
    uint32 u32_Retval = 0;
@@ -1499,13 +1369,10 @@ uint32 C_SdNdeDataPoolListTableView::m_GetOneAfterHighestSelected(void)
    return u32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle column state store
-
-   \created     16.05.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle column state store
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::m_HandleColumnStateSave(void) const
 {
    if (this->model() != NULL)
@@ -1531,13 +1398,10 @@ void C_SdNdeDataPoolListTableView::m_HandleColumnStateSave(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle column state restore
-
-   \created     16.05.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle column state restore
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListTableView::m_HandleColumnStateRestore(void)
 {
    if (this->mpc_ModelViewManager != NULL)

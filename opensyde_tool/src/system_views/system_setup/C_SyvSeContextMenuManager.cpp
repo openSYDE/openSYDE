@@ -1,51 +1,41 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Context menu manager of system view topology
 
    The context menu manager handles all request for context menus with its actions.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     09.01.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "gitypes.h"
 #include "C_SyvSeContextMenuManager.h"
 #include "C_GtGetText.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     09.01.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvSeContextMenuManager::C_SyvSeContextMenuManager() :
    C_SebTopologyBaseContextMenuManager()
 {
@@ -58,31 +48,25 @@ C_SyvSeContextMenuManager::C_SyvSeContextMenuManager() :
                                                                          &C_SyvSeContextMenuManager::m_ShowCanConfiguration);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     09.01.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvSeContextMenuManager::~C_SyvSeContextMenuManager()
 {
    //lint -e{1540}  no memory leak because of the parent of all mpc_Action* and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handles a context menu event and shows the context menu with the necessary actions
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handles a context menu event and shows the context menu with the necessary actions
 
    \param[in]     opc_Event            Event identification and information
    \param[in]     orc_SelectedItems    All selected and for the context menu relevant items
    \param[in]     orq_ShowPaste        Indicator if paste functionality is available (Not used here)
-
-   \created     08.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeContextMenuManager::HandleContextMenuEvent(QGraphicsSceneContextMenuEvent * const opc_Event,
                                                        const QList<QGraphicsItem *> & orc_SelectedItems,
                                                        const bool & orq_ShowPaste)
@@ -132,13 +116,13 @@ void C_SyvSeContextMenuManager::HandleContextMenuEvent(QGraphicsSceneContextMenu
       this->mc_ContextMenu.popup(opc_Event->screenPos());
    }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeContextMenuManager::m_ShowNodeInformation(void)
 {
    Q_EMIT this->SigShowNodeInformation(this->mpc_ActiveItem);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeContextMenuManager::m_ShowCanConfiguration(void)
 {
    Q_EMIT this->SigShowCanConfiguration(this->mpc_ActiveItem);

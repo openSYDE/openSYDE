@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Common flashloader actions
 
    Encapsulates some higher level action that are used by more complex procedures (e.g. downloadclass).
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     xx.xx.200x  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2002 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------ */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"  //pre-compiled headers
 #ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -35,7 +28,7 @@
 #include "CSCLString.h"
 #include "TGLUtils.h"
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 using namespace stw_types;
 using namespace stw_errors;
@@ -44,13 +37,13 @@ using namespace stw_scl;
 using namespace stw_tgl;
 using namespace stw_can;
 
-/* -- Defines ------------------------------------------------------------- */
+/* -- Defines ------------------------------------------------------------------------------------------------------- */
 
-/* -- Types --------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ---------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables --------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 //constants for ::ReadServerInformation
 //some things stay hard-coded for compatibility with older non-self-describing flashloader implementations:
 static const sint16 KNOWN_DEVICE_UNKNOWN = -1;
@@ -66,20 +59,20 @@ static const charn maacn_KNOWN_DEVICE_NAMES[KNOWN_DEVICE_MAX][10] =
    "EHC"   //DEVICE_EHC
 };
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 static uint16 mu16_WinflashInternalKey = 0x0000U;
 
-/* -- Module Global Function Prototypes ----------------------------------- */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------ */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 void XFLSetInternalKey(const uint16 ou16_Key)
 {
    mu16_WinflashInternalKey = ou16_Key;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_XFLWakeupParameters::C_XFLWakeupParameters(void) :
    e_WakeupMode(eXFL_WAKEUP_MODE_LID),
@@ -97,7 +90,7 @@ C_XFLWakeupParameters::C_XFLWakeupParameters(void) :
    (void)memset(&au8_SNR[0], 0, sizeof(au8_SNR));
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_XFLFoundNode::C_XFLFoundNode(void) :
    u8_NodeID(0U),
@@ -107,7 +100,7 @@ C_XFLFoundNode::C_XFLFoundNode(void) :
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_XFLDivertParameters::C_XFLDivertParameters(void) :
    u8_DeviceIndex(0U),     //0 = CAN (cf. flashloader protocol specification)
@@ -115,7 +108,7 @@ C_XFLDivertParameters::C_XFLDivertParameters(void) :
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_XFLDivertParameters & C_XFLDivertParameters::operator =(const C_XFLDivertParameters & orc_Source)
 {
@@ -129,9 +122,8 @@ C_XFLDivertParameters & C_XFLDivertParameters::operator =(const C_XFLDivertParam
    return (*this);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load divert stream parameter definition and values from INI file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load divert stream parameter definition and values from INI file
 
    Will read the following parameters:
 
@@ -150,10 +142,8 @@ C_XFLDivertParameters & C_XFLDivertParameters::operator =(const C_XFLDivertParam
 
    \param[in]   orc_IniFile        opened INI file
    \param[in]   orc_Section        section in INI file
-
-   \created     xx.xx.20xx  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_XFLDivertParameters::LoadFromINI(C_SCLIniFile & orc_IniFile, const C_SCLString & orc_Section)
 {
    sint32 i;
@@ -177,9 +167,8 @@ void C_XFLDivertParameters::LoadFromINI(C_SCLIniFile & orc_IniFile, const C_SCLS
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save divert stream parameter definitions and values to INI file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save divert stream parameter definitions and values to INI file
 
    Will write the following parameters:
 
@@ -202,11 +191,8 @@ void C_XFLDivertParameters::LoadFromINI(C_SCLIniFile & orc_IniFile, const C_SCLS
    \return
    C_NO_ERR   written  \n
    else       error
-
-
-   \created     xx.xx.20xx  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLDivertParameters::SaveToINI(C_SCLIniFile & orc_IniFile, const C_SCLString & orc_Section)
 {
    sint32 i;
@@ -239,17 +225,14 @@ sint32 C_XFLDivertParameters::SaveToINI(C_SCLIniFile & orc_IniFile, const C_SCLS
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set parameters for diverting from/to CAN bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set parameters for diverting from/to CAN bus
 
    Parameters for CAN are defined in flashloader protocol specification
 
    \param[in]   ou8_NumPositions        number of possible target busses
-
-   \created     11.04.2012  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_XFLDivertParametersCAN::C_XFLDivertParametersCAN(const uint8 ou8_NumPositions) :
    C_XFLDivertParameters()
 {
@@ -309,7 +292,7 @@ C_XFLDivertParametersCAN::C_XFLDivertParametersCAN(const uint8 ou8_NumPositions)
 
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_XFLDivertParametersCAN::SetValueClientIDType(const bool oq_StdIDs, const bool oq_ExtIDs)
 {
@@ -317,21 +300,21 @@ void C_XFLDivertParametersCAN::SetValueClientIDType(const bool oq_StdIDs, const 
    c_Parameters[mu8_PARAM_INDEX_CLIENT_ID_TYPE].u16_ParameterValue += (oq_ExtIDs ? 2U : 0U);
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_XFLDivertParametersCAN::SetValueClientBitrate(const uint16 ou16_Bitrate_kBitS)
 {
    c_Parameters[mu8_PARAM_INDEX_CLIENT_BUS_BITRATE].u16_ParameterValue = ou16_Bitrate_kBitS;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_XFLDivertParametersCAN::SetValueClientMaskStandard(const uint16 ou16_Mask)
 {
    c_Parameters[mu8_PARAM_INDEX_CLIENT_MASK_STD].u16_ParameterValue = ou16_Mask;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_XFLDivertParametersCAN::SetValueClientMaskExtended(const uint32 ou32_Mask)
 {
@@ -339,14 +322,14 @@ void C_XFLDivertParametersCAN::SetValueClientMaskExtended(const uint32 ou32_Mask
    c_Parameters[mu8_PARAM_INDEX_CLIENT_HW_MASK_EXT].u16_ParameterValue = static_cast<uint16>(ou32_Mask >> 16);
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_XFLDivertParametersCAN::SetValueClientIDStandard(const uint16 ou16_ID)
 {
    c_Parameters[mu8_PARAM_INDEX_CLIENT_ID_STD].u16_ParameterValue = ou16_ID;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_XFLDivertParametersCAN::SetValueClientIDExtended(const uint32 ou32_ID)
 {
@@ -354,7 +337,7 @@ void C_XFLDivertParametersCAN::SetValueClientIDExtended(const uint32 ou32_ID)
    c_Parameters[mu8_PARAM_INDEX_CLIENT_HW_ID_EXT].u16_ParameterValue = static_cast<uint16>(ou32_ID >> 16);
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_XFLDivertParametersCAN::SetValueTargetIDType(const bool oq_StdIDs, const bool oq_ExtIDs)
 {
@@ -362,21 +345,21 @@ void C_XFLDivertParametersCAN::SetValueTargetIDType(const bool oq_StdIDs, const 
    c_Parameters[mu8_PARAM_INDEX_TARGET_ID_TYPE].u16_ParameterValue += (oq_ExtIDs ? 2U : 0U);
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_XFLDivertParametersCAN::SetValueTargetBitrate(const uint16 ou16_Bitrate_kBitS)
 {
    c_Parameters[mu8_PARAM_INDEX_TARGET_BUS_BITRATE].u16_ParameterValue = ou16_Bitrate_kBitS;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_XFLDivertParametersCAN::SetValueTargetMaskStandard(const uint16 ou16_Mask)
 {
    c_Parameters[mu8_PARAM_INDEX_TARGET_MASK_STD].u16_ParameterValue = ou16_Mask;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_XFLDivertParametersCAN::SetValueTargetMaskExtended(const uint32 ou32_Mask)
 {
@@ -384,14 +367,14 @@ void C_XFLDivertParametersCAN::SetValueTargetMaskExtended(const uint32 ou32_Mask
    c_Parameters[mu8_PARAM_INDEX_TARGET_HW_MASK_EXT].u16_ParameterValue = static_cast<uint16>(ou32_Mask >> 16);
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_XFLDivertParametersCAN::SetValueTargetIDStandard(const uint16 ou16_ID)
 {
    c_Parameters[mu8_PARAM_INDEX_TARGET_ID_STD].u16_ParameterValue = ou16_ID;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_XFLDivertParametersCAN::SetValueTargetIDExtended(const uint32 ou32_ID)
 {
@@ -399,14 +382,14 @@ void C_XFLDivertParametersCAN::SetValueTargetIDExtended(const uint32 ou32_ID)
    c_Parameters[mu8_PARAM_INDEX_TARGET_HW_ID_EXT].u16_ParameterValue = static_cast<uint16>(ou32_ID >> 16);
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_XFLActions::C_XFLActions(void) : C_XFLProtocol()
 {
    //nothing to do here
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 bool C_XFLActions::m_AllowSTWCID(const C_XFLCompanyID & orc_ConfiguredCompanyID,
                                  const C_XFLCompanyID & orc_RespondedCompanyID)
@@ -427,7 +410,7 @@ bool C_XFLActions::m_AllowSTWCID(const C_XFLCompanyID & orc_ConfiguredCompanyID,
    return false;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_XFLActions::RequestNodeReset(const T_STWCAN_Msg_TX * const opt_ResetMessage, const bool oq_SingleNode)
 {
@@ -458,7 +441,7 @@ sint32 C_XFLActions::RequestNodeReset(const T_STWCAN_Msg_TX * const opt_ResetMes
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //bring server node into the wakeup state using the "wakeup_local_id" service
 sint32 C_XFLActions::m_WakeupLocalID(const C_XFLCompanyID & orc_CompanyID, const bool oq_MultiResponsesOK)
 {
@@ -510,7 +493,7 @@ sint32 C_XFLActions::m_WakeupLocalID(const C_XFLCompanyID & orc_CompanyID, const
    return s32_Return;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //bring server node into the wakeup state using the "wakeup_with_snr" service
 sint32 C_XFLActions::m_WakeupSNR(const C_XFLCompanyID & orc_CompanyID, const uint8 (&orau8_SNR)[6],
                                  uint8 & oru8_LocalID)
@@ -546,9 +529,8 @@ sint32 C_XFLActions::m_WakeupSNR(const C_XFLCompanyID & orc_CompanyID, const uin
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Bring server node into wakeup state.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Bring server node into wakeup state.
 
    This variation is to be used if:
    - the SNR and local ID of the server node are known
@@ -570,10 +552,8 @@ sint32 C_XFLActions::m_WakeupSNR(const C_XFLCompanyID & orc_CompanyID, const uin
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     22.03.2011  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLActions::m_WakeupLocalIDAndSNR(const C_XFLCompanyID & orc_CompanyID, const uint8 (& orau8_SNR)[6])
 {
    const uint8 u8_MAX_NUM_ECUS_PER_LOCAL_ID = 100U;
@@ -611,9 +591,8 @@ sint32 C_XFLActions::m_WakeupLocalIDAndSNR(const C_XFLCompanyID & orc_CompanyID,
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   function for generic divert stream mechanism
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   function for generic divert stream mechanism
 
    Assumptions:
    - server node is already in wakeup state
@@ -637,10 +616,8 @@ sint32 C_XFLActions::m_WakeupLocalIDAndSNR(const C_XFLCompanyID & orc_CompanyID,
    C_COM              no response from server                    \n
    C_NOACT            error response from server                 \n
    C_RANGE            ou8_HopHandle is != 0 with protocol versions < V3.02r0
-
-   \created     xx.xx.20xx  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLActions::DivertStreamOnOff(const bool oq_On, const C_XFLDivertParameters & orc_DivertParams,
                                        const bool oq_UseHopHandle, const uint8 ou8_HopHandle)
 {
@@ -707,7 +684,7 @@ sint32 C_XFLActions::DivertStreamOnOff(const bool oq_On, const C_XFLDivertParame
    return C_NO_ERR;
 }
 
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //function for ESX2 BBB specific divert stream mechanism
 sint32 C_XFLActions::DivertStreamOnOffBBB(const bool oq_OnOff, const uint8 ou8_TargetPosition,
                                           const uint8 (& orau8_UserID)[2])
@@ -747,9 +724,8 @@ sint32 C_XFLActions::DivertStreamOnOffBBB(const bool oq_OnOff, const uint8 ou8_T
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   read flash information
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   read flash information
 
    read all flash memory information from server
 
@@ -760,10 +736,8 @@ sint32 C_XFLActions::DivertStreamOnOffBBB(const bool oq_OnOff, const uint8 ou8_T
    C_NO_ERR           no errors                                  \n
    C_COM              no response from server                    \n
    C_NOACT            error response from server
-
-   \created     16.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLActions::ReadFlashInformation(C_XFLFlashInformation & orc_Information, C_SCLString & orc_ErrorText)
 {
    sint32 s32_Return;
@@ -854,16 +828,13 @@ sint32 C_XFLActions::ReadFlashInformation(C_XFLFlashInformation & orc_Informatio
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the total number of sectors in this IC
-
-   \created     27.07.2015  STW/A.Stangl
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the total number of sectors in this IC
 
    \return
    total number of sectors in this IC
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint16 C_XFLFlashICInformation::GetNumberOfSectors(void) const
 {
    sint32 s32_RangeIndex;
@@ -875,9 +846,8 @@ uint16 C_XFLFlashICInformation::GetNumberOfSectors(void) const
    return u16_NumSectors;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   convert flash mapping table to a linear array with all the individual sectors
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   convert flash mapping table to a linear array with all the individual sectors
 
    The flash information structure contains all information in a compact format.
    This is good for storage but not for searching through a list of all sectors.
@@ -885,10 +855,8 @@ uint16 C_XFLFlashICInformation::GetNumberOfSectors(void) const
     structure and put it in a table.
 
    \param[out]  orc_Sectors           array of sectors
-
-   \created     16.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_XFLFlashInformation::ConvertToFlashSectorTable(C_XFLFlashSectors & orc_Sectors) const
 {
    sint32 s32_ICIndex;
@@ -943,27 +911,22 @@ void C_XFLFlashInformation::ConvertToFlashSectorTable(C_XFLFlashSectors & orc_Se
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns true if specified address lies within sector range
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns true if specified address lies within sector range
 
    \param[in]   ou32_Address    address to check
 
    \return
    true:      (ou32_Address >= u32_LowestAddress) && (ou32_Address <= u32_HighestAddress)
-
-   \created     27.07.2015  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_XFLFlashSector::IsAddressWithinSector(const uint32 ou32_Address) const
 {
    return ((ou32_Address >= u32_LowestAddress) && (ou32_Address <= u32_HighestAddress));
 }
 
-
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the sector index the specified address resides in
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the sector index the specified address resides in
 
    \param[in]   ou32_Address    address to check
    \param[out]  oru16_Sector    sector the address resides in
@@ -971,10 +934,8 @@ bool C_XFLFlashSector::IsAddressWithinSector(const uint32 ou32_Address) const
    \return
    C_NO_ERR    no problems; oru16_Sector contains sector index
    else        could not find address within any sector
-
-   \created     27.07.2015  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLFlashSectors::GetSectorOccupiedByAddress(const uint32 ou32_Address, uint16 & oru16_Sector) const
 {
    sint32 s32_Return = C_RANGE;
@@ -991,18 +952,15 @@ sint32 C_XFLFlashSectors::GetSectorOccupiedByAddress(const uint32 ou32_Address, 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the erase time for a specified linear sector
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the erase time for a specified linear sector
 
    \param[in]   ou16_Sector         Linear sector index (0 = first sector in IC 0)
 
    \return
    Erase time of specified sector in [ms] (0xFFFFFFFFU if sector is not valid)
-
-   \created     27.07.2015  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_XFLFlashInformation::GetEraseTimeByLinearSectorNumber(const uint16 ou16_Sector) const
 {
    uint16 u16_NumSectors = 0U;
@@ -1021,18 +979,15 @@ uint32 C_XFLFlashInformation::GetEraseTimeByLinearSectorNumber(const uint16 ou16
    return u32_EraseTime;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the maximum write time for up to 255 bytes of data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the maximum write time for up to 255 bytes of data
 
    Returns time taken for slowest IC
 
    \return
    Write to for up to 255 bytes for slowest IC in [ms] (0xFFFFFFFF if no ICs are defined)
-
-   \created     27.07.2015  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_XFLFlashInformation::GetWriteTimeOfSlowestIC(void) const
 {
    uint32 u32_WriteTime;
@@ -1056,9 +1011,8 @@ uint32 C_XFLFlashInformation::GetWriteTimeOfSlowestIC(void) const
    return u32_WriteTime;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert company-ID string to byte-array to send to server
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert company-ID string to byte-array to send to server
 
    cf. details in STWCOMPID::CID_string_to_bytes
 
@@ -1068,10 +1022,8 @@ uint32 C_XFLFlashInformation::GetWriteTimeOfSlowestIC(void) const
    \return
    C_NO_ERR   converted company-id      \n
    C_CONFIG   invalid company-id
-
-   \created     22.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLActions::CompIDStringToStruct(const C_SCLString & orc_String, C_XFLCompanyID & orc_Data)
 {
    //just to make sure we don't get any crap:
@@ -1079,9 +1031,8 @@ sint32 C_XFLActions::CompIDStringToStruct(const C_SCLString & orc_String, C_XFLC
    return stw_company_id::CID_string_to_bytes(orc_String.c_str(), &orc_Data.au8_Data[0], &orc_Data.u8_NumBytes);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert encoded company-ID structure to a displayable string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert encoded company-ID structure to a displayable string
 
    cf. details in stw_company_id::CID_bytes_to_string
 
@@ -1091,10 +1042,8 @@ sint32 C_XFLActions::CompIDStringToStruct(const C_SCLString & orc_String, C_XFLC
    \return
    C_NO_ERR   converted company-id        \n
    C_CONFIG   invalid length
-
-   \created     25.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLActions::CompIDStructToString(const C_XFLCompanyID & orc_Data, C_SCLString & orc_String)
 {
    sint32 s32_Return;
@@ -1107,9 +1056,8 @@ sint32 C_XFLActions::CompIDStructToString(const C_XFLCompanyID & orc_Data, C_SCL
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert flash protocol driver error code to displayable error text
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert flash protocol driver error code to displayable error text
 
    Converts the return value of a CXFLProtocol funciton and an server-side error code
     to a displayable string.
@@ -1120,10 +1068,8 @@ sint32 C_XFLActions::CompIDStructToString(const C_XFLCompanyID & orc_Data, C_SCL
 
    \return
    Displayable error text
-
-   \created     28.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SCLString C_XFLActions::XFLProtocolErrorToText(const sint32 os32_ReturnValue, const uint8 ou8_ErrorCode)
 {
    C_SCLString c_Help;
@@ -1191,7 +1137,7 @@ C_SCLString C_XFLActions::XFLProtocolErrorToText(const sint32 os32_ReturnValue, 
    return c_Help;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_XFLActions::SNRBytesToString(const uint8 (& orau8_Data)[6], const bool oq_IncludeDots)
 {
@@ -1209,11 +1155,8 @@ C_SCLString C_XFLActions::SNRBytesToString(const uint8 (& orau8_Data)[6], const 
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
-//06.04.10  AST: allow hex nibbles in the SNR (return C_WARN if there are !)
-//                -> maybe the target contains an invalid serial number for whatever reason
-//20.07.09  AST: removed error messageboxes here. This is the job of the application layer.
-//16.06.08  AST: fixed converting SNR with dots
+//----------------------------------------------------------------------------------------------------------------------
+
 sint32 C_XFLActions::SNRStringToBytes(const C_SCLString & orc_Text, uint8 (& orau8_Data)[6])
 {
    uint8 u8_Index;
@@ -1260,9 +1203,8 @@ sint32 C_XFLActions::SNRStringToBytes(const C_SCLString & orc_Text, uint8 (& ora
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Search Nodes in network
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Search Nodes in network
 
    \param[in]     orc_CompanyID       company-id to use to wake up nodes (2, 3, 5 characters)
    \param[in]     ou32_StartTime      time to send "FLASH" message in milli seconds
@@ -1275,10 +1217,8 @@ sint32 C_XFLActions::SNRStringToBytes(const C_SCLString & orc_Text, uint8 (& ora
    C_DEFAULT       aborted by user       \n
    C_OVERFLOW      too many nodes found  \n
    C_RANGE         invalid parameter(s)
-
-   \created     28.04.2008  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLActions::SearchNodes(const C_SCLString & orc_CompanyID, const uint32 ou32_StartTime,
                                  const uint8 ou8_FlashInterval, SCLDynamicArray<C_XFLFoundNode> & orc_FoundNodes)
 {
@@ -1394,7 +1334,6 @@ sint32 C_XFLActions::SearchNodes(const C_SCLString & orc_CompanyID, const uint32
                      au8_Found[s32_i] = u8_NumSNRsFound; //to be added to s32_IndexInTable later !
                   }
 
-
                   for (s32_j = s32_IndexInTable; s32_j < (s32_IndexInTable + u8_NumSNRsFound); s32_j++)
                   {
                      //convert bcd to serial number in STW format
@@ -1475,17 +1414,14 @@ sint32 C_XFLActions::SearchNodes(const C_SCLString & orc_CompanyID, const uint32
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   read finger print information if available
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   read finger print information if available
 
    Read available finger print information from server
 
    \param[in,out]   orc_Information      target configuration and possibly read data
-
-   \created     01.04.2010  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_XFLActions::m_ReadFingerPrintInformation(C_XFLInformationFromServer & orc_Information)
 {
    sint32 s32_Return;
@@ -1564,18 +1500,15 @@ void C_XFLActions::m_ReadFingerPrintInformation(C_XFLInformationFromServer & orc
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   read device info information if available
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   read device info information if available
 
    Read available finger print information from server
 
    \param[in,out]   orc_Information      target configuration and possibly read data
                                           (u16_ProtocolVersion must already have been set !)
-
-   \created     01.04.2010  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_XFLActions::m_ReadDeviceInfo(C_XFLInformationFromServer & orc_Information)
 {
    sint32 s32_Return;
@@ -1613,14 +1546,14 @@ void C_XFLActions::m_ReadDeviceInfo(C_XFLInformationFromServer & orc_Information
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_XFLFeaturesAvailable::C_XFLFeaturesAvailable(void)
 {
    this->Clear();
 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_XFLFeaturesAvailable::Clear(void)
 {
@@ -1636,7 +1569,7 @@ void C_XFLFeaturesAvailable::Clear(void)
    q_DeviceInfo = false;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //determine available features from list if services available on server
 void C_XFLFeaturesAvailable::DetermineFeatures(const C_XFLImplementedServices & orc_Services,
                                                const uint16 ou16_ProtocolVersion)
@@ -1671,7 +1604,7 @@ void C_XFLFeaturesAvailable::DetermineFeatures(const C_XFLImplementedServices & 
    this->q_DeviceInfo       = orc_Services.q_GetDeviceInfoAddress && orc_Services.q_ReadFlash;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_XFLFingerPrintInformationFromServer::C_XFLFingerPrintInformationFromServer(void) :
    q_SupportedIndexesValid(false),
@@ -1689,7 +1622,7 @@ C_XFLFingerPrintInformationFromServer::C_XFLFingerPrintInformationFromServer(voi
 {
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_XFLInformationFromServer::C_XFLInformationFromServer(void) :
    u16_ProtocolVersion(0U),
@@ -1718,9 +1651,8 @@ C_XFLInformationFromServer::C_XFLInformationFromServer(void) :
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Read all available information from server
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read all available information from server
 
    Assumption: server node is already in wakeup state.
    On errors on individual read requests TRG_ReportStatus will be executed and the process will be
@@ -1736,10 +1668,8 @@ C_XFLInformationFromServer::C_XFLInformationFromServer(void) :
 
    \return
    C_NO_ERR     executed / check callback texts and valid flags in structure for details \n
-
-   \created     01.04.2010  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLActions::ReadServerInformation(C_XFLInformationFromServer & orc_Info)
 {
    sint32 s32_Return;
@@ -1992,9 +1922,8 @@ sint32 C_XFLActions::ReadServerInformation(C_XFLInformationFromServer & orc_Info
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Read block based flash checksum data from server
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read block based flash checksum data from server
 
    Assumption: server node is already in wakeup state.
    On errors on individual read requests TRG_ReportStatus will be executed with detailed error
@@ -2007,10 +1936,8 @@ sint32 C_XFLActions::ReadServerInformation(C_XFLInformationFromServer & orc_Info
    C_RANGE      invalid function parameter                             \n
    C_COM        no response from server                                \n
    C_NOACT      error response from server
-
-   \created     04.02.2016  STW/A.Stangl (refactored from existing code)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLActions::ReadServerBlockChecksumInformation(C_XFLChecksumAreas & orc_ChecksumInformation)
 {
    sint32 s32_Return;
@@ -2082,9 +2009,8 @@ sint32 C_XFLActions::ReadServerBlockChecksumInformation(C_XFLChecksumAreas & orc
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Read sector based flash checksum data from server
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Read sector based flash checksum data from server
 
    Assumption: server node is already in wakeup state.
    On errors on individual read requests TRG_ReportStatus will be executed with detailed error
@@ -2098,10 +2024,8 @@ sint32 C_XFLActions::ReadServerBlockChecksumInformation(C_XFLChecksumAreas & orc
    C_RANGE      invalid function parameter                             \n
    C_COM        no response from server                                \n
    C_NOACT      error response from server
-
-   \created     07.04.2010  STW/A.Stangl (refactored from existing code)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLActions::ReadServerSectorChecksumInformation(const uint16 ou16_SectorCount,
                                                          C_XFLChecksumAreas & orc_ChecksumInformation)
 {
@@ -2155,9 +2079,8 @@ sint32 C_XFLActions::ReadServerSectorChecksumInformation(const uint16 ou16_Secto
    return C_NO_ERR;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Perform node wakeup
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Perform node wakeup
 
    Configurable wakeup procedure.
    Steps:
@@ -2174,10 +2097,8 @@ sint32 C_XFLActions::ReadServerSectorChecksumInformation(const uint16 ou16_Secto
    \return
    C_NO_ERR           no errors                                  \n
    else               wakeup failed
-
-   \created     09.06.2010  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLActions::PerformWakeup(const C_XFLWakeupParameters & orc_Parameters, uint8 * const opu8_ActualLocalID)
 {
    sint32 s32_Return;
@@ -2241,4 +2162,4 @@ sint32 C_XFLActions::PerformWakeup(const C_XFLWakeupParameters & orc_Parameters,
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------

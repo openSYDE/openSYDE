@@ -1,24 +1,16 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for configuring database files like DBC or syde_sysdef files.
  (implementation)
 
    Widget for configuring database files like DBC or syde_sysdef files.
 
-
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     15.11.2018  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QTimer>
@@ -38,7 +30,7 @@
 #include "C_UsHandler.h"
 #include "C_CamUti.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
@@ -46,29 +38,26 @@ using namespace stw_opensyde_gui_elements;
 using namespace stw_types;
 using namespace stw_errors;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     15.11.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosDatabaseWidget::C_CamMosDatabaseWidget(QWidget * const opc_Parent) :
    C_OgeWiOnlyBackground(opc_Parent),
    mpc_Ui(new Ui::C_CamMosDatabaseWidget)
@@ -87,13 +76,10 @@ C_CamMosDatabaseWidget::C_CamMosDatabaseWidget(QWidget * const opc_Parent) :
            this, &C_CamMosDatabaseWidget::m_LoadConfig);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     15.11.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CamMosDatabaseWidget::~C_CamMosDatabaseWidget()
 {
    // clean up item widgets
@@ -102,28 +88,24 @@ C_CamMosDatabaseWidget::~C_CamMosDatabaseWidget()
    delete this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load all user settings.
-
-   \created     21.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load all user settings.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::LoadUserSettings(void) const
 {
    this->mpc_Ui->pc_WiHeader->SetExpanded(C_UsHandler::h_GetInstance()->GetWiDatabaseExpanded());
    this->m_OnExpand(C_UsHandler::h_GetInstance()->GetWiDatabaseExpanded());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for load finished signal in DBC file case.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for load finished signal in DBC file case.
 
    This always correlates to first entry in list.
 
-   \created     18.12.2018  STW/G.Landsgesell
+   \param[in]  os32_Result    Result of DBC file load
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::OnLoadFinishedDbc(const sint32 os32_Result)
 {
    // check if first database in queue is of type dbc
@@ -139,15 +121,15 @@ void C_CamMosDatabaseWidget::OnLoadFinishedDbc(const sint32 os32_Result)
    this->m_LoadFinishedGeneric(os32_Result);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for load finished signal in openSYDE system definition case.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for load finished signal in openSYDE system definition case.
 
    This always correlates to first entry in list.
 
-   \created     19.12.2018  STW/G.Landsgesell
+   \param[in]  os32_Result    Result of openSYDE system definition file load
+   \param[in]  orc_Busses     Buses found in system definition
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::OnLoadFinishedOsySysDef(const sint32 os32_Result,
                                                      const std::vector<C_OSCSystemBus> & orc_Busses)
 {
@@ -202,16 +184,13 @@ void C_CamMosDatabaseWidget::OnLoadFinishedOsySysDef(const sint32 os32_Result,
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for result of openSYDE bus selection.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for result of openSYDE bus selection.
 
    \param[in]     orc_PathSystemDefinition         system definition identifier (i.e. path)
    \param[in]     os32_Result                      result of bus selection
-
-   \created     07.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::OnSigOsySysDefBusResult(const QString & orc_PathSystemDefinition, const sint32 os32_Result)
 {
    C_CamMosDatabaseItemWidget * pc_Item = NULL;
@@ -274,27 +253,23 @@ void C_CamMosDatabaseWidget::OnSigOsySysDefBusResult(const QString & orc_PathSys
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for communication change signal.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for communication change signal.
 
-   \created     09.01.2019  STW/G.Landsgesell
+   \param[in]  oq_Online    Online/offline flag
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::OnCommunicationStarted(const bool oq_Online)
 {
    this->m_StartCheckTimer(!oq_Online);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Prepare widget for popup view in collapsed state resp. expanded view.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Prepare widget for popup view in collapsed state resp. expanded view.
 
    \param[in]     oq_Expand       true: prepare for expanded, false: prepare for collapsed popup
-
-   \created     14.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::PrepareForExpanded(const bool oq_Expand) const
 {
    if (oq_Expand == false)
@@ -310,13 +285,10 @@ void C_CamMosDatabaseWidget::PrepareForExpanded(const bool oq_Expand) const
    this->mpc_Ui->pc_WiHeader->ShowExpandButton(oq_Expand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update all paths if save location changed.
-
-   \created     05.02.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update all paths if save location changed.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::OnSigSavedAsNew(void) const
 {
    C_CamMosDatabaseItemWidget * pc_Item = NULL;
@@ -340,15 +312,12 @@ void C_CamMosDatabaseWidget::OnSigSavedAsNew(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add dropped database. Forwarded from main window.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add dropped database. Forwarded from main window.
 
    \param[in]     orc_Path        path of database file
-
-   \created     06.02.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::AddDroppedDatabase(const QString & orc_Path)
 {
    C_CamProDatabaseData c_Database;
@@ -363,13 +332,10 @@ void C_CamMosDatabaseWidget::AddDroppedDatabase(const QString & orc_Path)
    this->m_AddDatabaseWidget(c_Database);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up.
-
-   \created     17.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clean up.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::Clear(void)
 {
    // clear loading queue (first to avoid ghost signals)
@@ -389,13 +355,10 @@ void C_CamMosDatabaseWidget::Clear(void)
    mc_Entries.clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize GUI elements
-
-   \created     14.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize GUI elements
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_InitUi(void)
 {
    // initialize colors
@@ -437,13 +400,10 @@ void C_CamMosDatabaseWidget::m_InitUi(void)
    connect(this->mpc_Ui->pc_BtnAdd, &C_CamOgePubSettingsAdd::clicked, this, &C_CamMosDatabaseWidget::m_OnAddClicked);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load configuration (i.e. database widgets)
-
-   \created     17.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load configuration (i.e. database widgets)
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_LoadConfig(void)
 {
    // show no database label as default
@@ -461,18 +421,15 @@ void C_CamMosDatabaseWidget::m_LoadConfig(void)
    this->m_UpdateTitleDatabaseCount();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Remove database widget (GUI only)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove database widget (GUI only)
 
    Counterpart of m_AddDatabaseWidget.
    Does no external data handling.
 
    \param[in]     opc_ItemWidget      Database widget to remove
-
-   \created     17.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_RemoveDatabaseWidget(C_CamMosDatabaseItemWidget * const opc_ItemWidget) const
 {
    if (opc_ItemWidget != NULL)
@@ -488,13 +445,10 @@ void C_CamMosDatabaseWidget::m_RemoveDatabaseWidget(C_CamMosDatabaseItemWidget *
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for add button.
-
-   \created     14.12.2018  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for add button.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_OnAddClicked()
 {
    const QString c_Name = C_CamMosDatabaseItemWidget::h_BrowseForDatabasePath(this);
@@ -514,18 +468,15 @@ void C_CamMosDatabaseWidget::m_OnAddClicked()
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new database widget(GUI only).
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new database widget(GUI only).
 
    Counterpart of m_RemoveDatabaseWidget.
    Does no external data handling.
 
    \param[in]     orc_DatabaseData      database data
-
-   \created     14.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_AddDatabaseWidget(const C_CamProDatabaseData & orc_DatabaseData)
 {
    C_CamMosDatabaseItemWidget * pc_NewItem = new C_CamMosDatabaseItemWidget(orc_DatabaseData, this);
@@ -556,15 +507,12 @@ void C_CamMosDatabaseWidget::m_AddDatabaseWidget(const C_CamProDatabaseData & or
            this, &C_CamMosDatabaseWidget::m_UpdateDatabaseOsySysDefBus);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Remove existing database (widget and data).
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove existing database (widget and data).
 
    \param[in]     opc_Item       Database widget to remove
-
-   \created     14.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_RemoveDatabase(C_CamMosDatabaseItemWidget * const opc_ItemWidget, const bool oq_AskUser)
 {
    bool q_Continue = true;
@@ -633,16 +581,13 @@ void C_CamMosDatabaseWidget::m_RemoveDatabase(C_CamMosDatabaseItemWidget * const
    this->m_UpdateTitleDatabaseCount();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Activate or deactivate given filter.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Activate or deactivate given filter.
 
    \param[in]     opc_ItemWidget    Filter widget to select
    \param[in]     orq_Enable        True: activate filter, false: deactivate filter
-
-   \created     14.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_ActivateDatabase(const C_CamMosDatabaseItemWidget * const opc_ItemWidget,
                                                 const bool & orq_Enable)
 {
@@ -661,19 +606,16 @@ void C_CamMosDatabaseWidget::m_ActivateDatabase(const C_CamMosDatabaseItemWidget
               C_CamUti::h_GetAbsPathFromProj(opc_ItemWidget->GetDatabaseData().c_Name), orq_Enable));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update database configuration of specified database.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update database configuration of specified database.
 
    Slot for signal from item widget on browse finished.
 
    \param[in]     opc_ItemWidget      widget of database item
    \param[in]     orc_Database        database data
    \param[in]     oq_IsUpdate         Flag if action is used to update
-
-   \created     17.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_UpdateDatabasePath(C_CamMosDatabaseItemWidget * const opc_ItemWidget,
                                                   const C_CamProDatabaseData & orc_Database, const bool oq_IsUpdate)
 {
@@ -697,18 +639,15 @@ void C_CamMosDatabaseWidget::m_UpdateDatabasePath(C_CamMosDatabaseItemWidget * c
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update database bus index of specified database (of type openSYDE system definition).
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update database bus index of specified database (of type openSYDE system definition).
 
    Slot for bus editing finished.
 
    \param[in]     opc_ItemWidget      widget of database item
    \param[in]     os32_BusIndex       bus index
-
-   \created     07.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_UpdateDatabaseOsySysDefBus(const C_CamMosDatabaseItemWidget * const opc_ItemWidget,
                                                           const sint32 os32_BusIndex)
 {
@@ -717,18 +656,15 @@ void C_CamMosDatabaseWidget::m_UpdateDatabaseOsySysDefBus(const C_CamMosDatabase
    // note: data handling is done later after another signal was received
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data handling index of database from database widget pointer.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data handling index of database from database widget pointer.
 
    \param[in]  opc_ItemWidget    pointer to database widget
 
    \return
    index of database in data handling
-
-   \created     17.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CamMosDatabaseWidget::m_GetIndexFromWidget(const C_CamMosDatabaseItemWidget * const opc_ItemWidget)
 {
    sint32 s32_Return = 0;
@@ -754,15 +690,12 @@ sint32 C_CamMosDatabaseWidget::m_GetIndexFromWidget(const C_CamMosDatabaseItemWi
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add database to loading queue and trigger loading start if queue was empty before.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add database to loading queue and trigger loading start if queue was empty before.
 
    \param[in]     opc_ItemWidget   pointer to database widget
-
-   \created     19.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_AddToLoadingQueue(C_CamMosDatabaseItemWidget * const opc_ItemWidget)
 {
    if (opc_ItemWidget != NULL)
@@ -780,15 +713,12 @@ void C_CamMosDatabaseWidget::m_AddToLoadingQueue(C_CamMosDatabaseItemWidget * co
    //lint -e{429}  no memory leak because of remove handling of items
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start loading next database.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start loading next database.
 
    Check database type and emit associated signal to start loading this database.
-
-   \created     19.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_CheckAndLoadDatabase(void)
 {
    if (this->mc_DatabasesToLoad.isEmpty() == false)
@@ -832,17 +762,14 @@ void C_CamMosDatabaseWidget::m_CheckAndLoadDatabase(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update loading state of database and start loading next one.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update loading state of database and start loading next one.
 
    Generic because it does not depend on database type.
 
    \param[in]     os32_ErrorCode    error code of loading
-
-   \created     19.12.2018  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_LoadFinishedGeneric(const sint32 os32_ErrorCode)
 {
    // there is at least one entry in databases loading queue because we requested load for exactly this database
@@ -879,15 +806,12 @@ void C_CamMosDatabaseWidget::m_LoadFinishedGeneric(const sint32 os32_ErrorCode)
    // remaining databases in list: in queue (no changes)
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot for file check timer timeout.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot for file check timer timeout.
 
    Check all files for existence and changes.
-
-   \created     09.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_OnFileCheckTimeout()
 {
    // check all files
@@ -904,15 +828,12 @@ void C_CamMosDatabaseWidget::m_OnFileCheckTimeout()
    this->mc_Timer.setInterval(3000);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start or stop file check timer.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start or stop file check timer.
 
    \param[in]     oq_Active      true: start timer, false: stop timer
-
-   \created     09.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_StartCheckTimer(const bool oq_Active)
 {
    if (oq_Active == true)
@@ -925,28 +846,22 @@ void C_CamMosDatabaseWidget::m_StartCheckTimer(const bool oq_Active)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of expand signal.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of expand signal.
 
    \param[in] oq_Expand    true: expand; false: collapse
-
-   \created     10.01.2019  STW/G.Landsgesell
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_OnExpand(const bool oq_Expand) const
 {
    this->mpc_Ui->pc_WiContent->setVisible(oq_Expand);
    C_UsHandler::h_GetInstance()->SetWiDatabaseExpanded(oq_Expand);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update title: show number of databases
-
-   \created     25.01.2019  STW/G.Landsgesell
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update title: show number of databases
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_UpdateTitleDatabaseCount(void) const
 {
    this->mpc_Ui->pc_WiHeader->SetTitle(

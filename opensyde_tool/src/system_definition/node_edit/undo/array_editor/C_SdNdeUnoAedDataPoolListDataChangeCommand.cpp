@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data pool list array edit data change undo command (implementation)
 
    Data pool list array edit data change undo command
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     09.03.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -27,27 +20,26 @@
 #include "C_OSCNodeDataPoolDataSet.h"
 #include "C_SdNdeDataPoolContentUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     oru32_NodeIndex                  Node index
    \param[in]     oru32_DataPoolIndex              Node data pool index
@@ -60,10 +52,8 @@ using namespace stw_opensyde_core;
    \param[in]     orc_NewData                      New data
    \param[in,out] opc_DataPoolListModelViewManager Data pool lists model view manager to get objects to perform actions on
    \param[in,out] opc_Parent                       Optional pointer to parent
-
-   \created     09.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoAedDataPoolListDataChangeCommand::C_SdNdeUnoAedDataPoolListDataChangeCommand(const uint32 & oru32_NodeIndex,
                                                                                        const uint32 & oru32_DataPoolIndex, const uint32 & oru32_ListIndex, const uint32 & oru32_ElementIndex, const C_SdNdeDataPoolUtil::E_ArrayEditType & ore_ArrayEditType, const uint32 & oru32_DataSetIndex, const uint32 & oru32_ArrayElementIndex, const QVariant & orc_NewData, C_SdNdeDataPoolListModelViewManager * const opc_DataPoolListModelViewManager,
                                                                                        QUndoCommand * const opc_Parent)
@@ -83,42 +73,33 @@ C_SdNdeUnoAedDataPoolListDataChangeCommand::C_SdNdeUnoAedDataPoolListDataChangeC
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Redo
-
-   \created     09.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Redo
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoAedDataPoolListDataChangeCommand::redo(void)
 {
    m_Change(this->mc_PreviousData, this->mc_NewData);
    QUndoCommand::redo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Undo
-
-   \created     09.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Undo
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoAedDataPoolListDataChangeCommand::undo(void)
 {
    QUndoCommand::undo();
    m_Change(this->mc_NewData, this->mc_PreviousData);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Change data values and store previous value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Change data values and store previous value
 
    \param[out] orc_PreviousData Previous data value storage
    \param[in]  orc_NewData      New data value assignment
-
-   \created     09.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoAedDataPoolListDataChangeCommand::m_Change(QVariant & orc_PreviousData, const QVariant & orc_NewData)
 {
    const C_OSCNodeDataPoolListElement * const pc_OSCData = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
@@ -276,16 +257,13 @@ void C_SdNdeUnoAedDataPoolListDataChangeCommand::m_Change(QVariant & orc_Previou
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert to generic data change type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert to generic data change type
 
    \return
    generic data change type
-
-   \created     21.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolUtil::E_ElementDataChangeType C_SdNdeUnoAedDataPoolListDataChangeCommand::m_ConvertToChangeType(void)
 const
 {

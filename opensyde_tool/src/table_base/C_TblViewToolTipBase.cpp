@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Table view with tool tip (implementation)
 
    Table view with tool tip
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.03.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QEvent>
@@ -27,33 +20,30 @@
 #include "constants.h"
 #include "C_TblViewToolTipBase.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     27.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_TblViewToolTipBase::C_TblViewToolTipBase(QWidget * const opc_Parent) :
    QTableView(opc_Parent),
    mpc_ToolTip(NULL),
@@ -65,39 +55,32 @@ C_TblViewToolTipBase::C_TblViewToolTipBase(QWidget * const opc_Parent) :
    //Check mouse tracking active in all tables using this class?
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     17.08.2018  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_TblViewToolTipBase::~C_TblViewToolTipBase(void)
 {
    delete mpc_ToolTip;
    mpc_ToolTip = NULL;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse move event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse move event slot
 
    Here: Handle tooltip if necessary
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     27.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblViewToolTipBase::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
    QTableView::mouseMoveEvent(opc_Event);
    m_HandleMouseMoveToolTip(opc_Event->globalPos());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten default event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten default event slot
 
    Here: Handle tool tip
 
@@ -106,10 +89,8 @@ void C_TblViewToolTipBase::mouseMoveEvent(QMouseEvent * const opc_Event)
    \return
    True  Event was recognized and processed
    False Event ignored
-
-   \created     27.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_TblViewToolTipBase::event(QEvent * const opc_Event)
 {
    bool q_Return;
@@ -232,7 +213,7 @@ bool C_TblViewToolTipBase::event(QEvent * const opc_Event)
    else if (opc_Event->type() == QEvent::Leave)
    {
       //hide on leave
-      m_HideTooltip();
+      m_HideToolTip();
       q_Return = QTableView::event(opc_Event);
    }
    //Necessary to detect mouse move events over integrated widgets
@@ -255,14 +236,11 @@ bool C_TblViewToolTipBase::event(QEvent * const opc_Event)
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Hide tooltip
-
-   \created     27.03.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Hide tooltip
 */
-//-----------------------------------------------------------------------------
-void C_TblViewToolTipBase::m_HideTooltip(void)
+//----------------------------------------------------------------------------------------------------------------------
+void C_TblViewToolTipBase::m_HideToolTip(void)
 {
    if (this->mpc_ToolTip != NULL)
    {
@@ -274,15 +252,12 @@ void C_TblViewToolTipBase::m_HideTooltip(void)
    this->ms32_HoveredHorzHeader = -1;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle mouse move (tool tip related)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle mouse move (tool tip related)
 
    \param[in] orc_GlobalPos Global mouse pos
-
-   \created     27.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblViewToolTipBase::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos)
 {
    if ((this->ms32_HoveredRow >= 0) && (this->ms32_HoveredCol >= 0))
@@ -293,13 +268,13 @@ void C_TblViewToolTipBase::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos
          if ((this->ms32_HoveredRow != c_Index.row()) || (this->ms32_HoveredCol != c_Index.column()))
          {
             //Hide Tooltip
-            m_HideTooltip();
+            m_HideToolTip();
          }
       }
       else
       {
          //Hide Tooltip
-         m_HideTooltip();
+         m_HideToolTip();
       }
    }
    if ((this->verticalHeader()->isVisible() == true) && (this->ms32_HoveredVertHeader >= 0))
@@ -310,7 +285,7 @@ void C_TblViewToolTipBase::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos
       if (s32_VisualIndex != this->ms32_HoveredVertHeader)
       {
          //Hide Tooltip
-         m_HideTooltip();
+         m_HideToolTip();
       }
       else
       {
@@ -318,7 +293,7 @@ void C_TblViewToolTipBase::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos
                 this->verticalHeader()->mapFromGlobal(orc_GlobalPos)) == false)
          {
             //Hide Tooltip
-            m_HideTooltip();
+            m_HideToolTip();
          }
       }
    }
@@ -330,7 +305,7 @@ void C_TblViewToolTipBase::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos
       if (s32_VisualIndex != this->ms32_HoveredHorzHeader)
       {
          //Hide Tooltip
-         m_HideTooltip();
+         m_HideToolTip();
       }
       else
       {
@@ -338,7 +313,7 @@ void C_TblViewToolTipBase::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos
                 this->horizontalHeader()->mapFromGlobal(orc_GlobalPos)) == false)
          {
             //Hide Tooltip
-            m_HideTooltip();
+            m_HideToolTip();
          }
       }
    }

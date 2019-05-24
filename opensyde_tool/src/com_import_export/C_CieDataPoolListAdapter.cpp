@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Adapter to convert extern data structures (implementation)
 
@@ -9,17 +8,11 @@
    project internal openSYDE format for the data pool lists
    (see also C_CieDataPoolListStructure.h).
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     17.04.2018  STW/D.Pohl
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <vector>
@@ -35,7 +28,7 @@
 #include "stwerrors.h"
 #include "C_OSCLoggingHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
@@ -43,22 +36,21 @@ using namespace stw_opensyde_core;
 using namespace stw_errors;
 using namespace stw_scl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 static const stw_scl::C_SCLString mhc_MessageLineBreak = "\n"; // must be '\n' for later converting in HTML tag <br>
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert DBC import data structure to openSYDE data structure.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert DBC import data structure to openSYDE data structure.
 
    Assumptions:
    * consistent data (guaranteed by DBC import mechanism, this is no customer API function)
@@ -66,10 +58,8 @@ static const stw_scl::C_SCLString mhc_MessageLineBreak = "\n"; // must be '\n' f
    \param[in] orc_CIENode         data of DBC node
 
    \return  project internal openSYDE data structure
-
-   \created     17.04.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CieDataPoolListStructure C_CieDataPoolListAdapter::h_GetStructureFromDBCFileImport(
    const C_CieConverter::C_CIENode & orc_CIENode)
 {
@@ -96,22 +86,19 @@ C_CieDataPoolListStructure C_CieDataPoolListAdapter::h_GetStructureFromDBCFileIm
    return c_DataStructure;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add all necessary elements to the imported core elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add all necessary elements to the imported core elements
 
-   \param[in] orc_OSCRxMessageData Imported core RX message data
-   \param[in] orc_OSCRxSignalData  Imported core RX signal data
-   \param[in] orc_OSCTxMessageData Imported core TX message data
-   \param[in] orc_OSCTxSignalData  Imported core TX signal data
-   \param[in] orc_ImportMessages   Import result messages
+   \param[in] orc_OSCRxMessageData           Imported core RX message data
+   \param[in] orc_OSCRxSignalData            Imported core RX signal data
+   \param[in] orc_OSCTxMessageData           Imported core TX message data
+   \param[in] orc_OSCTxSignalData            Imported core TX signal data
+   \param[in] orc_InfoMessagesPerMessage     Information messages per message
 
    \return
    Complete structure as required by our interface
-
-   \created     19.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_CieDataPoolListStructure C_CieDataPoolListAdapter::h_GetStructureFromDCFAndEDSFileImport(
    const std::vector<C_OSCCanMessage> & orc_OSCRxMessageData,
    const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCRxSignalData,
@@ -161,9 +148,8 @@ C_CieDataPoolListStructure C_CieDataPoolListAdapter::h_GetStructureFromDCFAndEDS
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert DBC import data structure to openSYDE core data structure.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert DBC import data structure to openSYDE core data structure.
 
    Assumptions:
    * consistent data (guaranteed by DBC import mechanism, this is no customer API function)
@@ -174,10 +160,8 @@ C_CieDataPoolListStructure C_CieDataPoolListAdapter::h_GetStructureFromDCFAndEDS
    \param[out]    orc_WarningMessages    warning message of each CAN message
 
    \return  project internal openSYDE data structure
-
-   \created     17.04.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolListAdapter::mh_FillUpCoreStructureByDBCValues(
    const std::vector<C_CieConverter::C_CIENodeMessage> & orc_CIENodeMessages,
    std::vector<C_OSCCanMessage> & orc_CanMessages, std::vector<C_OSCNodeDataPoolListElement> & orc_CanSignalData,
@@ -264,18 +248,15 @@ void C_CieDataPoolListAdapter::mh_FillUpCoreStructureByDBCValues(
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Internal adapter function to fill up data for Ui functionality.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Internal adapter function to fill up data for Ui functionality.
 
    Currently this function is only resizing the Ui containers.
 
    \param[in,out] orc_DataPoolListStructure       openSYDE data structure for data pool lists
    \param[in,out] oq_ActivateAutoMinMaxForSignals Flag to automatically set the auto min max flag if necessary
-
-   \created     17.04.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_CieDataPoolListAdapter::mh_FillUpUiStructure(C_CieDataPoolListStructure & orc_DataPoolListStructure,
                                                     const bool oq_ActivateAutoMinMaxForSignals)
 {
@@ -321,23 +302,20 @@ void C_CieDataPoolListAdapter::mh_FillUpUiStructure(C_CieDataPoolListStructure &
       orc_DataPoolListStructure.c_Core.c_OSCTxSignalData.size(), c_DefaultUiSignal);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   to convert openSYDE CAN message data structure to DBC data structure
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   to convert openSYDE CAN message data structure to DBC data structure
 
    \param[in]     ou32_BusIndex         bus index
    \param[in]     oe_Type               CAN protocol type (e.g. Layer 2, ECeS, ECoS)
    \param[in]     orc_OSCCanMessage     openSYDE CAN message structure
-   \param[out]    orc_CIECanMessage     CAN message structure of DBC import/export
+   \param[out]    orc_CIENodeMessage    CAN message structure of DBC import/export
    \param[out]    orc_Warnings          message container to give user feedback
 
    \return
    C_NO_ERR    successful
    C_WARN      message(s) without (correct) signals, see message container with warnings
-
-   \created     05.06.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_CieDataPoolListAdapter::h_ConvertToDBCImportMessage(const uint32 ou32_BusIndex,
                                                              const C_OSCCanProtocol::E_Type oe_Type,
                                                              const C_OSCCanMessage & orc_OSCCanMessage,

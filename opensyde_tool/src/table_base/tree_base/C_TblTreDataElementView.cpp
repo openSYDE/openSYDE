@@ -1,59 +1,49 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Tree view for data elements (implementation)
 
    Tree view for data elements
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     07.09.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QKeyEvent>
 #include <QScrollBar>
 #include "C_TblTreDataElementView.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 QMap<C_TblTreDataElementModel::E_Mode,
      std::vector<std::vector<uint32> > > C_TblTreDataElementView::mhc_LastKnownExpandedIndices;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_TblTreDataElementView::C_TblTreDataElementView(QWidget * const opc_Parent) :
    C_OgeTreeViewToolTipBase(opc_Parent),
    mq_UseInternalExpandedItems(true),
@@ -72,42 +62,33 @@ C_TblTreDataElementView::C_TblTreDataElementView(QWidget * const opc_Parent) :
    this->horizontalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     19.07.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_TblTreDataElementView::~C_TblTreDataElementView(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set flag to use internal expanded items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set flag to use internal expanded items
 
    \param[in] oq_Use Flag to use internal expanded items
-
-   \created     01.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::SetUseInternalExpandedItems(const bool oq_Use)
 {
    this->mq_UseInternalExpandedItems = oq_Use;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set the active node index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set the active node index
 
    \param[in] ou32_NodeIndex               Active node index
    \param[in] os32_SkipApplicationIndex    Application index to not display as used
    \param[in] orc_UsedDataPoolIndicesIndex Data pools to always display as used
-
-   \created     01.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::InitSD(const uint32 ou32_NodeIndex, const sint32 os32_SkipApplicationIndex,
                                      const std::vector<uint32> & orc_UsedDataPoolIndicesIndex)
 {
@@ -117,19 +98,16 @@ void C_TblTreDataElementView::InitSD(const uint32 ou32_NodeIndex, const sint32 o
    this->mu32_ViewIndex = 0UL;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize tree structure
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize tree structure
 
    \param[in] ou32_ViewIndex           View index
    \param[in] oq_ShowOnlyWriteElements Optional flag to show only writable elements
    \param[in] oq_ShowArrayElements     Optional flag to hide all array elements (if false)
    \param[in] oq_Show64BitValues       Optional flag to hide all 64 bit elements (if false)
    \param[in] oq_ShowNVMLists          Optional flag to only show NVM LISTs
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::InitSV(const stw_types::uint32 ou32_ViewIndex, const bool oq_ShowOnlyWriteElements,
                                      const bool oq_ShowArrayElements, const bool oq_Show64BitValues,
                                      const bool oq_ShowNVMLists)
@@ -150,46 +128,57 @@ void C_TblTreDataElementView::InitSV(const stw_types::uint32 ou32_ViewIndex, con
    m_RestoreExpandedIndices();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Filter for string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Filter for string
 
    \param[in] orc_Text String
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::Search(const QString & orc_Text)
 {
+   const bool q_StartIsEmpty = this->mc_SortModel.filterRegExp().isEmpty();
+
+   //If it was empty and will soon not be empty: remember the expanded indices before filtering anything
+   if (q_StartIsEmpty)
+   {
+      this->SaveExpandedIndices();
+   }
    this->mc_SortModel.SetFilter(orc_Text);
+   //If it is empty after previously not being empty restore the last known state
+   if (this->mc_SortModel.filterRegExp().isEmpty())
+   {
+      if (q_StartIsEmpty == false)
+      {
+         this->m_RestoreExpandedIndices();
+      }
+   }
+   else
+   {
+      //While filtering always expand all
+      this->expandAll();
+   }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Setting of view index without initialization
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Setting of view index without initialization
 
    \param[in] ou32_ViewIndex           View index
-
-   \created     08.03.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::SetViewIndex(const uint32 ou32_ViewIndex)
 {
    this->mu32_ViewIndex = ou32_ViewIndex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Switch displayed content
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Switch displayed content
 
    \param[in] ore_Mode                 New mode
    \param[in] oq_ShowOnlyWriteElements Optional flag to show only writable elements
    \param[in] oq_ShowArrayElements     Optional flag to hide all array elements (if false)
    \param[in] oq_Show64BitValues       Optional flag to hide all 64 bit elements (if false)
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::SwitchMode(const C_TblTreDataElementModel::E_Mode & ore_Mode,
                                          const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
                                          const bool oq_Show64BitValues)
@@ -200,16 +189,13 @@ void C_TblTreDataElementView::SwitchMode(const C_TblTreDataElementModel::E_Mode 
    m_RestoreExpandedIndices();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get selected data elements
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get selected data elements
 
    \return
    Current selected data elements
-
-   \created     06.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 std::vector<C_PuiSvDbNodeDataPoolListElementId> C_TblTreDataElementView::GetSelectedDataElements(void) const
 {
    std::vector<C_PuiSvDbNodeDataPoolListElementId> c_Retval;
@@ -228,29 +214,23 @@ std::vector<C_PuiSvDbNodeDataPoolListElementId> C_TblTreDataElementView::GetSele
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if view empty
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if view empty
 
    \return
    True  Empty
    False Not empty
-
-   \created     19.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_TblTreDataElementView::IsEmpty(void) const
 {
    return this->mc_SortModel.rowCount() == 0;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle expanded index save
-
-   \created     18.07.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle expanded index save
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::SaveExpandedIndices(void)
 {
    if (this->mq_UseInternalExpandedItems == true)
@@ -268,17 +248,14 @@ void C_TblTreDataElementView::SaveExpandedIndices(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse double click event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse double click event slot
 
    Here: Add dialog exit if valid selection
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     19.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
 {
    const QModelIndex c_Index = this->indexAt(this->viewport()->mapFromGlobal(opc_Event->globalPos()));
@@ -293,17 +270,14 @@ void C_TblTreDataElementView::mouseDoubleClickEvent(QMouseEvent * const opc_Even
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten selection changed event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten selection changed event slot
 
    Here: Emit signal with new number of selected items
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     26.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::selectionChanged(const QItemSelection & orc_Selected,
                                                const QItemSelection & orc_Deselected)
 {
@@ -311,17 +285,14 @@ void C_TblTreDataElementView::selectionChanged(const QItemSelection & orc_Select
    Q_EMIT this->SigSelectionChanged(this->selectedIndexes().size());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Append all expanded indices for this parent
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Append all expanded indices for this parent
 
    \param[in,out] orc_FoundItems All expanded items
    \param[in]     orc_CurParent  Current parent to analyze
    \param[in]     osn_Column     Column to use for index access
-
-   \created     19.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::m_AppendExpandedIndices(std::vector<std::vector<uint32> > & orc_FoundItems,
                                                       const QModelIndex & orc_CurParent, const sintn osn_Column)
 {
@@ -336,13 +307,10 @@ void C_TblTreDataElementView::m_AppendExpandedIndices(std::vector<std::vector<ui
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle expanded index restoration
-
-   \created     18.07.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle expanded index restoration
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::m_RestoreExpandedIndices(void)
 {
    if (this->mq_UseInternalExpandedItems == true)
@@ -370,9 +338,8 @@ void C_TblTreDataElementView::m_RestoreExpandedIndices(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Map source model index to sort model index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Map source model index to sort model index
 
    Hint: This function is probably only necessary because the mapFromSource seems to not work in some cases
    -> Problematic case: if there is no parent this functions seems to return an invalid internalPointer
@@ -381,10 +348,8 @@ void C_TblTreDataElementView::m_RestoreExpandedIndices(void)
 
    \return
    Sort model index
-
-   \created     19.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QModelIndex C_TblTreDataElementView::m_ManualMapFromSource(const QModelIndex & orc_Index) const
 {
    QModelIndex c_Retval;

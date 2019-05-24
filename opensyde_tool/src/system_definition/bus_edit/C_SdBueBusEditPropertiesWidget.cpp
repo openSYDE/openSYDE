@@ -1,21 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for editing bus properties
 
    Widget for editing bus properties
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.03.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QSpinBox>
@@ -31,8 +25,9 @@
 #include "constants.h"
 #include "C_OgeWiUtil.h"
 #include "C_PuiSdUtil.h"
+#include "C_OgeWiCustomMessage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_errors;
 using namespace stw_opensyde_core;
@@ -43,29 +38,26 @@ using namespace stw_types;
 using namespace stw_scl;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     24.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueBusEditPropertiesWidget::C_SdBueBusEditPropertiesWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueBusEditPropertiesWidget),
@@ -89,27 +81,21 @@ C_SdBueBusEditPropertiesWidget::C_SdBueBusEditPropertiesWidget(QWidget * const o
            &C_SdBueBusEditPropertiesWidget::m_CheckBusName);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     24.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueBusEditPropertiesWidget::~C_SdBueBusEditPropertiesWidget(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     29.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueBusEditPropertiesWidget::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelName->setText(C_GtGetText::h_GetText("Name"));
@@ -138,29 +124,23 @@ void C_SdBueBusEditPropertiesWidget::InitStaticNames(void) const
                                                         C_GtGetText::h_GetText("CAN bus bitrate"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Selects the node name in the text edit for fast editing
-
-   \created     02.06.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Selects the node name in the text edit for fast editing
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueBusEditPropertiesWidget::SelectName(void) const
 {
    this->mpc_Ui->pc_LineEditBusName->setFocus();
    this->mpc_Ui->pc_LineEditBusName->selectAll();
 }
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Bus ID setter
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Bus ID setter
 
    Sets the private bus id of widget
 
    \param[in] ou32_BusIndex New bus id
-
-   \created     29.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueBusEditPropertiesWidget::SetBusId(const uint32 ou32_BusIndex)
 {
    this->mu32_BusIndex = ou32_BusIndex;
@@ -173,15 +153,12 @@ void C_SdBueBusEditPropertiesWidget::SetBusId(const uint32 ou32_BusIndex)
    this->m_CheckBusId();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load bus information
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load bus information
 
    Load bus information from core data using bus index
-
-   \created     29.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
 {
    const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(this->mu32_BusIndex);
@@ -317,25 +294,22 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueBusEditPropertiesWidget::m_CanBitrateFixed(void) const
 {
    this->mpc_Ui->pc_ComboBoxBitRate->SetToolTipInformation("", "", C_NagToolTip::eDEFAULT);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save ui data to bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save ui data to bus
 
    Is called from outside
       - on system definition save
       - on page change
 
    \return   false:
-
-   \created     29.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueBusEditPropertiesWidget::SaveToData(void) const
 {
    const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(this->mu32_BusIndex);
@@ -347,7 +321,17 @@ void C_SdBueBusEditPropertiesWidget::SaveToData(void) const
       C_OSCSystemBus c_NewBus = *pc_Bus;
 
       //name
-      c_NewBus.c_Name = this->mpc_Ui->pc_LineEditBusName->text().toStdString().c_str();
+      //Only accept new name if not in conflict
+      if (C_PuiSdHandler::h_GetInstance()->CheckBusNameAvailable(
+             this->mpc_Ui->pc_LineEditBusName->text().toStdString().c_str(), &this->mu32_BusIndex, NULL))
+      {
+         c_NewBus.c_Name = this->mpc_Ui->pc_LineEditBusName->text().toStdString().c_str();
+      }
+      else
+      {
+         //Restore previous name
+         c_NewBus.c_Name = pc_Bus->c_Name.c_str();
+      }
 
       //comment
       c_NewBus.c_Comment = this->mpc_Ui->pc_TextEditComment->toPlainText().toStdString().c_str();
@@ -374,7 +358,7 @@ void C_SdBueBusEditPropertiesWidget::SaveToData(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SdBueBusEditPropertiesWidget::m_GetComboBoxString(const uint32 ou32_Bitrate) const
 {
    const QString c_Text = QString::number(ou32_Bitrate) + QString(" KBit/s");
@@ -382,7 +366,7 @@ QString C_SdBueBusEditPropertiesWidget::m_GetComboBoxString(const uint32 ou32_Bi
    return c_Text;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 uint32 C_SdBueBusEditPropertiesWidget::m_GetBitrateFromComboBoxString(const QString & orc_Entry) const
 {
    QString c_Bitrate = orc_Entry;
@@ -392,19 +376,16 @@ uint32 C_SdBueBusEditPropertiesWidget::m_GetBitrateFromComboBoxString(const QStr
    return u32_Bitrate;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check bus name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check bus name
    - check input
-
-   \created     29.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueBusEditPropertiesWidget::m_CheckBusName(void)
 {
    const QString c_Text = this->mpc_Ui->pc_LineEditBusName->text();
    const bool q_NameIsUnique = C_PuiSdHandler::h_GetInstance()->CheckBusNameAvailable(
-      c_Text.toStdString().c_str(), &this->mu32_BusIndex);
+      c_Text.toStdString().c_str(), &this->mu32_BusIndex, NULL);
    const bool q_NameIsValid = C_OSCUtils::h_CheckValidCName(
       this->mpc_Ui->pc_LineEditBusName->text().toStdString().c_str());
 
@@ -433,14 +414,11 @@ void C_SdBueBusEditPropertiesWidget::m_CheckBusName(void)
    Q_EMIT this->SigChanged();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check bus id
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check bus id
    - check input
-
-   \created     29.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueBusEditPropertiesWidget::m_CheckBusId(void) const
 {
    bool q_IdIsValid;
@@ -468,29 +446,23 @@ void C_SdBueBusEditPropertiesWidget::m_CheckBusId(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trimm bus name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trimm bus name
 
    Remove whitespaces at the beginning and end of the string
-
-   \created     29.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueBusEditPropertiesWidget::m_TrimmBusName(void) const
 {
    this->mpc_Ui->pc_LineEditBusName->setText(this->mpc_Ui->pc_LineEditBusName->text().trimmed());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register Change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register Change
 
    Function where ui elements register a change. Change will be sent via a signal
-
-   \created     29.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueBusEditPropertiesWidget::m_RegisterChange(void)
 {
    SaveToData();
@@ -498,27 +470,62 @@ void C_SdBueBusEditPropertiesWidget::m_RegisterChange(void)
    Q_EMIT this->SigChanged();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle name change
-
-   \created     11.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle name change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueBusEditPropertiesWidget::m_RegisterNameChange(void)
 {
-   m_TrimmBusName();
-   m_RegisterChange();
-   Q_EMIT this->SigNameChanged(this->mpc_Ui->pc_LineEditBusName->text());
+   //This function can somehow be called twice, so ... let's avoid that!
+   static bool hq_InProgress = false;
+
+   if (hq_InProgress == false)
+   {
+      std::vector<stw_scl::C_SCLString> c_ExistingNames;
+      hq_InProgress = true;
+      if (C_PuiSdHandler::h_GetInstance()->CheckBusNameAvailable(this->mpc_Ui->pc_LineEditBusName->text().toStdString()
+                                                                 .
+                                                                 c_str(), &this->mu32_BusIndex,
+                                                                 &c_ExistingNames) == false)
+      {
+         const QString c_Description = QString(C_GtGetText::h_GetText(
+                                                  "A bus with the name \"%1\" already exists. Choose another name.")).
+                                       arg(this->mpc_Ui->pc_LineEditBusName->text());
+         QString c_Details;
+         C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+         c_Message.SetHeading(C_GtGetText::h_GetText("Bus naming"));
+         c_Message.SetDescription(c_Description);
+         c_Details.append(C_GtGetText::h_GetText("Used bus names:\n"));
+         for (uint32 u32_ItExistingName = 0UL; u32_ItExistingName < c_ExistingNames.size(); ++u32_ItExistingName)
+         {
+            const C_SCLString & rc_Name = c_ExistingNames[u32_ItExistingName];
+            c_Details.append(QString("\"%1\"\n").arg(rc_Name.c_str()));
+         }
+         c_Message.SetDetails(c_Details);
+         c_Message.Execute();
+         //Restore previous name
+         {
+            const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(this->mu32_BusIndex);
+            if (pc_Bus != NULL)
+            {
+               this->mpc_Ui->pc_LineEditBusName->setText(pc_Bus->c_Name.c_str());
+            }
+         }
+      }
+      else
+      {
+         m_TrimmBusName();
+         m_RegisterChange();
+         Q_EMIT this->SigNameChanged(this->mpc_Ui->pc_LineEditBusName->text());
+      }
+      hq_InProgress = false;
+   }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle id change
-
-   \created     11.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle id change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueBusEditPropertiesWidget::m_RegisterIdChange(void)
 {
    m_RegisterChange();

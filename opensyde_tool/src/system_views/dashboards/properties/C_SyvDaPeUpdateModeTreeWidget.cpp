@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for system view dashboard data element update mode tree (implementation)
 
    Widget for system view dashboard data element update mode tree
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     08.09.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QScrollBar>
@@ -27,36 +20,33 @@
 #include "C_SyvDaPeUpdateModeNodeHeader.h"
 #include "C_SyvDaPeUpdateModeTreeWidget.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     08.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeUpdateModeTreeWidget::C_SyvDaPeUpdateModeTreeWidget(QWidget * const opc_Parent) :
    QTreeWidget(opc_Parent)
 {
@@ -95,29 +85,23 @@ C_SyvDaPeUpdateModeTreeWidget::C_SyvDaPeUpdateModeTreeWidget(QWidget * const opc
            &C_SyvDaPeUpdateModeTreeWidget::m_ScrollBarRangeChanged);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     08.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeUpdateModeTreeWidget::~C_SyvDaPeUpdateModeTreeWidget(void)
 {
    m_Clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize update mode content
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize update mode content
 
    \param[in] ou32_ViewIndex View index
-
-   \created     08.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeTreeWidget::Init(const uint32 ou32_ViewIndex)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
@@ -190,15 +174,12 @@ void C_SyvDaPeUpdateModeTreeWidget::Init(const uint32 ou32_ViewIndex)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Select specified ID
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Select specified ID
 
    \param[in] orc_Id ID to select
-
-   \created     19.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeTreeWidget::Select(const C_PuiSvDbNodeDataPoolListElementId & orc_Id)
 {
    if (orc_Id.GetIsValid() == true)
@@ -250,13 +231,10 @@ void C_SyvDaPeUpdateModeTreeWidget::Select(const C_PuiSvDbNodeDataPoolListElemen
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply data from internal storage to global storage
-
-   \created     12.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply data from internal storage to global storage
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeTreeWidget::ApplyData(void) const
 {
    for (uint32 u32_ItModel = 0; u32_ItModel < this->mc_Models.size(); ++u32_ItModel)
@@ -269,13 +247,10 @@ void C_SyvDaPeUpdateModeTreeWidget::ApplyData(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete all items
-
-   \created     08.09.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete all items
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeTreeWidget::m_Clear(void)
 {
    for (uint32 u32_ItModel = 0; u32_ItModel < this->mc_Models.size(); ++u32_ItModel)
@@ -285,17 +260,14 @@ void C_SyvDaPeUpdateModeTreeWidget::m_Clear(void)
    this->mc_Models.clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle expand request
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle expand request
 
    \param[in] opc_Item  Affected tree item widget
    \param[in] oq_Expand true: expand
                         false collapse
-
-   \created     27.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeTreeWidget::m_OnExpandRequested(QTreeWidgetItem * const opc_Item, const bool oq_Expand)
 {
    if (oq_Expand == true)
@@ -308,15 +280,12 @@ void C_SyvDaPeUpdateModeTreeWidget::m_OnExpandRequested(QTreeWidgetItem * const 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle collapse event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle collapse event
 
    \param[in] orc_Index Collapsed item
-
-   \created     27.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeTreeWidget::m_OnCollapse(const QModelIndex & orc_Index) const
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -329,15 +298,12 @@ void C_SyvDaPeUpdateModeTreeWidget::m_OnCollapse(const QModelIndex & orc_Index) 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle expand event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle expand event
 
    \param[in] orc_Index Expanded item
-
-   \created     27.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeTreeWidget::m_OnExpand(const QModelIndex & orc_Index) const
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -350,7 +316,7 @@ void C_SyvDaPeUpdateModeTreeWidget::m_OnExpand(const QModelIndex & orc_Index) co
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeTreeWidget::m_ScrollBarRangeChanged(const sintn osn_Min, const sintn osn_Max) const
 {
    // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar

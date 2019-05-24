@@ -1,22 +1,16 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for navigation bar
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     07.07.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 #ifndef C_NAGNAVIBARWIDGET_H
 #define C_NAGNAVIBARWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <QWidget>
 #include <QTimer>
@@ -30,7 +24,7 @@
 #include "C_OgeGbxTransparent.h"
 #include "stwtypes.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace Ui
 {
@@ -39,9 +33,9 @@ class C_NagNaviBarWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_NagNaviBarWidget :
    public QWidget
@@ -62,6 +56,7 @@ public:
                 const stw_types::uint32 ou32_Index = 0U);
    void MarkModeForDataChanged(const bool oq_Changed, const bool oq_All, const stw_types::sint32 os32_Mode,
                                const stw_types::sint32 os32_SubMode = 0, const stw_types::uint32 ou32_Index = 0U) const;
+   void ResetUseCaseAfterChangeFailure(const stw_types::sint32 os32_Mode) const;
 
    void HandleElements(void);
    void InitText(void) const;
@@ -81,7 +76,7 @@ Q_SIGNALS:
    void SigRenameView(const stw_types::uint32 ou32_Index, const QString & orc_Name, const bool oq_UpdateDisplayName);
    void SigDeleteView(const stw_types::uint32 ou32_Index, const stw_types::sint32 os32_SelectedSubMode,
                       const stw_types::uint32 ou32_SelectedIndex);
-   void SigChangeUseCase(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode);
+   bool SigChangeUseCase(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode);
    void SigChangeMode(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode = 0,
                       const stw_types::uint32 ou32_Index = 0U, const QString & orc_Name = "",
                       const QString & orc_SubSubItemName = "", const stw_types::uint32 ou32_Flag = 0U);
@@ -141,7 +136,7 @@ private:
    std::set<stw_types::uint32> mc_SetChangedBusses;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

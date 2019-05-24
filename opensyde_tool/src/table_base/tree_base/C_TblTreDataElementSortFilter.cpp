@@ -1,67 +1,54 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Filter for data elements tree model (implementation)
 
    Filter for data elements tree model
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     07.09.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_TblTreDataElementSortFilter.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_TblTreDataElementSortFilter::C_TblTreDataElementSortFilter(QObject * const opc_Parent) :
    QSortFilterProxyModel(opc_Parent)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set filter string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set filter string
 
    \param[in] orc_Text Text to filter for
-
-   \created     02.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementSortFilter::SetFilter(const QString & orc_Text)
 {
    this->beginResetModel();
@@ -69,9 +56,8 @@ void C_TblTreDataElementSortFilter::SetFilter(const QString & orc_Text)
    this->endResetModel();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if current row is accepted for filter
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if current row is accepted for filter
 
    \param[in] osn_SourceRow    Source row
    \param[in] orc_SourceParent Source parent
@@ -79,10 +65,8 @@ void C_TblTreDataElementSortFilter::SetFilter(const QString & orc_Text)
    \return
    True  Accepted
    False Not accepted
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_TblTreDataElementSortFilter::filterAcceptsRow(const sintn osn_SourceRow,
                                                      const QModelIndex & orc_SourceParent) const
 {

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Manager for model and view instances to avoid invalid pointers (implementation)
 
    Manager for model and view instances to avoid invalid pointers
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     17.03.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -25,58 +18,49 @@
 #include "C_SdNdeDataPoolListArrayEditView.h"
 #include "C_SdNdeDataPoolListTableView.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListModelViewManager::C_SdNdeDataPoolListModelViewManager(QObject * const opc_Parent) :
    QObject(opc_Parent)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListModelViewManager::~C_SdNdeDataPoolListModelViewManager(void)
 {
    Clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clear known models
-
-   \created     23.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clear known models
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListModelViewManager::Clear(void)
 {
    for (uint32 u32_ItModel = 0; u32_ItModel < this->mc_DataSetModels.size(); ++u32_ItModel)
@@ -102,9 +86,8 @@ void C_SdNdeDataPoolListModelViewManager::Clear(void)
    this->mc_ElementViews.clear();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data set view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data set view
 
    \param[in] oru32_NodeIndex     Node index
    \param[in] oru32_DataPoolIndex Node data pool index
@@ -113,10 +96,8 @@ void C_SdNdeDataPoolListModelViewManager::Clear(void)
    \return
    NULL Not registered
    Else Registered view
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListDataSetView * C_SdNdeDataPoolListModelViewManager::GetDataSetView(const uint32 & oru32_NodeIndex,
                                                                                      const uint32 & oru32_DataPoolIndex,
                                                                                      const uint32 & oru32_ListIndex)
@@ -137,9 +118,8 @@ C_SdNdeDataPoolListDataSetView * C_SdNdeDataPoolListModelViewManager::GetDataSet
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data set model
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data set model
 
    \param[in] oru32_NodeIndex     Node index
    \param[in] oru32_DataPoolIndex Node data pool index
@@ -147,10 +127,8 @@ C_SdNdeDataPoolListDataSetView * C_SdNdeDataPoolListModelViewManager::GetDataSet
 
    \return
    Data set model (garanteed)
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListDataSetModel * C_SdNdeDataPoolListModelViewManager::GetDataSetModel(const uint32 & oru32_NodeIndex,
                                                                                        const uint32 & oru32_DataPoolIndex,
                                                                                        const uint32 & oru32_ListIndex)
@@ -186,9 +164,8 @@ C_SdNdeDataPoolListDataSetModel * C_SdNdeDataPoolListModelViewManager::GetDataSe
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get array edit view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get array edit view
 
    \param[in] oru32_NodeIndex     Node index
    \param[in] oru32_DataPoolIndex Node data pool index
@@ -201,10 +178,8 @@ C_SdNdeDataPoolListDataSetModel * C_SdNdeDataPoolListModelViewManager::GetDataSe
    \return
    NULL Not registered
    Else Registered view
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListArrayEditView * C_SdNdeDataPoolListModelViewManager::GetArrayEditView(const uint32 & oru32_NodeIndex,
                                                                                          const uint32 & oru32_DataPoolIndex, const uint32 & oru32_ListIndex, const uint32 & oru32_ElementIndex, const C_SdNdeDataPoolUtil::E_ArrayEditType & ore_ArrayEditType,
                                                                                          const uint32 & oru32_DataSetIndex)
@@ -226,9 +201,8 @@ C_SdNdeDataPoolListArrayEditView * C_SdNdeDataPoolListModelViewManager::GetArray
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get array edit model
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get array edit model
 
    \param[in] oru32_NodeIndex     Node index
    \param[in] oru32_DataPoolIndex Node data pool index
@@ -240,10 +214,8 @@ C_SdNdeDataPoolListArrayEditView * C_SdNdeDataPoolListModelViewManager::GetArray
 
    \return
    Array edit model (garanteed)
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListArrayEditModel * C_SdNdeDataPoolListModelViewManager::GetArrayEditModel(
    const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex, const uint32 & oru32_ListIndex,
    const uint32 & oru32_ElementIndex, const C_SdNdeDataPoolUtil::E_ArrayEditType & ore_ArrayEditType,
@@ -281,9 +253,8 @@ C_SdNdeDataPoolListArrayEditModel * C_SdNdeDataPoolListModelViewManager::GetArra
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get element view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get element view
 
    \param[in] oru32_NodeIndex     Node index
    \param[in] oru32_DataPoolIndex Node data pool index
@@ -292,10 +263,8 @@ C_SdNdeDataPoolListArrayEditModel * C_SdNdeDataPoolListModelViewManager::GetArra
    \return
    NULL Not registered
    Else Registered view
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListTableView * C_SdNdeDataPoolListModelViewManager::GetElementView(const uint32 & oru32_NodeIndex,
                                                                                    const uint32 & oru32_DataPoolIndex,
                                                                                    const uint32 & oru32_ListIndex)
@@ -316,9 +285,8 @@ C_SdNdeDataPoolListTableView * C_SdNdeDataPoolListModelViewManager::GetElementVi
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get element model
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get element model
 
    \param[in] oru32_NodeIndex     Node index
    \param[in] oru32_DataPoolIndex Node data pool index
@@ -326,10 +294,8 @@ C_SdNdeDataPoolListTableView * C_SdNdeDataPoolListModelViewManager::GetElementVi
 
    \return
    Element model (garanteed)
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListTableModel * C_SdNdeDataPoolListModelViewManager::GetElementModel(const uint32 & oru32_NodeIndex,
                                                                                      const uint32 & oru32_DataPoolIndex,
                                                                                      const uint32 & oru32_ListIndex)
@@ -366,18 +332,15 @@ C_SdNdeDataPoolListTableModel * C_SdNdeDataPoolListModelViewManager::GetElementM
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register data set view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register data set view
 
    \param[in]     oru32_NodeIndex     Node index
    \param[in]     oru32_DataPoolIndex Node data pool index
    \param[in]     oru32_ListIndex     Node data pool list index
    \param[in,out] opc_View            Data set view
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListModelViewManager::RegisterDataSetView(const uint32 & oru32_NodeIndex,
                                                               const uint32 & oru32_DataPoolIndex,
                                                               const uint32 & oru32_ListIndex,
@@ -403,18 +366,15 @@ void C_SdNdeDataPoolListModelViewManager::RegisterDataSetView(const uint32 & oru
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Unregister data set view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Unregister data set view
 
    \param[in]     oru32_NodeIndex     Node index
    \param[in]     oru32_DataPoolIndex Node data pool index
    \param[in]     oru32_ListIndex     Node data pool list index
    \param[in,out] opc_View            Data set view
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListModelViewManager::UnRegisterDataSetView(const uint32 & oru32_NodeIndex,
                                                                 const uint32 & oru32_DataPoolIndex,
                                                                 const uint32 & oru32_ListIndex,
@@ -436,9 +396,8 @@ void C_SdNdeDataPoolListModelViewManager::UnRegisterDataSetView(const uint32 & o
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register array edit view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register array edit view
 
    \param[in]     oru32_NodeIndex     Node index
    \param[in]     oru32_DataPoolIndex Node data pool index
@@ -448,10 +407,8 @@ void C_SdNdeDataPoolListModelViewManager::UnRegisterDataSetView(const uint32 & o
    \param[in]     oru32_DataSetIndex  If min or max use 0
                                       Else use data set index
    \param[in,out] opc_View            Array edit view
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListModelViewManager::RegisterArrayEditView(const uint32 & oru32_NodeIndex,
                                                                 const uint32 & oru32_DataPoolIndex,
                                                                 const uint32 & oru32_ListIndex,
@@ -480,9 +437,8 @@ void C_SdNdeDataPoolListModelViewManager::RegisterArrayEditView(const uint32 & o
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Unregister array edit view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Unregister array edit view
 
    \param[in]     oru32_NodeIndex     Node index
    \param[in]     oru32_DataPoolIndex Node data pool index
@@ -492,10 +448,8 @@ void C_SdNdeDataPoolListModelViewManager::RegisterArrayEditView(const uint32 & o
    \param[in]     oru32_DataSetIndex  If min or max use 0
                                       Else use data set index
    \param[in,out] opc_View            Array edit view
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListModelViewManager::UnRegisterArrayEditView(const uint32 & oru32_NodeIndex,
                                                                   const uint32 & oru32_DataPoolIndex,
                                                                   const uint32 & oru32_ListIndex,
@@ -520,18 +474,15 @@ void C_SdNdeDataPoolListModelViewManager::UnRegisterArrayEditView(const uint32 &
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register element view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register element view
 
    \param[in]     oru32_NodeIndex     Node index
    \param[in]     oru32_DataPoolIndex Node data pool index
    \param[in]     oru32_ListIndex     Node data pool list index
    \param[in,out] opc_View            Element view
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListModelViewManager::RegisterElementView(const uint32 & oru32_NodeIndex,
                                                               const uint32 & oru32_DataPoolIndex,
                                                               const uint32 & oru32_ListIndex,
@@ -557,18 +508,15 @@ void C_SdNdeDataPoolListModelViewManager::RegisterElementView(const uint32 & oru
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Unregister element view
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Unregister element view
 
    \param[in]     oru32_NodeIndex     Node index
    \param[in]     oru32_DataPoolIndex Node data pool index
    \param[in]     oru32_ListIndex     Node data pool list index
    \param[in,out] opc_View            Element view
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListModelViewManager::UnRegisterElementView(const uint32 & oru32_NodeIndex,
                                                                 const uint32 & oru32_DataPoolIndex,
                                                                 const uint32 & oru32_ListIndex,
@@ -590,17 +538,14 @@ void C_SdNdeDataPoolListModelViewManager::UnRegisterElementView(const uint32 & o
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Forward signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Forward signal
 
    \param[in] oru32_NodeIndex         Node index
    \param[in] oru32_DataPoolIndex     Data pool index
    \param[in] oru32_DataPoolListIndex List index
-
-   \created     20.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListModelViewManager::RegisterDataSetCountChange(const uint32 & oru32_NodeIndex,
                                                                      const uint32 & oru32_DataPoolIndex,
                                                                      const uint32 & oru32_ListIndex)
@@ -608,13 +553,10 @@ void C_SdNdeDataPoolListModelViewManager::RegisterDataSetCountChange(const uint3
    Q_EMIT this->SigDataSetCountChange(oru32_NodeIndex, oru32_DataPoolIndex, oru32_ListIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register model change
-
-   \created     18.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register model change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListModelViewManager::UpdateModels(void)
 {
    for (uint32 u32_ItModel = 0; u32_ItModel < this->mc_DataSetModels.size(); ++u32_ItModel)
@@ -634,17 +576,14 @@ void C_SdNdeDataPoolListModelViewManager::UpdateModels(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Forward signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Forward signal
 
    \param[in] oru32_NodeIndex         Node index
    \param[in] oru32_DataPoolIndex     Data pool index
    \param[in] oru32_DataPoolListIndex List index
-
-   \created     27.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListModelViewManager::m_OnDataSetErrorChangePossible(const uint32 & oru32_NodeIndex,
                                                                          const uint32 & oru32_DataPoolIndex,
                                                                          const uint32 & oru32_DataPoolListIndex)
@@ -652,17 +591,14 @@ void C_SdNdeDataPoolListModelViewManager::m_OnDataSetErrorChangePossible(const u
    Q_EMIT this->SigDataSetErrorChange(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do data change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do data change
 
    \param[in]     oru32_DataPoolListDataSetIndex Node data pool list data set index
    \param[in]     orc_NewData                    New data
    \param[in]     ore_DataChangeType             Data change type
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListModelViewManager::m_OnDataSetDataChange(const uint32 & oru32_NodeIndex,
                                                                 const uint32 & oru32_DataPoolIndex,
                                                                 const uint32 & oru32_DataPoolListIndex,
@@ -679,18 +615,15 @@ void C_SdNdeDataPoolListModelViewManager::m_OnDataSetDataChange(const uint32 & o
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle data set count change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle data set count change
 
    \param[in] oru32_NodeIndex         Node index
    \param[in] oru32_DataPoolIndex     Node data pool index
    \param[in] oru32_DataPoolListIndex Node data pool list index
    \param[in] ors32_NewColumnCount    New column count
-
-   \created     20.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListModelViewManager::m_OnDataSetColumnCountChange(const uint32 & oru32_NodeIndex,
                                                                        const uint32 & oru32_DataPoolIndex,
                                                                        const uint32 & oru32_DataPoolListIndex,
@@ -705,17 +638,14 @@ void C_SdNdeDataPoolListModelViewManager::m_OnDataSetColumnCountChange(const uin
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Forward signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Forward signal
 
    \param[in] oru32_NodeIndex         Node index
    \param[in] oru32_DataPoolIndex     Node data pool index
    \param[in] oru32_DataPoolListIndex Node data pool list index
-
-   \created     27.02.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListModelViewManager::m_OnElementErrorChangePossible(const uint32 & oru32_NodeIndex,
                                                                          const uint32 & oru32_DataPoolIndex,
                                                                          const uint32 & oru32_DataPoolListIndex)
@@ -729,17 +659,14 @@ void C_SdNdeDataPoolListModelViewManager::m_OnElementErrorChangePossible(const u
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Forward signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Forward signal
 
    \param[in] oru32_NodeIndex         Node index
    \param[in] oru32_DataPoolIndex     Node data pool index
    \param[in] oru32_DataPoolListIndex Node data pool list index
-
-   \created     24.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListModelViewManager::m_OnElementSizeChangePossible(const uint32 & oru32_NodeIndex,
                                                                         const uint32 & oru32_DataPoolIndex,
                                                                         const uint32 & oru32_DataPoolListIndex)
@@ -753,9 +680,8 @@ void C_SdNdeDataPoolListModelViewManager::m_OnElementSizeChangePossible(const ui
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do data change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do data change
 
    \param[in]     oru32_NodeIndex                Node index
    \param[in]     oru32_DataPoolIndex            Node data pool index
@@ -765,10 +691,8 @@ void C_SdNdeDataPoolListModelViewManager::m_OnElementSizeChangePossible(const ui
    \param[in]     ore_DataChangeType             Data change type
    \param[in]     oru32_ArrayIndex               Optional array index
    \param[in]     ors32_DataSetIndex             Optional data set index
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListModelViewManager::m_OnElementDataChange(const uint32 & oru32_NodeIndex,
                                                                 const uint32 & oru32_DataPoolIndex,
                                                                 const uint32 & oru32_DataPoolListIndex,
@@ -787,9 +711,8 @@ void C_SdNdeDataPoolListModelViewManager::m_OnElementDataChange(const uint32 & o
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Forward signal
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Forward signal
 
    \param[in]     oru32_NodeIndex     Node index
    \param[in]     oru32_DataPoolIndex Node data pool index
@@ -798,10 +721,8 @@ void C_SdNdeDataPoolListModelViewManager::m_OnElementDataChange(const uint32 & o
    \param[in]     ore_ArrayEditType   Enum for node data pool list element variable
    \param[in]     oru32_DataSetIndex  If min or max use 0
                                       Else use data set index
-
-   \created     21.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListModelViewManager::m_OnArrayEditErrorChangePossible(const uint32 & oru32_NodeIndex,
                                                                            const uint32 & oru32_DataPoolIndex,
                                                                            const uint32 & oru32_ListIndex,
@@ -819,9 +740,8 @@ void C_SdNdeDataPoolListModelViewManager::m_OnArrayEditErrorChangePossible(const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Do data change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Do data change
 
    \param[in]     oru32_NodeIndex         Node index
    \param[in]     oru32_DataPoolIndex     Node data pool index
@@ -832,10 +752,8 @@ void C_SdNdeDataPoolListModelViewManager::m_OnArrayEditErrorChangePossible(const
                                           Else use data set index
    \param[in]     oru32_ArrayElementIndex Array index
    \param[in]     orc_NewData             New data
-
-   \created     21.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListModelViewManager::m_OnArrayEditDataChange(const uint32 & oru32_NodeIndex,
                                                                   const uint32 & oru32_DataPoolIndex,
                                                                   const uint32 & oru32_ListIndex,

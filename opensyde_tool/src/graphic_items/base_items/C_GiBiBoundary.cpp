@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Implementation for drawing element boundary (implementation)
 
    detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.10.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPen>
@@ -30,13 +23,13 @@
 #include "C_PuiSdDataElement.h"
 #include "gitypes.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const float64 mf64_ActionPointOffsetBoundary = 8.0;
 
 const float64 C_GiBiBoundary::mhf64_MinWidthBoundary = 50.0;
@@ -44,19 +37,18 @@ const float64 C_GiBiBoundary::mhf64_MinHeightBoundary = 50.0;
 
 const QString mc_NAME_BOUNDARY = "BOUNDARY";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -64,10 +56,8 @@ const QString mc_NAME_BOUNDARY = "BOUNDARY";
    \param[in]     orf64_Width  Width of node
    \param[in]     orf64_Height Height of node
    \param[in,out] opc_Parent   Optional pointer to parent
-
-   \created     27.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiBiBoundary::C_GiBiBoundary(const uint64 & oru64_ID, const float64 of64_Width, const float64 of64_Height,
                                QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
@@ -105,15 +95,12 @@ C_GiBiBoundary::C_GiBiBoundary(const uint64 & oru64_ID, const float64 of64_Width
    this->setZValue(mf64_ZORDER_INIT_BOUNDARY);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     25.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiBiBoundary::~C_GiBiBoundary()
 {
    //Deleted via Qt parent mechanism
@@ -121,29 +108,26 @@ C_GiBiBoundary::~C_GiBiBoundary()
    //lint -e{1740}  no memory leak because of the parent of mpc_Rectangle and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the type of this itme
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the type of this itme
 
    \return  ID
-
-   \created     01.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_GiBiBoundary::type(void) const
 {
    return msn_GRAPHICS_ITEM_BOUNDARY;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Open style dialog
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Open style dialog
 
    \param[in] oq_DarkMode Optional dark mode flag
 
-   \created     23.08.2016  STW/M.Echtler
+   \retval true   style dialog was accepted
+   \retval false  style dialog was rejected
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiBiBoundary::OpenStyleDialog(const bool oq_DarkMode)
 {
    bool q_Retval;
@@ -176,43 +160,52 @@ bool C_GiBiBoundary::OpenStyleDialog(const bool oq_DarkMode)
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set border width
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Copy the style of the provided element
+
+   Warning: Only expected to work if the provided item is of the same type as this element
+
+   \param[in] opc_GuidelineItem Detailed input parameter description
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiBiBoundary::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
+{
+   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   const C_GiBiBoundary * const pc_Item = dynamic_cast<const C_GiBiBoundary * const>(opc_GuidelineItem);
+
+   if (pc_Item != NULL)
+   {
+      this->SetBorderColor(pc_Item->GetBorderColor());
+      this->SetBackgroundColor(pc_Item->GetBackgroundColor());
+      this->SetBorderWidth(pc_Item->GetBorderWidth());
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set border width
 
    \param[in] ors32_Width New line width
-
-   \created     28.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiBoundary::SetBorderWidth(const stw_types::sint32 & ors32_Width)
 {
-   QRectF c_Rect = this->mpc_Rectangle->rect();
-   float64 f64_WidthDiff;
+   //Update pen
    QPen c_Pen = this->mpc_Rectangle->pen();
 
-   f64_WidthDiff = static_cast<float64>(ors32_Width) - static_cast<float64>(c_Pen.width());
-   f64_WidthDiff = f64_WidthDiff * -1.0;
    c_Pen.setWidth(ors32_Width);
 
    this->mpc_Rectangle->setPen(c_Pen);
 
-   //Resize
-   this->mpc_Rectangle->setPos(this->mpc_Rectangle->pos() - QPointF(f64_WidthDiff / 2.0, f64_WidthDiff / 2.0));
-   c_Rect.setWidth(c_Rect.size().width() + f64_WidthDiff);
-   c_Rect.setHeight(c_Rect.size().height() + f64_WidthDiff);
-   this->mpc_Rectangle->setRect(c_Rect);
+   //Redraw/resize rectangle
+   this->mpc_Rectangle->Redraw();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set border color
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set border color
 
    \param[in] orc_Color New color
-
-   \created     28.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiBoundary::SetBorderColor(const QColor & orc_Color)
 {
    QPen c_Pen = this->mpc_Rectangle->pen();
@@ -222,15 +215,12 @@ void C_GiBiBoundary::SetBorderColor(const QColor & orc_Color)
    this->mpc_Rectangle->setPen(c_Pen);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set background color
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set background color
 
    \param[in] orc_Color New color
-
-   \created     28.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiBoundary::SetBackgroundColor(const QColor & orc_Color)
 {
    QBrush c_Brush = this->mpc_Rectangle->brush();
@@ -240,43 +230,43 @@ void C_GiBiBoundary::SetBackgroundColor(const QColor & orc_Color)
    this->mpc_Rectangle->setBrush(c_Brush);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get width
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get border width
 
-   \created     28.10.2016  STW/B.Bayer
+   \return
+   border width
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_GiBiBoundary::GetBorderWidth() const
 {
    return this->mpc_Rectangle->pen().width();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get color
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get border color
 
-   \created     28.10.2016  STW/B.Bayer
+   \return
+   border color
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QColor C_GiBiBoundary::GetBorderColor() const
 {
    return this->mpc_Rectangle->pen().color();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get color
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get background color
 
-   \created     28.10.2016  STW/B.Bayer
+   \return
+   background color
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QColor C_GiBiBoundary::GetBackgroundColor() const
 {
    return this->mpc_Rectangle->brush().color();
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiBoundary::m_ResizeUpdateItems(const float64 of64_DiffWidth, const float64 of64_DiffHeight)
 {
    Q_UNUSED(of64_DiffWidth)
@@ -285,13 +275,13 @@ void C_GiBiBoundary::m_ResizeUpdateItems(const float64 of64_DiffWidth, const flo
    this->mpc_Rectangle->update();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   load from internal data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load from internal data
 
-   \created     21.07.2017  STW/M.Echtler
+   \param[in]  orc_Data       Boundary data
+   \param[in]  oq_DarkMode    Optional dark mode flag
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiBoundary::m_LoadFromData(const C_PuiBsBoundary & orc_Data, const bool oq_DarkMode)
 {
    this->LoadBasicData(orc_Data);
@@ -308,13 +298,13 @@ void C_GiBiBoundary::m_LoadFromData(const C_PuiBsBoundary & orc_Data, const bool
    this->SetBorderWidth(orc_Data.s32_UIBorderWidth);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update internal data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update internal data
 
-   \created     21.07.2017  STW/M.Echtler
+   \param[in]  orc_Data       Boundary data
+   \param[in]  oq_DarkMode    Optional dark mode flag
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiBiBoundary::m_UpdateData(C_PuiBsBoundary & orc_Data, const bool oq_DarkMode) const
 {
    this->UpdateBasicData(orc_Data);

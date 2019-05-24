@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Ethernet bus (implementation)
 
    Ethernet bus
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     17.08.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QGraphicsView>
@@ -27,27 +20,26 @@
 #include "C_GiSyLineWidget.h"
 #include "gitypes.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_types;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString mc_NAME_ETHERNET = "BUS ETHERNET";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -57,10 +49,8 @@ const QString mc_NAME_ETHERNET = "BUS ETHERNET";
    \param[in]     oq_DoErrorCheck      Optional flag to trigger error check directly in constructor
    \param[in]     opc_Points           Points for line
    \param[in,out] opc_Parent           Optional pointer to parent
-
-   \created     17.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiLiEthernetBus::C_GiLiEthernetBus(const stw_types::sint32 & ors32_Index, const uint64 & oru64_ID,
                                      C_GiTextElementBus * const opc_TextElementName, const bool oq_DoErrorCheck,
                                      const std::vector<QPointF> * const opc_Points, QGraphicsItem * const opc_Parent) :
@@ -68,40 +58,31 @@ C_GiLiEthernetBus::C_GiLiEthernetBus(const stw_types::sint32 & ors32_Index, cons
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     18.08.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiLiEthernetBus::~C_GiLiEthernetBus()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the type of this itme
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the type of this itme
 
    \return  ID
-
-   \created     01.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_GiLiEthernetBus::type() const
 {
    return msn_GRAPHICS_ITEM_ETHERNETBUS;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Open style dialog
-
-   \created     23.08.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Open style dialog
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiLiEthernetBus::OpenStyleDialog(void)
 {
    bool q_Retval;
@@ -133,13 +114,30 @@ bool C_GiLiEthernetBus::OpenStyleDialog(void)
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Return bus type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Copy the style of the provided element
 
-   \created     20.09.2016  STW/M.Echtler
+   Warning: Only expected to work if the provided item is of the same type as this element
+
+   \param[in] opc_GuidelineItem Detailed input parameter description
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiLiEthernetBus::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
+{
+   //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
+   const C_GiLiBus * const pc_Item = dynamic_cast<const C_GiLiBus * const>(opc_GuidelineItem);
+
+   if (pc_Item != NULL)
+   {
+      this->SetMiddleLineColor(pc_Item->GetMiddleLineColor());
+      C_GiLiBus::CopyStyle(opc_GuidelineItem);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Return bus type
+*/
+//----------------------------------------------------------------------------------------------------------------------
 stw_opensyde_core::C_OSCSystemBus::E_Type C_GiLiEthernetBus::GetType() const
 {
    return stw_opensyde_core::C_OSCSystemBus::E_Type::eETHERNET;

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Graphics item for empty items of message layout viewer (implementation)
 
    detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     04.04.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
@@ -26,31 +19,28 @@
 
 #include "C_SdBueMlvEmptyItem.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out]   opc_parent           Optional pointer to parent
-
-   \created     05.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvEmptyItem::C_SdBueMlvEmptyItem(const uint8 ou8_Index, QGraphicsItem * const opc_Parent) :
    C_SdBueMlvBaseItem(mc_STYLE_GUIDE_COLOR_11, mc_STYLE_GUIDE_COLOR_8, mc_STYLE_GUIDE_FONT_REGULAR_13,
                       QString::number(ou8_Index), false, opc_Parent),
@@ -64,42 +54,33 @@ C_SdBueMlvEmptyItem::C_SdBueMlvEmptyItem(const uint8 ou8_Index, QGraphicsItem * 
    this->mc_ErrorIcon = QIcon("://images/Error_iconV2.svg").pixmap(mc_ICON_SIZE_24);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     05.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvEmptyItem::~C_SdBueMlvEmptyItem()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the index number for the text
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the index number for the text
 
    \param[in]     ou8_Index       Index number
-
-   \created     05.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvEmptyItem::SetIndex(const uint8 ou8_Index)
 {
    this->SetText(QString::number(ou8_Index));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the error state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the error state
 
    \param[in]     oq_Error        Flag if error is active
-
-   \created     12.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvEmptyItem::SetError(const bool oq_Error)
 {
    this->mq_ErrorActive = oq_Error;
@@ -130,15 +111,12 @@ void C_SdBueMlvEmptyItem::SetError(const bool oq_Error)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the active state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the active state
 
    \param[in]     oq_Active        Flag if active state is active
-
-   \created     26.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvEmptyItem::SetActive(const bool oq_Active)
 {
    this->mq_ItemActive = oq_Active;
@@ -163,15 +141,12 @@ void C_SdBueMlvEmptyItem::SetActive(const bool oq_Active)
    this->update();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the active font color to the parameter color
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the active font color to the parameter color
 
    \param[in]  orc_Color   New color
-
-   \created     02.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvEmptyItem::SetFontColor(const QColor & orc_Color)
 {
    if ((this->mq_ItemActive == true) && (this->mq_ErrorActive == false))
@@ -180,13 +155,10 @@ void C_SdBueMlvEmptyItem::SetFontColor(const QColor & orc_Color)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the active font color to the default color
-
-   \created     02.06.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the active font color to the default color
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvEmptyItem::RestoreFontColor(void)
 {
    if (this->mq_ItemActive == true)
@@ -195,15 +167,12 @@ void C_SdBueMlvEmptyItem::RestoreFontColor(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Sets the flag for drawing the rectangle
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the flag for drawing the rectangle
 
    \param[in]     oq_DrawBackground   Flag for drawing the rectangle
-
-   \created     07.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvEmptyItem::SetDrawRectangle(const bool oq_DrawRectangle)
 {
    this->mq_DrawRectangle = oq_DrawRectangle;
@@ -217,17 +186,14 @@ void C_SdBueMlvEmptyItem::SetDrawRectangle(const bool oq_DrawRectangle)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    \param[in,out] opc_Painter Painter
    \param[in,out] opc_Option  Option
    \param[in,out] opc_Widget  Widget
-
-   \created     05.04.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvEmptyItem::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                                 QWidget * const opc_Widget)
 {

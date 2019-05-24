@@ -1,0 +1,300 @@
+//----------------------------------------------------------------------------------------------------------------------
+/*!
+   \file
+   \brief       Base class for SVG push buttons with texts (set members as interface)
+
+   Base class for SVG push buttons with texts (set members as interface)
+
+   \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
+#include "precomp_headers.h"
+
+#include <QPainter>
+
+#include "C_OgePubSvgIconWithTextBase.h"
+
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
+using namespace stw_types;
+using namespace stw_opensyde_gui_elements;
+
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
+
+/* -- Types --------------------------------------------------------------------------------------------------------- */
+
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
+
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
+
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
+
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
+
+   Set up GUI with all elements.
+
+   \param[in,out] opc_Parent Optional pointer to parent
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_OgePubSvgIconWithTextBase::C_OgePubSvgIconWithTextBase(QWidget * const opc_Parent) :
+   C_OgePubSvgIconOnly(opc_Parent),
+   msn_RightBorderEnabledWidth(0),
+   msn_TopBorderEnabledWidth(0),
+   msn_LeftBorderEnabledWidth(0),
+   msn_BottomBorderEnabledWidth(0),
+   msn_RightBorderDisabledWidth(0),
+   msn_TopBorderDisabledWidth(0),
+   msn_LeftBorderDisabledWidth(0),
+   msn_BottomBorderDisabledWidth(0),
+   ms32_MarginLeft(0),
+   ms32_MarginInBetween(0)
+{
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set all supported margins
+
+   \param[in] os32_MarginLeft      Margin left before icon
+   \param[in] os32_MarginInBetween Margin between icon and text
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgePubSvgIconWithTextBase::SetMargins(const sint32 os32_MarginLeft, const sint32 os32_MarginInBetween)
+{
+   this->ms32_MarginLeft = os32_MarginLeft;
+   this->ms32_MarginInBetween = os32_MarginInBetween;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Override paint event
+
+   Draws the element
+
+   \param[in,out] opc_Event  Pointer to paint event
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgePubSvgIconWithTextBase::paintEvent(QPaintEvent * const opc_Event)
+{
+   Q_UNUSED(opc_Event)
+   if (this->mpc_SvgRendererEnabled != NULL)
+   {
+      QTextOption c_Option;
+      QColor c_BackgroundColor;
+      QColor c_TextColor;
+      //Sub rectangles
+      const QRect c_IconRect(this->rect().topLeft() + QPoint(this->ms32_MarginLeft,
+                                                             (this->rect().height() - this->iconSize().height()) / 2),
+                             this->iconSize());
+      const QRect c_TextRect(this->rect().topLeft() + QPoint(
+                                static_cast<sintn>(this->ms32_MarginLeft) +
+                                this->iconSize().width() + static_cast<sintn>(this->ms32_MarginInBetween), 0), QSize(
+                                this->rect().width(), this->rect().height()));
+      QPainter c_Painter(this);
+      //Background
+      //==========
+      if (this->isEnabled() == true)
+      {
+         if (this->isDown() == true)
+         {
+            c_BackgroundColor = this->mc_BackgroundColorEnabledPressed;
+         }
+         else if (this->mq_Hovered == true)
+         {
+            c_BackgroundColor = this->mc_BackgroundColorEnabledHover;
+         }
+         else
+         {
+            c_BackgroundColor = this->mc_BackgroundColorEnabledDefault;
+         }
+      }
+      else
+      {
+         c_BackgroundColor = this->mc_BackgroundColorDisabled;
+      }
+      c_Painter.setPen(Qt::NoPen);
+      c_Painter.setBrush(c_BackgroundColor);
+      c_Painter.drawRect(this->rect());
+      //Borders
+      //=======
+      if (this->isEnabled())
+      {
+         C_OgePubSvgIconWithTextBase::h_DrawRectBorders(
+            this->rect(), c_Painter, this->msn_LeftBorderEnabledWidth, this->msn_TopBorderEnabledWidth,
+            this->msn_RightBorderEnabledWidth, this->msn_BottomBorderEnabledWidth, this->mc_BorderColorEnabledLeft,
+            this->mc_BorderColorEnabledTop, this->mc_BorderColorEnabledRight,
+            this->mc_BorderColorEnabledBottom);
+      }
+      else
+      {
+         C_OgePubSvgIconWithTextBase::h_DrawRectBorders(
+            this->rect(), c_Painter, this->msn_LeftBorderDisabledWidth, this->msn_TopBorderDisabledWidth,
+            this->msn_RightBorderDisabledWidth, this->msn_BottomBorderDisabledWidth, this->mc_BorderColorDisabledLeft,
+            this->mc_BorderColorDisabledTop, this->mc_BorderColorDisabledRight,
+            this->mc_BorderColorDisabledBottom);
+      }
+      //Icon
+      //====
+      if (this->isChecked() == true)
+      {
+         if ((this->mpc_SvgRendererCheckedDisabeld != NULL) && (this->isEnabled() == false))
+         {
+            this->mpc_SvgRendererCheckedDisabeld->render(&c_Painter, c_IconRect);
+         }
+         else if ((this->mpc_SvgRendererCheckedHovered != NULL) && (this->mq_Hovered == true))
+         {
+            this->mpc_SvgRendererCheckedHovered->render(&c_Painter, c_IconRect);
+         }
+         else if (this->mpc_SvgRendererCheckedEnabled != NULL)
+         {
+            this->mpc_SvgRendererCheckedEnabled->render(&c_Painter, c_IconRect);
+         }
+         else
+         {
+            this->mpc_SvgRendererEnabled->render(&c_Painter, c_IconRect);
+         }
+      }
+      else
+      {
+         if ((this->mpc_SvgRendererDisabeld != NULL) && (this->isEnabled() == false))
+         {
+            this->mpc_SvgRendererDisabeld->render(&c_Painter, c_IconRect);
+         }
+         else if ((this->mpc_SvgRendererHovered != NULL) && (this->mq_Hovered == true))
+         {
+            this->mpc_SvgRendererHovered->render(&c_Painter, c_IconRect);
+         }
+         else
+         {
+            this->mpc_SvgRendererEnabled->render(&c_Painter, c_IconRect);
+         }
+      }
+      //Text
+      //====
+      if (this->isEnabled() == true)
+      {
+         c_TextColor = this->mc_TextColorEnabled;
+      }
+      else
+      {
+         c_TextColor = this->mc_TextColorDisabled;
+      }
+      c_Painter.setBrush(Qt::NoBrush);
+      c_Painter.setPen(c_TextColor);
+      c_Painter.setFont(this->mc_FontPixel);
+      c_Option.setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+      c_Painter.drawText(c_TextRect, this->text(), c_Option);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get the inner rectangle (rectangle to paint in minus all of the borders)
+
+   Depending on enabled or disabled state
+
+   \return
+   The inner rectangle (rectangle to paint in minus all of the borders)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QRect C_OgePubSvgIconWithTextBase::GetInnerRect(void) const
+{
+   QRect c_Retval;
+
+   if (this->isEnabled())
+   {
+      c_Retval = this->rect().adjusted(this->msn_LeftBorderEnabledWidth, this->msn_TopBorderEnabledWidth,
+                                       -this->msn_RightBorderEnabledWidth,
+                                       -this->msn_BottomBorderEnabledWidth);
+   }
+   else
+   {
+      c_Retval = this->rect().adjusted(this->msn_LeftBorderDisabledWidth, this->msn_TopBorderDisabledWidth,
+                                       -this->msn_RightBorderDisabledWidth,
+                                       -this->msn_BottomBorderDisabledWidth);
+   }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Draw rectangle borders
+
+   \param[in]     orc_RectOuter          Outer rectangle to draw borders at/in
+   \param[in,out] orc_Painter            Painter to use for drawing
+   \param[in]     osn_LeftBorderWidth   Left border width
+   \param[in]     osn_TopBorderWidth    Top border width
+   \param[in]     osn_RightBorderWidth  Right border width
+   \param[in]     osn_BottomBorderWidth Bottom border width
+   \param[in]     orc_BorderColorLeft    Left border color
+   \param[in]     orc_BorderColorTop     Top border color
+   \param[in]     orc_BorderColorRight   Right border color
+   \param[in]     orc_BorderColorBottom  Bottom border color
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgePubSvgIconWithTextBase::h_DrawRectBorders(const QRect & orc_RectOuter, QPainter & orc_Painter,
+                                                    const sintn osn_LeftBorderWidth, const sintn osn_TopBorderWidth,
+                                                    const sintn osn_RightBorderWidth, const sintn osn_BottomBorderWidth,
+                                                    const QColor & orc_BorderColorLeft,
+                                                    const QColor & orc_BorderColorTop,
+                                                    const QColor & orc_BorderColorRight,
+                                                    const QColor & orc_BorderColorBottom)
+{
+   //Points for an outer rectangle (the rectangle all points are drawn in)
+   //And points for an inner rectange (the rectangle the content is in)
+
+   //for some reason drawing polygons won't fully fill in the bottom and right border
+   // so the rect needs to be slightly expanded
+   const QRect & rc_Outer = orc_RectOuter.adjusted(0, 0, 1, 1);
+   const QRect c_Inner = rc_Outer.adjusted(osn_LeftBorderWidth, osn_TopBorderWidth, -osn_RightBorderWidth,
+                                           -osn_BottomBorderWidth);
+
+   //Left border
+   if (osn_LeftBorderWidth > 0)
+   {
+      QPolygon c_Poly;
+      c_Poly.append(rc_Outer.bottomLeft());
+      c_Poly.append(rc_Outer.topLeft());
+      c_Poly.append(c_Inner.topLeft());
+      c_Poly.append(c_Inner.bottomLeft());
+      orc_Painter.setPen(Qt::NoPen);
+      orc_Painter.setBrush(orc_BorderColorLeft);
+      orc_Painter.drawConvexPolygon(c_Poly);
+   }
+   //Top border
+   if (osn_TopBorderWidth > 0)
+   {
+      QPolygon c_Poly;
+      c_Poly.append(rc_Outer.topLeft());
+      c_Poly.append(rc_Outer.topRight());
+      c_Poly.append(c_Inner.topRight());
+      c_Poly.append(c_Inner.topLeft());
+      orc_Painter.setPen(Qt::NoPen);
+      orc_Painter.setBrush(orc_BorderColorTop);
+      orc_Painter.drawConvexPolygon(c_Poly);
+   }
+   //Right border
+   if (osn_RightBorderWidth > 0)
+   {
+      QPolygon c_Poly;
+      c_Poly.append(rc_Outer.topRight());
+      c_Poly.append(rc_Outer.bottomRight());
+      c_Poly.append(c_Inner.bottomRight());
+      c_Poly.append(c_Inner.topRight());
+      orc_Painter.setPen(Qt::NoPen);
+      orc_Painter.setBrush(orc_BorderColorRight);
+      orc_Painter.drawConvexPolygon(c_Poly);
+   }
+   //Bottom border
+   if (osn_BottomBorderWidth > 0)
+   {
+      QPolygon c_Poly;
+      c_Poly.append(rc_Outer.bottomRight());
+      c_Poly.append(rc_Outer.bottomLeft());
+      c_Poly.append(c_Inner.bottomLeft());
+      c_Poly.append(c_Inner.bottomRight());
+      orc_Painter.setPen(Qt::NoPen);
+      orc_Painter.setBrush(orc_BorderColorBottom);
+      orc_Painter.drawConvexPolygon(c_Poly);
+   }
+}

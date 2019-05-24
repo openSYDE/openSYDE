@@ -1,25 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \file        ccan.h
+   \file
    \brief       Header for C_CAN class.
 
    Header to class implementing an high level interface to MPC5200 Linux SocketCAN communication driver.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 2012-2012
-   license     use only under terms of contract / confidential
-
-   created     2012-03-09  STW/T.Heilig
-   \endimplementation
-
-   \internal
+   \copyright   Copyright 2012 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CCANH
 #define CCANH
 
-/* -- Includes ------------------------------------------------------------ */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <sys/time.h>
 
 #include "stwtypes.h"
@@ -28,12 +20,12 @@
 
 namespace stw_can
 {
-/* -- Defines ------------------------------------------------------------- */
+/* -- Defines ------------------------------------------------------------------------------------------------------- */
 #ifndef STWCAN_PACKAGE
 #define STWCAN_PACKAGE
 #endif
 
-/* -- Types --------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class STWCAN_PACKAGE C_CAN :
    public C_CAN_Dispatcher
@@ -82,7 +74,7 @@ public:
    stw_types::uint32 GetLimitRXID(void) const;
 };
 
-/* -- Global Variables ---------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 // Error codes for compatibility with Windows implementation, might never be set here
 const stw_types::sint32 CAN_COMP_ERR_DLL_NOT_OPENED       =   -201;
 const stw_types::sint32 CAN_COMP_ERR_DLL_ALREADY_CLOSED   =   -203;
@@ -92,9 +84,9 @@ const stw_types::sint32 CAN_COMP_ERR_DLL_FORMAT           =   -206;
 
 const stw_types::uint32 CAN_RX_ID_INVALID = 0xFFFFFFFFUL;
 
-/* -- Function Prototypes ------------------------------------------------- */
+/* -- Function Prototypes ------------------------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------ */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 }
 
 #endif

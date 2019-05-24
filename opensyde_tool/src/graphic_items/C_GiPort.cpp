@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Visualization and functionality of a port of a node (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     09.08.2016  STW/S.Singer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -23,35 +16,32 @@
 #include "constants.h"
 #include "C_OSCUtils.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_opensyde_gui;
 using namespace stw_types;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     22.07.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiPort::C_GiPort(QGraphicsItem * const opc_Parent) :
    QGraphicsItem(opc_Parent),
    mc_BoundingRect(QRectF(0.0, 0.0, 80.0, 15.0)),
@@ -74,42 +64,40 @@ C_GiPort::C_GiPort(QGraphicsItem * const opc_Parent) :
    this->setVisible(false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     30.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiPort::~C_GiPort(void)
 {
    this->mpc_Shadow = NULL;
    //lint -e{1740}  no memory leak because of the parent of mpc_Shadow and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   boundingRect
-            Returns an estimate of the area painted by the item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get bounding rectangle (estimate of the area painted by the item)
 
-   \created     04.08.2016  STW/S.Singer
+   \return
+   bounding rectangle
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QRectF C_GiPort::boundingRect() const
 {
    return this->mc_BoundingRect;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   boundingRect
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overridden paint event
 
+   Here: Custom paint operation
 
-   \created     04.08.2016  STW/S.Singer
+   \param[in]     opc_Painter    Pointer to Painter
+   \param[in]     opc_Option     Style option
+   \param[in]     opc_Widget     Optional widget to paint on
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiPort::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                      QWidget * const opc_Widget)
 {
@@ -191,16 +179,13 @@ void C_GiPort::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsIte
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Find closest point in shape to scene position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Find closest point in shape to scene position
 
    \param[in]  orc_ScenePoint Scene position
    \param[out] orc_Closest    Closest point in shape
-
-   \created     24.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_GiPort::FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Closest) const
 {
@@ -214,13 +199,10 @@ void C_GiPort::FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Cl
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register connector
-
-   \created     26.08.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register connector
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_GiPort::AddConnectorToRegistry(void)
 {
@@ -231,13 +213,10 @@ void C_GiPort::AddConnectorToRegistry(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Remove connector from registry
-
-   \created     26.08.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Remove connector from registry
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_GiPort::RemoveConnectorFromRegistry(void)
 {
@@ -248,13 +227,10 @@ void C_GiPort::RemoveConnectorFromRegistry(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Prepare for unregister
-
-   \created     26.08.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Prepare for unregister
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_GiPort::TemporaryUnregister(void)
 {
@@ -264,28 +240,22 @@ void C_GiPort::TemporaryUnregister(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Abort prepare for unregister
-
-   \created     26.08.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Abort prepare for unregister
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_GiPort::AbortTemporaryUnregister(void)
 {
    this->setOpacity(1.0);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Stretches the port for a specific difference distance
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Stretches the port for a specific difference distance
 
    \param[in]   of64_Difference     Stretch distance
-
-   \created     19.09.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiPort::StretchPort(const float64 of64_Difference)
 {
    if ((this->mc_Points.size() == 4) &&
@@ -304,13 +274,10 @@ void C_GiPort::StretchPort(const float64 of64_Difference)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Resets the size of the port to default values
-
-   \created     21.09.2016  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Resets the size of the port to default values
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiPort::ResizePortToDefault()
 {
    if (this->mc_Points.size() == 4)
@@ -324,13 +291,10 @@ void C_GiPort::ResizePortToDefault()
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reset port counter and port visibility to default
-
-   \created     02.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reset port counter and port visibility to default
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiPort::ResetConnectorCount(void)
 {
    this->ms32_RegisteredConnectors = 0;
@@ -338,68 +302,48 @@ void C_GiPort::ResetConnectorCount(void)
    this->setOpacity(1.0);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Activates the drawing of the border line
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Activates the drawing of the border line
 
    \param[in]     oq_Active       Flag for activating or deactivating the border
-
-   \created     22.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiPort::SetDrawBorder(const bool oq_Active)
 {
    this->mq_DrawBoder = oq_Active;
    this->SetShadow();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Activates the drawing of the white filter
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Activates the drawing of the white filter
 
    \param[in]     oq_Active       Flag for activating or deactivating the white filter
-
-   \created     22.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiPort::SetDrawWhiteFilter(const bool oq_Active)
 {
    this->mq_DrawWhiteFilter = oq_Active;
    this->update();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   short description of function
-
-   long description of function within several lines
-
-   \param[in]     ou8_Aa         input parameter description
-   \param[out]    opu32_Bb       output parameter description
-   \param[in,out] opu16_Cc       input/output parameter description
-
-   \return
-   possible return value(s) and description
-
-   \created     dd.mm.yyyy  STW/J.Doe
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set Shadow
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiPort::SetShadow()
 {
+   this->mpc_Shadow = new QGraphicsDropShadowEffect();
+   this->mpc_Shadow->setBlurRadius(30.0);
+   this->mpc_Shadow->setColor(mc_HOVER_SHADOW_COLOR);
+   this->mpc_Shadow->setOffset(0.0);
+
    if (this->mq_DrawBoder == false)
    {
-      this->mpc_Shadow = new QGraphicsDropShadowEffect();
       this->mpc_Shadow->setBlurRadius(30.0);
-      this->mpc_Shadow->setColor(mc_HOVER_SHADOW_COLOR);
-      this->mpc_Shadow->setOffset(0.0);
-      this->setGraphicsEffect(this->mpc_Shadow);
    }
    else
    {
-      this->mpc_Shadow = new QGraphicsDropShadowEffect();
       this->mpc_Shadow->setBlurRadius(0.0);
-      this->mpc_Shadow->setColor(mc_HOVER_SHADOW_COLOR);
-      this->mpc_Shadow->setOffset(0.0);
-      this->setGraphicsEffect(this->mpc_Shadow);
    }
+   this->setGraphicsEffect(this->mpc_Shadow);
 }

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       List widget for view widgets (implementation)
 
    List widget for view widgets
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     26.07.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QDrag>
@@ -27,34 +20,31 @@
 #include "C_NagViewList.h"
 #include "C_PuiSvHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     26.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_NagViewList::C_NagViewList(QWidget * const opc_Parent) :
    QListView(opc_Parent)
 {
@@ -69,26 +59,20 @@ C_NagViewList::C_NagViewList(QWidget * const opc_Parent) :
    this->setDropIndicatorShown(true);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     03.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_NagViewList::~C_NagViewList(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init
-
-   \created     26.07.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::Init(void)
 {
    this->mc_Model.SetNumRows(static_cast<sintn>(C_PuiSvHandler::h_GetInstance()->GetViewCount()));
@@ -117,13 +101,10 @@ void C_NagViewList::Init(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load all user settings
-
-   \created     08.08.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load all user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::LoadUserSettings(void) const
 {
    for (sintn sn_ItView = 0UL; sn_ItView < this->mc_Model.rowCount(); ++sn_ItView)
@@ -136,13 +117,10 @@ void C_NagViewList::LoadUserSettings(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save all user settings
-
-   \created     08.08.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save all user settings
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::SaveUserSettings(void) const
 {
    for (sintn sn_ItView = 0UL; sn_ItView < this->mc_Model.rowCount(); ++sn_ItView)
@@ -155,13 +133,10 @@ void C_NagViewList::SaveUserSettings(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update all view names
-
-   \created     03.08.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update all view names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::UpdateNames(void) const
 {
    for (sintn sn_ItView = 0UL; sn_ItView < this->mc_Model.rowCount(); ++sn_ItView)
@@ -174,16 +149,13 @@ void C_NagViewList::UpdateNames(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trigger update of decoration role
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger update of decoration role
 
    \param[in] oq_CheckOnlyThisView Flag to reduce view error check to one item
    \param[in] ou32_ViewIndex       Index to specify which view changed (only used if oq_CheckOnlyThisView set)
-
-   \created     30.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::UpdateDeco(const bool oq_CheckOnlyThisView, const uint32 ou32_ViewIndex) const
 {
    if (oq_CheckOnlyThisView == true)
@@ -207,16 +179,13 @@ void C_NagViewList::UpdateDeco(const bool oq_CheckOnlyThisView, const uint32 ou3
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get the maximum height required to display all items of this widget in their current state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get the maximum height required to display all items of this widget in their current state
 
    \return
    The maximum height required to display all items of this widget in their current state
-
-   \created     08.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_NagViewList::GetMaximumRequiredHeight(void) const
 {
    sint32 s32_Retval = 0;
@@ -231,16 +200,13 @@ sint32 C_NagViewList::GetMaximumRequiredHeight(void) const
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set active state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set active state
 
    \param[in] ou32_ViewIndex Active view index
    \param[in] os32_SubMode   New active sub mode
-
-   \created     30.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::SetActive(const uint32 ou32_ViewIndex, const sint32 os32_SubMode) const
 {
    for (sintn sn_ItView = 0UL; sn_ItView < this->mc_Model.rowCount(); ++sn_ItView)
@@ -260,36 +226,30 @@ void C_NagViewList::SetActive(const uint32 ou32_ViewIndex, const sint32 os32_Sub
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get item widget at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get item widget at index
 
    \param[in] osn_Index Item index
 
    \return
    NULL Item not found
    Else Valid item
-
-   \created     26.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_NagViewItem * C_NagViewList::GetItemAt(const sintn osn_Index) const
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
    return dynamic_cast<C_NagViewItem *>(this->indexWidget(this->mc_Model.index(osn_Index)));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten drag enter event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten drag enter event slot
 
    Here: Accept drag
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     02.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::dragEnterEvent(QDragEnterEvent * const opc_Event)
 {
    const QMimeData * const pc_MimeData = opc_Event->mimeData();
@@ -304,17 +264,14 @@ void C_NagViewList::dragEnterEvent(QDragEnterEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten drag move event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten drag move event slot
 
    Here: Accept drag
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     02.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::dragMoveEvent(QDragMoveEvent * const opc_Event)
 {
    const QMimeData * const pc_MimeData = opc_Event->mimeData();
@@ -329,17 +286,14 @@ void C_NagViewList::dragMoveEvent(QDragMoveEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten drop event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten drop event slot
 
    Here: Trigger view move
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     02.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::dropEvent(QDropEvent * const opc_Event)
 {
    const QMimeData * const pc_MimeData = opc_Event->mimeData();
@@ -383,17 +337,14 @@ void C_NagViewList::dropEvent(QDropEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten start drag event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten start drag event
 
    Here: send custom drag event
 
    \param[in] oc_SupportedActions Supported actions
-
-   \created     02.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::startDrag(const Qt::DropActions oc_SupportedActions)
 {
    const QModelIndexList c_SelectedIndices = this->selectedIndexes();
@@ -405,13 +356,10 @@ void C_NagViewList::startDrag(const Qt::DropActions oc_SupportedActions)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clean up UI after drag
-
-   \created     02.08.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clean up UI after drag
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::m_AfterDrag(void) const
 {
    for (sintn sn_ItView = 0UL; sn_ItView < this->mc_Model.rowCount(); ++sn_ItView)
@@ -424,15 +372,12 @@ void C_NagViewList::m_AfterDrag(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start drag action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start drag action
 
    \param[in] orc_Index Selected index
-
-   \created     02.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::m_StartDrag(const QModelIndex & orc_Index)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -480,15 +425,12 @@ void C_NagViewList::m_StartDrag(const QModelIndex & orc_Index)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle start drag action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle start drag action
 
    \param[in] opc_Sender Sender
-
-   \created     02.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::m_OnStartDrag(const C_NagViewItem * const opc_Sender)
 {
    for (sintn sn_It = 0; sn_It < this->mc_Model.rowCount(); ++sn_It)
@@ -501,15 +443,12 @@ void C_NagViewList::m_OnStartDrag(const C_NagViewItem * const opc_Sender)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle expand action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle expand action
 
    \param[in] opc_Sender Sender
-
-   \created     26.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::m_OnExpand(const C_NagViewItem * const opc_Sender)
 {
    for (sintn sn_It = 0; sn_It < this->mc_Model.rowCount(); ++sn_It)
@@ -523,15 +462,12 @@ void C_NagViewList::m_OnExpand(const C_NagViewItem * const opc_Sender)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle delete action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle delete action
 
    \param[in] opc_Sender Sender
-
-   \created     30.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::m_OnDelete(const C_NagViewItem * const opc_Sender)
 {
    for (sintn sn_It = 0; sn_It < this->mc_Model.rowCount(); ++sn_It)
@@ -544,15 +480,12 @@ void C_NagViewList::m_OnDelete(const C_NagViewItem * const opc_Sender)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle duplicate action
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle duplicate action
 
    \param[in] opc_Sender Sender
-
-   \created     30.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::m_OnDuplicate(const C_NagViewItem * const opc_Sender)
 {
    for (sintn sn_It = 0; sn_It < this->mc_Model.rowCount(); ++sn_It)
@@ -570,16 +503,13 @@ void C_NagViewList::m_OnDuplicate(const C_NagViewItem * const opc_Sender)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle set name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle set name
 
    \param[in] opc_Sender Sender
    \param[in] orc_Name   Name
-
-   \created     30.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::m_OnSetName(const C_NagViewItem * const opc_Sender, const QString & orc_Name)
 {
    for (sintn sn_It = 0; sn_It < this->mc_Model.rowCount(); ++sn_It)
@@ -591,18 +521,15 @@ void C_NagViewList::m_OnSetName(const C_NagViewItem * const opc_Sender, const QS
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle select
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle select
 
    \param[in] opc_Sender         Sender
    \param[in] os32_SubMode       Selected sub mode
    \param[in] orc_Name           Name to display
    \param[in] orc_SubSubItemName Selected sub sub mode name
-
-   \created     30.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::m_OnSelect(const C_NagViewItem * const opc_Sender, const sint32 os32_SubMode,
                                const QString & orc_Name, const QString & orc_SubSubItemName)
 {

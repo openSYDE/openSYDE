@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for system view dashboard toggle properties (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     12.09.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -26,39 +19,36 @@
 #include "C_GiSvDaToggleBase.h"
 #include "C_PuiSvDbWidgetBase.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const sintn C_SyvDaPeToggle::mhsn_INDEX_STYLE_TYPE1 = 0;
 const sintn C_SyvDaPeToggle::mhsn_INDEX_STYLE_TYPE2 = 1;
 const sintn C_SyvDaPeToggle::mhsn_INDEX_STYLE_TYPE3 = 2;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent  Optional pointer to parent
    \param[in]     oq_DarkMode Flag for dark mode
-
-   \created     11.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeToggle::C_SyvDaPeToggle(C_SyvDaPeBase & orc_Parent, const bool oq_DarkMode) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvDaPeToggle),
@@ -81,27 +71,21 @@ C_SyvDaPeToggle::C_SyvDaPeToggle(C_SyvDaPeBase & orc_Parent, const bool oq_DarkM
    connect(&this->mrc_ParentDialog, &C_SyvDaPeBase::SigRefresh, this, &C_SyvDaPeToggle::m_UpdatePreview);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     12.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeToggle::~C_SyvDaPeToggle(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     12.09.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeToggle::InitStaticNames(void) const
 {
    this->mpc_Ui->pc_LabelStyle->setText(C_GtGetText::h_GetText("Style"));
@@ -110,16 +94,13 @@ void C_SyvDaPeToggle::InitStaticNames(void) const
    this->mpc_Ui->pc_ComboBoxType->addItem(C_GtGetText::h_GetText("Type 3"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get type
 
    \return
    Current type
-
-   \created     12.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbToggle::E_Type C_SyvDaPeToggle::GetType(void) const
 {
    C_PuiSvDbToggle::E_Type e_Retval;
@@ -140,15 +121,12 @@ C_PuiSvDbToggle::E_Type C_SyvDaPeToggle::GetType(void) const
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set type
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set type
 
    \param[in] oe_Type New type
-
-   \created     12.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeToggle::SetType(const C_PuiSvDbToggle::E_Type oe_Type) const
 {
    switch (oe_Type)
@@ -165,13 +143,10 @@ void C_SyvDaPeToggle::SetType(const C_PuiSvDbToggle::E_Type oe_Type) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update of preview click
-
-   \created     12.09.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update of preview click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeToggle::m_UpdatePreview(void)
 {
    //Also include the fix offset to the right

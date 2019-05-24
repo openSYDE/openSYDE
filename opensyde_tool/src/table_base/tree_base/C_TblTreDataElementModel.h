@@ -1,35 +1,29 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Tree model for data elements (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     07.09.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SYVDAPEDATAELEMENTTREEMODEL_H
 #define C_SYVDAPEDATAELEMENTTREEMODEL_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QMap>
 
 #include "C_TblTreModel.h"
 #include "C_PuiSvDbNodeDataPoolListElementId.h"
 #include "C_PuiSdNodeCanMessageSyncManager.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class C_TblTreDataElementModel :
    public C_TblTreModel
 {
@@ -107,8 +101,8 @@ private:
                         const bool oq_ShowArrayElements, const bool oq_Show64BitValues);
    void m_InitDatapoolElement(const stw_types::uint32 ou32_ViewIndex, const bool oq_ShowOnlyWriteElements,
                               const bool oq_ShowArrayElements, const bool oq_Show64BitValues);
-   void m_UpdateDatapoolElement(const bool oq_ShowOnlyWriteElements,
-                                const bool oq_ShowArrayElements, const bool oq_Show64BitValues);
+   void m_UpdateDatapoolElement(const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
+                                const bool oq_Show64BitValues);
    static void mh_ConfigureDatapoolElement(const bool oq_ShowOnlyWriteElements, const bool oq_ShowArrayElements,
                                            const bool oq_Show64BitValues,
                                            const stw_opensyde_core::C_OSCNodeDataPoolListElement & orc_Element,
@@ -131,7 +125,7 @@ private:
    static bool mh_CheckNodeDiagnostic(const stw_types::uint32 ou32_ViewIndex, const stw_types::uint32 ou32_NodeIndex);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Util class for QWidget (implementation)
 
    Assortment of utility functions for QWidget
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     17.10.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <limits>
@@ -32,37 +25,35 @@
 #include "C_GtGetText.h"
 #include "C_OgeWiUtil.h"
 #include "C_OgePopUpDialog.h"
+#include "C_OSCLoggingHandler.h"
 #include "C_OgeWiCustomMessage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Draw background for widget (once)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Draw background for widget (once)
 
    \param[in,out] opc_Widget  Widget to draw background for
    \param[in,out] opc_Painter Optional painter
-
-   \created     17.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiUtil::h_DrawBackground(QWidget * const opc_Widget, QPainter * const opc_Painter)
 {
    //draw background
@@ -81,9 +72,8 @@ void C_OgeWiUtil::h_DrawBackground(QWidget * const opc_Widget, QPainter * const 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply stylesheet property
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply stylesheet property
 
    Apply stylesheet property and force update of style
    For more information see: https://wiki.qt.io/Dynamic_Properties_and_Stylesheets
@@ -91,10 +81,8 @@ void C_OgeWiUtil::h_DrawBackground(QWidget * const opc_Widget, QPainter * const 
    \param[in,out] opc_Widget  Widget where to set property
    \param[in,out] opcn_Name   Property name
    \param[in,out] orc_Value   Property value
-
-   \created     06.03.2017  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiUtil::h_ApplyStylesheetProperty(QWidget * const opc_Widget, const stw_types::charn * const opcn_Name,
                                             const QVariant & orc_Value)
 {
@@ -106,17 +94,14 @@ void C_OgeWiUtil::h_ApplyStylesheetProperty(QWidget * const opc_Widget, const st
    opc_Widget->style()->polish(opc_Widget);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply stylesheet property to widget AND all children (recursive)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply stylesheet property to widget AND all children (recursive)
 
    \param[in,out] opc_Widget  Widget where to set property
    \param[in,out] opcn_Name   Property name
    \param[in,out] orc_Value   Property value
-
-   \created     07.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(QWidget * const opc_Widget,
                                                                   const stw_types::charn * const opcn_Name,
                                                                   const QVariant & orc_Value)
@@ -134,15 +119,12 @@ void C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(QWidget * cons
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set window icon
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set window icon
 
    \param[in,out] opc_Widget Widget to set icon for
-
-   \created     16.05.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiUtil::h_SetWindowIcon(QWidget * const opc_Widget)
 {
    if (opc_Widget != NULL)
@@ -151,19 +133,18 @@ void C_OgeWiUtil::h_SetWindowIcon(QWidget * const opc_Widget)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility function to check if widget inside allowed area
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility function to check if widget inside allowed area
 
-   \param[in,out] orc_GlobalPosition Global position of top left corner (Set to default if necessary)
-   \param[in,out] orc_Size           Size of widget (Set to default if necessary)
-   \param[in]     orc_DefaultSize    Default size of widget
-
-   \created     11.07.2017  STW/M.Echtler
+   \param[in,out] orc_GlobalPosition          Global position of top left corner (Set to default if necessary)
+   \param[in,out] orc_Size                    Size of widget (Set to default if necessary)
+   \param[in]     orc_DefaultSize             Default size of widget
+   \param[in]     oq_AddLogEntryForWindowSize Optional flag to add log entry for window size
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiUtil::h_CheckAndFixDialogPositionAndSize(QPoint & orc_GlobalPosition, QSize & orc_Size,
-                                                     const QSize & orc_DefaultSize)
+                                                     const QSize & orc_DefaultSize,
+                                                     const bool oq_AddLogEntryForWindowSize)
 {
    const QDesktopWidget * const pc_Desktop = QApplication::desktop();
 
@@ -184,11 +165,18 @@ void C_OgeWiUtil::h_CheckAndFixDialogPositionAndSize(QPoint & orc_GlobalPosition
       orc_GlobalPosition = QPoint(10, 30);
       orc_Size = orc_DefaultSize;
    }
+   if (oq_AddLogEntryForWindowSize)
+   {
+      osc_write_log_info("Setup main window screen",
+                         QString("Setup main window for screen width %1, height %2").arg(
+                            pc_Desktop->geometry().width()).arg(pc_Desktop->
+                                                                geometry()
+                                                                .height()).toStdString().c_str());
+   }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update font depending on size
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update font depending on size
 
    \param[in] opc_Widget              Widget to adapt
    \param[in] orc_Text                Current text
@@ -199,10 +187,8 @@ void C_OgeWiUtil::h_CheckAndFixDialogPositionAndSize(QPoint & orc_GlobalPosition
    \return
    -1   Error
    Else New point size
-
-   \created     10.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_OgeWiUtil::h_UpdateFontSize(QWidget * const opc_Widget, const QString & orc_Text,
                                     const float32 of32_HeightScaling, const bool oq_IgnoreContentMargins,
                                     const QSize * const opc_ImprovedSize)
@@ -245,9 +231,8 @@ sintn C_OgeWiUtil::h_UpdateFontSize(QWidget * const opc_Widget, const QString & 
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get optimal point size based on parameters
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get optimal point size based on parameters
 
    \param[in] orc_Font           Current font
    \param[in] orc_Size           New size
@@ -256,10 +241,8 @@ sintn C_OgeWiUtil::h_UpdateFontSize(QWidget * const opc_Widget, const QString & 
 
    \return
    Font point size
-
-   \created     10.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_OgeWiUtil::h_GetNextOptimalPointSize(const QFont & orc_Font, const QSize & orc_Size, const QString & orc_Text,
                                              const float32 of32_HeightScaling)
 {
@@ -327,18 +310,15 @@ sintn C_OgeWiUtil::h_GetNextOptimalPointSize(const QFont & orc_Font, const QSize
    return std::max(sn_Retval, 1);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Logic to get the next widget to gray out
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Logic to get the next widget to gray out
 
    \param[in] opc_Input Widget to search the parent hierarchy for
 
    \return
    Either highest parent or the one child below the next pop up which is also parent of the input widget
-
-   \created     29.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QWidget * C_OgeWiUtil::h_GetWidgetUnderNextPopUp(QWidget * const opc_Input)
 {
    QWidget * pc_Retval = NULL;
@@ -379,19 +359,16 @@ QWidget * C_OgeWiUtil::h_GetWidgetUnderNextPopUp(QWidget * const opc_Input)
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility function to check if the requested key is part of the global key handling
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility function to check if the requested key is part of the global key handling
 
    \param[in] opc_Event Event information
 
    \return
    True  Global key handling requested
    False No special global key handling required
-
-   \created     07.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OgeWiUtil::h_CheckGlobalKey(const QKeyEvent * const opc_Event)
 {
    bool q_Retval;
@@ -417,9 +394,8 @@ bool C_OgeWiUtil::h_CheckGlobalKey(const QKeyEvent * const opc_Event)
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get save file name via QFileDialog
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get save file name via QFileDialog
 
    \param[in,out] opc_Parent          Parent widget
    \param[in]     orc_Heading         QFileDialog heading
@@ -430,10 +406,8 @@ bool C_OgeWiUtil::h_CheckGlobalKey(const QKeyEvent * const opc_Event)
 
    \return
    Get save file name (empty if aborted)
-
-   \created     05.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_OgeWiUtil::h_GetSaveFileName(QWidget * const opc_Parent, const QString & orc_Heading,
                                        const QString & orc_StartingFolder, const QString & orc_Filter,
                                        const QString & orc_DefaultFileName, const QFileDialog::Options oc_Option)
@@ -487,13 +461,10 @@ QString C_OgeWiUtil::h_GetSaveFileName(QWidget * const opc_Parent, const QString
    //lint -e{1746} Necessary because needs default parameter and is not recognized as const
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     17.10.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeWiUtil::C_OgeWiUtil(void)
 {
 }

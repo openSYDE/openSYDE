@@ -1,59 +1,49 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Overlay for background to concentrate focus on widget in foreground (implementation)
 
    Overlay for background to concentrate focus on widget in foreground
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     23.09.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QPainter>
 #include "C_OgeOverlay.h"
 #include "C_OgeWiUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
 QWidget * C_OgeOverlay::mhpc_TopWidget = NULL;
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent            Optional pointer to parent
    \param[in]     opc_EffectTargetChild Optional pointer to child widget of dialog to apply shadow effect to
-
-   \created     23.09.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeOverlay::C_OgeOverlay(QWidget * const opc_Parent, QWidget * const opc_EffectTargetChild) :
    QDialog(opc_Parent)
 {
@@ -93,32 +83,26 @@ C_OgeOverlay::C_OgeOverlay(QWidget * const opc_Parent, QWidget * const opc_Effec
    C_OgeWiUtil::h_SetWindowIcon(this);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set master for overlay
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set master for overlay
 
    \param[in]  opc_TopWidget
-
-   \created     25.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_OgeOverlay::h_SetTopWidget(QWidget * const opc_TopWidget)
 {
    mhpc_TopWidget = opc_TopWidget;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten paint event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten paint event slot
 
    Here: Paint transparent overlay
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     25.08.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_OgeOverlay::paintEvent(QPaintEvent * const opc_Event)
 {
@@ -130,16 +114,13 @@ void C_OgeOverlay::paintEvent(QPaintEvent * const opc_Event)
    Q_UNUSED(opc_Event)
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get top widget
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get top widget
 
    \return
    Top widget
-
-   \created     15.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const QWidget * C_OgeOverlay::h_GetTopWidget(void)
 {
    return mhpc_TopWidget;

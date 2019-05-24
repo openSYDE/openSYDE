@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Widget for param widget configuration import report (implementation)
 
    Widget for param widget configuration import report
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     16.10.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -28,32 +21,31 @@
 #include "C_SdNdeDataPoolContentUtil.h"
 #include "ui_C_SyvDaItPaImportReport.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvDaItPaImportReport::mhc_HTML_TABLE_HEADER_START =
    "<td align=\"left\" valign=\"top\" style=\"padding: 5px 18px 0px 0px;white-space:pre;font-weight:bold;\">";
 const QString C_SyvDaItPaImportReport::mhc_HTML_TABLE_DATA_START =
    "<td align=\"left\" valign=\"top\" style=\"padding: 0px 18px 0px 0px;white-space:pre;\">";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -63,10 +55,8 @@ const QString C_SyvDaItPaImportReport::mhc_HTML_TABLE_DATA_START =
    \param[in]     orc_Id           Selected element ID
    \param[in]     ou32_ValidLayers Number of valid layers in selected element ID
    \param[in]     orc_Path         Selected file path
-
-   \created     16.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaImportReport::C_SyvDaItPaImportReport(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
                                                  const std::vector<C_OSCParamSetInterpretedNode> & orc_Data,
                                                  const std::vector<C_OSCNodeDataPoolListElementId> & orc_ElementIds,
@@ -93,25 +83,19 @@ C_SyvDaItPaImportReport::C_SyvDaItPaImportReport(stw_opensyde_gui_elements::C_Og
    connect(this->mpc_Ui->pc_PushButtonCancel, &QPushButton::clicked, this, &C_SyvDaItPaImportReport::m_CancelClicked);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     16.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaImportReport::~C_SyvDaItPaImportReport(void)
 {
    delete this->mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     16.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImportReport::InitStaticNames(void) const
 {
    this->mrc_ParentDialog.SetTitle(C_GtGetText::h_GetText("Load Parameter Set File"));
@@ -121,16 +105,13 @@ void C_SyvDaItPaImportReport::InitStaticNames(void) const
    this->mpc_Ui->pc_PushButtonCancel->setText(C_GtGetText::h_GetText("Cancel"));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get results
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get results
 
    \param[out] orc_OutputListIds Element IDs to replace
    \param[out] orc_OutputContent Content to replace items with
-
-   \created     16.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImportReport::GetOutput(std::vector<C_OSCNodeDataPoolListElementId> & orc_OutputListIds,
                                         std::vector<C_OSCNodeDataPoolContent> & orc_OutputContent) const
 {
@@ -138,17 +119,14 @@ void C_SyvDaItPaImportReport::GetOutput(std::vector<C_OSCNodeDataPoolListElement
    orc_OutputContent = this->mc_OutputContent;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     16.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImportReport::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
@@ -174,37 +152,28 @@ void C_SyvDaItPaImportReport::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Ok button click
-
-   \created     16.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Ok button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImportReport::m_OkClicked(void)
 {
    this->mrc_ParentDialog.accept();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Cancel button click
-
-   \created     16.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Cancel button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImportReport::m_CancelClicked(void)
 {
    this->mrc_ParentDialog.reject();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set report content
-
-   \created     16.10.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set report content
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImportReport::m_SetReport(void)
 {
    QString c_CompleteLog;
@@ -220,15 +189,12 @@ void C_SyvDaItPaImportReport::m_SetReport(void)
    this->mpc_Ui->textBrowser->setHtml(c_CompleteLog);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle source file information
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle source file information
 
    \param[in,out] orc_Text Text to append to
-
-   \created     16.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImportReport::m_HandleSourceFileInformation(QString & orc_Text) const
 {
    uint32 u32_NodeCount = 0UL;
@@ -275,15 +241,12 @@ void C_SyvDaItPaImportReport::m_HandleSourceFileInformation(QString & orc_Text) 
    orc_Text += "</td></tr></table>";
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle parsing information
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle parsing information
 
    \param[in,out] orc_Text Text to append to
-
-   \created     16.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImportReport::m_HandleParsing(QString & orc_Text)
 {
    QString c_TableApplyContent;
@@ -408,9 +371,8 @@ void C_SyvDaItPaImportReport::m_HandleParsing(QString & orc_Text)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Parse for interpreted file content to get table content
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Parse for interpreted file content to get table content
 
    \param[in,out] orc_TableApplyContent    Content for table in apply section
    \param[in,out] orc_TableMismatchContent Content for table in mismatch section
@@ -418,10 +380,8 @@ void C_SyvDaItPaImportReport::m_HandleParsing(QString & orc_Text)
    \param[in,out] oru32_TableApplyCount    Number of entries in table in apply section
    \param[in,out] oru32_TableMismatchCount Number of entries in table in mismatch section
    \param[in,out] oru32_TableRemainCount   Number of entries in table in remain section
-
-   \created     16.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImportReport::m_PrepareTableContent(QString & orc_TableApplyContent, QString & orc_TableMismatchContent,
                                                     QString & orc_TableRemainContent, uint32 & oru32_TableApplyCount,
                                                     uint32 & oru32_TableMismatchCount, uint32 & oru32_TableRemainCount)
@@ -557,19 +517,16 @@ void C_SyvDaItPaImportReport::m_PrepareTableContent(QString & orc_TableApplyCont
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Append entry to table
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Append entry to table
 
    \param[in,out] orc_TableContent Table content to append entry to
    \param[in,out] oru32_TableCount Current number of entries in table
    \param[in]     orc_Id           ID of element to append to table
    \param[in]     orc_Value        Value as string
    \param[in]     orc_Reason       Optional reason for discarding
-
-   \created     16.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImportReport::m_AppendTableEntry(QString & orc_TableContent, uint32 & oru32_TableCount,
                                                  const C_OSCNodeDataPoolListElementId & orc_Id,
                                                  const QString & orc_Value, const QString & orc_Reason) const
@@ -617,18 +574,15 @@ void C_SyvDaItPaImportReport::m_AppendTableEntry(QString & orc_TableContent, uin
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get filter name for index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get filter name for index
 
    \param[in] ou32_Value Index to get filter for
 
    \return
    Get Name for current filter
-
-   \created     16.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaItPaImportReport::m_GetFilter(const uint32 ou32_Value) const
 {
    QString c_Retval;

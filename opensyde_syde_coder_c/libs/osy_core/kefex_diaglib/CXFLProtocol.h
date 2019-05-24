@@ -1,19 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       header for class C_XFLProtocol
 
    Encapsulate STW flashloader services.
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     xx.xx.1999  STW/O.Kemmer
-   \endimplementation
+   \copyright   Copyright 1999 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CXFLPROTOCOLH
 #define CXFLPROTOCOLH
 
@@ -267,7 +261,6 @@ protected:
                                    const stw_types::uint32 ou32_InterFrameDelayUs,
                                    const stw_types::uint32 ou32_TimeOut);
 
-
    stw_types::sint32 m_CANSendMessage(void);
    stw_types::sint32 m_CANSendMessage(const stw_can::T_STWCAN_Msg_TX & orc_MSG);
    stw_types::sint32 m_CANGetResponse(stw_can::T_STWCAN_Msg_RX & orc_MSG);
@@ -338,7 +331,6 @@ public:
                                       const stw_types::uint32 ou32_InterFrameDelayUs,
                                       stw_types::uint32 & oru32_NumBytesSent, stw_hex_file::C_HexFile & orc_HexFile,
                                       const stw_types::uint32 ou32_TimeOut = TIMEOUT_FLASH_MS);
-
 
    //Utility functions:
    stw_types::sint32 SendFLASH(const stw_types::uint32 ou32_StartTimeMs, const stw_types::uint8 ou8_FLASHIntervalMs);

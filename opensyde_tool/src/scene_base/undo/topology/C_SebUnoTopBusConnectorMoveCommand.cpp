@@ -1,59 +1,49 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Move / change bus connector undo command (implementation)
 
    Move / change bus connector undo command
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     05.12.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
 #include "C_SebUnoTopBusConnectorMoveCommand.h"
 #include "C_GiLiBusConnectorBase.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
 using namespace std;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Scene         Pointer to currently active scene
    \param[in]     orc_IDs           Affected unique IDs
    \param[in]     orc_InitialPoints Point state before move
    \param[in]     orc_FinalPoints   Point state after move
    \param[in,out] opc_Parent        Optional pointer to parent
-
-   \created     05.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoTopBusConnectorMoveCommand::C_SebUnoTopBusConnectorMoveCommand(QGraphicsScene * const opc_Scene,
                                                                        const vector<uint64> & orc_IDs,
                                                                        const vector<QPointF> & orc_InitialPoints,
@@ -65,16 +55,13 @@ C_SebUnoTopBusConnectorMoveCommand::C_SebUnoTopBusConnectorMoveCommand(QGraphics
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy constructor
 
    \param[in]     opc_Prev   Original command
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     06.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoTopBusConnectorMoveCommand::C_SebUnoTopBusConnectorMoveCommand(
    const C_SebUnoTopBusConnectorMoveCommand * const opc_Prev, QUndoCommand * const opc_Parent) :
    C_SebUnoBaseCommand(opc_Prev, opc_Parent),
@@ -83,24 +70,18 @@ C_SebUnoTopBusConnectorMoveCommand::C_SebUnoTopBusConnectorMoveCommand(
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     05.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoTopBusConnectorMoveCommand::~C_SebUnoTopBusConnectorMoveCommand(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Undo move
-
-   \created     05.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Undo move
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoTopBusConnectorMoveCommand::undo(void)
 {
    vector<QGraphicsItem *> c_Items = m_GetSceneItems();
@@ -116,13 +97,10 @@ void C_SebUnoTopBusConnectorMoveCommand::undo(void)
    QUndoCommand::undo();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Redo move
-
-   \created     05.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Redo move
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoTopBusConnectorMoveCommand::redo(void)
 {
    vector<QGraphicsItem *> c_Items = m_GetSceneItems();

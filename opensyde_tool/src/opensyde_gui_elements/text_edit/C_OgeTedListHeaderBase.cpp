@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Text edit for list header (implementation)
 
    Text edit for list header
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     18.01.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QHelpEvent>
@@ -24,36 +17,33 @@
 #include "C_Uti.h"
 #include "constants.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QFont C_OgeTedListHeaderBase::mhc_Font = mc_STYLE_GUIDE_FONT_REGULAR_12;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     17.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeTedListHeaderBase::C_OgeTedListHeaderBase(QWidget * const opc_Parent) :
    C_OgeTedContextMenuBase(opc_Parent),
    mq_JustGotFocus(false),
@@ -62,30 +52,24 @@ C_OgeTedListHeaderBase::C_OgeTedListHeaderBase(QWidget * const opc_Parent) :
    this->installEventFilter(this);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     18.08.2017  STW/Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeTedListHeaderBase::~C_OgeTedListHeaderBase(void)
 {
    delete mpc_ToolTip;
    mpc_ToolTip = NULL;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten focus in event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten focus in event slot
 
    Here: Signal, revert text and remember
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     18.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTedListHeaderBase::focusInEvent(QFocusEvent * const opc_Event)
 {
    QTextEdit::focusInEvent(opc_Event);
@@ -94,17 +78,14 @@ void C_OgeTedListHeaderBase::focusInEvent(QFocusEvent * const opc_Event)
    mq_JustGotFocus = true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse press event slot
 
    Here: Select all if necessary
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     18.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTedListHeaderBase::mousePressEvent(QMouseEvent * const opc_Event)
 {
    QTextEdit::mousePressEvent(opc_Event);
@@ -115,17 +96,14 @@ void C_OgeTedListHeaderBase::mousePressEvent(QMouseEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten focus in event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten focus in event slot
 
    Here: Signal and reduce text
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     18.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTedListHeaderBase::focusOutEvent(QFocusEvent * const opc_Event)
 {
    QTextEdit::focusOutEvent(opc_Event);
@@ -134,9 +112,8 @@ void C_OgeTedListHeaderBase::focusOutEvent(QFocusEvent * const opc_Event)
    Q_EMIT this->SigEditFinished();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten default event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten default event slot
 
    Here: Handle tool tip
 
@@ -145,10 +122,8 @@ void C_OgeTedListHeaderBase::focusOutEvent(QFocusEvent * const opc_Event)
    \return
    True  Event was recognized and processed
    False Event ignored
-
-   \created     18.01.2017  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OgeTedListHeaderBase::event(QEvent * const opc_Event)
 {
    if (opc_Event->type() == QEvent::ToolTip)
@@ -193,28 +168,22 @@ bool C_OgeTedListHeaderBase::event(QEvent * const opc_Event)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get complete text (text edit may contain only reduced comment)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get complete text (text edit may contain only reduced comment)
 
    \return
    Complete user comment
-
-   \created     20.01.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_OgeTedListHeaderBase::GetFullText(void) const
 {
    return mc_CompleteText;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save complete comment and replace by one line only
-
-   \created     20.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save complete comment and replace by one line only
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTedListHeaderBase::HideFullText(const bool oq_CheckForNewText)
 {
    sintn sn_CharCount = 0;
@@ -249,13 +218,10 @@ void C_OgeTedListHeaderBase::HideFullText(const bool oq_CheckForNewText)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reinsert complete comment
-
-   \created     20.01.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reinsert complete comment
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTedListHeaderBase::m_ShowFullText(void)
 {
    this->setText(mc_CompleteText);

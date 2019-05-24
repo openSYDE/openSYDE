@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Tab widget with tool tip (implementation)
 
    Tab widget with tool tip
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     27.03.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QEvent>
@@ -24,32 +17,29 @@
 #include <QHelpEvent>
 #include "C_OgeTawToolTipBase.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     27.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeTawToolTipBase::C_OgeTawToolTipBase(QWidget * const opc_Parent) :
    QTabWidget(opc_Parent),
    mpc_ToolTip(NULL),
@@ -57,30 +47,24 @@ C_OgeTawToolTipBase::C_OgeTawToolTipBase(QWidget * const opc_Parent) :
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     18.08.2017  STW/Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeTawToolTipBase::~C_OgeTawToolTipBase()
 {
    delete mpc_ToolTip;
    mpc_ToolTip = NULL;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set tool tip
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set tool tip
 
    \param[in] ou32_Index  Tab index (ID)
    \param[in] orc_Heading Tool tip heading
    \param[in] orc_Content Tool tip content
-
-   \created     28.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTawToolTipBase::SetToolTipInformation(const stw_types::uint32 ou32_Index, const QString & orc_Heading,
                                                 const QString & orc_Content)
 {
@@ -91,26 +75,22 @@ void C_OgeTawToolTipBase::SetToolTipInformation(const stw_types::uint32 ou32_Ind
    this->mc_ToolTips[static_cast<stw_types::sint32>(ou32_Index)] = c_ToolTip;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten mouse move event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse move event slot
 
    Here: Handle tooltip if necessary
 
    \param[in,out] opc_Event Event identification and information
-
-   \created     26.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTawToolTipBase::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
    QTabWidget::mouseMoveEvent(opc_Event);
    m_HandleMouseMoveToolTip(opc_Event->globalPos());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten default event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten default event slot
 
    Here: Handle tool tip
 
@@ -119,10 +99,8 @@ void C_OgeTawToolTipBase::mouseMoveEvent(QMouseEvent * const opc_Event)
    \return
    True  Event was recognized and processed
    False Event ignored
-
-   \created     26.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_OgeTawToolTipBase::event(QEvent * const opc_Event)
 {
    bool q_Return;
@@ -165,35 +143,35 @@ bool C_OgeTawToolTipBase::event(QEvent * const opc_Event)
                }
                else
                {
-                  m_HideTooltip();
+                  m_HideToolTip();
 
                   q_Return = QTabWidget::event(opc_Event);
                }
             }
             else
             {
-               m_HideTooltip();
+               m_HideToolTip();
 
                q_Return = QTabWidget::event(opc_Event);
             }
          }
          else
          {
-            m_HideTooltip();
+            m_HideToolTip();
 
             q_Return = QTabWidget::event(opc_Event);
          }
       }
       else
       {
-         m_HideTooltip();
+         m_HideToolTip();
 
          q_Return = QTabWidget::event(opc_Event);
       }
    }
    else if (opc_Event->type() == QEvent::Leave)
    {
-      m_HideTooltip();
+      m_HideToolTip();
 
       q_Return = QTabWidget::event(opc_Event);
    }
@@ -204,14 +182,11 @@ bool C_OgeTawToolTipBase::event(QEvent * const opc_Event)
    return q_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Hide tooltip
-
-   \created     28.03.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Hide tooltip
 */
-//-----------------------------------------------------------------------------
-void C_OgeTawToolTipBase::m_HideTooltip()
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeTawToolTipBase::m_HideToolTip()
 {
    if (this->mpc_ToolTip != NULL)
    {
@@ -222,15 +197,12 @@ void C_OgeTawToolTipBase::m_HideTooltip()
    this->setMouseTracking(false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Handle mouse move (tool tip related)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle mouse move (tool tip related)
 
    \param[in] orc_GlobalPos Global mouse pos
-
-   \created     28.03.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeTawToolTipBase::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos)
 {
    if (this->ms32_CurrentHoveredIndex >= 0)
@@ -242,13 +214,13 @@ void C_OgeTawToolTipBase::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos)
          if (s32_TabIndex != this->ms32_CurrentHoveredIndex)
          {
             //Hide Tooltip
-            m_HideTooltip();
+            m_HideToolTip();
          }
       }
       else
       {
          //Hide Tooltip
-         m_HideTooltip();
+         m_HideToolTip();
       }
    }
 }

@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Label with custom context menu (implementation)
 
@@ -8,17 +7,11 @@
    This is only needed for labels with text interaction flag
    Qt::TextSelectableByMouse.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     29.06.2018  STW/G.Scupin
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QApplication>
@@ -28,34 +21,31 @@
 #include "stwtypes.h"
 #include "C_GtGetText.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_types;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     29.06.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeLabContextMenuBase::C_OgeLabContextMenuBase(QWidget * const opc_Parent) :
    QLabel(opc_Parent),
    mpc_ContextMenu(NULL)
@@ -63,13 +53,10 @@ C_OgeLabContextMenuBase::C_OgeLabContextMenuBase(QWidget * const opc_Parent) :
    m_InitContextMenu();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize custom context menu functionality
-
-   \created     29.06.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize custom context menu functionality
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeLabContextMenuBase::m_InitContextMenu(void)
 {
    this->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -78,13 +65,10 @@ void C_OgeLabContextMenuBase::m_InitContextMenu(void)
            &C_OgeLabContextMenuBase::m_OnCustomContextMenuRequested);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Setup context menu entries
-
-   \created     29.06.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Setup context menu entries
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeLabContextMenuBase::m_SetupContextMenu(void)
 {
    // reset to empty menu
@@ -104,15 +88,12 @@ void C_OgeLabContextMenuBase::m_SetupContextMenu(void)
                                     static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_A));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Show custom context menu
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Show custom context menu
 
    \param[in] orc_Pos Local context menu position
-
-   \created     29.06.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeLabContextMenuBase::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 {
    // show context menu only if selectable
@@ -125,15 +106,12 @@ void C_OgeLabContextMenuBase::m_OnCustomContextMenuRequested(const QPoint & orc_
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy the selected text to clipboard.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy the selected text to clipboard.
 
    QLabel has no copy action.
-
-   \created     29.06.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeLabContextMenuBase::m_Copy() const
 {
    QClipboard * const pc_Clipboard = QApplication::clipboard();
@@ -141,15 +119,12 @@ void C_OgeLabContextMenuBase::m_Copy() const
    pc_Clipboard->setText(this->selectedText());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Select the hole text of the label.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Select the hole text of the label.
 
    QLabel has no selectAll action.
-
-   \created     29.06.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeLabContextMenuBase::m_SelectAll()
 {
    this->setSelection(0, this->text().length());

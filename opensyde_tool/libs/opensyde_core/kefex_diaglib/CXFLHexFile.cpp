@@ -1,6 +1,3 @@
-//14.07.09  AST   use C_SCLString instead of AnsiString to become more target independent
-//16.07.08  AST   Added ::CalcFileChecksum
-
 #include "precomp_headers.h" //pre-compiled headers
 #ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -33,8 +30,6 @@ using namespace stw_tgl;
 
    \return
    Textual representation of error.
-
-   \created     xx.xx.20xx  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_SCLString C_XFLHexFile::ErrorCodeToErrorText(const uint32 ou32_ErrorCode) const
@@ -92,8 +87,6 @@ C_SCLString C_XFLHexFile::ErrorCodeToErrorText(const uint32 ou32_ErrorCode) cons
    \return
    C_NO_ERR     everything OK (data in oat_InfoBlocks); but maybe there are 0 blocks
    C_NOACT      if oq_ExactAddressMatch: no block found at specified address
-
-   \created     11.07.2008  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_XFLHexFile::GetECUInformationBlocks(SCLDynamicArray<C_XFLECUInformation> & orc_InfoBlocks,
@@ -227,8 +220,6 @@ sint32 C_XFLHexFile::GetECUInformationBlocks(SCLDynamicArray<C_XFLECUInformation
    \return
    C_NO_ERR      checksum calculated
    C_CONFIG      error
-
-   \created     16.07.2008  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 sint32 C_XFLHexFile::CalcFileChecksum(uint32 & oru32_Checksum)

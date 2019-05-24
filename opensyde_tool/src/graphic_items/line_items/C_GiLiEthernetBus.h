@@ -1,21 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Ethernet bus (header)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     17.08.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_GILIETHERNETBUS_H
 #define C_GILIETHERNETBUS_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QGraphicsItem>
 
 #include "stwtypes.h"
@@ -23,12 +17,12 @@
 #include "C_OSCSystemBus.h"
 #include "C_GiLiBus.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_GiLiEthernetBus :
    public C_GiLiBus
@@ -41,6 +35,7 @@ public:
 
    virtual stw_types::sintn type() const override;
    virtual bool OpenStyleDialog(void);
+   virtual void CopyStyle(const QGraphicsItem * const opc_GuidelineItem) override;
    virtual stw_opensyde_core::C_OSCSystemBus::E_Type GetType() const;
 
 private:
@@ -49,7 +44,7 @@ private:
    C_GiLiEthernetBus & operator =(const C_GiLiEthernetBus &);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

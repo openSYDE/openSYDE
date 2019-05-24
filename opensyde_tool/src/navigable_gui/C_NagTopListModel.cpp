@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Model for topology item list (implementation)
 
    Model for topology item list
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     31.07.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_SdUtil.h"
@@ -26,34 +19,31 @@
 #include "C_NagToolTip.h"
 #include "C_NagTopListModel.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     31.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_NagTopListModel::C_NagTopListModel(QObject * const opc_Parent) :
    QAbstractListModel(opc_Parent),
    ms32_Selected(-1),
@@ -61,29 +51,23 @@ C_NagTopListModel::C_NagTopListModel(QObject * const opc_Parent) :
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set item types are nodes flag
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set item types are nodes flag
 
    \param[in] oq_IsNode Flag if items are nodes
-
-   \created     01.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagTopListModel::SetTypeNode(const bool oq_IsNode)
 {
    this->mq_TypeNode = oq_IsNode;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update selected index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update selected index
 
    \param[in] os32_Selected Selected index (is any)
-
-   \created     31.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagTopListModel::SetSelectedIndex(const sint32 os32_Selected)
 {
    this->ms32_Selected = os32_Selected;
@@ -91,19 +75,16 @@ void C_NagTopListModel::SetSelectedIndex(const sint32 os32_Selected)
    {
       QVector<sintn> c_Roles;
       c_Roles.push_back(static_cast<sintn>(Qt::ForegroundRole));
-      Q_EMIT dataChanged(this->index(0, 0), this->index(this->rowCount() - 1, 0), c_Roles);
+      Q_EMIT this->dataChanged(this->index(0, 0), this->index(this->rowCount() - 1, 0), c_Roles);
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set list content
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set list content
 
    \param[in] orc_Content List content names
-
-   \created     31.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagTopListModel::SetContent(const std::vector<QString> & orc_Content)
 {
    this->beginResetModel();
@@ -111,15 +92,12 @@ void C_NagTopListModel::SetContent(const std::vector<QString> & orc_Content)
    this->endResetModel();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set list errors
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set list errors
 
    \param[in] orc_Error List error states
-
-   \created     31.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_NagTopListModel::SetError(const std::vector<bool> & orc_Error)
 {
    this->mc_Error = orc_Error;
@@ -127,22 +105,19 @@ void C_NagTopListModel::SetError(const std::vector<bool> & orc_Error)
    {
       QVector<sintn> c_Roles;
       c_Roles.push_back(static_cast<sintn>(Qt::DecorationRole));
-      Q_EMIT dataChanged(this->index(0, 0), this->index(this->rowCount() - 1, 0), c_Roles);
+      Q_EMIT this->dataChanged(this->index(0, 0), this->index(this->rowCount() - 1, 0), c_Roles);
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get table row count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get table row count
 
    \param[in] orc_Parent Parent
 
    \return
    Row count
-
-   \created     31.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_NagTopListModel::rowCount(const QModelIndex & orc_Parent) const
 {
    stw_types::sintn sn_Retval = 0;
@@ -153,19 +128,16 @@ sintn C_NagTopListModel::rowCount(const QModelIndex & orc_Parent) const
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data at index
 
    \param[in] orc_Index Index
    \param[in] osn_Role  Data role
 
    \return
    Data
-
-   \created     31.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_NagTopListModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
 {
    QVariant c_Retval;

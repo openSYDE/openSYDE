@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Common graphics scene with system view functionality (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     19.06.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QGraphicsView>
@@ -31,61 +24,52 @@
 #include "C_GtGetText.h"
 #include "C_OgeWiCustomMessage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in]     ou32_ViewIndex View index
    \param[in,out] opc_Parent     Optional pointer to parent
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvTopologyBaseScene::C_SyvTopologyBaseScene(const stw_types::uint32 ou32_ViewIndex, QObject * const opc_Parent) :
    C_SebTopologyBaseScene(opc_Parent),
    mu32_ViewIndex(ou32_ViewIndex)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvTopologyBaseScene::~C_SyvTopologyBaseScene()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load system definition
-
-   \created     28.06.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load system definition
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::Load(void)
 {
    bool q_Change = false;
@@ -161,32 +145,26 @@ void C_SyvTopologyBaseScene::Load(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy items to scene from copy paste manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy items to scene from copy paste manager
 
    \param[in] opc_Pos Optional position offset
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::CopyFromManagerToScene(const QPointF * const opc_Pos)
 {
    // Nothing to do yet
    Q_UNUSED(opc_Pos)
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if the graphics item is deletable on the scene
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if the graphics item is deletable on the scene
 
    \return
    true     Item is deletable
    false    Item is not deletable
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvTopologyBaseScene::IsItemDeletable(const QGraphicsItem * const opc_Item) const
 {
    Q_UNUSED(opc_Item)
@@ -195,17 +173,14 @@ bool C_SyvTopologyBaseScene::IsItemDeletable(const QGraphicsItem * const opc_Ite
    return false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if the graphics item is changeable in the zorder
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if the graphics item is changeable in the zorder
 
    \return
    true     Z order is changeable
    false    Z order is not changeable
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvTopologyBaseScene::IsZOrderChangeable(const QGraphicsItem * const opc_Item) const
 {
    Q_UNUSED(opc_Item)
@@ -214,17 +189,14 @@ bool C_SyvTopologyBaseScene::IsZOrderChangeable(const QGraphicsItem * const opc_
    return false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if the graphics item can be aligned
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if the graphics item can be aligned
 
    \return
    true     Item can be aligned
    false    Item can not be alined
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvTopologyBaseScene::IsAlignmentUsable(const QGraphicsItem * const opc_Item) const
 {
    Q_UNUSED(opc_Item)
@@ -233,58 +205,48 @@ bool C_SyvTopologyBaseScene::IsAlignmentUsable(const QGraphicsItem * const opc_I
    return false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Checking if the drag move over the scene can be used
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checking if the drag move over the scene can be used
 
    \return
    true     Drag move is available
    false    Drag move is available
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvTopologyBaseScene::IsSceneRubberBandAvailable(void) const
 {
    // no dragging here
    return false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current copy paste manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current copy paste manager
 
    \return
    NULL No copy paste manager
    Else Valid copy paste manager
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_opensyde_gui_logic::C_SebBaseCopyPasteManager * C_SyvTopologyBaseScene::m_GetCopyPasteManager(void)
 {
    return NULL;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current copy paste manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current copy paste manager
 
    \return
    NULL No copy paste manager
    Else Valid copy paste manager
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const stw_opensyde_gui_logic::C_SebBaseCopyPasteManager * C_SyvTopologyBaseScene::m_GetCopyPasteManagerConst(void) const
 {
    return NULL;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get specific CAN bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get specific CAN bus
 
    \param[in]     ors32_Index          Index of data element in system definition
    \param[in]     oru64_ID             Unique ID
@@ -294,10 +256,8 @@ const stw_opensyde_gui_logic::C_SebBaseCopyPasteManager * C_SyvTopologyBaseScene
 
    \return
    Specific CAN bus
-
-   \created     15.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiLiCANBus * C_SyvTopologyBaseScene::m_CreateCANBus(const sint32 & ors32_Index, const uint64 & oru64_ID,
                                                       C_GiTextElementBus * const opc_TextElementName,
                                                       const std::vector<QPointF> * const opc_Points,
@@ -306,9 +266,8 @@ C_GiLiCANBus * C_SyvTopologyBaseScene::m_CreateCANBus(const sint32 & ors32_Index
    return new C_GiSvCANBus(this->mu32_ViewIndex, ors32_Index, oru64_ID, opc_TextElementName, opc_Points, opc_Parent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get specific ethernet bus
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get specific ethernet bus
 
    \param[in]     ors32_Index          Index of data element in system definition
    \param[in]     oru64_ID             Unique ID
@@ -318,10 +277,8 @@ C_GiLiCANBus * C_SyvTopologyBaseScene::m_CreateCANBus(const sint32 & ors32_Index
 
    \return
    Specific ethernet bus
-
-   \created     15.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiLiEthernetBus * C_SyvTopologyBaseScene::m_CreateEthernetBus(const sint32 & ors32_Index, const uint64 & oru64_ID,
                                                                 C_GiTextElementBus * const opc_TextElementName,
                                                                 const std::vector<QPointF> * const opc_Points,
@@ -331,32 +288,26 @@ C_GiLiEthernetBus * C_SyvTopologyBaseScene::m_CreateEthernetBus(const sint32 & o
                                 opc_Parent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get specific bus text element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get specific bus text element
 
    \param[in]       ors32_Index          Index of data element in system definition
    \param[in]       oru64_ID             Unique ID
    \param[in,out]   opc_parent           Optional pointer to parent
-
-   \created     15.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiTextElementBus * C_SyvTopologyBaseScene::m_CreateBusTextElement(const sint32 & ors32_Index, const uint64 & oru64_ID,
                                                                     QGraphicsItem * const opc_Parent)
 {
    return new C_GiSvTextElementBus(ors32_Index, oru64_ID, opc_Parent);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new bus to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new bus to scene and connect signals
 
    \param[in,out] opc_BusGraphicsItem Pointer to new bus
-
-   \created     26.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::m_AddBusToScene(C_GiLiBus * const opc_BusGraphicsItem)
 {
    C_SebTopologyBaseScene::m_AddBusToScene(opc_BusGraphicsItem);
@@ -366,15 +317,12 @@ void C_SyvTopologyBaseScene::m_AddBusToScene(C_GiLiBus * const opc_BusGraphicsIt
    opc_BusGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new bus connector to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new bus connector to scene and connect signals
 
    \param[in,out] opc_BusConnectorGraphicsItem Connector item
-
-   \created     14.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::m_AddBusConnectorToScene(C_GiLiBusConnector * const opc_BusConnectorGraphicsItem)
 {
    if (opc_BusConnectorGraphicsItem != NULL)
@@ -386,15 +334,12 @@ void C_SyvTopologyBaseScene::m_AddBusConnectorToScene(C_GiLiBusConnector * const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new text element to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new text element to scene and connect signals
 
    \param[in,out] opc_Item  Text element
-
-   \created     04.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::m_AddTextElementToScene(C_GiBiTextElement * const opc_Item)
 {
    C_SebTopologyBaseScene::m_AddTextElementToScene(opc_Item);
@@ -404,15 +349,12 @@ void C_SyvTopologyBaseScene::m_AddTextElementToScene(C_GiBiTextElement * const o
    opc_Item->setFlag(QGraphicsItem::ItemIsSelectable, false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new line arrow to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new line arrow to scene and connect signals
 
    \param[in,out] opc_Item Line arrow item
-
-   \created     27.10.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::m_AddLineArrowToScene(C_GiBiArrow * const opc_Item)
 {
    C_SebTopologyBaseScene::m_AddLineArrowToScene(opc_Item);
@@ -422,15 +364,12 @@ void C_SyvTopologyBaseScene::m_AddLineArrowToScene(C_GiBiArrow * const opc_Item)
    opc_Item->setFlag(QGraphicsItem::ItemIsSelectable, false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new boundary to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new boundary to scene and connect signals
 
    \param[in,out] opc_Item  Boundary item
-
-   \created     27.10.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::m_AddBoundaryToScene(C_GiBiBoundary * const opc_Item)
 {
    C_SebTopologyBaseScene::m_AddBoundaryToScene(opc_Item);
@@ -439,15 +378,12 @@ void C_SyvTopologyBaseScene::m_AddBoundaryToScene(C_GiBiBoundary * const opc_Ite
    opc_Item->SetDefaultCursor(Qt::ArrowCursor);
    opc_Item->setFlag(QGraphicsItem::ItemIsSelectable, false);
 }
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new image to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new image to scene and connect signals
 
    \param[in,out] opc_Item  Image group item
-
-   \created     08.11.2016  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::m_AddImageGroupToScene(C_GiBiImageGroup * const opc_Item)
 {
    C_SebTopologyBaseScene::m_AddImageGroupToScene(opc_Item);
@@ -457,15 +393,12 @@ void C_SyvTopologyBaseScene::m_AddImageGroupToScene(C_GiBiImageGroup * const opc
    opc_Item->setFlag(QGraphicsItem::ItemIsSelectable, false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new rectangle based item to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new rectangle based item to scene and connect signals
 
    \param[in,out] opc_Item Rectangle based item
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::m_AddRectBaseGroupToScene(C_GiBiRectBaseGroup * const opc_Item)
 {
    C_SebTopologyBaseScene::m_AddRectBaseGroupToScene(opc_Item);
@@ -474,15 +407,12 @@ void C_SyvTopologyBaseScene::m_AddRectBaseGroupToScene(C_GiBiRectBaseGroup * con
    opc_Item->SetDefaultCursor(Qt::ArrowCursor);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new line based item to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new line based item to scene and connect signals
 
    \param[in,out] opc_Item  Line based item
-
-   \created     22.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::m_AddLineGroupToScene(C_GiLiLineGroup * const opc_Item)
 {
    C_SebTopologyBaseScene::m_AddLineGroupToScene(opc_Item);
@@ -492,23 +422,19 @@ void C_SyvTopologyBaseScene::m_AddLineGroupToScene(C_GiLiLineGroup * const opc_I
    opc_Item->setFlag(QGraphicsItem::ItemIsSelectable, false);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new PC bus connector item to scene and connect signals
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new PC bus connector item to scene and connect signals
 
    \param[in,out] opc_PcBusConnectorGraphicsItem  PC bus connector item
-
-   \created     03.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::m_AddPcBusConnectorToScene(C_GiSvPcBusConnector * const opc_PcBusConnectorGraphicsItem)
 {
    m_AddBusConnectorBaseToScene(opc_PcBusConnectorGraphicsItem);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add data from mime data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add data from mime data
 
    \param[in] opc_MimeData Mime data to add to scene
    \param[in] orc_Position Position to add data at
@@ -516,10 +442,8 @@ void C_SyvTopologyBaseScene::m_AddPcBusConnectorToScene(C_GiSvPcBusConnector * c
    \return
    true: Item was added
    false: No item was added
-
-   \created     19.06.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvTopologyBaseScene::m_AddOfMime(const QMimeData * const opc_MimeData, const QPointF & orc_Position)
 {
    // Nothing to do
@@ -529,41 +453,32 @@ bool C_SyvTopologyBaseScene::m_AddOfMime(const QMimeData * const opc_MimeData, c
    return false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy items
-
-   \created     19.06.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy items
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::m_Copy(void)
 {
    // Nothing to do
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Cut items
-
-   \created     19.06.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Cut items
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::m_Cut(void)
 {
    // Nothing to do
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check active busses
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check active busses
 
    \return
    NULL No active bus
    Else Active bus
-
-   \created     03.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiLiBus * C_SyvTopologyBaseScene::m_CheckBusState(void) const
 {
    C_GiLiBus * pc_Retval = NULL;
@@ -613,16 +528,13 @@ C_GiLiBus * C_SyvTopologyBaseScene::m_CheckBusState(void) const
    return pc_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add PC - bus connection item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add PC - bus connection item
 
    \param[in]     opc_Bus Bus item
    \param[in,out] opc_Pc  PC item
-
-   \created     04.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvTopologyBaseScene::m_AddPcBusConnector(const C_GiLiBus * const opc_Bus, C_GiBiConnectableItem * const opc_Pc,
                                                  const C_PuiBsLineBase & orc_LineData)
 {
@@ -652,19 +564,16 @@ void C_SyvTopologyBaseScene::m_AddPcBusConnector(const C_GiLiBus * const opc_Bus
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get initial connection point for any graphics item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get initial connection point for any graphics item
 
    \param[in] opc_Item Any graphics item
 
    \return
    (0.0,0.0) Default
    Else      Bottom center of graphics item
-
-   \created     04.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QPointF C_SyvTopologyBaseScene::mh_GetInitialConnectionPoint(const QGraphicsItem * const opc_Item)
 {
    QPointF c_Retval(0.0, 0.0);
@@ -676,9 +585,8 @@ QPointF C_SyvTopologyBaseScene::mh_GetInitialConnectionPoint(const QGraphicsItem
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if PC bus reconnection necessary
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if PC bus reconnection necessary
 
    \param[out] orc_BusName    - Name of the new connected bus
                               - Empty string if no new bus found
@@ -686,10 +594,8 @@ QPointF C_SyvTopologyBaseScene::mh_GetInitialConnectionPoint(const QGraphicsItem
    \return
    True  PC bus connection reconnected (Emit change necessary)
    False No change
-
-   \created     04.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvTopologyBaseScene::m_HandlePcReconnectIfNecessary(QString & orc_BusName)
 {
    bool q_Retval = false;

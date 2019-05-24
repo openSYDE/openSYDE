@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Properties dialog for node properties
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.01.2017  STW/S.Singer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QCheckBox>
@@ -43,7 +36,7 @@
 #include "C_OgeLabNodePropComIfTable.h"
 #include "C_OgeWiCustomMessage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_errors;
 using namespace stw_opensyde_core;
@@ -54,7 +47,7 @@ using namespace stw_types;
 using namespace stw_scl;
 using namespace stw_tgl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const uint16 mu16_NODE_IMG_WIDTH = 300;
 
 const uint8 mu8_FL_INDEX_OS = 0;
@@ -64,28 +57,25 @@ const uint8 mu8_FL_INDEX_NOSUPPORT = 2;
 const stw_types::sint32 C_SdNdeNodePropertiesWidget::mhs32_PR_INDEX_DISABLED = 0;
 const stw_types::sint32 C_SdNdeNodePropertiesWidget::mhs32_PR_INDEX_ENABLED = 1;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent  Reference to parent
    \param[in]     orc_Name    Name of the bus for the title
-
-   \created     12.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeNodePropertiesWidget::C_SdNdeNodePropertiesWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeNodePropertiesWidget),
@@ -131,6 +121,9 @@ C_SdNdeNodePropertiesWidget::C_SdNdeNodePropertiesWidget(QWidget * const opc_Par
    this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeaderItem(static_cast<sintn> (
                                                                       C_SdNdeComIfSettingsTableDelegate::eCONNECTION))->
    setTextAlignment(static_cast<sintn> (Qt::AlignLeft));
+
+   //set min column width (necessary for "Linked to..." strech column
+   this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeader()->setMinimumSectionSize(75);
 
    //setup column size mode and size
    this->mpc_Ui->pc_TableWidgetComIfSettings->horizontalHeader()->setSectionResizeMode(static_cast<sintn> (
@@ -201,27 +194,21 @@ C_SdNdeNodePropertiesWidget::C_SdNdeNodePropertiesWidget(QWidget * const opc_Par
            &C_SdNdeNodePropertiesWidget::m_SupportedProtocolChange);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     12.08.2016  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeNodePropertiesWidget::~C_SdNdeNodePropertiesWidget(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     28.09.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
 {
    QString c_InterfaceString;
@@ -293,13 +280,14 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
                                                                "\n\nIf enabled, Data Blocks of type \"Programmable Application\" can be created."));
 
    this->mpc_Ui->pc_LabelProtocol->SetToolTipInformation(C_GtGetText::h_GetText("Protocol Support"),
-                                                         C_GtGetText::h_GetText("Type of flashloader and diagnostic server.\n"
-                                                                                "Options:\n"
-                                                                                "   - openSYDE: openSYDE Server and openSYDE Flashloader support\n"
-                                                                                "   - KEFEX: KEFEX server and STW Flashloader support\n"
-                                                                                "   - none: no STW protocol support (e.g.: 3rd party node)\n"
-                                                                                "\nSupported protocols defined in read only "
-                                                                                "*.syde_devdef file."));
+                                                         C_GtGetText::h_GetText(
+                                                            "Type of flashloader and diagnostic server.\n"
+                                                            "Options:\n"
+                                                            "   - openSYDE: openSYDE Server and openSYDE Flashloader support\n"
+                                                            "   - KEFEX: KEFEX server and STW Flashloader support\n"
+                                                            "   - none: no STW protocol support (e.g.: 3rd party node)\n"
+                                                            "\nSupported protocols defined in read only "
+                                                            "*.syde_devdef file."));
 
    this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipHeadingAt(sn_ColInterface, Qt::Horizontal,
                                                                   C_GtGetText::h_GetText("Interface"),
@@ -337,15 +325,6 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
                                                                      "a configuration for openSYDE tool, "
                                                                      "\nit is NOT configured on device."));
 
-   this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipHeadingAt(sn_ColRouting, Qt::Horizontal,
-                                                                  C_GtGetText::h_GetText("Routing"),
-                                                                  C_GtGetText::h_GetText(
-                                                                     "Is the openSYDE tool legitimated to use this "
-                                                                     "interface for diagnostic protocol routing? "
-                                                                     "\nUse cases: System Update and Dashboards. This "
-                                                                     "property is just a configuration for openSYDE tool, "
-                                                                     "\nit is NOT configured on device."));
-
    this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipHeadingAt(sn_ColDiagnostic, Qt::Horizontal,
                                                                   C_GtGetText::h_GetText("Diagnostic"),
                                                                   C_GtGetText::h_GetText(
@@ -354,32 +333,37 @@ void C_SdNdeNodePropertiesWidget::InitStaticNames(void) const
                                                                      "\nUse case: Dashboards. This property is just a "
                                                                      "configuration for openSYDE tool, "
                                                                      "\nit is NOT configured on device."));
+
+   this->mpc_Ui->pc_TableWidgetComIfSettings->SetToolTipHeadingAt(sn_ColRouting, Qt::Horizontal,
+                                                                  C_GtGetText::h_GetText("Routing"),
+                                                                  C_GtGetText::h_GetText(
+                                                                     "Is the openSYDE tool legitimated to use this "
+                                                                     "interface for diagnostic protocol routing? "
+                                                                     "\nAttention: This property is intended as additive "
+                                                                     "feature in addition to \"Update\" resp. \"Diagnostic\" "
+                                                                     "\nUse cases: System Update and Dashboards. This "
+                                                                     "property is just a configuration for openSYDE tool, "
+                                                                     "\nit is NOT configured on device."));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Selects the node name in the text edit for fast editing
-
-   \created     02.06.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Selects the node name in the text edit for fast editing
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodePropertiesWidget::SelectName(void) const
 {
    this->mpc_Ui->pc_LineEditNodeName->setFocus();
    this->mpc_Ui->pc_LineEditNodeName->selectAll();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Node ID setter
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Node ID setter
 
    Sets the private node id of widget
 
    \param[in]     ou32_NodeIndex         new node id
-
-   \created     24.02.2017  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodePropertiesWidget::SetNodeId(const uint32 ou32_NodeIndex)
 {
    this->mu32_NodeIndex = ou32_NodeIndex;
@@ -388,15 +372,12 @@ void C_SdNdeNodePropertiesWidget::SetNodeId(const uint32 ou32_NodeIndex)
    this->m_LoadFromData();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load node information
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load node information
 
    Load node information from core data using node index
-
-   \created     24.02.2017  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
 {
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
@@ -431,7 +412,6 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
 
       if (pc_DevDef != NULL)
       {
-         sintn sn_Height;
          QFileInfo c_FileInfo;
          bool q_FileExists;
          bool q_StwFlashloaderActive = false;
@@ -529,7 +509,7 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
          this->mpc_Ui->pc_DatapoolTypeImage->setPixmap(c_ImgNode);
 
          //load device type name
-         this->mpc_Ui->pc_LabelNodeType->setText(pc_DevDef->c_DeviceName.c_str());
+         this->mpc_Ui->pc_LabelNodeType->setText(pc_DevDef->GetDisplayName().c_str());
 
          //load nvm size
          this->mpc_Ui->pc_LabelNvmSizeValue->setText(QString::number(
@@ -560,14 +540,14 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
          this->mpc_Ui->pc_TableWidgetComIfSettings->setRowCount(static_cast<sintn> (pc_DevDef->u8_NumCanBusses) +
                                                                 static_cast<sintn> (pc_DevDef->u8_NumEthernetBusses));
 
-         //set new table max size (Header = 28 + row*40)
-         sn_Height = 28 + (static_cast<sintn> (this->mpc_Ui->
-                                               pc_TableWidgetComIfSettings->
-                                               rowCount()) * 40);
-
-         //Minimum is slightly off the optimal value (3 rows are visible)
-         this->mpc_Ui->pc_TableWidgetComIfSettings->setMinimumHeight(143);
-         this->mpc_Ui->pc_TableWidgetComIfSettings->setMaximumHeight(sn_Height);
+         {
+            //set new table max size (Header = 38 + row*40)
+            const sintn sn_MaxHeight = 38 + (this->mpc_Ui->pc_TableWidgetComIfSettings->rowCount() * 40);
+            //Minimum is slightly off the optimal value (3 rows are visible)
+            const sintn sn_MinHeight = 38 + (std::min(3, this->mpc_Ui->pc_TableWidgetComIfSettings->rowCount()) * 40);
+            this->mpc_Ui->pc_TableWidgetComIfSettings->setMinimumHeight(sn_MinHeight);
+            this->mpc_Ui->pc_TableWidgetComIfSettings->setMaximumHeight(sn_MaxHeight);
+         }
 
          //insert com ifs
          for (uint16 u16_ComIfCnt = 0;
@@ -852,19 +832,16 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
            &C_SdNdeNodePropertiesWidget::m_SupportedProtocolChange);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save ui data to node
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save ui data to node
 
    Is called from outside
       - on system definition save
       - on page change
 
    \return   false:
-
-   \created     24.02.2017  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodePropertiesWidget::SaveToData(void) const
 {
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
@@ -892,7 +869,17 @@ void C_SdNdeNodePropertiesWidget::SaveToData(void) const
          //save data
 
          //name
-         c_Name = this->mpc_Ui->pc_LineEditNodeName->text();
+         //Only accept new name if not in conflict
+         if (C_PuiSdHandler::h_GetInstance()->CheckNodeNameAvailable(
+                this->mpc_Ui->pc_LineEditNodeName->text().toStdString().c_str(), &this->mu32_NodeIndex, NULL))
+         {
+            c_Name = this->mpc_Ui->pc_LineEditNodeName->text();
+         }
+         else
+         {
+            //Restore previous name
+            c_Name = pc_Node->c_Properties.c_Name.c_str();
+         }
 
          //comment
          c_Comment = this->mpc_Ui->pc_TextEditComment->toPlainText();
@@ -1008,15 +995,12 @@ void C_SdNdeNodePropertiesWidget::SaveToData(void) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reacts on changing protocol
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reacts on changing protocol
 
    Adapts the visibility of the STW flashloader options button
-
-   \created     10.01.2019  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodePropertiesWidget::m_SupportedProtocolChange(void)
 {
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
@@ -1071,21 +1055,18 @@ void C_SdNdeNodePropertiesWidget::m_SupportedProtocolChange(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check node name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check node name
    - check input
    - show/hide invalid icon
-
-   \created     23.01.2017  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodePropertiesWidget::m_CheckNodeName(void)
 {
    //check
    const QString c_Text = this->mpc_Ui->pc_LineEditNodeName->text();
    const bool q_NameIsUnique = C_PuiSdHandler::h_GetInstance()->CheckNodeNameAvailable(
-      c_Text.toStdString().c_str(), &this->mu32_NodeIndex);
+      c_Text.toStdString().c_str(), &this->mu32_NodeIndex, NULL);
    const bool q_NameIsValid = C_OSCUtils::h_CheckValidCName(
       this->mpc_Ui->pc_LineEditNodeName->text().toStdString().c_str());
 
@@ -1114,29 +1095,23 @@ void C_SdNdeNodePropertiesWidget::m_CheckNodeName(void)
    Q_EMIT this->SigChanged();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Trim node name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trim node name
 
    Remove whitespaces at the beginning and end of the string
-
-   \created     23.01.2017  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodePropertiesWidget::m_TrimNodeName(void) const
 {
    this->mpc_Ui->pc_LineEditNodeName->setText(this->mpc_Ui->pc_LineEditNodeName->text().trimmed());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register Change
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register Change
 
    Function where ui elements register a change. Change will be sent via a signal
-
-   \created     23.01.2017  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodePropertiesWidget::m_RegisterChange(void)
 {
    SaveToData();
@@ -1144,32 +1119,67 @@ void C_SdNdeNodePropertiesWidget::m_RegisterChange(void)
    Q_EMIT this->SigChanged();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Register name change
-
-   \created     11.05.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register name change
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodePropertiesWidget::m_RegisterNameChange(void)
 {
-   m_TrimNodeName();
-   m_RegisterChange();
-   Q_EMIT this->SigNameChanged(this->mpc_Ui->pc_LineEditNodeName->text());
+   //This function can somehow be called twice, so ... let's avoid that!
+   static bool hq_InProgress = false;
+
+   if (hq_InProgress == false)
+   {
+      std::vector<stw_scl::C_SCLString> c_ExistingNames;
+      hq_InProgress = true;
+      if (C_PuiSdHandler::h_GetInstance()->CheckNodeNameAvailable(this->mpc_Ui->pc_LineEditNodeName->text().toStdString()
+                                                                  .
+                                                                  c_str(), &this->mu32_NodeIndex,
+                                                                  &c_ExistingNames) == false)
+      {
+         const QString c_Description = QString(C_GtGetText::h_GetText(
+                                                  "A node with the name \"%1\" already exists. Choose another name.")).
+                                       arg(this->mpc_Ui->pc_LineEditNodeName->text());
+         QString c_Details;
+         C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+         c_Message.SetHeading(C_GtGetText::h_GetText("Node naming"));
+         c_Message.SetDescription(c_Description);
+         c_Details.append(C_GtGetText::h_GetText("Used node names:\n"));
+         for (uint32 u32_ItExistingName = 0UL; u32_ItExistingName < c_ExistingNames.size(); ++u32_ItExistingName)
+         {
+            const C_SCLString & rc_Name = c_ExistingNames[u32_ItExistingName];
+            c_Details.append(QString("\"%1\"\n").arg(rc_Name.c_str()));
+         }
+         c_Message.SetDetails(c_Details);
+         c_Message.Execute();
+         //Restore previous name
+         {
+            const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+            if (pc_Node != NULL)
+            {
+               this->mpc_Ui->pc_LineEditNodeName->setText(pc_Node->c_Properties.c_Name.c_str());
+            }
+         }
+      }
+      else
+      {
+         m_TrimNodeName();
+         m_RegisterChange();
+         Q_EMIT this->SigNameChanged(this->mpc_Ui->pc_LineEditNodeName->text());
+      }
+      hq_InProgress = false;
+   }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check com interface id
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check com interface id
    - check input
    - valid/invalid text
 
    \param[in]     ou32_Row         Row
    \param[in]     ou32_Column      Column
-
-   \created     23.01.2017  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodePropertiesWidget::m_CheckComIfId(const uint32 ou32_Row, const uint32 ou32_Column) const
 {
    const sintn sn_ColNodeId = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eNODEID);
@@ -1286,18 +1296,15 @@ void C_SdNdeNodePropertiesWidget::m_CheckComIfId(const uint32 ou32_Row, const ui
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   m_IpAddressClick
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   m_IpAddressClick
    - check if ip cell is clicked
    - ...
 
    \param[in]     ou32_Row         Row
    \param[in]     ou32_Column      Column
-
-   \created     14.02.2018  STW/S.Singer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodePropertiesWidget::m_IpAddressClick(const uint32 ou32_Row, const uint32 ou32_Column)
 {
    const sintn sn_ColIpAddress = static_cast<sintn> (C_SdNdeComIfSettingsTableDelegate::eIPADDRESS);
@@ -1338,13 +1345,10 @@ void C_SdNdeNodePropertiesWidget::m_IpAddressClick(const uint32 ou32_Row, const 
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of flashloader options button
-
-   \created     07.12.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of flashloader options button
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodePropertiesWidget::m_FlashloaderOptions(void) const
 {
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);

@@ -1,63 +1,55 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Handle save'n load for user settings (implementation)
 
    Handle save'n load for user settings
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     15.07.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QFileInfo>
 #include <QDir>
+
 #include "stwerrors.h"
+#include "constants.h"
 #include "C_Uti.h"
 #include "C_UsFiler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_opensyde_gui_logic;
+using namespace stw_opensyde_gui;
 using namespace stw_scl;
 using namespace stw_types;
 using namespace stw_errors;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Constructor
-
-   \created     15.07.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_UsFiler::C_UsFiler(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save all user setting to default ini file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save all user setting to default ini file
 
    \param[in] orc_UserSettings  User settings to save
    \param[in] orc_Path          File path
@@ -68,10 +60,8 @@ C_UsFiler::C_UsFiler(void)
    C_NO_ERR: OK
    C_RANGE:  Parameter invalid
    C_NOACT:  File open failed
-
-   \created     15.07.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_UsFiler::h_Save(const C_UsHandler & orc_UserSettings, const QString & orc_Path,
                          const QString & orc_ActiveProject)
 {
@@ -111,9 +101,8 @@ sint32 C_UsFiler::h_Save(const C_UsHandler & orc_UserSettings, const QString & o
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load all values of ini file
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load all values of ini file
 
    If ini not existing set default values.
 
@@ -126,10 +115,8 @@ sint32 C_UsFiler::h_Save(const C_UsHandler & orc_UserSettings, const QString & o
    C_NO_ERR: OK
    C_RANGE:  Parameter invalid
    C_NOACT:  File open failed
-
-   \created     15.07.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_UsFiler::h_Load(C_UsHandler & orc_UserSettings, const QString & orc_Path, const QString & orc_ActiveProject)
 {
    sint32 s32_Retval;
@@ -166,19 +153,16 @@ sint32 C_UsFiler::h_Load(C_UsHandler & orc_UserSettings, const QString & orc_Pat
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save node part of user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save node part of user settings
 
    \param[in,out] orc_Ini         Ini handler
    \param[in]     orc_SectionName Section name
    \param[in]     orc_NodeIdBase  Node id base name
    \param[in]     orc_NodeName    Node name
    \param[in]     orc_Node        Node data
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_SaveNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionName, const QString & orc_NodeIdBase,
                             const QString & orc_NodeName, const C_UsNode & orc_Node)
 {
@@ -212,19 +196,16 @@ void C_UsFiler::mh_SaveNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save bus part of user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save bus part of user settings
 
    \param[in,out] orc_Ini         Ini handler
    \param[in]     orc_SectionName Section name
    \param[in]     orc_BusIdBase   Bus id base name
    \param[in]     orc_BusName     Bus name
    \param[in]     orc_Bus         Bus data
-
-   \created     27.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_SaveBus(C_SCLIniFile & orc_Ini, const QString & orc_SectionName, const QString & orc_BusIdBase,
                            const QString & orc_BusName, const C_UsCommunication & orc_Bus)
 {
@@ -264,19 +245,16 @@ void C_UsFiler::mh_SaveBus(C_SCLIniFile & orc_Ini, const QString & orc_SectionNa
                        c_SignalName.toStdString().c_str());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save datapool part of user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save datapool part of user settings
 
    \param[in,out] orc_Ini            Ini handler
    \param[in]     orc_SectionName    Section name
    \param[in]     orc_DatapoolIdBase Node datapool id base name
    \param[in]     orc_DatapoolName   Node datapool name
    \param[in]     orc_Datapool       Node datapool data
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_SaveDatapool(C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
                                 const QString & orc_DatapoolIdBase, const QString & orc_DatapoolName,
                                 const C_UsNodeDatapool & orc_Datapool)
@@ -376,19 +354,16 @@ void C_UsFiler::mh_SaveDatapool(C_SCLIniFile & orc_Ini, const QString & orc_Sect
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save node datapool list part of user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save node datapool list part of user settings
 
    \param[in,out] orc_Ini         Ini handler
    \param[in]     orc_SectionName Section name
    \param[in]     orc_ListIdBase  List id base name
    \param[in]     orc_ViewName    List name
    \param[in]     orc_View        List data
-
-   \created     16.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_SaveList(C_SCLIniFile & orc_Ini, const QString & orc_SectionName, const QString & orc_ListIdBase,
                             const QString & orc_ListName, const C_UsNodeDatapoolList & orc_List)
 {
@@ -411,24 +386,22 @@ void C_UsFiler::mh_SaveList(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save view part of user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save view part of user settings
 
    \param[in,out] orc_Ini         Ini handler
    \param[in]     orc_SectionName Section name
    \param[in]     orc_ViewIdBase  View id base name
    \param[in]     orc_ViewName    View name
    \param[in]     orc_View        View data
-
-   \created     10.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_SaveView(C_SCLIniFile & orc_Ini, const QString & orc_SectionName, const QString & orc_ViewIdBase,
                             const QString & orc_ViewName, const C_UsSystemView & orc_View)
 {
    const QString c_ViewIdName = QString("%1Name").arg(orc_ViewIdBase);
    const QString c_ViewIdNavigationExpandedStatus = QString("%1_navigation_expanded_status").arg(orc_ViewIdBase);
+   const QString c_ViewIdNodesCount = QString("%1Node_count").arg(orc_ViewIdBase);
    const QString c_ViewIdSetupPoxX = QString("%1_setup_x").arg(orc_ViewIdBase);
    const QString c_ViewIdSetupPoxY = QString("%1_setup_y").arg(orc_ViewIdBase);
    const QString c_ViewIdSetupZoom = QString("%1_setup_zoom_value").arg(orc_ViewIdBase);
@@ -439,19 +412,19 @@ void C_UsFiler::mh_SaveView(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    const QString c_ViewIdParamImportPath = QString("%1_param_import_path").arg(orc_ViewIdBase);
    const QString c_ViewIdParamRecordPath = QString("%1_param_record_path").arg(orc_ViewIdBase);
    const QString c_ViewIdParamRecordFileName = QString("%1_param_record_file_name").arg(orc_ViewIdBase);
-   const QString c_ViewIdNodeInfoPositionX = QString("%1_nodeinfo_x").arg(orc_ViewIdBase);
-   const QString c_ViewIdNodeInfoPositionY = QString("%1_nodeinfo_y").arg(orc_ViewIdBase);
-   const QString c_ViewIdNodeInfoSizeWidth = QString("%1_nodeinfo_width").arg(orc_ViewIdBase);
-   const QString c_ViewIdNodeInfoSizeHeight = QString("%1_nodeinfo_heigth").arg(orc_ViewIdBase);
-   const QString c_ViewIdNodeInfoIsMaximized = QString("%1_nodeinfo_is_maximized").arg(orc_ViewIdBase);
    const QString c_ViewIdUpdateDataRateBaseId = QString("%1_update_data_rate").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateDataRatePerNodeBaseId = QString("%1_update_data_rate_per_node").arg(orc_ViewIdBase);
    const QString c_ViewIdUpdateSplitterX = QString("%1_update_splitter_x").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateHorizontalSplitterY = QString("%1_update_horizontal_splitter_y").arg(orc_ViewIdBase);
    const QString c_ViewIdUpdateProgressLogPositionX = QString("%1_update_progress_log_x").arg(orc_ViewIdBase);
    const QString c_ViewIdUpdateProgressLogPositionY = QString("%1_update_progress_log_y").arg(orc_ViewIdBase);
    const QString c_ViewIdUpdateProgressLogSizeWidth = QString("%1_update_progress_log_width").arg(orc_ViewIdBase);
    const QString c_ViewIdUpdateProgressLogSizeHeight = QString("%1_update_progress_log_height").arg(orc_ViewIdBase);
-   const QString c_ViewIdUpdateProgressLogIsMaximized = QString("%1_update_progress_log_is_maximized").arg(
-      orc_ViewIdBase);
+   const QString c_ViewIdUpdateProgressLogIsMaximized =
+      QString("%1_update_progress_log_is_maximized").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateSummaryBig = QString("%1_update_summary_is_type_big").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateEmptyOptionalSectionsVisible =
+      QString("%1_empty_optional_sections_visible").arg(orc_ViewIdBase);
    const QString c_ViewIdDashboardToolboxPositionX = QString("%1_toolbox_x").arg(orc_ViewIdBase);
    const QString c_ViewIdDashboardToolboxPositionY = QString("%1_toolbox_y").arg(orc_ViewIdBase);
    const QString c_ViewIdDashboardToolboxSizeWidth = QString("%1_toolbox_width").arg(orc_ViewIdBase);
@@ -459,8 +432,9 @@ void C_UsFiler::mh_SaveView(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    const QString c_ViewIdDashboardToolboxIsMaximized = QString("%1_toolbox_is_maximized").arg(orc_ViewIdBase);
    const QString c_ViewIdDashboardSelectedTabIndex = QString("%1_selected_tab_index").arg(orc_ViewIdBase);
    const QString c_ViewIdDashboardCount = QString("%1Dashboard_count").arg(orc_ViewIdBase);
-   const QList<QString> c_DashboardKeyList = orc_View.GetDashboardKeysInternal();
-   sintn sn_ItDashboard = 0;
+   const QList<QString> & rc_DashboardKeyList = orc_View.GetDashboardKeysInternal();
+   const QList<QString> & rc_NodesKeyList = orc_View.GetViewNodesKeysInternal();
+   sintn sn_Iterator;
 
    //Name
    orc_Ini.WriteString(orc_SectionName.toStdString().c_str(), c_ViewIdName.toStdString().c_str(),
@@ -495,25 +469,15 @@ void C_UsFiler::mh_SaveView(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    orc_Ini.WriteString(orc_SectionName.toStdString().c_str(), c_ViewIdParamRecordFileName.toStdString().c_str(),
                        orc_View.c_ParamRecordFileName.toStdString().c_str());
 
-   //Node read info widget
-   orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_ViewIdNodeInfoPositionX.toStdString().c_str(),
-                        orc_View.GetSetupNodeInfoPos().x());
-   orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_ViewIdNodeInfoPositionY.toStdString().c_str(),
-                        orc_View.GetSetupNodeInfoPos().y());
-   orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_ViewIdNodeInfoSizeWidth.toStdString().c_str(),
-                        orc_View.GetSetupNodeInfoSize().width());
-   orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_ViewIdNodeInfoSizeHeight.toStdString().c_str(),
-                        orc_View.GetSetupNodeInfoSize().height());
-   orc_Ini.WriteBool(orc_SectionName.toStdString().c_str(),
-                     c_ViewIdNodeInfoIsMaximized.toStdString().c_str(),
-                     orc_View.GetSetupNodeInfoMaximized());
-
    //Data rates
    mh_SaveDataRates(orc_Ini, orc_SectionName, c_ViewIdUpdateDataRateBaseId, orc_View);
+   mh_SaveDataRatesPerNode(orc_Ini, orc_SectionName, c_ViewIdUpdateDataRatePerNodeBaseId, orc_View);
 
    //Splitter
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_ViewIdUpdateSplitterX.toStdString().c_str(),
                         orc_View.GetUpdateSplitterX());
+   orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_ViewIdUpdateHorizontalSplitterY.toStdString().c_str(),
+                        orc_View.GetUpdateHorizontalSplitterY());
 
    //Progress log
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_ViewIdUpdateProgressLogPositionX.toStdString().c_str(),
@@ -528,6 +492,30 @@ void C_UsFiler::mh_SaveView(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    orc_Ini.WriteBool(orc_SectionName.toStdString().c_str(),
                      c_ViewIdUpdateProgressLogIsMaximized.toStdString().c_str(),
                      orc_View.GetUpdateProgressLogMaximized());
+
+   //Update summary style
+   orc_Ini.WriteBool(orc_SectionName.toStdString().c_str(), c_ViewIdUpdateSummaryBig.toStdString().c_str(),
+                     orc_View.GetUpdateSummaryBig());
+
+   // Update package sections visibility of empty optional sections
+   orc_Ini.WriteBool(orc_SectionName.toStdString().c_str(),
+                     c_ViewIdUpdateEmptyOptionalSectionsVisible.toStdString().c_str(),
+                     orc_View.GetUpdatePackEmptyOptionalSectionsVisible());
+
+   // View nodes
+   orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_ViewIdNodesCount.toStdString().c_str(),
+                        rc_NodesKeyList.size());
+   sn_Iterator = 0;
+   for (QList<QString>::const_iterator c_ItNodesKey = rc_NodesKeyList.begin(); c_ItNodesKey != rc_NodesKeyList.end();
+        ++c_ItNodesKey)
+   {
+      const QString c_NodeIdBase = QString("%1Node%2").arg(orc_ViewIdBase).arg(sn_Iterator);
+      const C_UsSystemViewNode c_Node = orc_View.GetSvNode(*c_ItNodesKey);
+      mh_SaveViewNode(orc_Ini, orc_SectionName, c_NodeIdBase, *c_ItNodesKey, c_Node);
+
+      //Important iterator step
+      ++sn_Iterator;
+   }
 
    //Toolbox
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_ViewIdDashboardToolboxPositionX.toStdString().c_str(),
@@ -549,32 +537,30 @@ void C_UsFiler::mh_SaveView(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
 
    //Dashboard count
    orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_ViewIdDashboardCount.toStdString().c_str(),
-                        c_DashboardKeyList.size());
-   for (QList<QString>::const_iterator c_ItDashboardKey = c_DashboardKeyList.begin();
-        c_ItDashboardKey != c_DashboardKeyList.end(); ++c_ItDashboardKey)
+                        rc_DashboardKeyList.size());
+   sn_Iterator = 0;
+   for (QList<QString>::const_iterator c_ItDashboardKey = rc_DashboardKeyList.begin();
+        c_ItDashboardKey != rc_DashboardKeyList.end(); ++c_ItDashboardKey)
    {
-      const QString c_DashboardIdBase = QString("%1Dashboard%2").arg(orc_ViewIdBase).arg(sn_ItDashboard);
+      const QString c_DashboardIdBase = QString("%1Dashboard%2").arg(orc_ViewIdBase).arg(sn_Iterator);
       const QString c_DashboardName = *c_ItDashboardKey;
       const C_UsSystemViewDashboard c_Dashboard = orc_View.GetDashboardSettings(c_DashboardName);
       mh_SaveDashboard(orc_Ini, orc_SectionName, c_DashboardIdBase, c_DashboardName, c_Dashboard);
 
       //Important iterator step
-      ++sn_ItDashboard;
+      ++sn_Iterator;
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save view update data rates part of user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save view update data rates part of user settings
 
    \param[in,out] orc_Ini            Ini handler
    \param[in]     orc_SectionName    Section name
    \param[in]     orc_DataRateIdBase View data rate id base name
    \param[in]     orc_View           View data
-
-   \created     26.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_SaveDataRates(C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
                                  const QString & orc_DataRateIdBase, const C_UsSystemView & orc_View)
 {
@@ -602,19 +588,113 @@ void C_UsFiler::mh_SaveDataRates(C_SCLIniFile & orc_Ini, const QString & orc_Sec
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save view dashboard part of user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save view update data rates per node part of user settings
+
+   \param[in,out] orc_Ini                   Ini handler
+   \param[in]     orc_SectionName           Section name
+   \param[in]     orc_DataRatePerNodeIdBase View data rate id base name
+   \param[in]     orc_View                  View data
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsFiler::mh_SaveDataRatesPerNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
+                                        const QString & orc_DataRatePerNodeIdBase, const C_UsSystemView & orc_View)
+{
+   sint32 s32_ItDataRate = 0;
+   const QString c_DataRateIdCount = QString("%1_count").arg(orc_DataRatePerNodeIdBase);
+   const QMap<uint32, QMap<uint32, float64> > & rc_UpdateDataRateHistory = orc_View.GetUpdateDataRateHistoryPerNode();
+
+   //Data rate count
+   orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_DataRateIdCount.toStdString().c_str(),
+                        rc_UpdateDataRateHistory.size());
+   //Per checksum section
+   for (QMap<uint32, QMap<uint32, float64> >::const_iterator c_ItDataRateKey = rc_UpdateDataRateHistory.begin();
+        c_ItDataRateKey != rc_UpdateDataRateHistory.end(); ++c_ItDataRateKey)
+   {
+      sint32 s32_ItNode = 0;
+      const QString c_DataRateIdBase = QString("%1DataRate%2").arg(orc_DataRatePerNodeIdBase).arg(s32_ItDataRate);
+      const QString c_DataRateIdChecksum = QString("%1_checksum").arg(c_DataRateIdBase);
+      const QString c_DataRateIdCurrentCount = QString("%1_count").arg(c_DataRateIdBase);
+
+      //Key
+      orc_Ini.WriteString(orc_SectionName.toStdString().c_str(), c_DataRateIdChecksum.toStdString().c_str(),
+                          QString::number(c_ItDataRateKey.key()).toStdString().c_str());
+      //Value count
+      orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_DataRateIdCurrentCount.toStdString().c_str(),
+                           c_ItDataRateKey.value().size());
+
+      //Per node section
+      for (QMap<uint32, float64>::const_iterator c_ItPerNode = c_ItDataRateKey.value().begin();
+           c_ItPerNode != c_ItDataRateKey.value().end(); ++c_ItPerNode)
+      {
+         const QString c_DataRateIdCurrentBase = QString("%1Node%2").arg(c_DataRateIdBase).arg(s32_ItNode);
+         const QString c_DataRateIdCurrentIndex = QString("%1_index").arg(c_DataRateIdCurrentBase);
+         const QString c_DataRateIdCurrentValue = QString("%1_value").arg(c_DataRateIdCurrentBase);
+
+         //Key
+         orc_Ini.WriteString(orc_SectionName.toStdString().c_str(), c_DataRateIdCurrentIndex.toStdString().c_str(),
+                             QString::number(c_ItPerNode.key()).toStdString().c_str());
+         //Value
+         orc_Ini.WriteFloat(orc_SectionName.toStdString().c_str(), c_DataRateIdCurrentValue.toStdString().c_str(),
+                            c_ItPerNode.value());
+
+         //Important iterator step
+         ++s32_ItNode;
+      }
+
+      //Important iterator step
+      ++s32_ItDataRate;
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save view node part of user settings
+
+   \param[in,out] orc_Ini              Ini handler
+   \param[in]     orc_SectionName      Section name
+   \param[in]     orc_ViewNodeIdBase   View node ID base name
+   \param[in]     orc_NodeName         View node name
+   \param[in]     orc_ViewNode         View node data
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsFiler::mh_SaveViewNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
+                                const QString & orc_ViewNodeIdBase, const QString & orc_NodeName,
+                                const C_UsSystemViewNode & orc_ViewNode)
+{
+   const QString c_NodeIdName = QString("%1Name").arg(orc_ViewNodeIdBase);
+   const QMap<uint32, bool> & rc_ExpandedFlags = orc_ViewNode.GetSectionsExpanded();
+   QString c_NodeIdExpandedFlag;
+
+   std::vector<uint32> c_Types;
+
+   c_Types.push_back(mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK);
+   c_Types.push_back(mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET);
+   c_Types.push_back(mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_FILE);
+
+   // Name
+   orc_Ini.WriteString(orc_SectionName.toStdString().c_str(),
+                       c_NodeIdName.toStdString().c_str(), orc_NodeName.toStdString().c_str());
+
+   //Section expanded flags
+
+   for (std::vector<uint32>::const_iterator c_It = c_Types.begin(); c_It != c_Types.end(); ++c_It)
+   {
+      c_NodeIdExpandedFlag = QString("%1Section%2").arg(orc_ViewNodeIdBase).arg(*c_It);
+      orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(), c_NodeIdExpandedFlag.toStdString().c_str(),
+                           rc_ExpandedFlags[*c_It]);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save view dashboard part of user settings
 
    \param[in,out] orc_Ini             Ini handler
    \param[in]     orc_SectionName     Section name
    \param[in]     orc_DashboardIdBase View dashboard id base name
    \param[in]     orc_DashboardName   View dashboard name
    \param[in]     orc_Dashboard       View dashboard data
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_SaveDashboard(C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
                                  const QString & orc_DashboardIdBase, const QString & orc_DashboardName,
                                  const C_UsSystemViewDashboard & orc_Dashboard)
@@ -670,16 +750,13 @@ void C_UsFiler::mh_SaveDashboard(C_SCLIniFile & orc_Ini, const QString & orc_Sec
                         orc_Dashboard.sn_SceneZoom);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save recent languages part of user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save recent languages part of user settings
 
    \param[in]     orc_UserSettings User settings
    \param[in,out] orc_Ini          Ini handler
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_SaveLanguages(const C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini)
 {
    //Language
@@ -689,16 +766,13 @@ void C_UsFiler::mh_SaveLanguages(const C_UsHandler & orc_UserSettings, C_SCLIniF
                        orc_UserSettings.GetCurrentSaveAsPath().toStdString().c_str());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save recent projects part of user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save recent projects part of user settings
 
    \param[in]     orc_UserSettings User settings
    \param[in,out] orc_Ini          Ini handler
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_SaveRecentProjects(const C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini)
 {
    QStringList c_List = orc_UserSettings.GetRecentProjects();
@@ -717,16 +791,13 @@ void C_UsFiler::mh_SaveRecentProjects(const C_UsHandler & orc_UserSettings, C_SC
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save project independent part of user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save project independent part of user settings
 
    \param[in]     orc_UserSettings User settings
    \param[in,out] orc_Ini          Ini handler
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_SaveProjectIndependentSection(const C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini)
 {
    //Screen position
@@ -760,18 +831,15 @@ void C_UsFiler::mh_SaveProjectIndependentSection(const C_UsHandler & orc_UserSet
    orc_Ini.WriteInteger("SdBusEdit", "LayoutSplitterX", orc_UserSettings.GetSdBusEditLayoutSplitterX());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Save project dependent part of user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Save project dependent part of user settings
 
    \param[in]     orc_UserSettings User settings
    \param[in,out] orc_Ini          Ini handler
    \param[in] orc_ActiveProject    Actual project to save project specific settings
                                    Empty string results in saving no informations
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini,
                                                const QString & orc_ActiveProject)
 {
@@ -907,19 +975,16 @@ void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSetti
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load node part of user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load node part of user settings
 
    \param[in,out] orc_Ini          Ini handler
    \param[in]     orc_SectionName  Section name
    \param[in]     orc_NodeIdBase   Node id base name
    \param[in]     orc_NodeName     Node name
    \param[in,out] orc_UserSettings User settings to load
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_LoadNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionName, const QString & orc_NodeIdBase,
                             const QString & orc_NodeName, C_UsHandler & orc_UserSettings)
 {
@@ -943,9 +1008,8 @@ void C_UsFiler::mh_LoadNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load bus part of user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load bus part of user settings
 
    \param[in,out] orc_Ini          Ini handler
    \param[in]     orc_SectionName  Section name
@@ -955,10 +1019,8 @@ void C_UsFiler::mh_LoadNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    \param[in]     oq_IsBus         Indicator if this function is used on a bus
    \param[in]     orc_NodeName     If not used on a bus the node name is required
    \param[in]     orc_DataPoolName If not used on a bus the node data pool name is required
-
-   \created     27.04.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_LoadBus(C_SCLIniFile & orc_Ini, const QString & orc_SectionName, const QString & orc_BusIdBase,
                            const QString & orc_BusName, C_UsHandler & orc_UserSettings, const bool oq_IsBus,
                            const QString & orc_NodeName, const QString & orc_DataPoolName)
@@ -1002,19 +1064,16 @@ void C_UsFiler::mh_LoadBus(C_SCLIniFile & orc_Ini, const QString & orc_SectionNa
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load node datapool part of user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load node datapool part of user settings
 
    \param[in,out] orc_Ini            Ini handler
    \param[in]     orc_SectionName    Section name
    \param[in]     orc_DatapoolIdBase Node datapool id base name
    \param[in]     orc_NodeName       Node name
    \param[in,out] orc_UserSettings   User settings to load
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_LoadDatapool(C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
                                 const QString & orc_DatapoolIdBase, const QString & orc_NodeName,
                                 C_UsHandler & orc_UserSettings)
@@ -1125,19 +1184,16 @@ void C_UsFiler::mh_LoadDatapool(C_SCLIniFile & orc_Ini, const QString & orc_Sect
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load view part of user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load view part of user settings
 
    \param[in,out] orc_Ini          Ini handler
    \param[in]     orc_SectionName  Section name
    \param[in]     orc_ViewIdBase   View id base name
    \param[in]     orc_ViewName     View name
    \param[in,out] orc_UserSettings User settings to load
-
-   \created     16.05.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_LoadList(C_SCLIniFile & orc_Ini, const QString & orc_SectionName, const QString & orc_ListIdBase,
                             const QString & orc_NodeName, const QString & orc_DataPoolName,
                             C_UsHandler & orc_UserSettings)
@@ -1163,23 +1219,21 @@ void C_UsFiler::mh_LoadList(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load view part of user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load view part of user settings
 
    \param[in,out] orc_Ini          Ini handler
    \param[in]     orc_SectionName  Section name
    \param[in]     orc_ViewIdBase   View id base name
    \param[in]     orc_ViewName     View name
    \param[in,out] orc_UserSettings User settings to load
-
-   \created     10.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_LoadView(C_SCLIniFile & orc_Ini, const QString & orc_SectionName, const QString & orc_ViewIdBase,
                             const QString & orc_ViewName, C_UsHandler & orc_UserSettings)
 {
    const QString c_ViewIdNavigationExpandedStatus = QString("%1_navigation_expanded_status").arg(orc_ViewIdBase);
+   const QString c_ViewIdNodesCount = QString("%1Node_count").arg(orc_ViewIdBase);
    const QString c_ViewIdSetupPoxX = QString("%1_setup_x").arg(orc_ViewIdBase);
    const QString c_ViewIdSetupPoxY = QString("%1_setup_y").arg(orc_ViewIdBase);
    const QString c_ViewIdSetupZoom = QString("%1_setup_zoom_value").arg(orc_ViewIdBase);
@@ -1190,19 +1244,19 @@ void C_UsFiler::mh_LoadView(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    const QString c_ViewIdParamImportPath = QString("%1_param_import_path").arg(orc_ViewIdBase);
    const QString c_ViewIdParamRecordPath = QString("%1_param_record_path").arg(orc_ViewIdBase);
    const QString c_ViewIdParamRecordFileName = QString("%1_param_record_file_name").arg(orc_ViewIdBase);
-   const QString c_ViewIdNodeInfoPositionX = QString("%1_nodeinfo_x").arg(orc_ViewIdBase);
-   const QString c_ViewIdNodeInfoPositionY = QString("%1_nodeinfo_y").arg(orc_ViewIdBase);
-   const QString c_ViewIdNodeInfoSizeWidth = QString("%1_nodeinfo_width").arg(orc_ViewIdBase);
-   const QString c_ViewIdNodeInfoSizeHeight = QString("%1_nodeinfo_heigth").arg(orc_ViewIdBase);
-   const QString c_ViewIdNodeInfoIsMaximized = QString("%1_nodeinfo_is_maximized").arg(orc_ViewIdBase);
    const QString c_ViewIdUpdateDataRateBaseId = QString("%1_update_data_rate").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateDataRatePerNodeBaseId = QString("%1_update_data_rate_per_node").arg(orc_ViewIdBase);
    const QString c_ViewIdUpdateSplitterX = QString("%1_update_splitter_x").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateHorizontalSplitterY = QString("%1_update_horizontal_splitter_y").arg(orc_ViewIdBase);
    const QString c_ViewIdUpdateProgressLogPositionX = QString("%1_update_progress_log_x").arg(orc_ViewIdBase);
    const QString c_ViewIdUpdateProgressLogPositionY = QString("%1_update_progress_log_y").arg(orc_ViewIdBase);
    const QString c_ViewIdUpdateProgressLogSizeWidth = QString("%1_update_progress_log_width").arg(orc_ViewIdBase);
    const QString c_ViewIdUpdateProgressLogSizeHeight = QString("%1_update_progress_log_height").arg(orc_ViewIdBase);
-   const QString c_ViewIdUpdateProgressLogIsMaximized = QString("%1_update_progress_log_is_maximized").arg(
-      orc_ViewIdBase);
+   const QString c_ViewIdUpdateProgressLogIsMaximized =
+      QString("%1_update_progress_log_is_maximized").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateSummaryBig = QString("%1_update_summary_is_type_big").arg(orc_ViewIdBase);
+   const QString c_ViewIdUpdateEmptyOptionalSectionsVisible =
+      QString("%1_empty_optional_sections_visible").arg(orc_ViewIdBase);
    const QString c_ViewIdDashboardToolboxPositionX = QString("%1_toolbox_x").arg(orc_ViewIdBase);
    const QString c_ViewIdDashboardToolboxPositionY = QString("%1_toolbox_y").arg(orc_ViewIdBase);
    const QString c_ViewIdDashboardToolboxSizeWidth = QString("%1_toolbox_width").arg(orc_ViewIdBase);
@@ -1210,14 +1264,11 @@ void C_UsFiler::mh_LoadView(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    const QString c_ViewIdDashboardToolboxIsMaximized = QString("%1_toolbox_is_maximized").arg(orc_ViewIdBase);
    const QString c_ViewIdDashboardSelectedTabIndex = QString("%1_selected_tab_index").arg(orc_ViewIdBase);
    const QString c_ViewIdDashboardCount = QString("%1Dashboard_count").arg(orc_ViewIdBase);
+
    QPoint c_Pos;
    QSize c_Size;
+   sintn sn_Value;
    bool q_Value;
-
-   stw_types::sintn sn_Value;
-   //Dashboard count
-   const sintn sn_DashboardCount = orc_Ini.ReadInteger(
-      orc_SectionName.toStdString().c_str(), c_ViewIdDashboardCount.toStdString().c_str(), 0);
 
    //Navigation
    q_Value = orc_Ini.ReadBool(orc_SectionName.toStdString().c_str(),
@@ -1266,26 +1317,18 @@ void C_UsFiler::mh_LoadView(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
                                                             c_ViewIdParamRecordFileName.toStdString().c_str(),
                                                             "").c_str());
 
-   //Node read info widget
-   c_Pos.setX(orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
-                                  c_ViewIdNodeInfoPositionX.toStdString().c_str(), 20));
-   c_Pos.setY(orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
-                                  c_ViewIdNodeInfoPositionY.toStdString().c_str(), 30));
-   c_Size.setWidth(orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
-                                       c_ViewIdNodeInfoSizeWidth.toStdString().c_str(), 1300));
-   c_Size.setHeight(orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
-                                        c_ViewIdNodeInfoSizeHeight.toStdString().c_str(), 1000));
-   q_Value = orc_Ini.ReadBool(orc_SectionName.toStdString().c_str(),
-                              c_ViewIdNodeInfoIsMaximized.toStdString().c_str(), false);
-   orc_UserSettings.SetProjSvSetupNodeInfoSizePos(orc_ViewName, c_Pos, c_Size, q_Value);
-
    //Data rates
    mh_LoadDataRates(orc_Ini, orc_SectionName, c_ViewIdUpdateDataRateBaseId, orc_ViewName, orc_UserSettings);
+   mh_LoadDataRatesPerNode(orc_Ini, orc_SectionName, c_ViewIdUpdateDataRatePerNodeBaseId, orc_ViewName,
+                           orc_UserSettings);
 
    //Splitter
    orc_UserSettings.SetProjSvUpdateSplitterX(orc_ViewName, orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
                                                                                c_ViewIdUpdateSplitterX.toStdString().
                                                                                c_str(), -1));
+   orc_UserSettings.SetProjSvUpdateHorizontalSplitterY(
+      orc_ViewName, orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
+                                        c_ViewIdUpdateHorizontalSplitterY.toStdString().c_str(), -1));
 
    //Progress log
    c_Pos.setX(orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
@@ -1299,6 +1342,25 @@ void C_UsFiler::mh_LoadView(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    q_Value = orc_Ini.ReadBool(orc_SectionName.toStdString().c_str(),
                               c_ViewIdUpdateProgressLogIsMaximized.toStdString().c_str(), false);
    orc_UserSettings.SetProjSvUpdateProgressLog(orc_ViewName, c_Pos, c_Size, q_Value);
+
+   //Update summary type
+   q_Value = orc_Ini.ReadBool(orc_SectionName.toStdString().c_str(),
+                              c_ViewIdUpdateSummaryBig.toStdString().c_str(), true);
+   orc_UserSettings.SetProjSvUpdateSummaryBig(orc_ViewName, q_Value);
+
+   // Update package sections visibility of empty optional sections
+   q_Value = orc_Ini.ReadBool(orc_SectionName.toStdString().c_str(),
+                              c_ViewIdUpdateEmptyOptionalSectionsVisible.toStdString().c_str(), true);
+   orc_UserSettings.SetProjSvUpdateEmptyOptionalSectionsVisible(orc_ViewName, q_Value);
+
+   // View nodes
+   sn_Value = orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
+                                  c_ViewIdNodesCount.toStdString().c_str(), 0);
+   for (sintn sn_ItNodes = 0; sn_ItNodes < sn_Value; ++sn_ItNodes)
+   {
+      const QString c_DashboardIdBase = QString("%1Node%2").arg(orc_ViewIdBase).arg(sn_ItNodes);
+      mh_LoadViewNode(orc_Ini, orc_SectionName, c_DashboardIdBase, orc_ViewName, orc_UserSettings);
+   }
 
    //Toolbox
    c_Pos.setX(orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
@@ -1319,25 +1381,25 @@ void C_UsFiler::mh_LoadView(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    orc_UserSettings.SetProjSvDashboardSelectedTabIndex(orc_ViewName, sn_Value);
 
    //Dashboards
-   for (sintn sn_ItDashboard = 0; sn_ItDashboard < sn_DashboardCount; ++sn_ItDashboard)
+   sn_Value = orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
+                                  c_ViewIdDashboardCount.toStdString().c_str(), 0);
+   for (sintn sn_ItDashboard = 0; sn_ItDashboard < sn_Value; ++sn_ItDashboard)
    {
       const QString c_DashboardIdBase = QString("%1Dashboard%2").arg(orc_ViewIdBase).arg(sn_ItDashboard);
       mh_LoadDashboard(orc_Ini, orc_SectionName, c_DashboardIdBase, orc_ViewName, orc_UserSettings);
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load view dashboard part of user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load data rates part of user settings
 
    \param[in,out] orc_Ini            Ini handler
    \param[in]     orc_SectionName    Section name
    \param[in]     orc_DataRateIdBase View update data rate id base name
+   \param[in]     orc_ViewName       View name
    \param[in,out] orc_UserSettings   User settings to load
-
-   \created     26.02.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_LoadDataRates(C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
                                  const QString & orc_DataRateIdBase, const QString & orc_ViewName,
                                  C_UsHandler & orc_UserSettings)
@@ -1370,19 +1432,126 @@ void C_UsFiler::mh_LoadDataRates(C_SCLIniFile & orc_Ini, const QString & orc_Sec
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load view dashboard part of user settings
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load data rates per node part of user settings
+
+   \param[in,out] orc_Ini                   Ini handler
+   \param[in]     orc_SectionName           Section name
+   \param[in]     orc_DataRatePerNodeIdBase View update data rate id base name
+   \param[in]     orc_ViewName              View name
+   \param[in,out] orc_UserSettings          User settings to load
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsFiler::mh_LoadDataRatesPerNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
+                                        const QString & orc_DataRatePerNodeIdBase, const QString & orc_ViewName,
+                                        C_UsHandler & orc_UserSettings)
+{
+   const QString c_DataRateIdCount = QString("%1_count").arg(orc_DataRatePerNodeIdBase);
+   const sint32 s32_ItDataRate = orc_Ini.ReadInteger(
+      orc_SectionName.toStdString().c_str(), c_DataRateIdCount.toStdString().c_str(), 0);
+
+   //Data rate count
+   //Per checksum section
+   for (sint32 s32_It = 0; s32_It < s32_ItDataRate; ++s32_It)
+   {
+      const QString c_DataRateIdBase = QString("%1DataRate%2").arg(orc_DataRatePerNodeIdBase).arg(s32_It);
+      const QString c_DataRateIdChecksum = QString("%1_checksum").arg(c_DataRateIdBase);
+      const QString c_DataRateIdCurrentCount = QString("%1_count").arg(c_DataRateIdBase);
+      //Key
+      const QString c_Checksum = orc_Ini.ReadString(
+         orc_SectionName.toStdString().c_str(), c_DataRateIdChecksum.toStdString().c_str(), "").c_str();
+      //Value count
+      const sintn sn_CurrentCount = orc_Ini.ReadInteger(
+         orc_SectionName.toStdString().c_str(), c_DataRateIdCurrentCount.toStdString().c_str(), 0);
+      //String to uint32
+      if (c_Checksum.compare("") != 0)
+      {
+         bool q_Ok1;
+         const uint32 u32_Checksum = c_Checksum.toULong(&q_Ok1);
+         if (q_Ok1 == true)
+         {
+            QMap<uint32, float64> c_Tmp;
+
+            //Per node section
+            for (sint32 s32_ItNode = 0; s32_ItNode < sn_CurrentCount; ++s32_ItNode)
+            {
+               const QString c_DataRateIdCurrentBase = QString("%1Node%2").arg(c_DataRateIdBase).arg(s32_ItNode);
+               const QString c_DataRateIdCurrentIndex = QString("%1_index").arg(c_DataRateIdCurrentBase);
+               const QString c_DataRateIdCurrentValue = QString("%1_value").arg(c_DataRateIdCurrentBase);
+
+               //Key
+               const QString c_Index = orc_Ini.ReadString(orc_SectionName.toStdString().c_str(),
+                                                          c_DataRateIdCurrentIndex.toStdString().c_str(), "").c_str();
+               //Value
+               const float64 f64_Value =
+                  orc_Ini.ReadFloat(orc_SectionName.toStdString().c_str(),
+                                    c_DataRateIdCurrentValue.toStdString().c_str(), 0.0);
+               //String to uint32
+               const uint32 u32_Index = c_Index.toULong(&q_Ok1);
+               if (q_Ok1 == true)
+               {
+                  //Insert one element
+                  c_Tmp.insert(u32_Index, f64_Value);
+               }
+            }
+            orc_UserSettings.AddProjSvUpdateDataRatePerNode(orc_ViewName, u32_Checksum, c_Tmp);
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load node view part of user settings
+
+   \param[in,out] orc_Ini             Ini handler
+   \param[in]     orc_SectionName     Section name
+   \param[in]     orc_ViewNodeIdBase  View node ID base name
+   \param[in]     orc_ViewName        View name (not a copy paste error)
+   \param[in,out] orc_UserSettings    User settings to load
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsFiler::mh_LoadViewNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
+                                const QString & orc_ViewNodeIdBase, const QString & orc_ViewName,
+                                C_UsHandler & orc_UserSettings)
+{
+   const QString c_ViewNodeIdName = QString("%1Name").arg(orc_ViewNodeIdBase);
+   const QString c_ViewNodeName = orc_Ini.ReadString(orc_SectionName.toStdString().c_str(),
+                                                     c_ViewNodeIdName.toStdString().c_str(), "").c_str();
+
+   if (c_ViewNodeName.compare("") != 0)
+   {
+      QMap<uint32, bool> c_ExpandedFlags;
+      bool q_Value;
+      std::vector<uint32> c_Types;
+
+      c_Types.push_back(mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK);
+      c_Types.push_back(mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET);
+      c_Types.push_back(mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_FILE);
+
+      //Section expanded flags
+      for (std::vector<uint32>::const_iterator c_It = c_Types.begin(); c_It != c_Types.end(); ++c_It)
+      {
+         q_Value = orc_Ini.ReadBool(orc_SectionName.toStdString().c_str(),
+                                    QString("%1Section%2").arg(orc_ViewNodeIdBase).arg(*c_It).toStdString().c_str(),
+                                    true);
+         c_ExpandedFlags[*c_It] = q_Value;
+      }
+
+      // Append
+      orc_UserSettings.SetProjSvUpdateSectionsExpandedFlags(orc_ViewName, c_ViewNodeName, c_ExpandedFlags);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load view dashboard part of user settings
 
    \param[in,out] orc_Ini             Ini handler
    \param[in]     orc_SectionName     Section name
    \param[in]     orc_DashboardIdBase View dashboard id base name
    \param[in]     orc_ViewName        View name (not a copy paste error)
    \param[in,out] orc_UserSettings    User settings to load
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_LoadDashboard(C_SCLIniFile & orc_Ini, const QString & orc_SectionName,
                                  const QString & orc_DashboardIdBase, const QString & orc_ViewName,
                                  C_UsHandler & orc_UserSettings)
@@ -1455,16 +1624,13 @@ void C_UsFiler::mh_LoadDashboard(C_SCLIniFile & orc_Ini, const QString & orc_Sec
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load INI language section
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load INI language section
 
    \param[in,out] orc_UserSettings User settings
    \param[in,out] orc_Ini          Current ini
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_LoadLanguages(C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini)
 {
    QString c_Tmp;
@@ -1480,16 +1646,13 @@ void C_UsFiler::mh_LoadLanguages(C_UsHandler & orc_UserSettings, C_SCLIniFile & 
    orc_UserSettings.SetCurrentSaveAsPath(orc_Ini.ReadString("Common", "SaveAsLocation", "").c_str());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load INI recent projects section
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load INI recent projects section
 
    \param[in,out] orc_UserSettings User settings
    \param[in,out] orc_Ini          Current ini
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_LoadRecentProjects(C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini)
 {
    QStringList c_List;
@@ -1521,16 +1684,13 @@ void C_UsFiler::mh_LoadRecentProjects(C_UsHandler & orc_UserSettings, C_SCLIniFi
    orc_UserSettings.SetRecentProjects(c_List);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load INI project independent section
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load INI project independent section
 
    \param[in,out] orc_UserSettings User settings
    \param[in,out] orc_Ini          Current ini
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini)
 {
    QPoint c_Pos;
@@ -1567,7 +1727,7 @@ void C_UsFiler::mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings,
    orc_UserSettings.SetSdTopologyToolboxMaximized(q_Flag);
 
    // Sys def node edit splitter
-   s32_Value = orc_Ini.ReadInteger("SdNodeEdit", "SplitterX", 0);
+   s32_Value = orc_Ini.ReadInteger("SdNodeEdit", "SplitterX", 1000);
    orc_UserSettings.SetSdNodeEditSplitterX(s32_Value);
 
    // Sys def bus edit splitters
@@ -1577,18 +1737,15 @@ void C_UsFiler::mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings,
    orc_UserSettings.SetSdBusEditLayoutSplitterX(s32_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load INI project independent section
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load INI project independent section
 
    \param[in,out] orc_UserSettings  User settings
    \param[in,out] orc_Ini           Current ini
    \param[in]     orc_ActiveProject Actual project to load project specific settings.
                                     Empty string results in default values
-
-   \created     23.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini,
                                                const QString & orc_ActiveProject)
 {

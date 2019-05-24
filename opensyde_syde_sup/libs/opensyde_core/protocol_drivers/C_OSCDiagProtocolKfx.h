@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       openSYDE: Diagnostic protocol driver for KEFEX protocol
@@ -23,33 +23,27 @@
    The other error codes cannot necessarily be mapped to correct error codes defined by the base class of this class.
    See the individual function headers for details.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     18.07.2017  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCDIAGPROTOCOLKFXH
 #define C_OSCDIAGPROTOCOLKFXH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 #include "C_OSCDiagProtocolBase.h"
 #include "CSCLString.h"
 #include "CKFXCommunicationKEFEX.h"
 #include "CKFXCommConfiguration.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 ///interface class
 class C_OSCDiagProtocolKfx :
    public C_OSCDiagProtocolBase
@@ -151,7 +145,7 @@ public:
    stw_types::sint32 Logoff(const bool oq_WaitForHandshake);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

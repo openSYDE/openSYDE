@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Utility class for table/tree delegates (implementation)
 
    Utility class for table/tree delegates
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.02.2019  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2019 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QBitArray>
@@ -25,26 +18,25 @@
 #include "cam_constants.h"
 #include "C_TblDelegateUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paint marked section
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paint marked section
 
    \param[in,out] opc_Painter  Painter
    \param[in]     orc_CellRect Cell rectangle to draw in
@@ -54,10 +46,8 @@ using namespace stw_opensyde_gui_logic;
    \return
    True  Section painted
    False Section empty
-
-   \created     28.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_TblDelegateUtil::h_PaintMarkedCell(QPainter * const opc_Painter, const QRect & orc_CellRect,
                                           const QModelIndex & orc_Index, const bool oq_Selected,
                                           const QColor & orc_DefaultBackgroundColor,
@@ -240,9 +230,8 @@ bool C_TblDelegateUtil::h_PaintMarkedCell(QPainter * const opc_Painter, const QR
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Paint string segment and update current top left position
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Paint string segment and update current top left position
 
    Warning: painter is not saved/restored
 
@@ -262,10 +251,8 @@ bool C_TblDelegateUtil::h_PaintMarkedCell(QPainter * const opc_Painter, const QR
    \return
    True  Text got cut off by complete cell restrictions
    False Complete text drawn
-
-   \created     28.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_TblDelegateUtil::h_PaintStringWithRestriction(QPainter * const opc_Painter, QPoint & orc_TopLeft,
                                                      const QRect & orc_CompleteCell, const QString & orc_Text,
                                                      const QColor & orc_Background, const QColor & orc_Border,
@@ -315,30 +302,24 @@ bool C_TblDelegateUtil::h_PaintStringWithRestriction(QPainter * const opc_Painte
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     06.02.2019  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_TblDelegateUtil::C_TblDelegateUtil(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create string list from input and standardize the segment lengths as necessary
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create string list from input and standardize the segment lengths as necessary
 
    \param[in]     orc_Input Input to segment and standardize
    \param[in,out] orq_IsHex Utility parameter to identify if the values are hex or decimal
 
    \return
    Segmented and standardized string parts
-
-   \created     27.09.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QStringList C_TblDelegateUtil::mhc_CreateAndStandardizeStringList(const QString & orc_Input, bool & orq_IsHex)
 {
    QStringList c_Retval = orc_Input.split(" ", QString::SkipEmptyParts);
@@ -361,19 +342,16 @@ QStringList C_TblDelegateUtil::mhc_CreateAndStandardizeStringList(const QString 
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get color with specified transparency value
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get color with specified transparency value
 
    \param[in] orc_ColorBase    Base color
    \param[in] ocn_Transparency Desired transparency value
 
    \return
    Color with specified transparency value
-
-   \created     06.02.2019  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QColor C_TblDelegateUtil::mh_GetColorTransparent(const QColor & orc_ColorBase, const charn ocn_Transparency)
 {
    QColor c_Retval = orc_ColorBase;

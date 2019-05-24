@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Checksummed INI file class
@@ -33,15 +33,9 @@
     Older applications still can handle the files.
     Writing will stay slow, but this is usually not done very often.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     14.07.2016  STW/A.Stangl (refactored from existing CDLSecureINIFile)
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCCHECKSUMMEDINIFILEH
 #define C_OSCCHECKSUMMEDINIFILEH
 

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Handle clipboard load and save (implementation)
 
    Handle clipboard load and save
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.07.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -25,35 +18,32 @@
 #include "C_SyvClipBoardHelper.h"
 #include "C_PuiSvHandlerFiler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Store system view dashboard to clip board
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Store system view dashboard to clip board
 
    \param[in] orc_Data           System view dashboard
    \param[in] orc_Rails          System view dashboard rails
    \param[in] orc_GenericTagName Generic content tag name
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvClipBoardHelper::h_StoreDashboardToClipboard(const C_PuiSvDashboard & orc_Data,
                                                        const QMap<C_OSCNodeDataPoolListElementId,
                                                                   C_PuiSvReadDataConfiguration> & orc_Rails,
@@ -73,9 +63,8 @@ void C_SyvClipBoardHelper::h_StoreDashboardToClipboard(const C_PuiSvDashboard & 
    mh_SetClipBoard(c_XMLContent.c_str());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load system view dashboard from clip board
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load system view dashboard from clip board
 
    \param[out] orc_Data           System view dashboard
    \param[in]  orc_GenericTagName Generic content tag name
@@ -83,10 +72,8 @@ void C_SyvClipBoardHelper::h_StoreDashboardToClipboard(const C_PuiSvDashboard & 
    \return
    C_NO_ERR Found and loaded
    C_CONFIG Clipboard invalid
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvClipBoardHelper::h_LoadDashboardFromClipboard(C_PuiSvDashboard & orc_Data,
                                                           const QString & orc_GenericTagName)
 {
@@ -114,9 +101,8 @@ sint32 C_SyvClipBoardHelper::h_LoadDashboardFromClipboard(C_PuiSvDashboard & orc
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load system view dashboard from clip board
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load system view dashboard from clip board
 
    \param[out] orc_Rails          System view dashboard rails
    \param[in]  orc_GenericTagName Generic content tag name
@@ -124,10 +110,8 @@ sint32 C_SyvClipBoardHelper::h_LoadDashboardFromClipboard(C_PuiSvDashboard & orc
    \return
    C_NO_ERR Found and loaded
    C_CONFIG Clipboard invalid
-
-   \created     10.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvClipBoardHelper::h_LoadRailsFromClipboard(QMap<C_OSCNodeDataPoolListElementId,
                                                            C_PuiSvReadDataConfiguration> & orc_Rails,
                                                       const QString & orc_GenericTagName)
@@ -157,13 +141,10 @@ sint32 C_SyvClipBoardHelper::h_LoadRailsFromClipboard(QMap<C_OSCNodeDataPoolList
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     24.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvClipBoardHelper::C_SyvClipBoardHelper(void) :
    C_UtiClipBoardHelper()
 {

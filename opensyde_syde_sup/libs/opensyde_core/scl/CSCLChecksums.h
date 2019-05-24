@@ -1,4 +1,4 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief    Checksum calculation algorithms
@@ -9,22 +9,16 @@
    Provides implementations of various checksumming algorithms.
    For now only CRC routines.
 
-   \implementation
-   project     project name
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.04.2015  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2015 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CSCLCHECKSUMSH
 #define CSCLCHECKSUMSH
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_scl
 {
 //maybe this will be a part of a Borland library:
@@ -36,9 +30,9 @@ namespace stw_scl
 #endif
 #endif
 
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 class SCL_PACKAGE C_SCLChecksums
 {
 public:
@@ -53,7 +47,7 @@ public:
                             stw_types::uint16 & oru16_CRC);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }
 
 #endif

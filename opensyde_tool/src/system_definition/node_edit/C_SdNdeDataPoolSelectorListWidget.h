@@ -1,23 +1,17 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       List with all datapools of a specific type of one node (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     01.02.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_SDNDEDATAPOOLSELECTORLISTWIDGET_H
 #define C_SDNDEDATAPOOLSELECTORLISTWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <QTimer>
 #include <QAction>
@@ -29,15 +23,16 @@
 #include "C_OgeHorizontalListWidget.h"
 #include "C_OgeContextMenu.h"
 #include "C_OSCNodeDataPool.h"
+#include "C_OSCNodeDataPoolId.h"
 #include "C_OSCCanProtocol.h"
 #include "C_PuiSdNodeDataPool.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_SdNdeDataPoolSelectorListWidget :
    public stw_opensyde_gui_elements::C_OgeHorizontalListWidget
@@ -92,17 +87,23 @@ private:
    C_SdNdeDataPoolSelectorListWidget(const C_SdNdeDataPoolSelectorListWidget &);
    C_SdNdeDataPoolSelectorListWidget & operator =(const C_SdNdeDataPoolSelectorListWidget &);
 
+   bool m_OpenShareDataPoolDialog(stw_opensyde_core::C_OSCNodeDataPool & orc_OSCDataPool,
+                                  bool & orq_SharedDatapoolSelected,
+                                  stw_opensyde_core::C_OSCNodeDataPoolId & orc_SharedDatapoolId);
    bool m_OpenDataPoolDialog(stw_opensyde_core::C_OSCNodeDataPool & orc_OSCDataPool,
                              stw_opensyde_gui_logic::C_PuiSdNodeDataPool & orc_UiDataPool,
+                             const stw_opensyde_core::C_OSCNodeDataPoolId * const opc_SharedDatapoolId,
                              const bool oq_ShowApplicationSection, const stw_types::sint32 os32_DataPoolIndex = -1,
                              const bool oq_SelectName = false);
    void m_AddNewDataPool(const stw_opensyde_core::C_OSCNodeDataPool & orc_OSCDataPool,
                          const stw_opensyde_gui_logic::C_PuiSdNodeDataPool & orc_UIDataPool,
-                         const stw_types::sint32 os32_DataPoolIndex = -1, const bool oq_AllowNameAdaptation = false,
-                         const bool oq_AllowDataAdaptation = true);
+                         const stw_types::sint32 os32_DataPoolIndex, const bool oq_AllowNameAdaptation,
+                         const bool oq_AllowDataAdaptation, const bool oq_SharedDatapoolSelected = false,
+                         const stw_opensyde_core::C_OSCNodeDataPoolId * const opc_SharedDatapoolId = NULL);
    void m_AddDataPoolWidget(const stw_types::uint32 ou32_DataPoolIndex);
    void m_UpdateDataPoolWidget(const stw_types::uint32 ou32_DataPoolIndex,
                                const stw_types::sintn osn_DataPoolWidgetIndex) const;
+   void m_SynchronizeDatapoolProperties(const stw_opensyde_core::C_OSCNodeDataPoolId & orc_AdaptedDatapool) const;
 
    void m_OnCustomContextMenuRequested(const QPoint & orc_Pos);
    void m_SetupContextMenu(void);
@@ -115,8 +116,7 @@ private:
    void m_MoveRight(void);
    void m_ItemDoubleClicked(QListWidgetItem * const opc_Item);
 
-   void m_MoveDatapool(const stw_types::sintn osn_SourceIndex, const stw_types::sintn osn_TargetIndex,
-                       const bool oq_Reinit = true);
+   void m_MoveDatapool(const stw_types::sintn osn_SourceIndex, const stw_types::sintn osn_TargetIndex);
    void m_InitFromData(const bool oq_Update = false);
    void m_SelectionChanged(void);
    void m_AdaptSize(const QSize & orc_WidgetSize);
@@ -147,7 +147,7 @@ private:
    bool mq_InteractionAvailable;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

@@ -1,32 +1,26 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Header file with type constants of GraphicsItems
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.09.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 #ifndef GITYPES_H
 #define GITYPES_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QGraphicsItem>
 
 #include <limits>
 
 #include "stwtypes.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 const stw_types::sintn msn_GRAPHICS_ITEM_NODE             = static_cast<stw_types::sintn>(QGraphicsItem::UserType) + 1;
 const stw_types::sintn msn_GRAPHICS_ITEM_LINE             = static_cast<stw_types::sintn>(QGraphicsItem::UserType) + 2;
 const stw_types::sintn msn_GRAPHICS_ITEM_BUS              = static_cast<stw_types::sintn>(QGraphicsItem::UserType) + 3;
@@ -75,9 +69,9 @@ const stw_types::float64 mf64_ZORDER_INIT_PARAM_WIDGET        = mf64_ZORDER_INIT
 const stw_types::float64 mf64_ZORDER_INIT_HIGH                = mf64_ZORDER_INIT_PARAM_WIDGET;
 const stw_types::float64 mf64_ZORDER_MAX                      = std::numeric_limits<stw_types::float64>::max();
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

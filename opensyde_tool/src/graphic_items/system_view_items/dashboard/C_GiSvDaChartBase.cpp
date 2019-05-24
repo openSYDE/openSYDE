@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Class for system view dashboard chart item (implementation)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.08.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <QApplication>
@@ -36,7 +29,7 @@
 #include "C_OSCNodeDataPoolListElement.h"
 #include "C_PuiSdHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
@@ -44,22 +37,21 @@ using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const uint32 C_GiSvDaChartBase::mhu32_MaximumDataElements = 10U;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -70,11 +62,8 @@ const uint32 C_GiSvDaChartBase::mhu32_MaximumDataElements = 10U;
    \param[in]     ors32_DataIndex      Index of data element in dashboard in system view
    \param[in]     oru64_ID             Unique ID
    \param[in,out] opc_Parent           Optional pointer to parent
-
-
-   \created     25.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvDaChartBase::C_GiSvDaChartBase(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
                                      const sint32 & ors32_DataIndex, const uint64 & oru64_ID,
                                      QGraphicsItem * const opc_Parent) :
@@ -93,44 +82,35 @@ C_GiSvDaChartBase::C_GiSvDaChartBase(const uint32 & oru32_ViewIndex, const uint3
    this->mpc_Widget->SetWidget(this->mpc_ChartWidget);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     25.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvDaChartBase::~C_GiSvDaChartBase(void)
 {
    //lint -e{1540}  no memory leak because of the parent of mpc_ChartWidget by SetWidget and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the type of this item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the type of this item
 
    \return  ID
-
-   \created     25.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_GiSvDaChartBase::type(void) const
 {
    return msn_GRAPHICS_ITEM_DB_CHART;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply style
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply style
 
    \param[in] oe_Style    New style type
    \param[in] oq_DarkMode Flag if dark mode is active
-
-   \created     25.08.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaChartBase::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode)
 {
    C_GiSvDaRectBaseGroup::SetDisplayStyle(oe_Style, oq_DarkMode);
@@ -141,25 +121,19 @@ void C_GiSvDaChartBase::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_St
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Adjust font to current size
-
-   \created     25.08.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Adjust font to current size
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaChartBase::ReInitializeSize(void)
 {
    // TODO
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Load data from system view dashboard
-
-   \created     25.08.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Load data from system view dashboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaChartBase::LoadData(void)
 {
    const C_PuiSvDashboard * const pc_Dashboard = this->GetSvDashboard();
@@ -178,13 +152,10 @@ void C_GiSvDaChartBase::LoadData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update data in system view dashboard
-
-   \created     25.08.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update data in system view dashboard
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaChartBase::UpdateData(void)
 {
    if ((this->ms32_Index >= 0) &&
@@ -201,13 +172,10 @@ void C_GiSvDaChartBase::UpdateData(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the shown value of the element
-
-   \created     28.08.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the shown value of the element
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaChartBase::UpdateShowValue(void)
 {
    if (this->mpc_ChartWidget != NULL)
@@ -238,23 +206,22 @@ void C_GiSvDaChartBase::UpdateShowValue(void)
          }
       }
 
-      // Update the time axis
+      // Update the time axis (one central call necessary as this was removed from the add data series calls)
       this->mpc_ChartWidget->UpdateTimeAxis();
+      // Update the value axis (one central call necessary as this was removed from the add data series calls)
+      this->mpc_ChartWidget->UpdateValueAxis();
    }
 
    C_GiSvDaRectBaseGroup::UpdateShowValue();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update of the color transparence value configured by the actual timeout state
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update of the color transparence value configured by the actual timeout state
 
    \param[in] ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
    \param[in] osn_Value                       Value for transparence (0..255)
-
-   \created     31.07.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaChartBase::UpdateTransparence(const uint32 ou32_DataElementIndex, const sintn osn_Value)
 {
    tgl_assert(this->mpc_ChartWidget != NULL);
@@ -264,15 +231,12 @@ void C_GiSvDaChartBase::UpdateTransparence(const uint32 ou32_DataElementIndex, c
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Information about the start or stop of a connection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Information about the start or stop of a connection
 
    \param[in]  oq_Active      Flag if connection is active or not active now
-
-   \created     01.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaChartBase::ConnectionActiveChanged(const bool oq_Active)
 {
    if (this->mpc_ChartWidget != NULL)
@@ -283,13 +247,10 @@ void C_GiSvDaChartBase::ConnectionActiveChanged(const bool oq_Active)
    C_GiSvDaRectBaseGroup::ConnectionActiveChanged(oq_Active);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Call properties for widgets
-
-   \created     10.10.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Call properties for widgets
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaChartBase::CallProperties(void)
 {
    if (this->mpc_ChartWidget != NULL)
@@ -372,9 +333,22 @@ bool C_GiSvDaChartBase::CallProperties(void)
    return true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Activates or deactivates all relevant context menu entries for this item
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Function to activate or deactivate drawing of performance heavy widgets
+
+   \param[in] oq_Active Flag if widgets should currently be drawn
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaChartBase::SetDrawingActive(const bool oq_Active)
+{
+   if (this->mpc_ChartWidget != NULL)
+   {
+      this->mpc_ChartWidget->SetDrawingActive(oq_Active);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Activates or deactivates all relevant context menu entries for this item
 
    Context menu functions:
    - Add data element
@@ -382,10 +356,8 @@ bool C_GiSvDaChartBase::CallProperties(void)
 
    \param[in]     opc_ContextMenuManager  Pointer to context menu manager for registration of actions
    \param[in]     oq_Active       Flag if context menu entries have to be shown or not
-
-   \created     07.09.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaChartBase::ConfigureContextMenu(C_SyvDaContextMenuManager * const opc_ContextMenuManager,
                                              const bool oq_Active)
 {
@@ -472,83 +444,94 @@ void C_GiSvDaChartBase::ConfigureContextMenu(C_SyvDaContextMenuManager * const o
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Update the error icon
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update the error icon
 
    Here: update table
-
-   \created     21.08.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaChartBase::m_UpdateErrorIcon(void)
 {
    //Don't call parent to not show any error icon
    if (this->mpc_ChartWidget != NULL)
    {
-      QMap<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId, QString>::const_iterator c_ItError;
-      QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId, stw_types::uint8>::const_iterator c_ItSigError;
+      for (uint32 u32_ItItem = 0UL; u32_ItItem < this->GetWidgetDataPoolElementCount(); ++u32_ItItem)
+      {
+         C_PuiSvDbNodeDataPoolListElementId c_Id;
+         if (this->GetDataPoolElementIndex(u32_ItItem, c_Id) == C_NO_ERR)
+         {
+            if (c_Id.GetIsValid())
+            {
+               bool q_FoundError = false;
+               QMap<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId, QString>::const_iterator c_ItError;
+               QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId, stw_types::uint8>::const_iterator c_ItSigError;
 
-      for (c_ItError = this->mc_CommmunicationErrors.begin(); c_ItError != this->mc_CommmunicationErrors.end();
-           ++c_ItError)
-      {
-         uint32 u32_Index;
-         if (this->GetWidgetDataPoolElementIndex(c_ItError.key(), u32_Index) == C_NO_ERR)
-         {
-            this->mpc_ChartWidget->UpdateError(u32_Index, c_ItError.value(), true);
-         }
-      }
-      for (c_ItSigError = this->mc_InvalidDlcSignals.begin(); c_ItSigError != this->mc_InvalidDlcSignals.end();
-           ++c_ItSigError)
-      {
-         uint32 u32_Index;
-         if (this->GetWidgetDataPoolElementIndex(C_PuiSvDbNodeDataPoolListElementId(c_ItSigError.key(),
-                                                                                    C_PuiSvDbNodeDataPoolListElementId::
-                                                                                    eBUS_SIGNAL),
-                                                 u32_Index) == C_NO_ERR)
-         {
-            const QString c_Text = QString(C_GtGetText::h_GetText("%1 had invalid DLC %2.")).arg(
-               C_PuiSdHandler::h_GetInstance()->GetSignalNamespace(c_ItSigError.key())).arg(QString::number(c_ItSigError
-                                                                                                            .value()));
-            this->mpc_ChartWidget->UpdateError(u32_Index, c_Text, false);
+               //Errors
+               for (c_ItError = this->mc_CommmunicationErrors.begin(); c_ItError != this->mc_CommmunicationErrors.end();
+                    ++c_ItError)
+               {
+                  if (c_ItError.key() == c_Id)
+                  {
+                     //Set error
+                     this->mpc_ChartWidget->UpdateError(u32_ItItem, c_ItError.value(), true, true);
+
+                     //Signal error
+                     q_FoundError = true;
+                  }
+               }
+               for (c_ItSigError = this->mc_InvalidDlcSignals.begin(); c_ItSigError != this->mc_InvalidDlcSignals.end();
+                    ++c_ItSigError)
+               {
+                  if (c_ItSigError.key() == c_Id)
+                  {
+                     const QString c_Text = QString(C_GtGetText::h_GetText("%1 had invalid DLC %2.")).arg(
+                        C_PuiSdHandler::h_GetInstance()->GetSignalNamespace(c_ItSigError.key())).arg(QString::number(
+                                                                                                        c_ItSigError
+                                                                                                        .value()));
+                     //Set error
+                     this->mpc_ChartWidget->UpdateError(u32_ItItem, c_Text, false, true);
+                     //Signal error
+                     q_FoundError = true;
+                  }
+               }
+               if (q_FoundError == false)
+               {
+                  //Clear error
+                  this->mpc_ChartWidget->UpdateError(u32_ItItem, "", false, false);
+               }
+            }
          }
       }
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if warning icon is allowed
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if warning icon is allowed
 
    \return
    True  Warning icon is allowed
    False Warning icon is not allowed
-
-   \created     21.08.2018  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvDaChartBase::m_AllowWarningIcon(void) const
 {
    return false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get common tool tip content if no other item takes precedence over the tool tip
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get common tool tip content if no other item takes precedence over the tool tip
 
    \return
    Common tool tip content if no other item takes precedence over the tool tip
-
-   \created     20.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_GiSvDaChartBase::m_GetCommonToolTipContent(void) const
 {
    //No common tool tip!
    return "";
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaChartBase::m_AddNewDataElement(void)
 {
    QGraphicsView * const pc_View = this->scene()->views().at(0);
@@ -620,7 +603,7 @@ void C_GiSvDaChartBase::m_AddNewDataElement(void)
    //lint -e{429}  no memory leak because of the parent of pc_Dialog and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaChartBase::m_RemoveDataElement(void)
 {
    if ((this->mpc_ChartWidget != NULL) &&
@@ -652,7 +635,7 @@ void C_GiSvDaChartBase::m_RemoveDataElement(void)
    }
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaChartBase::m_RegisterDataElementRail(
    const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId) const
 {

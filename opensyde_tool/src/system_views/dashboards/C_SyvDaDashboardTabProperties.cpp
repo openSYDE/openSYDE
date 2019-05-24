@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Properties dialog for dashboard tab properties
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     23.07.2018  STW/G.Scupin
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "C_SyvDaDashboardTabProperties.h"
@@ -27,7 +20,7 @@
 #include "C_SyvDaDashboardWidget.h"
 #include "C_OgeWiCustomMessage.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
@@ -35,21 +28,20 @@ using namespace stw_opensyde_gui_elements;
 using namespace stw_types;
 using namespace stw_errors;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -58,10 +50,8 @@ using namespace stw_errors;
    \param[in]     ou32_DashboardIndex       Index of dashboard for editing (not relevant if oq_NewDashboard is true)
    \param[in]     ou32_ViewIndex            Index of current view
    \param[in]     oq_NewDashboard           Flag if new dashboard for creation ()
-
-   \created     23.07.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaDashboardTabProperties::C_SyvDaDashboardTabProperties(C_OgePopUpDialog & orc_Parent, const QString & orc_Name,
                                                              const uint32 ou32_DashboardIndex,
                                                              const uint32 ou32_ViewIndex, const bool oq_NewDashboard) :
@@ -113,28 +103,22 @@ C_SyvDaDashboardTabProperties::C_SyvDaDashboardTabProperties(C_OgePopUpDialog & 
            &C_SyvDaDashboardTabProperties::m_CheckDashboardTabName);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   default destructor
 
    Clean up.
-
-   \created     23.07.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaDashboardTabProperties::~C_SyvDaDashboardTabProperties(void)
 {
    delete mpc_Ui;
    //lint -e{1740}  no memory leak because of the parent of mpc_ParentDialog and the Qt memory management
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     23.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardTabProperties::InitStaticNames(void)
 {
    this->mpc_ParentDialog->SetSubTitle(C_GtGetText::h_GetText("Properties"));
@@ -155,46 +139,37 @@ void C_SyvDaDashboardTabProperties::InitStaticNames(void)
                                                         C_GtGetText::h_GetText("Comment for this Dashboard tab, that "
                                                                                "is shown in tooltip on tab hover."));
 }
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get name of dashboard tab.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get name of dashboard tab.
 
    \return
    name of dashboard tab
-
-   \created     23.07.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaDashboardTabProperties::GetDashboardTabName(void) const
 {
    return this->mpc_Ui->pc_LineEditName->text();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get comment of dashboard tab.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get comment of dashboard tab.
 
    \return
    name of dashboard tab
-
-   \created     23.07.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaDashboardTabProperties::GetDashboardTabComment(void) const
 {
    return this->mpc_Ui->pc_TedComment->toPlainText();
 }
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     23.07.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardTabProperties::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
@@ -220,13 +195,10 @@ void C_SyvDaDashboardTabProperties::keyPressEvent(QKeyEvent * const opc_KeyEvent
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Ok button click
-
-   \created     23.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Ok button click
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardTabProperties::m_OkClicked(void)
 {
    if (this->m_CheckDashboardTabName() == true)
@@ -241,18 +213,15 @@ void C_SyvDaDashboardTabProperties::m_OkClicked(void)
       C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR);
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Dashboard rename"));
       c_MessageBox.SetDescription(C_GtGetText::h_GetText(
-                                     "This Dashboard name is already exists. Choose another name."));
+                                     "This Dashboard name already exists. Choose another name."));
       c_MessageBox.Execute();
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Slot of Cancel button
-
-   \created     23.07.2018  STW/G.Scupin
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Slot of Cancel button
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardTabProperties::m_CancelClicked(void)
 {
    if (this->mpc_ParentDialog != NULL)
@@ -261,16 +230,13 @@ void C_SyvDaDashboardTabProperties::m_CancelClicked(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check Dashboard name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check Dashboard name
 
    Check if Dashboard name is valid (i.e. unique) and if not color line edit font red
    and show error tooltip.
-
-   \created     23.07.2018  STW/G.Scupin
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaDashboardTabProperties::m_CheckDashboardTabName(void) const
 {
    bool q_ValidName = false;

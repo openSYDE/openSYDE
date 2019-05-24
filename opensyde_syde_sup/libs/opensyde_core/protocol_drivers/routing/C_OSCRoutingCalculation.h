@@ -1,21 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Calculation of all potential routes to a specific node in a specific view. (header)
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     10.07.2017  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_OSCROUTINGCALCULATION_H
 #define C_OSCROUTINGCALCULATION_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 #include <list>
 
@@ -24,12 +18,12 @@
 #include "C_OSCRoutingRoute.h"
 #include "C_OSCNode.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OSCRoutingCalculation
 {
@@ -80,11 +74,13 @@ private:
    std::vector<stw_types::uint32> mc_CheckedBusses;
    bool mq_PcBus;
 
-   const std::vector<C_OSCNode> mc_AllNodes;
-   const std::vector<stw_types::uint8> mc_ActiveNodes;
+   //lint -e{1725} reference used for performance reasons
+   const std::vector<C_OSCNode> & mrc_AllNodes;
+   //lint -e{1725} reference used for performance reasons
+   const std::vector<stw_types::uint8> & mrc_ActiveNodes;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

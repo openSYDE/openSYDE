@@ -1,47 +1,39 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data set array edit widget
 
    Data set array edit widget
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     15.03.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SdNdeDataPoolListArrayEditWidget.h"
 #include "ui_C_SdNdeDataPoolListArrayEditWidget.h"
 #include "C_GtGetText.h"
 #include "C_PuiSdHandler.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -53,10 +45,8 @@ using namespace stw_opensyde_core;
    \param[in]     ore_ArrayEditType   Enum for node data pool list element variable
    \param[in]     oru32_DataSetIndex  If min or max use 0
                                   Else use data set index
-
-   \created     15.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListArrayEditWidget::C_SdNdeDataPoolListArrayEditWidget(
    stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, const uint32 & oru32_NodeIndex,
    const uint32 & oru32_DataPoolIndex, const uint32 & oru32_ListIndex, const uint32 & oru32_ElementIndex,
@@ -84,27 +74,21 @@ C_SdNdeDataPoolListArrayEditWidget::C_SdNdeDataPoolListArrayEditWidget(
            &C_SdNdeDataPoolListArrayEditWidget::m_CancelClicked);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     15.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListArrayEditWidget::~C_SdNdeDataPoolListArrayEditWidget(void)
 {
    delete mpc_Ui;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Initialize all displayed static names
-
-   \created     15.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Initialize all displayed static names
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListArrayEditWidget::InitStaticNames(void) const
 {
    const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(this->mu32_NodeIndex,
@@ -150,50 +134,41 @@ void C_SdNdeDataPoolListArrayEditWidget::InitStaticNames(void) const
    this->mrc_Parent.SetSubTitle(QString(C_GtGetText::h_GetText("Array Edit")));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   GetUndocommand and take ownership
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   GetUndocommand and take ownership
 
    Internal undo command is reseted
 
    \return
    NULL No changes
    Else Undocommand accumulating all changes
-
-   \created     16.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QUndoCommand * C_SdNdeDataPoolListArrayEditWidget::TakeUndoCommand(void) const
 {
    return this->mpc_Ui->pc_TableView->TakeUndoCommand();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set model view manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set model view manager
 
    \param[in,out] opc_Value Model view manager
-
-   \created     17.03.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListArrayEditWidget::SetModelViewManager(C_SdNdeDataPoolListModelViewManager * const opc_Value)
 const
 {
    this->mpc_Ui->pc_TableView->SetModelViewManager(opc_Value);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overwritten key press event slot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
 
    \param[in,out] opc_KeyEvent Event identification and information
-
-   \created     02.08.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListArrayEditWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    bool q_CallOrg = true;
@@ -219,25 +194,19 @@ void C_SdNdeDataPoolListArrayEditWidget::keyPressEvent(QKeyEvent * const opc_Key
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On ok clicked
-
-   \created     15.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On ok clicked
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListArrayEditWidget::m_OkClicked(void)
 {
    mrc_Parent.accept();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   On cancel clicked
-
-   \created     15.03.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   On cancel clicked
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListArrayEditWidget::m_CancelClicked(void)
 {
    mrc_Parent.reject();

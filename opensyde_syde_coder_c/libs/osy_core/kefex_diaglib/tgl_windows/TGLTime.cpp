@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       DiagLib Target Glue Layer: Time functions
 
@@ -8,15 +7,9 @@
 
    Here: Implementation for Windows.
 
-   \implementation
-   project     DiagLib
-   copyright   STW (c) 1999-200x
-   license     use only under terms of contract / confidential
-
-   created     21.07.2009  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h" //pre-compiled headers
@@ -48,12 +41,9 @@ using namespace stw_tgl;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get current date and time with milli seconds
+/*! \brief   Get current date and time with milli seconds
 
    \param[out] orc_DateTime Current date and time value with milli seconds
-
-   \created     14.09.2017  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void stw_tgl::TGL_GetDateTimeNow(C_TGLDateTime & orc_DateTime)
@@ -74,8 +64,7 @@ void stw_tgl::TGL_GetDateTimeNow(C_TGLDateTime & orc_DateTime)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Actively wait for a period of time
+/*! \brief   Actively wait for a period of time
 
    Actively blocks for the given number of microseconds.
    Depending on the underlying system very short delays might not be possible
@@ -83,8 +72,6 @@ void stw_tgl::TGL_GetDateTimeNow(C_TGLDateTime & orc_DateTime)
    Thus for example 10 calls of TGL_DelayUs(1) can cause a longer delay than 1 call of TGL_DelayUs(10).
 
    \param[in]   ou32_NumberUs             number of microseconds to block
-
-   \created     26.07.2000 STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void stw_tgl::TGL_DelayUs(const uint32 ou32_NumberUs)
@@ -97,15 +84,12 @@ void stw_tgl::TGL_DelayUs(const uint32 ou32_NumberUs)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get system time in microseconds
+/*! \brief   Get system time in microseconds
 
    Return elapsed time since system start in micro-seconds as precise as possible.
 
    \return
    System time in micro-seconds.
-
-   \created     29.09.2008  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 uint64 stw_tgl::TGL_GetTickCountUS(void)
@@ -129,16 +113,13 @@ uint64 stw_tgl::TGL_GetTickCountUS(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Get system time in milliseconds
+/*! \brief   Get system time in milliseconds
 
    Return elapsed time since system start in micro-seconds as precise as possible.
    As we return ms this will overflow after 47 days (just like the Win32 GetTickCount)
 
    \return
    System time in milliseconds.
-
-   \created     05.03.2002  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 uint32 stw_tgl::TGL_GetTickCount(void)
@@ -147,15 +128,12 @@ uint32 stw_tgl::TGL_GetTickCount(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Sleep for a number of milliseconds
+/*! \brief   Sleep for a number of milliseconds
 
    Delay for a number of milliseconds. Thread control shall meanwhile be passed on.
    i.e.: no active, blocking waiting.
 
    \param[in]    ou32_NumberMs    number of milliseconds to delay
-
-   \created     21.09.2009  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 void stw_tgl::TGL_Sleep(const uint32 ou32_NumberMs)

@@ -1,59 +1,49 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Base class for add and remove bend point actions (implementation)
 
    Base class for add and remove bend point actions
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.11.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
 #include "C_SebUnoBendPointBaseCommand.h"
 #include "C_SebScene.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace std;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    \param[in,out] opc_Scene         Pointer to currently active scene
    \param[in]     orc_IDs           Affected unique IDs
    \param[in]     orc_Text          Command description
    \param[in]     orc_ScenePosition Scene position to bend or remove bend point at
    \param[in,out] opc_Parent        Optional pointer to parent
-
-   \created     25.11.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoBendPointBaseCommand::C_SebUnoBendPointBaseCommand(QGraphicsScene * const opc_Scene,
                                                            const std::vector<uint64> & orc_IDs,
                                                            const QString & orc_Text, const QPointF & orc_ScenePosition,
@@ -64,24 +54,18 @@ C_SebUnoBendPointBaseCommand::C_SebUnoBendPointBaseCommand(QGraphicsScene * cons
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     25.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SebUnoBendPointBaseCommand::~C_SebUnoBendPointBaseCommand()
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Delete bend point
-
-   \created     25.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Delete bend point
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoBendPointBaseCommand::m_DeleteBend(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
@@ -104,13 +88,10 @@ void C_SebUnoBendPointBaseCommand::m_DeleteBend(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add bend point
-
-   \created     25.11.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add bend point
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoBendPointBaseCommand::m_AddBend(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2

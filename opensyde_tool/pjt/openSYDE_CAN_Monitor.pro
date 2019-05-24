@@ -19,11 +19,8 @@ TEMPLATE = app
 
 DESTDIR = ../result/tool/CAN_Monitor
 
-VERSION = 1.00.1
-
-DEFINES += APPLICATION_VERSION=\\\"$$VERSION\\\"
-
-QMAKE_CXXFLAGS_DEBUG *= -Og
+#version info:
+RC_FILE = ../src/can_monitor/cam_resources.rc
 
 SOURCES +=\
     ../libs/opensyde_core/scl/CSCLChecksums.cpp \
@@ -59,8 +56,9 @@ SOURCES +=\
     ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolListElement.cpp \
     ../libs/opensyde_core/project/system/node/C_OSCNodeOpenSydeServerSettings.cpp \
     ../libs/opensyde_core/project/system/node/C_OSCNodeProperties.cpp \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolListElementId.cpp \
+    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolId.cpp \
     ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolListId.cpp \
+    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolListElementId.cpp \
     ../libs/opensyde_core/project/system/node/C_OSCNodeStwFlashloaderSettings.cpp \
     ../libs/opensyde_core/project/system/node/can/C_OSCCanMessage.cpp \
     ../libs/opensyde_core/project/system/node/can/C_OSCCanMessageContainer.cpp \
@@ -290,7 +288,13 @@ SOURCES +=\
     ../src/opensyde_gui_elements/tool_button/C_OgeTobToolTipBase.cpp \
     ../src/can_monitor/util/C_CamUti.cpp \
     ../src/can_monitor/message_generator/C_CamGenTableDelegate.cpp \
-    ../src/table_base/C_TblDelegateUtil.cpp
+    ../src/table_base/C_TblDelegateUtil.cpp \
+    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCNodeDataPoolFilerV2.cpp \
+    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCNodeFilerV2.cpp \
+    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCSystemDefinitionFilerV2.cpp \
+    ../libs/opensyde_core/project/system/node/C_OSCNodeCommFiler.cpp \
+    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCSystemBusFilerV2.cpp \
+    ../src/opensyde_gui_elements/C_OgeTreeToolTipBase.cpp
 
 PRECOMPILED_HEADER = ../src/precompiled_headers/can_monitor/precomp_headers.h
 
@@ -330,8 +334,9 @@ HEADERS  += ../libs/opensyde_core/stwtypes/stwtypes.h \
     ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolListElement.h \
     ../libs/opensyde_core/project/system/node/C_OSCNodeOpenSydeServerSettings.h \
     ../libs/opensyde_core/project/system/node/C_OSCNodeProperties.h \
-    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolListElementId.h \
+    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolId.h \
     ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolListId.h \
+    ../libs/opensyde_core/project/system/node/C_OSCNodeDataPoolListElementId.h \
     ../libs/opensyde_core/project/system/node/C_OSCNodeStwFlashloaderSettings.h \
     ../libs/opensyde_core/project/system/node/can/C_OSCCanMessage.h \
     ../libs/opensyde_core/project/system/node/can/C_OSCCanMessageContainer.h \
@@ -687,7 +692,13 @@ HEADERS  += ../libs/opensyde_core/stwtypes/stwtypes.h \
     ../src/opensyde_gui_elements/tool_button/C_OgeTobToolTipBase.h \
     ../src/can_monitor/util/C_CamUti.h \
     ../src/can_monitor/message_generator/C_CamGenTableDelegate.h \
-    ../src/table_base/C_TblDelegateUtil.h
+    ../src/table_base/C_TblDelegateUtil.h \
+    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCNodeDataPoolFilerV2.h \
+    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCNodeFilerV2.h \
+    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCSystemDefinitionFilerV2.h \
+    ../libs/opensyde_core/project/system/node/C_OSCNodeCommFiler.h \
+    ../libs/opensyde_core/project/system/FileLoadersV2/C_OSCSystemBusFilerV2.h \
+    ../src/opensyde_gui_elements/C_OgeTreeToolTipBase.h
 
 FORMS    += \
     ../src/opensyde_gui_elements/widget/C_OgeWiCustomMessage.ui \
@@ -777,6 +788,7 @@ INCLUDEPATH += ../src \
                ../libs/opensyde_core/project/system \
                ../libs/opensyde_core/project/system/node \
                ../libs/opensyde_core/project/system/node/can \
+               ../libs/opensyde_core/project/system/FileLoadersV2 \
                ../libs/opensyde_core/protocol_drivers/communication \
                ../libs/opensyde_core/scl \
                ../libs/opensyde_core/stwtypes\
@@ -797,13 +809,14 @@ LIBS += -L../libs/gettext -lintl \
 LIBS += -lws2_32   #WinSock
 LIBS += -lIphlpapi #IP helper API
 
-#Icon
-win32: RC_ICONS += ../src/can_monitor/images/CAN_Monitor_logo.ico
+#add windows API libraries
+LIBS += -lversion
 
 QMAKE_TARGET_COMPANY = STW
 QMAKE_TARGET_PRODUCT = openSYDE CAN Monitor
 #QMAKE_TARGET_DESCRIPTION = TODO
-QMAKE_TARGET_COPYRIGHT = STW (c) 1999-2019
+#See C coding rules v4.00r0
+QMAKE_TARGET_COPYRIGHT = STW (c) 2018
 
 DISTFILES +=
 

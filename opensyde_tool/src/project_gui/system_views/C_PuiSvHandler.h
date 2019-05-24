@@ -1,33 +1,28 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       System views data manager (header)
 
    See cpp file for detailed description
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.06.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef C_PUISVHANDLER_H
 #define C_PUISVHANDLER_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <vector>
 #include <QObject>
+#include "C_OSCNode.h"
 #include "C_PuiSvData.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_PuiSvHandler :
    public QObject
@@ -37,7 +32,7 @@ class C_PuiSvHandler :
 public:
    //File
    stw_types::sint32 LoadFromFile(const QString & orc_Path);
-   stw_types::sint32 SaveToFile(const QString & orc_Path);
+   stw_types::sint32 SaveToFile(const QString & orc_Path, const bool oq_UseDeprecatedV1Format);
    bool HasHashChanged(void) const;
 
    //Get
@@ -95,6 +90,19 @@ public:
    stw_types::sint32 SetNodeUpdateInformation(const stw_types::uint32 ou32_ViewIndex,
                                               const stw_types::uint32 ou32_NodeIndex,
                                               const C_PuiSvNodeUpdate & orc_NodeUpdateInformation);
+   stw_types::sint32 SetNodeUpdateInformationPath(const stw_types::uint32 ou32_ViewIndex,
+                                                  const stw_types::uint32 ou32_NodeIndex,
+                                                  const stw_types::uint32 ou32_Index, const QString & orc_Value,
+                                                  const C_PuiSvNodeUpdate::E_GenericFileType oe_Type);
+   stw_types::sint32 SetNodeUpdateInformationParamInfo(const stw_types::uint32 ou32_ViewIndex,
+                                                       const stw_types::uint32 ou32_NodeIndex,
+                                                       const stw_types::uint32 ou32_Index,
+                                                       const C_PuiSvNodeUpdateParamInfo & orc_Value);
+   stw_types::sint32 SetNodeUpdateInformationParamInfoContent(const stw_types::uint32 ou32_ViewIndex,
+                                                              const stw_types::uint32 ou32_NodeIndex,
+                                                              const stw_types::uint32 ou32_Index,
+                                                              const QString & orc_FilePath,
+                                                              const stw_types::uint32 ou32_LastKnownCrc);
 
    //Add
    void AddView(const C_PuiSvData & orc_View, const bool oq_AutoAdaptName, const bool oq_AutoAdaptContent);
@@ -104,6 +112,12 @@ public:
    stw_types::sint32 AddViewReadRailItem(const stw_types::uint32 ou32_ViewIndex,
                                          const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id,
                                          const C_PuiSvReadDataConfiguration & orc_Config);
+   stw_types::sint32 AddNodeUpdateInformationPath(const stw_types::uint32 ou32_ViewIndex,
+                                                  const stw_types::uint32 ou32_NodeIndex, const QString & orc_Value,
+                                                  const C_PuiSvNodeUpdate::E_GenericFileType oe_Type);
+   stw_types::sint32 AddNodeUpdateInformationParamInfo(const stw_types::uint32 ou32_ViewIndex,
+                                                       const stw_types::uint32 ou32_NodeIndex,
+                                                       const C_PuiSvNodeUpdateParamInfo & orc_Value);
    stw_types::sint32 AddDashboard(const stw_types::uint32 ou32_ViewIndex, const C_PuiSvDashboard & orc_Dashboard,
                                   const bool oq_AutoAdapt);
    stw_types::sint32 InsertDashboard(const stw_types::uint32 ou32_ViewIndex,
@@ -147,6 +161,18 @@ public:
    stw_types::sint32 DeleteView(const stw_types::uint32 ou32_Index);
    stw_types::sint32 RemoveViewReadRailItem(const stw_types::uint32 ou32_ViewIndex,
                                             const stw_opensyde_core::C_OSCNodeDataPoolListElementId & orc_Id);
+   stw_types::sint32 RemoveNodeUpdateInformationPath(const stw_types::uint32 ou32_ViewIndex,
+                                                     const stw_types::uint32 ou32_NodeIndex,
+                                                     const stw_types::uint32 ou32_Index,
+                                                     const C_PuiSvNodeUpdate::E_GenericFileType oe_Type);
+   stw_types::sint32 RemoveNodeUpdateInformationParamInfo(const stw_types::uint32 ou32_ViewIndex,
+                                                          const stw_types::uint32 ou32_NodeIndex,
+                                                          const stw_types::uint32 ou32_Index);
+   stw_types::sint32 ClearNodeUpdateInformationAsAppropriate(const stw_types::uint32 ou32_ViewIndex,
+                                                             const stw_types::uint32 ou32_NodeIndex,
+                                                             const C_PuiSvNodeUpdate::E_GenericFileType oe_Type);
+   stw_types::sint32 ClearNodeUpdateInformationParamPaths(const stw_types::uint32 ou32_ViewIndex,
+                                                          const stw_types::uint32 ou32_NodeIndex);
    stw_types::sint32 DeleteDashboard(const stw_types::uint32 ou32_ViewIndex,
                                      const stw_types::uint32 ou32_DashboardIndex);
    stw_types::sint32 DeleteDashboardWidget(const stw_types::uint32 ou32_ViewIndex,
@@ -202,10 +228,18 @@ public:
    static C_PuiSvHandler * h_GetInstance(void);
    static void h_Destroy(void);
 
-private:
-   //Avoid call
+protected:
+   std::vector<C_PuiSvData> mc_Views;
+
+   stw_types::sint32 m_LoadFromFile(const QString & orc_Path,
+                                    const std::vector<stw_opensyde_core::C_OSCNode> & orc_OSCNodes);
+
+   //Avoid call (protected access for test)
    explicit C_PuiSvHandler(QObject * const opc_Parent = NULL);
    ~C_PuiSvHandler(void);
+
+private:
+   //Avoid call
    C_PuiSvHandler(const C_PuiSvHandler &);
    C_PuiSvHandler & operator =(const C_PuiSvHandler &);
 
@@ -284,7 +318,6 @@ private:
    static C_PuiSvHandler * mhpc_Singleton;
    std::vector<bool> mc_SdNodeErrors;
    std::vector<bool> mc_SdBusErrors;
-   std::vector<C_PuiSvData> mc_Views;
    stw_types::uint32 mu32_CalculatedHashSystemViews;
    stw_types::uint32 mu32_PreviousSystemDefintionHash;
 
@@ -307,7 +340,7 @@ private:
    QMap<stw_types::uint32, C_PuiSvViewErrorDetails> mc_PreviousErrorCheckResults;
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

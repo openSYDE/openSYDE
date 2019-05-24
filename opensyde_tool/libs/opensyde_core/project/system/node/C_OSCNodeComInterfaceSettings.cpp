@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data class for communication interface settings (implementation)
 
    Data class for communication interface settings
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.12.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <cstring>
@@ -24,29 +17,26 @@
 
 #include "CSCLChecksums.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_core;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     22.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeComInterfaceSettings::C_OSCNodeComInterfaceSettings(void) :
    e_InterfaceType(C_OSCSystemBus::eCAN),
    u8_InterfaceNumber(0),
@@ -57,43 +47,25 @@ C_OSCNodeComInterfaceSettings::C_OSCNodeComInterfaceSettings(void) :
    q_IsBusConnected(false),
    u32_BusIndex(0)
 {
-   c_Ip.au8_IpAddress[0] = 0U;
-   c_Ip.au8_IpAddress[1] = 0U;
-   c_Ip.au8_IpAddress[2] = 0U;
-   c_Ip.au8_IpAddress[3] = 0U;
-   c_Ip.au8_NetMask[0] = 0U;
-   c_Ip.au8_NetMask[1] = 0U;
-   c_Ip.au8_NetMask[2] = 0U;
-   c_Ip.au8_NetMask[3] = 0U;
-   c_Ip.au8_DefaultGateway[0] = 0U;
-   c_Ip.au8_DefaultGateway[1] = 0U;
-   c_Ip.au8_DefaultGateway[2] = 0U;
-   c_Ip.au8_DefaultGateway[3] = 0U;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     22.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeComInterfaceSettings::~C_OSCNodeComInterfaceSettings(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
    It is not endian-safe, so it should only be used on the same system it is created on.
 
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
-
-   \created     21.03.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeComInterfaceSettings::CalcHash(uint32 & oru32_HashValue) const
 {
    stw_scl::C_SCLChecksums::CalcCRC32(&this->e_InterfaceType, sizeof(this->e_InterfaceType), oru32_HashValue);
@@ -110,46 +82,38 @@ void C_OSCNodeComInterfaceSettings::CalcHash(uint32 & oru32_HashValue) const
    stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_BusIndex, sizeof(this->u32_BusIndex), oru32_HashValue);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Add new connection
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Add new connection
 
    \param[in] oru32_BusIndex Bus index to add
-
-   \created     22.12.2016  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeComInterfaceSettings::AddConnection(const uint32 & oru32_BusIndex)
 {
    this->u32_BusIndex = oru32_BusIndex;
    this->q_IsBusConnected = true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Clear existing connection
-
-   \created     22.12.2016  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Clear existing connection
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeComInterfaceSettings::RemoveConnection(void)
 {
    this->u32_BusIndex = 0;
    this->q_IsBusConnected = false;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Constructor
 
    Set defaults
-
-   \created     03.05.2018  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OSCNodeComInterfaceSettings::C_IpAddress::C_IpAddress(void)
 {
    (void)std::memset(&au8_IpAddress[0], 0, sizeof(au8_IpAddress));
-   (void)std::memset(&au8_NetMask[0], 0, sizeof(au8_NetMask));
+   (void)std::memset(&au8_NetMask[0], 255, sizeof(au8_NetMask));
+   au8_NetMask[3] = 0;
    (void)std::memset(&au8_DefaultGateway[0], 0, sizeof(au8_DefaultGateway));
 }

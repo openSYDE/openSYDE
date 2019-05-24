@@ -1,56 +1,46 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Node data pool lists tree drawing delegate (implementation)
 
    Node data pool lists tree drawing delegate
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.11.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
 #include "C_SdNdeDataPoolUtil.h"
 #include "C_SdNdeDataPoolListsTreeDelegate.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     06.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDataPoolListsTreeDelegate::C_SdNdeDataPoolListsTreeDelegate(QObject * const opc_Parent) :
    QStyledItemDelegate(opc_Parent),
    mu32_NodeIndex(0UL),
@@ -58,16 +48,13 @@ C_SdNdeDataPoolListsTreeDelegate::C_SdNdeDataPoolListsTreeDelegate(QObject * con
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set new data pool
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new data pool
 
    \param[in] ou32_NodeIndex     Node index
    \param[in] ou32_DataPoolIndex Data pool index
-
-   \created     06.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDataPoolListsTreeDelegate::SetDataPool(const stw_types::uint32 ou32_NodeIndex,
                                                    const stw_types::uint32 ou32_DataPoolIndex)
 {
@@ -75,19 +62,16 @@ void C_SdNdeDataPoolListsTreeDelegate::SetDataPool(const stw_types::uint32 ou32_
    this->mu32_DataPoolIndex = ou32_DataPoolIndex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Size hint of each index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Size hint of each index
 
    \param[in] orc_Option Style options
    \param[in] orc_Index  Index
 
    \return
    Item size
-
-   \created     06.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QSize C_SdNdeDataPoolListsTreeDelegate::sizeHint(const QStyleOptionViewItem & orc_Option,
                                                  const QModelIndex & orc_Index) const
 {

@@ -1,3 +1,13 @@
+//----------------------------------------------------------------------------------------------------------------------
+/*!
+   \file
+   \brief       Translate L2 CAN message to L7 interpretation
+
+   Translate L2 CAN message to SHIP-IP! resp. IVA protocol L7 interpretation
+
+   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
+*/
+//----------------------------------------------------------------------------------------------------------------------
 #ifndef CCMONProtocolSHIPIPIVAH
 #define CCMONProtocolSHIPIPIVAH
 
@@ -60,7 +70,6 @@ public:
    stw_scl::C_SCLString c_ASPPrefix;   ///< if c_ASPs.GetLength() == 0: meaning of ASP (e.g. "CH" or "IDX")
    stw_types::uint16 u16_Length;       ///< if c_ASPs.GetLength() == 0: expected size of APAY
    stw_scl::SCLDynamicArray<C_CMONProtocolSIPPayload> c_Payload; //if c_ASPs.GetLength() == 0
-
 
    stw_scl::SCLDynamicArray<C_CMONProtocolSIPASPDescription> c_ASPs;
 

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Utility functions for system definition (implementation)
 
    Utility functions for system definition
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     28.02.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwerrors.h"
@@ -24,28 +17,27 @@
 #include "C_PuiSdHandler.h"
 #include "C_GtGetText.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
 using namespace stw_scl;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check name not used in existing items
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check name not used in existing items
 
    \param[in] orc_ExistingStrings Existing item names
    \param[in] orc_ProposedName    Proposal for item name
@@ -55,10 +47,8 @@ using namespace stw_scl;
    \return
    True  Name available
    False Name already in use
-
-   \created     06.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_PuiSdUtil::h_CheckNameAvailable(const std::vector<const QString *> & orc_ExistingStrings,
                                        const QString & orc_Proposal, const uint32 * const opu32_SkipIndex)
 {
@@ -90,18 +80,15 @@ bool C_PuiSdUtil::h_CheckNameAvailable(const std::vector<const QString *> & orc_
    return q_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility function to convert bus type to string (uppercase only)
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility function to convert bus type to string (uppercase only)
 
    \param[in] ore_Type Bus type
 
    \return
    String for bus type
-
-   \created     03.04.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_PuiSdUtil::h_ConvertBusTypeToStringUppercase(const C_OSCSystemBus::E_Type & ore_Type)
 {
    QString c_Retval;
@@ -122,18 +109,15 @@ QString C_PuiSdUtil::h_ConvertBusTypeToStringUppercase(const C_OSCSystemBus::E_T
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility function to convert protocol type to string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility function to convert protocol type to string
 
    \param[in] ore_Type   Protocol type
 
    \return
    String for protocol type
-
-   \created     09.05.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_PuiSdUtil::h_ConvertProtocolTypeToString(const C_OSCCanProtocol::E_Type & ore_Type)
 {
    QString c_ProtocolName;
@@ -155,18 +139,15 @@ QString C_PuiSdUtil::h_ConvertProtocolTypeToString(const C_OSCCanProtocol::E_Typ
    return c_ProtocolName;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility function to convert protocol type to string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility function to convert protocol type to string
 
    \param[in] oe_Type Protocol type
 
    \return
    String for protocol type datapool name
-
-   \created     12.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_PuiSdUtil::h_ConvertProtocolTypeToDatapoolNameString(const C_OSCCanProtocol::E_Type oe_Type)
 {
    QString c_ProtocolName;
@@ -189,18 +170,15 @@ QString C_PuiSdUtil::h_ConvertProtocolTypeToDatapoolNameString(const C_OSCCanPro
    return c_ProtocolName;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility function to convert datapool type to string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility function to convert datapool type to string
 
    \param[in] ore_Type   Datapool type
 
    \return
    String for protocol type
-
-   \created     18.05.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_PuiSdUtil::h_ConvertDataPoolTypeToString(const C_OSCNodeDataPool::E_Type & ore_Type)
 {
    QString c_Name;
@@ -222,19 +200,16 @@ QString C_PuiSdUtil::h_ConvertDataPoolTypeToString(const C_OSCNodeDataPool::E_Ty
    return c_Name;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get/create interface name
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get/create interface name
 
    \param[in] oe_Type             Bus type
    \param[in] ou8_InterfaceNumber Interface index
 
    \return
    Interface name
-
-   \created     10.01.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QString C_PuiSdUtil::h_GetInterfaceName(const C_OSCSystemBus::E_Type oe_Type, const uint8 ou8_InterfaceNumber)
 {
    QString c_Retval;
@@ -253,9 +228,8 @@ QString C_PuiSdUtil::h_GetInterfaceName(const C_OSCSystemBus::E_Type oe_Type, co
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert com datapool element index to message ID
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert com datapool element index to message ID
 
    \param[in]  orc_ElementID     Datapool element ID
    \param[out] orc_MessageID     Message ID
@@ -264,10 +238,8 @@ QString C_PuiSdUtil::h_GetInterfaceName(const C_OSCSystemBus::E_Type oe_Type, co
    \return
    C_NO_ERR Operation success
    C_CONFIG Operation failure: configuration invalid
-
-   \created     28.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdUtil::h_ConvertIndex(const C_OSCNodeDataPoolListElementId & orc_ElementID,
                                    C_OSCCanMessageIdentificationIndices & orc_MessageID, uint32 & oru32_SignalIndex)
 {
@@ -332,9 +304,8 @@ sint32 C_PuiSdUtil::h_ConvertIndex(const C_OSCNodeDataPoolListElementId & orc_El
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Convert Signal index to datapool index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Convert Signal index to datapool index
 
    \param[in]  orc_MessageID    Message ID
    \param[in]  ou32_SignalIndex Signal index in message
@@ -343,10 +314,8 @@ sint32 C_PuiSdUtil::h_ConvertIndex(const C_OSCNodeDataPoolListElementId & orc_El
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     08.11.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdUtil::h_ConvertFromSignalIndex(const C_OSCCanMessageIdentificationIndices & orc_MessageID,
                                              const uint32 ou32_SignalIndex,
                                              C_OSCNodeDataPoolListElementId & orc_ElementID)
@@ -380,13 +349,10 @@ sint32 C_PuiSdUtil::h_ConvertFromSignalIndex(const C_OSCCanMessageIdentification
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     28.02.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSdUtil::C_PuiSdUtil(void)
 {
 }

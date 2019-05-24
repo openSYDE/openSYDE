@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Tree model base class (implementation)
 
    Tree model base class
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.06.2018  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "TGLUtils.h"
@@ -24,43 +17,39 @@
 #include "constants.h"
 #include "C_TblTreModel.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     25.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_TblTreModel::C_TblTreModel(QObject * const opc_Parent) :
    QAbstractItemModel(opc_Parent),
    mpc_InvisibleRootItem(NULL)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data index
 
    \param[in] osn_Row    Row
    \param[in] osn_Column Column
@@ -68,10 +57,8 @@ C_TblTreModel::C_TblTreModel(QObject * const opc_Parent) :
 
    \return
    Data index (may be invalid = invalid parameters)
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QModelIndex C_TblTreModel::index(const sintn osn_Row, const sintn osn_Column, const QModelIndex & orc_Parent) const
 {
    QModelIndex c_Retval;
@@ -104,9 +91,8 @@ QModelIndex C_TblTreModel::index(const sintn osn_Row, const sintn osn_Column, co
    //lint -e{1763} Just passing one child
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get parent index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get parent index
 
    Warning: currently this implementation works,
             but if a tree requires more layers this implementation has to be adapted
@@ -115,10 +101,8 @@ QModelIndex C_TblTreModel::index(const sintn osn_Row, const sintn osn_Column, co
 
    \return
    Parent index (may be invalid = root level)
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QModelIndex C_TblTreModel::parent(const QModelIndex & orc_Index) const
 {
    QModelIndex c_Retval;
@@ -139,18 +123,15 @@ QModelIndex C_TblTreModel::parent(const QModelIndex & orc_Index) const
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get tree row count
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get tree row count
 
    \param[in] orc_Parent Parent
 
    \return
    Row count
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_TblTreModel::rowCount(const QModelIndex & orc_Parent) const
 {
    sintn sn_Retval = 0;
@@ -177,19 +158,16 @@ sintn C_TblTreModel::rowCount(const QModelIndex & orc_Parent) const
    return sn_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data at index
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data at index
 
    \param[in] orc_Index Index
    \param[in] osn_Role  Data role
 
    \return
    Data
-
-   \created     07.09.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QVariant C_TblTreModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
 {
    QVariant c_Retval;
@@ -245,18 +223,15 @@ QVariant C_TblTreModel::data(const QModelIndex & orc_Index, const sintn osn_Role
    return c_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get item flags
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get item flags
 
    \param[in] orc_Index Index
 
    \return
    Item flags
-
-   \created     20.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 Qt::ItemFlags C_TblTreModel::flags(const QModelIndex & orc_Index) const
 {
    Qt::ItemFlags c_Retval = Qt::NoItemFlags;

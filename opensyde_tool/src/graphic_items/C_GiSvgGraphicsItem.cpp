@@ -1,41 +1,33 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       For rendering SVG Images
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     23.02.2018  STW/Hollmann
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QPainter>
 #include "C_GiSvgGraphicsItem.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_opensyde_gui;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
@@ -43,10 +35,8 @@ using namespace stw_opensyde_gui;
    \param[in]     of64_Width     Picture width
    \param[in]     of64_Height    Picture height
    \param[in,out] opc_Parent     Optional pointer to parent
-
-   \created     23.02.2018  STW/Hollmann
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvgGraphicsItem::C_GiSvgGraphicsItem(const QString & orc_ImagePath, const stw_types::float64 of64_Width,
                                          const stw_types::float64 of64_Height, QGraphicsItem * const opc_Parent) :
    QGraphicsRectItem(0.0, 0.0, of64_Width, of64_Height, opc_Parent),
@@ -63,29 +53,23 @@ C_GiSvgGraphicsItem::C_GiSvgGraphicsItem(const QString & orc_ImagePath, const st
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     17.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_GiSvgGraphicsItem::~C_GiSvgGraphicsItem(void)
 {
    delete this->mpc_SvgRenderer;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Set new SVG
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set new SVG
 
    \param[in] orc_ImagePath File path to svg
-
-   \created     17.08.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvgGraphicsItem::SetSvg(const QString & orc_ImagePath)
 {
    delete this->mpc_SvgRenderer;
@@ -100,19 +84,16 @@ void C_GiSvgGraphicsItem::SetSvg(const QString & orc_ImagePath)
    this->update();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Apply new size
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Apply new size
 
    \param[in] of64_Width  New width
    \param[in] of64_Height New height
 
    \return
    possible return value(s) and description
-
-   \created     18.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvgGraphicsItem::SetNewSize(const stw_types::float64 of64_Width, const stw_types::float64 of64_Height)
 {
    this->f64_Width = of64_Width;
@@ -120,25 +101,25 @@ void C_GiSvgGraphicsItem::SetNewSize(const stw_types::float64 of64_Width, const 
    this->setRect(QRectF(this->pos(), QSizeF(of64_Width, of64_Height)));
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Updates the drawing
-
-   \created     23.02.2018  STW/Hollmann
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the drawing
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvgGraphicsItem::Redraw(void)
 {
    this->setRect(this->GetSizeRect());
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Overiding paint event
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overridden paint event
 
-   \created     23.02.2018  STW/Hollmann
+   Here: Custom paint operation
+
+   \param[in]     opc_Painter    Pointer to Painter
+   \param[in]     opc_Option     Style option
+   \param[in]     opc_Widget     Optional widget to paint on
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_GiSvgGraphicsItem::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
                                 QWidget * const opc_Widget)
 {

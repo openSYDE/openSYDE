@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       ECU information block handling
 
@@ -8,17 +7,11 @@
    - deserialize
    - extract information
 
-   \implementation
-   project     KEFEX
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     21.08.2015  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2015 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h" //pre-compiled headers
 #ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
 #pragma hdrstop
@@ -30,7 +23,7 @@
 #include "stwerrors.h"
 #include "CXFLECUInformation.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_scl;
@@ -61,17 +54,17 @@ const stw_types::uint8 C_XFLECUInformation::hau8_LENGTHS_PROJECT_VERSION[3] =
    10U, 11U, 17U
 };
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 C_XFLECUInformation::C_XFLECUInformation(void) :
    u8_StructVersion(0U),
@@ -81,7 +74,7 @@ C_XFLECUInformation::C_XFLECUInformation(void) :
    this->ClearContents();
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_XFLECUInformation::ClearContents(void)
 {
@@ -94,7 +87,7 @@ void C_XFLECUInformation::ClearContents(void)
    (void)std::memset(&acn_AdditionalInfo[0], 0, sizeof(acn_AdditionalInfo));
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 uint16 C_XFLECUInformation::GetMaxSizeOnECU(void) const
 {
@@ -114,9 +107,8 @@ uint16 C_XFLECUInformation::GetMaxSizeOnECU(void) const
    return u16_Size;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Parse ECU information payload data from BLOB
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Parse ECU information payload data from BLOB
 
    Tries to parse the payload of an ECU information block.
    Supports V1, V2, V3 of the block definition.
@@ -128,10 +120,8 @@ uint16 C_XFLECUInformation::GetMaxSizeOnECU(void) const
    \return
    C_NO_ERR           no errors, information stored in class members
    else               error parsing
-
-   \created     24.11.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_XFLECUInformation::m_ParsePayload(const uint8 * const opu8_Data, const uint16 ou16_NumBytesAvailable,
                                            const uint8 ou8_BlockVersion)
 {
@@ -260,9 +250,8 @@ sint32 C_XFLECUInformation::m_ParsePayload(const uint8 * const opu8_Data, const 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Parse ECU information data from BLOB
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Parse ECU information data from BLOB
 
    Tries to parse an ECU information block.
    Supports V1, V2, V3 of the block definition.
@@ -274,10 +263,8 @@ sint32 C_XFLECUInformation::m_ParsePayload(const uint8 * const opu8_Data, const 
    \return
    C_NO_ERR           no errors, information stored in class members
    else               error parsing
-
-   \created     24.07.2015  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 stw_types::sint32 C_XFLECUInformation::ParseFromBLOB(const uint8 * const opu8_Data, const uint16 ou16_NumBytesAvailable)
 {
    C_XFLECUInformation c_Temp;
@@ -367,7 +354,7 @@ stw_types::sint32 C_XFLECUInformation::ParseFromBLOB(const uint8 * const opu8_Da
    return s32_Return;
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_XFLECUInformation::m_GetNonTerminatedString(const charn * const opcn_Chars,
                                                           const uint8 ou8_MaxLength) const
@@ -384,7 +371,7 @@ C_SCLString C_XFLECUInformation::m_GetNonTerminatedString(const charn * const op
    return c_Help;
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void C_XFLECUInformation::AddInfoToList(C_SCLStringList & orc_List) const
 {
@@ -437,7 +424,7 @@ void C_XFLECUInformation::AddInfoToList(C_SCLStringList & orc_List) const
    }
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_XFLECUInformation::GetInfoLevelAsString(void) const
 {
@@ -484,7 +471,7 @@ C_SCLString C_XFLECUInformation::GetInfoLevelAsString(void) const
    return c_Text;
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 sint32 C_XFLECUInformation::GetInfoLevel(void) const
 {
@@ -530,81 +517,81 @@ sint32 C_XFLECUInformation::GetInfoLevel(void) const
    return s32_Return;
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 bool C_XFLECUInformation::ContainsDeviceID(void) const
 {
    return ((u8_ContentMap & 0x01U) == 0x01U) ? true : false;
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 bool C_XFLECUInformation::ContainsDateAndTime(void) const
 {
    return ((u8_ContentMap & 0x02U) == 0x02U) ? true : false;
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 bool C_XFLECUInformation::ContainsProjectName(void) const
 {
    return ((u8_ContentMap & 0x04U) == 0x04U) ? true : false;
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 bool C_XFLECUInformation::ContainsProjectVersion(void) const
 {
    return ((u8_ContentMap & 0x08U) == 0x08U) ? true : false;
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 bool C_XFLECUInformation::ContainsAdditionalInfo(void) const
 {
    return ((u8_ContentMap & 0x10U) == 0x10U) ? true : false;
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_XFLECUInformation::GetDeviceID(void) const
 {
    return m_GetNonTerminatedString(&acn_DeviceID[0], static_cast<uint8>(sizeof(acn_DeviceID)));
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_XFLECUInformation::GetDate(void) const
 {
    return m_GetNonTerminatedString(&acn_Date[0], static_cast<uint8>(sizeof(acn_Date)));
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_XFLECUInformation::GetTime(void) const
 {
    return m_GetNonTerminatedString(&acn_Time[0], static_cast<uint8>(sizeof(acn_Time)));
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_XFLECUInformation::GetProjectName(void) const
 {
    return m_GetNonTerminatedString(&acn_ProjectName[0], static_cast<uint8>(sizeof(acn_ProjectName)));
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_XFLECUInformation::GetProjectVersion(void) const
 {
    return m_GetNonTerminatedString(&acn_ProjectVersion[0], static_cast<uint8>(sizeof(acn_ProjectVersion)));
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 C_SCLString C_XFLECUInformation::GetAdditionalInfo(void) const
 {
    return m_GetNonTerminatedString(&acn_AdditionalInfo[0], u8_LenAdditionalInfo);
 }
 
-//------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------

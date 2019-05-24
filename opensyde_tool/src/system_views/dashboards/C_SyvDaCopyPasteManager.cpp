@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Handle most parts of copy paste implementation for scene (implementation)
 
    Handle most parts of copy paste implementation for scene
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     24.07.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "gitypes.h"
@@ -45,7 +38,7 @@
 #include "C_OgeWiCustomMessage.h"
 #include "C_GtGetText.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -53,26 +46,23 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvDaCopyPasteManager::hc_ClipBoardBaseTagName = "opensyde-system-definition";
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     24.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaCopyPasteManager::C_SyvDaCopyPasteManager(void) :
    C_SebBaseCopyPasteManager(),
    mu32_ViewIndex(0),
@@ -80,70 +70,141 @@ C_SyvDaCopyPasteManager::C_SyvDaCopyPasteManager(void) :
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     24.07.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvDaCopyPasteManager::~C_SyvDaCopyPasteManager(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get data snapshot
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get data snapshot
 
    \return
    NULL No valid data snap shot found
    Else Valid data snapshot
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 const C_PuiBsElements * C_SyvDaCopyPasteManager::GetSnapshot(QWidget * const opc_Parent)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
    if (pc_View != NULL)
    {
-      bool q_InvalidElementsFound = false;
-      std::vector<const C_PuiSvDbWidgetBase *> c_AllWidgets;
       //Check params validity
       for (uint32 u32_ItParam = 0; u32_ItParam < this->mc_LastKnownData.GetParams().size();)
       {
+         std::set<QString> c_AdaptedLists;
          bool q_Found = false;
+         bool q_ElementMissing = false;
          const C_PuiSvDbParam & rc_ParamWidget = this->mc_LastKnownData.GetParams()[u32_ItParam];
+         //Check each parameter element
          for (uint32 u32_ItElement = 0; u32_ItElement < rc_ParamWidget.c_DataPoolElementsConfig.size();
               ++u32_ItElement)
          {
-            const C_PuiSvDbNodeDataElementConfig & rc_Config =
-               rc_ParamWidget.c_DataPoolElementsConfig[u32_ItElement];
+            const C_PuiSvDbNodeDataElementConfig & rc_Config = rc_ParamWidget.c_DataPoolElementsConfig[u32_ItElement];
             if (rc_Config.c_ElementId.GetIsValid() == true)
             {
-               if (pc_View->CheckNvmParamListUsage(stw_opensyde_core::C_OSCNodeDataPoolListId(rc_Config.c_ElementId.
-                                                                                              u32_NodeIndex,
-                                                                                              rc_Config.c_ElementId.
-                                                                                              u32_DataPoolIndex,
-                                                                                              rc_Config.c_ElementId.
-                                                                                              u32_ListIndex)) ==
-                   true)
+               const stw_opensyde_core::C_OSCNodeDataPoolListId c_ListId(rc_Config.c_ElementId.u32_NodeIndex,
+                                                                         rc_Config.c_ElementId.u32_DataPoolIndex,
+                                                                         rc_Config.c_ElementId.u32_ListIndex);
+               const stw_opensyde_core::C_OSCNodeDataPoolList * const pc_List =
+                  C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(c_ListId.u32_NodeIndex,
+                                                                      c_ListId.u32_DataPoolIndex,
+                                                                      c_ListId.u32_ListIndex);
+               if (pc_View->CheckNvmParamListUsage(c_ListId) == true)
                {
+                  //Signal error message necessary
                   q_Found = true;
+               }
+               //For each element check if all elements of this list are contained
+               if (pc_List != NULL)
+               {
+                  //Iterate over all list elements
+                  for (uint32 u32_ItSDElement = 0UL; u32_ItSDElement < pc_List->c_Elements.size(); ++u32_ItSDElement)
+                  {
+                     bool q_FoundOne = false;
+                     const stw_opensyde_core::C_OSCNodeDataPoolListElementId c_ElementId(
+                        rc_Config.c_ElementId.u32_NodeIndex,
+                        rc_Config.c_ElementId.u32_DataPoolIndex,
+                        rc_Config.c_ElementId.u32_ListIndex, u32_ItSDElement);
+                     //Check if each element contained
+                     for (uint32 u32_ItCheckElement = 0;
+                          u32_ItCheckElement < rc_ParamWidget.c_DataPoolElementsConfig.size();
+                          ++u32_ItCheckElement)
+                     {
+                        const C_PuiSvDbNodeDataElementConfig & rc_CheckConfig =
+                           rc_ParamWidget.c_DataPoolElementsConfig[u32_ItElement];
+                        if (rc_CheckConfig.c_ElementId.GetIsValid() == true)
+                        {
+                           if (rc_CheckConfig.c_ElementId == c_ElementId)
+                           {
+                              //Signal match for this index
+                              q_FoundOne = true;
+                              break;
+                           }
+                        }
+                     }
+                     //Signal at least one element missing
+                     if (q_FoundOne == false)
+                     {
+                        QString c_Tmp;
+                        const stw_opensyde_core::C_OSCNode * const pc_Node =
+                           C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+                              c_ListId.u32_NodeIndex);
+                        const stw_opensyde_core::C_OSCNodeDataPool * const pc_DataPool =
+                           C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+                              c_ListId.u32_NodeIndex,
+                              c_ListId.u32_DataPoolIndex);
+
+                        //For each missing element add default
+                        q_ElementMissing = true;
+                        //Remember name
+                        if ((pc_Node != NULL) && (pc_DataPool != NULL))
+                        {
+                           c_Tmp = QString("%1::%2::%3").arg(pc_Node->c_Properties.c_Name.c_str()).arg(
+                              pc_DataPool->c_Name.c_str()).arg(
+                              pc_List->c_Name.c_str());
+                        }
+                        c_AdaptedLists.insert(c_Tmp);
+                        break;
+                     }
+                  }
                }
             }
          }
-         if (q_Found == true)
+         //Check if error message necessary
+         if ((q_Found) || (q_ElementMissing))
          {
+            QString c_Details;
             C_OgeWiCustomMessage c_Message(opc_Parent);
             //No iterator step because new element at current position
             this->mc_LastKnownData.DeleteWidget(u32_ItParam, C_PuiSvDbDataElement::ePARAM);
-            c_Message.SetType(C_OgeWiCustomMessage::E_Type::eERROR);
+            c_Message.SetType(C_OgeWiCustomMessage::eINFORMATION);
             c_Message.SetHeading(C_GtGetText::h_GetText("Widget paste"));
-            c_Message.SetDescription(C_GtGetText::h_GetText("Parametrization widget could not be pasted.\n"
-                                                            "Another parametrization widget in this view is already "
-                                                            "using at least one of the containing lists."));
+            c_Message.SetDescription(C_GtGetText::h_GetText("Parametrization widget could not be pasted."));
+            if (q_Found)
+            {
+               c_Details = C_GtGetText::h_GetText("Another parametrization widget in this view is already "
+                                                  "using at least one of the containing lists.");
+            }
+            else if (q_ElementMissing)
+            {
+               c_Details = C_GtGetText::h_GetText(
+                  "The following copied lists were changed before pasting the parametrization widget:\n");
+               for (std::set<QString>::const_iterator c_It = c_AdaptedLists.begin(); c_It != c_AdaptedLists.end();
+                    ++c_It)
+               {
+                  c_Details += *c_It;
+                  c_Details += "\n";
+               }
+            }
+            else
+            {
+               //Unexpected
+            }
+            c_Message.SetDetails(c_Details);
             c_Message.Execute();
          }
          else
@@ -153,40 +214,14 @@ const C_PuiBsElements * C_SyvDaCopyPasteManager::GetSnapshot(QWidget * const opc
          }
       }
       //Check ID validity
-      this->mc_LastKnownData.GetAllWidgetItems(c_AllWidgets);
-      for (uint32 u32_ItWidget = 0; u32_ItWidget < c_AllWidgets.size(); ++u32_ItWidget)
-      {
-         const C_PuiSvDbWidgetBase * const pc_Widget = c_AllWidgets[u32_ItWidget];
-         if (pc_Widget != NULL)
-         {
-            for (uint32 u32_ItElement = 0; u32_ItElement < pc_Widget->c_DataPoolElementsConfig.size();
-                 ++u32_ItElement)
-            {
-               const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Widget->c_DataPoolElementsConfig[u32_ItElement];
-               if (rc_Config.c_ElementId.GetIsValid() == true)
-               {
-                  if (C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(rc_Config.c_ElementId.u32_NodeIndex,
-                                                                                 rc_Config.c_ElementId.
-                                                                                 u32_DataPoolIndex,
-                                                                                 rc_Config.c_ElementId.u32_ListIndex,
-                                                                                 rc_Config.c_ElementId.
-                                                                                 u32_ElementIndex) == NULL)
-                  {
-                     q_InvalidElementsFound = true;
-                  }
-               }
-            }
-         }
-      }
-      if (q_InvalidElementsFound == true)
+      if (this->mc_LastKnownData.DiscardInvalidIndices())
       {
          C_OgeWiCustomMessage c_Message(opc_Parent);
-         //Do not accept paste
-         this->mc_LastKnownData.Clear();
-         c_Message.SetType(C_OgeWiCustomMessage::E_Type::eERROR);
+         c_Message.SetType(C_OgeWiCustomMessage::eINFORMATION);
          c_Message.SetHeading(C_GtGetText::h_GetText("Widget paste"));
-         c_Message.SetDescription(C_GtGetText::h_GetText("Widgets could not be pasted.\n"
-                                                         "An item index was found that does not mach any element in your SYSTEM DEFINITION."));
+         c_Message.SetDescription(C_GtGetText::h_GetText(
+                                     "Some data elements were not found in your SYSTEM DEFINITION.\n"
+                                     "These were automatically removed from the pasted widgets"));
          c_Message.Execute();
       }
    }
@@ -194,16 +229,13 @@ const C_PuiBsElements * C_SyvDaCopyPasteManager::GetSnapshot(QWidget * const opc
    return &this->mc_LastKnownData;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Prepare call of CopyFromSceneToManager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Prepare call of CopyFromSceneToManager
 
    \param[in] ou32_ViewIndex      View index
    \param[in] ou32_DashboardIndex Dashboard index
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaCopyPasteManager::PrepareCopyFromSceneToManager(const uint32 ou32_ViewIndex,
                                                             const uint32 ou32_DashboardIndex)
 {
@@ -211,17 +243,14 @@ void C_SyvDaCopyPasteManager::PrepareCopyFromSceneToManager(const uint32 ou32_Vi
    this->mu32_DashboardIndex = ou32_DashboardIndex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Copy selected files to copy paste manager
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Copy selected files to copy paste manager
 
    \param[in] ou32_ViewIndex      View index
    \param[in] ou32_DashboardIndex Dashboard index
    \param[in] orc_SelectedItems   Selected items to copy
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *> & orc_SelectedItems)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
@@ -444,17 +473,14 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Indicator if copy paste manager has some content
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Indicator if copy paste manager has some content
 
    \return
    true: content
    false: no content
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaCopyPasteManager::CheckValidContentAndPrepareData(void)
 {
    this->mc_LastKnownData.Clear();
@@ -463,15 +489,12 @@ bool C_SyvDaCopyPasteManager::CheckValidContentAndPrepareData(void)
            C_NO_ERR);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Evaluate all items to get top left point
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Evaluate all items to get top left point
 
    \param[in] opc_Data Data
-
-   \created     24.07.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaCopyPasteManager::m_CalcOriginalPosition(const C_PuiBsElements * const opc_Data)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       openSYDE Core zip/unzip file utilities
 
    see header in .h file for details.
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     05.10.2018  STW/A.Stangl (refactored from pre-existing code)
-   \endimplementation
+   \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <fstream>
@@ -30,7 +23,7 @@
 #include "C_OSCUtils.h"
 #include "CSCLString.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_scl;
@@ -38,21 +31,20 @@ using namespace stw_tgl;
 using namespace stw_opensyde_core;
 using namespace std;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Create ZIP archive from files
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Create ZIP archive from files
 
    In the unlikely case that function fails there is no clean-up done and
    "it's possible the archive could be left without a central directory"
@@ -82,10 +74,8 @@ using namespace std;
    C_CONFIG    at least one input file does not exist
    C_RD_WR     could not open input file
    C_NOACT     could not add data to zip file (does the path to the file exist ?)
-
-   \created     08.03.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCZipFile::h_CreateZipFile(const C_SCLString & orc_SourcePath, const std::set<C_SCLString> & orc_SupFiles,
                                      const C_SCLString & orc_ZipArchivePath, stw_scl::C_SCLString * const opc_ErrorText)
 {
@@ -185,9 +175,8 @@ sint32 C_OSCZipFile::h_CreateZipFile(const C_SCLString & orc_SourcePath, const s
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Unpacks source zip archive and stores the contents to target unzip path.
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Unpacks source zip archive and stores the contents to target unzip path.
 
    Assumptions:
    * valid paths
@@ -204,10 +193,8 @@ sint32 C_OSCZipFile::h_CreateZipFile(const C_SCLString & orc_SourcePath, const s
    \return
    C_NO_ERR    success
    C_RD_WR     could not unpack archive to target path
-
-   \created     26.03.2018  STW/D.Pohl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCZipFile::h_UnpackZipFile(const C_SCLString & orc_SourcePath, const C_SCLString & orc_TargetUnzipPath,
                                      stw_scl::C_SCLString * const opc_ErrorText)
 {

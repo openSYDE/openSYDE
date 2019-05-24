@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Double spin box with auto fix to nearest raw value (implementation)
 
    Double spin box with auto fix to nearest raw value
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     13.11.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include <cmath>
@@ -29,7 +22,7 @@
 #include "C_OgeSpxDoubleAutoFix.h"
 #include "C_SdNdeDataPoolContentUtil.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
@@ -38,29 +31,26 @@ using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_gui_elements;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up GUI with all elements.
 
    \param[in,out] opc_Parent Optional pointer to parent
-
-   \created     13.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_OgeSpxDoubleAutoFix::C_OgeSpxDoubleAutoFix(QWidget * const opc_Parent) :
    C_OgeSpxDoubleToolTipBase(opc_Parent),
    C_OgeSpxAutoFixBase(),
@@ -71,30 +61,24 @@ C_OgeSpxDoubleAutoFix::C_OgeSpxDoubleAutoFix(QWidget * const opc_Parent) :
    this->setCorrectionMode(QDoubleSpinBox::CorrectToNearestValue);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get current line edit width
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current line edit width
 
    \return
    Current line edit width
-
-   \created     12.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sintn C_OgeSpxDoubleAutoFix::GetLineEditWidth(void) const
 {
    return this->lineEdit()->width();
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Fix intermediate string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Fix intermediate string
 
    \param[in,out] orc_String Intermediate string to fix
-
-   \created     12.06.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxDoubleAutoFix::fixup(QString & orc_String) const
 {
    sintn sn_Pos = 0;
@@ -123,9 +107,8 @@ void C_OgeSpxDoubleAutoFix::fixup(QString & orc_String) const
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Validate current input string
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Validate current input string
 
    \param[in,out] orc_Input Input string
    \param[in,out] orc_Pos   Position
@@ -134,10 +117,8 @@ void C_OgeSpxDoubleAutoFix::fixup(QString & orc_String) const
    Invalid      Unusable
    Intermediate Might be valid on next user input
    Acceptable   Completely valid
-
-   \created     13.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 QValidator::State C_OgeSpxDoubleAutoFix::validate(QString & orc_Input, sintn & orc_Pos) const
 {
    QValidator::State e_Retval = C_OgeSpxDoubleToolTipBase::validate(orc_Input, orc_Pos);
@@ -165,13 +146,10 @@ QValidator::State C_OgeSpxDoubleAutoFix::validate(QString & orc_Input, sintn & o
    return e_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Init static values
-
-   \created     14.11.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Init static values
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxDoubleAutoFix::m_Init(void)
 {
    std::vector<float64> c_Tmp;
@@ -243,9 +221,8 @@ void C_OgeSpxDoubleAutoFix::m_Init(void)
    this->setSingleStep(this->mf64_StepWidth);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get value from string if any
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get value from string if any
 
    \param[in]  orc_Value    Input string
    \param[out] orf64_Output Output value
@@ -253,10 +230,8 @@ void C_OgeSpxDoubleAutoFix::m_Init(void)
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     14.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_OgeSpxDoubleAutoFix::mh_GetValue(const QString & orc_Input, float64 & orf64_Output)
 {
    sint32 s32_Retval = C_NO_ERR;

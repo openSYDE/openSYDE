@@ -1,6 +1,5 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Utility class to execute polled service in a separate thread
 
@@ -17,17 +16,11 @@
    4 the class will store the result and finish the thread
    5 continue with 2 with the next service
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     18.08.2017  STW/A.Stangl
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -36,30 +29,27 @@
 
 #include "TGLUtils.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility: remember parameters for service execution
-
-   \created     23.08.2017  STW/A.Stangl
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility: remember parameters for service execution
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvComPollingThreadDiag::m_SetRunParams(const C_SyvComPollingThreadDiag::E_Service oe_Service,
                                                C_SyvComDataDealer & orc_Dealer, const uint8 ou8_DataPoolIndex,
                                                const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex)
@@ -71,13 +61,10 @@ void C_SyvComPollingThreadDiag::m_SetRunParams(const C_SyvComPollingThreadDiag::
    mu16_ElementIndex = ou16_ElementIndex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utlity: remember parameters for service execution
-
-   \created     23.08.2017  STW/A.Stangl
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utlity: remember parameters for service execution
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvComPollingThreadDiag::m_SetRunParams(const C_SyvComPollingThreadDiag::E_Service oe_Service,
                                                C_SyvComDataDealer & orc_Dealer, const uint8 ou8_DataPoolIndex,
                                                const uint16 ou16_ListIndex)
@@ -88,13 +75,10 @@ void C_SyvComPollingThreadDiag::m_SetRunParams(const C_SyvComPollingThreadDiag::
    mu16_ListIndex = ou16_ListIndex;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility: remember parameters for service execution
-
-   \created     13.11.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility: remember parameters for service execution
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvComPollingThreadDiag::m_SetRunParams(const C_SyvComPollingThreadDiag::E_Service oe_Service,
                                                C_SyvComDataDealer & orc_Dealer,
                                                const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListId> & orc_ListIds)
@@ -104,13 +88,10 @@ void C_SyvComPollingThreadDiag::m_SetRunParams(const C_SyvComPollingThreadDiag::
    mc_ListIds = orc_ListIds;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Utility: remember parameters for service execution
-
-   \created     06.11.2017  STW/B.Bayer
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility: remember parameters for service execution
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvComPollingThreadDiag::m_SetRunParams(const C_SyvComPollingThreadDiag::E_Service oe_Service,
                                                C_SyvComDataDealer & orc_Dealer)
 {
@@ -118,15 +99,12 @@ void C_SyvComPollingThreadDiag::m_SetRunParams(const C_SyvComPollingThreadDiag::
    mpc_Dealer = &orc_Dealer;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Thread function
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Thread function
 
    Thread execution function
-
-   \created     23.08.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvComPollingThreadDiag::run(void)
 {
    switch (me_Service)
@@ -167,15 +145,12 @@ void C_SyvComPollingThreadDiag::run(void)
    }
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 
    Set up class elements
-
-   \created     18.08.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvComPollingThreadDiag::C_SyvComPollingThreadDiag(void) :
    QThread(),
    me_Service(eDPREAD),
@@ -191,24 +166,20 @@ C_SyvComPollingThreadDiag::C_SyvComPollingThreadDiag(void) :
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default destructor
 
    Clean up.
-
-   \created     18.08.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_SyvComPollingThreadDiag::~C_SyvComPollingThreadDiag(void)
 {
    mpc_Dealer = NULL;
    //lint -e{1540}  no memory leak because of we never took ownership
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start executing service in thread
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start executing service in thread
 
    \param[in]  orc_Dealer         data dealer to use
    \param[in]  ou8_DataPoolIndex  index of data pool to read from
@@ -218,10 +189,8 @@ C_SyvComPollingThreadDiag::~C_SyvComPollingThreadDiag(void)
    \return
    C_NO_ERR   started polling
    C_BUSY     previously started polled communication still going on
-
-   \created     23.08.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComPollingThreadDiag::StartDataPoolRead(C_SyvComDataDealer & orc_Dealer, const uint8 ou8_DataPoolIndex,
                                                     const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex)
 {
@@ -240,9 +209,8 @@ sint32 C_SyvComPollingThreadDiag::StartDataPoolRead(C_SyvComDataDealer & orc_Dea
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start executing service in thread
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start executing service in thread
 
    \param[in]  orc_Dealer         data dealer to use
    \param[in]  ou8_DataPoolIndex  index of data pool to write to
@@ -252,10 +220,8 @@ sint32 C_SyvComPollingThreadDiag::StartDataPoolRead(C_SyvComDataDealer & orc_Dea
    \return
    C_NO_ERR   started polling
    C_BUSY     previously started polled communication still going on
-
-   \created     23.08.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComPollingThreadDiag::StartDataPoolWrite(C_SyvComDataDealer & orc_Dealer, const uint8 ou8_DataPoolIndex,
                                                      const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex)
 {
@@ -274,9 +240,8 @@ sint32 C_SyvComPollingThreadDiag::StartDataPoolWrite(C_SyvComDataDealer & orc_De
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start executing service in thread
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start executing service in thread
 
    \param[in]  orc_Dealer         data dealer to use
    \param[in]  ou8_DataPoolIndex  index of data pool to read from
@@ -286,10 +251,8 @@ sint32 C_SyvComPollingThreadDiag::StartDataPoolWrite(C_SyvComDataDealer & orc_De
    \return
    C_NO_ERR   started polling
    C_BUSY     previously started polled communication still going on
-
-   \created     23.08.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComPollingThreadDiag::StartNvmRead(C_SyvComDataDealer & orc_Dealer, const uint8 ou8_DataPoolIndex,
                                                const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex)
 {
@@ -308,9 +271,8 @@ sint32 C_SyvComPollingThreadDiag::StartNvmRead(C_SyvComDataDealer & orc_Dealer, 
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start executing service in thread
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start executing service in thread
 
    \param[in]  orc_Dealer         data dealer to use
    \param[in]  ou8_DataPoolIndex  index of data pool to write to
@@ -320,10 +282,8 @@ sint32 C_SyvComPollingThreadDiag::StartNvmRead(C_SyvComDataDealer & orc_Dealer, 
    \return
    C_NO_ERR   started polling
    C_BUSY     previously started polled communication still going on
-
-   \created     23.08.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComPollingThreadDiag::StartNvmWrite(C_SyvComDataDealer & orc_Dealer, const uint8 ou8_DataPoolIndex,
                                                 const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex)
 {
@@ -342,9 +302,8 @@ sint32 C_SyvComPollingThreadDiag::StartNvmWrite(C_SyvComDataDealer & orc_Dealer,
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start executing service in thread
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start executing service in thread
 
    \param[in]  orc_Dealer         data dealer to use
    \param[in]  ou8_DataPoolIndex  index of data pool to read from
@@ -353,10 +312,8 @@ sint32 C_SyvComPollingThreadDiag::StartNvmWrite(C_SyvComDataDealer & orc_Dealer,
    \return
    C_NO_ERR   started polling
    C_BUSY     previously started polled communication still going on
-
-   \created     23.08.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComPollingThreadDiag::StartNvmReadList(C_SyvComDataDealer & orc_Dealer, const uint8 ou8_DataPoolIndex,
                                                    const uint16 ou16_ListIndex)
 {
@@ -375,9 +332,8 @@ sint32 C_SyvComPollingThreadDiag::StartNvmReadList(C_SyvComDataDealer & orc_Deal
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start executing service in thread
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start executing service in thread
 
    \param[in]  orc_Dealer           data dealer to use
    \param[in]  orc_ListIds          Lists to update CRC only
@@ -385,10 +341,8 @@ sint32 C_SyvComPollingThreadDiag::StartNvmReadList(C_SyvComDataDealer & orc_Deal
    \return
    C_NO_ERR   started polling
    C_BUSY     previously started polled communication still going on
-
-   \created     06.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComPollingThreadDiag::StartNvmSafeWriteChangedValues(C_SyvComDataDealer & orc_Dealer,
                                                                  const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListId> & orc_ListIds)
 {
@@ -407,9 +361,8 @@ sint32 C_SyvComPollingThreadDiag::StartNvmSafeWriteChangedValues(C_SyvComDataDea
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the output of the function NvmSafeWriteChangedValues
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the output of the function NvmSafeWriteChangedValues
 
    Must be called after the thread was finished after calling StartNvmSafeWriteChangedValues
 
@@ -418,10 +371,8 @@ sint32 C_SyvComPollingThreadDiag::StartNvmSafeWriteChangedValues(C_SyvComDataDea
    \return
    C_NO_ERR   result returned
    C_BUSY     previously started polled communication still going on
-
-   \created     07.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComPollingThreadDiag::GetNvmSafeWriteChangedValuesOutput(
    std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ChangedElements) const
 {
@@ -440,9 +391,8 @@ sint32 C_SyvComPollingThreadDiag::GetNvmSafeWriteChangedValuesOutput(
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start executing service in thread
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start executing service in thread
 
    \param[in]  orc_Dealer           data dealer to use
    \param[in]  orc_ChangedElements  All changed datapool elements
@@ -451,10 +401,8 @@ sint32 C_SyvComPollingThreadDiag::GetNvmSafeWriteChangedValuesOutput(
    \return
    C_NO_ERR   started polling
    C_BUSY     previously started polled communication still going on
-
-   \created     06.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComPollingThreadDiag::StartNvmSafeReadValues(C_SyvComDataDealer & orc_Dealer)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -472,9 +420,8 @@ sint32 C_SyvComPollingThreadDiag::StartNvmSafeReadValues(C_SyvComDataDealer & or
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the output of the function NvmSafeReadValues
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the output of the function NvmSafeReadValues
 
    Must be called after the thread was finished after calling NvmSafeReadValues
 
@@ -483,10 +430,8 @@ sint32 C_SyvComPollingThreadDiag::StartNvmSafeReadValues(C_SyvComDataDealer & or
    \return
    C_NO_ERR   result returned
    C_BUSY     previously started polled communication still going on
-
-   \created     24.10.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComPollingThreadDiag::GetNvmSafeReadValuesOutput(const stw_opensyde_core::C_OSCNode * & orpc_ParamNodeValues)
 const
 {
@@ -506,19 +451,16 @@ const
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start executing service in thread
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start executing service in thread
 
    \param[in]  orc_Dealer           data dealer to use
 
    \return
    C_NO_ERR   started polling
    C_BUSY     previously started polled communication still going on
-
-   \created     08.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComPollingThreadDiag::StartNvmSafeWriteCrcs(C_SyvComDataDealer & orc_Dealer)
 {
    sint32 s32_Return = C_NO_ERR;
@@ -536,9 +478,8 @@ sint32 C_SyvComPollingThreadDiag::StartNvmSafeWriteCrcs(C_SyvComDataDealer & orc
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Start executing service in thread
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Start executing service in thread
 
    \param[in]  orc_Dealer         data dealer to use
    \param[in]  ou8_DataPoolIndex  index of data pool to read from
@@ -547,10 +488,8 @@ sint32 C_SyvComPollingThreadDiag::StartNvmSafeWriteCrcs(C_SyvComDataDealer & orc
    \return
    C_NO_ERR   started polling
    C_BUSY     previously started polled communication still going on
-
-   \created     09.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComPollingThreadDiag::StartNvmNotifyOfChanges(C_SyvComDataDealer & orc_Dealer,
                                                           const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex)
 {
@@ -569,9 +508,8 @@ sint32 C_SyvComPollingThreadDiag::StartNvmNotifyOfChanges(C_SyvComDataDealer & o
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Returns the output of the function NvmNotifyOfChanges
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the output of the function NvmNotifyOfChanges
 
    Must be called after the thread was finished after calling StartNvmNotifyOfChanges
 
@@ -581,10 +519,8 @@ sint32 C_SyvComPollingThreadDiag::StartNvmNotifyOfChanges(C_SyvComDataDealer & o
    \return
    C_NO_ERR   result returned
    C_BUSY     previously started polled communication still going on
-
-   \created     07.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComPollingThreadDiag::GetNvmNotifyOfChangesOutput(bool & orq_ApplicationAcknowledge) const
 {
    sint32 s32_Return = C_NO_ERR;
@@ -602,7 +538,7 @@ sint32 C_SyvComPollingThreadDiag::GetNvmNotifyOfChangesOutput(bool & orq_Applica
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    Start executing service in thread
 
@@ -612,10 +548,8 @@ sint32 C_SyvComPollingThreadDiag::GetNvmNotifyOfChangesOutput(bool & orq_Applica
    \return
    C_NO_ERR   started polling
    C_BUSY     previously started polled communication still going on
-
-   \created     13.11.2017  STW/B.Bayer
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComPollingThreadDiag::StartNvmSafeReadParameterValues(C_SyvComDataDealer & orc_Dealer,
                                                                   const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListId> & orc_ListIds)
 {
@@ -634,9 +568,8 @@ sint32 C_SyvComPollingThreadDiag::StartNvmSafeReadParameterValues(C_SyvComDataDe
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get result of previously started service execution
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get result of previously started service execution
 
    Can be used to extract the results of one service execution after it has finished.
 
@@ -647,10 +580,8 @@ sint32 C_SyvComPollingThreadDiag::StartNvmSafeReadParameterValues(C_SyvComDataDe
    C_NO_ERR       result code read
    C_BUSY         previously started polled communication still going on
    C_UNKNOWN_ERR  no concrete state was set yet
-
-   \created     23.08.2017  STW/A.Stangl
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComPollingThreadDiag::GetResults(sint32 & ors32_Result) const
 {
    sint32 s32_Return = C_NO_ERR;
@@ -667,9 +598,8 @@ sint32 C_SyvComPollingThreadDiag::GetResults(sint32 & ors32_Result) const
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Get result of previously started service execution
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get result of previously started service execution
 
    Can be used to extract the results of one service execution after it has finished.
 
@@ -679,10 +609,8 @@ sint32 C_SyvComPollingThreadDiag::GetResults(sint32 & ors32_Result) const
    \return
    C_NO_ERR       result code read
    C_BUSY         previously started polled communication still going on
-
-   \created     17.07.2018  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_SyvComPollingThreadDiag::GetNegativeResponseCode(uint8 & oru8_NRC) const
 {
    sint32 s32_Return = C_NO_ERR;
@@ -699,13 +627,10 @@ sint32 C_SyvComPollingThreadDiag::GetNegativeResponseCode(uint8 & oru8_NRC) cons
    return s32_Return;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Reset flag to accept next request
-
-   \created     14.06.2018  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reset flag to accept next request
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_SyvComPollingThreadDiag::AcceptNextRequest(void)
 {
    this->mq_AcceptNextRequest = true;

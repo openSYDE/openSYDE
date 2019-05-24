@@ -1,22 +1,16 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       Widget for upper toolbar with dynamic buttons
 
-   \implementation
-   project     opensyde
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     06.07.2016  STW/B.Bayer
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 #ifndef C_NAGTOOLBARWIDGET_H
 #define C_NAGTOOLBARWIDGET_H
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include <QWidget>
 #include <QPixmap>
@@ -28,7 +22,7 @@
 #include "C_OgeGbxTransparent.h"
 #include "C_NagToolBarSearchResults.h"
 
-/* -- Namespace ------------------------------------------------------------ */
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
 namespace Ui
 {
@@ -37,9 +31,9 @@ class C_NagToolBarWidget;
 
 namespace stw_opensyde_gui
 {
-/* -- Global Constants ----------------------------------------------------- */
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_NagToolBarWidget :
    public QWidget
@@ -82,6 +76,12 @@ Q_SIGNALS:
                       const stw_types::sint32 os32_SubSubIndex, const stw_types::sint32 os32_SubSubSubIndex,
                       const stw_types::sint32 os32_Flag);
 
+protected:
+   // The naming of the Qt parameters can't be changed and are not compliant with the naming conventions
+   //lint -save -e1960
+   virtual void paintEvent(QPaintEvent * const opc_Event) override;
+   //lint -restore
+
 private:
    //Avoid call
    C_NagToolBarWidget(const C_NagToolBarWidget &);
@@ -122,7 +122,7 @@ private:
    static stw_types::sint32 mh_GetButtonStringWidth(const QString & orc_Text);
 };
 
-/* -- Extern Global Variables ---------------------------------------------- */
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 } //end of namespace
 
 #endif

@@ -1,22 +1,15 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       UI class for dashboard parameterization table data (implementation)
 
    UI class for dashboard parameterization table data
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     25.10.2017  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
-/* -- Includes ------------------------------------------------------------- */
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
 #include "stwtypes.h"
@@ -26,47 +19,41 @@
 #include "C_PuiSdHandler.h"
 #include "C_PuiSvDbParam.h"
 
-/* -- Used Namespaces ------------------------------------------------------ */
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
-/* -- Module Global Constants ---------------------------------------------- */
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-/* -- Types ---------------------------------------------------------------- */
+/* -- Types --------------------------------------------------------------------------------------------------------- */
 
-/* -- Global Variables ----------------------------------------------------- */
+/* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
-/* -- Module Global Variables ---------------------------------------------- */
+/* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
-/* -- Module Global Function Prototypes ------------------------------------ */
+/* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
-/* -- Implementation ------------------------------------------------------- */
+/* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     25.10.2017  STW/M.Echtler
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Default constructor
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbParam::C_PuiSvDbParam(void)
 {
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
 
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
-
-   \created     25.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbParam::CalcHash(stw_types::uint32 & oru32_HashValue) const
 {
    uint32 u32_Counter;
@@ -106,25 +93,21 @@ void C_PuiSvDbParam::CalcHash(stw_types::uint32 & oru32_HashValue) const
    C_PuiSvDbWidgetBase::CalcHash(oru32_HashValue);
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if item is a read element
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if item is a read element
 
    \return
    True  Read element
    False Write element
-
-   \created     25.10.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 bool C_PuiSvDbParam::IsReadElement(void) const
 {
    return true;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if param widget error
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if param widget error
 
    \param[in]  orc_ListId List ID to check
    \param[out] orq_Error  Error output
@@ -132,10 +115,8 @@ bool C_PuiSvDbParam::IsReadElement(void) const
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     20.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvDbParam::CheckError(const C_OSCNodeDataPoolListId & orc_ListId, bool & orq_Error) const
 {
    sint32 s32_Retval = C_NO_ERR;
@@ -210,9 +191,8 @@ sint32 C_PuiSvDbParam::CheckError(const C_OSCNodeDataPoolListId & orc_ListId, bo
    return s32_Retval;
 }
 
-//-----------------------------------------------------------------------------
-/*!
-   \brief   Check if value in range
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check if value in range
 
    \param[in]  orc_Elem  Element
    \param[in]  orc_Value Value
@@ -221,10 +201,8 @@ sint32 C_PuiSvDbParam::CheckError(const C_OSCNodeDataPoolListId & orc_ListId, bo
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
-
-   \created     21.11.2017  STW/M.Echtler
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSvDbParam::h_CheckMinMax(const C_OSCNodeDataPoolListElement & orc_Elem,
                                      const C_OSCNodeDataPoolContent & orc_Value, bool & orq_Ok)
 {
@@ -249,6 +227,35 @@ sint32 C_PuiSvDbParam::h_CheckMinMax(const C_OSCNodeDataPoolListElement & orc_El
    else
    {
       s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Remove element from widget
+
+   \param[in] oru32_Index Internal index
+
+   \retval   C_NO_ERR   Index found
+   \retval   C_RANGE    Index not found
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvDbParam::RemoveElement(const uint32 & oru32_Index)
+{
+   sint32 s32_Retval = C_PuiSvDbWidgetBase::RemoveElement(oru32_Index);
+
+   if (s32_Retval == C_NO_ERR)
+   {
+      if ((oru32_Index < this->c_DataSetSelectionIndices.size()) &&
+          (oru32_Index < this->c_ListValues.size()))
+      {
+         this->c_DataSetSelectionIndices.erase(this->c_DataSetSelectionIndices.begin() + oru32_Index);
+         this->c_ListValues.erase(this->c_ListValues.begin() + oru32_Index);
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
    }
    return s32_Retval;
 }

@@ -1,20 +1,13 @@
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 /*!
-   \internal
    \file
    \brief       Data class for communication interface settings (implementation)
 
    Data class for communication interface settings
 
-   \implementation
-   project     openSYDE
-   copyright   STW (c) 1999-20xx
-   license     use only under terms of contract / confidential
-
-   created     22.12.2016  STW/M.Echtler
-   \endimplementation
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------- */
 #include "precomp_headers.h"
@@ -41,10 +34,7 @@ using namespace stw_opensyde_core;
 /* -- Implementation ------------------------------------------------------- */
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default constructor
-
-   \created     22.12.2016  STW/M.Echtler
+/*! \brief   Default constructor
 */
 //-----------------------------------------------------------------------------
 C_OSCNodeComInterfaceSettings::C_OSCNodeComInterfaceSettings(void) :
@@ -72,10 +62,7 @@ C_OSCNodeComInterfaceSettings::C_OSCNodeComInterfaceSettings(void) :
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Default destructor
-
-   \created     22.12.2016  STW/M.Echtler
+/*! \brief   Default destructor
 */
 //-----------------------------------------------------------------------------
 C_OSCNodeComInterfaceSettings::~C_OSCNodeComInterfaceSettings(void)
@@ -83,15 +70,12 @@ C_OSCNodeComInterfaceSettings::~C_OSCNodeComInterfaceSettings(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Calculates the hash value over all data
+/*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
    It is not endian-safe, so it should only be used on the same system it is created on.
 
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
-
-   \created     21.03.2017  STW/B.Bayer
 */
 //-----------------------------------------------------------------------------
 void C_OSCNodeComInterfaceSettings::CalcHash(uint32 & oru32_HashValue) const
@@ -111,12 +95,9 @@ void C_OSCNodeComInterfaceSettings::CalcHash(uint32 & oru32_HashValue) const
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Add new connection
+/*! \brief   Add new connection
 
    \param[in] oru32_BusIndex Bus index to add
-
-   \created     22.12.2016  STW/M.Echtler
 */
 //-----------------------------------------------------------------------------
 void C_OSCNodeComInterfaceSettings::AddConnection(const uint32 & oru32_BusIndex)
@@ -126,10 +107,7 @@ void C_OSCNodeComInterfaceSettings::AddConnection(const uint32 & oru32_BusIndex)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Clear existing connection
-
-   \created     22.12.2016  STW/M.Echtler
+/*! \brief   Clear existing connection
 */
 //-----------------------------------------------------------------------------
 void C_OSCNodeComInterfaceSettings::RemoveConnection(void)
@@ -139,12 +117,9 @@ void C_OSCNodeComInterfaceSettings::RemoveConnection(void)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-   \brief   Constructor
+/*! \brief   Constructor
 
    Set defaults
-
-   \created     03.05.2018  STW/A.Stangl
 */
 //-----------------------------------------------------------------------------
 C_OSCNodeComInterfaceSettings::C_IpAddress::C_IpAddress(void)
