@@ -5089,7 +5089,10 @@ C_SCLString C_OSCProtocolDriverOsy::h_GetOpenSydeServiceErrorDetails(const sint3
       c_Text = "Misconfigured protocol stack.";
       break;
    case C_WARN:
-      (*opq_IsHardError) = false;
+      if (opq_IsHardError != NULL)
+      {
+         (*opq_IsHardError) = false;
+      }
       c_Text = "Error response received (";
       switch (ou8_NrCode)
       {

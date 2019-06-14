@@ -54,6 +54,8 @@ C_PuiSvNodeUpdate::C_PuiSvNodeUpdate(void) :
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvNodeUpdate::CalcHash(uint32 & oru32_HashValue) const
 {
+   const sintn sn_Size = this->mc_DataBlockPaths.size();
+   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Size, sizeof(sn_Size), oru32_HashValue);
    for (uint32 u32_It = 0; u32_It < this->mc_DataBlockPaths.size(); ++u32_It)
    {
       const QString & rc_QtData = this->mc_DataBlockPaths[u32_It];
